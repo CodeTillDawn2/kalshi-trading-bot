@@ -821,7 +821,7 @@ namespace TradingSimulator.Simulator
         {
             OnTestProgress?.Invoke("Starting weight test for GUI.");
 
-            string weightName = "B2_AntiSpike_C";
+            string weightName = "B2_MRB5_A10";
 
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
@@ -1320,8 +1320,8 @@ namespace TradingSimulator.Simulator
             // Reset processed markets to ensure clean state
             _processedMarkets.Clear();
 
-            await RunMultipleFlowMoForGuiAsync(writeToFile, maxGroups, marketsToRun);
-            //await RunMultipleBreakoutForGuiAsync(writeToFile, maxGroups, marketsToRun);
+            //await RunMultipleFlowMoForGuiAsync(writeToFile, maxGroups, marketsToRun);
+            await RunMultipleBreakoutForGuiAsync(writeToFile, maxGroups, marketsToRun);
             //await RunMultipleNothingHappensForGuiAsync(writeToFile, maxGroups, marketsToRun);
 
             OnTestProgress?.Invoke("All multiple strategy tests for GUI completed.");

@@ -10,7 +10,7 @@ namespace TradingStrategies.Strategies.Strats
 {
     // - Ratio-first breakout logic with depth-capped velocity thresholds
     // - Relative spike detection (current vs previous), optional volume-weighted spike scaling
-    // - Trade-rate/event-share confirmations
+    // - Trade-rate/event-share confirmations (single thresholds applied symmetrically)
     // - Position-aware exits:
     //     * EXIT if price flattens (RSI_Short near 50 within ExitRsiDevThreshold)
     //     * Only FLIP (reverse) if opposite signal meets ExitOppositeSignalStrength
@@ -36,19 +36,14 @@ namespace TradingStrategies.Strategies.Strats
             // Spike detection threshold: |currentVel| >= X * |prevVel|
             SpikeMinRelativeIncrease,
 
-            // Safety cap on threshold ratio
-            MaxVelocityThresholdRatio,
-
             // Spike weighting (optional)
             SpikeWeightScale,
             SpikeWeightCap,
             SpikeVolumeWeightScale,
 
-            // Confirmations (share of total)
-            TradeRateShareMin_Yes,
-            TradeRateShareMin_No,
-            TradeEventShareMin_Yes,
-            TradeEventShareMin_No,
+            // Confirmations (share of total) — single thresholds for both sides
+            TradeRateShareMin,
+            TradeEventShareMin,
 
             // Exit knobs
             ExitOppositeSignalStrength, // min signal strength to flip while holding
@@ -71,16 +66,13 @@ namespace TradingStrategies.Strategies.Strats
                 { ParamKey.ReversalExtraStrength, 1.0 },
 
                 { ParamKey.SpikeMinRelativeIncrease, 2.0 },
-                { ParamKey.MaxVelocityThresholdRatio, 0.25 },
 
                 { ParamKey.SpikeWeightScale, 1.0 },
                 { ParamKey.SpikeWeightCap, 5.0 },
                 { ParamKey.SpikeVolumeWeightScale, 0.5 },
 
-                { ParamKey.TradeRateShareMin_Yes, 0.55 },
-                { ParamKey.TradeRateShareMin_No, 0.55 },
-                { ParamKey.TradeEventShareMin_Yes, 0.35 },
-                { ParamKey.TradeEventShareMin_No, 0.35 },
+                { ParamKey.TradeRateShareMin, 0.55 },
+                { ParamKey.TradeEventShareMin, 0.35 },
 
                 { ParamKey.ExitOppositeSignalStrength, 3.0 },
                 { ParamKey.ExitRsiDevThreshold, 5.0 }
@@ -114,16 +106,13 @@ namespace TradingStrategies.Strategies.Strats
             double minRatioDifference = _mlParams.GetValueOrDefault(ParamKey.MinRatioDifference, 0.05);
             double reversalExtraStrength = _mlParams.GetValueOrDefault(ParamKey.ReversalExtraStrength, 1.0);
             double spikeRel = _mlParams.GetValueOrDefault(ParamKey.SpikeMinRelativeIncrease, 2.0);
-            double maxThrRatio = _mlParams.GetValueOrDefault(ParamKey.MaxVelocityThresholdRatio, 0.25);
 
             double spikeWeightScale = _mlParams.GetValueOrDefault(ParamKey.SpikeWeightScale, 1.0);
             double spikeWeightCap = _mlParams.GetValueOrDefault(ParamKey.SpikeWeightCap, 5.0);
             double spikeVolScale = _mlParams.GetValueOrDefault(ParamKey.SpikeVolumeWeightScale, 0.5);
 
-            double trShareMinYes = _mlParams.GetValueOrDefault(ParamKey.TradeRateShareMin_Yes, 0.55);
-            double trShareMinNo = _mlParams.GetValueOrDefault(ParamKey.TradeRateShareMin_No, 0.55);
-            double teShareMinYes = _mlParams.GetValueOrDefault(ParamKey.TradeEventShareMin_Yes, 0.35);
-            double teShareMinNo = _mlParams.GetValueOrDefault(ParamKey.TradeEventShareMin_No, 0.35);
+            double trShareMin = _mlParams.GetValueOrDefault(ParamKey.TradeRateShareMin, 0.55);
+            double teShareMin = _mlParams.GetValueOrDefault(ParamKey.TradeEventShareMin, 0.35);
 
             double exitOppStrength = _mlParams.GetValueOrDefault(ParamKey.ExitOppositeSignalStrength, 3.0);
             double exitRsiDevThreshold = _mlParams.GetValueOrDefault(ParamKey.ExitRsiDevThreshold, 5.0);
@@ -148,8 +137,9 @@ namespace TradingStrategies.Strategies.Strats
             double depthYes = snapshot.TotalOrderbookDepth_Yes / 100.0;
             double depthNo = snapshot.TotalOrderbookDepth_No / 100.0;
 
-            // threshold cap
-            double effRatio = Math.Min(baseThrRatio, maxThrRatio);
+            // threshold (freeze global cap; param removed)
+            const double MAX_VEL_THR_FIXED = 0.35;
+            double effRatio = Math.Min(baseThrRatio, MAX_VEL_THR_FIXED);
             double thrYes = depthYes * effRatio;
             double thrNo = depthNo * effRatio;
 
@@ -184,7 +174,7 @@ namespace TradingStrategies.Strategies.Strats
             double maxMinVol = Math.Max(snapshot.HighestVolume_Minute, 1e-9);
             double volContext = Math.Max(0.0, Math.Min(currMinVol / maxMinVol, 1.0));
 
-            // confirmations
+            // confirmations (single thresholds applied symmetrically)
             double totalTradeRate = Math.Max(snapshot.TradeRatePerMinute_Yes + snapshot.TradeRatePerMinute_No, 1e-9);
             double yesTRShare = snapshot.TradeRatePerMinute_Yes / totalTradeRate;
             double noTRShare = snapshot.TradeRatePerMinute_No / totalTradeRate;
@@ -194,8 +184,8 @@ namespace TradingStrategies.Strategies.Strats
             double yesEventShare = totalEvents > 0 ? snapshot.TradeCount_Yes / totalEvents : 0.0;
             double noEventShare = totalEvents > 0 ? snapshot.TradeCount_No / totalEvents : 0.0;
 
-            bool confirmYes = yesTRShare >= trShareMinYes && yesEventShare >= teShareMinYes;
-            bool confirmNo = noTRShare >= trShareMinNo && noEventShare >= teShareMinNo;
+            bool confirmYes = yesTRShare >= trShareMin && yesEventShare >= teShareMin;
+            bool confirmNo = noTRShare >= trShareMin && noEventShare >= teShareMin;
 
             // candidate decision
             ActionType candidateAction = _defaultAction;
@@ -307,7 +297,7 @@ namespace TradingStrategies.Strategies.Strats
             if (candidateAction == ActionType.Long && absorbNo < absorptionThreshold) signalStrength += 0.5 * reversalExtraStrength;
             if (candidateAction == ActionType.Short && absorbYes < absorptionThreshold) signalStrength += 0.5 * reversalExtraStrength;
 
-            // ---- actionMemo builder (your full diagnostics) ----
+            // ---- actionMemo builder (full diagnostics) ----
             string BuildActionMemo()
             {
                 var lines = new List<string>
@@ -329,13 +319,12 @@ namespace TradingStrategies.Strategies.Strats
 
                     $"Trade rate/minute Yes: {F(snapshot.TradeRatePerMinute_Yes)}",
                     $"Trade rate/minute No: {F(snapshot.TradeRatePerMinute_No)}",
-                    $"Trade rate share Yes: {F(yesTRShare)} (min {F(trShareMinYes)})",
-                    $"Trade rate share No: {F(noTRShare)} (min {F(trShareMinNo)})",
+                    $"Trade rate share Yes: {F(yesTRShare)} (min {F(trShareMin)})",
+                    $"Trade rate share No: {F(noTRShare)} (min {F(trShareMin)})",
 
                     $"Trade volume/minute Yes: {F(snapshot.TradeVolumePerMinute_Yes)}",
                     $"Trade volume/minute No: {F(snapshot.TradeVolumePerMinute_No)}",
 
-                    // NEW diagnostics
                     $"Highest vol (1m): {F(snapshot.HighestVolume_Minute)}",
                     $"Curr vol (1m): {F(currMinVol)}",
                     $"Vol context 0-1: {F(volContext)}",
@@ -345,8 +334,8 @@ namespace TradingStrategies.Strategies.Strats
                     $"Trade count No: {I(snapshot.TradeCount_No)}",
                     $"Non-trade order count Yes: {I(snapshot.NonTradeRelatedOrderCount_Yes)}",
                     $"Non-trade order count No: {I(snapshot.NonTradeRelatedOrderCount_No)}",
-                    $"Trade event share Yes: {F(yesEventShare)} (min {F(teShareMinYes)})",
-                    $"Trade event share No: {F(noEventShare)} (min {F(teShareMinNo)})",
+                    $"Trade event share Yes: {F(yesEventShare)} (min {F(teShareMin)})",
+                    $"Trade event share No: {F(noEventShare)} (min {F(teShareMin)})",
                     $"Confirm Yes: {YN(confirmYes)}  Confirm No: {YN(confirmNo)}",
 
                     $"Best Yes Bid: {F(snapshot.BestYesBid)}",
