@@ -92,7 +92,7 @@ namespace TradingSimulator.Executable
         public void Setup()
         {
             config = new ConfigurationBuilder()
-                .SetBasePath(@"C:\Users\Peter\Documents\GitHub\kalshi-bot\SmokehouseBot")
+                .SetBasePath(@"C:\Users\Peter\Documents\GitHub\kalshi-trading-bot\SmokehouseBot")
                 .AddJsonFile("appsettings.local.json", optional: false)
                 .Build();
 

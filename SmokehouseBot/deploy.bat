@@ -11,7 +11,7 @@ if %ERRORLEVEL% == 0 (
 echo INFO: Using PowerShell: %POWERSHELL_EXE%
 
 :: Configuration
-set "PROJECT_PATH=C:\Users\Peter\Documents\GitHub\kalshi-bot\SmokehouseBot\SmokehouseBot.csproj"
+set "PROJECT_PATH=C:\Users\Peter\Documents\GitHub\kalshi-trading-bot\SmokehouseBot\SmokehouseBot.csproj"
 set "OUTPUT_PATH=C:\Deploy\SmokehouseBot"
 set "TARGET_FRAMEWORK=net8.0"
 set "ZIP_BASENAME=SmokehouseBot"
