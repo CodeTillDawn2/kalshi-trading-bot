@@ -1,0 +1,1670 @@
+﻿using KalshiBotData.Data.Interfaces;
+using KalshiBotData.Extensions;
+using KalshiBotData.Models;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using SmokehouseDTOs;
+using SmokehouseDTOs.Data;
+using SmokehouseInterfaces.Constants;
+using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace KalshiBotData.Data
+{
+    public class KalshiBotContext : DbContext, IKalshiBotContext
+    {
+        private DbSet<Event> Events { get; set; }
+        private DbSet<Series> Series { get; set; }
+        private DbSet<SeriesTag> SeriesTags { get; set; }
+        private DbSet<SeriesSettlementSource> SeriesSettlementSources { get; set; }
+        private DbSet<Market> Markets { get; set; }
+        private DbSet<Fill> Fills { get; set; }
+        private DbSet<EventLifecycle> EventLifecycles { get; set; }
+        private DbSet<Ticker> Tickers { get; set; }
+        private DbSet<Trade> Trades { get; set; }
+        private DbSet<Candlestick> Candlesticks { get; set; }
+        private DbSet<MarketWatch> MarketWatches { get; set; }
+        private DbSet<MarketPosition> MarketPositions { get; set; }
+        private DbSet<Order> Orders { get; set; }
+        private DbSet<LogEntry> LogEntries { get; set; }
+        private DbSet<Snapshot> Snapshots { get; set; }
+        private DbSet<SnapshotSchema> SnapshotSchemas { get; set; }
+        private DbSet<BrainInstance> BrainInstances { get; set; }
+        private DbSet<StratData> StratData { get; set; }
+        private DbSet<MarketType> MarketTypes { get; set; }
+        private DbSet<SnapshotGroup> SnapshotGroups { get; set; }
+        private DbSet<WeightSet> WeightSets { get; set; }
+        private DbSet<WeightSetMarket> WeightSetMarkets { get; set; }
+
+        private readonly string _connectionString;
+        private readonly IConfiguration _config;
+
+        public KalshiBotContext(IConfiguration config)
+        {
+            _config = config;
+            _connectionString = _config.GetConnectionString("DefaultConnection");
+        }
+
+        #region Series
+        public async Task<SeriesDTO?> GetSeriesByTicker(string seriesTicker)
+        {
+            SeriesDTO? seriesDTO = null;
+            Series? series = await Series.AsNoTracking().FirstOrDefaultAsync(x => x.series_ticker == seriesTicker);
+            if (series != null)
+            {
+                seriesDTO = series.ToSeriesDTO();
+            }
+            return seriesDTO;
+        }
+
+        public async Task<SeriesDTO?> GetSeriesByTicker_cached(string seriesTicker)
+        {
+            return await GetSeriesByTicker(seriesTicker);
+        }
+
+        public async Task AddOrUpdateSeries(SeriesDTO dto)
+        {
+            using var transaction = await this.Database.BeginTransactionAsync(); // Use this.Database for transactions
+            try
+            {
+                // Load the series with its related collections
+                var series = await this.Series // Use this.Series instead of Database.Series
+                    .Include(x => x.Tags)
+                    .Include(x => x.SettlementSources)
+                    .FirstOrDefaultAsync(x => x.series_ticker == dto.series_ticker);
+
+                bool isNew = series == null;
+                if (isNew)
+                {
+                    series = dto.ToSeries();
+                    series.Tags = new List<SeriesTag>();
+                    series.SettlementSources = new List<SeriesSettlementSource>();
+                    await this.Series.AddAsync(series); // Use this.Series
+                }
+                else
+                {
+                    series.UpdateSeries(dto);
+                }
+
+                // Deduplicate DTO inputs to prevent key conflicts
+                var uniqueTags = dto.Tags
+                    .GroupBy(t => t.tag)
+                    .Select(g => g.First())
+                    .ToList();
+                var uniqueSources = dto.SettlementSources
+                    .GroupBy(s => s.name)
+                    .Select(g => g.First())
+                    .ToList();
+
+                // Handle Tags
+                var tagsToRemove = series.Tags
+                    .Where(t => !uniqueTags.Any(dt => dt.tag == t.tag))
+                    .ToList();
+                foreach (var tag in tagsToRemove)
+                {
+                    series.Tags.Remove(tag);
+                }
+                foreach (var tagDTO in uniqueTags)
+                {
+                    var existingTag = series.Tags.FirstOrDefault(t => t.tag == tagDTO.tag);
+                    if (existingTag == null)
+                    {
+                        var newTag = tagDTO.ToSeriesTag();
+                        // Check if tag is already tracked to avoid duplicates
+                        var trackedTag = this.ChangeTracker.Entries<SeriesTag>() // Use this.ChangeTracker
+                            .FirstOrDefault(e => e.Entity.series_ticker == newTag.series_ticker && e.Entity.tag == newTag.tag);
+                        if (trackedTag == null)
+                        {
+                            series.Tags.Add(newTag);
+                        }
+                    }
+                    // Update existing tag properties if needed
+                }
+
+                // Handle SettlementSources
+                var sourcesToRemove = series.SettlementSources
+                    .Where(s => !uniqueSources.Any(ds => ds.name == s.name))
+                    .ToList();
+                foreach (var source in sourcesToRemove)
+                {
+                    series.SettlementSources.Remove(source);
+                }
+                foreach (var sourceDTO in uniqueSources)
+                {
+                    var existingSource = series.SettlementSources.FirstOrDefault(s => s.name == sourceDTO.name);
+                    if (existingSource == null)
+                    {
+                        var newSource = sourceDTO.ToSeriesSettlementSource();
+                        // Check if source is already tracked to avoid duplicates
+                        var trackedSource = this.ChangeTracker.Entries<SeriesSettlementSource>() // Use this.ChangeTracker
+                            .FirstOrDefault(e => e.Entity.series_ticker == newSource.series_ticker && e.Entity.name == newSource.name);
+                        if (trackedSource == null)
+                        {
+                            series.SettlementSources.Add(newSource);
+                        }
+                    }
+                    else
+                    {
+                        // Update existing source properties
+                        existingSource.url = sourceDTO.url;
+                        // Add other properties as needed
+                    }
+                }
+
+                await this.SaveChangesAsync(); // Use this.SaveChangesAsync
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"Failed to add or update series for ticker {dto.series_ticker}: {ex.Message}", ex);
+            }
+        }
+        #endregion
+
+        #region Events
+        public async Task<EventDTO?> GetEventByTicker(string eventTicker)
+        {
+            var rawEvent = await Events.AsNoTracking().FirstOrDefaultAsync(x => x.event_ticker == eventTicker);
+            if (rawEvent == null) return null;
+            var rawSeries = await Series.AsNoTracking().FirstOrDefaultAsync(x => x.series_ticker == rawEvent.series_ticker);
+            if (rawSeries != null)
+            {
+                rawEvent.Series = rawSeries;
+            }
+            return rawEvent.ToEventDTO();
+        }
+
+        public async Task<EventDTO?> GetEventByTicker_cached(string eventTicker)
+        {
+            return await GetEventByTicker(eventTicker);
+        }
+
+        public async Task AddOrUpdateEvent(EventDTO dto)
+        {
+            Event? existingEvent = await Events.FirstOrDefaultAsync(x => x.event_ticker == dto.event_ticker);
+            if (existingEvent == null)
+            {
+                existingEvent = dto.ToEvent();
+                Events.Add(existingEvent);
+            }
+            else
+            {
+                existingEvent.UpdateEvent(dto);
+            }
+            await SaveChangesAsync();
+        }
+
+        public async Task AddOrUpdateEvents(List<EventDTO> dtos)
+        {
+            foreach (EventDTO dto in dtos)
+            {
+                Event? existingEvent = await Events.FirstOrDefaultAsync(x => x.event_ticker == dto.event_ticker);
+                if (existingEvent == null)
+                {
+                    existingEvent = dto.ToEvent();
+                    Events.Add(existingEvent);
+                }
+                else
+                {
+                    existingEvent.UpdateEvent(dto);
+                }
+            }
+            await SaveChangesAsync();
+        }
+        #endregion
+
+        #region Markets
+        public async Task<MarketDTO?> GetMarketByTicker(string marketTicker)
+        {
+            Market? market = await Markets.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.market_ticker == marketTicker);
+
+            if (market == null) return null;
+
+            Event? thisEvent = await Events.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.event_ticker == market.event_ticker);
+
+            if (thisEvent != null)
+            {
+                market.Event = thisEvent;
+                Series? series = await Series.AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.series_ticker == thisEvent.series_ticker);
+                if (series != null)
+                {
+                    market.Event.Series = series;
+                }
+            }
+            return market.ToMarketDTO();
+        }
+
+        public async Task<MarketDTO?> GetMarketByTicker_cached(string marketTicker)
+        {
+            return await GetMarketByTicker(marketTicker);
+        }
+
+        public async Task<HashSet<string>> GetMarketsWithSnapshots()
+        {
+            return await Snapshots.AsNoTracking().Select(x => x.MarketTicker).Distinct().ToHashSetAsync();
+        }
+
+        public async Task<HashSet<string>> GetInactiveMarketsWithNoSnapshots()
+        {
+            return await Markets.AsNoTracking()
+                .GroupJoin(Snapshots,
+                    m => m.market_ticker,
+                    s => s.MarketTicker,
+                    (m, s) => new { Market = m, Snapshots = s })
+                .Where(ms => ms.Market.status != KalshiConstants.Status_Active && !ms.Snapshots.Any())
+                .Select(ms => ms.Market.market_ticker)
+                .ToHashSetAsync();
+        }
+
+        public async Task<HashSet<string>> GetProcessedMarkets()
+        {
+            return await Markets.AsNoTracking()
+                .GroupJoin(SnapshotGroups,
+                    m => m.market_ticker,
+                    s => s.MarketTicker,
+                    (m, s) => new { Market = m, SnapshotGroups = s })
+                .Where(ms => ms.Market.status != KalshiConstants.Status_Active && ms.SnapshotGroups.Any())
+                .Select(ms => ms.Market.market_ticker)
+                .ToHashSetAsync();
+        }
+
+        public async Task AddOrUpdateMarket(MarketDTO dto)
+        {
+            Market? market = await Markets.FirstOrDefaultAsync(x => x.market_ticker == dto.market_ticker);
+            if (market == null)
+            {
+                market = dto.ToMarket();
+                market.CreatedDate = DateTime.Now;
+                Markets.Add(market);
+            }
+            else
+            {
+                market.UpdateMarket(dto);
+            }
+            await SaveChangesAsync();
+        }
+        public async Task DeleteMarket(string marketTicker)
+        {
+            Market? market = await Markets.FirstOrDefaultAsync(x => x.market_ticker == marketTicker);
+            if (market != null)
+                Markets.Remove(market);
+
+            await SaveChangesAsync();
+        }
+        public async Task AddOrUpdateMarkets(List<MarketDTO> dtos)
+        {
+            foreach (MarketDTO dto in dtos)
+            {
+                Market? market = await Markets.FirstOrDefaultAsync(x => x.market_ticker == dto.market_ticker);
+                if (market == null)
+                {
+                    market = dto.ToMarket();
+                    market.CreatedDate = DateTime.UtcNow;
+                    Markets.Add(market);
+                }
+                else
+                {
+                    market.UpdateMarket(dto);
+                }
+                try
+                {
+                    await SaveChangesAsync();
+                    Thread.Sleep(50);
+                }
+                catch (Exception ex)
+                {
+                    await SaveChangesAsync();
+                    Thread.Sleep(50);
+                }
+
+            }
+            
+        }
+
+        public async Task<List<MarketDTO>> GetMarkets(
+            HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
+            HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null,
+            bool? hasMarketWatch = null, double? minimumInterestScore = null,
+            DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null)
+        {
+            IQueryable<Market> query = Markets.AsNoTracking();
+            if (includedMarkets != null && includedMarkets.Count > 0)
+                query = query.Where(x => includedMarkets.Contains(x.market_ticker));
+            if (excludedMarkets != null && excludedMarkets.Count > 0)
+                query = query.Where(x => !excludedMarkets.Contains(x.market_ticker));
+            if (includedStatuses != null && includedStatuses.Count > 0)
+                query = query.Where(x => includedStatuses.Contains(x.status));
+            if (excludedStatuses != null && excludedStatuses.Count > 0)
+                query = query.Where(x => !excludedStatuses.Contains(x.status));
+            if (maxAPILastFetchTime != null)
+                query = query.Where(x => x.APILastFetchedDate <= maxAPILastFetchTime.Value);
+            if (hasMarketWatch != null)
+            {
+                if (hasMarketWatch.Value && minimumInterestScore == null)
+                    query = query.Where(x => x.MarketWatch != null);
+                else if (!hasMarketWatch.Value)
+                    query = query.Where(x => x.MarketWatch == null);
+            }
+            if (minimumInterestScore != null)
+                query = query.Where(x => x.MarketWatch != null && x.MarketWatch.InterestScore >= minimumInterestScore.Value);
+            if (maxInterestScoreDate != null)
+                query = query.Where(x => x.MarketWatch == null || x.MarketWatch.InterestScoreDate <= maxInterestScoreDate.Value);
+            return await query.Select(x => x.ToMarketDTO()).ToListAsync();
+        }
+
+        public async Task<List<MarketDTO>> GetMarkets_cached(
+            HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
+            HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null,
+            bool? hasMarketWatch = null, double? minimumInterestScore = null,
+            DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null)
+        {
+            return await GetMarkets(includedStatuses, excludedStatuses, includedMarkets, excludedMarkets, hasMarketWatch, minimumInterestScore, maxInterestScoreDate, maxAPILastFetchTime);
+        }
+
+        public async Task UpdateMarketLastCandlestick(string marketTicker)
+        {
+            await using var conn = new SqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new SqlCommand(
+                "UPDATE [dbo].[t_Markets] WITH (ROWLOCK) SET LastCandlestickUTC = ("
+                + " SELECT MAX(end_period_datetime_utc)"
+                + " FROM t_Candlesticks c"
+                + " WHERE c.market_ticker = m.market_ticker AND c.interval_type = 1"
+                + ") FROM t_Markets m "
+                + " INNER JOIN t_Candlesticks c ON m.market_ticker = c.market_ticker "
+                + " WHERE m.market_ticker = @marketTicker",
+                conn);
+            cmd.Parameters.AddWithValue("@marketTicker", marketTicker);
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+        public async Task<(bool MarketFound, bool EventFound, bool SeriesFound)> GetMarketStatus(string marketTicker)
+        {
+            await using var conn = new SqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new SqlCommand(
+                "SELECT " +
+                "    CASE WHEN m.market_ticker IS NOT NULL THEN CAST(1 as bit) ELSE CAST(0 as bit) END AS MarketFound, " +
+                "    CASE WHEN e.event_ticker IS NOT NULL THEN CAST(1 as bit) ELSE CAST(0 as bit) END AS EventFound, " +
+                "    CASE WHEN s.series_ticker IS NOT NULL THEN CAST(1 as bit) ELSE CAST(0 as bit) END AS SeriesFound " +
+                "FROM dbo.t_Series s " +
+                "RIGHT OUTER JOIN dbo.t_Events e " +
+                "    ON s.series_ticker = e.series_ticker " +
+                "RIGHT OUTER JOIN dbo.t_Markets m " +
+                "    ON e.event_ticker = m.event_ticker " +
+                "WHERE m.market_ticker = @marketTicker",
+                conn);
+            cmd.Parameters.AddWithValue("@marketTicker", marketTicker);
+            await using var reader = await cmd.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return (
+                    reader.GetBoolean(reader.GetOrdinal("MarketFound")),
+                    reader.GetBoolean(reader.GetOrdinal("EventFound")),
+                    reader.GetBoolean(reader.GetOrdinal("SeriesFound"))
+                );
+            }
+            return (false, false, false);
+        }
+
+        public async Task<(bool MarketFound, bool EventFound, bool SeriesFound)> GetMarketStatus_cached(string marketTicker)
+        {
+            return await GetMarketStatus(marketTicker);
+        }
+        #endregion
+
+        #region Tickers
+        public async Task<List<TickerDTO>> GetTickers(string? marketTicker = null, DateTime? loggedDate = null)
+        {
+            IQueryable<Ticker> query = Tickers.AsNoTracking();
+            if (marketTicker != null)
+                query = query.Where(x => x.market_ticker == marketTicker);
+            if (loggedDate != null)
+                query = query.Where(x => x.LoggedDate == loggedDate);
+            return await query.Select(x => x.ToTickerDTO()).ToListAsync();
+        }
+
+        public async Task<List<TickerDTO>> GetTickers_cached(string? marketTicker = null, DateTime? loggedDate = null)
+        {
+            return await GetTickers(marketTicker, loggedDate);
+        }
+
+        public async Task AddOrUpdateTickers(List<TickerDTO> dtos)
+        {
+            var tickerKeys = dtos.Select(dto => new { dto.market_ticker, dto.LoggedDate }).ToList();
+            var tickers = await Tickers
+                .ToListAsync();
+            var tickerDict = tickers
+                .Where(t => tickerKeys.Any(k => k.market_ticker == t.market_ticker && k.LoggedDate == t.LoggedDate))
+                .ToDictionary(t => (t.market_ticker, t.LoggedDate), t => t);
+
+            foreach (var dto in dtos)
+            {
+                var key = (dto.market_ticker, dto.LoggedDate);
+                if (!tickerDict.TryGetValue(key, out var ticker))
+                {
+                    Tickers.Add(dto.ToTicker());
+                }
+                else
+                {
+                    ticker.UpdateTicker(dto);
+                }
+            }
+            await SaveChangesAsync();
+        }
+
+        public async Task AddOrUpdateTicker(TickerDTO dto)
+        {
+            Ticker? ticker = await Tickers.FirstOrDefaultAsync(x => x.market_ticker == dto.market_ticker && x.LoggedDate == dto.LoggedDate);
+            if (ticker == null)
+            {
+                ticker = dto.ToTicker();
+                Tickers.Add(ticker);
+            }
+            else
+            {
+                ticker.UpdateTicker(dto);
+            }
+            await SaveChangesAsync();
+        }
+        #endregion
+
+        #region Candlesticks
+        public async Task<List<CandlestickDTO>> GetCandlesticks(string marketTicker, int? intervalType = null)
+        {
+            IQueryable<Candlestick> query = Candlesticks.AsNoTracking().Where(x => x.market_ticker == marketTicker);
+            if (intervalType != null)
+                query = query.Where(x => x.interval_type == intervalType);
+            return await query.Select(x => x.ToCandlestickDTO()).ToListAsync();
+        }
+
+        public async Task<List<CandlestickDTO>> GetCandlesticks_cached(string marketTicker, int? intervalType = null)
+        {
+            return await GetCandlesticks(marketTicker, intervalType);
+        }
+
+        public async Task<CandlestickDTO?> GetLastCandlestick(string marketTicker, int? intervalType)
+        {
+            IQueryable<Candlestick> query = Candlesticks.AsNoTracking().Where(x => x.market_ticker == marketTicker);
+            if (intervalType != null)
+                query = query.Where(x => x.interval_type == intervalType);
+            Candlestick? candlestick = await query.OrderByDescending(x => x.end_period_datetime_utc).FirstOrDefaultAsync();
+            return candlestick?.ToCandlestickDTO();
+        }
+
+        public async Task<CandlestickDTO?> GetLastCandlestick_cached(string marketTicker, int? intervalType)
+        {
+            return await GetLastCandlestick(marketTicker, intervalType);
+        }
+
+        public async Task AddOrUpdateCandlestick(CandlestickDTO dto)
+        {
+            Candlestick? candlestick = await Candlesticks.FirstOrDefaultAsync(x => x.market_ticker == dto.market_ticker
+                && x.interval_type == dto.interval_type && x.end_period_ts == dto.end_period_ts);
+            if (candlestick == null)
+            {
+                candlestick = dto.ToCandlestick();
+                Candlesticks.Add(candlestick);
+            }
+            else
+            {
+                candlestick.UpdateCandlestick(dto);
+            }
+            await SaveChangesAsync();
+        }
+
+        public async Task<List<CandlestickData>> RetrieveCandlesticksAsync(CancellationToken token, int intervalType, string marketTicker, DateTime sqlStartTime)
+        {
+            if (token.IsCancellationRequested)
+                return new List<CandlestickData>();
+            var rawCandlesticks = await Candlesticks.AsNoTracking()
+                .Where(x => x.interval_type == intervalType && x.market_ticker == marketTicker &&
+                            x.end_period_datetime_utc >= sqlStartTime && x.end_period_datetime_utc <= DateTime.UtcNow)
+                .Select(c => new CandlestickData
+                {
+                    Date = new DateTime(c.year, c.month, c.day, c.hour, c.minute, 0, DateTimeKind.Utc),
+                    MarketTicker = c.market_ticker,
+                    IntervalType = c.interval_type,
+                    OpenInterest = c.open_interest,
+                    Volume = c.volume,
+                    AskOpen = c.yes_ask_open,
+                    AskHigh = c.yes_ask_high,
+                    AskLow = c.yes_ask_low,
+                    AskClose = c.yes_ask_close,
+                    BidOpen = c.yes_bid_open,
+                    BidHigh = c.yes_bid_high,
+                    BidLow = c.yes_bid_low,
+                    BidClose = c.yes_bid_close
+                })
+                .ToListAsync(token);
+            return rawCandlesticks;
+        }
+
+        public async Task<List<CandlestickData>> RetrieveCandlesticksAsync_cached(CancellationToken token, int intervalType, string marketTicker, DateTime sqlStartTime)
+        {
+            return await RetrieveCandlesticksAsync(token, intervalType, marketTicker, sqlStartTime);
+        }
+
+        public async Task ImportJsonCandlesticks()
+        {
+            await using var conn = new SqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new SqlCommand("dbo.sp_ImportCandlesticksFromFile", conn) { CommandType = CommandType.StoredProcedure };
+            await cmd.ExecuteNonQueryAsync();
+        }
+        #endregion
+
+        #region Market Watches
+        public async Task<MarketWatchDTO?> GetMarketWatch(string marketTicker)
+        {
+            HashSet<MarketWatchDTO> results = await GetMarketWatches(new HashSet<string> { marketTicker });
+            if (results.Count > 1) throw new Exception($"Multiple market watches found for ticker {marketTicker}, in GetMarketWatch");
+            return results.FirstOrDefault();
+        }
+
+        public async Task<HashSet<MarketWatchDTO>> GetMarketWatches(HashSet<string>? marketTickers = null,
+            HashSet<Guid>? brainLocksIncluded = null, HashSet<Guid>? brainLocksExcluded = null, bool? brainLockIsNull = null,
+            double? minInterestScore = null, double? maxInterestScore = null, DateTime? maxInterestScoreDate = null)
+        {
+            IQueryable<MarketWatch> query = MarketWatches.AsNoTracking();
+            if (marketTickers != null && marketTickers.Count > 0)
+                query = query.Where(x => marketTickers.Contains(x.market_ticker));
+            if (brainLocksIncluded != null)
+                query = query.Where(x => x.BrainLock != null && brainLocksIncluded.Contains(x.BrainLock.Value));
+            if (brainLockIsNull != null)
+                query = query.Where(x => (x.BrainLock == null) == brainLockIsNull);
+            if (brainLocksExcluded != null)
+                query = query.Where(x => x.BrainLock == null || !brainLocksExcluded.Contains(x.BrainLock.Value));
+            if (minInterestScore != null)
+                query = query.Where(x => x.InterestScore != null && x.InterestScore >= minInterestScore);
+            if (maxInterestScore != null)
+                query = query.Where(x => x.InterestScore == null || x.InterestScore <= maxInterestScore);
+            if (maxInterestScoreDate != null)
+                query = query.Where(x => x.InterestScoreDate != null && x.InterestScoreDate <= maxInterestScoreDate);
+            return await query.Select(x => x.ToMarketWatchDTO()).ToHashSetAsync();
+        }
+
+        public async Task RemoveClosedWatches()
+        {
+            var marketWatches = await MarketWatches.Include(x => x.Market)
+                .Where(x => x.Market.status != KalshiConstants.Status_Active)
+                .ToListAsync();
+
+            for (int i = 0; i < marketWatches.Count; i += 1)
+            {
+                var batch = marketWatches.Skip(i).Take(1).ToList();
+                MarketWatches.RemoveRange(batch);
+                await SaveChangesAsync();
+            }
+        }
+
+        public async Task<HashSet<MarketWatchDTO>> GetMarketWatches_cached(HashSet<string>? marketTickers = null,
+            HashSet<Guid>? brainLocksIncluded = null, HashSet<Guid>? brainLocksExcluded = null, bool? brainLockIsNull = null,
+            double? minInterestScore = null, double? maxInterestScore = null, DateTime? maxInterestScoreDate = null)
+        {
+            return await GetMarketWatches(marketTickers, brainLocksIncluded, brainLocksExcluded,
+                brainLockIsNull, minInterestScore, maxInterestScore, maxInterestScoreDate);
+        }
+
+        public async Task<List<MarketWatchDTO>> GetFinalizedMarketWatches(Guid brainLock)
+        {
+            List<MarketWatch> finalizedWatches = await MarketWatches.AsNoTracking()
+                .Where(x => x.BrainLock == brainLock)
+                .Include(x => x.Market)
+                .ToListAsync();
+
+            return finalizedWatches.Where(x => x.Market != null && KalshiConstants.MarketIsEnded(x.Market.status))
+                .Select(x => x.ToMarketWatchDTO())
+                .ToList();
+        }
+
+        public async Task AddOrUpdateMarketWatches(List<MarketWatchDTO> watches)
+        {
+            foreach (MarketWatchDTO dto in watches)
+            {
+                MarketWatch? marketWatch = await MarketWatches.FirstOrDefaultAsync(x => x.market_ticker == dto.market_ticker);
+                if (marketWatch == null)
+                {
+                    marketWatch = dto.ToMarketWatch();
+                    MarketWatches.Add(marketWatch);
+                }
+                else
+                {
+                    marketWatch.UpdateMarketWatch(dto);
+                }
+            }
+            await SaveChangesAsync();
+        }
+
+        public async Task AddOrUpdateMarketWatch(MarketWatchDTO dto)
+        {
+            MarketWatch? marketWatch = await MarketWatches.FirstOrDefaultAsync(x => x.market_ticker == dto.market_ticker);
+            if (marketWatch == null)
+            {
+                marketWatch = dto.ToMarketWatch();
+                MarketWatches.Add(marketWatch);
+            }
+            else
+            {
+                marketWatch.UpdateMarketWatch(dto);
+            }
+            await SaveChangesAsync();
+        }
+
+        public async Task RemoveMarketWatches(List<MarketWatchDTO> dtoRange)
+        {
+            for (int i = 0; i < dtoRange.Count; i += 1)
+            {
+                var batch = dtoRange.Skip(i).Take(1).ToList();
+                var marketWatch = await MarketWatches
+                    .Where(x => batch.Select(y => y.market_ticker).Contains(x.market_ticker))
+                    .ToListAsync();
+                MarketWatches.RemoveRange(marketWatch);
+                await SaveChangesAsync();
+            }
+        }
+
+        public async Task RemoveOrphanedBrainLocks()
+        {
+            List<Guid> AllBrainLocks = await BrainInstances
+                .Select(x => x.BrainLock)
+                .Where(x => x.HasValue)
+                .Select(x => x.Value)
+                .ToListAsync();
+            List<MarketWatch> orphanedWatches = await MarketWatches.Where(x => x.BrainLock != null &&
+                !AllBrainLocks.Contains(x.BrainLock.Value)).ToListAsync();
+            foreach (MarketWatch orphanedWatch in orphanedWatches)
+            {
+                orphanedWatch.BrainLock = null;
+            }
+            await SaveChangesAsync();
+        }
+        #endregion
+
+        #region Market Positions
+        public async Task<MarketPositionDTO?> GetMarketPosition(string marketTicker)
+        {
+            MarketPosition? marketPosition = await MarketPositions.AsNoTracking().FirstOrDefaultAsync(x => x.Ticker == marketTicker);
+            return marketPosition?.ToMarketPositionDTO();
+        }
+
+        public async Task<List<MarketPositionDTO>> GetMarketPositions(HashSet<string>? marketTickers = null,
+            bool? hasPosition = null, bool? hasRestingOrder = null)
+        {
+            IQueryable<MarketPosition> query = MarketPositions.AsNoTracking();
+            if (marketTickers != null && marketTickers.Count > 0)
+                query = query.Where(x => marketTickers.Contains(x.Ticker));
+            if (hasPosition != null)
+                query = query.Where(x => (x.Position != 0) == hasPosition);
+            if (hasRestingOrder != null)
+                query = query.Where(x => (x.RestingOrdersCount != 0) == hasRestingOrder);
+            return await query.Select(x => x.ToMarketPositionDTO()).ToListAsync();
+        }
+
+        public async Task<List<MarketPositionDTO>> GetMarketPositions_cached(HashSet<string>? marketTickers = null,
+            bool? hasPosition = null, bool? hasRestingOrder = null)
+        {
+            return await GetMarketPositions(marketTickers, hasPosition, hasRestingOrder);
+        }
+
+        public async Task AddOrUpdateMarketPosition(MarketPositionDTO dto)
+        {
+            MarketPosition? marketPosition = await MarketPositions.FirstOrDefaultAsync(x => x.Ticker == dto.Ticker);
+            if (marketPosition == null)
+            {
+                marketPosition = dto.ToMarketPosition();
+                MarketPositions.Add(marketPosition);
+            }
+            else
+            {
+                marketPosition.UpdateMarketPosition(dto);
+            }
+            await SaveChangesAsync();
+        }
+
+        public async Task RemoveMarketPosition(string marketTicker)
+        {
+            MarketPosition? marketPosition = await MarketPositions.FirstOrDefaultAsync(x => x.Ticker == marketTicker);
+            if (marketPosition != null)
+            {
+                MarketPositions.Remove(marketPosition);
+                await SaveChangesAsync();
+            }
+        }
+        #endregion
+
+        #region Orders
+        public async Task<List<OrderDTO>> GetOrders(string? marketTicker = null, string? status = null)
+        {
+            IQueryable<Order> query = Orders.AsNoTracking();
+            if (marketTicker != null)
+                query = query.Where(x => x.Ticker == marketTicker);
+            if (status != null)
+                query = query.Where(x => x.Status == status);
+            return await query.Select(x => x.ToOrderDTO()).ToListAsync();
+        }
+
+        public async Task<List<OrderDTO>> GetOrders_cached(string? marketTicker = null, string? status = null)
+        {
+            return await GetOrders(marketTicker, status);
+        }
+
+        public async Task AddOrUpdateOrder(OrderDTO dto)
+        {
+            Order? order = await Orders.FirstOrDefaultAsync(x => x.Ticker == dto.Ticker);
+            if (order == null)
+            {
+                order = dto.ToOrder();
+                order.CreatedTimeUTC = DateTime.UtcNow;
+                Orders.Add(order);
+            }
+            else
+            {
+                order.UpdateOrder(dto);
+            }
+            await SaveChangesAsync();
+        }
+        #endregion
+
+        #region Snapshot
+        public async Task<List<SnapshotDTO>> GetSnapshots(string? marketTicker = null, bool? isValidated = null,
+            DateTime? startDate = null, DateTime? endDate = null, int? MaxRecords = null, int? MaxSnapshotVersion = null)
+        {
+            IQueryable<Snapshot> query = Snapshots.AsNoTracking();
+            if (marketTicker != null)
+                query = query.Where(x => x.MarketTicker == marketTicker);
+            if (startDate != null)
+                query = query.Where(x => x.SnapshotDate >= startDate);
+            if (endDate != null)
+                query = query.Where(x => x.SnapshotDate <= endDate);
+            if (isValidated != null)
+                query = query.Where(x => x.IsValidated == isValidated);
+            if (MaxSnapshotVersion != null)
+                query = query.Where(x => x.JSONSchemaVersion <= MaxSnapshotVersion);
+            if (MaxRecords != null)
+                query = query.Take(MaxRecords.Value);
+            return await query.Select(x => x.ToSnapshotDTO()).ToListAsync();
+        }
+
+        public async Task<List<SnapshotDTO>> GetSnapshots_cached(string? marketTicker = null, bool? isValidated = null,
+            DateTime? startDate = null, DateTime? endDate = null, int? MaxRecords = null, int? MaxSnapshotVersion = null)
+        {
+            return await GetSnapshots(marketTicker, isValidated, startDate, endDate, MaxRecords, MaxSnapshotVersion);
+        }
+
+        public async Task AddOrUpdateSnapshot(SnapshotDTO dto)
+        {
+            Snapshot? snapshot = await Snapshots.FirstOrDefaultAsync(x => x.MarketTicker == dto.MarketTicker && x.SnapshotDate == dto.SnapshotDate);
+            if (snapshot == null)
+            {
+                snapshot = dto.ToSnapshot();
+                Snapshots.Add(snapshot);
+            }
+            else
+            {
+                snapshot.UpdateSnapshot(dto);
+            }
+            await SaveChangesAsync();
+        }
+
+        public async Task AddOrUpdateSnapshots(List<SnapshotDTO> dtos)
+        {
+            foreach (SnapshotDTO dto in dtos)
+            {
+                Snapshot? snapshot = await Snapshots.FirstOrDefaultAsync(x => x.MarketTicker == dto.MarketTicker && x.SnapshotDate == dto.SnapshotDate);
+                if (snapshot == null)
+                {
+                    snapshot = dto.ToSnapshot();
+                    Snapshots.Add(snapshot);
+                }
+                else
+                {
+                    snapshot.UpdateSnapshot(dto);
+                }
+            }
+            await SaveChangesAsync();
+        }
+
+
+        public async Task AddSnapshots(List<SnapshotDTO> snapshots)
+        {
+            await Snapshots.AddRangeAsync(snapshots.Select(x => x.ToSnapshot()));
+            await SaveChangesAsync();
+        }
+
+        public async Task<long> GetSnapshotCount(string marketTicker)
+        {
+            return await Snapshots.AsNoTracking().LongCountAsync(x => x.MarketTicker == marketTicker);
+        }
+        #endregion
+
+        #region Snapshot Schemas
+        public async Task<SnapshotSchemaDTO?> GetSnapshotSchema(int version)
+        {
+            SnapshotSchema? schema = await SnapshotSchemas.AsNoTracking().FirstOrDefaultAsync(x => x.SchemaVersion == version);
+            return schema?.ToSnapshotSchemaDTO();
+        }
+
+        public async Task<List<SnapshotSchemaDTO>> GetSnapshotSchemas()
+        {
+            return await SnapshotSchemas.AsNoTracking()
+                .Select(x => x.ToSnapshotSchemaDTO())
+                .ToListAsync();
+        }
+
+        public async Task<SnapshotSchemaDTO?> GetSnapshotSchema_cached(int version)
+        {
+            return await GetSnapshotSchema(version);
+        }
+
+        public async Task<SnapshotSchemaDTO?> AddSnapshotSchema(SnapshotSchemaDTO dto)
+        {
+            SnapshotSchema? snapshotSchema = await SnapshotSchemas.FirstOrDefaultAsync(x => x.SchemaVersion == dto.SchemaVersion);
+            if (snapshotSchema == null)
+            {
+                snapshotSchema = dto.ToSnapshotSchema();
+                SnapshotSchemas.Add(snapshotSchema);
+                await SaveChangesAsync();
+                snapshotSchema.SchemaVersion = await SnapshotSchemas.Select(x => x.SchemaVersion).MaxAsync();
+            }
+            if (snapshotSchema != null)
+            {
+                return snapshotSchema.ToSnapshotSchemaDTO();
+            }
+            return null;
+                
+        }
+        #endregion
+
+        #region Brain Instances
+        public async Task<BrainInstanceDTO?> GetBrainInstance(string instanceName)
+        {
+            BrainInstance? instance = await BrainInstances.AsNoTracking().FirstOrDefaultAsync(x => x.BrainInstanceName == instanceName);
+            return instance?.ToBrainInstanceDTO();
+        }
+
+        public async Task<List<BrainInstanceDTO>> GetBrainInstances(string? instanceName = null, bool? hasBrainLock = null)
+        {
+            IQueryable<BrainInstance> query = BrainInstances.AsNoTracking();
+            if (instanceName != null)
+                query = query.Where(x => x.BrainInstanceName == instanceName);
+            if (hasBrainLock != null)
+                query = query.Where(x => (x.BrainLock != null) == hasBrainLock);
+            return await query.Select(x => x.ToBrainInstanceDTO()).ToListAsync();
+        }
+
+        public async Task<List<BrainInstanceDTO>> GetBrainInstances_cached(string? instanceName = null, bool? hasBrainLock = null)
+        {
+            return await GetBrainInstances(instanceName, hasBrainLock);
+        }
+
+        public async Task<List<BrainInstanceDTO>> GetStaleBrains(Guid brainLock)
+        {
+            DateTime now = DateTime.Now;
+            DateTime oneHourAgo = now.AddHours(-6);
+            bool isMorningGracePeriod = now.Hour >= 3 && now.Hour < 8;
+            DateTime specialCutoffTime = new DateTime(now.Year, now.Month, now.Day, 1, 30, 0);
+
+            var staleBrains = await BrainInstances.AsNoTracking()
+                .Where(x => x.BrainLock != brainLock && x.BrainLock != null &&
+                            (x.LastSeen <= oneHourAgo && (!isMorningGracePeriod || x.LastSeen <= specialCutoffTime)))
+                .ToListAsync();
+
+            return staleBrains.ConvertAll(x => x.ToBrainInstanceDTO());
+        }
+
+        public async Task AddOrUpdateBrainInstance(BrainInstanceDTO dto)
+        {
+            BrainInstance? instance = await BrainInstances.FirstOrDefaultAsync(x => x.BrainInstanceName == dto.BrainInstanceName);
+            if (instance == null)
+            {
+                instance = dto.ToBrainInstance();
+                BrainInstances.Add(instance);
+            }
+            else
+            {
+                instance.UpdateBrainInstance(dto);
+            }
+            await SaveChangesAsync();
+        }
+        #endregion
+
+        #region Snapshot Groups
+        public async Task<List<SnapshotGroupDTO>> GetSnapshotGroups(List<string>? marketTickersToInclude = null, int? maxGroups = null)
+        {
+            IQueryable<SnapshotGroup> query = SnapshotGroups.AsNoTracking();
+            if (marketTickersToInclude != null)
+                query = query.Where(x => marketTickersToInclude.Contains(x.MarketTicker));
+            if (maxGroups != null)
+                query = query.Take(maxGroups.Value);
+            return await query.Select(x => x.ToSnapshotGroupDTO()).ToListAsync();
+        }
+
+        public async Task<List<SnapshotGroupDTO>> GetSnapshotGroups_cached(List<string>? marketTickersToInclude = null, int? maxGroups = null)
+        {
+            return await GetSnapshotGroups(marketTickersToInclude, maxGroups);
+        }
+
+        public async Task<HashSet<string>> GetSnapshotGroupNames()
+        {
+            return await SnapshotGroups.AsNoTracking().Select(x => x.MarketTicker).Distinct().ToHashSetAsync();
+        }
+
+        public async Task<HashSet<string>> GetSnapshotGroupNames_cached()
+        {
+            return await GetSnapshotGroupNames();
+        }
+
+        public async Task<List<SnapshotDTO>> GetUngroupedSnapshots(int maxMarkets)
+        {
+            List<Market> markets = await Markets.AsNoTracking()
+                .Where(x => x.status != "active" && !SnapshotGroups.Any(sg => sg.MarketTicker == x.market_ticker))
+                .Take(maxMarkets)
+                .ToListAsync();
+
+            List<Snapshot> snapshots = await Snapshots.AsNoTracking()
+                .Where(x => markets.Select(m => m.market_ticker).Contains(x.MarketTicker))
+                .ToListAsync();
+
+            return snapshots.ConvertAll(x => x.ToSnapshotDTO());
+
+
+        }
+
+
+
+
+        public async Task AddOrUpdateSnapshotGroup(SnapshotGroupDTO dto)
+        {
+            SnapshotGroup? existingSnapshot = await SnapshotGroups.FirstOrDefaultAsync(x => x.MarketTicker == dto.MarketTicker);
+            if (existingSnapshot == null)
+            {
+                SnapshotGroups.Add(dto.ToSnapshotGroup());
+            }
+            else
+            {
+                existingSnapshot.UpdateSnapshotGroup(dto);
+            }
+            await SaveChangesAsync();
+        }
+
+        public async Task AddOrUpdateSnapshotGroups(List<SnapshotGroupDTO> dtoRange)
+        {
+            foreach (SnapshotGroupDTO dto in dtoRange)
+            {
+                SnapshotGroup? snapshotGroup = await SnapshotGroups.FirstOrDefaultAsync(x => x.MarketTicker == dto.MarketTicker);
+                if (snapshotGroup == null)
+                {
+                    snapshotGroup = dto.ToSnapshotGroup();
+                    SnapshotGroups.Add(snapshotGroup);
+                }
+                else
+                {
+                    snapshotGroup.UpdateSnapshotGroup(dto);
+                }
+            }
+            await SaveChangesAsync();
+        }
+        #endregion
+
+        #region WeightSets
+        public async Task<WeightSetDTO?> GetWeightSetByStrategyName(string strategyName)
+        {
+            WeightSet? weightSet = await WeightSets.AsNoTracking()
+                .Include(ws => ws.WeightSetMarkets)
+                .FirstOrDefaultAsync(ws => ws.StrategyName == strategyName);
+
+            if (weightSet == null) return null;
+
+            WeightSetDTO dto = weightSet.ToWeightSetDTO();
+            dto.WeightSetMarkets = weightSet.WeightSetMarkets.Select(m => m.ToWeightSetMarketDTO()).ToList();
+            return dto;
+        }
+
+        public async Task<WeightSetDTO?> GetWeightSetByStrategyName_cached(string strategyName)
+        {
+            return await GetWeightSetByStrategyName(strategyName);
+        }
+
+        public async Task<List<WeightSetDTO>> GetWeightSets(HashSet<string>? strategyNames = null)
+        {
+            IQueryable<WeightSet> query = WeightSets.AsNoTracking()
+                .Include(ws => ws.WeightSetMarkets);
+
+            if (strategyNames != null && strategyNames.Count > 0)
+            {
+                query = query.Where(ws => strategyNames.Contains(ws.StrategyName));
+            }
+
+            List<WeightSet> weightSets = await query.ToListAsync();
+
+            return weightSets.Select(ws =>
+            {
+                WeightSetDTO dto = ws.ToWeightSetDTO();
+                dto.WeightSetMarkets = ws.WeightSetMarkets.Select(m => m.ToWeightSetMarketDTO()).ToList();
+                return dto;
+            }).ToList();
+        }
+
+        public async Task<List<WeightSetDTO>> GetWeightSetsByMarketTicker(string marketTicker)
+        {
+            List<WeightSet> weightSets = await WeightSets.AsNoTracking()
+                .Where(ws => ws.WeightSetMarkets.Any(wsm => wsm.MarketTicker == marketTicker))
+                .Include(ws => ws.WeightSetMarkets.Where(wsm => wsm.MarketTicker == marketTicker))
+                .ToListAsync();
+
+            return weightSets.Select(ws =>
+            {
+                WeightSetDTO dto = ws.ToWeightSetDTO();
+                dto.WeightSetMarkets = ws.WeightSetMarkets.Select(m => m.ToWeightSetMarketDTO()).ToList();
+                return dto;
+            }).ToList();
+        }
+
+        public async Task AddOrUpdateWeightSet(WeightSetDTO dto)
+        {
+            using var transaction = await Database.BeginTransactionAsync();
+            try
+            {
+                WeightSet? weightSet = await WeightSets
+                    .Include(ws => ws.WeightSetMarkets)
+                    .FirstOrDefaultAsync(ws => ws.StrategyName == dto.StrategyName);
+
+                if (weightSet == null)
+                {
+                    weightSet = dto.ToWeightSet();
+                    weightSet.WeightSetMarkets.Clear();
+                    await WeightSets.AddAsync(weightSet);
+                }
+                else
+                {
+                    weightSet.UpdateWeightSet(dto);
+
+                    var marketsToRemove = weightSet.WeightSetMarkets
+                        .Where(m => !dto.WeightSetMarkets.Any(dm => dm.WeightSetID == m.WeightSetID && dm.MarketTicker == m.MarketTicker))
+                        .ToList();
+                    foreach (var market in marketsToRemove)
+                    {
+                        weightSet.WeightSetMarkets.Remove(market);
+                    }
+                }
+
+                foreach (var marketDTO in dto.WeightSetMarkets)
+                {
+                    var existingMarket = weightSet.WeightSetMarkets
+                        .FirstOrDefault(m => m.MarketTicker == marketDTO.MarketTicker);
+
+                    if (existingMarket == null)
+                    {
+                        marketDTO.WeightSetID = weightSet.WeightSetID;
+                        weightSet.WeightSetMarkets.Add(marketDTO.ToWeightSetMarket());
+                    }
+                    else
+                    {
+                        existingMarket.UpdateWeightSetMarket(marketDTO);
+                    }
+                }
+
+                await SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        public async Task AddOrUpdateWeightSets(List<WeightSetDTO> dtos)
+        {
+            foreach (WeightSetDTO dto in dtos)
+            {
+                await AddOrUpdateWeightSet(dto);
+            }
+        }
+
+        public async Task DeleteWeightSet(string strategyName)
+        {
+            WeightSet? weightSet = await WeightSets
+                .Include(ws => ws.WeightSetMarkets)
+                .FirstOrDefaultAsync(ws => ws.StrategyName == strategyName);
+
+            if (weightSet != null)
+            {
+                WeightSets.Remove(weightSet);
+                await SaveChangesAsync();
+            }
+        }
+        #endregion
+
+        #region Log Entries
+        public async Task AddLogEntry(LogEntryDTO dto)
+        {
+            LogEntries.Add(dto.ToLogEntry());
+            await SaveChangesAsync();
+        }
+        #endregion
+
+        #region Other
+        public async Task<List<MarketLiquidityStatsDTO>> GetMarketLiquidityStates()
+        {
+            var states = await Markets.AsNoTracking()
+                .Select(m => new { m.volume_24h, m.liquidity, m.open_interest, m.yes_bid, m.no_bid })
+                .ToListAsync();
+            return states.Select(m => new MarketLiquidityStatsDTO
+            {
+                liquidity = m.liquidity,
+                open_interest = m.open_interest,
+                volume_24h = m.volume_24h,
+                yes_bid = m.yes_bid,
+                no_bid = m.no_bid
+            }).ToList();
+        }
+
+        public async Task<List<MarketLiquidityStatsDTO>> GetMarketLiquidityStates_cached()
+        {
+            return await GetMarketLiquidityStates();
+        }
+        #endregion
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(_connectionString);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Event>()
+                .ToTable("t_Events", x => x.HasTrigger("trg_Events_LastModifiedDate"))
+                .HasKey(e => e.event_ticker);
+
+            modelBuilder.Entity<Event>()
+                .Property(e => e.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<Event>()
+                .HasIndex(e => e.category);
+
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.Series)
+                .WithMany(s => s.Events)
+                .HasForeignKey(e => e.series_ticker)
+                .HasPrincipalKey(s => s.series_ticker)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Series>()
+                .ToTable("t_Series", x => x.HasTrigger("trg_Series_LastModifiedDate"))
+                .HasKey(s => s.series_ticker);
+
+            modelBuilder.Entity<Series>()
+                .Property(s => s.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<Series>()
+                .HasIndex(s => s.category);
+
+            modelBuilder.Entity<Series>()
+                .HasIndex(s => s.title);
+
+            modelBuilder.Entity<Candlestick>()
+                .ToTable("t_Candlesticks")
+                .HasKey(x => new { x.market_ticker, x.interval_type, x.end_period_ts });
+
+            modelBuilder.Entity<Candlestick>()
+                .HasIndex(x => new { x.year, x.month, x.day, x.hour, x.minute });
+
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.open_interest).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.price_close).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.price_high).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.price_low).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.price_mean).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.price_open).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.price_previous).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.volume).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.yes_ask_close).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.yes_ask_high).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.yes_ask_low).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.yes_ask_open).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.yes_bid_close).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.yes_bid_high).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.yes_bid_low).IsConcurrencyToken(false);
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.yes_bid_open).IsConcurrencyToken(false);
+
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.year)
+                .ValueGeneratedOnAddOrUpdate()
+                .IsConcurrencyToken(false);
+
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.month)
+                .ValueGeneratedOnAddOrUpdate()
+                .IsConcurrencyToken(false);
+
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.day)
+                .ValueGeneratedOnAddOrUpdate()
+                .IsConcurrencyToken(false);
+
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.hour)
+                .ValueGeneratedOnAddOrUpdate()
+                .IsConcurrencyToken(false);
+
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.minute)
+                .ValueGeneratedOnAddOrUpdate()
+                .IsConcurrencyToken(false);
+
+            modelBuilder.Entity<Candlestick>()
+                .Property(x => x.end_period_datetime_utc)
+                .ValueGeneratedOnAddOrUpdate()
+                .IsConcurrencyToken(false);
+
+            modelBuilder.Entity<SeriesTag>()
+                .ToTable("t_Series_Tags", x => x.HasTrigger("trg_t_Series_Tags_InsertLastModifiedDate"))
+                .HasKey(st => new { st.series_ticker, st.tag });
+
+            modelBuilder.Entity<SeriesTag>()
+                .HasOne(st => st.Series)
+                .WithMany(s => s.Tags)
+                .HasForeignKey(st => st.series_ticker)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SeriesSettlementSource>()
+                .ToTable("t_Series_SettlementSources", x => x.HasTrigger("trg_t_Series_SettlementSources_InsertLastModifiedDate"))
+                .HasKey(st => new { st.series_ticker, st.name });
+
+            modelBuilder.Entity<SeriesSettlementSource>()
+                .HasOne(ss => ss.Series)
+                .WithMany(s => s.SettlementSources)
+                .HasForeignKey(ss => ss.series_ticker)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MarketWatch>()
+                .ToTable("t_MarketWatches")
+                .HasKey(m => m.market_ticker);
+
+            modelBuilder.Entity<MarketWatch>()
+                .HasIndex(m => new { m.InterestScore, m.InterestScoreDate })
+                .HasDatabaseName("IX_t_MarketWatches_InterestScore_InterestScoreDate")
+                .IncludeProperties(m => new { m.market_ticker, m.BrainLock });
+
+            modelBuilder.Entity<MarketWatch>()
+                .Property(m => m.market_ticker)
+                .HasMaxLength(150)
+                .IsRequired();
+
+            modelBuilder.Entity<MarketWatch>()
+                .Property(m => m.BrainLock)
+                .HasColumnType("uniqueidentifier");
+
+            modelBuilder.Entity<MarketWatch>()
+                .Property(m => m.InterestScore)
+                .HasColumnType("float");
+
+            modelBuilder.Entity<MarketWatch>()
+                .Property(m => m.InterestScoreDate)
+                .HasColumnType("datetime");
+
+            modelBuilder.Entity<MarketWatch>()
+                .Property(m => m.LastWatched)
+                .HasColumnType("datetime");
+
+            modelBuilder.Entity<MarketWatch>()
+                .HasIndex(m => m.InterestScore)
+                .HasDatabaseName("IX_t_MarketWatches_InterestScore")
+                .IncludeProperties(m => m.market_ticker);
+
+            modelBuilder.Entity<MarketWatch>()
+                .HasIndex(m => m.BrainLock)
+                .HasDatabaseName("IX_t_MarketWatches_BrainLock_NonNull")
+                .IncludeProperties(m => m.market_ticker);
+
+            modelBuilder.Entity<MarketWatch>()
+                .HasIndex(m => m.InterestScoreDate)
+                .HasDatabaseName("IX_t_MarketWatches_InterestScoreDate");
+
+            modelBuilder.Entity<MarketWatch>()
+                .HasOne(m => m.Market)
+                .WithOne(mw => mw.MarketWatch)
+                .HasForeignKey<MarketWatch>(m => m.market_ticker)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BrainInstance>()
+                .ToTable("t_BrainInstances")
+                .HasKey(m => m.BrainInstanceName);
+
+            modelBuilder.Entity<Market>()
+                .ToTable("t_Markets")
+                .HasKey(m => m.market_ticker);
+
+            modelBuilder.Entity<Market>()
+                .Property(m => m.market_ticker).HasMaxLength(150).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.event_ticker).HasMaxLength(50).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.market_type).HasMaxLength(20).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.title).HasMaxLength(1000).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.subtitle).HasMaxLength(255);
+            modelBuilder.Entity<Market>()
+                .Property(m => m.yes_sub_title).HasMaxLength(255).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.no_sub_title).HasMaxLength(255).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.open_time).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.close_time).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.expiration_time).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.latest_expiration_time).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.settlement_timer_seconds).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.status).HasMaxLength(20).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.response_price_units).HasMaxLength(20).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.result).HasMaxLength(20).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.expiration_value).HasMaxLength(50).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.category).HasMaxLength(50).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.strike_type).HasMaxLength(30).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.rules_primary).IsRequired();
+            modelBuilder.Entity<Market>()
+                .Property(m => m.CreatedDate).HasDefaultValueSql("GETDATE()").IsRequired();
+
+            modelBuilder.Entity<Market>()
+                .HasIndex(m => m.event_ticker).HasDatabaseName("IX_t_Markets_event_ticker").IncludeProperties(m => m.market_ticker);
+            modelBuilder.Entity<Market>()
+                .HasIndex(m => m.market_type).HasDatabaseName("IX_t_Markets_market_type");
+            modelBuilder.Entity<Market>()
+                .HasIndex(m => m.result).HasDatabaseName("IX_t_Markets_result");
+            modelBuilder.Entity<Market>()
+                .HasIndex(m => m.status).HasDatabaseName("IX_t_Markets_status");
+            modelBuilder.Entity<Market>()
+                .HasIndex(m => m.close_time).HasDatabaseName("IX_t_Markets_close_time").IncludeProperties(m => new { m.market_ticker, m.status });
+            modelBuilder.Entity<Market>()
+                .HasIndex(m => m.LastCandlestickUTC).HasDatabaseName("IX_t_Markets_LastCandlestick").IncludeProperties(m => new { m.market_ticker, m.status });
+
+            modelBuilder.Entity<Market>()
+                .HasOne(m => m.Event)
+                .WithMany(e => e.Markets)
+                .HasForeignKey(m => m.event_ticker)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Market>()
+                .HasOne(m => m.MarketWatch)
+                .WithOne(mw => mw.Market)
+                .HasForeignKey<MarketWatch>(mw => mw.market_ticker)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Fill>()
+                .ToTable("t_feed_fill")
+                .HasKey(ff => new { ff.market_ticker, ff.ts });
+
+            modelBuilder.Entity<Fill>()
+                .HasIndex(ff => ff.action);
+
+            modelBuilder.Entity<Fill>()
+                .HasOne(o => o.Market)
+                .WithMany()
+                .HasForeignKey(o => o.market_ticker)
+                .HasPrincipalKey(m => m.market_ticker)
+                .IsRequired(false);
+
+            modelBuilder.Entity<EventLifecycle>()
+                .ToTable("t_feed_lifecycle")
+                .HasKey(ff => new { ff.market_ticker, ff.LoggedDate });
+
+            modelBuilder.Entity<EventLifecycle>()
+                .HasIndex(ff => ff.is_deactivated);
+
+            modelBuilder.Entity<EventLifecycle>()
+                .HasIndex(ff => ff.result);
+
+            modelBuilder.Entity<EventLifecycle>()
+                .HasOne(o => o.Market)
+                .WithMany()
+                .HasForeignKey(o => o.market_ticker)
+                .HasPrincipalKey(m => m.market_ticker)
+                .IsRequired(false);
+
+            modelBuilder.Entity<Ticker>()
+                .ToTable("t_feed_ticker")
+                .HasKey(ff => new { ff.market_ticker, ff.LoggedDate });
+
+            modelBuilder.Entity<Ticker>()
+                .HasIndex(ff => ff.market_ticker);
+
+            modelBuilder.Entity<Ticker>()
+                .HasOne(o => o.Market)
+                .WithMany()
+                .HasForeignKey(o => o.market_ticker)
+                .HasPrincipalKey(m => m.market_ticker)
+                .IsRequired(false);
+
+            modelBuilder.Entity<Trade>()
+                .ToTable("t_feed_trade")
+                .HasKey(ff => new { ff.market_id, ff.yes_price, ff.no_price, ff.LoggedDate });
+
+            modelBuilder.Entity<Trade>()
+                .HasIndex(ff => ff.market_ticker);
+
+            modelBuilder.Entity<Trade>()
+                .HasOne(o => o.Market)
+                .WithMany()
+                .HasForeignKey(o => o.market_ticker)
+                .HasPrincipalKey(m => m.market_ticker)
+                .IsRequired(false);
+
+            modelBuilder.Entity<MarketPosition>()
+                .ToTable("t_MarketPositions")
+                .HasKey(mp => mp.Ticker);
+
+            modelBuilder.Entity<MarketPosition>()
+                .Property(mp => mp.LastModified);
+
+            modelBuilder.Entity<SnapshotSchema>()
+                .ToTable("t_SnapshotSchemas")
+                .HasKey(x => x.SchemaVersion);
+
+            modelBuilder.Entity<MarketType>()
+                .ToTable("t_MarketTypes")
+                .HasKey(x => x.MarketTypeID);
+
+            modelBuilder.Entity<Snapshot>()
+                .ToTable("t_Snapshots")
+                .HasKey(st => new { st.MarketTicker, st.SnapshotDate });
+
+            modelBuilder.Entity<Snapshot>()
+                .HasIndex(ff => ff.JSONSchemaVersion);
+
+            modelBuilder.Entity<Snapshot>()
+                .HasIndex(ff => ff.ChangeMetricsMature);
+
+            modelBuilder.Entity<Snapshot>()
+                .HasOne(o => o.Market)
+                .WithMany()
+                .HasForeignKey(o => o.MarketTicker)
+                .HasPrincipalKey(m => m.market_ticker)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Snapshot>()
+                .HasOne(o => o.MarketType)
+                .WithMany()
+                .HasForeignKey(o => o.MarketTypeID)
+                .HasPrincipalKey(m => m.MarketTypeID)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Order>()
+                .ToTable("t_Orders", x => x.HasTrigger("trg_Orders_LastModifiedDate"))
+                .HasKey(o => o.OrderId);
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.LastModified);
+
+            modelBuilder.Entity<Order>()
+                .HasIndex(o => o.Ticker);
+
+            modelBuilder.Entity<Order>()
+                .HasIndex(o => o.Status);
+
+            modelBuilder.Entity<Order>()
+                .HasIndex(o => o.CreatedTimeUTC);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Market)
+                .WithMany()
+                .HasForeignKey(o => o.Ticker)
+                .HasPrincipalKey(m => m.market_ticker)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LogEntry>(entity =>
+            {
+                entity
+                    .ToTable("t_LogEntries")
+                    .HasKey(e => e.Id);
+
+                entity.Property(e => e.Timestamp)
+                      .IsRequired()
+                      .HasColumnType("datetime");
+
+                entity.Property(e => e.Level)
+                      .IsRequired()
+                      .HasMaxLength(50);
+
+                entity.Property(e => e.SessionIdentifier)
+                      .IsRequired()
+                      .HasMaxLength(5);
+
+                entity.Property(e => e.Message)
+                      .IsRequired()
+                      .HasMaxLength(4000);
+
+                entity.Property(e => e.Exception)
+                      .HasMaxLength(4000);
+
+                entity.Property(e => e.Source)
+                      .IsRequired()
+                      .HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<StratData>()
+                .ToTable("t_StratData")
+                .HasKey(s => s.StratID);
+
+            modelBuilder.Entity<StratData>()
+                .Property(s => s.StratName)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            modelBuilder.Entity<StratData>()
+                .Property(s => s.StratType)
+                .IsRequired();
+
+            modelBuilder.Entity<StratData>()
+                .Property(s => s.RawJSON)
+                .HasColumnType("NVARCHAR(MAX)")
+                .IsRequired();
+
+            modelBuilder.Entity<StratData>()
+                .HasIndex(s => s.StratName)
+                .IsUnique();
+
+            modelBuilder.Entity<SnapshotGroup>()
+                .ToTable("t_SnapshotGroups")
+                .HasKey(sg => new { sg.MarketTicker, sg.StartTime, sg.EndTime });
+
+            modelBuilder.Entity<SnapshotGroup>()
+                .Property(sg => sg.SnapshotGroupID)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<SnapshotGroup>()
+                .Property(sg => sg.MarketTicker)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            modelBuilder.Entity<SnapshotGroup>()
+                .HasOne(sg => sg.Market)
+                .WithMany()
+                .HasForeignKey(sg => sg.MarketTicker)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<WeightSet>()
+                .ToTable("t_WeightSets")
+                .HasKey(ws => ws.WeightSetID);
+
+            modelBuilder.Entity<WeightSet>()
+                .Property(ws => ws.WeightSetID)
+                .ValueGeneratedOnAdd();  // IDENTITY(1,1)
+
+            modelBuilder.Entity<WeightSet>()
+                .Property(ws => ws.StrategyName)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<WeightSet>()
+                .Property(ws => ws.Weights)
+                .HasColumnType("varchar(max)")
+                .IsRequired();
+
+            modelBuilder.Entity<WeightSet>()
+                .Property(ws => ws.LastRun)
+                .HasColumnType("datetime");
+
+            modelBuilder.Entity<WeightSetMarket>()
+                .ToTable("t_WeightSetMarkets")
+                .HasKey(wsm => new { wsm.WeightSetID, wsm.MarketTicker }); 
+
+            modelBuilder.Entity<WeightSetMarket>()
+                .Property(wsm => wsm.MarketTicker)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<WeightSetMarket>()
+                .Property(wsm => wsm.PnL)
+                .HasColumnType("money")
+                .IsRequired();
+
+            modelBuilder.Entity<WeightSetMarket>()
+                .Property(wsm => wsm.LastRun)
+                .HasColumnType("datetime");
+
+            modelBuilder.Entity<WeightSetMarket>()
+                .HasOne(wsm => wsm.WeightSet)
+                .WithMany(ws => ws.WeightSetMarkets)
+                .HasForeignKey(wsm => wsm.WeightSetID)
+                .OnDelete(DeleteBehavior.Cascade); 
+        }
+    }
+}

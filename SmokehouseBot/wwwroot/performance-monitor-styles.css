@@ -1,0 +1,156 @@
+﻿/* Styles for the performance monitoring dashboard page */
+
+.performance-container {
+    flex: 1 1 100%;
+    min-width: 18.75rem; /* approx 300px */
+    position: relative;
+    background-color: #252525;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    box-shadow: 0 0.1875rem 0.5rem rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Essential for scrollable flex children */
+}
+
+    .performance-container > h2 {
+        color: #ffffff;
+        font-weight: 400;
+        margin: 0 0 0.75rem 0;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+    }
+
+#allChartsContainer { /* This will now hold all dynamically generated charts */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem; /* Spacing between chart items */
+    margin-bottom: 1rem;
+    max-height: 880px; /* Approximate height for all charts; adjust as needed */
+    overflow-y: auto; /* Enable vertical scrollbar for charts area */
+    flex-grow: 1;
+    min-height: 0; /* Essential for scrollable flex children */
+}
+
+    #allChartsContainer > div { /* Individual chart item wrapper */
+        background-color: #2a2a2a;
+        padding: 0.5rem;
+        border-radius: 0.3rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.2);
+        box-sizing: border-box;
+        flex: 1 1 calc(50% - 0.375rem); /* Two items per row, accounting for gap */
+        min-width: 280px; /* Minimum width for a chart item */
+        display: flex;
+        flex-direction: column;
+        height: auto;
+    }
+
+        /* Style for the full-width chart (e.g., MarketRefreshService) */
+        #allChartsContainer > div.full-width-chart {
+            flex: 1 1 100%; /* Makes it full width */
+            max-width: 100%; /* Ensures it doesn't exceed parent width */
+        }
+
+    #allChartsContainer h3 {
+        color: #e0e0e0;
+        font-size: 0.85rem;
+        margin-top: 0;
+        margin-bottom: 0.4rem;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    #allChartsContainer canvas {
+        width: 100% !important;
+        max-height: 180px; /* Controls the height of individual charts */
+        flex-grow: 1;
+        min-height: 0; /* Prevent canvas overflow issues */
+    }
+
+    /* Adjust max-height for the main full-width chart if needed */
+    #allChartsContainer > div.full-width-chart canvas {
+        max-height: 250px; /* Example: make the main chart taller */
+    }
+
+
+#performanceTable {
+    width: 100%;
+    border-collapse: collapse;
+    color: #e0e0e0;
+    font-size: 0.8rem;
+    table-layout: fixed; /* Improves column consistency */
+    flex-shrink: 0; /* Prevents table from shrinking excessively */
+}
+
+    #performanceTable thead {
+        position: sticky;
+        top: 0;
+        background-color: #2a2a2a;
+        z-index: 10; /* Ensures header stays above scrolling content if table itself scrolls */
+    }
+
+    #performanceTable th,
+    #performanceTable td {
+        padding: 0.3rem 0.5rem;
+        text-align: left;
+        border-bottom: 1px solid #444;
+        word-wrap: break-word;
+    }
+
+    #performanceTable th {
+        font-weight: bold;
+        color: #ffffff;
+    }
+
+    #performanceTable tbody tr:hover {
+        background-color: #333;
+    }
+
+/* Responsive adjustments */
+@media (max-width: 48rem) { /* ~768px */
+    #allChartsContainer > div {
+        flex: 1 1 100%; /* Single chart per row */
+        min-width: 0;
+    }
+
+    #performanceTable th,
+    #performanceTable td {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.3rem;
+    }
+
+    #allChartsContainer canvas {
+        max-height: 170px;
+    }
+
+    #allChartsContainer {
+        max-height: 800px; /* Adjust max height for mobile if desired */
+    }
+}
+
+@media (max-width: 30rem) { /* ~480px */
+    .performance-container {
+        padding: 0.5rem;
+    }
+
+    #allChartsContainer {
+        gap: 0.5rem;
+    }
+
+        #allChartsContainer canvas {
+            max-height: 160px;
+        }
+
+    #performanceTable th,
+    #performanceTable td {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.2rem;
+    }
+
+    #allChartsContainer {
+        max-height: 700px; /* Adjust max height for small mobile if desired */
+    }
+}

@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Monitor</title>
+    <link rel="stylesheet" href="performance-monitor-styles.css">
+    <link rel="stylesheet" href="shared-styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="performance-container">
+            <h2>Service Performance Metrics</h2>
+            <div id="allChartsContainer">
+            </div>
+            <table id="performanceTable">
+                <thead>
+                    <tr>
+                        <th>Service (Instance)</th>
+                        <th>Last Execution Time (s)</th>
+                        <th>Market Count</th>
+                        <th>Usage (%)</th>
+                        <th>Acceptable</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody id="performanceBody">
+                    <tr><td colspan="6">Loading...</td></tr>
+                </tbody>
+            </table>
+            <div id="loadingOverlay">Loading...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/moment"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
+    <script src="signalrService.js"></script>
+    <script src="PerformanceMonitorViewModel.js"></script>
+    <script src="PerformanceMonitorView.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const viewModel = new PerformanceMonitorViewModel();
+            new SignalRService(null, viewModel); // marketModel is not used for this page
+            new PerformanceMonitorView(viewModel);
+        });
+    </script>
+</body>
+</html>

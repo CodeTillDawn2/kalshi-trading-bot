@@ -1,0 +1,53 @@
+﻿<Window x:Class="TradingSimulatorGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TradingSimulatorGUI"
+        mc:Ignorable="d"
+        Title="Trading Simulator" Height="600" Width="800">
+    <Window.Resources>
+        <local:PnLConverter x:Key="PnLConverter"/>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
+            <Button x:Name="RunBollingerButton" Content="Run Bollinger" Click="RunBollinger_Click" Margin="5"/>
+            <Button x:Name="RunBollingerTrainingButton" Content="Run Bollinger Training" Click="RunBollingerTraining_Click" Margin="5"/>
+            <Button x:Name="SelectAllNAButton" Content="Select All NA" Click="SelectAllNA_Click" Margin="5"/>
+            <Button x:Name="SelectAllWithResultsButton" Content="Select All With Results" Click="SelectAllWithResultsButton_Click" Margin="5"/>
+            <Button x:Name="SelectAllButton" Content="Select All" Click="SelectAll_Click" Margin="5"/>
+        </StackPanel>
+
+        <DataGrid x:Name="MarketGrid"
+                  Grid.Row="1"
+                  ItemsSource="{Binding MarketResults}"
+                  AutoGenerateColumns="False"
+                  SelectionChanged="MarketGrid_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Binding="{Binding IsSelected}" Header="Select"/>
+                <DataGridTextColumn Binding="{Binding Market}" Header="Market" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding PnL, Converter={StaticResource PnLConverter}}" Header="PnL" IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Chart is created lazily in code to avoid XAML-time initialization -->
+        <Grid x:Name="ChartPanel" Grid.Row="1" Visibility="Collapsed">
+            <ContentControl x:Name="ChartHost"/>
+        </Grid>
+
+        <Button x:Name="BackButton" Grid.Row="2" Content="Back" Click="BackButton_Click" Visibility="Collapsed" Margin="5"/>
+
+        <StackPanel Grid.Row="3" Margin="5">
+            <TextBlock x:Name="ProfitLossText" Text="Profit/Loss: $0.00" Margin="5"/>
+            <TextBox x:Name="TestOutput" IsReadOnly="True" Height="150" VerticalScrollBarVisibility="Auto" Margin="5"/>
+        </StackPanel>
+    </Grid>
+</Window>

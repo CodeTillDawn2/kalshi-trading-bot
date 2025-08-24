@@ -1,0 +1,95 @@
+# ============================
+# Pattern Strength Configurations (Name, Strength, Certainty, Uncertainty)
+# ============================
+[Patterns]
+Abandoned Baby (Bearish)=-5,0.95,0
+Abandoned Baby (Bullish)=5,0.95,0
+Belt Hold (Bearish)=-3,0.80,0
+Belt Hold (Bullish)=3,0.80,0
+Bearish Engulfing=-4,0.85,0
+Breakaway (Bearish)=-3,0.75,0
+Breakaway (Bullish)=3,0.75,0
+Bullish Engulfing=4,0.85,0
+Closing Marubozu (Bearish)=-5,0.90,0
+Closing Marubozu (Bullish)=5,0.90,0
+Concealing Baby Swallow=-4,0.85,0
+Counterattack (Bearish)=-3,0.70,0
+Counterattack (Bullish)=3,0.70,0
+Dark Cloud Cover=-3,0.80,0
+Doji=0,0.55,2
+Doji Star=0,0.60,2
+Dragonfly Doji=1,0.60,1
+Downside Gap Three Methods=-3,0.75,0
+Evening Doji Star=-5,0.85,0
+Evening Star=-5,0.90,0
+Gravestone Doji=-1,0.60,1
+Hammer=3,0.75,0
+Hanging Man=-3,0.75,0
+Harami (Bearish)=-3,0.70,0
+Harami (Bullish)=3,0.70,0
+High-Wave Candle=0,0.60,2
+Hikkake (Bearish)=-2,0.65,1
+Hikkake (Bullish)=2,0.65,1
+Homing Pigeon=2,0.70,0
+Identical Three Crows=-5,0.85,0
+In-Neck Pattern=-2,0.65,0
+Inverted Hammer=3,0.70,0
+Kicking (Bearish)=-4,0.80,0
+Kicking (Bullish)=4,0.80,0
+Kicking (By Length - Bearish)=-4,0.80,0
+Kicking (By Length - Bullish)=4,0.80,0
+Ladder Bottom=3,0.70,0
+Long Legged Doji=0,0.50,3
+Long Line Candle (Bearish)=-4,0.85,0
+Long Line Candle (Bullish)=4,0.85,0
+Marubozu (Bearish)=-4,0.80,0
+Marubozu (Bullish)=4,0.80,0
+Mat Hold (Bearish)=-5,0.90,0
+Mat Hold (Bullish)=5,0.90,0
+Modified Hikkake (Bearish)=-2,0.65,1
+Modified Hikkake (Bullish)=2,0.65,1
+Morning Doji Star=5,0.85,0
+Morning Star=5,0.90,0
+On-Neck Pattern=-2,0.65,0
+Piercing Pattern=3,0.80,0
+Rickshaw Man=0,0.55,2
+Rising Falling Three Methods=4,0.80,0
+Separating Lines (Bearish)=-3,0.75,0
+Separating Lines (Bullish)=3,0.75,0
+Shooting Star=-3,0.70,0
+Short Line Candle (Bearish)=-1,0.65,1
+Short Line Candle (Bullish)=1,0.65,1
+Spinning Top=0,0.60,1
+Stalled Pattern=3,0.70,0
+Stick Sandwich (Bearish)=-3,0.80,0
+Stick Sandwich (Bullish)=3,0.80,0
+Takuri=3,0.70,1
+Tasuki Gap (Bearish)=-3,0.70,0
+Tasuki Gap (Bullish)=3,0.70,0
+Three Advancing White Soldiers=5,0.85,0
+Three Black Crows=-5,0.85,0
+Three Inside Down=-4,0.75,0
+Three Inside Up=4,0.75,0
+Three Line Strike (Bearish)=-5,0.85,0
+Three Line Strike (Bullish)=5,0.85,0
+Three Outside Down=-4,0.80,0
+Three Outside Up=4,0.80,0
+Three Stars In The South=5,0.85,0
+Thrusting Pattern=-2,0.65,0
+Tristar Pattern (Bearish)=-5,0.90,0
+Tristar Pattern (Bullish)=5,0.90,0
+Two Crows=-3,0.75,0
+Unique 3 River=2,0.60,1
+Upside Downside Gap Three Methods (Bearish)=-4,0.80,0
+Upside Downside Gap Three Methods (Bullish)=4,0.80,0
+Upside Gap Two Crows=-3,0.75,0
+Up Down-gap side-by-side white lines=2,0.70,1
+
+# ============================
+# Training Parameters
+# ============================
+[Training]
+learning_rate=0.1
+n_estimators=100
+test_size=0.2
+future_candles=5

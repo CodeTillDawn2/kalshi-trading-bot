@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Namotion.Reflection" Version="3.4.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NJsonSchema" Version="11.3.2" />
+    <PackageReference Include="NJsonSchema.Annotations" Version="11.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SmokehouseDTOs\SmokehouseDTOs.csproj" />
+    <ProjectReference Include="..\SmokehouseInterfaces\SmokehouseInterfaces.csproj" />
+  </ItemGroup>
+
+</Project>

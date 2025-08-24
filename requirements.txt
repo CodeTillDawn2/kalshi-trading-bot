@@ -1,0 +1,54 @@
+# Core Data Science
+pandas
+numpy
+scipy
+scikit-learn
+joblib
+
+# Visualization
+plotly
+matplotlib
+tabulate
+seaborn
+
+# Machine Learning & NLP
+transformers
+textblob
+newsapi-python
+torch
+xgboost
+
+# Database
+pyodbc
+
+# API & Networking
+requests
+urllib3
+
+# Cryptography & Security
+cryptography
+
+# Time Zone Handling
+pytz
+
+# Environment & Configuration
+python-dotenv
+
+# Web Socket Support
+websockets
+
+# Utilities
+statistics
+typing
+-e ./Python/SmokehouseModules
+json
+
+# System & Performance Monitoring
+psutil
+
+# Logging & Time Management
+tqdm
+logging
+time
+datetime
+hashlib

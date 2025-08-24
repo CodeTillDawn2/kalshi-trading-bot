@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Do NOT add <UseWPF> -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.0.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.0" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.0" />
+    <PackageReference Include="ReactiveUI" Version="18.3.1" />
+    <PackageReference Include="LiveChartsCore" Version="2.0.0-rc5.4" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc5.4" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc5.4" />
+  </ItemGroup>
+
+  <!-- 🔧 Nuke any accidental AXAML includes from other item types -->
+  <ItemGroup>
+    <None Remove="**\*.axaml" />
+    <AvaloniaResource Remove="**\*.axaml" />
+    <Page Remove="**\*.axaml" />
+    <ApplicationDefinition Remove="**\*.axaml" />
+  </ItemGroup>
+
+  <!-- ✅ Explicitly include only the AXAML files you want -->
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <!-- Reference your simulator project if needed -->
+  <ItemGroup>
+    <ProjectReference Include="..\TradingSimulator\TradingSimulator.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="MainWindow.axaml.cs">
+      <DependentUpon>MainWindow.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

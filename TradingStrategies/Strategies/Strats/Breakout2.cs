@@ -1,0 +1,461 @@
+﻿using SmokehouseDTOs;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text.Json;
+using static SmokehouseInterfaces.Enums.StrategyEnums;
+
+namespace TradingStrategies.Strategies.Strats
+{
+    // - Ratio-first breakout logic with depth-capped velocity thresholds
+    // - Relative spike detection (current vs previous), optional volume-weighted spike scaling
+    // - Trade-rate/event-share confirmations
+    // - Position-aware exits:
+    //     * EXIT if price flattens (RSI_Short near 50 within ExitRsiDevThreshold)
+    //     * Only FLIP (reverse) if opposite signal meets ExitOppositeSignalStrength
+    // - Full actionMemo diagnostics: labels-first, comma-free, multi-line
+    public class Breakout2 : Strat
+    {
+        public string Name { get; private set; }
+        public override double Weight { get; }
+
+        private readonly ActionType _defaultAction;
+        private readonly Dictionary<ParamKey, double> _mlParams;
+
+        public enum ParamKey
+        {
+            AbsorptionThreshold,
+            MinSignalStrength,
+            VelocityToDepthRatio,
+            MinNumberOfPointsFromResolved,
+            MaxVolumeRatio,
+            MinRatioDifference,
+            ReversalExtraStrength,
+
+            // Spike detection threshold: |currentVel| >= X * |prevVel|
+            SpikeMinRelativeIncrease,
+
+            // Safety cap on threshold ratio
+            MaxVelocityThresholdRatio,
+
+            // Spike weighting (optional)
+            SpikeWeightScale,
+            SpikeWeightCap,
+            SpikeVolumeWeightScale,
+
+            // Confirmations (share of total)
+            TradeRateShareMin_Yes,
+            TradeRateShareMin_No,
+            TradeEventShareMin_Yes,
+            TradeEventShareMin_No,
+
+            // Exit knobs
+            ExitOppositeSignalStrength, // min signal strength to flip while holding
+            ExitRsiDevThreshold         // RSI_Short distance from 50 to deem "flat"
+        }
+
+        public Breakout2(string name = nameof(Breakout2), double weight = 1.0,
+            Dictionary<ParamKey, double> mlParams = null)
+        {
+            Name = name;
+            Weight = weight;
+            _mlParams = mlParams ?? new Dictionary<ParamKey, double>
+            {
+                { ParamKey.AbsorptionThreshold, 10.0 },
+                { ParamKey.MinSignalStrength, 2.0 },
+                { ParamKey.VelocityToDepthRatio, 0.10 },
+                { ParamKey.MinNumberOfPointsFromResolved, 5 },
+                { ParamKey.MaxVolumeRatio, 6.0 },
+                { ParamKey.MinRatioDifference, 0.05 },
+                { ParamKey.ReversalExtraStrength, 1.0 },
+
+                { ParamKey.SpikeMinRelativeIncrease, 2.0 },
+                { ParamKey.MaxVelocityThresholdRatio, 0.25 },
+
+                { ParamKey.SpikeWeightScale, 1.0 },
+                { ParamKey.SpikeWeightCap, 5.0 },
+                { ParamKey.SpikeVolumeWeightScale, 0.5 },
+
+                { ParamKey.TradeRateShareMin_Yes, 0.55 },
+                { ParamKey.TradeRateShareMin_No, 0.55 },
+                { ParamKey.TradeEventShareMin_Yes, 0.35 },
+                { ParamKey.TradeEventShareMin_No, 0.35 },
+
+                { ParamKey.ExitOppositeSignalStrength, 3.0 },
+                { ParamKey.ExitRsiDevThreshold, 5.0 }
+            };
+            _defaultAction = ActionType.None;
+        }
+
+        public override ActionDecision GetAction(MarketSnapshot snapshot, MarketSnapshot? previousSnapshot, int simulationPosition = 0)
+        {
+            if (!snapshot.ChangeMetricsMature)
+                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 1, Memo = "reason not_mature" };
+
+            var inv = CultureInfo.InvariantCulture;
+            string F(double d)
+            {
+                if (double.IsNaN(d)) return "NaN";
+                if (double.IsInfinity(d)) return "Inf";
+                double ad = Math.Abs(d);
+                if (ad > 0 && ad < 0.001) return "0";
+                return d.ToString("0.##", inv);
+            }
+            string I(int x) => x.ToString(inv);
+            string YN(bool b) => b ? "Yes" : "No";
+
+            // knobs
+            double absorptionThreshold = _mlParams.GetValueOrDefault(ParamKey.AbsorptionThreshold, 10.0);
+            double minSignalStrength = _mlParams.GetValueOrDefault(ParamKey.MinSignalStrength, 2.0);
+            double baseThrRatio = _mlParams.GetValueOrDefault(ParamKey.VelocityToDepthRatio, 0.10);
+            int minPointsFromResolved = (int)Math.Round(_mlParams.GetValueOrDefault(ParamKey.MinNumberOfPointsFromResolved, 5.0));
+            double maxVolumeRatio = _mlParams.GetValueOrDefault(ParamKey.MaxVolumeRatio, 6.0);
+            double minRatioDifference = _mlParams.GetValueOrDefault(ParamKey.MinRatioDifference, 0.05);
+            double reversalExtraStrength = _mlParams.GetValueOrDefault(ParamKey.ReversalExtraStrength, 1.0);
+            double spikeRel = _mlParams.GetValueOrDefault(ParamKey.SpikeMinRelativeIncrease, 2.0);
+            double maxThrRatio = _mlParams.GetValueOrDefault(ParamKey.MaxVelocityThresholdRatio, 0.25);
+
+            double spikeWeightScale = _mlParams.GetValueOrDefault(ParamKey.SpikeWeightScale, 1.0);
+            double spikeWeightCap = _mlParams.GetValueOrDefault(ParamKey.SpikeWeightCap, 5.0);
+            double spikeVolScale = _mlParams.GetValueOrDefault(ParamKey.SpikeVolumeWeightScale, 0.5);
+
+            double trShareMinYes = _mlParams.GetValueOrDefault(ParamKey.TradeRateShareMin_Yes, 0.55);
+            double trShareMinNo = _mlParams.GetValueOrDefault(ParamKey.TradeRateShareMin_No, 0.55);
+            double teShareMinYes = _mlParams.GetValueOrDefault(ParamKey.TradeEventShareMin_Yes, 0.35);
+            double teShareMinNo = _mlParams.GetValueOrDefault(ParamKey.TradeEventShareMin_No, 0.35);
+
+            double exitOppStrength = _mlParams.GetValueOrDefault(ParamKey.ExitOppositeSignalStrength, 3.0);
+            double exitRsiDevThreshold = _mlParams.GetValueOrDefault(ParamKey.ExitRsiDevThreshold, 5.0);
+
+            // velocities (USD/min approx)
+            double vTopYes = snapshot.VelocityPerMinute_Top_Yes_Bid;
+            double vBotYes = snapshot.VelocityPerMinute_Bottom_Yes_Bid;
+            double vTopNo = snapshot.VelocityPerMinute_Top_No_Bid;
+            double vBotNo = snapshot.VelocityPerMinute_Bottom_No_Bid;
+            double vSumYes = vTopYes + vBotYes;
+            double vSumNo = vTopNo + vBotNo;
+
+            // prev for flip flags
+            double prevSumYes = 0.0, prevSumNo = 0.0;
+            if (previousSnapshot != null)
+            {
+                prevSumYes = (previousSnapshot.VelocityPerMinute_Top_Yes_Bid + previousSnapshot.VelocityPerMinute_Bottom_Yes_Bid);
+                prevSumNo = (previousSnapshot.VelocityPerMinute_Top_No_Bid + previousSnapshot.VelocityPerMinute_Bottom_No_Bid);
+            }
+
+            // depths cents→dollars
+            double depthYes = snapshot.TotalOrderbookDepth_Yes / 100.0;
+            double depthNo = snapshot.TotalOrderbookDepth_No / 100.0;
+
+            // threshold cap
+            double effRatio = Math.Min(baseThrRatio, maxThrRatio);
+            double thrYes = depthYes * effRatio;
+            double thrNo = depthNo * effRatio;
+
+            // flows
+            double flowYes = vSumYes / Math.Max(depthYes, 1e-9);
+            double flowNo = vSumNo / Math.Max(depthNo, 1e-9);
+
+            // ratios/flags
+            double depthRatioYesToNo = depthYes / Math.Max(depthNo, 1e-9);
+
+            bool spikeYes = false, spikeNo = false;
+            double relIncYes = 1.0, relIncNo = 1.0;
+            if (previousSnapshot != null)
+            {
+                double pYes = prevSumYes;
+                double pNo = prevSumNo;
+                double pAbsYes = Math.Abs(pYes);
+                double pAbsNo = Math.Abs(pNo);
+                double cAbsYes = Math.Abs(vSumYes);
+                double cAbsNo = Math.Abs(vSumNo);
+                relIncYes = (pAbsYes < 1e-12) ? (cAbsYes > 0 ? double.PositiveInfinity : 1.0) : (cAbsYes / pAbsYes);
+                relIncNo = (pAbsNo < 1e-12) ? (cAbsNo > 0 ? double.PositiveInfinity : 1.0) : (cAbsNo / pAbsNo);
+                spikeYes = relIncYes >= spikeRel;
+                spikeNo = relIncNo >= spikeRel;
+            }
+
+            bool flipYes = previousSnapshot != null && Math.Sign(prevSumYes) != Math.Sign(vSumYes) && Math.Abs(prevSumYes) > 0 && Math.Abs(vSumYes) > 0;
+            bool flipNo = previousSnapshot != null && Math.Sign(prevSumNo) != Math.Sign(vSumNo) && Math.Abs(prevSumNo) > 0 && Math.Abs(vSumNo) > 0;
+
+            // volume context for spike weight
+            double currMinVol = snapshot.TradeVolumePerMinute_Yes + snapshot.TradeVolumePerMinute_No;
+            double maxMinVol = Math.Max(snapshot.HighestVolume_Minute, 1e-9);
+            double volContext = Math.Max(0.0, Math.Min(currMinVol / maxMinVol, 1.0));
+
+            // confirmations
+            double totalTradeRate = Math.Max(snapshot.TradeRatePerMinute_Yes + snapshot.TradeRatePerMinute_No, 1e-9);
+            double yesTRShare = snapshot.TradeRatePerMinute_Yes / totalTradeRate;
+            double noTRShare = snapshot.TradeRatePerMinute_No / totalTradeRate;
+
+            double totalEvents = (double)(snapshot.TradeCount_Yes + snapshot.TradeCount_No
+                                 + snapshot.NonTradeRelatedOrderCount_Yes + snapshot.NonTradeRelatedOrderCount_No);
+            double yesEventShare = totalEvents > 0 ? snapshot.TradeCount_Yes / totalEvents : 0.0;
+            double noEventShare = totalEvents > 0 ? snapshot.TradeCount_No / totalEvents : 0.0;
+
+            bool confirmYes = yesTRShare >= trShareMinYes && yesEventShare >= teShareMinYes;
+            bool confirmNo = noTRShare >= trShareMinNo && noEventShare >= teShareMinNo;
+
+            // candidate decision
+            ActionType candidateAction = _defaultAction;
+            double signalStrength = 0.0;
+
+            // Long: acceleration into Yes
+            if (vSumYes > thrYes &&
+                snapshot.BestYesAsk <= 100 - minPointsFromResolved &&
+                Math.Abs(depthRatioYesToNo) < maxVolumeRatio &&
+                (flowYes > Math.Abs(flowNo) + minRatioDifference) &&
+                confirmYes)
+            {
+                candidateAction = ActionType.Long;
+                signalStrength += 2.0;
+            }
+
+            // Long via No weakness (scaled)
+            double scaledVNo = -vSumNo * Math.Min(Math.Max(depthYes / Math.Max(depthNo, 1e-9), 0.5), 2.0);
+            if (vSumNo < -thrNo &&
+                scaledVNo > thrYes &&
+                snapshot.BestYesAsk <= 100 - minPointsFromResolved &&
+                Math.Abs(depthRatioYesToNo) < maxVolumeRatio &&
+                -flowNo > Math.Abs(flowYes) + minRatioDifference &&
+                flowYes >= 0 &&
+                confirmYes)
+            {
+                if (candidateAction == ActionType.Long || candidateAction == _defaultAction)
+                {
+                    candidateAction = ActionType.Long;
+                    signalStrength += 2.0;
+                }
+            }
+
+            // Short: acceleration into No
+            if (vSumNo > thrNo &&
+                snapshot.BestYesBid >= minPointsFromResolved &&
+                Math.Abs(depthRatioYesToNo) < maxVolumeRatio &&
+                (flowNo > Math.Abs(flowYes) + minRatioDifference) &&
+                confirmNo)
+            {
+                candidateAction = ActionType.Short;
+                signalStrength += 2.0;
+            }
+
+            // Short via Yes weakness (scaled)
+            double scaledVYes = -vSumYes * Math.Min(Math.Max(depthNo / Math.Max(depthYes, 1e-9), 0.5), 2.0);
+            if (vSumYes < -thrYes &&
+                scaledVYes > thrNo &&
+                snapshot.BestYesBid >= minPointsFromResolved &&
+                Math.Abs(depthRatioYesToNo) < maxVolumeRatio &&
+                -flowYes > Math.Abs(flowNo) + minRatioDifference &&
+                flowNo >= 0 &&
+                confirmNo)
+            {
+                if (candidateAction == ActionType.Short || candidateAction == _defaultAction)
+                {
+                    candidateAction = ActionType.Short;
+                    signalStrength += 2.0;
+                }
+            }
+
+            // Spike weighting helper
+            double SpikeWeighted(double relInc, double relThr)
+            {
+                double baseW = double.IsInfinity(relInc) ? spikeWeightCap : relInc / Math.Max(relThr, 1e-9);
+                double volBoost = 1.0 + (spikeVolScale * volContext);
+                return Math.Min(baseW * spikeWeightScale * volBoost, spikeWeightCap);
+            }
+
+            // Spike influences
+            if (spikeYes && confirmYes)
+            {
+                if (vSumYes > 0 && (candidateAction == ActionType.Long || candidateAction == _defaultAction))
+                {
+                    candidateAction = ActionType.Long;
+                    signalStrength += SpikeWeighted(relIncYes, spikeRel);
+                }
+                else if (vSumYes < 0 && (candidateAction == ActionType.Short || candidateAction == _defaultAction))
+                {
+                    candidateAction = ActionType.Short;
+                    signalStrength += SpikeWeighted(relIncYes, spikeRel);
+                }
+            }
+            if (spikeNo && confirmNo)
+            {
+                if (vSumNo > 0 && (candidateAction == ActionType.Short || candidateAction == _defaultAction))
+                {
+                    candidateAction = ActionType.Short;
+                    signalStrength += SpikeWeighted(relIncNo, spikeRel);
+                }
+                else if (vSumNo < 0 && (candidateAction == ActionType.Long || candidateAction == _defaultAction))
+                {
+                    candidateAction = ActionType.Long;
+                    signalStrength += SpikeWeighted(relIncNo, spikeRel);
+                }
+            }
+
+            // MACD nudge
+            double macdMedHist = snapshot.MACD_Medium.Histogram ?? 0.0;
+            if (macdMedHist > 0 && candidateAction == ActionType.Long) signalStrength += 0.5;
+            if (macdMedHist < 0 && candidateAction == ActionType.Short) signalStrength += 0.5;
+
+            // absorption proxy
+            double yesRemovalRate = -Math.Min(vSumYes, 0.0);
+            double noRemovalRate = -Math.Min(vSumNo, 0.0);
+            double absorbYes = yesRemovalRate > 0 ? depthYes / yesRemovalRate : double.PositiveInfinity;
+            double absorbNo = noRemovalRate > 0 ? depthNo / noRemovalRate : double.PositiveInfinity;
+
+            if (candidateAction == ActionType.Long && absorbNo < absorptionThreshold) signalStrength += 0.5 * reversalExtraStrength;
+            if (candidateAction == ActionType.Short && absorbYes < absorptionThreshold) signalStrength += 0.5 * reversalExtraStrength;
+
+            // ---- actionMemo builder (your full diagnostics) ----
+            string BuildActionMemo()
+            {
+                var lines = new List<string>
+                {
+                    $"Velocity/min Top Yes: {F(vTopYes)}",
+                    $"Velocity/min Top No: {F(vTopNo)}",
+                    $"Velocity/min Bottom Yes: {F(vBotYes)}",
+                    $"Velocity/min Bottom No: {F(vBotNo)}",
+                    $"Velocity/min Sum Yes: {F(vSumYes)}",
+                    $"Velocity/min Sum No: {F(vSumNo)}",
+                    $"Velocity/min Threshold Yes: {F(thrYes)}",
+                    $"Velocity/min Threshold No: {F(thrNo)}",
+
+                    $"Depth dollars Yes: {F(depthYes)}",
+                    $"Depth dollars No: {F(depthNo)}",
+                    $"Depth ratio Yes/No: {F(depthRatioYesToNo)}",
+                    $"Flow ratio Yes: {F(flowYes)}",
+                    $"Flow ratio No: {F(flowNo)}",
+
+                    $"Trade rate/minute Yes: {F(snapshot.TradeRatePerMinute_Yes)}",
+                    $"Trade rate/minute No: {F(snapshot.TradeRatePerMinute_No)}",
+                    $"Trade rate share Yes: {F(yesTRShare)} (min {F(trShareMinYes)})",
+                    $"Trade rate share No: {F(noTRShare)} (min {F(trShareMinNo)})",
+
+                    $"Trade volume/minute Yes: {F(snapshot.TradeVolumePerMinute_Yes)}",
+                    $"Trade volume/minute No: {F(snapshot.TradeVolumePerMinute_No)}",
+
+                    // NEW diagnostics
+                    $"Highest vol (1m): {F(snapshot.HighestVolume_Minute)}",
+                    $"Curr vol (1m): {F(currMinVol)}",
+                    $"Vol context 0-1: {F(volContext)}",
+                    $"Average size Yes: {F(snapshot.AverageTradeSize_Yes)}",
+                    $"Average size No: {F(snapshot.AverageTradeSize_No)}",
+                    $"Trade count Yes: {I(snapshot.TradeCount_Yes)}",
+                    $"Trade count No: {I(snapshot.TradeCount_No)}",
+                    $"Non-trade order count Yes: {I(snapshot.NonTradeRelatedOrderCount_Yes)}",
+                    $"Non-trade order count No: {I(snapshot.NonTradeRelatedOrderCount_No)}",
+                    $"Trade event share Yes: {F(yesEventShare)} (min {F(teShareMinYes)})",
+                    $"Trade event share No: {F(noEventShare)} (min {F(teShareMinNo)})",
+                    $"Confirm Yes: {YN(confirmYes)}  Confirm No: {YN(confirmNo)}",
+
+                    $"Best Yes Bid: {F(snapshot.BestYesBid)}",
+                    $"Best Yes Ask: {F(snapshot.BestYesAsk)}",
+                    $"Best No Bid: {F(snapshot.BestNoBid)}",
+                    $"Bid center of mass Yes: {F(snapshot.YesBidCenterOfMass)}",
+                    $"Bid center of mass No: {F(snapshot.NoBidCenterOfMass)}",
+                    $"Ask center of mass Yes: {F(snapshot.YesAskCenterOfMass)}",
+                    $"Ask center of mass No: {F(snapshot.NoAskCenterOfMass)}",
+
+                    $"Spike Yes: {YN(spikeYes)}",
+                    $"Spike No: {YN(spikeNo)}",
+                    $"Relative increase Yes: {(double.IsInfinity(relIncYes) ? "Inf" : F(relIncYes))}",
+                    $"Relative increase No: {(double.IsInfinity(relIncNo) ? "Inf" : F(relIncNo))}",
+                    $"Flip Yes: {YN(flipYes)}",
+                    $"Flip No: {YN(flipNo)}",
+
+                    $"MACD Medium histogram: {F(macdMedHist)}",
+
+                    $"Absorption ratio Yes: {F(absorbYes)}",
+                    $"Absorption ratio No: {F(absorbNo)}",
+                    $"Absorption threshold: {F(absorptionThreshold)}",
+
+                    $"Signal strength: {F(signalStrength)}"
+                };
+                return string.Join(Environment.NewLine, lines);
+            }
+
+            // ---- POSITION-AWARE EXIT LOGIC ----
+            if (simulationPosition != 0)
+            {
+                // Exit on flatten (RSI near 50)
+                double rsiShort = snapshot.RSI_Short ?? 50.0;
+                if (Math.Abs(rsiShort - 50.0) <= exitRsiDevThreshold)
+                {
+                    string actionMemo = BuildActionMemo();
+                    int exitPrice = simulationPosition > 0 ? snapshot.BestYesBid : snapshot.BestYesAsk;
+                    return new ActionDecision
+                    {
+                        Type = ActionType.Exit,
+                        Price = exitPrice,
+                        Qty = Math.Abs(simulationPosition),
+                        Memo = actionMemo
+                    };
+                }
+
+                // Only flip if opposite signal is strong enough; else HOLD
+                if (simulationPosition > 0 && candidateAction == ActionType.Short && signalStrength < exitOppStrength)
+                {
+                    string actionMemo = BuildActionMemo();
+                    return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = actionMemo };
+                }
+                if (simulationPosition < 0 && candidateAction == ActionType.Long && signalStrength < exitOppStrength)
+                {
+                    string actionMemo = BuildActionMemo();
+                    return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = actionMemo };
+                }
+            }
+
+            // final gate
+            if (candidateAction == ActionType.None || signalStrength < minSignalStrength)
+            {
+                string actionMemo = BuildActionMemo();
+                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = actionMemo };
+            }
+
+            int pricePoint =
+                (candidateAction == ActionType.Long || candidateAction == ActionType.PostYes)
+                ? snapshot.BestYesBid
+                : snapshot.BestNoBid;
+
+            {
+                string actionMemo = BuildActionMemo();
+                return new ActionDecision
+                {
+                    Type = candidateAction,
+                    Price = pricePoint,
+                    Qty = 1,
+                    Memo = actionMemo
+                };
+            }
+        }
+
+        public override string ToJson()
+        {
+            var json = JsonSerializer.Serialize(new
+            {
+                type = "Breakout2",
+                name = Name,
+                weight = Weight,
+                defaultAction = _defaultAction.ToString(),
+                mlParams = _mlParams.ToDictionary(kv => kv.Key.ToString(), kv => kv.Value)
+            });
+            return json;
+        }
+
+        public static Breakout2 FromJson(string json)
+        {
+            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            if ((string)data["type"] != "Breakout2")
+                throw new ArgumentException("Invalid strategy type");
+
+            var name = (string)data["name"];
+            var weight = Convert.ToDouble(data["weight"]);
+            var mlParamsJson = (JsonElement)data["mlParams"];
+            var mlParams = mlParamsJson.Deserialize<Dictionary<string, double>>()
+                .ToDictionary(kv => Enum.Parse<ParamKey>(kv.Key), kv => kv.Value);
+
+            return new Breakout2(name, weight, mlParams);
+        }
+    }
+}

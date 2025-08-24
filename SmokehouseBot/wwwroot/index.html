@@ -1,0 +1,322 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalshi Market Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1/dist/chartjs-chart-financial.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0/dist/chartjs-adapter-moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <link rel="stylesheet" href="shared-styles.css" />
+    <link rel="stylesheet" href="market-styles.css" />
+    <link rel="icon" type="image/png" href="/favicon.png">
+</head>
+<body>
+    <div class="market-controls">
+        <div class="market-actions">
+            <button onclick="marketViewModel.subscribeToMarket()">+</button>
+            <button onclick="marketViewModel.unsubscribeFromMarket()">−</button>
+            <input type="text" id="marketTicker" placeholder="Enter market ticker">
+        </div>
+        <div class="market-selection">
+            <span class="data-field" data-key="warningCount">0</span>
+            <span class="data-field" data-key="errorCount">0</span>
+            <div class="staleness-indicator"></div>
+            <select id="marketSelector" class="market-header"></select>
+            <div class="toggle-container">
+                <label class="switch">
+                    <input type="checkbox" id="yesNoToggle" checked>
+                    <span class="slider round"></span>
+                </label>
+                <span class="toggle-label data-field" data-key="toggleLabel">Yes</span>
+            </div>
+        </div>
+        <div class="cash-positions">
+            <div class="cash-box">
+                <span class="label">Balance</span>
+                <span class="data-field" data-key="cash">$0.00</span>
+            </div>
+            <div class="positions-box">
+                <span class="label">Position</span>
+                <span class="data-field" data-key="positionsCount">$0.00</span>
+            </div>
+            <div class="last-websocket-box">
+                <span class="label">Last Web Socket Event</span>
+                <span class="data-field" data-key="lastWebSocketEvent">--</span>
+            </div>
+            <div class="exchange-status-box">
+                <span class="label">Exchange Status</span>
+                <span class="data-field" data-key="exchangeStatus">--</span>
+            </div>
+            <div class="trading-status-box">
+                <span class="label">Trading Status</span>
+                <span class="data-field" data-key="tradingStatus">--</span>
+            </div>
+        </div>
+    </div>
+    <div id="response"></div>
+    <div class="dashboard-container">
+        <div class="chart-container">
+            <h2>Price Chart - <span class="data-field" data-key="currentMarketChart"></span></h2>
+            <div class="chart-controls">
+                <select id="timeframeSelector">
+                    <option value="15m">15 Minutes</option>
+                    <option value="1h">1 Hour</option>
+                    <option value="1d" selected>1 Day</option>
+                    <option value="3d">3 Days</option>
+                    <option value="1w">1 Week</option>
+                    <option value="1M">1 Month</option>
+                    <option value="All">All</option>
+                </select>
+            </div>
+            <canvas id="priceChart"></canvas>
+            <div id="loadingOverlay">Loading...</div>
+        </div>
+        <div class="market-info-container">
+            <div class="market-info-grid">
+                <div class="market-info-left-column">
+                    <div class="market-info-left">
+                        <div class="market-info-item price-group all-time-high-row">
+                            <span>All Time High</span>
+                            <div class="price-time">
+                                <span class="price-field" data-key="allTimeHighAsk" title="--">--</span>
+                                <span class="price-field" data-key="allTimeHighAskTime" title="--">--</span>
+                            </div>
+                            <div class="price-time">
+                                <span class="price-field" data-key="allTimeHighBid" title="--">--</span>
+                                <span class="price-field" data-key="allTimeHighBidTime" title="--">--</span>
+                            </div>
+                        </div>
+                        <div class="market-info-item price-group recent-high-row">
+                            <span>Recent High</span>
+                            <div class="price-time">
+                                <span class="price-field" data-key="recentHighAsk" title="--">--</span>
+                                <span class="price-field" data-key="recentHighAskTime" title="--">--</span>
+                            </div>
+                            <div class="price-time">
+                                <span class="price-field" data-key="recentHighBid" title="--">--</span>
+                                <span class="price-field" data-key="recentHighBidTime" title="--">--</span>
+                            </div>
+                        </div>
+                        <div class="market-info-item price-group price-row">
+                            <span class="current-price-label">Current Price</span>
+                            <span class="price-field" data-key="priceAsk" title="--">--</span>
+                            <span class="price-field" data-key="priceBid" title="--">--</span>
+                        </div>
+                        <div class="market-info-item price-group recent-low-row">
+                            <span>Recent Low</span>
+                            <div class="price-time">
+                                <span class="price-field" data-key="recentLowAsk" title="--">--</span>
+                                <span class="price-field" data-key="recentLowAskTime" title="--">--</span>
+                            </div>
+                            <div class="price-time">
+                                <span class="price-field" data-key="recentLowBid" title="--">--</span>
+                                <span class="price-field" data-key="recentLowBidTime" title="--">--</span>
+                            </div>
+                        </div>
+                        <div class="market-info-item price-group all-time-low-row">
+                            <span>All Time Low</span>
+                            <div class="price-time">
+                                <span class="price-field" data-key="allTimeLowAsk" title="--">--</span>
+                                <span class="price-field" data-key="allTimeLowAskTime" title="--">--</span>
+                            </div>
+                            <div class="price-time">
+                                <span class="price-field" data-key="allTimeLowBid" title="--">--</span>
+                                <span class="price-field" data-key="allTimeLowBidTime" title="--">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="market-info-trading-metrics">
+                        <div class="market-info-section-header">
+                            <span>Trading Metrics</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>RSI</span>
+                            <span class="data-field" data-key="rsi">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>MACD</span>
+                            <span class="data-field" data-key="macd">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>EMA</span>
+                            <span class="data-field" data-key="ema">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>Bollinger Bands</span>
+                            <span class="data-field" data-key="bollingerBands">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>ATR</span>
+                            <span class="data-field" data-key="atr">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>VWAP</span>
+                            <span class="data-field" data-key="vwap">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>Stochastic Oscillator</span>
+                            <span class="data-field" data-key="stochasticOscillator">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>OBV</span>
+                            <span class="data-field" data-key="obv">--</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="market-info-right">
+                    <div class="market-info-right-other">
+                        <div class="market-info-item single-col">
+                            <span>Title</span>
+                            <span class="data-field" data-key="marketTitle" title="--">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>Subtitle</span>
+                            <span class="data-field" data-key="marketSubtitle" title="--">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>Market Type</span>
+                            <span class="data-field" data-key="marketTypeCanCloseEarly">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>Price Good/Bad</span>
+                            <span class="data-field" data-key="priceGoodBad">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>Market Behavior</span>
+                            <span class="data-field" data-key="marketBehavior">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>Time Left</span>
+                            <span class="data-field" data-key="marketTimeLeft">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>Market Age</span>
+                            <span class="data-field" data-key="marketAge">--</span>
+                        </div>
+                        <div class="market-info-section-header">
+                            <span>Flow & Momentum</span>
+                        </div>
+                        <div class="market-info-item grid-row">
+                            <span>Top Velocity</span>
+                            <div class="bid-ask-values">
+                                <span class="data-field" data-key="askVelocityTop">--</span>
+                                <span class="data-field" data-key="topBidVelocity">--</span>
+                            </div>
+                        </div>
+                        <div class="market-info-item grid-row">
+                            <span>Bottom Velocity</span>
+                            <div class="bid-ask-values">
+                                <span class="data-field" data-key="bottomVelocityAsk">--</span>
+                                <span class="data-field" data-key="bottomVelocityBid">--</span>
+                            </div>
+                        </div>
+                        <div class="market-info-item grid-row">
+                            <span>Net Order Rate</span>
+                            <div class="bid-ask-values">
+                                <span class="data-field" data-key="netOrderRateAsk">--</span>
+                                <span class="data-field" data-key="netOrderRateBid">--</span>
+                            </div>
+                        </div>
+                        <div class="market-info-item grid-row">
+                            <span>Trade Volume</span>
+                            <div class="bid-ask-values">
+                                <span class="data-field" data-key="tradeVolumeAsk">--</span>
+                                <span class="data-field" data-key="tradeVolumeBid">--</span>
+                            </div>
+                        </div>
+                        <div class="market-info-item grid-row">
+                            <span>Average Trade Size</span>
+                            <div class="bid-ask-values">
+                                <span class="data-field" data-key="averageTradeSizeAsk">--</span>
+                                <span class="data-field" data-key="averageTradeSizeBid">--</span>
+                            </div>
+                        </div>
+                        <div class="market-info-section-header">
+                            <span>Context & Deeper Book</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>Spread</span>
+                            <span class="data-field" data-key="spreadCurrent">--</span>
+                        </div>
+                        <div class="market-info-item single-col">
+                            <span>Ask/Bid Imbal (Vol)</span>
+                            <span class="data-field" data-key="askBidImbalanceVolume">--</span>
+                        </div>
+                        <div class="market-info-item grid-row">
+                            <span>Depth Top 4</span>
+                            <div class="bid-ask-values">
+                                <span class="data-field" data-key="depthAtTop4Asks">--</span>
+                                <span class="data-field" data-key="depthAtTop4Bids">--</span>
+                            </div>
+                        </div>
+                        <div class="market-info-item grid-row">
+                            <span>Center Mass</span>
+                            <div class="bid-ask-values">
+                                <span class="data-field" data-key="askCenterOfMass">--</span>
+                                <span class="data-field" data-key="bidCenterOfMass">--</span>
+                            </div>
+                        </div>
+                        <div class="market-info-item grid-row">
+                            <span>Total Contracts</span>
+                            <div class="bid-ask-values">
+                                <span class="data-field" data-key="totalAskContracts">--</span>
+                                <span class="data-field" data-key="totalBidContracts">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="positions-container">
+            <h2>Positions - <span class="data-field" data-key="currentMarketPositions"></span></h2>
+            <div class="position-details-grid">
+                <div class="position-details-column">
+                    <div><span>Position Size</span><span class="data-field" data-key="positionSize">--</span></div>
+                    <div><span>Position ROI</span><span class="data-field" data-key="positionROI">--</span></div>
+                    <div><span>Position Upside</span><span class="data-field" data-key="positionUpside">--</span></div>
+                    <div><span>Resting Orders</span><span class="data-field" data-key="restingOrdersCount">--</span></div>
+                </div>
+                <div class="position-details-column">
+                    <div><span>Last Trade</span><span class="data-field" data-key="holdTime">--</span></div>
+                    <div><span>Buyin Price</span><span class="data-field" data-key="buyinPrice">--</span></div>
+                    <div><span>Position Downside</span><span class="data-field" data-key="positionDownside">--</span></div>
+                </div>
+            </div>
+            <div class="position-strategy">
+                <select id="buyStrategySelector" onchange="marketViewModel.changeBuyStrategy(this.value)">
+                    <option value="">Buy Strategy</option>
+                </select>
+                <select id="exitStrategySelector" onchange="marketViewModel.changeExitStrategy(this.value)">
+                    <option value="">Exit Strategy</option>
+                </select>
+            </div>
+        </div>
+        <div class="orderbook-container">
+            <h2>Orderbook <span id="orderbookLastUpdated">Updated --</span></h2>
+            <div class="orderbook-table-wrapper">
+                <table id="orderbookTable">
+                    <thead><tr><th>Price</th><th>Size</th><th>Value</th></tr></thead>
+                    <tbody id="orderbookBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="/marketModel.js"></script>
+    <script src="/marketViewModel.js"></script>
+    <script src="/marketView.js"></script>
+    <script src="/SignalRService.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const marketViewModel = new MarketViewModel(marketModel);
+            const marketView = new MarketView(marketViewModel);
+            marketViewModel.setView(marketView);
+            const signalRService = new SignalRService(marketModel, marketViewModel);
+            window.marketViewModel = marketViewModel;
+            window.signalRService = signalRService;
+        });
+    </script>
+</body>
+</html>

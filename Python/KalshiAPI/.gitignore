@@ -1,0 +1,4 @@
+.env
+__pycache__
+private_key.txt
+prod_private_key.txt

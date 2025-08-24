@@ -1,0 +1,503 @@
+<Window x:Class="TradingSimulatorGUI.MarketSnapshotWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:TradingSimulatorGUI"
+        mc:Ignorable="d"
+        Title="Market Snapshot" Height="800" Width="1200">
+    <Window.Resources>
+        <!-- Converter to colourise values based on sign -->
+        <local:PositiveNegativeBrushConverter x:Key="PositiveNegativeBrushConverter"/>
+        <Style TargetType="TextBlock" x:Key="LabelText">
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    <DockPanel>
+        <!-- Summary section at the top of the window -->
+        <Border DockPanel.Dock="Top" Padding="10" Background="#F5F5F5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <!-- Market information -->
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="{Binding Snapshot.MarketTicker}" FontSize="24" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding Snapshot.MarketType}" FontSize="14"/>
+                    <TextBlock Text="{Binding Snapshot.MarketCategory}" FontSize="14"/>
+                    <TextBlock Text="{Binding Snapshot.MarketStatus}" FontSize="14"/>
+                    <TextBlock Text="{Binding Snapshot.Timestamp, StringFormat=yyyy-MM-dd HH:mm:ss}" FontSize="14"/>
+                </StackPanel>
+                <!-- Best bid prices -->
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Best Yes Bid" Style="{StaticResource LabelText}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding Snapshot.BestYesBid}" Style="{StaticResource LabelText}"/>
+                    <TextBlock Text="Best No Bid" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding Snapshot.BestNoBid}" Style="{StaticResource LabelText}"/>
+                </StackPanel>
+                <!-- Best ask prices -->
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Best Yes Ask" Style="{StaticResource LabelText}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding Snapshot.BestYesAsk}" Style="{StaticResource LabelText}"/>
+                    <TextBlock Text="Best No Ask" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding Snapshot.BestNoAsk}" Style="{StaticResource LabelText}"/>
+                </StackPanel>
+                <!-- Spread information -->
+                <StackPanel Grid.Column="3">
+                    <TextBlock Text="Yes Spread" Style="{StaticResource LabelText}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding Snapshot.YesSpread}" Style="{StaticResource LabelText}"/>
+                    <TextBlock Text="No Spread" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding Snapshot.NoSpread}" Style="{StaticResource LabelText}"/>
+                </StackPanel>
+                <!-- Position summary -->
+                <StackPanel Grid.Column="4">
+                    <TextBlock Text="Position Size" Style="{StaticResource LabelText}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding Snapshot.PositionSize}" Style="{StaticResource LabelText}"/>
+                    <TextBlock Text="ROI (%)" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding Snapshot.PositionROI, StringFormat={}{0:F2}%}" Style="{StaticResource LabelText}"
+                               Foreground="{Binding Snapshot.PositionROI, Converter={StaticResource PositiveNegativeBrushConverter}}"/>
+                    <TextBlock Text="PnL" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding Snapshot.PositionROIAmt, StringFormat={}{0:C}}" Style="{StaticResource LabelText}"
+                               Foreground="{Binding Snapshot.PositionROIAmt, Converter={StaticResource PositiveNegativeBrushConverter}}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <!-- Main tab control -->
+        <TabControl>
+            <!-- Position details -->
+            <TabItem Header="Position">
+                <ScrollViewer>
+                    <StackPanel Margin="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="250"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Position Size:" Grid.Row="0" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.PositionSize}" Grid.Row="0" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Market Exposure:" Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.MarketExposure, StringFormat={}{0:C}}" Grid.Row="1" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Buy‑in Price:" Grid.Row="2" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.BuyinPrice, StringFormat={}{0:C}}" Grid.Row="2" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Position Upside:" Grid.Row="3" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.PositionUpside, StringFormat={}{0:C}}" Grid.Row="3" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Position Downside:" Grid.Row="4" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.PositionDownside, StringFormat={}{0:C}}" Grid.Row="4" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Total Traded:" Grid.Row="5" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TotalTraded}" Grid.Row="5" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Realized PnL:" Grid.Row="6" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.RealizedPnl, StringFormat={}{0:C}}" Grid.Row="6" Grid.Column="1" Style="{StaticResource LabelText}"
+                                       Foreground="{Binding Snapshot.RealizedPnl, Converter={StaticResource PositiveNegativeBrushConverter}}"/>
+
+                            <TextBlock Text="Fees Paid:" Grid.Row="7" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.FeesPaid, StringFormat={}{0:C}}" Grid.Row="7" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Expected Fees:" Grid.Row="8" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.ExpectedFees, StringFormat={}{0:C}}" Grid.Row="8" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Hold Time:" Grid.Row="9" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.HoldTime}" Grid.Row="9" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                        </Grid>
+                        <GroupBox Header="Resting Orders" Margin="0,20,0,0">
+                            <DataGrid ItemsSource="{Binding RestingOrdersView}"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding Action}" Header="Action"/>
+                                    <DataGridTextColumn Binding="{Binding Side}" Header="Side"/>
+                                    <DataGridTextColumn Binding="{Binding Type}" Header="Type"/>
+                                    <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
+                                    <DataGridTextColumn Binding="{Binding Price}" Header="Price"/>
+                                    <DataGridTextColumn Binding="{Binding Expiration}" Header="Expiration"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <!-- Order book details -->
+            <TabItem Header="Order Book">
+                <ScrollViewer>
+                    <StackPanel Margin="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="250"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Depth at Best Yes Bid:" Grid.Row="0" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.DepthAtBestYesBid}" Grid.Row="0" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Depth at Best No Bid:" Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.DepthAtBestNoBid}" Grid.Row="1" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Cumulative Yes Depth:" Grid.Row="2" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TopTenPercentLevelDepth_Yes}" Grid.Row="2" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Cumulative No Depth:" Grid.Row="3" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TopTenPercentLevelDepth_No}" Grid.Row="3" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Yes Bid Range:" Grid.Row="4" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.BidRange_Yes}" Grid.Row="4" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="No Bid Range:" Grid.Row="5" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.BidRange_No}" Grid.Row="5" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Total Yes Contracts:" Grid.Row="6" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TotalBidContracts_Yes}" Grid.Row="6" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Total No Contracts:" Grid.Row="7" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TotalBidContracts_No}" Grid.Row="7" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Bid Count Imbalance:" Grid.Row="8" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.BidCountImbalance}" Grid.Row="8" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Bid Volume Imbalance:" Grid.Row="9" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.BidVolumeImbalance}" Grid.Row="9" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Depth at Top 4 Yes Bids:" Grid.Row="10" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.DepthAtTop4YesBids}" Grid.Row="10" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Depth at Top 4 No Bids:" Grid.Row="11" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.DepthAtTop4NoBids}" Grid.Row="11" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Depth at Top 4 Yes Asks:" Grid.Row="12" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.DepthAtTop4YesAsks}" Grid.Row="12" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Depth at Top 4 No Asks:" Grid.Row="13" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.DepthAtTop4NoAsks}" Grid.Row="13" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Yes Center of Mass:" Grid.Row="14" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.YesBidCenterOfMass}" Grid.Row="14" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="No Center of Mass:" Grid.Row="15" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.NoBidCenterOfMass}" Grid.Row="15" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Tolerance %:" Grid.Row="16" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TolerancePercentage, StringFormat={}{0:F2}%}" Grid.Row="16" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <!-- Trade and volume metrics -->
+            <TabItem Header="Trade &amp; Volume">
+                <ScrollViewer>
+                    <StackPanel Margin="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Trade Rate Yes (/min):" Grid.Row="0" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TradeRatePerMinute_Yes}" Grid.Row="0" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Trade Rate No (/min):" Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TradeRatePerMinute_No}" Grid.Row="1" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Trade Volume Yes (/min):" Grid.Row="2" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TradeVolumePerMinute_Yes, StringFormat={}{0:C}}" Grid.Row="2" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Trade Volume No (/min):" Grid.Row="3" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TradeVolumePerMinute_No, StringFormat={}{0:C}}" Grid.Row="3" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Trade Count Yes:" Grid.Row="4" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TradeCount_Yes}" Grid.Row="4" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Trade Count No:" Grid.Row="5" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TradeCount_No}" Grid.Row="5" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Average Trade Size Yes:" Grid.Row="6" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.AverageTradeSize_Yes, StringFormat={}{0:C}}" Grid.Row="6" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Average Trade Size No:" Grid.Row="7" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.AverageTradeSize_No, StringFormat={}{0:C}}" Grid.Row="7" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Non‑Trade Orders Yes:" Grid.Row="8" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.NonTradeRelatedOrderCount_Yes}" Grid.Row="8" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Non‑Trade Orders No:" Grid.Row="9" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.NonTradeRelatedOrderCount_No}" Grid.Row="9" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Order Vol Yes Bid (/min):" Grid.Row="10" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.OrderVolumePerMinute_YesBid, StringFormat={}{0:C}}" Grid.Row="10" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Order Vol No Bid (/min):" Grid.Row="11" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.OrderVolumePerMinute_NoBid, StringFormat={}{0:C}}" Grid.Row="11" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Order Vol Yes Ask (/min):" Grid.Row="12" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.OrderVolumePerMinute_YesAsk, StringFormat={}{0:C}}" Grid.Row="12" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Order Vol No Ask (/min):" Grid.Row="13" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.OrderVolumePerMinute_NoAsk, StringFormat={}{0:C}}" Grid.Row="13" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                        </Grid>
+                        <GroupBox Header="Volume Metrics" Margin="0,20,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="250"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Highest Volume Day:" Grid.Row="0" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.HighestVolume_Day}" Grid.Row="0" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="Highest Volume Hour:" Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.HighestVolume_Hour}" Grid.Row="1" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="Highest Volume Minute:" Grid.Row="2" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.HighestVolume_Minute}" Grid.Row="2" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="Recent Volume Last Hour:" Grid.Row="3" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.RecentVolume_LastHour}" Grid.Row="3" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="Recent Volume Last 3 Hours:" Grid.Row="4" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.RecentVolume_LastThreeHours}" Grid.Row="4" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="Recent Volume Last Month:" Grid.Row="5" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.RecentVolume_LastMonth}" Grid.Row="5" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                            </Grid>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <!-- Technical indicators -->
+            <TabItem Header="Technical">
+                <ScrollViewer>
+                    <StackPanel Margin="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="RSI Short:" Grid.Row="0" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.RSI_Short}" Grid.Row="0" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="RSI Medium:" Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.RSI_Medium}" Grid.Row="1" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="RSI Long:" Grid.Row="2" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.RSI_Long}" Grid.Row="2" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <!-- MACD Medium -->
+                            <TextBlock Text="MACD Medium:" Grid.Row="3" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.MACD_Medium.MACD}" Grid.Row="3" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="Signal Medium:" Grid.Row="4" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.MACD_Medium.Signal}" Grid.Row="4" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="Histogram Medium:" Grid.Row="5" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.MACD_Medium.Histogram}" Grid.Row="5" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <!-- MACD Long -->
+                            <TextBlock Text="MACD Long:" Grid.Row="6" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.MACD_Long.MACD}" Grid.Row="6" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="Signal Long:" Grid.Row="7" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.MACD_Long.Signal}" Grid.Row="7" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="Histogram Long:" Grid.Row="8" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.MACD_Long.Histogram}" Grid.Row="8" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="EMA Medium:" Grid.Row="9" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.EMA_Medium}" Grid.Row="9" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="EMA Long:" Grid.Row="10" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.EMA_Long}" Grid.Row="10" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Bollinger Medium Lower:" Grid.Row="11" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.BollingerBands_Medium.Lower}" Grid.Row="11" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="Bollinger Medium Middle:" Grid.Row="12" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.BollingerBands_Medium.Middle}" Grid.Row="12" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="Bollinger Medium Upper:" Grid.Row="13" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.BollingerBands_Medium.Upper}" Grid.Row="13" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="ATR Medium:" Grid.Row="14" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.ATR_Medium}" Grid.Row="14" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                        </Grid>
+                        <GroupBox Header="More Indicators" Margin="0,20,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="300"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="ATR Long:" Grid.Row="0" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.ATR_Long}" Grid.Row="0" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="VWAP Short:" Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.VWAP_Short}" Grid.Row="1" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="VWAP Medium:" Grid.Row="2" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.VWAP_Medium}" Grid.Row="2" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="Stoch Short K:" Grid.Row="3" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.StochasticOscillator_Short.K}" Grid.Row="3" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="Stoch Short D:" Grid.Row="4" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.StochasticOscillator_Short.D}" Grid.Row="4" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="Stoch Medium K:" Grid.Row="5" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.StochasticOscillator_Medium.K}" Grid.Row="5" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="Stoch Medium D:" Grid.Row="6" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.StochasticOscillator_Medium.D}" Grid.Row="6" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="Stoch Long K:" Grid.Row="7" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.StochasticOscillator_Long.K}" Grid.Row="7" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="Stoch Long D:" Grid.Row="8" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.StochasticOscillator_Long.D}" Grid.Row="8" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="OBV Medium:" Grid.Row="9" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.OBV_Medium}" Grid.Row="9" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                                <TextBlock Text="OBV Long:" Grid.Row="10" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="{Binding Snapshot.OBV_Long}" Grid.Row="10" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                            </Grid>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <!-- Miscellaneous information -->
+            <TabItem Header="Misc">
+                <ScrollViewer>
+                    <StackPanel Margin="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Snapshot Version:" Grid.Row="0" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.SnapshotSchemaVersion}" Grid.Row="0" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Change Metrics Mature:" Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.ChangeMetricsMature}" Grid.Row="1" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Market Age:" Grid.Row="2" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.MarketAge}" Grid.Row="2" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Time Left:" Grid.Row="3" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.TimeLeft}" Grid.Row="3" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Can Close Early:" Grid.Row="4" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.CanCloseEarly}" Grid.Row="4" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Last WS Message:" Grid.Row="5" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.LastWebSocketMessageReceived, StringFormat=yyyy-MM-dd HH:mm:ss}" Grid.Row="5" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Behavior Yes:" Grid.Row="6" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.MarketBehaviorYes}" Grid.Row="6" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Behavior No:" Grid.Row="7" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.MarketBehaviorNo}" Grid.Row="7" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Good/Bad Yes:" Grid.Row="8" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.GoodBadPriceYes}" Grid.Row="8" Grid.Column="1" Style="{StaticResource LabelText}"/>
+
+                            <TextBlock Text="Good/Bad No:" Grid.Row="9" Grid.Column="0" Style="{StaticResource LabelText}"/>
+                            <TextBlock Text="{Binding Snapshot.GoodBadPriceNo}" Grid.Row="9" Grid.Column="1" Style="{StaticResource LabelText}"/>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SmokehouseBot": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:60208;http://localhost:60209"
+    }
+  }
+}
