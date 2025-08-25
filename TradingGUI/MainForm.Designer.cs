@@ -10,6 +10,8 @@
         private System.Windows.Forms.Button btnRunSet;
         private ScottPlot.FormsPlot formsPlot1;
         private System.Windows.Forms.ToolTip toolTip1;
+        private Button btnCheckAll;
+        private Button btnUncheckAll;
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -74,6 +76,19 @@
             this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
             this.btnRunSet.Text = "Run Set";
             this.btnRunSet.Click += new System.EventHandler(this.btnRunSet_Click);
+
+            this.btnCheckAll = new Button();
+            this.btnUncheckAll = new Button();
+
+            this.btnCheckAll.Text = "Check All";
+            this.btnUncheckAll.Text = "Uncheck All";
+
+            this.btnCheckAll.Click += BtnCheckAll_Click;
+            this.btnUncheckAll.Click += BtnUncheckAll_Click;
+
+            buttonPanel.Controls.Add(this.btnCheckAll);
+            buttonPanel.Controls.Add(this.btnUncheckAll);
+
 
             // ToolTip
             this.toolTip1.InitialDelay = 100;

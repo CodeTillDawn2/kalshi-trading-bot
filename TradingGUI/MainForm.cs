@@ -17,6 +17,7 @@ namespace SimulatorWinForms
         private readonly string _cacheDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "TestingOutput");
         private List<(double x, double y, string memo)> _tooltipPoints = new();
         private string _lastTooltipMemo = null;
+        private HashSet<string> _checkedMarketNames = new();
         public MainForm()
         {
             InitializeComponent();
@@ -29,11 +30,34 @@ namespace SimulatorWinForms
 
             Load += (_, __) => LoadCache();
             dgvMarkets.SelectionChanged += DgvMarkets_SelectionChanged;
+
+            dgvMarkets.CellValueChanged += dgvMarkets_CellValueChanged;
+            dgvMarkets.CurrentCellDirtyStateChanged += (s, e) =>
+            {
+                if (dgvMarkets.IsCurrentCellDirty)
+                    dgvMarkets.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            };
+            dgvMarkets.Sorted += (s, e) => RestoreCheckboxes();
+
         }
 
         private void LoadCache()
         {
+            dgvMarkets.Columns.Clear(); // ensure clean state
             dgvMarkets.Rows.Clear();
+
+            // Rebuild columns (without binding CheckedCol to data source)
+            var checkCol = new DataGridViewCheckBoxColumn
+            {
+                Name = "CheckedCol",
+                HeaderText = "✓",
+                FalseValue = false,
+                TrueValue = true,
+                ValueType = typeof(bool)
+            };
+            dgvMarkets.Columns.Add(checkCol);
+            dgvMarkets.Columns.Add("Market", "Market");
+            dgvMarkets.Columns.Add("PnL", "PnL");
 
             if (!Directory.Exists(_cacheDir))
             {
@@ -47,7 +71,7 @@ namespace SimulatorWinForms
                 {
                     var json = File.ReadAllText(file);
                     var data = JsonSerializer.Deserialize<CachedMarketData>(json);
-                    dgvMarkets.Rows.Add(data.Market, data.PnL.ToString("F2"));
+                    dgvMarkets.Rows.Add(_checkedMarketNames.Contains(data.Market), data.Market, data.PnL.ToString("F2"));
                 }
                 catch (Exception ex)
                 {
@@ -55,6 +79,34 @@ namespace SimulatorWinForms
                 }
             }
         }
+
+        private void dgvMarkets_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || dgvMarkets.Columns[e.ColumnIndex].Name != "CheckedCol")
+                return;
+
+            var row = dgvMarkets.Rows[e.RowIndex];
+            var isChecked = Convert.ToBoolean(row.Cells["CheckedCol"].Value);
+            var marketName = row.Cells["Market"].Value?.ToString();
+
+            if (marketName == null) return;
+
+            if (isChecked)
+                _checkedMarketNames.Add(marketName);
+            else
+                _checkedMarketNames.Remove(marketName);
+        }
+
+        private void RestoreCheckboxes()
+        {
+            foreach (DataGridViewRow row in dgvMarkets.Rows)
+            {
+                var marketName = row.Cells["Market"].Value?.ToString();
+                if (marketName != null)
+                    row.Cells["CheckedCol"].Value = _checkedMarketNames.Contains(marketName);
+            }
+        }
+
 
         private void AddPoints(List<PricePoint> points, string label, Color color)
         {
@@ -96,6 +148,28 @@ namespace SimulatorWinForms
             }
         }
 
+        private void BtnCheckAll_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in dgvMarkets.Rows)
+            {
+                row.Cells["CheckedCol"].Value = true;
+                var marketName = row.Cells["Market"].Value?.ToString();
+                if (marketName != null)
+                    _checkedMarketNames.Add(marketName);
+            }
+        }
+
+        private void BtnUncheckAll_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in dgvMarkets.Rows)
+            {
+                row.Cells["CheckedCol"].Value = false;
+                var marketName = row.Cells["Market"].Value?.ToString();
+                if (marketName != null)
+                    _checkedMarketNames.Remove(marketName);
+            }
+        }
+
 
         private void AppendLog(string msg)
         {
@@ -107,9 +181,9 @@ namespace SimulatorWinForms
         {
             foreach (DataGridViewRow row in dgvMarkets.Rows)
             {
-                if (row.Cells[0].Value?.ToString() == market)
+                if (row.Cells["Market"].Value?.ToString() == market)
                 {
-                    row.Cells[1].Value = pnl.ToString("F2");
+                    row.Cells["PnL"].Value = pnl.ToString("F2");
                     break;
                 }
             }
@@ -118,7 +192,7 @@ namespace SimulatorWinForms
         private void DgvMarkets_SelectionChanged(object sender, EventArgs e)
         {
             if (dgvMarkets.SelectedRows.Count == 0) return;
-            string market = dgvMarkets.SelectedRows[0].Cells[0].Value?.ToString();
+            string market = dgvMarkets.SelectedRows[0].Cells["Market"].Value?.ToString();
             if (!string.IsNullOrWhiteSpace(market))
                 LoadChart(market);
         }
