@@ -21,95 +21,166 @@
 
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-
-            this.dgvMarkets = new System.Windows.Forms.DataGridView();
-            this.rtbLog = new System.Windows.Forms.RichTextBox();
-            this.btnRun = new System.Windows.Forms.Button();
-            this.btnReload = new System.Windows.Forms.Button();
-            this.btnRunSet = new System.Windows.Forms.Button();
-            this.formsPlot1 = new ScottPlot.FormsPlot();
-            var layout = new System.Windows.Forms.TableLayoutPanel();
-
-            ((System.ComponentModel.ISupportInitialize)(this.dgvMarkets)).BeginInit();
-            this.SuspendLayout();
-
+            components = new System.ComponentModel.Container();
+            toolTip1 = new ToolTip(components);
+            dgvMarkets = new DataGridView();
+            rtbLog = new RichTextBox();
+            btnRun = new Button();
+            btnReload = new Button();
+            btnRunSet = new Button();
+            formsPlot1 = new ScottPlot.FormsPlot();
+            layout = new TableLayoutPanel();
+            buttonPanel = new FlowLayoutPanel();
+            btnCheckAll = new Button();
+            btnUncheckAll = new Button();
+            dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
+            ((System.ComponentModel.ISupportInitialize)dgvMarkets).BeginInit();
+            layout.SuspendLayout();
+            buttonPanel.SuspendLayout();
+            SuspendLayout();
+            // 
+            // toolTip1
+            // 
+            toolTip1.AutoPopDelay = 5000;
+            toolTip1.InitialDelay = 100;
+            toolTip1.ReshowDelay = 100;
+            // 
+            // dgvMarkets
+            // 
+            dgvMarkets.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvMarkets.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumn1, dataGridViewTextBoxColumn2 });
+            dgvMarkets.Dock = DockStyle.Fill;
+            dgvMarkets.Location = new Point(3, 3);
+            dgvMarkets.Name = "dgvMarkets";
+            dgvMarkets.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvMarkets.Size = new Size(294, 504);
+            dgvMarkets.TabIndex = 0;
+            // 
+            // rtbLog
+            // 
+            rtbLog.BackColor = Color.Black;
+            layout.SetColumnSpan(rtbLog, 2);
+            rtbLog.Dock = DockStyle.Fill;
+            rtbLog.Font = new Font("Consolas", 9F);
+            rtbLog.ForeColor = Color.Lime;
+            rtbLog.Location = new Point(3, 513);
+            rtbLog.Name = "rtbLog";
+            rtbLog.ReadOnly = true;
+            rtbLog.Size = new Size(1094, 68);
+            rtbLog.TabIndex = 2;
+            rtbLog.Text = "";
+            // 
+            // btnRun
+            // 
+            btnRun.Location = new Point(3, 3);
+            btnRun.Name = "btnRun";
+            btnRun.Size = new Size(75, 23);
+            btnRun.TabIndex = 0;
+            btnRun.Text = "Run Strategy";
+            btnRun.Click += btnRun_Click;
+            // 
+            // btnReload
+            // 
+            btnReload.Location = new Point(84, 3);
+            btnReload.Name = "btnReload";
+            btnReload.Size = new Size(75, 23);
+            btnReload.TabIndex = 1;
+            btnReload.Text = "Reload Cache";
+            btnReload.Click += btnReload_Click;
+            // 
+            // btnRunSet
+            // 
+            btnRunSet.Location = new Point(165, 3);
+            btnRunSet.Name = "btnRunSet";
+            btnRunSet.Size = new Size(75, 23);
+            btnRunSet.TabIndex = 2;
+            btnRunSet.Text = "Run Set";
+            btnRunSet.Click += btnRunSet_Click;
+            // 
+            // formsPlot1
+            // 
+            formsPlot1.Dock = DockStyle.Fill;
+            formsPlot1.Location = new Point(304, 3);
+            formsPlot1.Margin = new Padding(4, 3, 4, 3);
+            formsPlot1.Name = "formsPlot1";
+            formsPlot1.Size = new Size(792, 504);
+            formsPlot1.TabIndex = 1;
+            // 
             // layout
-            layout.Dock = DockStyle.Fill;
+            // 
             layout.ColumnCount = 2;
-            layout.RowCount = 2;
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 300F));
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 120F));
-
-            // dgvMarkets
-            this.dgvMarkets.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvMarkets.Columns.Add("Market", "Market");
-            this.dgvMarkets.Columns.Add("PnL", "PnL");
-            this.dgvMarkets.Dock = DockStyle.Fill;
-            this.dgvMarkets.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-
-            // formsPlot1
-            this.formsPlot1.Dock = DockStyle.Fill;
-
-            // rtbLog
-            this.rtbLog.ReadOnly = true;
-            this.rtbLog.Dock = DockStyle.Fill;
-            this.rtbLog.Font = new System.Drawing.Font("Consolas", 9);
-            this.rtbLog.BackColor = System.Drawing.Color.Black;
-            this.rtbLog.ForeColor = System.Drawing.Color.Lime;
-
-            // Buttons layout
-            var buttonPanel = new FlowLayoutPanel();
-            buttonPanel.Dock = DockStyle.Fill;
-            buttonPanel.FlowDirection = FlowDirection.LeftToRight;
-            buttonPanel.Controls.Add(this.btnRun);
-            buttonPanel.Controls.Add(this.btnReload);
-            buttonPanel.Controls.Add(this.btnRunSet);
-
-            // Buttons
-            this.btnRun.Text = "Run Strategy";
-            this.btnRun.Click += new System.EventHandler(this.btnRun_Click);
-            this.btnReload.Text = "Reload Cache";
-            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
-            this.btnRunSet.Text = "Run Set";
-            this.btnRunSet.Click += new System.EventHandler(this.btnRunSet_Click);
-
-            this.btnCheckAll = new Button();
-            this.btnUncheckAll = new Button();
-
-            this.btnCheckAll.Text = "Check All";
-            this.btnUncheckAll.Text = "Uncheck All";
-
-            this.btnCheckAll.Click += BtnCheckAll_Click;
-            this.btnUncheckAll.Click += BtnUncheckAll_Click;
-
-            buttonPanel.Controls.Add(this.btnCheckAll);
-            buttonPanel.Controls.Add(this.btnUncheckAll);
-
-
-            // ToolTip
-            this.toolTip1.InitialDelay = 100;
-            this.toolTip1.ReshowDelay = 100;
-            this.toolTip1.AutoPopDelay = 5000;
-
-            // Layout assembly
-            layout.Controls.Add(this.dgvMarkets, 0, 0);
-            layout.Controls.Add(this.formsPlot1, 1, 0);
-            layout.Controls.Add(this.rtbLog, 0, 1);
+            layout.Controls.Add(dgvMarkets, 0, 0);
+            layout.Controls.Add(formsPlot1, 1, 0);
+            layout.Controls.Add(rtbLog, 0, 1);
             layout.Controls.Add(buttonPanel, 1, 1);
-            layout.SetColumnSpan(this.rtbLog, 2);
-
+            layout.Dock = DockStyle.Fill;
+            layout.Location = new Point(0, 0);
+            layout.Name = "layout";
+            layout.RowCount = 2;
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 74F));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 66F));
+            layout.Size = new Size(1100, 650);
+            layout.TabIndex = 0;
+            // 
+            // buttonPanel
+            // 
+            buttonPanel.Controls.Add(btnRun);
+            buttonPanel.Controls.Add(btnReload);
+            buttonPanel.Controls.Add(btnRunSet);
+            buttonPanel.Controls.Add(btnCheckAll);
+            buttonPanel.Controls.Add(btnUncheckAll);
+            buttonPanel.Dock = DockStyle.Fill;
+            buttonPanel.Location = new Point(3, 587);
+            buttonPanel.Name = "buttonPanel";
+            buttonPanel.Size = new Size(294, 60);
+            buttonPanel.TabIndex = 3;
+            // 
+            // btnCheckAll
+            // 
+            btnCheckAll.Location = new Point(3, 32);
+            btnCheckAll.Name = "btnCheckAll";
+            btnCheckAll.Size = new Size(75, 23);
+            btnCheckAll.TabIndex = 3;
+            btnCheckAll.Text = "Check All";
+            btnCheckAll.Click += BtnCheckAll_Click;
+            // 
+            // btnUncheckAll
+            // 
+            btnUncheckAll.Location = new Point(84, 32);
+            btnUncheckAll.Name = "btnUncheckAll";
+            btnUncheckAll.Size = new Size(75, 23);
+            btnUncheckAll.TabIndex = 4;
+            btnUncheckAll.Text = "Uncheck All";
+            btnUncheckAll.Click += BtnUncheckAll_Click;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            dataGridViewTextBoxColumn1.HeaderText = "Market";
+            dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            dataGridViewTextBoxColumn2.HeaderText = "PnL";
+            dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            // 
             // MainForm
-            this.ClientSize = new System.Drawing.Size(1100, 650);
-            this.Controls.Add(layout);
-            this.Text = "Trading Strategy Viewer";
-
-            ((System.ComponentModel.ISupportInitialize)(this.dgvMarkets)).EndInit();
-            this.ResumeLayout(false);
+            // 
+            ClientSize = new Size(1100, 650);
+            Controls.Add(layout);
+            Name = "MainForm";
+            Text = "Trading Strategy Viewer";
+            ((System.ComponentModel.ISupportInitialize)dgvMarkets).EndInit();
+            layout.ResumeLayout(false);
+            buttonPanel.ResumeLayout(false);
+            ResumeLayout(false);
         }
-
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private TableLayoutPanel layout;
+        private FlowLayoutPanel buttonPanel;
     }
 }
