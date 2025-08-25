@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using ScottPlot;
 using TradingSimulator.Simulator;
 using TradingSimulator.TestObjects;
+using System.Threading.Tasks;
 
 namespace SimulatorWinForms
 {
@@ -18,6 +19,9 @@ namespace SimulatorWinForms
         private List<(double x, double y, string memo)> _tooltipPoints = new();
         private string _lastTooltipMemo = null;
         private HashSet<string> _checkedMarketNames = new();
+        private bool _simSetup;
+
+
         public MainForm()
         {
             InitializeComponent();
@@ -78,6 +82,17 @@ namespace SimulatorWinForms
                     AppendLog($"Error loading {file}: {ex.Message}");
                 }
             }
+        }
+        private void EnsureSimulatorSetup()
+        {
+            if (_simSetup) return;
+            _simulator.Setup();
+            _simSetup = true;
+        }
+
+        private List<string> GetCheckedMarkets()
+        {
+            return _checkedMarketNames.ToList();
         }
 
         private void dgvMarkets_CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -235,19 +250,44 @@ namespace SimulatorWinForms
 
         }
 
-        private void btnRun_Click(object sender, EventArgs e)
+        private async void btnRun_Click(object sender, EventArgs e)
         {
-            _ = _simulator.RunStrategiesForGuiAsync();
+            var sel = GetCheckedMarkets();
+            EnsureSimulatorSetup();
+            try
+            {
+                await _simulator.RunMultipleAllStrategiesForGuiAsync(writeToFile: false, marketsToRun: sel);
+            }
+            finally
+            {
+                _simulator.TearDown();
+                _simSetup = false;
+            }
         }
 
         private void btnReload_Click(object sender, EventArgs e)
         {
             LoadCache();
         }
-
-        private void btnRunSet_Click(object sender, EventArgs e)
+        private async void btnRunSet_Click(object sender, EventArgs e)
         {
-            _ = _simulator.RunSelectedSetForGuiAsync("Breakout2", "B2_AntiSpike_C", true);
+            var sel = GetCheckedMarkets();
+            EnsureSimulatorSetup();
+            try
+            {
+                await _simulator.RunSelectedSetForGuiAsync(
+                    setKey: "Breakout2",
+                    weightName: "B2_MRB5_A10",
+                    writeToFile: true,
+                    marketsToRun: sel);
+            }
+            finally
+            {
+                _simulator.TearDown();
+                _simSetup = false;
+            }
         }
+
+
     }
 }

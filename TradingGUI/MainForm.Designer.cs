@@ -24,6 +24,8 @@
             components = new System.ComponentModel.Container();
             toolTip1 = new ToolTip(components);
             dgvMarkets = new DataGridView();
+            dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
+            dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
             rtbLog = new RichTextBox();
             btnRun = new Button();
             btnReload = new Button();
@@ -33,8 +35,6 @@
             buttonPanel = new FlowLayoutPanel();
             btnCheckAll = new Button();
             btnUncheckAll = new Button();
-            dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
-            dataGridViewTextBoxColumn2 = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dgvMarkets).BeginInit();
             layout.SuspendLayout();
             buttonPanel.SuspendLayout();
@@ -57,6 +57,16 @@
             dgvMarkets.Size = new Size(294, 504);
             dgvMarkets.TabIndex = 0;
             // 
+            // dataGridViewTextBoxColumn1
+            // 
+            dataGridViewTextBoxColumn1.HeaderText = "Market";
+            dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            dataGridViewTextBoxColumn2.HeaderText = "PnL";
+            dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            // 
             // rtbLog
             // 
             rtbLog.BackColor = Color.Black;
@@ -77,21 +87,21 @@
             btnRun.Name = "btnRun";
             btnRun.Size = new Size(75, 23);
             btnRun.TabIndex = 0;
-            btnRun.Text = "Run Strategy";
+            btnRun.Text = "Run All";
             btnRun.Click += btnRun_Click;
             // 
             // btnReload
             // 
             btnReload.Location = new Point(84, 3);
             btnReload.Name = "btnReload";
-            btnReload.Size = new Size(75, 23);
+            btnReload.Size = new Size(90, 23);
             btnReload.TabIndex = 1;
             btnReload.Text = "Reload Cache";
             btnReload.Click += btnReload_Click;
             // 
             // btnRunSet
             // 
-            btnRunSet.Location = new Point(165, 3);
+            btnRunSet.Location = new Point(180, 3);
             btnRunSet.Name = "btnRunSet";
             btnRunSet.Size = new Size(75, 23);
             btnRunSet.TabIndex = 2;
@@ -123,6 +133,8 @@
             layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 74F));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 66F));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             layout.Size = new Size(1100, 650);
             layout.TabIndex = 0;
             // 
@@ -156,16 +168,6 @@
             btnUncheckAll.TabIndex = 4;
             btnUncheckAll.Text = "Uncheck All";
             btnUncheckAll.Click += BtnUncheckAll_Click;
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            dataGridViewTextBoxColumn1.HeaderText = "Market";
-            dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            // 
-            // dataGridViewTextBoxColumn2
-            // 
-            dataGridViewTextBoxColumn2.HeaderText = "PnL";
-            dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
             // 
             // MainForm
             // 
