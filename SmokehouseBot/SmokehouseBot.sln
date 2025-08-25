@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmokehouseDTOs", "..\Smokeh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KalshiBotData", "..\KalshiBotContext\KalshiBotData.csproj", "{FF123049-8B01-4626-B76C-E14FD2598C5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatorGUI", "..\SimulatorGUI\SimulatorGUI.csproj", "{9B2B7879-A5B9-E0F1-196A-475E1E657065}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradingGUI", "..\TradingGUI\TradingGUI.csproj", "{C50F1943-7B9C-480E-A91B-994F65B96A16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,10 +53,10 @@ Global
 		{FF123049-8B01-4626-B76C-E14FD2598C5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF123049-8B01-4626-B76C-E14FD2598C5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF123049-8B01-4626-B76C-E14FD2598C5A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B2B7879-A5B9-E0F1-196A-475E1E657065}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B2B7879-A5B9-E0F1-196A-475E1E657065}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B2B7879-A5B9-E0F1-196A-475E1E657065}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B2B7879-A5B9-E0F1-196A-475E1E657065}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C50F1943-7B9C-480E-A91B-994F65B96A16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C50F1943-7B9C-480E-A91B-994F65B96A16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C50F1943-7B9C-480E-A91B-994F65B96A16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C50F1943-7B9C-480E-A91B-994F65B96A16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

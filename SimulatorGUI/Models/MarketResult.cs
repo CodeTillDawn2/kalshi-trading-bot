@@ -1,1 +1,0 @@
-namespace SimulatorGUI.Models { public class MarketResult { public string Market { get; set; } = ""; public double PnL { get; set; } public bool IsSelected { get; set; } } }
