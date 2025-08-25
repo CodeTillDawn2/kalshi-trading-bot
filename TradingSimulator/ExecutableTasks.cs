@@ -91,9 +91,10 @@ namespace TradingSimulator.Executable
         [SetUp]
         public void Setup()
         {
-            config = new ConfigurationBuilder()
-                .SetBasePath(@"C:\Users\Peter\Documents\GitHub\kalshi-trading-bot\SmokehouseBot")
-                .AddJsonFile("appsettings.local.json", optional: false)
+            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "SmokehouseBot"));
+            var config = new ConfigurationBuilder()
+                .SetBasePath(basePath)
+                .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
                 .Build();
 
             var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>();

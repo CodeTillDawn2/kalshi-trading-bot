@@ -21,15 +21,15 @@ namespace SimulatorWinForms
         private HashSet<string> _checkedMarketNames = new();
         private bool _simSetup;
         private Label _tooltipOverlay;
-
+        private ScottPlot.Plottable.VLine _hoverLine;
         public MainForm()
         {
             InitializeComponent();
 
-            // keep tooltip fixed even when focus changes
             toolTip1.ShowAlways = true;
 
             _simulator = new SimulatorTests();
+            _simulator.EnsureInitialized();
             _simulator.OnTestProgress += msg => AppendLog(msg);
             _simulator.OnProfitLossUpdate += (m, pnl) => UpdatePnL(m, pnl);
             _simulator.OnMarketProcessed += m => AppendLog($"✔ Processed {m}");
@@ -66,73 +66,104 @@ namespace SimulatorWinForms
                 _tooltipOverlay.MaximumSize = new Size(dgvMarkets.Width - 16, 0);
             };
 
+            // thin vertical hover indicator (no pattern property in this ScottPlot version)
+            _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Gray, 1);
+            _hoverLine.IsVisible = false;
         }
 
 
-        private void LoadCache()
+        // MainForm.cs
+        private async Task LoadCache()
         {
             dgvMarkets.Columns.Clear();
             dgvMarkets.Rows.Clear();
 
-            // grid sizing defaults
             dgvMarkets.RowHeadersVisible = false;
             dgvMarkets.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            var checkCol = new DataGridViewCheckBoxColumn
-            {
-                Name = "CheckedCol",
-                HeaderText = "✓",
-                FalseValue = false,
-                TrueValue = true,
-                ValueType = typeof(bool),
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-            };
+            var checkCol = new DataGridViewCheckBoxColumn { Name = "CheckedCol", HeaderText = "✓", AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells };
+            var marketCol = new DataGridViewTextBoxColumn { Name = "Market", HeaderText = "Market", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 75 };
+            var pnlCol = new DataGridViewTextBoxColumn { Name = "PnL", HeaderText = "PnL", AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells };
             dgvMarkets.Columns.Add(checkCol);
-
-            var marketCol = new DataGridViewTextBoxColumn
-            {
-                Name = "Market",
-                HeaderText = "Market",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                FillWeight = 75
-            };
             dgvMarkets.Columns.Add(marketCol);
-
-            var pnlCol = new DataGridViewTextBoxColumn
-            {
-                Name = "PnL",
-                HeaderText = "PnL",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            };
             dgvMarkets.Columns.Add(pnlCol);
 
-            // tighten checkbox column after it's realized
             dgvMarkets.HandleCreated += (_, __) =>
             {
-                if (dgvMarkets.Columns["CheckedCol"] is DataGridViewCheckBoxColumn c)
-                    dgvMarkets.Columns["CheckedCol"].Width = 32;
+                if (dgvMarkets.Columns["CheckedCol"] is DataGridViewCheckBoxColumn c) c.Width = 32;
             };
 
-            if (!Directory.Exists(_cacheDir))
+            // Always drive entries from snapshot groups
+            try
             {
-                AppendLog($"Missing cache directory: {_cacheDir}");
-                return;
-            }
+                _simulator.EnsureInitialized();
 
-            foreach (var file in Directory.GetFiles(_cacheDir, "*.json"))
+                var groupNames = await _simulator.GetSnapshotGroupNames();
+                var bases = groupNames
+                    .Select(g => System.Text.RegularExpressions.Regex.Replace(g ?? "", @"_(\d+)$", ""))
+                    .Where(b => !string.IsNullOrWhiteSpace(b))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(b => b, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                // Optional enrichment from cache (if present)
+                var pnlByBase = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+                if (Directory.Exists(_cacheDir))
+                {
+                    foreach (var b in bases)
+                    {
+                        try
+                        {
+                            var canonical = Path.Combine(_cacheDir, $"{b}.json");
+                            if (File.Exists(canonical))
+                            {
+                                var json = File.ReadAllText(canonical);
+                                var cd = JsonSerializer.Deserialize<CachedMarketData>(json);
+                                if (cd != null) pnlByBase[b] = cd.PnL;
+                                continue;
+                            }
+
+                            var parts = Directory.GetFiles(_cacheDir, $"{b}_*.json");
+                            if (parts.Length > 0)
+                            {
+                                double sum = 0;
+                                foreach (var p in parts)
+                                {
+                                    var pj = File.ReadAllText(p);
+                                    var d = JsonSerializer.Deserialize<CachedMarketData>(pj);
+                                    if (d != null) sum += d.PnL;
+                                }
+                                pnlByBase[b] = sum;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            AppendLog($"PnL enrich failed for {b}: {ex.Message}");
+                        }
+                    }
+                }
+                else
+                {
+                    AppendLog($"Missing cache directory: {_cacheDir} (entries still loaded from snapshots).");
+                }
+
+                foreach (var b in bases)
+                {
+                    string pnlText = pnlByBase.TryGetValue(b, out var pnl) ? pnl.ToString("F2") : "";
+                    dgvMarkets.Rows.Add(_checkedMarketNames.Contains(b), b, pnlText);
+                }
+
+                AppendLog($"Loaded {bases.Count} markets from snapshot groups (cache used only for PnL if available).");
+                RestoreCheckboxes();
+            }
+            catch (Exception ex)
             {
-                try
-                {
-                    var json = File.ReadAllText(file);
-                    var data = JsonSerializer.Deserialize<CachedMarketData>(json);
-                    dgvMarkets.Rows.Add(_checkedMarketNames.Contains(data.Market), data.Market, data.PnL.ToString("F2"));
-                }
-                catch (Exception ex)
-                {
-                    AppendLog($"Error loading {file}: {ex.Message}");
-                }
+                AppendLog($"Snapshot group load failed: {ex.Message}");
             }
         }
+
+
+
 
         private void EnsureSimulatorSetup()
         {
@@ -174,14 +205,14 @@ namespace SimulatorWinForms
         }
 
 
-        private void AddPoints(List<PricePoint> pts, string fallbackLabel, Color color, int size, bool collectTooltips)
+        private void AddPoints(List<PricePoint> pts, string fallbackLabel, Color color, int size, bool collectTooltips, bool connectLine = false)
         {
             if (pts == null || pts.Count == 0) return;
 
             double[] xs = pts.Select(p => p.Date.ToOADate()).ToArray();
             double[] ys = pts.Select(p => (double)p.Price).ToArray();
 
-            formsPlot1.Plot.AddScatter(xs, ys, color, markerSize: size, lineWidth: 0);
+            formsPlot1.Plot.AddScatter(xs, ys, color, markerSize: size, lineWidth: connectLine ? 1 : 0);
 
             if (!collectTooltips) return;
 
@@ -192,16 +223,12 @@ namespace SimulatorWinForms
             }
         }
 
-
-
-
         private void FormsPlot1_MouseMove(object sender, MouseEventArgs e)
         {
             if (_tooltipPoints == null || _tooltipPoints.Count == 0)
                 return;
 
             int mxPx = e.X;
-
             int bestIdx = 0;
             int bestDxPx = int.MaxValue;
 
@@ -224,14 +251,23 @@ namespace SimulatorWinForms
                 _tooltipOverlay.BringToFront();
                 _lastTooltipMemo = memo;
             }
-        }
 
+            if (_hoverLine != null)
+            {
+                _hoverLine.X = _tooltipPoints[bestIdx].x; // OADate X
+                _hoverLine.IsVisible = true;
+            }
+
+            formsPlot1.Render();
+        }
 
 
         private void FormsPlot1_MouseLeave(object sender, EventArgs e)
         {
             _tooltipOverlay.Visible = false;
             _lastTooltipMemo = null;
+            _hoverLine.IsVisible = false;
+            formsPlot1.Render();
         }
 
 
@@ -286,43 +322,89 @@ namespace SimulatorWinForms
 
         private void LoadChart(string market)
         {
-            // pick the most recent cache file for this market (handles suffixed names)
-            var candidates = Directory.GetFiles(_cacheDir, $"{market}*.json");
-            if (candidates == null || candidates.Length == 0)
-            {
-                AppendLog($"Missing file(s): {_cacheDir}\\{market}*.json");
-                return;
-            }
-            string path = candidates
-                .Select(p => new FileInfo(p))
-                .OrderByDescending(fi => fi.LastWriteTimeUtc)
-                .First().FullName;
-
-            var json = File.ReadAllText(path);
-            var data = JsonSerializer.Deserialize<CachedMarketData>(json);
-
             formsPlot1.Plot.Clear();
             _tooltipPoints.Clear();
 
-            // bids/asks: dots only, NO tooltip
-            AddPoints(data.AskPoints, "Ask", Color.OrangeRed, 4, false);
-            AddPoints(data.BidPoints, "Bid", Color.DodgerBlue, 4, false);
+            var baseMarket = System.Text.RegularExpressions.Regex.Replace(market ?? "", @"_(\d+)$", "");
+            var canonical = Path.Combine(_cacheDir, $"{baseMarket}.json");
 
-            // buy/sell/events: larger dots WITH tooltip (prefix comes from ProcessMarketAsync)
-            AddPoints(data.BuyPoints, "Buy", Color.Green, 12, true);
-            AddPoints(data.SellPoints, "Sell", Color.Red, 12, true);
-            AddPoints(data.EventPoints, "Event", Color.Purple, 10, true);
+            CachedMarketData merged = null;
+
+            if (File.Exists(canonical))
+            {
+                var json = File.ReadAllText(canonical);
+                merged = JsonSerializer.Deserialize<CachedMarketData>(json);
+            }
+            else
+            {
+                var parts = Directory.GetFiles(_cacheDir, $"{baseMarket}_*.json");
+                if (parts == null || parts.Length == 0)
+                {
+                    AppendLog($"Missing files for {baseMarket}");
+                    return;
+                }
+
+                merged = new CachedMarketData
+                {
+                    Market = baseMarket,
+                    PnL = 0,
+                    BidPoints = new List<PricePoint>(),
+                    AskPoints = new List<PricePoint>(),
+                    BuyPoints = new List<PricePoint>(),
+                    SellPoints = new List<PricePoint>(),
+                    EventPoints = new List<PricePoint>(),
+                    IntendedLongPoints = new List<PricePoint>(),
+                    IntendedShortPoints = new List<PricePoint>()
+                };
+
+                foreach (var fp in parts)
+                {
+                    var json = File.ReadAllText(fp);
+                    var d = JsonSerializer.Deserialize<CachedMarketData>(json);
+                    if (d == null) continue;
+                    merged.PnL += d.PnL;
+                    if (d.BidPoints != null) merged.BidPoints.AddRange(d.BidPoints);
+                    if (d.AskPoints != null) merged.AskPoints.AddRange(d.AskPoints);
+                    if (d.BuyPoints != null) merged.BuyPoints.AddRange(d.BuyPoints);
+                    if (d.SellPoints != null) merged.SellPoints.AddRange(d.SellPoints);
+                    if (d.EventPoints != null) merged.EventPoints.AddRange(d.EventPoints);
+                    if (d.IntendedLongPoints != null) merged.IntendedLongPoints.AddRange(d.IntendedLongPoints);
+                    if (d.IntendedShortPoints != null) merged.IntendedShortPoints.AddRange(d.IntendedShortPoints);
+                }
+
+                merged.BidPoints = merged.BidPoints.OrderBy(p => p.Date).ToList();
+                merged.AskPoints = merged.AskPoints.OrderBy(p => p.Date).ToList();
+                merged.BuyPoints = merged.BuyPoints.OrderBy(p => p.Date).ToList();
+                merged.SellPoints = merged.SellPoints.OrderBy(p => p.Date).ToList();
+                merged.EventPoints = merged.EventPoints.OrderBy(p => p.Date).ToList();
+                merged.IntendedLongPoints = merged.IntendedLongPoints.OrderBy(p => p.Date).ToList();
+                merged.IntendedShortPoints = merged.IntendedShortPoints.OrderBy(p => p.Date).ToList();
+            }
+
+            if (merged == null)
+            {
+                AppendLog($"No data for {baseMarket}");
+                return;
+            }
+
+            AddPoints(merged.AskPoints, "Ask", Color.OrangeRed, 4, collectTooltips: false, connectLine: true);
+            AddPoints(merged.BidPoints, "Bid", Color.DodgerBlue, 4, collectTooltips: false, connectLine: true);
+            AddPoints(merged.BuyPoints, "Buy", Color.Green, 12, collectTooltips: true);
+            AddPoints(merged.SellPoints, "Sell", Color.Red, 12, collectTooltips: true);
+            AddPoints(merged.EventPoints, "Event", Color.Purple, 0, collectTooltips: true);
 
             formsPlot1.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
-
             formsPlot1.Plot.AxisAuto();
             var lim = formsPlot1.Plot.GetAxisLimits();
             double xPad = (lim.XMax - lim.XMin) * 0.05;
             double yPad = (lim.YMax - lim.YMin) * 0.10;
             formsPlot1.Plot.SetAxisLimits(lim.XMin - xPad, lim.XMax + xPad, lim.YMin - yPad, lim.YMax + yPad);
 
+            _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Gray, 1);
+            _hoverLine.IsVisible = false;
             formsPlot1.Render();
         }
+
 
 
 

@@ -51,9 +51,9 @@ namespace TradingSimulator.Tests
         public async Task OneTimeSetUp()
         {
             // Load configuration from appsettings.local.json (real credentials)
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(@"C:\Users\Peter\Documents\GitHub\kalshi-trading-bot\SmokehouseBot")
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "SmokehouseBot"));
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(basePath)
                 .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
                 .Build();
 

@@ -167,18 +167,15 @@ namespace TradingStrategies
 
         private SimulatedOrderbook GetOrInitializeBook(SimulationPath path, MarketSnapshot snapshot)
         {
-            SimulatedOrderbook book;
             if (path.SimulatedBook == null)
             {
-                book = new SimulatedOrderbook();
+                var book = new SimulatedOrderbook();
                 book.InitializeFromSnapshot(snapshot);
+                path.SimulatedBook = book; // <<< persist it
             }
-            else
-            {
-                book = path.SimulatedBook;
-            }
-            return book;
+            return path.SimulatedBook;
         }
+
 
         private MarketSnapshot CreateEffectiveSnapshot(MarketSnapshot snapshot, SimulatedOrderbook book, SimulationPath path)
         {
@@ -198,6 +195,7 @@ namespace TradingStrategies
             return currentMarketConditions;
         }
 
+        // Keep this whole method together
         private SimulationPath HandleNoStrategies(SimulationPath path, MarketSnapshot effectiveSnapshot, MarketType currentMarketConditions, SimulatedOrderbook book, bool isSingleStrategy)
         {
             Dictionary<MarketType, HashSet<Strategy>> newStrategiesByMarketConditions;
@@ -207,11 +205,12 @@ namespace TradingStrategies
 
             if (isSingleStrategy)
             {
-                // Mutate in-place for efficiency
                 newStrategiesByMarketConditions = path.StrategiesByMarketConditions;
-                actionBook = book; // Reference, no clone
-                actionResting = path.SimulatedRestingOrders; // Reference
-                actionEvents = path.Events; // Reference
+                actionBook = book; // reference
+                actionResting = path.SimulatedRestingOrders; // reference
+                actionEvents = path.Events; // reference
+                path.SimulatedBook = actionBook;                 // <<< ensure persisted
+                path.SimulatedRestingOrders = actionResting;     // <<< ensure persisted
             }
             else
             {
@@ -224,7 +223,7 @@ namespace TradingStrategies
                 actionEvents = new List<ReportGenerator.EventLog>(path.Events);
             }
 
-            path.CurrentRisk = path.CurrentRisk; // No change
+            path.CurrentRisk = path.CurrentRisk;
 
             var (restingYes, restingNo) = SummarizeRestingOrders(actionResting);
 
@@ -258,14 +257,14 @@ namespace TradingStrategies
                 AverageTradeSize_No = effectiveSnapshot.AverageTradeSize_No,
                 RestingYesBids = restingYes,
                 RestingNoBids = restingNo,
-                Memo = "" // No memo for no-action
+                Memo = ""
             };
 
             actionEvents.Add(eventLog);
 
             if (isSingleStrategy)
             {
-                return path; // Return mutated path
+                return path; // mutated
             }
             else
             {
@@ -278,6 +277,7 @@ namespace TradingStrategies
                 };
             }
         }
+
 
         private Dictionary<ActionType, List<(Strategy strategy, ActionDecision decision)>> GroupStrategiesByAction(HashSet<Strategy> activeStrategies, 
             MarketSnapshot effectiveSnapshot, MarketSnapshot previousEffectiveSnapshot)
@@ -296,7 +296,8 @@ namespace TradingStrategies
             return actionGroups;
         }
 
-        private SimulationPath HandleActionGroup(SimulationPath path, ActionType action, List<(Strategy strategy, ActionDecision decision)> strategiesWithDecisions, 
+        // Keep this whole method together
+        private SimulationPath HandleActionGroup(SimulationPath path, ActionType action, List<(Strategy strategy, ActionDecision decision)> strategiesWithDecisions,
             MarketSnapshot effectiveSnapshot, MarketSnapshot? previousEffectiveSnapshot,
             MarketType currentMarketConditions, SimulatedOrderbook book, double maxRisk, bool isSingleStrategy)
         {
@@ -309,11 +310,12 @@ namespace TradingStrategies
 
             if (isSingleStrategy)
             {
-                // Mutate in-place
-                actionBook = book; // Reference
-                actionResting = path.SimulatedRestingOrders; // Reference
-                actionEvents = path.Events; // Reference
+                actionBook = book;                          // reference
+                actionResting = path.SimulatedRestingOrders;
+                actionEvents = path.Events;
                 newStrategiesByMarketConditions = path.StrategiesByMarketConditions;
+                path.SimulatedBook = actionBook;            // <<< ensure persisted
+                path.SimulatedRestingOrders = actionResting;// <<< ensure persisted
             }
             else
             {
@@ -332,24 +334,18 @@ namespace TradingStrategies
             double newCash = path.Cash;
             double newRisk = path.CurrentRisk;
 
-            // Handle implicit exit if flipping position direction
             bool needsFlip = (action == ActionType.Long && path.Position < 0) || (action == ActionType.Short && path.Position > 0);
             bool skipAdd = false;
             if (needsFlip)
             {
-                skipAdd = HandleSpecificAction(ActionType.Exit, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)), 
-                    effectiveSnapshot, previousEffectiveSnapshot,
-                    actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk);
-                if (skipAdd || newPosition == path.Position)
-                {
-                    return null;
-                }
+                skipAdd = HandleSpecificAction(ActionType.Exit, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)),
+                    effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk);
+                if (skipAdd || newPosition == path.Position) return null;
             }
             else
             {
-                skipAdd = HandleSpecificAction(action, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)), 
-                    effectiveSnapshot, previousEffectiveSnapshot,
-                    actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk);
+                skipAdd = HandleSpecificAction(action, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)),
+                    effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk);
                 if (skipAdd) return null;
             }
 
@@ -366,25 +362,16 @@ namespace TradingStrategies
                 YesSpread = actionBook.GetBestYesAsk() - actionBook.GetBestYesBid(),
                 TradeRate = (effectiveSnapshot.TradeRatePerMinute_Yes) + (effectiveSnapshot.TradeRatePerMinute_No),
                 RSI = effectiveSnapshot.RSI_Medium ?? 0,
-                Strategies = string.Join(", ", strategiesWithDecisions.Select(t => t.strategy).SelectMany(s => s.Strats.Select(e => e.GetType().Name)).Distinct()),
+                Strategies = string.Join(", ", strategiesWithDecisions.Select(s => s.strategy.Name)),
                 BestYesBid = effectiveSnapshot.BestYesBid,
                 BestYesAsk = effectiveSnapshot.BestYesAsk,
                 BestNoBid = effectiveSnapshot.BestNoBid,
-                BestNoAsk = effectiveSnapshot.BestNoAsk,
                 NoSpread = effectiveSnapshot.NoSpread,
                 DepthAtBestYesBid = effectiveSnapshot.DepthAtBestYesBid,
                 DepthAtBestNoBid = effectiveSnapshot.DepthAtBestNoBid,
                 TotalYesBidContracts = effectiveSnapshot.TotalBidContracts_Yes,
                 TotalNoBidContracts = effectiveSnapshot.TotalBidContracts_No,
                 BidImbalance = effectiveSnapshot.BidCountImbalance,
-                TradeRatePerMinute_Yes = effectiveSnapshot.TradeRatePerMinute_Yes,
-                TradeRatePerMinute_No = effectiveSnapshot.TradeRatePerMinute_No,
-                TradeVolumePerMinute_Yes = effectiveSnapshot.TradeVolumePerMinute_Yes,
-                TradeVolumePerMinute_No = effectiveSnapshot.TradeVolumePerMinute_No,
-                TradeCount_Yes = effectiveSnapshot.TradeCount_Yes,
-                TradeCount_No = effectiveSnapshot.TradeCount_No,
-                AverageTradeSize_Yes = effectiveSnapshot.AverageTradeSize_Yes,
-                AverageTradeSize_No = effectiveSnapshot.AverageTradeSize_No,
                 RestingYesBids = restingYes,
                 RestingNoBids = restingNo,
                 Memo = decision.Memo
@@ -397,7 +384,7 @@ namespace TradingStrategies
                 path.Position = newPosition;
                 path.Cash = newCash;
                 path.CurrentRisk = newRisk;
-                return path; // Return mutated path
+                return path;
             }
             else
             {
@@ -411,6 +398,7 @@ namespace TradingStrategies
                 return newPath;
             }
         }
+
 
         private bool HandleSpecificAction(ActionType action, HashSet<Strategy> strategiesForAction, MarketSnapshot effectiveSnapshot, MarketSnapshot? previousEffectiveSnapshot,
             SimulatedOrderbook actionBook, List<(string action, string side, string type, int count, int price, DateTime? expiration)> actionResting, ref int newPosition, ref double newCash, ref double newRisk, SimulationPath path, DateTime timestamp, double maxRisk)

@@ -36,7 +36,7 @@ namespace TradingStrategies.Classification
                 var nb2 = json2["BestNoBid"]?.Value<int>() ?? 0;
 
                 if (IsAcceptableGap(t1, t2) && (!PriceChanged(yb1, nb1, yb2, nb2)
-                    || IsDowntimeOnlyGap(t1, t2) || (t2 - t1).TotalMinutes <= smallGapMinutes))
+                     || (t2 - t1).TotalMinutes <= smallGapMinutes))
                 {
                     currentPeriod.Add(snapshots[i]);
                 }
@@ -59,19 +59,6 @@ namespace TradingStrategies.Classification
             }
 
             return validPeriods;
-        }
-
-        private bool IsDowntimeOnlyGap(DateTime t1, DateTime t2)
-        {
-            if (t2 <= t1) return false;
-
-            TimeSpan timediff = t2 - t1;
-            double totalTimeHours = timediff.TotalHours;
-            double downtimeHours = CalculateDowntimeHours(t1, t2);
-            double activeTimeHours = totalTimeHours - downtimeHours;
-
-            // Check if the gap is mostly downtime and resumes within 10 minutes (0.1667 hours) of downtime ending
-            return downtimeHours > 0 && activeTimeHours <= 0.1667; // 10 minutes tolerance
         }
 
         private SnapshotGroupDTO CreateSnapshotGroup(List<SnapshotDTO> snapshots, int groupNumber, string snapshotDirectory)
@@ -311,39 +298,11 @@ namespace TradingStrategies.Classification
             if (diffMinutes <= smallGapMinutes) return true;
 
             double totalTimeHours = timediff.TotalHours;
-            double downtimeHours = CalculateDowntimeHours(t1, t2);
-            double activeTimeHours = totalTimeHours - downtimeHours;
-            bool GapLessThanMaxActiveGap = activeTimeHours <= maxActiveGapHours;
+            bool GapLessThanMaxActiveGap = totalTimeHours <= maxActiveGapHours;
 
             return GapLessThanMaxActiveGap;
         }
 
-        private static double CalculateDowntimeHours(DateTime start, DateTime end)
-        {
-            if (start >= end) return 0;
-
-            double totalDowntime = 0;
-            DateTime currentDate = start.Date;
-
-            while (currentDate <= end.Date)
-            {
-                // Fixed downtime: 7 AM UTC to 12 PM UTC
-                DateTime downtimeStart = currentDate.AddHours(7); // 7 AM UTC
-                DateTime downtimeEnd = currentDate.AddHours(12); // 12 PM UTC
-
-                // Calculate overlap with downtime window
-                DateTime effectiveStart = start > downtimeStart ? start : downtimeStart;
-                DateTime effectiveEnd = end < downtimeEnd ? end : downtimeEnd;
-
-                if (effectiveStart < effectiveEnd)
-                {
-                    totalDowntime += (effectiveEnd - effectiveStart).TotalHours;
-                }
-
-                currentDate = currentDate.AddDays(1);
-            }
-
-            return totalDowntime;
-        }
+     
     }
 }

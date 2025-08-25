@@ -142,6 +142,11 @@ namespace TradingSimulator.Simulator
                 context.Decision.AddSignal("PriceRise", 1.0);
         }
 
+        public void EnsureInitialized()
+        {
+            if (_scopeFactory == null) Setup();
+        }
+
         private static IEnumerable<(string Name, TradingStrategyFunc<MarketSnapshot> Func)> GetTradingStrategies()
         {
             yield return ("SimplePriceDropStrategy", SimplePriceDropStrategy);
@@ -202,13 +207,13 @@ namespace TradingSimulator.Simulator
                     // best bid/ask points with rich tooltips (market/timestamp/ask/bid/position)
                     var bidPoints = marketSnapshots.Select(s =>
                     {
-                        string prefix = $"[{marketTicker}] {s.Timestamp:yyyy-MM-dd HH:mm} | Ask={s.BestYesAsk} | Bid={s.BestYesBid} | Pos={s.PositionSize} ";
+                        string prefix = $" ";
                         return new PricePoint(s.Timestamp, s.BestYesBid, prefix + "Best Bid");
                     }).ToList();
 
                     var askPoints = marketSnapshots.Select(s =>
                     {
-                        string prefix = $"[{marketTicker}] {s.Timestamp:yyyy-MM-dd HH:mm} | Ask={s.BestYesAsk} | Bid={s.BestYesBid} | Pos={s.PositionSize} ";
+                        string prefix = $" ";
                         return new PricePoint(s.Timestamp, s.BestYesAsk, prefix + "Best Ask");
                     }).ToList();
 
@@ -220,7 +225,7 @@ namespace TradingSimulator.Simulator
                     int prevPos = 0;
                     foreach (var ev in eventLogs)
                     {
-                        string prefix = $"[{marketTicker}] {ev.Timestamp:yyyy-MM-dd HH:mm} | Ask={ev.BestYesAsk} | Bid={ev.BestYesBid} | Pos={ev.Position} ";
+                        string prefix = $" ";
 
                         if (ev.Position != prevPos)
                         {
@@ -242,7 +247,7 @@ namespace TradingSimulator.Simulator
 
                     var eventPoints = eventLogs.Select(ev =>
                     {
-                        string prefix = $"[{marketTicker}] {ev.Timestamp:yyyy-MM-dd HH:mm} | Ask={ev.BestYesAsk} | Bid={ev.BestYesBid} | Pos={ev.Position} ";
+                        string prefix = $" ";
                         return new PricePoint(ev.Timestamp, (ev.BestYesBid + ev.BestYesAsk) / 2.0, prefix + ev.Memo);
                     }).ToList();
 
@@ -259,11 +264,11 @@ namespace TradingSimulator.Simulator
 
 
         private void SaveMarketDataToFile(
-            string marketTicker, double finalPnL,
-            List<PricePoint> bidPoints, List<PricePoint> askPoints,
-            List<PricePoint> buyPoints, List<PricePoint> sellPoints,
-            List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
-            string fileNameSuffix = "")
+     string marketTicker, double finalPnL,
+     List<PricePoint> bidPoints, List<PricePoint> askPoints,
+     List<PricePoint> buyPoints, List<PricePoint> sellPoints,
+     List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
+     string fileNameSuffix = "")
         {
             var cachedData = new CachedMarketData
             {
@@ -279,10 +284,53 @@ namespace TradingSimulator.Simulator
             };
 
             var json = JsonSerializer.Serialize(cachedData);
-            Directory.CreateDirectory(_cacheDirectory);            
+            Directory.CreateDirectory(_cacheDirectory);
             var filePath = Path.Combine(_cacheDirectory, $"{marketTicker}{fileNameSuffix}.json");
             File.WriteAllText(filePath, json);
+
+            var baseTicker = System.Text.RegularExpressions.Regex.Replace(marketTicker, @"_(\d+)$", "");
+            var groupFiles = Directory.GetFiles(_cacheDirectory, $"{baseTicker}_*.json");
+
+            var merged = new CachedMarketData
+            {
+                Market = baseTicker,
+                PnL = 0,
+                BidPoints = new List<PricePoint>(),
+                AskPoints = new List<PricePoint>(),
+                BuyPoints = new List<PricePoint>(),
+                SellPoints = new List<PricePoint>(),
+                EventPoints = new List<PricePoint>(),
+                IntendedLongPoints = new List<PricePoint>(),
+                IntendedShortPoints = new List<PricePoint>()
+            };
+
+            foreach (var gf in groupFiles)
+            {
+                var gj = File.ReadAllText(gf);
+                var gd = JsonSerializer.Deserialize<CachedMarketData>(gj);
+                if (gd == null) continue;
+                merged.PnL += gd.PnL;
+                if (gd.BidPoints != null) merged.BidPoints.AddRange(gd.BidPoints);
+                if (gd.AskPoints != null) merged.AskPoints.AddRange(gd.AskPoints);
+                if (gd.BuyPoints != null) merged.BuyPoints.AddRange(gd.BuyPoints);
+                if (gd.SellPoints != null) merged.SellPoints.AddRange(gd.SellPoints);
+                if (gd.EventPoints != null) merged.EventPoints.AddRange(gd.EventPoints);
+                if (gd.IntendedLongPoints != null) merged.IntendedLongPoints.AddRange(gd.IntendedLongPoints);
+                if (gd.IntendedShortPoints != null) merged.IntendedShortPoints.AddRange(gd.IntendedShortPoints);
+            }
+
+            merged.BidPoints = merged.BidPoints.OrderBy(p => p.Date).ToList();
+            merged.AskPoints = merged.AskPoints.OrderBy(p => p.Date).ToList();
+            merged.BuyPoints = merged.BuyPoints.OrderBy(p => p.Date).ToList();
+            merged.SellPoints = merged.SellPoints.OrderBy(p => p.Date).ToList();
+            merged.EventPoints = merged.EventPoints.OrderBy(p => p.Date).ToList();
+            merged.IntendedLongPoints = merged.IntendedLongPoints.OrderBy(p => p.Date).ToList();
+            merged.IntendedShortPoints = merged.IntendedShortPoints.OrderBy(p => p.Date).ToList();
+
+            var canonicalPath = Path.Combine(_cacheDirectory, $"{baseTicker}.json");
+            File.WriteAllText(canonicalPath, JsonSerializer.Serialize(merged));
         }
+
 
 
         [Test]
