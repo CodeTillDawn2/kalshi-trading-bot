@@ -165,19 +165,18 @@ namespace TradingSimulator.Simulator
         }
 
 
-        // SimulatorTests.cs
         private async Task<(double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints,
-            List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> eventPoints,
-            List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints)>
-            ProcessMarketAsync(
-                string marketTicker,
-                List<MarketSnapshot> marketSnapshots,
-                Dictionary<MarketType, List<Strategy>> strategiesDict,
-                IServiceScopeFactory scopeFactory,
-                string progressPrefix = "",
-                bool writeToFile = false,
-                SnapshotGroupDTO? group = null,
-                bool ignoreProcessedCache = false)                   // FIX: opt-out of global skip cache
+    List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> eventPoints,
+    List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints)>
+    ProcessMarketAsync(
+        string marketTicker,
+        List<MarketSnapshot> marketSnapshots,
+        Dictionary<MarketType, List<Strategy>> strategiesDict,
+        IServiceScopeFactory scopeFactory,
+        string progressPrefix = "",
+        bool writeToFile = false,
+        SnapshotGroupDTO? group = null,
+        bool ignoreProcessedCache = false)
         {
             if (!ignoreProcessedCache && _processedMarkets.Contains(marketTicker))
             {
@@ -200,30 +199,52 @@ namespace TradingSimulator.Simulator
                     var eventLogs = bestPath.events;
                     var finalPnL = bestPath.performance.PnL;
 
-                    var bidPoints = marketSnapshots.Select(s => new PricePoint(s.Timestamp, s.BestYesBid, "")).ToList();
-                    var askPoints = marketSnapshots.Select(s => new PricePoint(s.Timestamp, s.BestYesAsk, "")).ToList();
+                    // best bid/ask points with rich tooltips (market/timestamp/ask/bid/position)
+                    var bidPoints = marketSnapshots.Select(s =>
+                    {
+                        string prefix = $"[{marketTicker}] {s.Timestamp:yyyy-MM-dd HH:mm} | Ask={s.BestYesAsk} | Bid={s.BestYesBid} | Pos={s.PositionSize} ";
+                        return new PricePoint(s.Timestamp, s.BestYesBid, prefix + "Best Bid");
+                    }).ToList();
+
+                    var askPoints = marketSnapshots.Select(s =>
+                    {
+                        string prefix = $"[{marketTicker}] {s.Timestamp:yyyy-MM-dd HH:mm} | Ask={s.BestYesAsk} | Bid={s.BestYesBid} | Pos={s.PositionSize} ";
+                        return new PricePoint(s.Timestamp, s.BestYesAsk, prefix + "Best Ask");
+                    }).ToList();
 
                     var buyPoints = new List<PricePoint>();
                     var sellPoints = new List<PricePoint>();
                     var intendedLongPoints = new List<PricePoint>();
                     var intendedShortPoints = new List<PricePoint>();
+
                     int prevPos = 0;
                     foreach (var ev in eventLogs)
                     {
+                        string prefix = $"[{marketTicker}] {ev.Timestamp:yyyy-MM-dd HH:mm} | Ask={ev.BestYesAsk} | Bid={ev.BestYesBid} | Pos={ev.Position} ";
+
                         if (ev.Position != prevPos)
                         {
-                            if (ev.Position > prevPos) buyPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesAsk, ev.Memo));
-                            else sellPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesBid, ev.Memo));
+                            if (ev.Position > prevPos)
+                                buyPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesAsk, prefix + ev.Memo));
+                            else
+                                sellPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesBid, prefix + ev.Memo));
                         }
                         else
                         {
-                            if (ev.Action == "Long") intendedLongPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesAsk, "Intended Long: " + ev.Memo));
-                            else if (ev.Action == "Short") intendedShortPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesBid, "Intended Short: " + ev.Memo));
+                            if (ev.Action == "Long")
+                                intendedLongPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesAsk, prefix + "Intended Long: " + ev.Memo));
+                            else if (ev.Action == "Short")
+                                intendedShortPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesBid, prefix + "Intended Short: " + ev.Memo));
                         }
+
                         prevPos = ev.Position;
                     }
 
-                    var eventPoints = eventLogs.Select(ev => new PricePoint(ev.Timestamp, (ev.BestYesBid + ev.BestYesAsk) / 2.0, ev.Memo)).ToList();
+                    var eventPoints = eventLogs.Select(ev =>
+                    {
+                        string prefix = $"[{marketTicker}] {ev.Timestamp:yyyy-MM-dd HH:mm} | Ask={ev.BestYesAsk} | Bid={ev.BestYesBid} | Pos={ev.Position} ";
+                        return new PricePoint(ev.Timestamp, (ev.BestYesBid + ev.BestYesAsk) / 2.0, prefix + ev.Memo);
+                    }).ToList();
 
                     return (finalPnL, bidPoints, askPoints, buyPoints, sellPoints, eventPoints, intendedLongPoints, intendedShortPoints);
                 }
@@ -234,6 +255,7 @@ namespace TradingSimulator.Simulator
             }
             return (0, null, null, null, null, null, null, null);
         }
+
 
 
         private void SaveMarketDataToFile(

@@ -174,19 +174,26 @@ namespace SimulatorWinForms
         }
 
 
-        private void AddPoints(List<PricePoint> points, string label, Color color)
+        private void AddPoints(List<PricePoint> pts, string fallbackLabel, Color color, int size, bool collectTooltips)
         {
-            if (points == null || points.Count == 0) return;
+            if (pts == null || pts.Count == 0) return;
 
-            var xs = points.Select(p => p.Date.ToOADate()).ToArray();
-            var ys = points.Select(p => p.Price).ToArray();
-            var memos = points.Select(p => string.IsNullOrWhiteSpace(p.Memo) ? label : p.Memo).ToArray();
+            double[] xs = pts.Select(p => p.Date.ToOADate()).ToArray();
+            double[] ys = pts.Select(p => (double)p.Price).ToArray();
 
-            formsPlot1.Plot.AddScatter(xs, ys, color: color, label: label, markerSize: 6, lineWidth: 0);
+            formsPlot1.Plot.AddScatter(xs, ys, color, markerSize: size, lineWidth: 0);
 
-            for (int i = 0; i < xs.Length; i++)
-                _tooltipPoints.Add((xs[i], ys[i], memos[i]));
+            if (!collectTooltips) return;
+
+            for (int i = 0; i < pts.Count; i++)
+            {
+                string memo = string.IsNullOrWhiteSpace(pts[i].Memo) ? fallbackLabel : pts[i].Memo.Trim();
+                _tooltipPoints.Add((xs[i], ys[i], memo));
+            }
         }
+
+
+
 
         private void FormsPlot1_MouseMove(object sender, MouseEventArgs e)
         {
@@ -279,41 +286,45 @@ namespace SimulatorWinForms
 
         private void LoadChart(string market)
         {
-            string path = Path.Combine(_cacheDir, $"{market}.json");
-            if (!File.Exists(path))
+            // pick the most recent cache file for this market (handles suffixed names)
+            var candidates = Directory.GetFiles(_cacheDir, $"{market}*.json");
+            if (candidates == null || candidates.Length == 0)
             {
-                AppendLog($"Missing file: {path}");
+                AppendLog($"Missing file(s): {_cacheDir}\\{market}*.json");
                 return;
             }
+            string path = candidates
+                .Select(p => new FileInfo(p))
+                .OrderByDescending(fi => fi.LastWriteTimeUtc)
+                .First().FullName;
 
             var json = File.ReadAllText(path);
             var data = JsonSerializer.Deserialize<CachedMarketData>(json);
+
             formsPlot1.Plot.Clear();
-
-            var mids = data.BidPoints.Zip(data.AskPoints, (b, a) => new
-            {
-                Time = b.Date.ToOADate(),
-                Price = (b.Price + a.Price) / 2
-            }).ToList();
-
-            formsPlot1.Plot.AddScatter(
-                mids.Select(m => m.Time).ToArray(),
-                mids.Select(m => m.Price).ToArray(),
-                color: Color.Blue,
-                label: "Midpoint");
-
             _tooltipPoints.Clear();
 
-            AddPoints(data.BuyPoints, "Buy", Color.Green);
-            AddPoints(data.SellPoints, "Sell", Color.Red);
-            AddPoints(data.EventPoints, "Event", Color.Purple);
+            // bids/asks: dots only, NO tooltip
+            AddPoints(data.AskPoints, "Ask", Color.OrangeRed, 4, false);
+            AddPoints(data.BidPoints, "Bid", Color.DodgerBlue, 4, false);
+
+            // buy/sell/events: larger dots WITH tooltip (prefix comes from ProcessMarketAsync)
+            AddPoints(data.BuyPoints, "Buy", Color.Green, 12, true);
+            AddPoints(data.SellPoints, "Sell", Color.Red, 12, true);
+            AddPoints(data.EventPoints, "Event", Color.Purple, 10, true);
 
             formsPlot1.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
 
-            formsPlot1.Plot.Legend();
-            formsPlot1.Render();
+            formsPlot1.Plot.AxisAuto();
+            var lim = formsPlot1.Plot.GetAxisLimits();
+            double xPad = (lim.XMax - lim.XMin) * 0.05;
+            double yPad = (lim.YMax - lim.YMin) * 0.10;
+            formsPlot1.Plot.SetAxisLimits(lim.XMin - xPad, lim.XMax + xPad, lim.YMin - yPad, lim.YMax + yPad);
 
+            formsPlot1.Render();
         }
+
+
 
         private async void btnRun_Click(object sender, EventArgs e)
         {
