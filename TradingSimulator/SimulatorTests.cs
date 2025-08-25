@@ -171,22 +171,22 @@ namespace TradingSimulator.Simulator
 
 
         private async Task<(double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints,
-    List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> eventPoints,
-    List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints)>
-    ProcessMarketAsync(
-        string marketTicker,
-        List<MarketSnapshot> marketSnapshots,
-        Dictionary<MarketType, List<Strategy>> strategiesDict,
-        IServiceScopeFactory scopeFactory,
-        string progressPrefix = "",
-        bool writeToFile = false,
-        SnapshotGroupDTO? group = null,
-        bool ignoreProcessedCache = false)
+         List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
+         List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints)>
+     ProcessMarketAsync(
+         string marketTicker,
+         List<MarketSnapshot> marketSnapshots,
+         Dictionary<MarketType, List<Strategy>> strategiesDict,
+         IServiceScopeFactory scopeFactory,
+         string progressPrefix = "",
+         bool writeToFile = false,
+         SnapshotGroupDTO? group = null,
+         bool ignoreProcessedCache = false)
         {
             if (!ignoreProcessedCache && _processedMarkets.Contains(marketTicker))
             {
                 OnTestProgress?.Invoke($"{progressPrefix}Skipping cached market: {marketTicker}");
-                return (0, null, null, null, null, null, null, null);
+                return (0, null, null, null, null, null, null, null, null);
             }
             OnTestProgress?.Invoke($"{progressPrefix}Processing market: {marketTicker}");
 
@@ -204,29 +204,21 @@ namespace TradingSimulator.Simulator
                     var eventLogs = bestPath.events;
                     var finalPnL = bestPath.performance.PnL;
 
-                    // best bid/ask points with rich tooltips (market/timestamp/ask/bid/position)
-                    var bidPoints = marketSnapshots.Select(s =>
-                    {
-                        string prefix = $" ";
-                        return new PricePoint(s.Timestamp, s.BestYesBid, prefix + "Best Bid");
-                    }).ToList();
-
-                    var askPoints = marketSnapshots.Select(s =>
-                    {
-                        string prefix = $" ";
-                        return new PricePoint(s.Timestamp, s.BestYesAsk, prefix + "Best Ask");
-                    }).ToList();
+                    var bidPoints = marketSnapshots.Select(s => new PricePoint(s.Timestamp, s.BestYesBid, " Best Bid")).ToList();
+                    var askPoints = marketSnapshots.Select(s => new PricePoint(s.Timestamp, s.BestYesAsk, " Best Ask")).ToList();
 
                     var buyPoints = new List<PricePoint>();
                     var sellPoints = new List<PricePoint>();
+                    var exitPoints = new List<PricePoint>();
                     var intendedLongPoints = new List<PricePoint>();
                     var intendedShortPoints = new List<PricePoint>();
 
                     int prevPos = 0;
                     foreach (var ev in eventLogs)
                     {
-                        string prefix = $" ";
+                        string prefix = " ";
 
+                        // trade markers (existing)
                         if (ev.Position != prevPos)
                         {
                             if (ev.Position > prevPos)
@@ -242,33 +234,42 @@ namespace TradingSimulator.Simulator
                                 intendedShortPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesBid, prefix + "Intended Short: " + ev.Memo));
                         }
 
+                        // NEW: explicit exits (close long at bid; close short at ask)
+                        bool isExit = string.Equals(ev.Action, "Exit", StringComparison.OrdinalIgnoreCase)
+                                      || (prevPos != 0 && ev.Position == 0);
+                        if (isExit)
+                        {
+                            if (prevPos > 0)
+                                exitPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesBid, prefix + "Exit Long: " + ev.Memo));
+                            else if (prevPos < 0)
+                                exitPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesAsk, prefix + "Exit Short: " + ev.Memo));
+                        }
+
                         prevPos = ev.Position;
                     }
 
-                    var eventPoints = eventLogs.Select(ev =>
-                    {
-                        string prefix = $" ";
-                        return new PricePoint(ev.Timestamp, (ev.BestYesBid + ev.BestYesAsk) / 2.0, prefix + ev.Memo);
-                    }).ToList();
+                    var eventPoints = eventLogs
+                        .Select(ev => new PricePoint(ev.Timestamp, (ev.BestYesBid + ev.BestYesAsk) / 2.0, " " + ev.Memo))
+                        .ToList();
 
-                    return (finalPnL, bidPoints, askPoints, buyPoints, sellPoints, eventPoints, intendedLongPoints, intendedShortPoints);
+                    return (finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints);
                 }
             }
             finally
             {
                 OnTestProgress?.Invoke($"{progressPrefix}Cleared memory for market: {marketTicker}");
             }
-            return (0, null, null, null, null, null, null, null);
+            return (0, null, null, null, null, null, null, null, null);
         }
 
 
 
         private void SaveMarketDataToFile(
-     string marketTicker, double finalPnL,
-     List<PricePoint> bidPoints, List<PricePoint> askPoints,
-     List<PricePoint> buyPoints, List<PricePoint> sellPoints,
-     List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
-     string fileNameSuffix = "")
+        string marketTicker, double finalPnL,
+        List<PricePoint> bidPoints, List<PricePoint> askPoints,
+        List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
+        List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
+        string fileNameSuffix = "")
         {
             var cachedData = new CachedMarketData
             {
@@ -278,6 +279,7 @@ namespace TradingSimulator.Simulator
                 AskPoints = askPoints,
                 BuyPoints = buyPoints,
                 SellPoints = sellPoints,
+                ExitPoints = exitPoints,
                 EventPoints = eventPoints,
                 IntendedLongPoints = intendedLongPoints,
                 IntendedShortPoints = intendedShortPoints
@@ -299,6 +301,7 @@ namespace TradingSimulator.Simulator
                 AskPoints = new List<PricePoint>(),
                 BuyPoints = new List<PricePoint>(),
                 SellPoints = new List<PricePoint>(),
+                ExitPoints = new List<PricePoint>(),
                 EventPoints = new List<PricePoint>(),
                 IntendedLongPoints = new List<PricePoint>(),
                 IntendedShortPoints = new List<PricePoint>()
@@ -314,6 +317,7 @@ namespace TradingSimulator.Simulator
                 if (gd.AskPoints != null) merged.AskPoints.AddRange(gd.AskPoints);
                 if (gd.BuyPoints != null) merged.BuyPoints.AddRange(gd.BuyPoints);
                 if (gd.SellPoints != null) merged.SellPoints.AddRange(gd.SellPoints);
+                if (gd.ExitPoints != null) merged.ExitPoints.AddRange(gd.ExitPoints);
                 if (gd.EventPoints != null) merged.EventPoints.AddRange(gd.EventPoints);
                 if (gd.IntendedLongPoints != null) merged.IntendedLongPoints.AddRange(gd.IntendedLongPoints);
                 if (gd.IntendedShortPoints != null) merged.IntendedShortPoints.AddRange(gd.IntendedShortPoints);
@@ -323,6 +327,7 @@ namespace TradingSimulator.Simulator
             merged.AskPoints = merged.AskPoints.OrderBy(p => p.Date).ToList();
             merged.BuyPoints = merged.BuyPoints.OrderBy(p => p.Date).ToList();
             merged.SellPoints = merged.SellPoints.OrderBy(p => p.Date).ToList();
+            merged.ExitPoints = merged.ExitPoints.OrderBy(p => p.Date).ToList();
             merged.EventPoints = merged.EventPoints.OrderBy(p => p.Date).ToList();
             merged.IntendedLongPoints = merged.IntendedLongPoints.OrderBy(p => p.Date).ToList();
             merged.IntendedShortPoints = merged.IntendedShortPoints.OrderBy(p => p.Date).ToList();
@@ -330,6 +335,7 @@ namespace TradingSimulator.Simulator
             var canonicalPath = Path.Combine(_cacheDirectory, $"{baseTicker}.json");
             File.WriteAllText(canonicalPath, JsonSerializer.Serialize(merged));
         }
+
 
 
 
@@ -597,7 +603,7 @@ namespace TradingSimulator.Simulator
                 var groupForId = new SnapshotGroupDTO { MarketTicker = marketTicker, JsonPath = $"{marketTicker}.json" };
 
                 (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints,
-                 List<PricePoint> buyPoints, List<PricePoint> sellPoints,
+                 List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
                  List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints)
                     = await ProcessMarketAsync(
                         marketTicker, marketSnapshots, strategiesDict, _scopeFactory,
@@ -606,7 +612,7 @@ namespace TradingSimulator.Simulator
                 if (bidPoints != null)
                 {
                     if (writeToFile)
-                        SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints,
+                        SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints,
                                              eventPoints, intendedLongPoints, intendedShortPoints,
                                              fileNameSuffix: $"_{setKey}_{weightName}");
 
@@ -732,7 +738,7 @@ namespace TradingSimulator.Simulator
 
                     OnTestProgress?.Invoke($"Strategy Set {dto.StrategyName} ({setIdx + 1}/{totalSets}) processing market {market} ({mIdx + 1}/{totalMarkets})");
 
-                    var (finalPnL, bid, ask, buy, sell, ev, il, ishort) =
+                    var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort) =
                         await ProcessMarketAsync(
                             market, marketSnapshots, strategies, _scopeFactory,
                             progressPrefix: $"[Bollinger/{dto.StrategyName}] ",
@@ -742,7 +748,7 @@ namespace TradingSimulator.Simulator
                     if (bid != null)
                     {
                         if (writeToFile)
-                            SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, ev, il, ishort,
+                            SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
                                 fileNameSuffix: $"_Bollinger_{dto.StrategyName}");
 
                         dto.WeightSetMarkets.Add(new WeightSetMarketDTO
@@ -842,7 +848,7 @@ namespace TradingSimulator.Simulator
 
                     OnTestProgress?.Invoke($"Strategy Set {dto.StrategyName} ({setIdx + 1}/{totalSets}) processing market {market} ({mIdx + 1}/{totalMarkets})");
 
-                    var (finalPnL, bid, ask, buy, sell, ev, il, ishort) =
+                    var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort) =
                         await ProcessMarketAsync(
                             market, marketSnapshots, strategies, _scopeFactory,
                             progressPrefix: $"[FlowMo/{dto.StrategyName}] ",
@@ -852,7 +858,7 @@ namespace TradingSimulator.Simulator
                     if (bid != null)
                     {
                         if (writeToFile)
-                            SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, ev, il, ishort,
+                            SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
                                 fileNameSuffix: $"_FlowMo_{dto.StrategyName}");
 
                         dto.WeightSetMarkets.Add(new WeightSetMarketDTO
@@ -955,13 +961,14 @@ namespace TradingSimulator.Simulator
                 // Create a dummy SnapshotGroupDTO for uniqueId derivation
                 var groupForId = new SnapshotGroupDTO { MarketTicker = marketTicker, JsonPath = $"{marketTicker}.json" };
 
-                (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
+                (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
+                    List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
                     await ProcessMarketAsync(marketTicker, marketSnapshots, strategiesDict, _scopeFactory,
                         progressPrefix: $"Strategy set {strategyName}: ", writeToFile: writeToFile, group: groupForId);
 
                 if (bidPoints != null)
                 {
-                    if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, eventPoints, intendedLongPoints, intendedShortPoints);
+                    if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints);
 
                     weightSetDto.WeightSetMarkets.Add(new WeightSetMarketDTO
                     {
@@ -1075,13 +1082,14 @@ namespace TradingSimulator.Simulator
                     var strategyName = weightSetDtos[strategyIndex].StrategyName;
                     OnTestProgress?.Invoke($"Processing Breakout strategy set {strategyName} ({strategyIndex + 1}/{strategiesList.Count}) for market {marketTicker}");
 
-                    (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
+                    (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
+                        List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
                         await ProcessMarketAsync(marketTicker, marketSnapshots, strategiesDict, _scopeFactory,
                             progressPrefix: $"Breakout strategy {strategyName}: ", writeToFile: writeToFile, group: groupForId);
 
                     if (bidPoints != null)
                     {
-                        if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, eventPoints, intendedLongPoints, intendedShortPoints, fileNameSuffix: $"_Breakout_{strategyName}");
+                        if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, fileNameSuffix: $"_Breakout_{strategyName}");
 
                         weightSetDtos[strategyIndex].WeightSetMarkets.Add(new WeightSetMarketDTO
                         {
@@ -1202,13 +1210,14 @@ namespace TradingSimulator.Simulator
                     var strategyName = weightSetDtos[strategyIndex].StrategyName;
                     OnTestProgress?.Invoke($"Processing Breakout strategy set {strategyName} ({strategyIndex + 1}/{strategiesList.Count}) for market {marketTicker}");
 
-                    (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
+                    (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
+                        List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
                         await ProcessMarketAsync(marketTicker, marketSnapshots, strategiesDict, _scopeFactory,
                             progressPrefix: $"Breakout strategy {strategyName}: ", writeToFile: writeToFile, group: groupForId);
 
                     if (bidPoints != null)
                     {
-                        if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, eventPoints, intendedLongPoints, intendedShortPoints, fileNameSuffix: $"_Breakout_{strategyName}");
+                        if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, fileNameSuffix: $"_Breakout_{strategyName}");
 
                         weightSetDtos[strategyIndex].WeightSetMarkets.Add(new WeightSetMarketDTO
                         {
@@ -1329,13 +1338,14 @@ namespace TradingSimulator.Simulator
                     var strategyName = weightSetDtos[strategyIndex].StrategyName;
                     OnTestProgress?.Invoke($"Processing Nothing Happens strategy set {strategyName} ({strategyIndex + 1}/{strategiesList.Count}) for market {marketTicker}");
 
-                    (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
+                    (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
+                        List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
                         await ProcessMarketAsync(marketTicker, marketSnapshots, strategiesDict, _scopeFactory,
                             progressPrefix: $"Nothing Happens strategy {strategyName}: ", writeToFile: writeToFile, group: groupForId);
 
                     if (bidPoints != null)
                     {
-                        if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, eventPoints, intendedLongPoints, intendedShortPoints, fileNameSuffix: $"_NothingHappens_{strategyName}");
+                        if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, fileNameSuffix: $"_NothingHappens_{strategyName}");
 
                         weightSetDtos[strategyIndex].WeightSetMarkets.Add(new WeightSetMarketDTO
                         {

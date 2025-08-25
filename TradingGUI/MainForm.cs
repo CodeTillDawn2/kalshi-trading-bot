@@ -352,6 +352,7 @@ namespace SimulatorWinForms
                     AskPoints = new List<PricePoint>(),
                     BuyPoints = new List<PricePoint>(),
                     SellPoints = new List<PricePoint>(),
+                    ExitPoints = new List<PricePoint>(),
                     EventPoints = new List<PricePoint>(),
                     IntendedLongPoints = new List<PricePoint>(),
                     IntendedShortPoints = new List<PricePoint>()
@@ -367,6 +368,7 @@ namespace SimulatorWinForms
                     if (d.AskPoints != null) merged.AskPoints.AddRange(d.AskPoints);
                     if (d.BuyPoints != null) merged.BuyPoints.AddRange(d.BuyPoints);
                     if (d.SellPoints != null) merged.SellPoints.AddRange(d.SellPoints);
+                    if (d.ExitPoints != null) merged.ExitPoints.AddRange(d.ExitPoints);
                     if (d.EventPoints != null) merged.EventPoints.AddRange(d.EventPoints);
                     if (d.IntendedLongPoints != null) merged.IntendedLongPoints.AddRange(d.IntendedLongPoints);
                     if (d.IntendedShortPoints != null) merged.IntendedShortPoints.AddRange(d.IntendedShortPoints);
@@ -376,6 +378,7 @@ namespace SimulatorWinForms
                 merged.AskPoints = merged.AskPoints.OrderBy(p => p.Date).ToList();
                 merged.BuyPoints = merged.BuyPoints.OrderBy(p => p.Date).ToList();
                 merged.SellPoints = merged.SellPoints.OrderBy(p => p.Date).ToList();
+                merged.ExitPoints = merged.ExitPoints.OrderBy(p => p.Date).ToList();
                 merged.EventPoints = merged.EventPoints.OrderBy(p => p.Date).ToList();
                 merged.IntendedLongPoints = merged.IntendedLongPoints.OrderBy(p => p.Date).ToList();
                 merged.IntendedShortPoints = merged.IntendedShortPoints.OrderBy(p => p.Date).ToList();
@@ -391,6 +394,7 @@ namespace SimulatorWinForms
             AddPoints(merged.BidPoints, "Bid", Color.DodgerBlue, 4, collectTooltips: false, connectLine: true);
             AddPoints(merged.BuyPoints, "Buy", Color.Green, 12, collectTooltips: true);
             AddPoints(merged.SellPoints, "Sell", Color.Red, 12, collectTooltips: true);
+            AddPoints(merged.ExitPoints, "Exit", Color.Black, 12, collectTooltips: true); // NEW
             AddPoints(merged.EventPoints, "Event", Color.Purple, 0, collectTooltips: true);
 
             formsPlot1.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
@@ -404,7 +408,6 @@ namespace SimulatorWinForms
             _hoverLine.IsVisible = false;
             formsPlot1.Render();
         }
-
 
 
 
@@ -435,7 +438,7 @@ namespace SimulatorWinForms
             {
                 await _simulator.RunSelectedSetForGuiAsync(
                     setKey: "Breakout2",
-                    weightName: "B2_MRB5_A10",
+                    weightName: "B2_MRB5_A09",
                     writeToFile: true,
                     marketsToRun: sel);
             }

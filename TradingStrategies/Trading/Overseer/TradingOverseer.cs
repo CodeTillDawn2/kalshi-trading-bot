@@ -41,7 +41,6 @@ namespace TradingStrategies
         {
             if (snapshots == null || snapshots.Count == 0) return new List<(PathPerformance, List<EventLog>)>();
 
-            // Detect single-strategy mode to enable in-place mutations (no cloning)
             bool isSingleStrategy = scenario.StrategiesByMarketConditions.Values.All(hs => hs.Count <= 1);
 
             var initialStrategiesByMarketConditions = scenario.StrategiesByMarketConditions.ToDictionary(
@@ -85,7 +84,8 @@ namespace TradingStrategies
                         continue;
                     }
 
-                    var actionGroups = GroupStrategiesByAction(activeStrategies, effectiveSnapshot, prevSnapshot);
+                    // PASS simulated position here
+                    var actionGroups = GroupStrategiesByAction(activeStrategies, effectiveSnapshot, prevSnapshot, path.Position);
 
                     foreach (var kvp in actionGroups)
                     {
@@ -279,14 +279,18 @@ namespace TradingStrategies
         }
 
 
-        private Dictionary<ActionType, List<(Strategy strategy, ActionDecision decision)>> GroupStrategiesByAction(HashSet<Strategy> activeStrategies, 
-            MarketSnapshot effectiveSnapshot, MarketSnapshot previousEffectiveSnapshot)
+        private Dictionary<ActionType, List<(Strategy strategy, ActionDecision decision)>> GroupStrategiesByAction(
+            HashSet<Strategy> activeStrategies,
+            MarketSnapshot effectiveSnapshot,
+            MarketSnapshot previousEffectiveSnapshot,
+            int simulationPosition)
         {
             var actionGroups = new Dictionary<ActionType, List<(Strategy strategy, ActionDecision decision)>>();
 
             foreach (var strategy in activeStrategies)
             {
-                var decision = strategy.GetAction(effectiveSnapshot, previousEffectiveSnapshot);
+                // PASS simulated position to the strategy
+                var decision = strategy.GetAction(effectiveSnapshot, previousEffectiveSnapshot, simulationPosition);
                 var action = decision.Type;
                 if (!actionGroups.ContainsKey(action))
                     actionGroups[action] = new List<(Strategy strategy, ActionDecision decision)>();
@@ -296,15 +300,14 @@ namespace TradingStrategies
             return actionGroups;
         }
 
-        // Keep this whole method together
         private SimulationPath HandleActionGroup(SimulationPath path, ActionType action, List<(Strategy strategy, ActionDecision decision)> strategiesWithDecisions,
-            MarketSnapshot effectiveSnapshot, MarketSnapshot? previousEffectiveSnapshot,
-            MarketType currentMarketConditions, SimulatedOrderbook book, double maxRisk, bool isSingleStrategy)
+      MarketSnapshot effectiveSnapshot, MarketSnapshot? previousEffectiveSnapshot,
+      MarketType currentMarketConditions, SimulatedOrderbook book, double maxRisk, bool isSingleStrategy)
         {
             var decision = strategiesWithDecisions.First().decision;
 
             SimulatedOrderbook actionBook;
-            List<(string, string, string, int, int, DateTime?)> actionResting;
+            List<(string action, string side, string type, int count, int price, DateTime? expiration)> actionResting;
             List<ReportGenerator.EventLog> actionEvents;
             Dictionary<MarketType, HashSet<Strategy>> newStrategiesByMarketConditions;
 
@@ -314,8 +317,8 @@ namespace TradingStrategies
                 actionResting = path.SimulatedRestingOrders;
                 actionEvents = path.Events;
                 newStrategiesByMarketConditions = path.StrategiesByMarketConditions;
-                path.SimulatedBook = actionBook;            // <<< ensure persisted
-                path.SimulatedRestingOrders = actionResting;// <<< ensure persisted
+                path.SimulatedBook = actionBook;            // persist
+                path.SimulatedRestingOrders = actionResting;// persist
             }
             else
             {
@@ -339,13 +342,13 @@ namespace TradingStrategies
             if (needsFlip)
             {
                 skipAdd = HandleSpecificAction(ActionType.Exit, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)),
-                    effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk);
+                    effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk, path.Position);
                 if (skipAdd || newPosition == path.Position) return null;
             }
             else
             {
                 skipAdd = HandleSpecificAction(action, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)),
-                    effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk);
+                    effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk, path.Position);
                 if (skipAdd) return null;
             }
 
@@ -401,7 +404,7 @@ namespace TradingStrategies
 
 
         private bool HandleSpecificAction(ActionType action, HashSet<Strategy> strategiesForAction, MarketSnapshot effectiveSnapshot, MarketSnapshot? previousEffectiveSnapshot,
-            SimulatedOrderbook actionBook, List<(string action, string side, string type, int count, int price, DateTime? expiration)> actionResting, ref int newPosition, ref double newCash, ref double newRisk, SimulationPath path, DateTime timestamp, double maxRisk)
+      SimulatedOrderbook actionBook, List<(string action, string side, string type, int count, int price, DateTime? expiration)> actionResting, ref int newPosition, ref double newCash, ref double newRisk, SimulationPath path, DateTime timestamp, double maxRisk, int simulationPosition)
         {
             int qty = 0;
             if (action == ActionType.Long || action == ActionType.Short || action == ActionType.Exit)
@@ -470,12 +473,13 @@ namespace TradingStrategies
                 int posDelta = longSide ? filled : -filled;
                 newPosition += posDelta;
 
-                // Apply taker fees
+                // taker fees
                 newCash -= 0.0007 * totalCost;
             }
             else if (action == ActionType.PostYes)
             {
-                var decision = strategiesForAction.First().GetAction(effectiveSnapshot, previousEffectiveSnapshot);
+                // PASS simulated position to get price/qty
+                var decision = strategiesForAction.First().GetAction(effectiveSnapshot, previousEffectiveSnapshot, simulationPosition);
                 int limitPrice = decision.Price;
                 qty = decision.Qty;
                 DateTime? exp = decision.Expiration;
@@ -487,7 +491,8 @@ namespace TradingStrategies
             }
             else if (action == ActionType.PostAsk)
             {
-                var decision = strategiesForAction.First().GetAction(effectiveSnapshot, previousEffectiveSnapshot);
+                // PASS simulated position to get price/qty
+                var decision = strategiesForAction.First().GetAction(effectiveSnapshot, previousEffectiveSnapshot, simulationPosition);
                 int sellPrice = decision.Price;
                 int bidPrice = 100 - sellPrice;
                 qty = decision.Qty;
@@ -508,9 +513,8 @@ namespace TradingStrategies
                 actionResting.Clear();
             }
 
-            return false; // Always return false (never skip the path)
+            return false;
         }
-
         private (string, string) SummarizeRestingOrders(List<(string action, string side, string type, int count, int price, DateTime? expiration)> restingOrders)
         {
             var yesBidsSummary = new Dictionary<int, int>();

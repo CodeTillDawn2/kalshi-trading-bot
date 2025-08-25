@@ -29,6 +29,7 @@ namespace TradingSimulator.TestObjects
         public List<PricePoint> EventPoints { get; set; }
         public List<PricePoint> IntendedLongPoints { get; set; }
         public List<PricePoint> IntendedShortPoints { get; set; }
+        public List<PricePoint> ExitPoints { get; set; }
     }
 
 }

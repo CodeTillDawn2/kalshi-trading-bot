@@ -303,6 +303,8 @@ namespace TradingStrategies.Strategies.Strats
         // --- Velocities ---
         Pair($"Vel/min Yes: {F(vSumYes)}", $"Vel/min No: {F(vSumNo)}"),
         Pair($"Thr Yes: {F(thrYes)}", $"Thr No: {F(thrNo)}"),
+        Pair($"Top 10% Yes: {F(snapshot.VelocityPerMinute_Top_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Top_No_Bid)}"),
+        Pair($"Bottom 90% Yes: {F(snapshot.VelocityPerMinute_Bottom_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Bottom_No_Bid)}"),
 
         // --- Depths / Flows ---
         Pair($"Depth$ Yes: {F(depthYes)}", $"Depth$ No: {F(depthNo)}"),
@@ -319,6 +321,7 @@ namespace TradingStrategies.Strategies.Strats
         Pair($"Rel inc Yes: {(double.IsInfinity(relIncYes) ? "Inf" : F(relIncYes))}",
              $"Rel inc No: {(double.IsInfinity(relIncNo) ? "Inf" : F(relIncNo))}"),
         Pair($"Flip Yes: {YN(flipYes)}", $"Flip No: {YN(flipNo)}"),
+        Pair($"RSI_Short: {snapshot.RSI_Short}",$"RSI_Medium: {snapshot.RSI_Medium}"),
 
         // --- Absorption ---
         Pair($"Absorb Yes: {F(absorbYes)}", $"Absorb No: {F(absorbNo)}"),
