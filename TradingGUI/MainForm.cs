@@ -20,17 +20,21 @@ namespace SimulatorWinForms
         private string _lastTooltipMemo = null;
         private HashSet<string> _checkedMarketNames = new();
         private bool _simSetup;
-
+        private Label _tooltipOverlay;
 
         public MainForm()
         {
             InitializeComponent();
+
+            // keep tooltip fixed even when focus changes
+            toolTip1.ShowAlways = true;
 
             _simulator = new SimulatorTests();
             _simulator.OnTestProgress += msg => AppendLog(msg);
             _simulator.OnProfitLossUpdate += (m, pnl) => UpdatePnL(m, pnl);
             _simulator.OnMarketProcessed += m => AppendLog($"✔ Processed {m}");
             formsPlot1.MouseMove += FormsPlot1_MouseMove;
+            formsPlot1.MouseLeave += FormsPlot1_MouseLeave;
 
             Load += (_, __) => LoadCache();
             dgvMarkets.SelectionChanged += DgvMarkets_SelectionChanged;
@@ -41,27 +45,73 @@ namespace SimulatorWinForms
                 if (dgvMarkets.IsCurrentCellDirty)
                     dgvMarkets.CommitEdit(DataGridViewDataErrorContexts.Commit);
             };
+
             dgvMarkets.Sorted += (s, e) => RestoreCheckboxes();
+
+            _tooltipOverlay = new Label
+            {
+                AutoSize = true,
+                Visible = false,
+                BackColor = Color.Khaki,
+                BorderStyle = BorderStyle.FixedSingle,
+                Padding = new Padding(4),
+                MaximumSize = new Size(dgvMarkets.Width - 16, 0)
+            };
+            dgvMarkets.Controls.Add(_tooltipOverlay);
+            _tooltipOverlay.Location = new Point(8, 8);
+            _tooltipOverlay.BringToFront();
+
+            dgvMarkets.Resize += (_, __) =>
+            {
+                _tooltipOverlay.MaximumSize = new Size(dgvMarkets.Width - 16, 0);
+            };
 
         }
 
+
         private void LoadCache()
         {
-            dgvMarkets.Columns.Clear(); // ensure clean state
+            dgvMarkets.Columns.Clear();
             dgvMarkets.Rows.Clear();
 
-            // Rebuild columns (without binding CheckedCol to data source)
+            // grid sizing defaults
+            dgvMarkets.RowHeadersVisible = false;
+            dgvMarkets.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
             var checkCol = new DataGridViewCheckBoxColumn
             {
                 Name = "CheckedCol",
                 HeaderText = "✓",
                 FalseValue = false,
                 TrueValue = true,
-                ValueType = typeof(bool)
+                ValueType = typeof(bool),
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
             };
             dgvMarkets.Columns.Add(checkCol);
-            dgvMarkets.Columns.Add("Market", "Market");
-            dgvMarkets.Columns.Add("PnL", "PnL");
+
+            var marketCol = new DataGridViewTextBoxColumn
+            {
+                Name = "Market",
+                HeaderText = "Market",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                FillWeight = 75
+            };
+            dgvMarkets.Columns.Add(marketCol);
+
+            var pnlCol = new DataGridViewTextBoxColumn
+            {
+                Name = "PnL",
+                HeaderText = "PnL",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            };
+            dgvMarkets.Columns.Add(pnlCol);
+
+            // tighten checkbox column after it's realized
+            dgvMarkets.HandleCreated += (_, __) =>
+            {
+                if (dgvMarkets.Columns["CheckedCol"] is DataGridViewCheckBoxColumn c)
+                    dgvMarkets.Columns["CheckedCol"].Width = 32;
+            };
 
             if (!Directory.Exists(_cacheDir))
             {
@@ -83,6 +133,7 @@ namespace SimulatorWinForms
                 }
             }
         }
+
         private void EnsureSimulatorSetup()
         {
             if (_simSetup) return;
@@ -139,29 +190,43 @@ namespace SimulatorWinForms
 
         private void FormsPlot1_MouseMove(object sender, MouseEventArgs e)
         {
-            var mouse = formsPlot1.GetMouseCoordinates();
-            double mouseX = mouse.x;
-            const double xThreshold = 0.01;
+            if (_tooltipPoints == null || _tooltipPoints.Count == 0)
+                return;
 
-            foreach (var (x, _, memo) in _tooltipPoints)
+            int mxPx = e.X;
+
+            int bestIdx = 0;
+            int bestDxPx = int.MaxValue;
+
+            for (int i = 0; i < _tooltipPoints.Count; i++)
             {
-                if (Math.Abs(x - mouseX) < xThreshold)
+                int px = (int)Math.Round(formsPlot1.Plot.GetPixelX(_tooltipPoints[i].x));
+                int dx = Math.Abs(px - mxPx);
+                if (dx < bestDxPx)
                 {
-                    if (memo != _lastTooltipMemo)
-                    {
-                        toolTip1.Show(memo, formsPlot1, e.Location.X + 15, e.Location.Y + 15, 4000);
-                        _lastTooltipMemo = memo;
-                    }
-                    return;
+                    bestDxPx = dx;
+                    bestIdx = i;
                 }
             }
 
-            if (_lastTooltipMemo != null)
+            string memo = _tooltipPoints[bestIdx].memo;
+            if (!string.Equals(memo, _lastTooltipMemo))
             {
-                toolTip1.Hide(formsPlot1);
-                _lastTooltipMemo = null;
+                _tooltipOverlay.Text = memo;
+                _tooltipOverlay.Visible = true;
+                _tooltipOverlay.BringToFront();
+                _lastTooltipMemo = memo;
             }
         }
+
+
+
+        private void FormsPlot1_MouseLeave(object sender, EventArgs e)
+        {
+            _tooltipOverlay.Visible = false;
+            _lastTooltipMemo = null;
+        }
+
 
         private void BtnCheckAll_Click(object sender, EventArgs e)
         {

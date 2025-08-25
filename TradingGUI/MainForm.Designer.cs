@@ -77,7 +77,7 @@
             rtbLog.Location = new Point(3, 513);
             rtbLog.Name = "rtbLog";
             rtbLog.ReadOnly = true;
-            rtbLog.Size = new Size(1094, 68);
+            rtbLog.Size = new Size(1094, 90);
             rtbLog.TabIndex = 2;
             rtbLog.Text = "";
             // 
@@ -125,35 +125,36 @@
             layout.Controls.Add(dgvMarkets, 0, 0);
             layout.Controls.Add(formsPlot1, 1, 0);
             layout.Controls.Add(rtbLog, 0, 1);
-            layout.Controls.Add(buttonPanel, 1, 1);
+            layout.Controls.Add(buttonPanel, 0, 2);
             layout.Dock = DockStyle.Fill;
             layout.Location = new Point(0, 0);
             layout.Name = "layout";
-            layout.RowCount = 2;
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 74F));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 66F));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            layout.RowCount = 3;
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));   // main area
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 96F));   // log
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));   // buttons
             layout.Size = new Size(1100, 650);
             layout.TabIndex = 0;
             // 
             // buttonPanel
             // 
+            layout.SetColumnSpan(buttonPanel, 2);            // full width
+            buttonPanel.WrapContents = false;                // single row
+            buttonPanel.AutoScroll = true;                   // allow overflow scroll if needed
             buttonPanel.Controls.Add(btnRun);
             buttonPanel.Controls.Add(btnReload);
             buttonPanel.Controls.Add(btnRunSet);
             buttonPanel.Controls.Add(btnCheckAll);
             buttonPanel.Controls.Add(btnUncheckAll);
             buttonPanel.Dock = DockStyle.Fill;
-            buttonPanel.Location = new Point(3, 587);
+            buttonPanel.Location = new Point(3, 613);
             buttonPanel.Name = "buttonPanel";
-            buttonPanel.Size = new Size(294, 60);
+            buttonPanel.Size = new Size(1094, 34);
             buttonPanel.TabIndex = 3;
             // 
             // btnCheckAll
             // 
-            btnCheckAll.Location = new Point(3, 32);
+            btnCheckAll.Location = new Point(261, 3);
             btnCheckAll.Name = "btnCheckAll";
             btnCheckAll.Size = new Size(75, 23);
             btnCheckAll.TabIndex = 3;
@@ -162,9 +163,9 @@
             // 
             // btnUncheckAll
             // 
-            btnUncheckAll.Location = new Point(84, 32);
+            btnUncheckAll.Location = new Point(342, 3);
             btnUncheckAll.Name = "btnUncheckAll";
-            btnUncheckAll.Size = new Size(75, 23);
+            btnUncheckAll.Size = new Size(90, 23);
             btnUncheckAll.TabIndex = 4;
             btnUncheckAll.Text = "Uncheck All";
             btnUncheckAll.Click += BtnUncheckAll_Click;
@@ -180,6 +181,7 @@
             buttonPanel.ResumeLayout(false);
             ResumeLayout(false);
         }
+
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private TableLayoutPanel layout;
