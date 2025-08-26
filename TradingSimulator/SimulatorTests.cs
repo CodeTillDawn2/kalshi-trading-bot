@@ -529,882 +529,148 @@ namespace TradingSimulator.Simulator
     string setKey,
     string weightName,
     bool writeToFile,
-    int? maxGroups = null,
-    List<string>? marketsToRun = null)
+    List<string>? marketsToRun = null,
+    int? maxGroups = null)
         {
-            OnTestProgress?.Invoke($"Starting {setKey}:{weightName} test for GUI.");
+            // map provided setKey -> family
+            var family = MapFamilyFromSetKey(setKey);
 
+            // resolve strategies + param sets for that family
+            var (strategiesList, paramSets, label) = ResolveFamily(family);
+
+            // find the requested weight set by name (exact, case-insensitive)
+            var idx = paramSets.FindIndex(ps =>
+                string.Equals(ps.Name, weightName, StringComparison.OrdinalIgnoreCase));
+            if (idx < 0)
+                throw new InvalidOperationException($"Weight set '{weightName}' not found in {label}.");
+
+            // prep context once
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
-            var helper = new StrategySelectionHelper();
-            var strategiesDict = helper.GetMapping(setKey, weightName); // unified mapping
-
-            // Fetch the typed weights and serialize them for persistence
-            string weightsJson = setKey switch
+            // create DTO for just this one set
+            var (name, parameters) = paramSets[idx];
+            var dto = new WeightSetDTO
             {
-                "Breakout2" => JsonSerializer.Serialize(
-                    StrategySelectionHelper.BreakoutParameterSets.First(x => x.Name == weightName).Parameters),
-                "Bollinger" => JsonSerializer.Serialize(
-                    StrategySelectionHelper.BollingerParameterSets.First(x => x.Name == weightName).Parameters),
-                "Nothing" => JsonSerializer.Serialize(
-                    StrategySelectionHelper.NothingEverHappensParameterSets.First(x => x.Name == weightName).Parameters),
-                _ => throw new ArgumentException($"Unknown set '{setKey}'", nameof(setKey))
-            };
-
-            var weightSetDto = new WeightSetDTO
-            {
-                StrategyName = weightName,
-                Weights = weightsJson,
-                LastRun = DateTime.UtcNow,
-                WeightSetMarkets = new List<WeightSetMarketDTO>()
-            };
-
-            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, marketsToRun);
-            var uniqueMarketTickers = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
-            int totalMarkets = uniqueMarketTickers.Count;
-            int processedMarkets = 0;
-
-            foreach (var marketTicker in uniqueMarketTickers)
-            {
-                if (_processedMarkets.Contains(marketTicker))
-                {
-                    OnTestProgress?.Invoke($"Skipping already processed market: {marketTicker}");
-                    continue;
-                }
-
-                OnTestProgress?.Invoke($"Loading market data for {marketTicker}");
-
-                var marketGroups = filteredGroups.Where(g => g.MarketTicker == marketTicker).ToList();
-                List<SnapshotDTO> allSnapshotData = new();
-                foreach (var group in marketGroups)
-                {
-                    var snapshotData = await context.GetSnapshots_cached(
-                        marketTicker: group.MarketTicker,
-                        startDate: group.StartTime,
-                        endDate: group.EndTime);
-                    allSnapshotData.AddRange(snapshotData);
-                }
-                allSnapshotData = allSnapshotData.OrderBy(x => x.SnapshotDate).ToList();
-
-                var cacheSnapshotDict = await _snapshotService.LoadManySnapshots(allSnapshotData);
-                var marketSnapshots = cacheSnapshotDict
-                    .SelectMany(kvp => kvp.Value.Select(cs => cs))
-                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue && ms.BestYesBid > 0 && ms.BestYesAsk > 0)
-                    .OrderBy(ms => ms.Timestamp)
-                    .ToList();
-
-                if (!marketSnapshots.Any())
-                {
-                    OnTestProgress?.Invoke($"No valid snapshots for {marketTicker}. Skipping.");
-                    continue;
-                }
-
-                var groupForId = new SnapshotGroupDTO { MarketTicker = marketTicker, JsonPath = $"{marketTicker}.json" };
-
-                (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints,
-                 List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
-                 List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints)
-                    = await ProcessMarketAsync(
-                        marketTicker, marketSnapshots, strategiesDict, _scopeFactory,
-                        progressPrefix: $"Strategy set {setKey}/{weightName}: ", writeToFile: writeToFile, group: groupForId);
-
-                if (bidPoints != null)
-                {
-                    if (writeToFile)
-                        SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints,
-                                             eventPoints, intendedLongPoints, intendedShortPoints,
-                                             fileNameSuffix: $"_{setKey}_{weightName}");
-
-                    weightSetDto.WeightSetMarkets.Add(new WeightSetMarketDTO
-                    {
-                        MarketTicker = marketTicker,
-                        PnL = (decimal)finalPnL,
-                        LastRun = DateTime.UtcNow
-                    });
-
-                    OnProfitLossUpdate?.Invoke(marketTicker, finalPnL);
-                    OnMarketProcessed?.Invoke(marketTicker);
-                }
-
-                processedMarkets++;
-                OnTestProgress?.Invoke($"Progress: {processedMarkets}/{totalMarkets} markets processed.");
-
-                marketSnapshots.Clear();
-                allSnapshotData.Clear();
-                cacheSnapshotDict.Clear();
-            }
-
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    using var saveScope = _scopeFactory.CreateScope();
-                    var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                    await saveContext.AddOrUpdateWeightSet(weightSetDto);
-                    OnTestProgress?.Invoke($"Saved WeightSet for {setKey}/{weightName} with {weightSetDto.WeightSetMarkets.Count} market results to database.");
-                }
-                catch (Exception ex)
-                {
-                    OnTestProgress?.Invoke($"Error saving WeightSet for {setKey}/{weightName}: {ex.Message}");
-                }
-            });
-
-            OnTestProgress?.Invoke($"{setKey}/{weightName} test for GUI completed.");
-        }
-        public async Task RunTrainingForGuiAsync(string setKey, bool writeToFile, int? maxGroups = null, List<string>? marketsToRun = null)
-        {
-            switch (setKey)
-            {
-                case "Breakout2":
-                    await RunMultipleBreakoutForGuiAsync(writeToFile, maxGroups, marketsToRun);
-                    break;
-                case "Nothing":
-                    await RunMultipleNothingHappensForGuiAsync(writeToFile, maxGroups, marketsToRun);
-                    break;
-                case "Bollinger":
-                    // You already expose the mappings via helper.GetTrainingMappings("Bollinger");
-                    // If you have no Bollinger runner yet, mirror RunMultipleBreakoutForGuiAsync
-                    // using GetBollingerBreakoutStrategiesForTraining().
-                    var helper = new StrategySelectionHelper();
-                    var strategiesList = helper.GetTrainingMappings("Bollinger");
-                    // reuse your existing Breakout loop as a template
-                    // (copy of RunMultipleBreakoutForGuiAsync body, swapping the strategiesList)
-                    throw new NotImplementedException("Add Bollinger runner using GetBollingerBreakoutStrategiesForTraining().");
-                default:
-                    throw new ArgumentException($"Unknown set '{setKey}'", nameof(setKey));
-            }
-        }
-
-        // SimulatorTests.cs
-        public async Task RunMultipleBollingerForGuiAsync(bool writeToFile, int? maxGroups = null, List<string>? marketsToRun = null)
-        {
-            using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-
-            var helper = new StrategySelectionHelper();
-            var strategiesList = helper.GetTrainingMappings("Bollinger");
-            var paramSets = StrategySelectionHelper.BollingerParameterSets
-                ?? throw new InvalidOperationException("BollingerParameterSets is null.");
-
-            var weightSetDtos = new List<WeightSetDTO>();
-            for (int i = 0; i < strategiesList.Count; i++)
-            {
-                var (name, parameters) = paramSets[i];
-                weightSetDtos.Add(new WeightSetDTO
-                {
-                    StrategyName = name,
-                    Weights = JsonSerializer.Serialize(parameters),
-                    LastRun = DateTime.UtcNow,
-                    WeightSetMarkets = new List<WeightSetMarketDTO>()
-                });
-            }
-
-            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, marketsToRun);
-            var uniqueMarkets = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
-
-            int totalSets = strategiesList.Count;
-            int totalMarkets = uniqueMarkets.Count;
-            OnTestProgress?.Invoke($"Bollinger: {totalSets} strategy sets × {totalMarkets} markets");
-
-            for (int mIdx = 0; mIdx < uniqueMarkets.Count; mIdx++)
-            {
-                var market = uniqueMarkets[mIdx];
-                var marketGroups = filteredGroups.Where(g => g.MarketTicker == market).ToList();
-
-                var allSnapshotData = new List<SnapshotDTO>();
-                foreach (var g in marketGroups)
-                {
-                    var snap = await context.GetSnapshots_cached(marketTicker: g.MarketTicker, startDate: g.StartTime, endDate: g.EndTime);
-                    allSnapshotData.AddRange(snap);
-                }
-                allSnapshotData = allSnapshotData.OrderBy(x => x.SnapshotDate).ToList();
-
-                var cache = await _snapshotService.LoadManySnapshots(allSnapshotData);
-                var marketSnapshots = cache
-                    .SelectMany(kvp => kvp.Value)
-                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue && ms.BestYesBid > 0 && ms.BestYesAsk > 0)
-                    .OrderBy(ms => ms.Timestamp)
-                    .ToList();
-
-                if (marketSnapshots.Count == 0) continue;
-
-                var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
-
-                for (int setIdx = 0; setIdx < strategiesList.Count; setIdx++)
-                {
-                    var strategies = strategiesList[setIdx];
-                    var dto = weightSetDtos[setIdx];
-
-                    OnTestProgress?.Invoke($"Strategy Set {dto.StrategyName} ({setIdx + 1}/{totalSets}) processing market {market} ({mIdx + 1}/{totalMarkets})");
-
-                    var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort) =
-                        await ProcessMarketAsync(
-                            market, marketSnapshots, strategies, _scopeFactory,
-                            progressPrefix: $"[Bollinger/{dto.StrategyName}] ",
-                            writeToFile: writeToFile, group: groupForId,
-                            ignoreProcessedCache: true);                    // do not skip within training runs
-
-                    if (bid != null)
-                    {
-                        if (writeToFile)
-                            SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
-                                fileNameSuffix: $"_Bollinger_{dto.StrategyName}");
-
-                        dto.WeightSetMarkets.Add(new WeightSetMarketDTO
-                        {
-                            MarketTicker = market,
-                            PnL = (decimal)finalPnL,
-                            LastRun = DateTime.UtcNow
-                        });
-
-                        OnProfitLossUpdate?.Invoke(market, finalPnL);
-                    }
-                }
-
-                OnMarketProcessed?.Invoke(market);
-
-                // clear per market to keep memory in check
-                marketSnapshots.Clear();
-                allSnapshotData.Clear();
-                cache.Clear();
-            }
-
-            // Persist each weight set (awaited, no fire-and-forget)
-            foreach (var dto in weightSetDtos)
-            {
-                using var saveScope = _scopeFactory.CreateScope();
-                var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                await saveContext.AddOrUpdateWeightSet(dto);
-                OnTestProgress?.Invoke($"Saved Bollinger/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{uniqueMarkets.Count} markets)");
-            }
-
-            OnTestProgress?.Invoke("Bollinger: all strategy sets completed");
-        }
-
-
-
-
-        // SimulatorTests.cs
-        public async Task RunMultipleFlowMoForGuiAsync(bool writeToFile, int? maxGroups = null, List<string>? marketsToRun = null)
-        {
-            using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-
-            var helper = new StrategySelectionHelper();
-            var strategiesList = helper.GetTrainingMappings("FlowMo");
-            var paramSets = StrategySelectionHelper.FlowMomentumParameterSets
-                ?? throw new InvalidOperationException("FlowMomentumParameterSets is null.");
-
-            var weightSetDtos = new List<WeightSetDTO>();
-            for (int i = 0; i < strategiesList.Count; i++)
-            {
-                var (name, parameters) = paramSets[i];
-                weightSetDtos.Add(new WeightSetDTO
-                {
-                    StrategyName = name,
-                    Weights = JsonSerializer.Serialize(parameters),
-                    LastRun = DateTime.UtcNow,
-                    WeightSetMarkets = new List<WeightSetMarketDTO>()
-                });
-            }
-
-            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, marketsToRun);
-            var uniqueMarkets = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
-
-            int totalSets = strategiesList.Count;
-            int totalMarkets = uniqueMarkets.Count;
-            OnTestProgress?.Invoke($"FlowMo: {totalSets} strategy sets × {totalMarkets} markets");
-
-            // MARKETS → SETS
-            for (int mIdx = 0; mIdx < uniqueMarkets.Count; mIdx++)
-            {
-                var market = uniqueMarkets[mIdx];
-                var marketGroups = filteredGroups.Where(g => g.MarketTicker == market).ToList();
-
-                var allSnapshotData = new List<SnapshotDTO>();
-                foreach (var g in marketGroups)
-                {
-                    var snap = await context.GetSnapshots_cached(marketTicker: g.MarketTicker, startDate: g.StartTime, endDate: g.EndTime);
-                    allSnapshotData.AddRange(snap);
-                }
-                allSnapshotData = allSnapshotData.OrderBy(x => x.SnapshotDate).ToList();
-
-                var cache = await _snapshotService.LoadManySnapshots(allSnapshotData);
-                var marketSnapshots = cache
-                    .SelectMany(kvp => kvp.Value)
-                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue && ms.BestYesBid > 0 && ms.BestYesAsk > 0)
-                    .OrderBy(ms => ms.Timestamp)
-                    .ToList();
-
-                if (marketSnapshots.Count == 0) continue;
-
-                var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
-
-                for (int setIdx = 0; setIdx < strategiesList.Count; setIdx++)
-                {
-                    var strategies = strategiesList[setIdx];
-                    var dto = weightSetDtos[setIdx];
-
-                    OnTestProgress?.Invoke($"Strategy Set {dto.StrategyName} ({setIdx + 1}/{totalSets}) processing market {market} ({mIdx + 1}/{totalMarkets})");
-
-                    var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort) =
-                        await ProcessMarketAsync(
-                            market, marketSnapshots, strategies, _scopeFactory,
-                            progressPrefix: $"[FlowMo/{dto.StrategyName}] ",
-                            writeToFile: writeToFile, group: groupForId,
-                            ignoreProcessedCache: true);
-
-                    if (bid != null)
-                    {
-                        if (writeToFile)
-                            SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
-                                fileNameSuffix: $"_FlowMo_{dto.StrategyName}");
-
-                        dto.WeightSetMarkets.Add(new WeightSetMarketDTO
-                        {
-                            MarketTicker = market,
-                            PnL = (decimal)finalPnL,
-                            LastRun = DateTime.UtcNow
-                        });
-
-                        OnProfitLossUpdate?.Invoke(market, finalPnL);
-                    }
-                }
-
-                OnMarketProcessed?.Invoke(market);
-
-                marketSnapshots.Clear();
-                allSnapshotData.Clear();
-                cache.Clear();
-            }
-
-            foreach (var dto in weightSetDtos)
-            {
-                using var saveScope = _scopeFactory.CreateScope();
-                var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                await saveContext.AddOrUpdateWeightSet(dto);
-                OnTestProgress?.Invoke($"Saved FlowMo/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{uniqueMarkets.Count} markets)");
-            }
-
-            OnTestProgress?.Invoke("FlowMo: all strategy sets completed");
-        }
-
-
-
-
-        public async Task RunWeightsForGuiAsync(bool writeToFile, int? maxGroups = null, List<string>? marketsToRun = null)
-        {
-            OnTestProgress?.Invoke("Starting weight test for GUI.");
-
-            string weightName = "B2_MRB5_A10";
-
-            using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-            var strategyHelper = new StrategySelectionHelper();
-            var strategiesDict = strategyHelper.GetBreakoutStrategy(weightName);
-
-            var paramSets = StrategySelectionHelper.BreakoutParameterSets
-                ?? throw new InvalidOperationException("BreakoutParameterSets is null.");
-
-            var (strategyName, parameters) = paramSets.First(x => x.Name == weightName);
-
-            var weightSetDto = new WeightSetDTO
-            {
-                StrategyName = strategyName,
+                StrategyName = name,
                 Weights = JsonSerializer.Serialize(parameters),
                 LastRun = DateTime.UtcNow,
                 WeightSetMarkets = new List<WeightSetMarketDTO>()
             };
 
-            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, marketsToRun);
-            var uniqueMarketTickers = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
-            int totalMarkets = uniqueMarketTickers.Count;
+            // filter groups/markets
+            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, marketsToRun).ConfigureAwait(false);
+            var uniqueMarkets = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
 
-            int processedMarkets = 0;
+            OnTestProgress?.Invoke($"{label}/{dto.StrategyName}: 1 strategy set × {uniqueMarkets.Count} markets");
 
-            foreach (var marketTicker in uniqueMarketTickers)
+            // iterate markets
+            for (int mIdx = 0; mIdx < uniqueMarkets.Count; mIdx++)
             {
-                if (_processedMarkets.Contains(marketTicker))
-                {
-                    OnTestProgress?.Invoke($"Skipping already processed market: {marketTicker}");
-                    continue;
-                }
+                var market = uniqueMarkets[mIdx];
+                var marketGroups = filteredGroups.Where(g => g.MarketTicker == market).ToList();
 
-                OnTestProgress?.Invoke($"Loading market data for {marketTicker}");
-
-                var marketGroups = filteredGroups.Where(g => g.MarketTicker == marketTicker).ToList();
-                List<SnapshotDTO> allSnapshotData = new List<SnapshotDTO>();
-                foreach (var group in marketGroups)
+                var allSnapshotData = new List<SnapshotDTO>();
+                foreach (var g in marketGroups)
                 {
-                    var snapshotData = await context.GetSnapshots_cached(
-                        marketTicker: group.MarketTicker,
-                        startDate: group.StartTime,
-                        endDate: group.EndTime);
-                    allSnapshotData.AddRange(snapshotData);
+                    var snaps = await context.GetSnapshots_cached(
+                        marketTicker: g.MarketTicker,
+                        startDate: g.StartTime,
+                        endDate: g.EndTime).ConfigureAwait(false);
+                    allSnapshotData.AddRange(snaps);
                 }
                 allSnapshotData = allSnapshotData.OrderBy(x => x.SnapshotDate).ToList();
 
-                var cacheSnapshotDict = await _snapshotService.LoadManySnapshots(allSnapshotData);
-                var marketSnapshots = cacheSnapshotDict
-                    .SelectMany(kvp => kvp.Value.Select(cs => cs))
+                var cache = await _snapshotService.LoadManySnapshots(allSnapshotData).ConfigureAwait(false);
+                var marketSnapshots = cache
+                    .SelectMany(kvp => kvp.Value)
                     .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue && ms.BestYesBid > 0 && ms.BestYesAsk > 0)
                     .OrderBy(ms => ms.Timestamp)
                     .ToList();
 
-                if (!marketSnapshots.Any())
+                if (marketSnapshots.Count == 0) continue;
+
+                var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
+
+                var strategies = strategiesList[idx]; // only the selected set
+                OnTestProgress?.Invoke($"[{label}/{dto.StrategyName}] market {market} ({mIdx + 1}/{uniqueMarkets.Count})");
+
+                var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort) =
+                    await ProcessMarketAsync(
+                        market, marketSnapshots, strategies, _scopeFactory,
+                        progressPrefix: $"[{label}/{dto.StrategyName}] ",
+                        writeToFile: writeToFile, group: groupForId,
+                        ignoreProcessedCache: true).ConfigureAwait(false);
+
+                if (bid != null)
                 {
-                    OnTestProgress?.Invoke($"No valid snapshots for {marketTicker}. Skipping.");
-                    continue;
-                }
+                    if (writeToFile)
+                        SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
+                            fileNameSuffix: $"_{label}_{dto.StrategyName}");
 
-                // Create a dummy SnapshotGroupDTO for uniqueId derivation
-                var groupForId = new SnapshotGroupDTO { MarketTicker = marketTicker, JsonPath = $"{marketTicker}.json" };
-
-                (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
-                    List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
-                    await ProcessMarketAsync(marketTicker, marketSnapshots, strategiesDict, _scopeFactory,
-                        progressPrefix: $"Strategy set {strategyName}: ", writeToFile: writeToFile, group: groupForId);
-
-                if (bidPoints != null)
-                {
-                    if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints);
-
-                    weightSetDto.WeightSetMarkets.Add(new WeightSetMarketDTO
+                    dto.WeightSetMarkets.Add(new WeightSetMarketDTO
                     {
-                        MarketTicker = marketTicker,
+                        MarketTicker = market,
                         PnL = (decimal)finalPnL,
                         LastRun = DateTime.UtcNow
                     });
 
-                    OnProfitLossUpdate?.Invoke(marketTicker, finalPnL);
-                    OnMarketProcessed?.Invoke(marketTicker);
+                    OnProfitLossUpdate?.Invoke(market, finalPnL);
                 }
 
-                processedMarkets++;
-                OnTestProgress?.Invoke($"Progress: {processedMarkets}/{totalMarkets} markets processed.");
-
-                // Clear market snapshots to free memory
+                OnMarketProcessed?.Invoke(market);
                 marketSnapshots.Clear();
                 allSnapshotData.Clear();
-                cacheSnapshotDict.Clear();
+                cache.Clear();
             }
 
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    using var scope = _scopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                    await context.AddOrUpdateWeightSet(weightSetDto);
-                    OnTestProgress?.Invoke($"Saved WeightSet for strategy {strategyName} with {weightSetDto.WeightSetMarkets.Count} market results to database.");
-                }
-                catch (Exception ex)
-                {
-                    OnTestProgress?.Invoke($"Error saving WeightSet for strategy {strategyName} to database: {ex.Message}");
-                }
-            });
+            // save the one set
+            using var saveScope = _scopeFactory.CreateScope();
+            var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
 
-            OnTestProgress?.Invoke("Breakout test for GUI completed.");
+            OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{uniqueMarkets.Count} markets)");
+            OnTestProgress?.Invoke($"{label}/{dto.StrategyName}: completed");
+        }
+        
+        private StrategyFamily MapFamilyFromSetKey(string setKey)
+        {
+            if (string.IsNullOrWhiteSpace(setKey)) throw new ArgumentException("setKey is required.", nameof(setKey));
+            var k = setKey.Trim().ToLowerInvariant();
+            if (k.Contains("breakout")) return StrategyFamily.Breakout;
+            if (k.Contains("bollinger")) return StrategyFamily.Bollinger;
+            if (k.Contains("flowmo") || k.Contains("flow")) return StrategyFamily.FlowMo;
+            if (k.Contains("nothing")) return StrategyFamily.NothingHappens;
+            if (k.Contains("momentum")) return StrategyFamily.Momentum;
+            // specific short names
+            if (k is "b2" or "breakout2") return StrategyFamily.Breakout;
+            if (k is "bb" or "bollingerbreakout") return StrategyFamily.Bollinger;
+            throw new ArgumentOutOfRangeException(nameof(setKey), $"Unrecognized setKey: {setKey}");
         }
 
-        public async Task RunMultipleBreakoutForGuiAsync(bool writeToFile, int? maxGroups = null, List<string>? marketsToRun = null)
+
+        public async Task RunMultipleAllStrategiesForGuiAsync(
+            bool writeToFile,
+            int? maxGroups = null,
+            List<string>? marketsToRun = null)
         {
-            OnTestProgress?.Invoke("Starting multiple Breakout tests for GUI.");
+            // run all families automatically
+            var families = new[] {
+        //StrategyFamily.Bollinger,
+        //StrategyFamily.FlowMo,
+        //StrategyFamily.Breakout,
+        StrategyFamily.Momentum,
+        //StrategyFamily.NothingHappens
+    };
 
-            using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-            var strategyHelper = new StrategySelectionHelper();
-            var strategiesList = strategyHelper.GetBreakoutStrategiesForTraining();
-
-            var paramSets = StrategySelectionHelper.BreakoutParameterSets
-                ?? throw new InvalidOperationException("BreakoutParameterSets is null.");
-
-            var weightSetDtos = new List<WeightSetDTO>();
-            for (int strategyIndex = 0; strategyIndex < strategiesList.Count; strategyIndex++)
+            foreach (var fam in families)
             {
-                var (strategyName, parameters) = paramSets[strategyIndex];
-                weightSetDtos.Add(new WeightSetDTO
-                {
-                    StrategyName = strategyName,
-                    Weights = JsonSerializer.Serialize(parameters),
-                    LastRun = DateTime.UtcNow,
-                    WeightSetMarkets = new List<WeightSetMarketDTO>()
-                });
+                await RunMultipleForGuiAsync(
+                    family: fam,
+                    writeToFile: writeToFile,
+                    maxGroups: maxGroups,
+                    marketsToRun: marketsToRun).ConfigureAwait(false);
             }
-
-            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, marketsToRun);
-            var uniqueMarketTickers = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
-            int totalMarkets = uniqueMarketTickers.Count;
-            int processedMarkets = 0;
-
-            foreach (var marketTicker in uniqueMarketTickers)
-            {
-                if (_processedMarkets.Contains(marketTicker))
-                {
-                    OnTestProgress?.Invoke($"Skipping already processed market: {marketTicker}");
-                    continue;
-                }
-
-                OnTestProgress?.Invoke($"Loading market data for {marketTicker}");
-
-                var marketGroups = filteredGroups.Where(g => g.MarketTicker == marketTicker).ToList();
-                List<SnapshotDTO> allSnapshotData = new List<SnapshotDTO>();
-                foreach (var group in marketGroups)
-                {
-                    var snapshotData = await context.GetSnapshots_cached(
-                        marketTicker: group.MarketTicker,
-                        startDate: group.StartTime,
-                        endDate: group.EndTime);
-                    allSnapshotData.AddRange(snapshotData);
-                }
-                allSnapshotData = allSnapshotData.OrderBy(x => x.SnapshotDate).ToList();
-
-                var cacheSnapshotDict = await _snapshotService.LoadManySnapshots(allSnapshotData);
-                var marketSnapshots = cacheSnapshotDict
-                    .SelectMany(kvp => kvp.Value.Select(cs => cs))
-                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue && ms.BestYesBid > 0 && ms.BestYesAsk > 0)
-                    .OrderBy(ms => ms.Timestamp)
-                    .ToList();
-
-                if (!marketSnapshots.Any())
-                {
-                    OnTestProgress?.Invoke($"No valid snapshots for {marketTicker}. Skipping.");
-                    continue;
-                }
-
-                // Create a dummy SnapshotGroupDTO for uniqueId derivation
-                var groupForId = new SnapshotGroupDTO { MarketTicker = marketTicker, JsonPath = $"{marketTicker}.json" };
-
-                for (int strategyIndex = 0; strategyIndex < strategiesList.Count; strategyIndex++)
-                {
-                    var strategiesDict = strategiesList[strategyIndex];
-                    var strategyName = weightSetDtos[strategyIndex].StrategyName;
-                    OnTestProgress?.Invoke($"Processing Breakout strategy set {strategyName} ({strategyIndex + 1}/{strategiesList.Count}) for market {marketTicker}");
-
-                    (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
-                        List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
-                        await ProcessMarketAsync(marketTicker, marketSnapshots, strategiesDict, _scopeFactory,
-                            progressPrefix: $"Breakout strategy {strategyName}: ", writeToFile: writeToFile, group: groupForId);
-
-                    if (bidPoints != null)
-                    {
-                        if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, fileNameSuffix: $"_Breakout_{strategyName}");
-
-                        weightSetDtos[strategyIndex].WeightSetMarkets.Add(new WeightSetMarketDTO
-                        {
-                            MarketTicker = marketTicker,
-                            PnL = (decimal)finalPnL,
-                            LastRun = DateTime.UtcNow
-                        });
-
-                        OnProfitLossUpdate?.Invoke(marketTicker, finalPnL);
-                    }
-                }
-
-                _processedMarkets.Add(marketTicker);
-                OnMarketProcessed?.Invoke(marketTicker);
-
-                processedMarkets++;
-                OnTestProgress?.Invoke($"Progress: {processedMarkets}/{totalMarkets} markets processed for Breakout strategies.");
-
-                // Clear market snapshots to free memory
-                marketSnapshots.Clear();
-                allSnapshotData.Clear();
-                cacheSnapshotDict.Clear();
-            }
-
-            // Save all WeightSetDTOs
-            foreach (var weightSetDto in weightSetDtos)
-            {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        using var saveScope = _scopeFactory.CreateScope();
-                        var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                        await saveContext.AddOrUpdateWeightSet(weightSetDto);
-                        OnTestProgress?.Invoke($"Saved WeightSet for Breakout strategy {weightSetDto.StrategyName} with {weightSetDto.WeightSetMarkets.Count} market results to database.");
-                    }
-                    catch (Exception ex)
-                    {
-                        OnTestProgress?.Invoke($"Error saving WeightSet for Breakout strategy {weightSetDto.StrategyName} to database: {ex.Message}");
-                    }
-                });
-            }
-
-            OnTestProgress?.Invoke("Multiple Breakout tests for GUI completed.");
-        }
-
-        public async Task RunFlowMoForGuiAsync(bool writeToFile, int? maxGroups = null, List<string>? marketsToRun = null)
-        {
-            OnTestProgress?.Invoke("Starting multiple FlowMo tests for GUI.");
-
-            using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-            var strategyHelper = new StrategySelectionHelper();
-            var strategiesList = strategyHelper.GetFlowMomentumStrategiesForTraining();
-
-            var paramSets = StrategySelectionHelper.FlowMomentumParameterSets
-                ?? throw new InvalidOperationException("BreakoutParameterSets is null.");
-
-            var weightSetDtos = new List<WeightSetDTO>();
-            for (int strategyIndex = 0; strategyIndex < strategiesList.Count; strategyIndex++)
-            {
-                var (strategyName, parameters) = paramSets[strategyIndex];
-                weightSetDtos.Add(new WeightSetDTO
-                {
-                    StrategyName = strategyName,
-                    Weights = JsonSerializer.Serialize(parameters),
-                    LastRun = DateTime.UtcNow,
-                    WeightSetMarkets = new List<WeightSetMarketDTO>()
-                });
-            }
-
-            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, marketsToRun);
-            var uniqueMarketTickers = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
-            int totalMarkets = uniqueMarketTickers.Count;
-            int processedMarkets = 0;
-
-            foreach (var marketTicker in uniqueMarketTickers)
-            {
-                if (_processedMarkets.Contains(marketTicker))
-                {
-                    OnTestProgress?.Invoke($"Skipping already processed market: {marketTicker}");
-                    continue;
-                }
-
-                OnTestProgress?.Invoke($"Loading market data for {marketTicker}");
-
-                var marketGroups = filteredGroups.Where(g => g.MarketTicker == marketTicker).ToList();
-                List<SnapshotDTO> allSnapshotData = new List<SnapshotDTO>();
-                foreach (var group in marketGroups)
-                {
-                    var snapshotData = await context.GetSnapshots_cached(
-                        marketTicker: group.MarketTicker,
-                        startDate: group.StartTime,
-                        endDate: group.EndTime);
-                    allSnapshotData.AddRange(snapshotData);
-                }
-                allSnapshotData = allSnapshotData.OrderBy(x => x.SnapshotDate).ToList();
-
-                var cacheSnapshotDict = await _snapshotService.LoadManySnapshots(allSnapshotData);
-                var marketSnapshots = cacheSnapshotDict
-                    .SelectMany(kvp => kvp.Value.Select(cs => cs))
-                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue && ms.BestYesBid > 0 && ms.BestYesAsk > 0)
-                    .OrderBy(ms => ms.Timestamp)
-                    .ToList();
-
-                if (!marketSnapshots.Any())
-                {
-                    OnTestProgress?.Invoke($"No valid snapshots for {marketTicker}. Skipping.");
-                    continue;
-                }
-
-                // Create a dummy SnapshotGroupDTO for uniqueId derivation
-                var groupForId = new SnapshotGroupDTO { MarketTicker = marketTicker, JsonPath = $"{marketTicker}.json" };
-
-                for (int strategyIndex = 0; strategyIndex < strategiesList.Count; strategyIndex++)
-                {
-                    var strategiesDict = strategiesList[strategyIndex];
-                    var strategyName = weightSetDtos[strategyIndex].StrategyName;
-                    OnTestProgress?.Invoke($"Processing Breakout strategy set {strategyName} ({strategyIndex + 1}/{strategiesList.Count}) for market {marketTicker}");
-
-                    (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
-                        List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
-                        await ProcessMarketAsync(marketTicker, marketSnapshots, strategiesDict, _scopeFactory,
-                            progressPrefix: $"Breakout strategy {strategyName}: ", writeToFile: writeToFile, group: groupForId);
-
-                    if (bidPoints != null)
-                    {
-                        if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, fileNameSuffix: $"_Breakout_{strategyName}");
-
-                        weightSetDtos[strategyIndex].WeightSetMarkets.Add(new WeightSetMarketDTO
-                        {
-                            MarketTicker = marketTicker,
-                            PnL = (decimal)finalPnL,
-                            LastRun = DateTime.UtcNow
-                        });
-
-                        OnProfitLossUpdate?.Invoke(marketTicker, finalPnL);
-                    }
-                }
-
-                _processedMarkets.Add(marketTicker);
-                OnMarketProcessed?.Invoke(marketTicker);
-
-                processedMarkets++;
-                OnTestProgress?.Invoke($"Progress: {processedMarkets}/{totalMarkets} markets processed for Breakout strategies.");
-
-                // Clear market snapshots to free memory
-                marketSnapshots.Clear();
-                allSnapshotData.Clear();
-                cacheSnapshotDict.Clear();
-            }
-
-            // Save all WeightSetDTOs
-            foreach (var weightSetDto in weightSetDtos)
-            {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        using var saveScope = _scopeFactory.CreateScope();
-                        var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                        await saveContext.AddOrUpdateWeightSet(weightSetDto);
-                        OnTestProgress?.Invoke($"Saved WeightSet for Breakout strategy {weightSetDto.StrategyName} with {weightSetDto.WeightSetMarkets.Count} market results to database.");
-                    }
-                    catch (Exception ex)
-                    {
-                        OnTestProgress?.Invoke($"Error saving WeightSet for Breakout strategy {weightSetDto.StrategyName} to database: {ex.Message}");
-                    }
-                });
-            }
-
-            OnTestProgress?.Invoke("Multiple Breakout tests for GUI completed.");
-        }
-
-        public async Task RunMultipleNothingHappensForGuiAsync(bool writeToFile, int? maxGroups = null, List<string>? marketsToRun = null)
-        {
-            OnTestProgress?.Invoke("Starting multiple Nothing Happens tests for GUI.");
-
-            using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-            var strategyHelper = new StrategySelectionHelper();
-            var strategiesList = strategyHelper.GetNothingEverHappensStrategiesForTraining();
-
-            var paramSets = StrategySelectionHelper.NothingEverHappensParameterSets
-                ?? throw new InvalidOperationException("NothingEverHappensParameterSets is null.");
-
-            var weightSetDtos = new List<WeightSetDTO>();
-            for (int strategyIndex = 0; strategyIndex < strategiesList.Count; strategyIndex++)
-            {
-                var (strategyName, parameters) = paramSets[strategyIndex];
-                weightSetDtos.Add(new WeightSetDTO
-                {
-                    StrategyName = strategyName,
-                    Weights = JsonSerializer.Serialize(parameters),
-                    LastRun = DateTime.UtcNow,
-                    WeightSetMarkets = new List<WeightSetMarketDTO>()
-                });
-            }
-
-            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, marketsToRun);
-            var uniqueMarketTickers = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
-            int totalMarkets = uniqueMarketTickers.Count;
-            int processedMarkets = 0;
-
-            foreach (var marketTicker in uniqueMarketTickers)
-            {
-                if (_processedMarkets.Contains(marketTicker))
-                {
-                    OnTestProgress?.Invoke($"Skipping already processed market: {marketTicker}");
-                    continue;
-                }
-
-                OnTestProgress?.Invoke($"Loading market data for {marketTicker}");
-
-                var marketGroups = filteredGroups.Where(g => g.MarketTicker == marketTicker).ToList();
-                List<SnapshotDTO> allSnapshotData = new List<SnapshotDTO>();
-                foreach (var group in marketGroups)
-                {
-                    var snapshotData = await context.GetSnapshots_cached(
-                        marketTicker: group.MarketTicker,
-                        startDate: group.StartTime,
-                        endDate: group.EndTime);
-                    allSnapshotData.AddRange(snapshotData);
-                }
-                allSnapshotData = allSnapshotData.OrderBy(x => x.SnapshotDate).ToList();
-
-                var cacheSnapshotDict = await _snapshotService.LoadManySnapshots(allSnapshotData);
-                var marketSnapshots = cacheSnapshotDict
-                    .SelectMany(kvp => kvp.Value.Select(cs => cs))
-                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue && ms.BestYesBid > 0 && ms.BestYesAsk > 0)
-                    .OrderBy(ms => ms.Timestamp)
-                    .ToList();
-
-                if (!marketSnapshots.Any())
-                {
-                    OnTestProgress?.Invoke($"No valid snapshots for {marketTicker}. Skipping.");
-                    continue;
-                }
-
-                // Create a dummy SnapshotGroupDTO for uniqueId derivation
-                var groupForId = new SnapshotGroupDTO { MarketTicker = marketTicker, JsonPath = $"{marketTicker}.json" };
-
-                for (int strategyIndex = 0; strategyIndex < strategiesList.Count; strategyIndex++)
-                {
-                    var strategiesDict = strategiesList[strategyIndex];
-                    var strategyName = weightSetDtos[strategyIndex].StrategyName;
-                    OnTestProgress?.Invoke($"Processing Nothing Happens strategy set {strategyName} ({strategyIndex + 1}/{strategiesList.Count}) for market {marketTicker}");
-
-                    (double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints, List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
-                        List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints) =
-                        await ProcessMarketAsync(marketTicker, marketSnapshots, strategiesDict, _scopeFactory,
-                            progressPrefix: $"Nothing Happens strategy {strategyName}: ", writeToFile: writeToFile, group: groupForId);
-
-                    if (bidPoints != null)
-                    {
-                        if (writeToFile) SaveMarketDataToFile(marketTicker, finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, fileNameSuffix: $"_NothingHappens_{strategyName}");
-
-                        weightSetDtos[strategyIndex].WeightSetMarkets.Add(new WeightSetMarketDTO
-                        {
-                            MarketTicker = marketTicker,
-                            PnL = (decimal)finalPnL,
-                            LastRun = DateTime.UtcNow
-                        });
-
-                        OnProfitLossUpdate?.Invoke(marketTicker, finalPnL);
-                    }
-                }
-
-                _processedMarkets.Add(marketTicker);
-                OnMarketProcessed?.Invoke(marketTicker);
-
-                processedMarkets++;
-                OnTestProgress?.Invoke($"Progress: {processedMarkets}/{totalMarkets} markets processed for Nothing Happens strategies.");
-
-                // Clear market snapshots to free memory
-                marketSnapshots.Clear();
-                allSnapshotData.Clear();
-                cacheSnapshotDict.Clear();
-            }
-
-            // Save all WeightSetDTOs
-            foreach (var weightSetDto in weightSetDtos)
-            {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        using var saveScope = _scopeFactory.CreateScope();
-                        var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                        await saveContext.AddOrUpdateWeightSet(weightSetDto);
-                        OnTestProgress?.Invoke($"Saved WeightSet for Nothing Happens strategy {weightSetDto.StrategyName} with {weightSetDto.WeightSetMarkets.Count} market results to database.");
-                    }
-                    catch (Exception ex)
-                    {
-                        OnTestProgress?.Invoke($"Error saving WeightSet for Nothing Happens strategy {weightSetDto.StrategyName} to database: {ex.Message}");
-                    }
-                });
-            }
-
-
-            OnTestProgress?.Invoke("Multiple Nothing Happens tests for GUI completed.");
-        }
-
-        public async Task RunMultipleAllStrategiesForGuiAsync(bool writeToFile, int? maxGroups = null, List<string>? marketsToRun = null)
-        {
-            OnTestProgress?.Invoke("Starting all multiple strategy tests for GUI.");
-
-            // Reset processed markets to ensure clean state
-            _processedMarkets.Clear();
-
-            //await RunMultipleFlowMoForGuiAsync(writeToFile, maxGroups, marketsToRun);
-            await RunMultipleBreakoutForGuiAsync(writeToFile, maxGroups, marketsToRun);
-            //await RunMultipleNothingHappensForGuiAsync(writeToFile, maxGroups, marketsToRun);
-
-            OnTestProgress?.Invoke("All multiple strategy tests for GUI completed.");
         }
 
         public async Task<HashSet<string>> GetSnapshotGroupNames()
@@ -1414,7 +680,178 @@ namespace TradingSimulator.Simulator
             return await context.GetSnapshotGroupNames();
         }
 
-        [TearDown]
+  
+        public enum StrategyFamily
+        {
+            Bollinger,
+            FlowMo,
+            Breakout,
+            NothingHappens,
+            Momentum
+        }
+
+        private (List<Dictionary<MarketType, List<Strategy>>> Strategies,
+                 List<(string Name, object Parameters)> ParamSets,
+                 string Label)
+        ResolveFamily(StrategyFamily family)
+        {
+            var helper = new StrategySelectionHelper();
+
+            switch (family)
+            {
+                case StrategyFamily.Bollinger:
+                    return (
+                        helper.GetTrainingMappings("Bollinger"),
+                        (StrategySelectionHelper.BollingerParameterSets
+                            ?? throw new InvalidOperationException("BollingerParameterSets is null."))
+                            .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
+                        "Bollinger"
+                    );
+
+                case StrategyFamily.FlowMo:
+                    return (
+                        helper.GetTrainingMappings("FlowMo"),
+                        (StrategySelectionHelper.FlowMomentumParameterSets
+                            ?? throw new InvalidOperationException("FlowMomentumParameterSets is null."))
+                            .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
+                        "FlowMo"
+                    );
+
+                case StrategyFamily.Breakout:
+                    return (
+                        helper.GetBreakoutStrategiesForTraining(),
+                        (StrategySelectionHelper.BreakoutParameterSets
+                            ?? throw new InvalidOperationException("BreakoutParameterSets is null."))
+                            .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
+                        "Breakout"
+                    );
+
+                case StrategyFamily.NothingHappens:
+                    return (
+                        helper.GetNothingEverHappensStrategiesForTraining(),
+                        (StrategySelectionHelper.NothingEverHappensParameterSets
+                            ?? throw new InvalidOperationException("NothingEverHappensParameterSets is null."))
+                            .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
+                        "NothingHappens"
+                    );
+                case StrategyFamily.Momentum:
+                    return (
+                        helper.GetMomentumTradingStrategiesForTraining(),
+                        (StrategySelectionHelper.MomentumTradingParameterSets
+                            ?? throw new InvalidOperationException("MomentumTradingParameterSets is null."))
+                            .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
+                        "Momentum"
+                    );
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(family));
+            }
+        }
+
+
+        public async Task RunMultipleForGuiAsync(
+            StrategyFamily family,
+            bool writeToFile,
+            int? maxGroups = null,
+            List<string>? marketsToRun = null)
+        {
+            var (strategiesList, paramSets, label) = ResolveFamily(family);
+
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+
+            var weightSetDtos = new List<WeightSetDTO>(paramSets.Count);
+            for (int i = 0; i < paramSets.Count; i++)
+            {
+                var (name, parameters) = paramSets[i];
+                weightSetDtos.Add(new WeightSetDTO
+                {
+                    StrategyName = name,
+                    Weights = JsonSerializer.Serialize(parameters),
+                    LastRun = DateTime.UtcNow,
+                    WeightSetMarkets = new List<WeightSetMarketDTO>()
+                });
+            }
+
+            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, marketsToRun).ConfigureAwait(false);
+            var uniqueMarkets = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
+
+            OnTestProgress?.Invoke($"{label}: {strategiesList.Count} strategy sets × {uniqueMarkets.Count} markets");
+
+            for (int mIdx = 0; mIdx < uniqueMarkets.Count; mIdx++)
+            {
+                var market = uniqueMarkets[mIdx];
+                var marketGroups = filteredGroups.Where(g => g.MarketTicker == market).ToList();
+
+                var allSnapshotData = new List<SnapshotDTO>();
+                foreach (var g in marketGroups)
+                {
+                    var snaps = await context.GetSnapshots_cached(
+                        marketTicker: g.MarketTicker,
+                        startDate: g.StartTime,
+                        endDate: g.EndTime).ConfigureAwait(false);
+                    allSnapshotData.AddRange(snaps);
+                }
+                allSnapshotData = allSnapshotData.OrderBy(x => x.SnapshotDate).ToList();
+
+                var cache = await _snapshotService.LoadManySnapshots(allSnapshotData).ConfigureAwait(false);
+                var marketSnapshots = cache
+                    .SelectMany(kvp => kvp.Value)
+                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue && ms.BestYesBid > 0 && ms.BestYesAsk > 0)
+                    .OrderBy(ms => ms.Timestamp)
+                    .ToList();
+
+                if (marketSnapshots.Count == 0) continue;
+
+                var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
+
+                for (int setIdx = 0; setIdx < strategiesList.Count; setIdx++)
+                {
+                    var strategies = strategiesList[setIdx];
+                    var dto = weightSetDtos[setIdx];
+
+                    OnTestProgress?.Invoke($"[{label}/{dto.StrategyName}] market {market} ({mIdx + 1}/{uniqueMarkets.Count}) set {setIdx + 1}/{strategiesList.Count}");
+
+                    var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort) =
+                        await ProcessMarketAsync(
+                            market, marketSnapshots, strategies, _scopeFactory,
+                            progressPrefix: $"[{label}/{dto.StrategyName}] ",
+                            writeToFile: writeToFile, group: groupForId,
+                            ignoreProcessedCache: true).ConfigureAwait(false);
+
+                    if (bid != null)
+                    {
+                        if (writeToFile)
+                            SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
+                                fileNameSuffix: $"_{label}_{dto.StrategyName}");
+
+                        dto.WeightSetMarkets.Add(new WeightSetMarketDTO
+                        {
+                            MarketTicker = market,
+                            PnL = (decimal)finalPnL,
+                            LastRun = DateTime.UtcNow
+                        });
+
+                        OnProfitLossUpdate?.Invoke(market, finalPnL);
+                    }
+                }
+
+                OnMarketProcessed?.Invoke(market);
+                marketSnapshots.Clear();
+                allSnapshotData.Clear();
+                cache.Clear();
+            }
+
+            foreach (var dto in weightSetDtos)
+            {
+                using var saveScope = _scopeFactory.CreateScope();
+                var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
+                OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{uniqueMarkets.Count} markets)");
+            }
+
+            OnTestProgress?.Invoke($"{label}: all strategy sets completed");
+        }
+[TearDown]
         public void TearDown()
         {
             _dbContext.Dispose();

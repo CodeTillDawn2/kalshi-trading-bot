@@ -22,6 +22,8 @@ namespace SimulatorWinForms
         private bool _simSetup;
         private Label _tooltipOverlay;
         private ScottPlot.Plottable.VLine _hoverLine;
+
+        private readonly Dictionary<string, double> _bestPnL = new(StringComparer.OrdinalIgnoreCase);
         public MainForm()
         {
             InitializeComponent();
@@ -71,8 +73,27 @@ namespace SimulatorWinForms
             _hoverLine.IsVisible = false;
         }
 
+        private void ResetPnLForMarkets(IEnumerable<string> markets)
+        {
+            if (dgvMarkets.InvokeRequired)
+            {
+                dgvMarkets.BeginInvoke(new Action(() => ResetPnLForMarkets(markets)));
+                return;
+            }
 
-        // MainForm.cs
+            var set = new HashSet<string>(markets ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+
+            foreach (DataGridViewRow row in dgvMarkets.Rows)
+            {
+                var marketName = row.Cells["Market"].Value?.ToString();
+                if (string.IsNullOrWhiteSpace(marketName)) continue;
+                if (!set.Contains(marketName)) continue;
+
+                _bestPnL[marketName] = double.NegativeInfinity; // clear best
+                row.Cells["PnL"].Value = "";                    // visually reset
+            }
+        }
+
         private async Task LoadCache()
         {
             dgvMarkets.Columns.Clear();
@@ -296,21 +317,45 @@ namespace SimulatorWinForms
 
         private void AppendLog(string msg)
         {
+            if (rtbLog.InvokeRequired)
+            {
+                rtbLog.BeginInvoke(new Action(() =>
+                {
+                    rtbLog.AppendText($"[{DateTime.Now:HH:mm:ss}] {msg}{Environment.NewLine}");
+                    rtbLog.ScrollToCaret();
+                }));
+                return;
+            }
+
             rtbLog.AppendText($"[{DateTime.Now:HH:mm:ss}] {msg}{Environment.NewLine}");
             rtbLog.ScrollToCaret();
         }
 
         private void UpdatePnL(string market, double pnl)
         {
-            foreach (DataGridViewRow row in dgvMarkets.Rows)
+            if (dgvMarkets.InvokeRequired)
             {
-                if (row.Cells["Market"].Value?.ToString() == market)
+                dgvMarkets.BeginInvoke(new Action(() => UpdatePnL(market, pnl)));
+                return;
+            }
+
+            // only show if this beats the session-best for this market
+            if (!_bestPnL.TryGetValue(market, out var best) || pnl > best)
+            {
+                _bestPnL[market] = pnl;
+
+                foreach (DataGridViewRow row in dgvMarkets.Rows)
                 {
-                    row.Cells["PnL"].Value = pnl.ToString("F2");
-                    break;
+                    if (row.Cells["Market"].Value?.ToString() == market)
+                    {
+                        row.Cells["PnL"].Value = pnl.ToString("F2");
+                        break;
+                    }
                 }
             }
         }
+
+
 
         private void DgvMarkets_SelectionChanged(object sender, EventArgs e)
         {
@@ -414,6 +459,10 @@ namespace SimulatorWinForms
         private async void btnRun_Click(object sender, EventArgs e)
         {
             var sel = GetCheckedMarkets();
+
+            // reset UI PnL for selected markets before the run
+            ResetPnLForMarkets(sel);
+
             EnsureSimulatorSetup();
             try
             {
@@ -433,6 +482,10 @@ namespace SimulatorWinForms
         private async void btnRunSet_Click(object sender, EventArgs e)
         {
             var sel = GetCheckedMarkets();
+
+            // reset UI PnL for selected markets before the run
+            ResetPnLForMarkets(sel);
+
             EnsureSimulatorSetup();
             try
             {

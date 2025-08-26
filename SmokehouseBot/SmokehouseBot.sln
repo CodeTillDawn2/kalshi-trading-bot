@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradingStrategies", "..\Tra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradingSimulator", "..\TradingSimulator\TradingSimulator.csproj", "{2534A9A8-FE6E-44C6-8581-23870A3474F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradingSimulatorGUI", "..\TradingSimulatorGUI\TradingSimulatorGUI.csproj", "{8F570A9D-05E8-41BD-B2F0-4B43F57DD07E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmokehouseInterfaces", "..\SmokehouseInterfaces\SmokehouseInterfaces.csproj", "{8DB07D0B-A55A-4594-A83B-B8728F43B4D3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmokehouseDTOs", "..\SmokehouseDTOs\SmokehouseDTOs.csproj", "{8A84CDB4-160B-4FE4-88C2-68223D68C245}"
@@ -37,10 +35,6 @@ Global
 		{2534A9A8-FE6E-44C6-8581-23870A3474F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2534A9A8-FE6E-44C6-8581-23870A3474F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2534A9A8-FE6E-44C6-8581-23870A3474F8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8F570A9D-05E8-41BD-B2F0-4B43F57DD07E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F570A9D-05E8-41BD-B2F0-4B43F57DD07E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F570A9D-05E8-41BD-B2F0-4B43F57DD07E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F570A9D-05E8-41BD-B2F0-4B43F57DD07E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8DB07D0B-A55A-4594-A83B-B8728F43B4D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8DB07D0B-A55A-4594-A83B-B8728F43B4D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DB07D0B-A55A-4594-A83B-B8728F43B4D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
