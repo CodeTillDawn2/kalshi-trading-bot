@@ -47,11 +47,17 @@ namespace TradingStrategies.Strategies.Strats
 
             // Exit knobs
             ExitOppositeSignalStrength, // min signal strength to flip while holding
-            ExitRsiDevThreshold         // RSI_Short distance from 50 to deem "flat"
+            ExitRsiDevThreshold,        // RSI_Short distance from 50 to deem "flat"
+
+            // NEW: flatness exit tuning
+            ExitFlatBidRangeMax,        // ticks/cents
+            ExitFlatQuietRatio,         // fraction of thr
+            ExitFlatVolContextMax,      // 0..1
+            ExitFlatTradeRateMax        // trades/min
         }
 
         public Breakout2(string name = nameof(Breakout2), double weight = 1.0,
-            Dictionary<ParamKey, double> mlParams = null)
+                  Dictionary<ParamKey, double> mlParams = null)
         {
             Name = name;
             Weight = weight;
@@ -75,11 +81,17 @@ namespace TradingStrategies.Strategies.Strats
                 { ParamKey.TradeEventShareMin, 0.35 },
 
                 { ParamKey.ExitOppositeSignalStrength, 3.0 },
-                { ParamKey.ExitRsiDevThreshold, 5.0 }
+                { ParamKey.ExitRsiDevThreshold, 5.0 },
+
+                // NEW defaults
+                { ParamKey.ExitFlatBidRangeMax, 1.0 },
+                { ParamKey.ExitFlatQuietRatio, 0.40 },
+                { ParamKey.ExitFlatVolContextMax, 0.12 },
+                { ParamKey.ExitFlatTradeRateMax, 0.30 }
             };
             _defaultAction = ActionType.None;
         }
-
+        public ActionType DefaultAction => _defaultAction;
         public override ActionDecision GetAction(MarketSnapshot snapshot, MarketSnapshot? previousSnapshot, int simulationPosition = 0)
         {
             if (!snapshot.ChangeMetricsMature)
@@ -117,6 +129,12 @@ namespace TradingStrategies.Strategies.Strats
 
             double exitOppStrength = _mlParams.GetValueOrDefault(ParamKey.ExitOppositeSignalStrength, 3.0);
             double exitRsiDevThreshold = _mlParams.GetValueOrDefault(ParamKey.ExitRsiDevThreshold, 5.0);
+
+            // NEW pulls
+            double exitBidRangeMax = _mlParams.GetValueOrDefault(ParamKey.ExitFlatBidRangeMax, 1.0);
+            double exitQuietRatio = _mlParams.GetValueOrDefault(ParamKey.ExitFlatQuietRatio, 0.40);
+            double exitVolCtxMax = _mlParams.GetValueOrDefault(ParamKey.ExitFlatVolContextMax, 0.12);
+            double exitTRMax = _mlParams.GetValueOrDefault(ParamKey.ExitFlatTradeRateMax, 0.30);
 
             double vTopYes = snapshot.VelocityPerMinute_Top_Yes_Bid;
             double vBotYes = snapshot.VelocityPerMinute_Bottom_Yes_Bid;
@@ -178,7 +196,7 @@ namespace TradingStrategies.Strategies.Strats
             double noEventShare = totalEvents > 0 ? snapshot.TradeCount_No / totalEvents : 0.0;
 
             bool confirmYes = yesTRShare >= trShareMin && yesEventShare >= teShareMin;
-            bool confirmNo = noTRShare >= trShareMin && noEventShare >= teShareMin;
+            bool confirmNo = noTRShare  >= trShareMin && noEventShare  >= teShareMin;
 
             ActionType candidateAction = _defaultAction;
             double signalStrength = 0.0;
@@ -284,68 +302,76 @@ namespace TradingStrategies.Strategies.Strats
             double yesRemovalRate = -Math.Min(vSumYes, 0.0);
             double noRemovalRate = -Math.Min(vSumNo, 0.0);
             double absorbYes = yesRemovalRate > 0 ? depthYes / yesRemovalRate : double.PositiveInfinity;
-            double absorbNo = noRemovalRate > 0 ? depthNo / noRemovalRate : double.PositiveInfinity;
+            double absorbNo = noRemovalRate > 0 ? depthNo  / noRemovalRate : double.PositiveInfinity;
 
-            if (candidateAction == ActionType.Long && absorbNo < absorptionThreshold) { signalStrength += 0.5 * reversalExtraStrength; pathTaken.Add("Absorb:No<thr"); }
+            if (candidateAction == ActionType.Long  && absorbNo  < absorptionThreshold) { signalStrength += 0.5 * reversalExtraStrength; pathTaken.Add("Absorb:No<thr"); }
             if (candidateAction == ActionType.Short && absorbYes < absorptionThreshold) { signalStrength += 0.5 * reversalExtraStrength; pathTaken.Add("Absorb:Yes<thr"); }
 
             string BuildActionMemo()
             {
                 string Pair(string a, string b) => $"{a} | {b}";
                 var lines = new List<string>
-    {
-        // --- Header ---
-        Pair($"Market: {snapshot.MarketTicker}", $","),
-        Pair($"Time: {snapshot.Timestamp} $", ","),
-        Pair($"Best Yes Bid: {F(snapshot.BestYesBid)}", $"Best Yes Ask: {F(snapshot.BestYesAsk)}"),
-        Pair($"Path: {(pathTaken.Count==0 ? "none" : string.Join(" > ", pathTaken))}", $"SimPos: {I(simulationPosition)}"),
+                {
+                    Pair($"Market: {snapshot.MarketTicker}", $","),
+                    Pair($"Time: {snapshot.Timestamp} $", ","),
+                    Pair($"Best Yes Bid: {F(snapshot.BestYesBid)}", $"Best Yes Ask: {F(snapshot.BestYesAsk)}"),
+                    Pair($"Path: {(pathTaken.Count==0 ? "none" : string.Join(" > ", pathTaken))}", $"SimPos: {I(simulationPosition)}"),
 
-        // --- Velocities ---
-        Pair($"Vel/min Yes: {F(vSumYes)}", $"Vel/min No: {F(vSumNo)}"),
-        Pair($"Thr Yes: {F(thrYes)}", $"Thr No: {F(thrNo)}"),
-        Pair($"Top 10% Yes: {F(snapshot.VelocityPerMinute_Top_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Top_No_Bid)}"),
-        Pair($"Bottom 90% Yes: {F(snapshot.VelocityPerMinute_Bottom_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Bottom_No_Bid)}"),
+                    Pair($"Vel/min Yes: {F(vSumYes)}", $"Vel/min No: {F(vSumNo)}"),
+                    Pair($"Thr Yes: {F(thrYes)}", $"Thr No: {F(thrNo)}"),
+                    Pair($"Top 10% Yes: {F(snapshot.VelocityPerMinute_Top_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Top_No_Bid)}"),
+                    Pair($"Bottom 90% Yes: {F(snapshot.VelocityPerMinute_Bottom_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Bottom_No_Bid)}"),
 
-        // --- Depths / Flows ---
-        Pair($"Depth$ Yes: {F(depthYes)}", $"Depth$ No: {F(depthNo)}"),
-        Pair($"Flow Yes: {F(flowYes)}", $"Flow No: {F(flowNo)}"),
+                    Pair($"Depth$ Yes: {F(depthYes)}", $"Depth$ No: {F(depthNo)}"),
+                    Pair($"Flow Yes: {F(flowYes)}", $"Flow No: {F(flowNo)}"),
 
-        // --- Trade rates ---
-        Pair($"TR/min Yes: {F(snapshot.TradeRatePerMinute_Yes)}", $"TR/min No: {F(snapshot.TradeRatePerMinute_No)}"),
-        Pair($"TR share Yes: {F(yesTRShare)}", $"TR share No: {F(noTRShare)}"),
-        Pair($"TE share Yes: {F(yesEventShare)}", $"TE share No: {F(noEventShare)}"),
-        Pair($"Confirm Yes: {YN(confirmYes)}", $"Confirm No: {YN(confirmNo)}"),
+                    Pair($"TR/min Yes: {F(snapshot.TradeRatePerMinute_Yes)}", $"TR/min No: {F(snapshot.TradeRatePerMinute_No)}"),
+                    Pair($"TR share Yes: {F(yesTRShare)}", $"TR share No: {F(noTRShare)}"),
+                    Pair($"TE share Yes: {F(yesEventShare)}", $"TE share No: {F(noEventShare)}"),
+                    Pair($"Confirm Yes: {YN(confirmYes)}", $"Confirm No: {YN(confirmNo)}"),
 
-        // --- Spikes / Flips ---
-        Pair($"Spike Yes: {YN(spikeYes)}", $"Spike No: {YN(spikeNo)}"),
-        Pair($"Rel inc Yes: {(double.IsInfinity(relIncYes) ? "Inf" : F(relIncYes))}",
-             $"Rel inc No: {(double.IsInfinity(relIncNo) ? "Inf" : F(relIncNo))}"),
-        Pair($"Flip Yes: {YN(flipYes)}", $"Flip No: {YN(flipNo)}"),
-        Pair($"RSI_Short: {snapshot.RSI_Short}",$"RSI_Medium: {snapshot.RSI_Medium}"),
+                    Pair($"Spike Yes: {YN(spikeYes)}", $"Spike No: {YN(spikeNo)}"),
+                    Pair($"Rel inc Yes: {(double.IsInfinity(relIncYes) ? "Inf" : F(relIncYes))}",
+                         $"Rel inc No: {(double.IsInfinity(relIncNo) ? "Inf" : F(relIncNo))}"),
+                    Pair($"Flip Yes: {YN(flipYes)}", $"Flip No: {YN(flipNo)}"),
+                    Pair($"RSI_Short: {snapshot.RSI_Short}",$"RSI_Medium: {snapshot.RSI_Medium}"),
 
-        // --- Absorption ---
-        Pair($"Absorb Yes: {F(absorbYes)}", $"Absorb No: {F(absorbNo)}"),
-        $"Absorb thr: {F(absorptionThreshold)}",
+                    Pair($"Absorb Yes: {F(absorbYes)}", $"Absorb No: {F(absorbNo)}"),
+                    $"Absorb thr: {F(absorptionThreshold)}",
 
-        // --- Context ---
-        Pair($"Depth ratio Y/N: {F(depthRatioYesToNo)}", $"Signal strength: {F(signalStrength)}"),
-        Pair($"Highest vol(1m): {F(snapshot.HighestVolume_Minute)}", $"Curr vol(1m): {F(currMinVol)}"),
-        Pair($"Vol context 0-1: {F(volContext)}", $"MACD Med hist: {F(macdMedHist)}"),
+                    Pair($"Depth ratio Y/N: {F(depthRatioYesToNo)}", $"Signal strength: {F(signalStrength)}"),
+                    Pair($"Highest vol(1m): {F(snapshot.HighestVolume_Minute)}", $"Curr vol(1m): {F(currMinVol)}"),
+                    Pair($"Vol context 0-1: {F(volContext)}", $"MACD Med hist: {F(macdMedHist)}"),
 
-        // --- Sizes / Counts ---
-        Pair($"Avg size Yes: {F(snapshot.AverageTradeSize_Yes)}", $"Avg size No: {F(snapshot.AverageTradeSize_No)}"),
-        Pair($"Trades Yes: {I(snapshot.TradeCount_Yes)}", $"Trades No: {I(snapshot.TradeCount_No)}"),
-        Pair($"Non-trade Yes: {I(snapshot.NonTradeRelatedOrderCount_Yes)}", $"Non-trade No: {I(snapshot.NonTradeRelatedOrderCount_No)}")
-    };
+                    Pair($"Avg size Yes: {F(snapshot.AverageTradeSize_Yes)}", $"Avg size No: {F(snapshot.AverageTradeSize_No)}"),
+                    Pair($"Trades Yes: {I(snapshot.TradeCount_Yes)}", $"Trades No: {I(snapshot.TradeCount_No)}"),
+                    Pair($"Non-trade Yes: {I(snapshot.NonTradeRelatedOrderCount_Yes)}", $"Non-trade No: {I(snapshot.NonTradeRelatedOrderCount_No)}")
+                };
                 return string.Join(Environment.NewLine, lines);
             }
 
+            // NEW: multi-signal flatness exit (RSI assists but never acts alone)
             if (simulationPosition != 0)
             {
                 double rsiShort = snapshot.RSI_Short ?? 50.0;
-                if (Math.Abs(rsiShort - 50.0) <= exitRsiDevThreshold)
+                bool rsiFlat = Math.Abs(rsiShort - 50.0) <= exitRsiDevThreshold;
+
+                bool rangeFlat = snapshot.BidRange_Yes <= exitBidRangeMax && snapshot.BidRange_No <= exitBidRangeMax;
+                double quietYes = Math.Max(thrYes, 1e-9) * exitQuietRatio;
+                double quietNo = Math.Max(thrNo, 1e-9) * exitQuietRatio;
+                bool velFlat = Math.Abs(vSumYes) <= quietYes && Math.Abs(vSumNo) <= quietNo;
+                bool volFlat = volContext <= exitVolCtxMax;
+                bool tradeFlat = totalTradeRate <= exitTRMax;
+
+                bool shouldExit =
+                    (rangeFlat && velFlat) ||
+                    (velFlat && volFlat) ||
+                    (rangeFlat && tradeFlat) ||
+                    (rsiFlat && (velFlat || rangeFlat));
+
+                if (shouldExit)
                 {
-                    pathTaken.Add("Exit: RSI flat");
+                    pathTaken.Add("Exit: flat");
                     string actionMemo = BuildActionMemo();
                     int exitPrice = simulationPosition > 0 ? snapshot.BestYesBid : snapshot.BestYesAsk;
                     return new ActionDecision
@@ -396,7 +422,6 @@ namespace TradingStrategies.Strategies.Strats
                 };
             }
         }
-
 
         public override string ToJson()
         {
