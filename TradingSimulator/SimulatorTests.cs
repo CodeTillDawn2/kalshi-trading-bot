@@ -290,50 +290,50 @@ namespace TradingSimulator.Simulator
             var filePath = Path.Combine(_cacheDirectory, $"{marketTicker}{fileNameSuffix}.json");
             File.WriteAllText(filePath, json);
 
-            var baseTicker = System.Text.RegularExpressions.Regex.Replace(marketTicker, @"_(\d+)$", "");
-            var groupFiles = Directory.GetFiles(_cacheDirectory, $"{baseTicker}_*.json");
+            //var baseTicker = System.Text.RegularExpressions.Regex.Replace(marketTicker, @"_(\d+)$", "");
+            //var groupFiles = Directory.GetFiles(_cacheDirectory, $"{baseTicker}_*.json");
 
-            var merged = new CachedMarketData
-            {
-                Market = baseTicker,
-                PnL = 0,
-                BidPoints = new List<PricePoint>(),
-                AskPoints = new List<PricePoint>(),
-                BuyPoints = new List<PricePoint>(),
-                SellPoints = new List<PricePoint>(),
-                ExitPoints = new List<PricePoint>(),
-                EventPoints = new List<PricePoint>(),
-                IntendedLongPoints = new List<PricePoint>(),
-                IntendedShortPoints = new List<PricePoint>()
-            };
+            //var merged = new CachedMarketData
+            //{
+            //    Market = baseTicker,
+            //    PnL = 0,
+            //    BidPoints = new List<PricePoint>(),
+            //    AskPoints = new List<PricePoint>(),
+            //    BuyPoints = new List<PricePoint>(),
+            //    SellPoints = new List<PricePoint>(),
+            //    ExitPoints = new List<PricePoint>(),
+            //    EventPoints = new List<PricePoint>(),
+            //    IntendedLongPoints = new List<PricePoint>(),
+            //    IntendedShortPoints = new List<PricePoint>()
+            //};
 
-            foreach (var gf in groupFiles)
-            {
-                var gj = File.ReadAllText(gf);
-                var gd = JsonSerializer.Deserialize<CachedMarketData>(gj);
-                if (gd == null) continue;
-                merged.PnL += gd.PnL;
-                if (gd.BidPoints != null) merged.BidPoints.AddRange(gd.BidPoints);
-                if (gd.AskPoints != null) merged.AskPoints.AddRange(gd.AskPoints);
-                if (gd.BuyPoints != null) merged.BuyPoints.AddRange(gd.BuyPoints);
-                if (gd.SellPoints != null) merged.SellPoints.AddRange(gd.SellPoints);
-                if (gd.ExitPoints != null) merged.ExitPoints.AddRange(gd.ExitPoints);
-                if (gd.EventPoints != null) merged.EventPoints.AddRange(gd.EventPoints);
-                if (gd.IntendedLongPoints != null) merged.IntendedLongPoints.AddRange(gd.IntendedLongPoints);
-                if (gd.IntendedShortPoints != null) merged.IntendedShortPoints.AddRange(gd.IntendedShortPoints);
-            }
+            //foreach (var gf in groupFiles)
+            //{
+            //    var gj = File.ReadAllText(gf);
+            //    var gd = JsonSerializer.Deserialize<CachedMarketData>(gj);
+            //    if (gd == null) continue;
+            //    merged.PnL += gd.PnL;
+            //    if (gd.BidPoints != null) merged.BidPoints.AddRange(gd.BidPoints);
+            //    if (gd.AskPoints != null) merged.AskPoints.AddRange(gd.AskPoints);
+            //    if (gd.BuyPoints != null) merged.BuyPoints.AddRange(gd.BuyPoints);
+            //    if (gd.SellPoints != null) merged.SellPoints.AddRange(gd.SellPoints);
+            //    if (gd.ExitPoints != null) merged.ExitPoints.AddRange(gd.ExitPoints);
+            //    if (gd.EventPoints != null) merged.EventPoints.AddRange(gd.EventPoints);
+            //    if (gd.IntendedLongPoints != null) merged.IntendedLongPoints.AddRange(gd.IntendedLongPoints);
+            //    if (gd.IntendedShortPoints != null) merged.IntendedShortPoints.AddRange(gd.IntendedShortPoints);
+            //}
 
-            merged.BidPoints = merged.BidPoints.OrderBy(p => p.Date).ToList();
-            merged.AskPoints = merged.AskPoints.OrderBy(p => p.Date).ToList();
-            merged.BuyPoints = merged.BuyPoints.OrderBy(p => p.Date).ToList();
-            merged.SellPoints = merged.SellPoints.OrderBy(p => p.Date).ToList();
-            merged.ExitPoints = merged.ExitPoints.OrderBy(p => p.Date).ToList();
-            merged.EventPoints = merged.EventPoints.OrderBy(p => p.Date).ToList();
-            merged.IntendedLongPoints = merged.IntendedLongPoints.OrderBy(p => p.Date).ToList();
-            merged.IntendedShortPoints = merged.IntendedShortPoints.OrderBy(p => p.Date).ToList();
+            //merged.BidPoints = merged.BidPoints.OrderBy(p => p.Date).ToList();
+            //merged.AskPoints = merged.AskPoints.OrderBy(p => p.Date).ToList();
+            //merged.BuyPoints = merged.BuyPoints.OrderBy(p => p.Date).ToList();
+            //merged.SellPoints = merged.SellPoints.OrderBy(p => p.Date).ToList();
+            //merged.ExitPoints = merged.ExitPoints.OrderBy(p => p.Date).ToList();
+            //merged.EventPoints = merged.EventPoints.OrderBy(p => p.Date).ToList();
+            //merged.IntendedLongPoints = merged.IntendedLongPoints.OrderBy(p => p.Date).ToList();
+            //merged.IntendedShortPoints = merged.IntendedShortPoints.OrderBy(p => p.Date).ToList();
 
-            var canonicalPath = Path.Combine(_cacheDirectory, $"{baseTicker}.json");
-            File.WriteAllText(canonicalPath, JsonSerializer.Serialize(merged));
+            //var canonicalPath = Path.Combine(_cacheDirectory, $"{baseTicker}.json");
+            //File.WriteAllText(canonicalPath, JsonSerializer.Serialize(merged));
         }
 
 

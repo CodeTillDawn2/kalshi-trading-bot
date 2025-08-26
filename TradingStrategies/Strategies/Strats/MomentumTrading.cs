@@ -122,29 +122,29 @@ namespace TradingStrategies.Strategies.Strats
             double vBotNo = snapshot.VelocityPerMinute_Bottom_No_Bid;
 
             double vSumYes = (topDecileW * vTopYes) + vBotYes;
-            double vSumNo = (topDecileW * vTopNo)  + vBotNo;
+            double vSumNo = (topDecileW * vTopNo) + vBotNo;
 
             // prev sums (no new fields)
             double prevSumYes = 0.0, prevSumNo = 0.0;
             if (previousSnapshot != null)
             {
                 prevSumYes = previousSnapshot.VelocityPerMinute_Top_Yes_Bid + previousSnapshot.VelocityPerMinute_Bottom_Yes_Bid;
-                prevSumNo  = previousSnapshot.VelocityPerMinute_Top_No_Bid  + previousSnapshot.VelocityPerMinute_Bottom_No_Bid;
+                prevSumNo = previousSnapshot.VelocityPerMinute_Top_No_Bid + previousSnapshot.VelocityPerMinute_Bottom_No_Bid;
             }
 
             // depths (cents*contracts -> dollars)
             double depthYes = snapshot.TotalOrderbookDepth_Yes / 100.0;
-            double depthNo = snapshot.TotalOrderbookDepth_No  / 100.0;
+            double depthNo = snapshot.TotalOrderbookDepth_No / 100.0;
 
             // thresholds
             const double MAX_VEL_THR_FIXED = 0.35;
             double effRatio = Math.Min(baseThrRatio, MAX_VEL_THR_FIXED);
             double thrYes = depthYes * effRatio;
-            double thrNo = depthNo  * effRatio;
+            double thrNo = depthNo * effRatio;
 
             // flow proxies
             double flowYes = vSumYes / Math.Max(depthYes, 1e-9);
-            double flowNo = vSumNo  / Math.Max(depthNo, 1e-9);
+            double flowNo = vSumNo / Math.Max(depthNo, 1e-9);
 
             double depthRatioYN = depthYes / Math.Max(depthNo, 1e-9);
 
@@ -158,13 +158,13 @@ namespace TradingStrategies.Strategies.Strats
                 double cAbsYes = Math.Abs(vSumYes);
                 double cAbsNo = Math.Abs(vSumNo);
                 relIncYes = (pAbsYes < 1e-12) ? (cAbsYes > 0 ? double.PositiveInfinity : 1.0) : (cAbsYes / pAbsYes);
-                relIncNo  = (pAbsNo  < 1e-12) ? (cAbsNo  > 0 ? double.PositiveInfinity : 1.0) : (cAbsNo  / pAbsNo);
-                spikeYes  = relIncYes >= spikeRelThr;
-                spikeNo   = relIncNo  >= spikeRelThr;
+                relIncNo = (pAbsNo < 1e-12) ? (cAbsNo > 0 ? double.PositiveInfinity : 1.0) : (cAbsNo / pAbsNo);
+                spikeYes = relIncYes >= spikeRelThr;
+                spikeNo = relIncNo >= spikeRelThr;
             }
 
             bool flipYes = previousSnapshot != null && Math.Sign(prevSumYes) != Math.Sign(vSumYes) && Math.Abs(prevSumYes) > 0 && Math.Abs(vSumYes) > 0;
-            bool flipNo = previousSnapshot != null && Math.Sign(prevSumNo)  != Math.Sign(vSumNo)  && Math.Abs(prevSumNo)  > 0 && Math.Abs(vSumNo)  > 0;
+            bool flipNo = previousSnapshot != null && Math.Sign(prevSumNo) != Math.Sign(vSumNo) && Math.Abs(prevSumNo) > 0 && Math.Abs(vSumNo) > 0;
 
             // context
             double currMinVol = snapshot.TradeVolumePerMinute_Yes + snapshot.TradeVolumePerMinute_No;
@@ -174,15 +174,15 @@ namespace TradingStrategies.Strategies.Strats
             // confirmations
             double totalTR = Math.Max(snapshot.TradeRatePerMinute_Yes + snapshot.TradeRatePerMinute_No, 1e-9);
             double yesTRShare = snapshot.TradeRatePerMinute_Yes / totalTR;
-            double noTRShare = snapshot.TradeRatePerMinute_No  / totalTR;
+            double noTRShare = snapshot.TradeRatePerMinute_No / totalTR;
 
             double totalEvents = (double)(snapshot.TradeCount_Yes + snapshot.TradeCount_No
                                  + snapshot.NonTradeRelatedOrderCount_Yes + snapshot.NonTradeRelatedOrderCount_No);
             double yesEventShare = totalEvents > 0 ? snapshot.TradeCount_Yes / totalEvents : 0.0;
-            double noEventShare = totalEvents > 0 ? snapshot.TradeCount_No  / totalEvents : 0.0;
+            double noEventShare = totalEvents > 0 ? snapshot.TradeCount_No / totalEvents : 0.0;
 
             bool confirmYes = yesTRShare >= trShareMin && yesEventShare >= teShareMin;
-            bool confirmNo = noTRShare  >= trShareMin && noEventShare  >= teShareMin;
+            bool confirmNo = noTRShare >= trShareMin && noEventShare >= teShareMin;
 
             // base signals
             bool yesBreak = vSumYes >= thrYes
@@ -190,7 +190,7 @@ namespace TradingStrategies.Strategies.Strats
                             && Math.Abs(depthRatioYN) < maxVolumeRatio
                             && (flowYes > Math.Abs(flowNo) + minRatioDiff);
 
-            bool noBreak = vSumNo  >= thrNo
+            bool noBreak = vSumNo >= thrNo
                             && (snapshot.BestYesBid >= minPtsFromResolved)
                             && Math.Abs(depthRatioYN) < maxVolumeRatio
                             && (flowNo > Math.Abs(flowYes) + minRatioDiff);
@@ -247,7 +247,7 @@ namespace TradingStrategies.Strategies.Strats
                 }
             }
 
-            // spike-weighted boosts (kept; memo only shows booleans/rel inc)
+            // spike-weighted boosts
             double SpikeWeighted(double relInc)
             {
                 double baseW = double.IsInfinity(relInc) ? spikeWeightCap : (relInc / Math.Max(spikeRelThr, 1e-9));
@@ -285,97 +285,131 @@ namespace TradingStrategies.Strategies.Strats
                 }
             }
 
-            // MACD alignment bonus (memo shows MACD value only)
+            // MACD alignment bonus
             double macdMedHist = snapshot.MACD_Medium.Histogram ?? 0.0;
             if (macdMedHist > 0 && candidateAction == ActionType.Long) { signalStrength += 0.5; pathTaken.Add("MACD:+"); }
             if (macdMedHist < 0 && candidateAction == ActionType.Short) { signalStrength += 0.5; pathTaken.Add("MACD:-"); }
 
-            // absorption timing (memo shows absorb + threshold)
+            // absorption timing
             double yesRemovalRate = -Math.Min(vSumYes, 0.0);
             double noRemovalRate = -Math.Min(vSumNo, 0.0);
             double absorbYes = yesRemovalRate > 0 ? depthYes / yesRemovalRate : double.PositiveInfinity;
-            double absorbNo = noRemovalRate  > 0 ? depthNo  / noRemovalRate : double.PositiveInfinity;
+            double absorbNo = noRemovalRate > 0 ? depthNo / noRemovalRate : double.PositiveInfinity;
 
-            if (candidateAction == ActionType.Long  && absorbNo  < absorptionThreshold) { signalStrength += 0.5 * reversalExtraStrength; pathTaken.Add("Absorb:No<thr"); }
+            if (candidateAction == ActionType.Long && absorbNo < absorptionThreshold) { signalStrength += 0.5 * reversalExtraStrength; pathTaken.Add("Absorb:No<thr"); }
             if (candidateAction == ActionType.Short && absorbYes < absorptionThreshold) { signalStrength += 0.5 * reversalExtraStrength; pathTaken.Add("Absorb:Yes<thr"); }
 
-            // ---- memo (unchanged fields/order) ----
-            string BuildActionMemo()
+            // ---- memo ----
+            string BuildActionMemo(ActionType cand)
             {
                 string Pair(string a, string b) => $"{a} | {b}";
                 var lines = new List<string>
-                {
-                    Pair($"Market: {snapshot.MarketTicker}", ","),
-                    Pair($"Time: {snapshot.Timestamp}", ","),
-                    Pair($"Best Yes Bid: {F(snapshot.BestYesBid)}", $"Best Yes Ask: {F(snapshot.BestYesAsk)}"),
-                    Pair($"Path: {(pathTaken.Count==0 ? "none" : string.Join(" > ", pathTaken))}", $"SimPos: {I(simulationPosition)}"),
+        {
+            Pair($"Action: {cand.ToString()}", ","),
+            Pair($"Market: {snapshot.MarketTicker}", ","),
+            Pair($"Time: {snapshot.Timestamp}", ","),
+            Pair($"Best Yes Bid: {F(snapshot.BestYesBid)}", $"Best Yes Ask: {F(snapshot.BestYesAsk)}"),
+            Pair($"Path: {(pathTaken.Count==0 ? "none" : string.Join(" > ", pathTaken))}", $"SimPos: {I(simulationPosition)}"),
 
-                    Pair($"Vel/min Yes: {F(vSumYes)}", $"Vel/min No: {F(vSumNo)}"),
-                    Pair($"Thr Yes: {F(thrYes)}", $"Thr No: {F(thrNo)}"),
-                    Pair($"Top 10% Yes: {F(snapshot.VelocityPerMinute_Top_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Top_No_Bid)}"),
-                    Pair($"Bottom 90% Yes: {F(snapshot.VelocityPerMinute_Bottom_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Bottom_No_Bid)}"),
+            Pair($"Vel/min Yes: {F(vSumYes)}", $"Vel/min No: {F(vSumNo)}"),
+            Pair($"Thr Yes: {F(thrYes)}", $"Thr No: {F(thrNo)}"),
+            Pair($"Top 10% Yes: {F(snapshot.VelocityPerMinute_Top_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Top_No_Bid)}"),
+            Pair($"Bottom 90% Yes: {F(snapshot.VelocityPerMinute_Bottom_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Bottom_No_Bid)}"),
 
-                    Pair($"Depth$ Yes: {F(depthYes)}", $"Depth$ No: {F(depthNo)}"),
-                    Pair($"Flow Yes: {F(flowYes)}", $"Flow No: {F(flowNo)}"),
+            Pair($"Depth$ Yes: {F(depthYes)}", $"Depth$ No: {F(depthNo)}"),
+            Pair($"Flow Yes: {F(flowYes)}", $"Flow No: {F(flowNo)}"),
 
-                    Pair($"TR/min Yes: {F(snapshot.TradeRatePerMinute_Yes)}", $"TR/min No: {F(snapshot.TradeRatePerMinute_No)}"),
-                    Pair($"TR share Yes: {F(yesTRShare)}", $"TR share No: {F(noTRShare)}"),
-                    Pair($"TE share Yes: {F(yesEventShare)}", $"TE share No: {F(noEventShare)}"),
-                    Pair($"Confirm Yes: {YN(confirmYes)}", $"Confirm No: {YN(confirmNo)}"),
+            Pair($"TR/min Yes: {F(snapshot.TradeRatePerMinute_Yes)}", $"TR/min No: {F(snapshot.TradeRatePerMinute_No)}"),
+            Pair($"TR share Yes: {F(yesTRShare)}", $"TR share No: {F(noTRShare)}"),
+            Pair($"TE share Yes: {F(yesEventShare)}", $"TE share No: {F(noEventShare)}"),
+            Pair($"Confirm Yes: {YN(confirmYes)}", $"Confirm No: {YN(confirmNo)}"),
 
-                    Pair($"Spike Yes: {YN(spikeYes)}", $"Spike No: {YN(spikeNo)}"),
-                    Pair($"Rel inc Yes: {(double.IsInfinity(relIncYes) ? "Inf" : F(relIncYes))}",
-                         $"Rel inc No: {(double.IsInfinity(relIncNo) ? "Inf" : F(relIncNo))}"),
-                    Pair($"Flip Yes: {YN(flipYes)}", $"Flip No: {YN(flipNo)}"),
-                    Pair($"RSI_Short: {snapshot.RSI_Short}",$"RSI_Medium: {snapshot.RSI_Medium}"),
+            Pair($"Spike Yes: {YN(spikeYes)}", $"Spike No: {YN(spikeNo)}"),
+            Pair($"Rel inc Yes: {(double.IsInfinity(relIncYes) ? "Inf" : F(relIncYes))}",
+                 $"Rel inc No: {(double.IsInfinity(relIncNo) ? "Inf" : F(relIncNo))}"),
+            Pair($"Flip Yes: {YN(flipYes)}", $"Flip No: {YN(flipNo)}"),
+            Pair($"RSI_Short: {snapshot.RSI_Short}",$"RSI_Medium: {snapshot.RSI_Medium}"),
 
-                    Pair($"Absorb Yes: {F(absorbYes)}", $"Absorb No: {F(absorbNo)}"),
-                    $"Absorb thr: {F(absorptionThreshold)}",
+            Pair($"Absorb Yes: {F(absorbYes)}", $"Absorb No: {F(absorbNo)}"),
+            $"Absorb thr: {F(absorptionThreshold)}",
 
-                    Pair($"Depth ratio Y/N: {F(depthRatioYN)}", $"Signal strength: {F(signalStrength)}"),
-                    Pair($"Highest vol(1m): {F(snapshot.HighestVolume_Minute)}", $"Curr vol(1m): {F(currMinVol)}"),
-                    Pair($"Vol context 0-1: {F(volContext)}", $"MACD Med hist: {F(macdMedHist)}"),
+            Pair($"Depth ratio Y/N: {F(depthRatioYN)}", $"Signal strength: {F(signalStrength)}"),
+            Pair($"Highest vol(1m): {F(snapshot.HighestVolume_Minute)}", $"Curr vol(1m): {F(currMinVol)}"),
+            Pair($"Vol context 0-1: {F(volContext)}", $"MACD Med hist: {F(macdMedHist)}"),
 
-                    Pair($"Avg size Yes: {F(snapshot.AverageTradeSize_Yes)}", $"Avg size No: {F(snapshot.AverageTradeSize_No)}"),
-                    Pair($"Trades Yes: {I(snapshot.TradeCount_Yes)}", $"Trades No: {I(snapshot.TradeCount_No)}"),
-                    Pair($"Non-trade Yes: {I(snapshot.NonTradeRelatedOrderCount_Yes)}", $"Non-trade No: {I(snapshot.NonTradeRelatedOrderCount_No)}")
-                };
+            Pair($"Avg size Yes: {F(snapshot.AverageTradeSize_Yes)}", $"Avg size No: {F(snapshot.AverageTradeSize_No)}"),
+            Pair($"Trades Yes: {I(snapshot.TradeCount_Yes)}", $"Trades No: {I(snapshot.TradeCount_No)}"),
+            Pair($"Non-trade Yes: {I(snapshot.NonTradeRelatedOrderCount_Yes)}", $"Non-trade No: {I(snapshot.NonTradeRelatedOrderCount_No)}")
+        };
                 return string.Join(Environment.NewLine, lines);
             }
+
+            // -------- Resolved proximity gating (centralized) --------
+            bool nearResLong = snapshot.BestYesAsk > 100 - minPtsFromResolved; // cents
+            bool nearResShort = snapshot.BestYesBid < minPtsFromResolved;      // cents
+
+            if (candidateAction == ActionType.Long && nearResLong)
+            {
+                pathTaken.Add("Gate NearResolved L");
+                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo(ActionType.None) };
+            }
+            if (candidateAction == ActionType.Short && nearResShort)
+            {
+                pathTaken.Add("Gate NearResolved S");
+                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo(ActionType.None) };
+            }
+            // ---------------------------------------------------------
 
             // reversal gating only (no special exits)
             if (simulationPosition > 0 && candidateAction == ActionType.Short && signalStrength < (minSignalStrength + reversalExtraStrength))
             {
                 pathTaken.Add("Hold weak flip L->S");
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo() };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo(ActionType.None) };
             }
             if (simulationPosition < 0 && candidateAction == ActionType.Long && signalStrength < (minSignalStrength + reversalExtraStrength))
             {
                 pathTaken.Add("Hold weak flip S->L");
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo() };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo(ActionType.None) };
             }
 
             if (candidateAction == ActionType.None || signalStrength < minSignalStrength)
             {
                 pathTaken.Add(candidateAction == ActionType.None ? "Gate None" : "Gate Weak");
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo() };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo(ActionType.None) };
             }
 
             int px = (candidateAction == ActionType.Long) ? snapshot.BestYesBid : snapshot.BestNoBid;
             pathTaken.Add("Final " + candidateAction.ToString());
-            return new ActionDecision { Type = candidateAction, Price = px, Qty = 1, Memo = BuildActionMemo() };
+            return new ActionDecision { Type = candidateAction, Price = px, Qty = 1, Memo = BuildActionMemo(candidateAction) };
         }
+
 
         public override string ToJson()
         {
             return JsonSerializer.Serialize(new
             {
-                type = "MomentumTrading",
+                type = "Momentum",
                 name = Name,
                 weight = Weight,
                 defaultAction = _defaultAction.ToString(),
                 mlParams = _mlParams.ToDictionary(kv => kv.Key.ToString(), kv => kv.Value)
             });
+        }
+
+
+        public static MomentumTrading FromJson(string json)
+        {
+            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            if ((string)data["type"] != "Momentum")
+                throw new ArgumentException("Invalid strategy type");
+
+            var name = (string)data["name"];
+            var weight = Convert.ToDouble(data["weight"]);
+            var mlParamsJson = (JsonElement)data["mlParams"];
+            var mlParams = mlParamsJson.Deserialize<Dictionary<string, double>>()
+                .ToDictionary(kv => Enum.Parse<ParamKey>(kv.Key), kv => kv.Value);
+
+            return new MomentumTrading(name, weight, ActionType.None, mlParams);
         }
     }
 }
