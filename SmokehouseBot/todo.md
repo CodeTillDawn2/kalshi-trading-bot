@@ -28,23 +28,27 @@
 - [ ] Need some kind of "traffic cop" intermediary to handle graceful handoffs, potentially handle some of the maintenance duties
 
 
-
-# v0.2.5
+# v0.2.6
 - [ ] Automate data cleanup
 - [ ] Make database logging of debug work
 - [ ] Was forced to upgrade to market lifecycle v2, need to update code to capture new fields if necessary
-- [x] Configurable saving of feeds, for performance
 - [ ] Clean up unused db objects
 - [ ] Ensure category properly retrieved and saved (missing on some markets still)
 - [ ] Revisit market interest score
-- [x] Add web socket activity level to MarketWatches
-- [x] OrderbookChangeTracker survived market KXJOINKARPATHY-26JAN-TES (SmokehouseBot.Services.OrderbookChangeTracker)
 - [ ] Make various refresh threshholds configurable (timing between refreshes, number of extras forced when not many to refresh, etc)
-- [ ] Make executable tasks setup smarter about path
 - [ ] Investigate: Exchange is inactive or reconnection disabled, skipping reconnection attempt (id 458076146,followed by no reconnection attempt for 2 hours, then skipping "late" snapshots, only restarting because of no snapshots in 10 minutes)
 - [ ] Start periodically sampling exchange status and find out if they are warning about sudden outages
+
+# v0.2.5
+Notes: Major issue which was causing snapshots after the first to not translate to change over time... all snapshots invalidated.
+- [x] Configurable saving of feeds, for performance
+- [x] Add web socket activity level to MarketWatches
+- [x] OrderbookChangeTracker survived market KXJOINKARPATHY-26JAN-TES (SmokehouseBot.Services.OrderbookChangeTracker)
+- [x] Make executable tasks setup smarter about path
 - [ ] OrderImbalanceAbsorption and RSI_Short_Slope
-- [ ] Clean new repo on github
+- [x] Clean new repo on github
+- [x] Tests now runnable on other machines
+- [x] So many strat and trading GUI changes
 
 # v0.2.4
 Note: Discovered bug which was causing the orderbook to be static in the snapshot due to dual storage in memory and only one copy being updated. All snapshots have been invalidated with no
