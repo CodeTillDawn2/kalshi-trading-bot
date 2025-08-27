@@ -81,8 +81,6 @@ namespace SmokehouseDTOs
             double bidVolumeImbalance,
             int depthAtTop4YesBids,
             int depthAtTop4NoBids,
-            int depthAtTop4YesAsks,
-            int depthAtTop4NoAsks,
             double? rsiShort,
             double? rsiMedium,
             double? rsiLong,
@@ -120,7 +118,9 @@ namespace SmokehouseDTOs
             double totalBidVolume_Yes,
             double totalBidVolume_No,
             double yesBidSlopePerMinute,
-            double noBidSlopePerMinute)
+            double noBidSlopePerMinute,
+            double? psar,
+            double? adx)
         {
             Timestamp = marketTimestamp;
             MarketTicker = marketTicker;
@@ -191,8 +191,6 @@ namespace SmokehouseDTOs
             BidVolumeImbalance = bidVolumeImbalance;
             DepthAtTop4YesBids = depthAtTop4YesBids;
             DepthAtTop4NoBids = depthAtTop4NoBids;
-            DepthAtTop4YesAsks = depthAtTop4YesAsks;
-            DepthAtTop4NoAsks = depthAtTop4NoAsks;
             RSI_Short = rsiShort;
             RSI_Medium = rsiMedium;
             RSI_Long = rsiLong;
@@ -231,6 +229,8 @@ namespace SmokehouseDTOs
             TotalBidVolume_No = totalBidVolume_No;
             YesBidSlopePerMinute = yesBidSlopePerMinute;
             NoBidSlopePerMinute = noBidSlopePerMinute;
+            ADX = adx;
+            PSAR = psar;
         }
 
         public DateTime Timestamp { get; set; }
@@ -484,6 +484,11 @@ namespace SmokehouseDTOs
         #endregion
 
         #region Trade Metrics
+
+        public double? ADX { get; set; }
+        public double? PSAR { get; set; }
+
+
         /// <summary>
         /// Gets or sets the trade rate for "Yes" side trades, in trades per minute.
         /// </summary>
@@ -932,25 +937,6 @@ namespace SmokehouseDTOs
         /// </remarks>
         public int DepthAtTop4NoBids { get; set; }
 
-        /// <summary>
-        /// Gets or sets the total resting contracts for top four "Yes" ask price levels.
-        /// </summary>
-        /// <remarks>
-        /// Sum of contracts at four lowest "Yes" ask prices (top four "No" bids).
-        /// Sourced from <see cref="MarketData.DepthAtTop4YesAsks"/>, computed from <see cref="MarketData.OrderbookData"/>.
-        /// Sums all levels if fewer than four. 0 if no "No" bid orders.
-        /// </remarks>
-        public int DepthAtTop4YesAsks { get; set; }
-
-        /// <summary>
-        /// Gets or sets the total resting contracts for top four "No" ask price levels.
-        /// </summary>
-        /// <remarks>
-        /// Sum of contracts at four lowest "No" ask prices (top four "Yes" bids).
-        /// Sourced from <see cref="MarketData.DepthAtTop4NoAsks"/>, computed from <see cref="MarketData.OrderbookData"/>.
-        /// Sums all levels if fewer than four. 0 if no "Yes" bid orders.
-        /// </remarks>
-        public int DepthAtTop4NoAsks { get; set; }
 
 
         public double TotalBidVolume_Yes { get; set; }
@@ -1288,26 +1274,6 @@ namespace SmokehouseDTOs
         public double NoBidCenterOfMass { get; set; }
 
         /// <summary>
-        /// Gets or sets the center of mass for "Yes" ask orders.
-        /// </summary>
-        /// <remarks>
-        /// Weighted average price of "Yes" ask orders, in cents.
-        /// Sourced from <see cref="MarketData.YesAskCenterOfMass"/>, computed from <see cref="MarketData.OrderbookData"/>.
-        /// 0 if no orders.
-        /// </remarks>
-        public double YesAskCenterOfMass { get; set; }
-
-        /// <summary>
-        /// Gets or sets the center of mass for "No" ask orders.
-        /// </summary>
-        /// <remarks>
-        /// Weighted average price of "No" ask orders, in cents.
-        /// Sourced from <see cref="MarketData.NoAskCenterOfMass"/>, computed from <see cref="MarketData.OrderbookData"/>.
-        /// 0 if no orders.
-        /// </remarks>
-        public double NoAskCenterOfMass { get; set; }
-
-        /// <summary>
         /// Gets or sets the tolerance percentage for cumulative depth calculations.
         /// </summary>
         /// <remarks>
@@ -1561,8 +1527,6 @@ namespace SmokehouseDTOs
                 DepthAtTop4NoBids = this.DepthAtTop4NoBids,
                 TotalBidVolume_Yes = this.TotalBidVolume_Yes,
                 TotalBidVolume_No = this.TotalBidVolume_No,
-                DepthAtTop4YesAsks = this.DepthAtTop4YesAsks,
-                DepthAtTop4NoAsks = this.DepthAtTop4NoAsks,
                 RSI_Short = this.RSI_Short,
                 RSI_Medium = this.RSI_Medium,
                 RSI_Long = this.RSI_Long,
@@ -1605,32 +1569,12 @@ namespace SmokehouseDTOs
                 TotalOrderbookDepth_Yes = this.TotalOrderbookDepth_Yes,
                 TotalOrderbookDepth_No = this.TotalOrderbookDepth_No,
                 YesBidSlopePerMinute = this.YesBidSlopePerMinute,
-                NoBidSlopePerMinute = this.NoBidSlopePerMinute
+                NoBidSlopePerMinute = this.NoBidSlopePerMinute,
+                PSAR = this.PSAR,
+                ADX = this.ADX
             };
         }
 
-
-
-        private int CalculateCumulativeDepth(SortedDictionary<int, List<(int count, DateTime timestamp)>> bids, int bestBid, double tolerancePct)
-        {
-            if (bids.Count == 0) return 0;
-            double minPrice = bestBid * (1 - tolerancePct / 100.0);
-            return bids.Where(kv => kv.Key >= minPrice).Sum(kv => kv.Value.Sum(o => o.count));
-        }
-
-        private double CalculateCenterOfMass(SortedDictionary<int, List<(int count, DateTime timestamp)>> bids)
-        {
-            if (bids.Count == 0) return 0;
-            double weightedSum = 0;
-            int totalMass = 0;
-            foreach (var kv in bids)
-            {
-                int levelCount = kv.Value.Sum(o => o.count);
-                weightedSum += kv.Key * levelCount;
-                totalMass += levelCount;
-            }
-            return totalMass > 0 ? weightedSum / totalMass : 0;
-        }
     }
 
     public class MACDConverter : JsonConverter<(double? MACD, double? Signal, double? Histogram)>

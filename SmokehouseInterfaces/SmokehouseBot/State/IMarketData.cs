@@ -98,8 +98,6 @@ namespace SmokehouseBot.State.Interfaces
         double RecentVolume_LastMonth { get; set; }
         int DepthAtTop4YesBids { get; }
         int DepthAtTop4NoBids { get; }
-        int DepthAtTop4YesAsks { get; }
-        int DepthAtTop4NoAsks { get; }
         double YesBidCenterOfMass { get; }
         double NoBidCenterOfMass { get; }
         double? RSI_Short { get; set; }

@@ -950,8 +950,6 @@ namespace SmokehouseBot.Management
                 kvp.Value.BidVolumeImbalance,
                 kvp.Value.DepthAtTop4YesBids,
                 kvp.Value.DepthAtTop4NoBids,
-                kvp.Value.DepthAtTop4YesAsks,
-                kvp.Value.DepthAtTop4NoAsks,
                 kvp.Value.RSI_Short,
                 kvp.Value.RSI_Medium,
                 kvp.Value.RSI_Long,
@@ -989,7 +987,9 @@ namespace SmokehouseBot.Management
                 kvp.Value.TotalBidVolume_Yes,
                 kvp.Value.TotalBidVolume_No,
                 kvp.Value.YesBidSlopePerMinute,
-                kvp.Value.NoBidSlopePerMinute
+                kvp.Value.NoBidSlopePerMinute,
+                kvp.Value.PSAR,
+                kvp.Value.ADX
             );
         }
 

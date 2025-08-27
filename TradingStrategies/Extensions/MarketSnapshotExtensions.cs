@@ -42,8 +42,6 @@ namespace TradingStrategies.Extensions
             // Top 4 depths (recompute)
             snapshot.DepthAtTop4YesBids = CalculateTopNDepth(book.YesBids, 4);
             snapshot.DepthAtTop4NoBids = CalculateTopNDepth(book.NoBids, 4);
-            snapshot.DepthAtTop4YesAsks = snapshot.DepthAtTop4NoBids;
-            snapshot.DepthAtTop4NoAsks = snapshot.DepthAtTop4YesBids;
 
             snapshot.TotalBidVolume_Yes = snapshot.TotalBidVolume_Yes;
             snapshot.TotalBidVolume_No = snapshot.TotalBidVolume_No;
@@ -51,8 +49,6 @@ namespace TradingStrategies.Extensions
             // Centers of mass (recompute)
             snapshot.YesBidCenterOfMass = CalculateCenterOfMass(book.YesBids);
             snapshot.NoBidCenterOfMass = CalculateCenterOfMass(book.NoBids);
-            snapshot.YesAskCenterOfMass = 100 - snapshot.NoBidCenterOfMass; // Approximate
-            snapshot.NoAskCenterOfMass = 100 - snapshot.YesBidCenterOfMass;
 
         }
 

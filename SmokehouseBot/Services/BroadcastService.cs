@@ -441,8 +441,6 @@ namespace SmokehouseBot.Services
                     bidImbalance = marketData.BidCountImbalance,
                     depthAtTop4YesBids = marketData.DepthAtTop4YesBids,
                     depthAtTop4NoBids = marketData.DepthAtTop4NoBids,
-                    depthAtTop4YesAsks = marketData.DepthAtTop4YesAsks,
-                    depthAtTop4NoAsks = marketData.DepthAtTop4NoAsks,
                     yesBidCenterOfMass = marketData.YesBidCenterOfMass,
                     noBidCenterOfMass = marketData.NoBidCenterOfMass,
                     lastUpdated

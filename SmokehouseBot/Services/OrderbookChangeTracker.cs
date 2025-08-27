@@ -266,6 +266,7 @@ namespace SmokehouseBot.Services
                         CheckForMatchingTrade(change);
 
                     _orderbookChanges.Enqueue(change);
+                    CheckForCancelingOrderbookChange(change);
                 }
 
                 _logger.LogDebug("Logged change for {MarketTicker}: ChangeID={ChangeID}, Side={Side}, Price={Price}, Delta={Delta}, Sequence={Sequence}, IsTradeRelated={IsTradeRelated}, IsCanceled={IsCanceled}",
@@ -453,7 +454,6 @@ namespace SmokehouseBot.Services
             }
 
             var cutoff = newChange.Timestamp - _config.Value.OrderbookCancelWindow;
-            List<(OrderbookChange ExistingChange, OrderbookChange NewChange)> canceledPairs = new();
             lock (_matchingLock)
             {
                 foreach (var existingChange in _orderbookChanges)
@@ -484,7 +484,6 @@ namespace SmokehouseBot.Services
                     {
                         existingChange.IsCanceled = true;
                         newChange.IsCanceled = true;
-                        canceledPairs.Add((existingChange, newChange));
                         _logger.LogDebug(
                             "TRADEMON-Matched canceling orderbook changes in {MarketTicker}: Change1Id={Change1Id}, Change2Id={Change2Id}, Side={Side}, Price={Price}, Delta1={Delta1}, Delta2={Delta2}, Timestamp1={Timestamp1}, Timestamp2={Timestamp2}",
                             _marketTicker, existingChange.Id, newChange.Id, newChange.Side, newChange.Price, existingChange.DeltaContracts, newChange.DeltaContracts, existingChange.Timestamp, newChange.Timestamp);
@@ -492,7 +491,6 @@ namespace SmokehouseBot.Services
                     }
                 }
             }
-            newChange.CanceledPairs = canceledPairs;
 
             if (newChange.IsCanceled)
             {
@@ -650,7 +648,7 @@ namespace SmokehouseBot.Services
         }
 
         private void RefreshOrderbookChangeOverTimeMetrics(List<OrderbookChange> orderbookChanges,
-            List<OrderbookData> bids, double elapsedMinutes)
+    List<OrderbookData> bids, double elapsedMinutes)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -665,7 +663,7 @@ namespace SmokehouseBot.Services
             List<OrderbookData> yesBids = bids.Where(x => x.Side == "yes").ToList();
 
             int yesThreshold = yesBids.Any() ? (int)Math.Floor(yesBids.Max(x => x.Price) * 0.9) : 0;
-            int noThreshold = noBids.Any() ? (int)Math.Ceiling(noBids.Min(x => x.Price) + (100 - noBids.Min(x => x.Price)) * 0.1) : 100;
+            int noThreshold = noBids.Any() ? (int)Math.Floor(noBids.Max(x => x.Price) * 0.9) : 0;
 
             var YesTopVelocity = GetTopYesVelocityPerMinute(yesBids, orderbookChanges, elapsedMinutes, yesThreshold);
             var YesBottomVelocity = GetBottomYesVelocityPerMinute(yesBids, orderbookChanges, elapsedMinutes, yesThreshold);
@@ -679,8 +677,6 @@ namespace SmokehouseBot.Services
 
             Market.VelocityPerMinute_Bottom_Yes_Bid = Math.Round(YesBottomVelocity.Volume, 2);
             Market.VelocityPerMinute_Top_Yes_Bid = Math.Round(YesTopVelocity.Volume, 2);
-
-            //These two are problems
             Market.VelocityPerMinute_Bottom_No_Bid = Math.Round(NoBottomVelocity.Volume, 2);
             Market.VelocityPerMinute_Top_No_Bid = Math.Round(NoTopVelocity.Volume, 2);
 
@@ -689,14 +685,12 @@ namespace SmokehouseBot.Services
                 "YesBidTop={YesBidTopRate}/min ({YesBidTopLevels} levels), " +
                 "YesBidBottom={YesBidBottomRate}/min ({YesBidBottomLevels} levels), " +
                 "NoBidTop={NoBidTopRate}/min ({NoBidTopLevels} levels), " +
-                "NoBidBottom={NoBidBottomRate}/min ({NoBidBottomLevels} levels), ",
+                "NoBidBottom={NoBidBottomRate}/min ({NoBidBottomLevels} levels)",
                 _marketTicker,
                 YesTopVelocity.Volume, YesTopVelocity.Levels,
-                NoTopVelocity.Volume, NoTopVelocity.Levels,
                 YesBottomVelocity.Volume, YesBottomVelocity.Levels,
-                NoBottomVelocity.Volume, NoBottomVelocity.Levels,
-                Market.VelocityPerMinute_Top_No_Bid, Market.LevelCount_Top_No_Bid,
-                Market.VelocityPerMinute_Bottom_No_Bid, Market.LevelCount_Bottom_No_Bid);
+                NoTopVelocity.Volume, NoTopVelocity.Levels,
+                NoBottomVelocity.Volume, NoBottomVelocity.Levels);
         }
 
         private void RefreshTradeChangeOverTimeMetrics(List<OrderbookChange> orderbookChanges, double elapsedMinutes)
@@ -907,7 +901,6 @@ namespace SmokehouseBot.Services
             var gracePeriodEnd = LastMarketOpenTime.Add(_config.Value.ChangeWindowDuration);
             int removedCount = 0;
             int warningCount = 0;
-            bool FoundMatch = false;
 
             while (_tradeEvents.TryPeek(out var trade) && trade.Timestamp < cutoff)
             {
@@ -918,7 +911,6 @@ namespace SmokehouseBot.Services
 
                 if (_tradeEvents.TryDequeue(out trade))
                 {
-
                     bool isGracePeriodOver = trade.Timestamp > gracePeriodEnd;
 
                     if (!trade.HasMatchingOrderbookChange)
@@ -929,8 +921,10 @@ namespace SmokehouseBot.Services
                             trade.HasMatchingOrderbookChange = true;
                             matchingChange.IsTradeRelated = true;
                             matchingChange.MatchedTradeId = trade.Id;
-                            FoundMatch = true;
-                            break;
+                            CalculationsDirty = true;  // Trigger recalculation due to new match
+                            _logger.LogDebug(
+                                "Found matching orderbook change during cleanup for TradeID={TradeID}: ChangeID={ChangeID}, Side={Side}, Price={Price}, Delta={Delta}",
+                                trade.Id, matchingChange.Id, matchingChange.Side, matchingChange.Price, matchingChange.DeltaContracts);
                         }
                         else if (isGracePeriodOver)
                         {
@@ -1041,10 +1035,10 @@ namespace SmokehouseBot.Services
             }
             else
             {
-                levels = noBids.Where(x => x.Price > threshold).Count(); // Count lower price levels
+                levels = noBids.Where(x => x.Price < threshold).Count(); // Lower prices are bottom
             }
 
-            var bottomChanges = validChanges.Where(c => c.Price > threshold).ToList();
+            var bottomChanges = validChanges.Where(c => c.Price < threshold).ToList();
             _logger.LogDebug("Calculating VelocityPerMinute_Bottom_No_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, NoBidsCount={NoBidsCount}",
                 _marketTicker, threshold, levels, bottomChanges.Count, noBids.Count);
             foreach (var change in bottomChanges)
@@ -1159,10 +1153,10 @@ namespace SmokehouseBot.Services
             }
             else
             {
-                levels = noBids.Where(x => x.Price <= threshold).Count(); // Count higher price levels
+                levels = noBids.Where(x => x.Price >= threshold).Count(); // Higher prices are top
             }
 
-            var topChanges = validChanges.Where(c => c.Price <= threshold).ToList();
+            var topChanges = validChanges.Where(c => c.Price >= threshold).ToList();
             _logger.LogDebug("Calculating VelocityPerMinute_Top_No_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, NoBidsCount={NoBidsCount}",
                 _marketTicker, threshold, levels, topChanges.Count, noBids.Count);
             foreach (var change in topChanges)

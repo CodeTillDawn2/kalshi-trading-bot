@@ -267,15 +267,6 @@ namespace SmokehouseBot.State
             .Take(4)
             .Sum(o => o.RestingContracts);
 
-        public int DepthAtTop4YesAsks => GetBids("no")
-            .OrderByDescending(o => o.Price)
-            .Take(4)
-            .Sum(o => o.RestingContracts);
-
-        public int DepthAtTop4NoAsks => GetBids("yes")
-            .OrderByDescending(o => o.Price)
-            .Take(4)
-            .Sum(o => o.RestingContracts);
 
         public double YesBidCenterOfMass => GetBids("yes").Any() ?
             Math.Round(GetBids("yes").Sum(o => o.Price * (double)o.Price * o.RestingContracts) /
