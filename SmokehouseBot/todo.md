@@ -45,7 +45,7 @@ Notes: Major issue which was causing snapshots after the first to not translate 
 - [x] Add web socket activity level to MarketWatches
 - [x] OrderbookChangeTracker survived market KXJOINKARPATHY-26JAN-TES (SmokehouseBot.Services.OrderbookChangeTracker)
 - [x] Make executable tasks setup smarter about path
-- [ ] Better change over time metrics
+- [x] Better change over time metrics
 - [x] Clean new repo on github
 - [x] Tests now runnable on other machines
 - [x] So many strat and trading GUI changes
