@@ -987,7 +987,9 @@ namespace SmokehouseBot.Management
                 totalYesDepth,
                 totalNoDepth,
                 kvp.Value.TotalBidVolume_Yes,
-                kvp.Value.TotalBidVolume_No
+                kvp.Value.TotalBidVolume_No,
+                kvp.Value.YesBidSlopePerMinute,
+                kvp.Value.NoBidSlopePerMinute
             );
         }
 

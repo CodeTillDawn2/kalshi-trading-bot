@@ -77,6 +77,11 @@ namespace SmokehouseBot.State
         private double _positionROI;
         private double _positionROIAmt;
         private double _expectedFees;
+        private double _yesBidSlopePerMinute = 0;
+        private double _noBidSlopePerMinute = 0;
+
+        public double YesBidSlopePerMinute { get { return _yesBidSlopePerMinute; } set { _yesBidSlopePerMinute = value; } }
+        public double NoBidSlopePerMinute { get { return _noBidSlopePerMinute; } set { _noBidSlopePerMinute = value; } }
 
         public string MarketType { get; set; }
 
@@ -356,6 +361,35 @@ namespace SmokehouseBot.State
             {
                 _mostRecentTicker = _tickers.OrderByDescending(t => t.LoggedDate).FirstOrDefault()?.LoggedDate ?? default;
             }
+
+            var now = DateTime.UtcNow;
+            var fiveMinAgo = now.AddMinutes(-5);
+            var recentTickers = _tickers
+                .Where(t => t.LoggedDate >= fiveMinAgo && t.LoggedDate <= now)
+                .OrderBy(t => t.LoggedDate)
+                .ToList();
+
+            if (recentTickers.Count < 2)
+            {
+                _yesBidSlopePerMinute = 0;
+                _noBidSlopePerMinute = 0;
+                return;
+            }
+
+            var first = recentTickers.First();
+            var last = recentTickers.Last();
+            var timeDiffMin = (last.LoggedDate - first.LoggedDate).TotalMinutes;
+
+            if (timeDiffMin <= 0)
+            {
+                _yesBidSlopePerMinute = 0;
+                _noBidSlopePerMinute = 0;
+                return;
+            }
+
+            _yesBidSlopePerMinute = (last.yes_bid - first.yes_bid) / timeDiffMin;
+            _noBidSlopePerMinute = ((100 - last.yes_ask) - (100 - first.yes_ask)) / timeDiffMin;
+
             UpdateTradingMetrics();
         }
 

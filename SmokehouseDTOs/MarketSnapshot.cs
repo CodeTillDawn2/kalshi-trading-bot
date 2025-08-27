@@ -118,7 +118,9 @@ namespace SmokehouseDTOs
             long totalOrderbookDepth_Yes,
             long totalOrderbookDepth_No,
             double totalBidVolume_Yes,
-            double totalBidVolume_No)
+            double totalBidVolume_No,
+            double yesBidSlopePerMinute,
+            double noBidSlopePerMinute)
         {
             Timestamp = marketTimestamp;
             MarketTicker = marketTicker;
@@ -227,6 +229,8 @@ namespace SmokehouseDTOs
             TotalOrderbookDepth_No = totalOrderbookDepth_No;
             TotalBidVolume_Yes = totalBidVolume_Yes;
             TotalBidVolume_No = totalBidVolume_No;
+            YesBidSlopePerMinute = yesBidSlopePerMinute;
+            NoBidSlopePerMinute = noBidSlopePerMinute;
         }
 
         public DateTime Timestamp { get; set; }
@@ -251,6 +255,10 @@ namespace SmokehouseDTOs
         #endregion
 
         #region Historical Prices
+
+        public double YesBidSlopePerMinute { get; set; }
+        public double NoBidSlopePerMinute { get; set; }
+
 
         /// <summary>
         /// Gets or sets the all-time high bid price for the "Yes" contract and its timestamp.
@@ -1595,7 +1603,9 @@ namespace SmokehouseDTOs
                 TolerancePercentage = this.TolerancePercentage,
                 ExpectedFees = this.ExpectedFees,
                 TotalOrderbookDepth_Yes = this.TotalOrderbookDepth_Yes,
-                TotalOrderbookDepth_No = this.TotalOrderbookDepth_No
+                TotalOrderbookDepth_No = this.TotalOrderbookDepth_No,
+                YesBidSlopePerMinute = this.YesBidSlopePerMinute,
+                NoBidSlopePerMinute = this.NoBidSlopePerMinute
             };
         }
 
