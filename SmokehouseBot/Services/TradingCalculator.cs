@@ -531,5 +531,212 @@ namespace SmokehouseBot.Services
             return selectedLevels;
         }
 
+        /// <summary>
+        /// Calculates the Parabolic Stop and Reverse (PSAR) value for a series of pseudo-candlesticks in the Kalshi marketplace.
+        /// This indicator is valuable for event-driven contracts where price trends can emerge rapidly due to evolving news or data releases influencing outcome probabilities.
+        /// It identifies trend directions and provides dynamic trailing stop levels, aiding risk management in volatile, bounded-price environments (1 to 99 cents per contract).
+        /// However, in ranging or sideways markets—common when events are distant or uncertain—PSAR may generate frequent false reversal signals (whipsaws), potentially leading to unnecessary trades.
+        /// It performs best when combined with trend-confirming indicators like the Average Directional Index (ADX) to filter signals.
+        /// </summary>
+        /// <param name="candlesticks">The list of candlesticks containing ask and bid prices for high, low, and close.</param>
+        /// <param name="initialAF">The initial acceleration factor (default: 0.02).</param>
+        /// <param name="maxAF">The maximum acceleration factor (default: 0.2).</param>
+        /// <param name="afStep">The step increment for the acceleration factor (default: 0.02).</param>
+        /// <returns>The current PSAR value, or null if insufficient data or invalid computation.</returns>
+        /// <remarks>
+        /// Different PSAR values indicate the following in Kalshi's context:
+        /// - A PSAR value below the current price (e.g., PSAR at 45 when the mid-close is 60) suggests an uptrend, signaling potential buying opportunities or holding long ("Yes") positions, with the PSAR serving as a rising trailing stop.
+        /// - A PSAR value above the current price (e.g., PSAR at 75 when the mid-close is 60) indicates a downtrend, implying selling pressure or short ("No") positions, with the PSAR acting as a falling trailing stop.
+        /// - Crossovers, where the price moves beyond the PSAR, denote potential trend reversals: a price rising above PSAR flips to bullish, while falling below flips to bearish.
+        /// - Acceleration factor (AF) increases (up to the maximum, typically 0.20) amplify the PSAR's sensitivity in strong trends, tightening stops to lock in gains.
+        /// </remarks>
+        public double? CalculatePSAR(List<CandlestickData> candlesticks, double initialAF = 0.02, double maxAF = 0.2, double afStep = 0.02)
+        {
+            var log = new StringBuilder();
+            log.AppendLine($"Calculating PSAR with InitialAF={initialAF}, MaxAF={maxAF}, AFStep={afStep}.");
+
+            if (initialAF <= 0 || maxAF <= 0 || afStep <= 0 || initialAF > maxAF)
+            {
+                log.AppendLine("Invalid acceleration parameters.");
+                _logger.LogError("{Log}", log.ToString());
+                throw new ArgumentException("Acceleration factors must be positive and InitialAF <= MaxAF.");
+            }
+
+            if (candlesticks == null || candlesticks.Count < 2)
+            {
+                log.AppendLine($"Insufficient data. Candles: {candlesticks?.Count ?? 0}, Required: 2.");
+                _logger.LogDebug("{Log}", log.ToString());
+                return null;
+            }
+
+            var highs = candlesticks.Select(c => (c.AskHigh + c.BidHigh) / 2.0).ToList();
+            var lows = candlesticks.Select(c => (c.AskLow + c.BidLow) / 2.0).ToList();
+            var closes = candlesticks.Select(c => (c.AskClose + c.BidClose) / 2.0).ToList();
+
+            double psar = lows[0]; // Initialize with first low
+            int trend = closes[1] > closes[0] ? 1 : -1; // 1 for uptrend, -1 for downtrend
+            double ep = trend == 1 ? highs[0] : lows[0]; // Extreme point
+            double af = initialAF;
+
+            for (int i = 1; i < candlesticks.Count; i++)
+            {
+                double currentPsar = psar + af * (ep - psar);
+
+                if (trend == 1) // Uptrend
+                {
+                    if (lows[i] < currentPsar) // Reversal to downtrend
+                    {
+                        trend = -1;
+                        psar = i > 0 ? Math.Max(highs[i - 1], highs[i]) : highs[i];
+                        ep = lows[i];
+                        af = initialAF;
+                    }
+                    else
+                    {
+                        psar = currentPsar;
+                        if (highs[i] > ep)
+                        {
+                            ep = highs[i];
+                            af = Math.Min(af + afStep, maxAF);
+                        }
+                    }
+                }
+                else // Downtrend
+                {
+                    if (highs[i] > currentPsar) // Reversal to uptrend
+                    {
+                        trend = 1;
+                        psar = i > 0 ? Math.Min(lows[i - 1], lows[i]) : lows[i];
+                        ep = highs[i];
+                        af = initialAF;
+                    }
+                    else
+                    {
+                        psar = currentPsar;
+                        if (lows[i] < ep)
+                        {
+                            ep = lows[i];
+                            af = Math.Min(af + afStep, maxAF);
+                        }
+                    }
+                }
+
+                log.AppendLine($"Index {i}: PSAR={psar:F4}, Trend={(trend == 1 ? "Up" : "Down")}, EP={ep:F4}, AF={af:F4}");
+            }
+
+            if (double.IsNaN(psar) || double.IsInfinity(psar))
+            {
+                log.AppendLine($"Invalid PSAR: {psar}.");
+                _logger.LogWarning("{Log}", log.ToString());
+                return null;
+            }
+
+            _logger.LogDebug("{Log}", log.ToString());
+            return psar;
+        }
+
+        /// <summary>
+        /// Calculates the Average Directional Index (ADX) value for a series of pseudo-candlesticks in the Kalshi marketplace.
+        /// This indicator serves as a robust complementary metric, particularly when integrated with tools like the Parabolic Stop and Reverse (PSAR) to validate trend strength.
+        /// It provides an objective measure of trend intensity, irrespective of direction, which aids in distinguishing genuine trends from periods of consolidation or volatility without momentum.
+        /// This is especially pertinent in Kalshi's event-driven environment, where contract prices may exhibit pronounced trends due to evolving probabilities influenced by economic announcements or other developments.
+        /// By confirming the presence of a strong trend (typically ADX values exceeding 25), it enhances the efficacy of PSAR signals, reducing the likelihood of whipsaws in non-trending conditions.
+        /// Nonetheless, ADX functions as a lagging indicator and does not inherently specify trend direction; it necessitates pairing with directional components like the Positive Directional Indicator (+DI) and Negative Directional Indicator (-DI), or external tools such as PSAR.
+        /// Its utility diminishes in highly volatile, range-bound markets common to certain Kalshi contracts awaiting resolution.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing mid-high, mid-low, and mid-close prices.</param>
+        /// <param name="period">The period for ADX calculation (default: 14).</param>
+        /// <returns>The current ADX value, or null if insufficient data or invalid computation.</returns>
+        /// <remarks>
+        /// Interpretations of ADX values are as follows in Kalshi's context:
+        /// - Below 20: Indicates a weak or absent trend, suggesting consolidation or choppy conditions; traders should exercise caution with trend-following strategies like PSAR, as signals may prove unreliable.
+        /// - Between 20 and 25: Signals the potential emergence of a trend; this transitional range warrants monitoring for confirmation, such as a PSAR crossover aligned with rising ADX.
+        /// - Between 25 and 40: Reflects a strong trend, validating PSAR positions and encouraging trend continuation trades, with higher values denoting increased momentum.
+        /// - Above 40: Denotes an exceptionally strong trend, often nearing potential exhaustion; while supportive of PSAR trailing stops, it may foreshadow reversals, prompting consideration of profit-taking.
+        /// </remarks>
+        public double? CalculateADX(List<PseudoCandlestick> pseudoCandles, int period = 14)
+        {
+            var log = new StringBuilder();
+            log.AppendLine($"Calculating ADX for {period} periods.");
+
+            if (period < 1)
+            {
+                log.AppendLine($"Invalid period: {period}. Must be at least 1.");
+                _logger.LogError("{Log}", log.ToString());
+                throw new ArgumentException("Period must be at least 1.", nameof(period));
+            }
+
+            if (pseudoCandles == null || pseudoCandles.Count < period * 2)
+            {
+                log.AppendLine($"Insufficient data. Candles: {pseudoCandles?.Count ?? 0}, Required: {period * 2}.");
+                _logger.LogDebug("{Log}", log.ToString());
+                return null;
+            }
+
+            var highs = pseudoCandles.Select(pc => pc.MidHigh).ToList();
+            var lows = pseudoCandles.Select(pc => pc.MidLow).ToList();
+            var closes = pseudoCandles.Select(pc => pc.MidClose).ToList();
+
+            // Calculate smoothed +DM, -DM, and TR
+            double smoothedPlusDM = 0, smoothedMinusDM = 0, smoothedTR = 0;
+            for (int i = 1; i <= period; i++)
+            {
+                double upMove = highs[i] - highs[i - 1];
+                double downMove = lows[i - 1] - lows[i];
+                double plusDM = (upMove > downMove && upMove > 0) ? upMove : 0;
+                double minusDM = (downMove > upMove && downMove > 0) ? downMove : 0;
+                double tr = Math.Max(highs[i] - lows[i], Math.Max(Math.Abs(highs[i] - closes[i - 1]), Math.Abs(lows[i] - closes[i - 1])));
+                smoothedPlusDM += plusDM;
+                smoothedMinusDM += minusDM;
+                smoothedTR += tr;
+            }
+            smoothedPlusDM /= period;
+            smoothedMinusDM /= period;
+            smoothedTR /= period;
+
+            // Calculate subsequent values iteratively
+            var dxValues = new List<double>();
+            for (int i = period + 1; i < pseudoCandles.Count; i++)
+            {
+                double upMove = highs[i] - highs[i - 1];
+                double downMove = lows[i - 1] - lows[i];
+                double plusDM = (upMove > downMove && upMove > 0) ? upMove : 0;
+                double minusDM = (downMove > upMove && downMove > 0) ? downMove : 0;
+                double tr = Math.Max(highs[i] - lows[i], Math.Max(Math.Abs(highs[i] - closes[i - 1]), Math.Abs(lows[i] - closes[i - 1])));
+
+                smoothedPlusDM = ((smoothedPlusDM * (period - 1)) + plusDM) / period;
+                smoothedMinusDM = ((smoothedMinusDM * (period - 1)) + minusDM) / period;
+                smoothedTR = ((smoothedTR * (period - 1)) + tr) / period;
+
+                if (smoothedTR == 0) continue; // Avoid division by zero
+
+                double plusDI = (smoothedPlusDM / smoothedTR) * 100;
+                double minusDI = (smoothedMinusDM / smoothedTR) * 100;
+                double dx = Math.Abs(plusDI - minusDI) / (plusDI + minusDI) * 100;
+                dxValues.Add(dx);
+
+                log.AppendLine($"Index {i}: +DM={plusDM:F4}, -DM={minusDM:F4}, TR={tr:F4}, +DI={plusDI:F2}, -DI={minusDI:F2}, DX={dx:F2}");
+            }
+
+            if (dxValues.Count < period)
+            {
+                log.AppendLine($"Insufficient DX values for ADX: {dxValues.Count}, Required: {period}.");
+                _logger.LogDebug("{Log}", log.ToString());
+                return null;
+            }
+
+            // Calculate ADX as SMA of last 'period' DX values
+            double adx = dxValues.TakeLast(period).Average();
+            if (double.IsNaN(adx) || double.IsInfinity(adx))
+            {
+                log.AppendLine($"Invalid ADX: {adx}.");
+                _logger.LogWarning("{Log}", log.ToString());
+                return null;
+            }
+
+            log.AppendLine($"ADX: {adx:F2}");
+            _logger.LogDebug("{Log}", log.ToString());
+            return adx;
+        }
     }
 }

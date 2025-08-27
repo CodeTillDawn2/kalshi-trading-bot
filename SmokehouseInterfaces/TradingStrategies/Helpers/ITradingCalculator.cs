@@ -18,5 +18,8 @@ namespace TradingStrategies.Helpers.Interfaces
             int maxLevels,
             double sigma,
             int minDistance);
+
+        double? CalculateADX(List<PseudoCandlestick> pseudoCandles, int period = 14);
+        double? CalculatePSAR(List<CandlestickData> candlesticks, double initialAF = 0.02, double maxAF = 0.2, double afStep = 0.02);
     }
 }

@@ -238,6 +238,9 @@ namespace SmokehouseBot.State
         public int BidCountImbalance => TotalBidContracts_Yes - TotalBidContracts_No;
         public double BidVolumeImbalance => TotalBidVolume_Yes - TotalBidVolume_No;
 
+        public double? PSAR { get; set; }
+        public double? ADX { get; set; }
+
         private double _highestVolume_Day = 0;
         private double _highestVolume_Hour = 0;
         private double _highestVolume_Minute = 0;
@@ -504,6 +507,9 @@ namespace SmokehouseBot.State
             _obv_Medium = (long)_tradingCalculator.CalculateOBV(hourCopy);
 
             _obv_Long = (long)_tradingCalculator.CalculateOBV(dayCopy);
+            
+            ADX = _tradingCalculator.CalculateADX(minuteCopy, _calculationConfig.ADX_Periods);
+
             _logger.LogDebug("**Ended updating trading metrics for {marketTicker}**", _marketTicker);
         }
 

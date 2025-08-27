@@ -39,5 +39,7 @@
         public int ResistanceLevels_MaxLevels { get; set; }
         public double ResistanceLevels_Sigma { get; set; }
         public int ResistanceLevels_MinDistance { get; set; }
+        public int ADX_Periods { get; set; }
+
     }
 }

@@ -137,5 +137,8 @@ namespace SmokehouseBot.State.Interfaces
 
         double YesBidSlopePerMinute { get; set; }
         double NoBidSlopePerMinute { get; set; }
+
+        public double? PSAR { get; set; }
+        public double? ADX { get; set; }
     }
 }

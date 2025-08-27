@@ -745,6 +745,7 @@ namespace SmokehouseBot.Services
                         maxLevels: _calculationConfig.ResistanceLevels_MaxLevels,
                         sigma: _calculationConfig.ResistanceLevels_Sigma,
                         minDistance: _calculationConfig.ResistanceLevels_MinDistance);
+                    marketData.PSAR = _serviceFactory.GetTradingCalculator().CalculatePSAR(marketData.Candlesticks["minute"]);
                 }
                 NotifyMarketDataUpdated(marketTicker);
                 marketData.LastSuccessfulSync = DateTime.UtcNow;
