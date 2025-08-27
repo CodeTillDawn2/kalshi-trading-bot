@@ -727,7 +727,7 @@ namespace SmokehouseBot.Services
                         marketData.OrderbookData = updatedOrderbook;
                         marketData.ChangeTracker.LogOrderbookSnapshot(originalOrderbook, updatedOrderbook);
 
-                        _logger.LogInformation("Stored OrderbookData for {MarketTicker}: [{Entries}]",
+                        _logger.LogDebug("Stored OrderbookData for {MarketTicker}: [{Entries}]",
                             marketTicker,
                             string.Join("; ", updatedOrderbook.Select(o => $"Price={o.Price},Side={o.Side},Contracts={o.RestingContracts}")));
 

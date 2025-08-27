@@ -400,7 +400,8 @@ namespace SimulatorWinForms
                     ExitPoints = new List<PricePoint>(),
                     EventPoints = new List<PricePoint>(),
                     IntendedLongPoints = new List<PricePoint>(),
-                    IntendedShortPoints = new List<PricePoint>()
+                    IntendedShortPoints = new List<PricePoint>(),
+                    DiscrepancyPoints = new List<PricePoint>()  // NEW
                 };
 
                 foreach (var fp in parts)
@@ -417,6 +418,7 @@ namespace SimulatorWinForms
                     if (d.EventPoints != null) merged.EventPoints.AddRange(d.EventPoints);
                     if (d.IntendedLongPoints != null) merged.IntendedLongPoints.AddRange(d.IntendedLongPoints);
                     if (d.IntendedShortPoints != null) merged.IntendedShortPoints.AddRange(d.IntendedShortPoints);
+                    if (d.DiscrepancyPoints != null) merged.DiscrepancyPoints.AddRange(d.DiscrepancyPoints);  // NEW
                 }
 
                 merged.BidPoints = merged.BidPoints.OrderBy(p => p.Date).ToList();
@@ -427,6 +429,7 @@ namespace SimulatorWinForms
                 merged.EventPoints = merged.EventPoints.OrderBy(p => p.Date).ToList();
                 merged.IntendedLongPoints = merged.IntendedLongPoints.OrderBy(p => p.Date).ToList();
                 merged.IntendedShortPoints = merged.IntendedShortPoints.OrderBy(p => p.Date).ToList();
+                merged.DiscrepancyPoints = merged.DiscrepancyPoints.OrderBy(p => p.Date).ToList();  // NEW
             }
 
             if (merged == null)
@@ -441,6 +444,7 @@ namespace SimulatorWinForms
             AddPoints(merged.SellPoints, "Sell", Color.Red, 12, collectTooltips: true);
             AddPoints(merged.ExitPoints, "Exit", Color.Black, 12, collectTooltips: true); // NEW
             AddPoints(merged.EventPoints, "Event", Color.Purple, 0, collectTooltips: true);
+            AddPoints(merged.DiscrepancyPoints, "Discrepancy", Color.Magenta, 8, collectTooltips: true);  // NEW
 
             formsPlot1.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
             formsPlot1.Plot.AxisAuto();
@@ -453,7 +457,6 @@ namespace SimulatorWinForms
             _hoverLine.IsVisible = false;
             formsPlot1.Render();
         }
-
 
 
         private async void btnRun_Click(object sender, EventArgs e)
@@ -491,7 +494,7 @@ namespace SimulatorWinForms
             {
                 await _simulator.RunSelectedSetForGuiAsync(
                     setKey: "Momentum",
-                    weightName: "MT_A12",
+                    weightName: "MT_F05",
                     writeToFile: true,
                     marketsToRun: sel);
             }

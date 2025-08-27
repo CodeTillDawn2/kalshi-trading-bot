@@ -207,7 +207,7 @@ namespace SmokehouseBot.Services
                 .ToDictionary(g => g.Key, g => g.First().RestingContracts);
 
 
-            if (!FirstSnapshotReceived)
+            if (FirstSnapshotReceived)
             {
                 var allKeys = originalBySideAndPrice.Keys.Union(newBySideAndPrice.Keys).ToList();
 

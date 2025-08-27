@@ -26,10 +26,11 @@ namespace TradingSimulator.TestObjects
         public List<PricePoint> AskPoints { get; set; }
         public List<PricePoint> BuyPoints { get; set; }
         public List<PricePoint> SellPoints { get; set; }
+        public List<PricePoint> ExitPoints { get; set; }
         public List<PricePoint> EventPoints { get; set; }
         public List<PricePoint> IntendedLongPoints { get; set; }
         public List<PricePoint> IntendedShortPoints { get; set; }
-        public List<PricePoint> ExitPoints { get; set; }
+        public List<PricePoint> DiscrepancyPoints { get; set; } = new List<PricePoint>();  // NEW
     }
 
 }

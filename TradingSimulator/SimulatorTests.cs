@@ -172,7 +172,8 @@ namespace TradingSimulator.Simulator
 
         private async Task<(double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints,
          List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
-         List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints)>
+         List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
+         List<PricePoint> discrepancyPoints)>
      ProcessMarketAsync(
          string marketTicker,
          List<MarketSnapshot> marketSnapshots,
@@ -186,7 +187,7 @@ namespace TradingSimulator.Simulator
             if (!ignoreProcessedCache && _processedMarkets.Contains(marketTicker))
             {
                 OnTestProgress?.Invoke($"{progressPrefix}Skipping cached market: {marketTicker}");
-                return (0, null, null, null, null, null, null, null, null);
+                return (0, null, null, null, null, null, null, null, null, null);
             }
             OnTestProgress?.Invoke($"{progressPrefix}Processing market: {marketTicker}");
 
@@ -194,6 +195,10 @@ namespace TradingSimulator.Simulator
             {
                 var helper = new MarketTypeHelper();
                 foreach (var s in marketSnapshots) s.MarketType = helper.GetMarketType(s).ToString();
+
+                // NEW: Detect discrepancies
+                var discrepancyPoints = DetectDiscrepancies(marketSnapshots);
+                OnTestProgress?.Invoke($"{progressPrefix}Detected {discrepancyPoints.Count} orderbook discrepancies in {marketTicker}.");
 
                 var scenario = new Scenario(strategiesDict);
                 var pathData = await Task.Run(() => _overseer.TestScenario(scenario, marketSnapshots, writeToFile, 100, group));
@@ -252,24 +257,76 @@ namespace TradingSimulator.Simulator
                         .Select(ev => new PricePoint(ev.Timestamp, (ev.BestYesBid + ev.BestYesAsk) / 2.0, " " + ev.Memo))
                         .ToList();
 
-                    return (finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints);
+                    return (finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, discrepancyPoints);
                 }
             }
             finally
             {
                 OnTestProgress?.Invoke($"{progressPrefix}Cleared memory for market: {marketTicker}");
             }
-            return (0, null, null, null, null, null, null, null, null);
+            return (0, null, null, null, null, null, null, null, null, null);
         }
 
+        private List<PricePoint> DetectDiscrepancies(List<MarketSnapshot> snapshots, double majorChangeFactor = 5.0, double averagingWindowMin = 5.0)
+        {
+            var discrepancyPoints = new List<PricePoint>();
 
+            for (int i = 1; i < snapshots.Count; i++)
+            {
+                var prev = snapshots[i - 1];
+                var curr = snapshots[i];
+
+                double timeMin = (curr.Timestamp - prev.Timestamp).TotalMinutes;
+
+                // Yes side: Compute expected depth change from velocities (averaged over last 5 minutes)
+                double velocityYes = curr.VelocityPerMinute_Bottom_Yes_Bid + curr.VelocityPerMinute_Top_Yes_Bid;
+                double expectedDeltaYes = velocityYes * timeMin;
+                long actualDeltaYes = curr.TotalOrderbookDepth_Yes - prev.TotalOrderbookDepth_Yes;
+
+                // Adjust leniency for short intervals relative to averaging window
+                double effectiveFactorYes = majorChangeFactor * (timeMin < averagingWindowMin ? (averagingWindowMin / timeMin) : 1.0);
+
+                bool isZeroVelocityChangeYes = (velocityYes == 0) && (Math.Abs(actualDeltaYes) > 0);
+                bool isMajorVsMinorYes = Math.Abs(actualDeltaYes) > (Math.Abs(expectedDeltaYes) * effectiveFactorYes);
+
+                // No side: Compute expected depth change from velocities (averaged over last 5 minutes)
+                double velocityNo = curr.VelocityPerMinute_Bottom_No_Bid + curr.VelocityPerMinute_Top_No_Bid;
+                double expectedDeltaNo = velocityNo * timeMin;
+                long actualDeltaNo = curr.TotalOrderbookDepth_No - prev.TotalOrderbookDepth_No;
+
+                // Adjust leniency similarly for No side
+                double effectiveFactorNo = majorChangeFactor * (timeMin < averagingWindowMin ? (averagingWindowMin / timeMin) : 1.0);
+
+                bool isZeroVelocityChangeNo = (velocityNo == 0) && (Math.Abs(actualDeltaNo) > 0);
+                bool isMajorVsMinorNo = Math.Abs(actualDeltaNo) > (Math.Abs(expectedDeltaNo) * effectiveFactorNo);
+
+                bool isDiscrepancyYes = isZeroVelocityChangeYes || isMajorVsMinorYes;
+                bool isDiscrepancyNo = isZeroVelocityChangeNo || isMajorVsMinorNo;
+
+                if (isDiscrepancyYes || isDiscrepancyNo)
+                {
+                    string memo = "";
+                    if (isDiscrepancyYes)
+                        memo += $"Yes Actual ΔDepth={actualDeltaYes} (cents equiv.), Expected={expectedDeltaYes:F2}, Velocity={velocityYes:F2}; ";
+                    if (isDiscrepancyNo)
+                        memo += $"No Actual ΔDepth={actualDeltaNo} (cents equiv.), Expected={expectedDeltaNo:F2}, Velocity={velocityNo:F2}";
+
+                    // Place marker at midpoint price for visibility
+                    double midPrice = (curr.BestYesBid + curr.BestYesAsk) / 2.0;
+                    discrepancyPoints.Add(new PricePoint(curr.Timestamp, midPrice, "Obvious Discrepancy: " + memo.Trim()));
+                }
+            }
+
+            return discrepancyPoints;
+        }
 
         private void SaveMarketDataToFile(
-        string marketTicker, double finalPnL,
-        List<PricePoint> bidPoints, List<PricePoint> askPoints,
-        List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
-        List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
-        string fileNameSuffix = "")
+            string marketTicker, double finalPnL,
+            List<PricePoint> bidPoints, List<PricePoint> askPoints,
+            List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
+            List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
+            List<PricePoint> discrepancyPoints,
+            string fileNameSuffix = "")
         {
             var cachedData = new CachedMarketData
             {
@@ -282,255 +339,23 @@ namespace TradingSimulator.Simulator
                 ExitPoints = exitPoints,
                 EventPoints = eventPoints,
                 IntendedLongPoints = intendedLongPoints,
-                IntendedShortPoints = intendedShortPoints
+                IntendedShortPoints = intendedShortPoints,
+                DiscrepancyPoints = discrepancyPoints
             };
 
             var json = JsonSerializer.Serialize(cachedData);
             Directory.CreateDirectory(_cacheDirectory);
             var filePath = Path.Combine(_cacheDirectory, $"{marketTicker}{fileNameSuffix}.json");
             File.WriteAllText(filePath, json);
-
-            //var baseTicker = System.Text.RegularExpressions.Regex.Replace(marketTicker, @"_(\d+)$", "");
-            //var groupFiles = Directory.GetFiles(_cacheDirectory, $"{baseTicker}_*.json");
-
-            //var merged = new CachedMarketData
-            //{
-            //    Market = baseTicker,
-            //    PnL = 0,
-            //    BidPoints = new List<PricePoint>(),
-            //    AskPoints = new List<PricePoint>(),
-            //    BuyPoints = new List<PricePoint>(),
-            //    SellPoints = new List<PricePoint>(),
-            //    ExitPoints = new List<PricePoint>(),
-            //    EventPoints = new List<PricePoint>(),
-            //    IntendedLongPoints = new List<PricePoint>(),
-            //    IntendedShortPoints = new List<PricePoint>()
-            //};
-
-            //foreach (var gf in groupFiles)
-            //{
-            //    var gj = File.ReadAllText(gf);
-            //    var gd = JsonSerializer.Deserialize<CachedMarketData>(gj);
-            //    if (gd == null) continue;
-            //    merged.PnL += gd.PnL;
-            //    if (gd.BidPoints != null) merged.BidPoints.AddRange(gd.BidPoints);
-            //    if (gd.AskPoints != null) merged.AskPoints.AddRange(gd.AskPoints);
-            //    if (gd.BuyPoints != null) merged.BuyPoints.AddRange(gd.BuyPoints);
-            //    if (gd.SellPoints != null) merged.SellPoints.AddRange(gd.SellPoints);
-            //    if (gd.ExitPoints != null) merged.ExitPoints.AddRange(gd.ExitPoints);
-            //    if (gd.EventPoints != null) merged.EventPoints.AddRange(gd.EventPoints);
-            //    if (gd.IntendedLongPoints != null) merged.IntendedLongPoints.AddRange(gd.IntendedLongPoints);
-            //    if (gd.IntendedShortPoints != null) merged.IntendedShortPoints.AddRange(gd.IntendedShortPoints);
-            //}
-
-            //merged.BidPoints = merged.BidPoints.OrderBy(p => p.Date).ToList();
-            //merged.AskPoints = merged.AskPoints.OrderBy(p => p.Date).ToList();
-            //merged.BuyPoints = merged.BuyPoints.OrderBy(p => p.Date).ToList();
-            //merged.SellPoints = merged.SellPoints.OrderBy(p => p.Date).ToList();
-            //merged.ExitPoints = merged.ExitPoints.OrderBy(p => p.Date).ToList();
-            //merged.EventPoints = merged.EventPoints.OrderBy(p => p.Date).ToList();
-            //merged.IntendedLongPoints = merged.IntendedLongPoints.OrderBy(p => p.Date).ToList();
-            //merged.IntendedShortPoints = merged.IntendedShortPoints.OrderBy(p => p.Date).ToList();
-
-            //var canonicalPath = Path.Combine(_cacheDirectory, $"{baseTicker}.json");
-            //File.WriteAllText(canonicalPath, JsonSerializer.Serialize(merged));
         }
 
-
-
-
-        [Test]
-        [TestCase("KXPRESNOMR-28-NH")]
-        public async Task TestMarketScore(string ticker)
-        {
-            using var scope = _scopeFactory.CreateScope();
-            var logger = _interestScoreLoggerMock.Object;
-            var interestScoreHelper = new InterestScoreService(logger);
-            var dbContext = scope.ServiceProvider.GetRequiredService<KalshiBotContext>();
-
-            var (testScore, testParts) = await interestScoreHelper.CalculateMarketInterestScoreAsync(
-                dbContext,
-                ticker,
-                spreadTightnessWeight: 0.2,
-                spreadWidthWeight: 0.2,
-                volumeWeight: 0.33,
-                volumePercentileWeight: 0.15,
-                liquidityPercentileWeight: 0.06,
-                openInterestPercentileWeight: 0.06);
-
-            double testRawScore = testParts.spreadTightness +
-                testParts.spreadWidth +
-                testParts.volume +
-                testParts.volumePercentile +
-                testParts.liquidityPercentile +
-                testParts.openInterestPercentile;
-            double testCloseTimePoints = testScore - Math.Round(testRawScore, 2);
-
-            string testOutput = $"Test run for {ticker}:\n" +
-                $"Score: {testScore:F4}\n" +
-                $"Close Time Points: {testCloseTimePoints:F4}\n" +
-                $"SpreadTightness: {testParts.spreadTightness:F4}\n" +
-                $"SpreadWidth: {testParts.spreadWidth:F4}\n" +
-                $"Volume: {testParts.volume:F4}\n" +
-                $"VolumePercentile: {testParts.volumePercentile:F4}\n" +
-                $"LiquidityPercentile: {testParts.liquidityPercentile:F4}\n" +
-                $"OpenInterestPercentile: {testParts.openInterestPercentile:F4}\n" +
-                $"Raw Score (Sum of Parts): {testRawScore:F4}";
-
-            OnTestProgress?.Invoke(testOutput);
-            TestContext.WriteLine(testOutput);
-
-            var (controlScore, controlParts) = await interestScoreHelper.CalculateMarketInterestScoreAsync(
-                dbContext,
-                ticker,
-                spreadTightnessWeight: 0.2,
-                spreadWidthWeight: 0.2,
-                volumeWeight: 0.2,
-                volumePercentileWeight: 0.2,
-                liquidityPercentileWeight: 0.1,
-                openInterestPercentileWeight: 0.1);
-
-            double controlRawScore = controlParts.spreadTightness +
-                controlParts.spreadWidth +
-                controlParts.volume +
-                controlParts.volumePercentile +
-                controlParts.liquidityPercentile +
-                controlParts.openInterestPercentile;
-            double controlCloseTimePoints = controlScore - Math.Round(controlRawScore, 2);
-
-            string controlOutput = $"\nControl run for {ticker}:\n" +
-                $"Score: {controlScore:F4}\n" +
-                $"Close Time Points: {controlCloseTimePoints:F4}\n" +
-                $"SpreadTightness: {controlParts.spreadTightness:F4}\n" +
-                $"SpreadWidth: {controlParts.spreadWidth:F4}\n" +
-                $"Volume: {controlParts.volume:F4}\n" +
-                $"VolumePercentile: {controlParts.volumePercentile:F4}\n" +
-                $"LiquidityPercentile: {controlParts.liquidityPercentile:F4}\n" +
-                $"OpenInterestPercentile: {controlParts.openInterestPercentile:F4}\n" +
-                $"Raw Score (Sum of Parts): {controlRawScore:F4}";
-
-            OnTestProgress?.Invoke(controlOutput);
-            TestContext.WriteLine(controlOutput);
-        }
-
-        [Test]
-        public async Task TestOvernightActivities()
-        {
-            using var scope = _scopeFactory.CreateScope();
-            var logger = new Mock<ILogger<OvernightActivitiesHelper>>().Object;
-            var interestScoreHelper = new InterestScoreService(_interestScoreLoggerMock.Object);
-            var overnightHelper = new OvernightActivitiesHelper(logger, interestScoreHelper, _marketAnalysisHelper, _executionConfig, _sqlDataService);
-
-            OnTestProgress?.Invoke("Starting overnight activities test.");
-            await overnightHelper.RunOvernightTasks(_scopeFactory);
-            OnTestProgress?.Invoke("Overnight activities test completed.");
-        }
-
-        [Test]
-        public async Task TestTradingStrategy([ValueSource(nameof(GetTradingStrategies))] (string Name, TradingStrategyFunc<MarketSnapshot> Func) strategy)
-        {
-            var strategyTest = new TradingStrategy<MarketSnapshot>(
-                _snapshotService,
-                _snapshotPeriodHelper,
-                _strategyLoggerMock.Object,
-                _snapshotOptions,
-                _tradingOptions,
-                _scopeFactory,
-                _dbContext,
-                new List<(string, TradingStrategyFunc<MarketSnapshot>)> { (strategy.Name, strategy.Func) });
-
-            strategyTest.OnTestProgress += message => OnTestProgress?.Invoke(message);
-            strategyTest.OnProfitLossUpdate += (market, revenue) => OnProfitLossUpdate?.Invoke(market, revenue);
-            strategyTest.OnMarketProcessed += market => OnMarketProcessed?.Invoke(market);
-
-            await strategyTest.RunStrategyTestAsync();
-        }
-
-        public async Task RunStrategiesForGuiAsync()
-        {
-            var strategies = GetTradingStrategies().ToList();
-            var strategyTest = new TradingStrategy<MarketSnapshot>(
-                _snapshotService,
-                _snapshotPeriodHelper,
-                _strategyLoggerMock.Object,
-                _snapshotOptions,
-                _tradingOptions,
-                _scopeFactory,
-                _dbContext,
-                strategies);
-
-            strategyTest.OnTestProgress += message => OnTestProgress?.Invoke(message);
-            strategyTest.OnProfitLossUpdate += (market, revenue) => OnProfitLossUpdate?.Invoke(market, revenue);
-            strategyTest.OnMarketProcessed += market => OnMarketProcessed?.Invoke(market);
-
-            await strategyTest.RunStrategyTestAsync();
-        }
-
-        [Test]
-        public async Task TestMarketPriceHistory()
-        {
-            try
-            {
-                using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<KalshiBotContext>();
-
-                var groups = await context.GetSnapshotGroups_cached();
-                var filteredGroups = new List<SnapshotGroupDTO>();
-
-                foreach (var group in groups)
-                {
-                    TimeSpan recordedHours = group.EndTime - group.StartTime;
-                    if (recordedHours.Hours < 1) continue;
-                    int count = groups.Count(x => x.MarketTicker == group.MarketTicker);
-                    if (count > 1) continue;
-                    int minYes = groups.Where(x => x.MarketTicker == group.MarketTicker).Min(x => x.YesEnd);
-                    int minNo = groups.Where(x => x.MarketTicker == group.MarketTicker).Min(x => x.NoEnd);
-                    if (minYes != 0 && minNo != 0) continue;
-                    filteredGroups.Add(group);
-                }
-
-                foreach (var group in filteredGroups)
-                {
-                    OnTestProgress?.Invoke($"Processing market: {group.MarketTicker}");
-                    List<SnapshotDTO> snapshotData = await context.GetSnapshots_cached(
-                        marketTicker: group.MarketTicker,
-                        startDate: group.StartTime,
-                        endDate: group.EndTime);
-                    snapshotData = snapshotData
-                        .OrderBy(x => x.SnapshotDate).ToList();
-                    var snapshots = snapshotData.ToList();
-
-                    var cacheSnapshotDict = await _snapshotService.LoadManySnapshots(snapshots);
-                    var marketSnapshots = cacheSnapshotDict
-                        .SelectMany(kvp => kvp.Value.Select(cs => cs))
-                        .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue && ms.BestYesBid > 0 && ms.BestYesAsk > 0)
-                        .OrderBy(ms => ms.Timestamp)
-                        .ToList();
-
-                    if (!marketSnapshots.Any())
-                    {
-                        OnTestProgress?.Invoke($"No valid snapshots for {group.MarketTicker}");
-                        continue;
-                    }
-
-                    OnMarketProcessed?.Invoke(group.MarketTicker);
-                }
-
-                OnTestProgress?.Invoke("Market price history test completed.");
-            }
-            catch (Exception ex)
-            {
-                OnTestProgress?.Invoke($"Error: {ex.Message}");
-                Assert.Fail(ex.ToString());
-            }
-        }
 
         public async Task RunSelectedSetForGuiAsync(
-    string setKey,
-    string weightName,
-    bool writeToFile,
-    List<string>? marketsToRun = null,
-    int? maxGroups = null)
+            string setKey,
+            string weightName,
+            bool writeToFile,
+            List<string>? marketsToRun = null,
+            int? maxGroups = null)
         {
             // map provided setKey -> family
             var family = MapFamilyFromSetKey(setKey);
@@ -564,6 +389,9 @@ namespace TradingSimulator.Simulator
 
             OnTestProgress?.Invoke($"{label}/{dto.StrategyName}: 1 strategy set × {uniqueMarkets.Count} markets");
 
+            // NEW: Running counter for discrepancies
+            int totalDiscrepancies = 0;
+
             // iterate markets
             for (int mIdx = 0; mIdx < uniqueMarkets.Count; mIdx++)
             {
@@ -595,18 +423,20 @@ namespace TradingSimulator.Simulator
                 var strategies = strategiesList[idx]; // only the selected set
                 OnTestProgress?.Invoke($"[{label}/{dto.StrategyName}] market {market} ({mIdx + 1}/{uniqueMarkets.Count})");
 
-                var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort) =
+                var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort, disc) =
                     await ProcessMarketAsync(
                         market, marketSnapshots, strategies, _scopeFactory,
                         progressPrefix: $"[{label}/{dto.StrategyName}] ",
                         writeToFile: writeToFile, group: groupForId,
                         ignoreProcessedCache: true).ConfigureAwait(false);
 
+                totalDiscrepancies += disc?.Count ?? 0;
+
                 if (bid != null)
                 {
                     if (writeToFile)
                         SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
-                            fileNameSuffix: $"_{label}_{dto.StrategyName}");
+                            disc, fileNameSuffix: $"_{label}_{dto.StrategyName}");
 
                     dto.WeightSetMarkets.Add(new WeightSetMarketDTO
                     {
@@ -630,9 +460,10 @@ namespace TradingSimulator.Simulator
             await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
 
             OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{uniqueMarkets.Count} markets)");
+            OnTestProgress?.Invoke($"Total discrepancies across all markets: {totalDiscrepancies} (widespread if >10% of snapshots).");
             OnTestProgress?.Invoke($"{label}/{dto.StrategyName}: completed");
         }
-        
+
         private StrategyFamily MapFamilyFromSetKey(string setKey)
         {
             if (string.IsNullOrWhiteSpace(setKey)) throw new ArgumentException("setKey is required.", nameof(setKey));
@@ -656,12 +487,12 @@ namespace TradingSimulator.Simulator
         {
             // run all families automatically
             var families = new[] {
-        //StrategyFamily.Bollinger,
-        //StrategyFamily.FlowMo,
-        //StrategyFamily.Breakout,
-        StrategyFamily.Momentum,
-        //StrategyFamily.NothingHappens
-    };
+                //StrategyFamily.Bollinger,
+                //StrategyFamily.FlowMo,
+                //StrategyFamily.Breakout,
+                StrategyFamily.Momentum,
+                //StrategyFamily.NothingHappens
+            };
 
             foreach (var fam in families)
             {
@@ -680,7 +511,7 @@ namespace TradingSimulator.Simulator
             return await context.GetSnapshotGroupNames();
         }
 
-  
+
         public enum StrategyFamily
         {
             Bollinger,
@@ -777,6 +608,9 @@ namespace TradingSimulator.Simulator
 
             OnTestProgress?.Invoke($"{label}: {strategiesList.Count} strategy sets × {uniqueMarkets.Count} markets");
 
+            // NEW: Running counter for discrepancies
+            int totalDiscrepancies = 0;
+
             for (int mIdx = 0; mIdx < uniqueMarkets.Count; mIdx++)
             {
                 var market = uniqueMarkets[mIdx];
@@ -811,18 +645,20 @@ namespace TradingSimulator.Simulator
 
                     OnTestProgress?.Invoke($"[{label}/{dto.StrategyName}] market {market} ({mIdx + 1}/{uniqueMarkets.Count}) set {setIdx + 1}/{strategiesList.Count}");
 
-                    var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort) =
+                    var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort, disc) =
                         await ProcessMarketAsync(
                             market, marketSnapshots, strategies, _scopeFactory,
                             progressPrefix: $"[{label}/{dto.StrategyName}] ",
                             writeToFile: writeToFile, group: groupForId,
                             ignoreProcessedCache: true).ConfigureAwait(false);
 
+                    totalDiscrepancies += disc?.Count ?? 0;
+
                     if (bid != null)
                     {
                         if (writeToFile)
                             SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
-                                fileNameSuffix: $"_{label}_{dto.StrategyName}");
+                                disc, fileNameSuffix: $"_{label}_{dto.StrategyName}");
 
                         dto.WeightSetMarkets.Add(new WeightSetMarketDTO
                         {
@@ -849,9 +685,10 @@ namespace TradingSimulator.Simulator
                 OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{uniqueMarkets.Count} markets)");
             }
 
+            OnTestProgress?.Invoke($"Total discrepancies across all markets: {totalDiscrepancies} (widespread if >10% of snapshots).");
             OnTestProgress?.Invoke($"{label}: all strategy sets completed");
         }
-[TearDown]
+        [TearDown]
         public void TearDown()
         {
             _dbContext.Dispose();
