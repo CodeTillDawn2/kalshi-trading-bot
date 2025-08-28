@@ -1,4 +1,7 @@
 ﻿
+using SmokehouseDTOs.Converters;
+using System.Text.Json.Serialization;
+
 namespace KalshiBotData.Models
 {
 
@@ -22,6 +25,8 @@ namespace KalshiBotData.Models
         public double? AverageTradeSize_No { get; set; }
         public int? MarketTypeID { get; set; }
         public bool? IsValidated { get; set; }
+        [JsonPropertyName("r")]
+        [JsonConverter(typeof(RawJsonStringConverter))]
         public string RawJSON { get; set; }
         public string? BrainInstance { get; set; }
 

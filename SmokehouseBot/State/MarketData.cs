@@ -356,6 +356,12 @@ namespace SmokehouseBot.State
                 _mostRecentTicker = _tickers.OrderByDescending(t => t.LoggedDate).FirstOrDefault()?.LoggedDate ?? default;
             }
 
+            UpdateTradingMetrics();
+            CalculateSlope();
+        }
+
+        private void CalculateSlope()
+        {
             var now = DateTime.UtcNow;
             var fiveMinAgo = now.AddMinutes(-5);
             var recentTickers = _tickers
@@ -383,8 +389,6 @@ namespace SmokehouseBot.State
 
             _yesBidSlopePerMinute = (last.yes_bid - first.yes_bid) / timeDiffMin;
             _noBidSlopePerMinute = ((100 - last.yes_ask) - (100 - first.yes_ask)) / timeDiffMin;
-
-            UpdateTradingMetrics();
         }
 
         private double? _rsi_Short;

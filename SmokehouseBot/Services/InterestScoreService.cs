@@ -38,7 +38,7 @@ namespace SmokehouseBot.Services
                 using var scope = scopeFactory.CreateScope();
                 var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
                 var dbContext = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(300));
                 var token = cts.Token;
                 _logger.LogDebug("API: Need to calculate market {0} interest scores... refetching from API", uniqueTickers);
                 await apiService.FetchMarketsAsync(tickers: uniqueTickers);

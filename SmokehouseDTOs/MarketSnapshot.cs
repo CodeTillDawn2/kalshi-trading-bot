@@ -1,6 +1,7 @@
 ﻿using SmokehouseDTOs.Data;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using SmokehouseDTOs.Converters;
 
 namespace SmokehouseDTOs
 {
@@ -251,6 +252,7 @@ namespace SmokehouseDTOs
         /// Updated via WebSocket events by <see cref="OrderBookService"/>. Null if no data is available.
         /// </remarks>
         [JsonPropertyName("Orderbook")]
+        [JsonConverter(typeof(OrderbookSlimConverter))]
         public List<Dictionary<string, object>> OrderbookData { get; set; }
         #endregion
 
@@ -1575,6 +1577,93 @@ namespace SmokehouseDTOs
             };
         }
 
+        public sealed record Difference(string Path, object? Left, object? Right);
+
+        public List<Difference> Diff(MarketSnapshot other)
+        {
+            var diffs = new List<Difference>();
+            if (other is null) { diffs.Add(new Difference("$", this, null)); return diffs; }
+
+            var props = typeof(MarketSnapshot).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            foreach (var p in props)
+            {
+                if (!p.CanRead || p.GetIndexParameters().Length > 0) continue;
+                var a = p.GetValue(this);
+                var b = p.GetValue(other);
+                Compare($"{p.Name}", a, b, diffs);
+            }
+            return diffs;
+
+            static bool IsSimple(System.Type t)
+            {
+                t = System.Nullable.GetUnderlyingType(t) ?? t;
+                if (t.IsPrimitive || t.IsEnum) return true;
+                return t == typeof(string) || t == typeof(decimal) || t == typeof(System.DateTime) ||
+                       t == typeof(System.DateTimeOffset) || t == typeof(System.TimeSpan) || t == typeof(System.Guid);
+            }
+
+            static bool IsValueTuple(System.Type t) =>
+                t.IsValueType && t.FullName != null && t.FullName.StartsWith("System.ValueTuple`", System.StringComparison.Ordinal);
+
+            static void Compare(string path, object? a, object? b, List<Difference> diffs)
+            {
+                if (object.ReferenceEquals(a, b)) return;
+                if (a is null || b is null) { diffs.Add(new Difference(path, a, b)); return; }
+
+                var ta = a.GetType();
+                var tb = b.GetType();
+                if (ta != tb) { diffs.Add(new Difference(path, a, b)); return; }
+
+                if (IsSimple(ta))
+                {
+                    if (!object.Equals(a, b)) diffs.Add(new Difference(path, a, b));
+                    return;
+                }
+
+                if (ta == typeof(string))
+                {
+                    if (!System.String.Equals((string)a, (string)b, System.StringComparison.Ordinal))
+                        diffs.Add(new Difference(path, a, b));
+                    return;
+                }
+
+                if (IsValueTuple(ta))
+                {
+                    var fs = ta.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                    foreach (var f in fs)
+                        Compare($"{path}.{f.Name}", f.GetValue(a), f.GetValue(b), diffs);
+                    return;
+                }
+
+                if (typeof(System.Collections.IEnumerable).IsAssignableFrom(ta))
+                {
+                    if (ta == typeof(string)) { if (!object.Equals(a, b)) diffs.Add(new Difference(path, a, b)); return; }
+
+                    var la = new System.Collections.Generic.List<object?>();
+                    var lb = new System.Collections.Generic.List<object?>();
+
+                    var ea = ((System.Collections.IEnumerable)a).GetEnumerator();
+                    while (ea.MoveNext()) la.Add(ea.Current);
+                    var eb = ((System.Collections.IEnumerable)b).GetEnumerator();
+                    while (eb.MoveNext()) lb.Add(eb.Current);
+
+                    if (la.Count != lb.Count) diffs.Add(new Difference($"{path}.Count", la.Count, lb.Count));
+
+                    var n = System.Math.Min(la.Count, lb.Count);
+                    for (int i = 0; i < n; i++)
+                        Compare($"{path}[{i}]", la[i], lb[i], diffs);
+                    return;
+                }
+
+                var props = ta.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                foreach (var p in props)
+                {
+                    if (!p.CanRead || p.GetIndexParameters().Length > 0) continue;
+                    Compare($"{path}.{p.Name}", p.GetValue(a), p.GetValue(b), diffs);
+                }
+            }
+        }
+
     }
 
     public class MACDConverter : JsonConverter<(double? MACD, double? Signal, double? Histogram)>
@@ -1724,5 +1813,6 @@ namespace SmokehouseDTOs
 
             writer.WriteEndObject();
         }
+
     }
 }

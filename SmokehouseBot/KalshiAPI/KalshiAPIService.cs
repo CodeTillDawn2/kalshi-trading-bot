@@ -103,164 +103,176 @@ namespace SmokehouseBot.KalshiAPI
         /// <param name="updateNotFoundToClosed"></param>
         /// <returns></returns>
         public async Task<(int ProcessedCount, int ErrorCount)> FetchMarketsAsync(
-            string? eventTicker = null, string? seriesTicker = null, string? maxCloseTs = null,
-            string? minCloseTs = null, string? status = null, string[]? tickers = null, bool updateNotFoundToClosed = true)
+    string? eventTicker = null, string? seriesTicker = null, string? maxCloseTs = null,
+    string? minCloseTs = null, string? status = null, string[]? tickers = null, bool updateNotFoundToClosed = true)
         {
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                var queryParams = new Dictionary<string, string>();
-                if (!string.IsNullOrEmpty(eventTicker)) queryParams["event_ticker"] = eventTicker;
-                if (!string.IsNullOrEmpty(seriesTicker)) queryParams["series_ticker"] = seriesTicker;
-                if (!string.IsNullOrEmpty(maxCloseTs)) queryParams["max_close_ts"] = maxCloseTs;
-                if (!string.IsNullOrEmpty(minCloseTs)) queryParams["min_close_ts"] = minCloseTs;
-                if (!string.IsNullOrEmpty(status)) queryParams["status"] = status;
-                if (tickers?.Length > 0) queryParams["tickers"] = string.Join(",", tickers);
-
                 int processedCount = 0;
                 int errorCount = 0;
-                string cursor = "";
                 var foundTickers = new HashSet<string>();
-
                 bool responseWasSuccessful = true;
 
-                
+                // Build base (non-list) query params once
+                var baseQueryParams = new Dictionary<string, string>();
+                if (!string.IsNullOrEmpty(eventTicker)) baseQueryParams["event_ticker"] = eventTicker;
+                if (!string.IsNullOrEmpty(seriesTicker)) baseQueryParams["series_ticker"] = seriesTicker;
+                if (!string.IsNullOrEmpty(maxCloseTs)) baseQueryParams["max_close_ts"] = maxCloseTs;
+                if (!string.IsNullOrEmpty(minCloseTs)) baseQueryParams["min_close_ts"] = minCloseTs;
+                if (!string.IsNullOrEmpty(status)) baseQueryParams["status"] = status;
 
-                while (true)
+                // Determine batches (<=20) if tickers list provided, else single null batch
+                var batches = (tickers != null && tickers.Length > 0)
+                    ? Enumerable.Range(0, (tickers.Length + 19) / 20)
+                                .Select(i => tickers.Skip(i * 20).Take(20).ToArray())
+                    : new[] { Array.Empty<string>() };
+
+                foreach (var batch in batches)
                 {
                     _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-                    if (!string.IsNullOrEmpty(cursor)) queryParams["cursor"] = cursor;
-                    string queryString = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
-                    string url = $"markets{(string.IsNullOrEmpty(queryString) ? "" : "?" + queryString)}";
 
-                    var headers = GenerateAuthHeaders("GET", "/trade-api/v2/markets");
-                    var request = new HttpRequestMessage(HttpMethod.Get, url);
-                    foreach (var header in headers) request.Headers.Add(header.Key, header.Value);
+                    // Clone base params and add current batch tickers if any
+                    var queryParams = new Dictionary<string, string>(baseQueryParams);
+                    if (batch.Length > 0)
+                        queryParams["tickers"] = string.Join(",", batch);
 
-                    MarketResponse? responseData = null;
-                    string jsonString = "";
+                    string cursor = "";
 
-
-
-                    try
+                    while (true)
                     {
-                        var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
-                        response.EnsureSuccessStatusCode();
-                        jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
-                        responseData = JsonSerializer.Deserialize<MarketResponse>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    }
-                    catch (JsonException ex)
-                    {
-                        responseWasSuccessful = false;
-                        _logger.LogWarning(ex, "Failed to deserialize response for {Url}, json={0}", url, jsonString);
-                    }
-                    catch (HttpRequestException ex)
-                    {
-                        responseWasSuccessful = false;
-                        _logger.LogWarning("HTTP request failed for {Url}", url);
-                        errorCount++;
-                        break;
-                    }
+                        _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
-                    if (responseData == null) _logger.LogWarning(new Exception($"No response data found. String: {jsonString}"),
-                        "No response data found. String: {jsonString}", jsonString);
+                        if (!string.IsNullOrEmpty(cursor)) queryParams["cursor"] = cursor;
 
-                    try
-                    {
-                        List<MarketDTO> marketsToUpdate = new List<MarketDTO>();
-                        foreach (var apiMarket in responseData.Markets)
+                        string queryString = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
+                        string url = $"markets{(string.IsNullOrEmpty(queryString) ? "" : "?" + queryString)}";
+
+                        var headers = GenerateAuthHeaders("GET", "/trade-api/v2/markets");
+                        var request = new HttpRequestMessage(HttpMethod.Get, url);
+                        foreach (var header in headers) request.Headers.Add(header.Key, header.Value);
+
+                        MarketResponse? responseData = null;
+                        string jsonString = "";
+
+                        try
                         {
+                            var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                            response.EnsureSuccessStatusCode();
+                            jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+                            responseData = JsonSerializer.Deserialize<MarketResponse>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        }
+                        catch (JsonException ex)
+                        {
+                            responseWasSuccessful = false;
+                            _logger.LogWarning(ex, "Failed to deserialize response for {Url}, json={0}", url, jsonString);
+                        }
+                        catch (HttpRequestException ex)
+                        {
+                            responseWasSuccessful = false;
+                            _logger.LogWarning("HTTP request failed for {Url}. Message: {message}", url, ex.Message);
+                            errorCount++;
+                            break;
+                        }
 
-                            _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
+                        if (responseData == null)
+                            _logger.LogWarning(new Exception($"No response data found. String: {jsonString}"), "No response data found. String: {jsonString}", jsonString);
 
-                            foundTickers.Add(apiMarket.Ticker);
+                        try
+                        {
+                            List<MarketDTO> marketsToUpdate = new List<MarketDTO>();
 
-                            var market = new MarketDTO
+                            foreach (var apiMarket in responseData?.Markets)
                             {
-                                market_ticker = apiMarket.Ticker,
-                                event_ticker = apiMarket.EventTicker,
-                                market_type = apiMarket.MarketType,
-                                title = apiMarket.Title,
-                                subtitle = apiMarket.Subtitle,
-                                yes_sub_title = apiMarket.YesSubTitle,
-                                no_sub_title = apiMarket.NoSubTitle,
-                                open_time = apiMarket.OpenTime,
-                                close_time = apiMarket.CloseTime,
-                                expected_expiration_time = apiMarket.ExpectedExpirationTime,
-                                expiration_time = apiMarket.ExpirationTime,
-                                latest_expiration_time = apiMarket.LatestExpirationTime,
-                                settlement_timer_seconds = apiMarket.SettlementTimerSeconds,
-                                status = apiMarket.Status,
-                                response_price_units = apiMarket.ResponsePriceUnits,
-                                notional_value = apiMarket.NotionalValue,
-                                tick_size = apiMarket.TickSize,
-                                yes_bid = apiMarket.YesBid,
-                                yes_ask = apiMarket.YesAsk,
-                                no_bid = apiMarket.NoBid,
-                                no_ask = apiMarket.NoAsk,
-                                last_price = apiMarket.LastPrice,
-                                previous_yes_bid = apiMarket.PreviousYesBid,
-                                previous_yes_ask = apiMarket.PreviousYesAsk,
-                                previous_price = apiMarket.PreviousPrice,
-                                volume = apiMarket.Volume,
-                                volume_24h = apiMarket.Volume24h,
-                                liquidity = apiMarket.Liquidity,
-                                open_interest = apiMarket.OpenInterest,
-                                result = apiMarket.Result,
-                                can_close_early = apiMarket.CanCloseEarly,
-                                expiration_value = apiMarket.ExpirationValue,
-                                risk_limit_cents = apiMarket.RiskLimitCents,
-                                strike_type = apiMarket.StrikeType,
-                                floor_strike = (apiMarket.StrikeType == "" || apiMarket.FloorStrike == null) ? 0 : apiMarket.FloorStrike,
-                                rules_primary = apiMarket.RulesPrimary,
-                                rules_secondary = apiMarket.RulesSecondary,
-                                APILastFetchedDate = DateTime.Now,
-                                LastModifiedDate = DateTime.Now,
-                                category = ""
-                            };
+                                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
-                            marketsToUpdate.Add(market);
-                            processedCount++;
-                        }
-                        using var scope = _scopeFactory.CreateScope();
-                        var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                        await context.AddOrUpdateMarkets(marketsToUpdate);
-                    }
-                    catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key"))
-                    {
-                        stopwatch.Stop();
-                        _logger.LogWarning(ex, "Duplicate market encountered while saving market data");
-                        return (0, 1);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        _logger.LogDebug("FetchMarketsAsync cancelled");
-                    }
-                    catch (Exception ex)
-                    {
-                        if (tickers?.Count() == 1)
-                        {
-                            _logger.LogWarning(new MarketTransientFailureException(tickers[0], $"Failed to save market {tickers[0]}"),
-                                "Failed to save market {Ticker}. Message: {message}, Inner message {inmsg}, Stack trace: {st}",
-                                tickers[0], ex.Message, ex.InnerException != null ? ex.InnerException.Message : "", ex.StackTrace);
-                        }
-                        else
-                        {
-                            _logger.LogWarning(
-                                "Failed to save market {Ticker}. Message: {message}, Inner message {inmsg}, Stack trace: {st}",
-                                tickers, ex.Message, ex.InnerException != null ? ex.InnerException.Message : "", ex.StackTrace);
-                        }
-                        errorCount++;
-                    }
+                                foundTickers.Add(apiMarket.Ticker);
 
-                    cursor = responseData?.Cursor ?? "";
-                    if (string.IsNullOrEmpty(cursor)) break;
+                                var market = new MarketDTO
+                                {
+                                    market_ticker = apiMarket.Ticker,
+                                    event_ticker = apiMarket.EventTicker,
+                                    market_type = apiMarket.MarketType,
+                                    title = apiMarket.Title,
+                                    subtitle = apiMarket.Subtitle,
+                                    yes_sub_title = apiMarket.YesSubTitle,
+                                    no_sub_title = apiMarket.NoSubTitle,
+                                    open_time = apiMarket.OpenTime,
+                                    close_time = apiMarket.CloseTime,
+                                    expected_expiration_time = apiMarket.ExpectedExpirationTime,
+                                    expiration_time = apiMarket.ExpirationTime,
+                                    latest_expiration_time = apiMarket.LatestExpirationTime,
+                                    settlement_timer_seconds = apiMarket.SettlementTimerSeconds,
+                                    status = apiMarket.Status,
+                                    response_price_units = apiMarket.ResponsePriceUnits,
+                                    notional_value = apiMarket.NotionalValue,
+                                    tick_size = apiMarket.TickSize,
+                                    yes_bid = apiMarket.YesBid,
+                                    yes_ask = apiMarket.YesAsk,
+                                    no_bid = apiMarket.NoBid,
+                                    no_ask = apiMarket.NoAsk,
+                                    last_price = apiMarket.LastPrice,
+                                    previous_yes_bid = apiMarket.PreviousYesBid,
+                                    previous_yes_ask = apiMarket.PreviousYesAsk,
+                                    previous_price = apiMarket.PreviousPrice,
+                                    volume = apiMarket.Volume,
+                                    volume_24h = apiMarket.Volume24h,
+                                    liquidity = apiMarket.Liquidity,
+                                    open_interest = apiMarket.OpenInterest,
+                                    result = apiMarket.Result,
+                                    can_close_early = apiMarket.CanCloseEarly,
+                                    expiration_value = apiMarket.ExpirationValue,
+                                    risk_limit_cents = apiMarket.RiskLimitCents,
+                                    strike_type = apiMarket.StrikeType,
+                                    floor_strike = (apiMarket.StrikeType == "" || apiMarket.FloorStrike == null) ? 0 : apiMarket.FloorStrike,
+                                    rules_primary = apiMarket.RulesPrimary,
+                                    rules_secondary = apiMarket.RulesSecondary,
+                                    APILastFetchedDate = DateTime.Now,
+                                    LastModifiedDate = DateTime.Now,
+                                    category = ""
+                                };
+
+                                marketsToUpdate.Add(market);
+                                processedCount++;
+                            }
+
+                            using var scope = _scopeFactory.CreateScope();
+                            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                            await context.AddOrUpdateMarkets(marketsToUpdate);
+                        }
+                        catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key"))
+                        {
+                            stopwatch.Stop();
+                            _logger.LogWarning(ex, "Duplicate market encountered while saving market data");
+                            return (0, 1);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            _logger.LogDebug("FetchMarketsAsync cancelled");
+                        }
+                        catch (Exception ex)
+                        {
+                            if (tickers?.Count() == 1)
+                            {
+                                _logger.LogWarning(new MarketTransientFailureException(tickers[0], $"Failed to save market {tickers[0]}"),
+                                    "Failed to save market {Ticker}. Message: {message}, Inner message {inmsg}, Stack trace: {st}",
+                                    tickers[0], ex.Message, ex.InnerException != null ? ex.InnerException.Message : "", ex.StackTrace);
+                            }
+                            else
+                            {
+                                _logger.LogWarning(
+                                    "Failed to save market {Ticker}. Message: {message}, Inner message {inmsg}, Stack trace: {st}",
+                                    tickers, ex.Message, ex.InnerException != null ? ex.InnerException.Message : "", ex.StackTrace);
+                            }
+                            errorCount++;
+                        }
+
+                        cursor = responseData?.Cursor ?? "";
+                        if (string.IsNullOrEmpty(cursor)) break;
+                    }
                 }
 
-
-
-                // If tickers were explicitly requested and updateNotFoundToClosed is true, update not found tickers to closed
-                //If even one api request failed, we don't want to assume that markets closed due to their absence
+                // Update not-found tickers to closed only if all API requests succeeded
                 if (tickers?.Length > 0 && updateNotFoundToClosed && responseWasSuccessful)
                 {
                     using var scope = _scopeFactory.CreateScope();
@@ -294,7 +306,6 @@ namespace SmokehouseBot.KalshiAPI
 
                 stopwatch.Stop();
                 RecordExecutionTime(nameof(FetchMarketsAsync), stopwatch.ElapsedMilliseconds);
-
                 return (processedCount, errorCount);
             }
             catch (OperationCanceledException)
@@ -308,6 +319,7 @@ namespace SmokehouseBot.KalshiAPI
                 return (0, 0);
             }
         }
+
 
         public async Task<ExchangeScheduleResponse> GetExchangeScheduleAsync()
         {

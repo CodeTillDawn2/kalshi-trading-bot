@@ -7,12 +7,15 @@ using SmokehouseBot.Exceptions;
 using SmokehouseBot.Helpers;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
+using SmokehouseDTOs.Converters;
 using SmokehouseDTOs.Data;
 using SmokehouseInterfaces.Constants;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.IO;
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using TradingStrategies.Configuration;
 
 namespace SmokehouseBot.Services
@@ -93,7 +96,8 @@ namespace SmokehouseBot.Services
                 {
                     WriteIndented = false,
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                    Converters = { new SimplifiedTupleConverter() }
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    Converters = { new SimplifiedTupleConverter(), new ShortIsoDateTimeConverter(), new OrderbookSlimConverter(), new MarketSnapshotSlimConverter() }
                 };
 
                 var schema = JsonSchema.FromType<CacheSnapshot>();
@@ -108,7 +112,6 @@ namespace SmokehouseBot.Services
                 }
                 else
                 {
-                    // Collect all valid snapshots into a list
                     var snapshotsToSave = new List<object>();
                     foreach (var marketSnapshot in cacheSnapshot.Markets)
                     {
@@ -131,7 +134,6 @@ namespace SmokehouseBot.Services
 
                         var rawJson = JsonSerializer.Serialize(marketSnapshot.Value, options);
 
-                        // Create the snapshot data as an anonymous object for serialization
                         var snapshotData = new
                         {
                             MarketTicker = marketSnapshot.Value.MarketTicker,
@@ -157,28 +159,19 @@ namespace SmokehouseBot.Services
 
                         snapshotsToSave.Add(snapshotData);
                         SavedCount += 1;
-
-                        _logger.LogDebug("Snapshot prepared for {Market} at {Timestamp}",
-                            marketSnapshot.Key, timestampString);
                     }
 
                     if (snapshotsToSave.Any())
                     {
-                        // Serialize all snapshots as an array into a single JSON file
                         var fileJson = JsonSerializer.Serialize(snapshotsToSave, options);
-
-                        // Generate filename using timestamp only
                         var fileName = $"SnapshotGroup_{timestampString}.json";
                         var fullPath = Path.Combine(_snapshotDirectory, fileName);
-
-                        // Write to file asynchronously in UTF-16 encoding
                         await File.WriteAllTextAsync(fullPath, fileJson, Encoding.Unicode);
-
                         _logger.LogInformation("Saved {Count} snapshots to file: {FilePath}", SavedCount, fullPath);
                     }
 
                     _lastSnapshotTimestamp = timestamp;
-                    _nextExpectedSnapshotTimestamp = timestamp + _expectedInterval; // Update expected timestamp here
+                    _nextExpectedSnapshotTimestamp = timestamp + _expectedInterval;
                     _isFirstSnapshot = false;
                 }
 
@@ -190,6 +183,7 @@ namespace SmokehouseBot.Services
                 return 0;
             }
         }
+
 
         // Updated LoadManySnapshots method in TradingSnapshotService.cs with parallelization
         public async Task<Dictionary<string, List<MarketSnapshot>>> LoadManySnapshots(List<SnapshotDTO> snapshots, bool forceLoad = false)
@@ -206,7 +200,8 @@ namespace SmokehouseBot.Services
                 var result = new Dictionary<string, List<MarketSnapshot>>();
                 var options = new JsonSerializerOptions
                 {
-                    Converters = { new SimplifiedTupleConverter() }
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    Converters = { new SimplifiedTupleConverter(), new ShortIsoDateTimeConverter(), new OrderbookSlimConverter(), new MarketSnapshotSlimConverter() }
                 };
 
                 // Group snapshots by MarketTicker

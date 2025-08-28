@@ -768,6 +768,7 @@ namespace SmokehouseBot.Management
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     if (!kvp.Value.ReceivedFirstSnapshot) continue;
+                    kvp.Value.RefreshAllMetadata();
                     var marketSnapshot = CreateMarketSnapshot(snapshotDate, kvp);
                     marketSnapshots.Add(marketSnapshot);
                 }

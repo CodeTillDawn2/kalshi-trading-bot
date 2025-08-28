@@ -458,7 +458,7 @@ namespace SmokehouseBot.Management
                     }
                 }
 
-                int marketsToAdd = marketsToAddCount - marketsAdded;
+                int marketsToAdd = Math.Min(marketsToAddCount - marketsAdded,_executionConfig.MaxMarketsPerSubscriptionAction);
                 if (marketsToAdd > 0)
                 {
                     List<MarketDTO> candidates = await context.GetMarkets(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active },
@@ -499,7 +499,7 @@ namespace SmokehouseBot.Management
 
                             var existingDoubleCheck = await context.GetMarketWatches_cached(marketTickers: new HashSet<string> { market.Ticker });
 
-                            if (existingDoubleCheck == null && market.Score >= minimumInterest) // Strict check
+                            if (existingDoubleCheck.Count == 0 && market.Score >= minimumInterest) // Strict check
                             {
                                 MarketWatchDTO newWatch = new MarketWatchDTO
                                 {

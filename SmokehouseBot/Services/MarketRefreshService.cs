@@ -227,7 +227,7 @@ namespace SmokehouseBot.Services
             
             
             //Additional refresh loop to utilize extra time so we aren't refreshing ALL of the low activity ones at once
-            if (MarketsRefreshed / watchedMarkets.Count < .25)
+            if (watchedMarkets.Count > 0 && MarketsRefreshed / watchedMarkets.Count < .25)
             {
                 int ForceRefreshMarkets = (int)Math.Round(watchedMarkets.Count * .25) - MarketsRefreshed;
                 int ForcedRefreshCount = 0;
