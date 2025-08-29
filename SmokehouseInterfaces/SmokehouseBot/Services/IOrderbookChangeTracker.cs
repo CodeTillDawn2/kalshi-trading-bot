@@ -16,10 +16,10 @@ namespace SmokehouseBot.Services.Interfaces
         void LogOrderbookSnapshot(List<OrderbookData> originalOrderbook, List<OrderbookData> newOrderbook);
         void LogChange(string side, int price, int deltaContracts);
         void LogTrade(string takerSide, int yesPrice, int noPrice, int count, DateTime timestamp);
-        (double Volume, int Levels) GetBottomNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, double elapsedMinutes, int threshold);
-        (double Volume, int Levels) GetBottomYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, double elapsedMinutes, int threshold);
-        (double Volume, int Levels) GetTopNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, double elapsedMinutes, int threshold);
-        (double Volume, int Levels) GetTopYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, double elapsedMinutes, int threshold);
+        (double Volume, int Levels) GetBottomNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges,  int threshold);
+        (double Volume, int Levels) GetBottomYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges,  int threshold);
+        (double Volume, int Levels) GetTopNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges,  int threshold);
+        (double Volume, int Levels) GetTopYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges,  int threshold);
         (double Volume, int Count) GetYesNetOrderVolumePerMinute(List<OrderbookChange> yesBidChanges, double minutes);
         (double Volume, int Count) GetNoNetOrderVolumePerMinute(List<OrderbookChange> noBidChanges, double minutes);
         (double rate, double volume) GetTradeRatePerMinute_MakerYes(List<OrderbookChange> yesTradeRelatedChanges, double elapsedMinutes);

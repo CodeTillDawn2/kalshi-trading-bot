@@ -665,10 +665,10 @@ namespace SmokehouseBot.Services
             int yesThreshold = yesBids.Any() ? (int)Math.Floor(yesBids.Max(x => x.Price) * 0.9) : 0;
             int noThreshold = noBids.Any() ? (int)Math.Floor(noBids.Max(x => x.Price) * 0.9) : 0;
 
-            var YesTopVelocity = GetTopYesVelocityPerMinute(yesBids, orderbookChanges, elapsedMinutes, yesThreshold);
-            var YesBottomVelocity = GetBottomYesVelocityPerMinute(yesBids, orderbookChanges, elapsedMinutes, yesThreshold);
-            var NoTopVelocity = GetTopNoVelocityPerMinute(noBids, orderbookChanges, elapsedMinutes, noThreshold);
-            var NoBottomVelocity = GetBottomNoVelocityPerMinute(noBids, orderbookChanges, elapsedMinutes, noThreshold);
+            var YesTopVelocity = GetTopYesVelocityPerMinute(yesBids, orderbookChanges, yesThreshold);
+            var YesBottomVelocity = GetBottomYesVelocityPerMinute(yesBids, orderbookChanges, yesThreshold);
+            var NoTopVelocity = GetTopNoVelocityPerMinute(noBids, orderbookChanges, noThreshold);
+            var NoBottomVelocity = GetBottomNoVelocityPerMinute(noBids, orderbookChanges, noThreshold);
 
             Market.LevelCount_Top_Yes_Bid = YesTopVelocity.Levels;
             Market.LevelCount_Bottom_Yes_Bid = YesBottomVelocity.Levels;
@@ -691,6 +691,28 @@ namespace SmokehouseBot.Services
                 YesBottomVelocity.Volume, YesBottomVelocity.Levels,
                 NoTopVelocity.Volume, NoTopVelocity.Levels,
                 NoBottomVelocity.Volume, NoBottomVelocity.Levels);
+        }
+
+        private double ComputeEffectiveWindowMinutes(IEnumerable<OrderbookChange> changes)
+        {
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogDebug("Effective window calculation cancelled for {MarketTicker}", _marketTicker);
+                return 0;
+            }
+
+            var orderedChanges = changes.OrderBy(c => c.Timestamp).ToList();
+            if (!orderedChanges.Any())
+            {
+                return 0;
+            }
+
+            var earliest = orderedChanges.First().Timestamp;
+            var latest = orderedChanges.Last().Timestamp;
+            var spanMinutes = (latest - earliest).TotalMinutes;
+
+            // Cap at ChangeWindowDuration to align with roll-off
+            return Math.Min(spanMinutes, ChangeWindowDuration.TotalMinutes);
         }
 
         private void RefreshTradeChangeOverTimeMetrics(List<OrderbookChange> orderbookChanges, double elapsedMinutes)
@@ -1012,7 +1034,8 @@ namespace SmokehouseBot.Services
         #endregion
 
         #region Velocity and Rate Calculations
-        public (double Volume, int Levels) GetBottomNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, double elapsedMinutes, int threshold)
+        // Revised GetBottomNoVelocityPerMinute (remove elapsedMinutes parameter)
+        public (double Volume, int Levels) GetBottomNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -1031,7 +1054,7 @@ namespace SmokehouseBot.Services
             if (noBids.Count == 0)
             {
                 _logger.LogDebug("No 'no' side bids for {MarketTicker}, bottom velocity is 0 as all changes are top-level", _marketTicker);
-                return (0, 0);
+                levels = 0;
             }
             else
             {
@@ -1039,8 +1062,10 @@ namespace SmokehouseBot.Services
             }
 
             var bottomChanges = validChanges.Where(c => c.Price < threshold).ToList();
-            _logger.LogDebug("Calculating VelocityPerMinute_Bottom_No_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, NoBidsCount={NoBidsCount}",
-                _marketTicker, threshold, levels, bottomChanges.Count, noBids.Count);
+            double effectiveMinutes = ComputeEffectiveWindowMinutes(bottomChanges);
+            _logger.LogDebug("Calculating VelocityPerMinute_Bottom_No_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, NoBidsCount={NoBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
+                _marketTicker, threshold, levels, bottomChanges.Count, noBids.Count, effectiveMinutes);
+
             foreach (var change in bottomChanges)
             {
                 _logger.LogDebug("BottomNoBid change for {MarketTicker}: ChangeID={ChangeID}, Price={Price}, DeltaContracts={DeltaContracts}, IsTradeRelated={IsTradeRelated}, IsCanceled={IsCanceled}",
@@ -1051,13 +1076,13 @@ namespace SmokehouseBot.Services
             if (bottomChanges.Any())
             {
                 double totalDollarDelta = bottomChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = elapsedMinutes > 0 ? totalDollarDelta / elapsedMinutes : 0;
-                _logger.LogDebug("BottomNoBidVelocityPerMinute for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, Minutes={Minutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, elapsedMinutes, volume, levels);
+                volume = effectiveMinutes > 0 ? totalDollarDelta / effectiveMinutes : 0;
+                _logger.LogDebug("VelocityPerMinute_Bottom_No_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
+                    _marketTicker, totalDollarDelta, effectiveMinutes, volume, levels);
             }
             else
             {
-                _logger.LogDebug("No changes found for BottomNoBidVelocityPerMinute in {MarketTicker}, Rate=0, Levels={Levels}", _marketTicker, levels);
+                _logger.LogDebug("No changes found for VelocityPerMinute_Bottom_No_Bid in {MarketTicker}, Rate=0, Levels={Levels}", _marketTicker, levels);
             }
 
             return (Math.Round(volume, 2), levels);
@@ -1083,7 +1108,8 @@ namespace SmokehouseBot.Services
             return Bids.Where(x => x.Price < upperBound).Count();
         }
 
-        public (double Volume, int Levels) GetBottomYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, double elapsedMinutes, int threshold)
+        // Revised GetBottomYesVelocityPerMinute (remove elapsedMinutes parameter)
+        public (double Volume, int Levels) GetBottomYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -1098,39 +1124,45 @@ namespace SmokehouseBot.Services
                 return (0, 0);
             }
 
+            int levels;
             if (yesBids.Count == 0)
             {
                 _logger.LogDebug("No 'yes' side bids for {MarketTicker}, bottom velocity is 0 as all changes are top-level", _marketTicker);
-                return (0, 0); // No bids, so bottom velocity is 0
+                levels = 0;
+            }
+            else
+            {
+                levels = yesBids.Where(x => x.Price < threshold).Count(); // Lower prices are bottom
             }
 
-            int levels = GetBottomLevels(yesBids, threshold);
-            var changes = validChanges.Where(c => c.Price < threshold).ToList();
-            _logger.LogDebug("Calculating BottomYesBidVelocityPerMinute for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, YesBidsCount={YesBidsCount}",
-                _marketTicker, threshold, levels, changes.Count, yesBids.Count);
-            foreach (var change in changes)
+            var bottomChanges = validChanges.Where(c => c.Price < threshold).ToList();
+            double effectiveMinutes = ComputeEffectiveWindowMinutes(bottomChanges);
+            _logger.LogDebug("Calculating VelocityPerMinute_Bottom_Yes_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, YesBidsCount={YesBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
+                _marketTicker, threshold, levels, bottomChanges.Count, yesBids.Count, effectiveMinutes);
+
+            foreach (var change in bottomChanges)
             {
                 _logger.LogDebug("BottomYesBid change: ChangeID={ChangeID}, Price={Price}, DeltaContracts={DeltaContracts}, IsTradeRelated={IsTradeRelated}, IsCanceled={IsCanceled}",
                     change.Id, change.Price, change.DeltaContracts, change.IsTradeRelated, change.IsCanceled);
             }
 
             double volume = 0;
-            if (changes.Any())
+            if (bottomChanges.Any())
             {
-                double totalDollarDelta = changes.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = elapsedMinutes > 0 ? totalDollarDelta / elapsedMinutes : 0;
-                _logger.LogDebug("BottomYesBidVelocityPerMinute for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, Minutes={Minutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, elapsedMinutes, volume, levels);
+                double totalDollarDelta = bottomChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
+                volume = effectiveMinutes > 0 ? totalDollarDelta / effectiveMinutes : 0;
+                _logger.LogDebug("VelocityPerMinute_Bottom_Yes_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
+                    _marketTicker, totalDollarDelta, effectiveMinutes, volume, levels);
             }
             else
             {
-                _logger.LogDebug("No changes found for BottomYesBidVelocityPerMinute in {MarketTicker}, Rate=0, Levels={Levels}", _marketTicker, levels);
+                _logger.LogDebug("No changes found for VelocityPerMinute_Bottom_Yes_Bid in {MarketTicker}, Rate=0, Levels={Levels}", _marketTicker, levels);
             }
 
             return (Math.Round(volume, 2), levels);
         }
 
-        public (double Volume, int Levels) GetTopNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, double elapsedMinutes, int threshold)
+        public (double Volume, int Levels) GetTopNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -1157,8 +1189,10 @@ namespace SmokehouseBot.Services
             }
 
             var topChanges = validChanges.Where(c => c.Price >= threshold).ToList();
-            _logger.LogDebug("Calculating VelocityPerMinute_Top_No_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, NoBidsCount={NoBidsCount}",
-                _marketTicker, threshold, levels, topChanges.Count, noBids.Count);
+            double effectiveMinutes = ComputeEffectiveWindowMinutes(topChanges);
+            _logger.LogDebug("Calculating VelocityPerMinute_Top_No_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, NoBidsCount={NoBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
+                _marketTicker, threshold, levels, topChanges.Count, noBids.Count, effectiveMinutes);
+
             foreach (var change in topChanges)
             {
                 _logger.LogDebug("TopNoBid change for {MarketTicker}: ChangeID={ChangeID}, Price={Price}, DeltaContracts={DeltaContracts}, IsTradeRelated={IsTradeRelated}, IsCanceled={IsCanceled}",
@@ -1169,9 +1203,9 @@ namespace SmokehouseBot.Services
             if (topChanges.Any())
             {
                 double totalDollarDelta = topChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = elapsedMinutes > 0 ? totalDollarDelta / elapsedMinutes : 0;
-                _logger.LogDebug("VelocityPerMinute_Top_No_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, Minutes={Minutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, elapsedMinutes, volume, levels);
+                volume = effectiveMinutes > 0 ? totalDollarDelta / effectiveMinutes : 0;
+                _logger.LogDebug("VelocityPerMinute_Top_No_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
+                    _marketTicker, totalDollarDelta, effectiveMinutes, volume, levels);
             }
             else
             {
@@ -1181,7 +1215,7 @@ namespace SmokehouseBot.Services
             return (Math.Round(volume, 2), levels);
         }
 
-        public (double Volume, int Levels) GetTopYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, double elapsedMinutes, int threshold)
+        public (double Volume, int Levels) GetTopYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -1200,16 +1234,18 @@ namespace SmokehouseBot.Services
             if (yesBids.Count == 0)
             {
                 _logger.LogDebug("No 'yes' side bids for {MarketTicker}, treating all valid changes as top-level", _marketTicker);
-                levels = 0; // No bids, so no levels
+                levels = 0;
             }
             else
             {
-                levels = GetTopLevels(yesBids, threshold);
+                levels = yesBids.Where(x => x.Price >= threshold).Count(); // Higher prices are top
             }
 
             var topChanges = validChanges.Where(c => c.Price >= threshold).ToList();
-            _logger.LogDebug("Calculating VelocityPerMinute_Top_Yes_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, YesBidsCount={YesBidsCount}",
-                _marketTicker, threshold, levels, topChanges.Count, yesBids.Count);
+            double effectiveMinutes = ComputeEffectiveWindowMinutes(topChanges);
+            _logger.LogDebug("Calculating VelocityPerMinute_Top_Yes_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, YesBidsCount={YesBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
+                _marketTicker, threshold, levels, topChanges.Count, yesBids.Count, effectiveMinutes);
+
             foreach (var change in topChanges)
             {
                 _logger.LogDebug("TopYesBid change: ChangeID={ChangeID}, Price={Price}, DeltaContracts={DeltaContracts}, IsTradeRelated={IsTradeRelated}, IsCanceled={IsCanceled}",
@@ -1220,9 +1256,9 @@ namespace SmokehouseBot.Services
             if (topChanges.Any())
             {
                 double totalDollarDelta = topChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = elapsedMinutes > 0 ? totalDollarDelta / elapsedMinutes : 0;
-                _logger.LogDebug("VelocityPerMinute_Top_Yes_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, Minutes={Minutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, elapsedMinutes, volume, levels);
+                volume = effectiveMinutes > 0 ? totalDollarDelta / effectiveMinutes : 0;
+                _logger.LogDebug("VelocityPerMinute_Top_Yes_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
+                    _marketTicker, totalDollarDelta, effectiveMinutes, volume, levels);
             }
             else
             {
