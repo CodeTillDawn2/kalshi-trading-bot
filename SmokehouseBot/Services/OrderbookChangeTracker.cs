@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
-using SmokehouseBot.Exceptions;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseBot.State.Interfaces;
 using SmokehouseDTOs;
+using SmokehouseDTOs.Exceptions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Timers;

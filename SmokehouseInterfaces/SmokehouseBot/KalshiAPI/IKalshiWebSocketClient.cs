@@ -2,7 +2,7 @@
 using SmokehouseInterfaces.Enums;
 using System.Collections.Concurrent;
 
-namespace SmokehouseBot.KalshiAPI.Interfaces
+namespace KalshiBotAPI.WebSockets.Interfaces
 {
     public interface IKalshiWebSocketClient
     {

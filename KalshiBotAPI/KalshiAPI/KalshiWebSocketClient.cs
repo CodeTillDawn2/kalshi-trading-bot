@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Options;
-using SmokehouseBot.Configuration;
-using SmokehouseBot.Exceptions;
+﻿using KalshiBotAPI.WebSockets.Interfaces;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
@@ -12,9 +12,11 @@ using System.Data;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
+using KalshiBotAPI.Configuration;
 using System.Text.Json;
+using SmokehouseDTOs.Exceptions;
 
-namespace SmokehouseBot.KalshiAPI
+namespace KalshiBotAPI.WebSockets
 {
     public class KalshiWebSocketClient : IKalshiWebSocketClient
     {

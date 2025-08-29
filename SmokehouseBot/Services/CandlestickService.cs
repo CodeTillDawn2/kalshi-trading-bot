@@ -4,13 +4,14 @@ using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
 using SmokehouseBot.Configuration;
-using SmokehouseBot.Exceptions;
 using SmokehouseBot.Helpers;
 using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
+using SmokehouseDTOs.Exceptions;
+using SmokehouseDTOs.Helpers;
 using System.Collections.Concurrent;
 
 namespace SmokehouseBot.Services

@@ -1,6 +1,6 @@
 ﻿
 
-namespace SmokehouseBot.Exceptions
+namespace SmokehouseDTOs.Exceptions
 {
 
     public interface ISmokehouseBotException

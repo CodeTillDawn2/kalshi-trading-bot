@@ -1,13 +1,16 @@
-﻿using KalshiBotData.Data.Interfaces;
+﻿using KalshiBotAPI.Configuration;
+using KalshiBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SmokehouseBot.Configuration;
-using SmokehouseBot.Exceptions;
-using SmokehouseBot.Helpers;
 using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs.Data;
+using SmokehouseDTOs.Exceptions;
+using SmokehouseDTOs.Helpers;
 using SmokehouseDTOs.KalshiAPI;
 using SmokehouseInterfaces.Constants;
 using System.Collections.Concurrent;
@@ -17,7 +20,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace SmokehouseBot.KalshiAPI
+namespace KalshiBotAPI.KalshiAPI
 {
     public class KalshiAPIService : IKalshiAPIService
     {

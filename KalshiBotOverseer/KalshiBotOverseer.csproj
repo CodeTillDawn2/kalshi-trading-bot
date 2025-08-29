@@ -7,4 +7,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\KalshiBotAPI\KalshiBotAPI.csproj" />
+    <ProjectReference Include="..\KalshiBotContext\KalshiBotData.csproj" />
+    <ProjectReference Include="..\SmokehouseDTOs\SmokehouseDTOs.csproj" />
+    <ProjectReference Include="..\SmokehouseInterfaces\SmokehouseInterfaces.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmokehouseBot.Configuration;
-using SmokehouseBot.Exceptions;
 using SmokehouseBot.Helpers;
 using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management;
@@ -12,6 +11,8 @@ using SmokehouseBot.State;
 using SmokehouseBot.State.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
+using SmokehouseDTOs.Exceptions;
+using SmokehouseDTOs.Helpers;
 using SmokehouseInterfaces.Constants;
 using SmokehouseInterfaces.Enums;
 using System.Collections.Concurrent;

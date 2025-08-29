@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SmokehouseBot.Configuration;
-using SmokehouseBot.Exceptions;
 using SmokehouseBot.Helpers;
 using SmokehouseBot.KalshiAPI;
 using SmokehouseBot.KalshiAPI.Interfaces;
@@ -25,6 +24,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
+using KalshiBotAPI.Configuration;
+using KalshiBotAPI.KalshiAPI;
+using SmokehouseDTOs.Helpers;
 
 namespace TradingSimulator.Tests
 {

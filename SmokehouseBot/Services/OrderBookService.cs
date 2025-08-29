@@ -1,5 +1,4 @@
-﻿using SmokehouseBot.Exceptions;
-using SmokehouseBot.Helpers;
+﻿using SmokehouseBot.Helpers;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
@@ -9,6 +8,8 @@ using System.Text.Json;
 using SmokehouseBot.State.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using System.Linq.Expressions;
+using SmokehouseDTOs.Exceptions;
+using SmokehouseDTOs.Helpers;
 
 namespace SmokehouseBot.Services
 {

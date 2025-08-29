@@ -1,4 +1,4 @@
-﻿namespace SmokehouseBot.Helpers
+﻿namespace SmokehouseDTOs.Helpers
 {
     public static class UnixHelper
     {
