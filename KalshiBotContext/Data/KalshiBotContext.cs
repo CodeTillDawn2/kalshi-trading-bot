@@ -66,102 +66,97 @@ namespace KalshiBotData.Data
 
         public async Task AddOrUpdateSeries(SeriesDTO dto)
         {
-            using var transaction = await this.Database.BeginTransactionAsync(); // Use this.Database for transactions
+            using var tx = await this.Database.BeginTransactionAsync();
             try
             {
-                // Load the series with its related collections
-                var series = await this.Series // Use this.Series instead of Database.Series
-                    .Include(x => x.Tags)
-                    .Include(x => x.SettlementSources)
-                    .FirstOrDefaultAsync(x => x.series_ticker == dto.series_ticker);
+                // Load series WITHOUT tracking children to avoid duplicate-tracking issues
+                var series = await this.Series.FirstOrDefaultAsync(x => x.series_ticker == dto.series_ticker);
 
-                bool isNew = series == null;
-                if (isNew)
+                if (series == null)
                 {
                     series = dto.ToSeries();
                     series.Tags = new List<SeriesTag>();
                     series.SettlementSources = new List<SeriesSettlementSource>();
-                    await this.Series.AddAsync(series); // Use this.Series
+                    await this.Series.AddAsync(series);
                 }
                 else
                 {
                     series.UpdateSeries(dto);
                 }
 
-                // Deduplicate DTO inputs to prevent key conflicts
-                var uniqueTags = dto.Tags
-                    .GroupBy(t => t.tag)
-                    .Select(g => g.First())
-                    .ToList();
-                var uniqueSources = dto.SettlementSources
-                    .GroupBy(s => s.name)
+                // --- Tags (idempotent, case-insensitive) ---
+                var incomingTags = (dto.Tags ?? new List<SeriesTagDTO>())
+                    .GroupBy(t => t.tag, StringComparer.OrdinalIgnoreCase)
                     .Select(g => g.First())
                     .ToList();
 
-                // Handle Tags
-                var tagsToRemove = series.Tags
-                    .Where(t => !uniqueTags.Any(dt => dt.tag == t.tag))
+                var existingTags = await this.SeriesTags
+                    .Where(t => t.series_ticker == dto.series_ticker)
+                    .ToListAsync();
+
+                var tagsToRemove = existingTags
+                    .Where(et => !incomingTags.Any(it => string.Equals(it.tag, et.tag, StringComparison.OrdinalIgnoreCase)))
                     .ToList();
-                foreach (var tag in tagsToRemove)
+                if (tagsToRemove.Count > 0) this.SeriesTags.RemoveRange(tagsToRemove);
+
+                foreach (var tagDto in incomingTags)
                 {
-                    series.Tags.Remove(tag);
-                }
-                foreach (var tagDTO in uniqueTags)
-                {
-                    var existingTag = series.Tags.FirstOrDefault(t => t.tag == tagDTO.tag);
-                    if (existingTag == null)
+                    var match = existingTags.FirstOrDefault(et => string.Equals(et.tag, tagDto.tag, StringComparison.OrdinalIgnoreCase));
+                    if (match == null)
                     {
-                        var newTag = tagDTO.ToSeriesTag();
-                        // Check if tag is already tracked to avoid duplicates
-                        var trackedTag = this.ChangeTracker.Entries<SeriesTag>() // Use this.ChangeTracker
-                            .FirstOrDefault(e => e.Entity.series_ticker == newTag.series_ticker && e.Entity.tag == newTag.tag);
-                        if (trackedTag == null)
-                        {
-                            series.Tags.Add(newTag);
-                        }
+                        await this.SeriesTags.AddAsync(tagDto.ToSeriesTag());
                     }
-                    // Update existing tag properties if needed
                 }
 
-                // Handle SettlementSources
-                var sourcesToRemove = series.SettlementSources
-                    .Where(s => !uniqueSources.Any(ds => ds.name == s.name))
+                // --- SettlementSources (dedupe + upsert, case-insensitive) ---
+                var incomingSources = (dto.SettlementSources ?? new List<SeriesSettlementSourceDTO>())
+                    .GroupBy(s => s.name, StringComparer.OrdinalIgnoreCase)
+                    .Select(g => g.First())
                     .ToList();
-                foreach (var source in sourcesToRemove)
+
+                var existingSources = await this.SeriesSettlementSources
+                    .Where(s => s.series_ticker == dto.series_ticker)
+                    .ToListAsync();
+
+                // Remove exact duplicate rows already in DB (keep one per name)
+                var dupExisting = existingSources
+                    .GroupBy(s => s.name, StringComparer.OrdinalIgnoreCase)
+                    .SelectMany(g => g.Skip(1))
+                    .ToList();
+                if (dupExisting.Count > 0) this.SeriesSettlementSources.RemoveRange(dupExisting);
+
+                // Remove sources not present anymore
+                var sourcesToRemove = existingSources
+                    .Where(es => !incomingSources.Any(ins => string.Equals(ins.name, es.name, StringComparison.OrdinalIgnoreCase)))
+                    .ToList();
+                if (sourcesToRemove.Count > 0) this.SeriesSettlementSources.RemoveRange(sourcesToRemove);
+
+                // Add or update remaining
+                foreach (var srcDto in incomingSources)
                 {
-                    series.SettlementSources.Remove(source);
-                }
-                foreach (var sourceDTO in uniqueSources)
-                {
-                    var existingSource = series.SettlementSources.FirstOrDefault(s => s.name == sourceDTO.name);
-                    if (existingSource == null)
+                    var existing = existingSources.FirstOrDefault(es =>
+                        string.Equals(es.name, srcDto.name, StringComparison.OrdinalIgnoreCase));
+                    if (existing == null)
                     {
-                        var newSource = sourceDTO.ToSeriesSettlementSource();
-                        // Check if source is already tracked to avoid duplicates
-                        var trackedSource = this.ChangeTracker.Entries<SeriesSettlementSource>() // Use this.ChangeTracker
-                            .FirstOrDefault(e => e.Entity.series_ticker == newSource.series_ticker && e.Entity.name == newSource.name);
-                        if (trackedSource == null)
-                        {
-                            series.SettlementSources.Add(newSource);
-                        }
+                        await this.SeriesSettlementSources.AddAsync(srcDto.ToSeriesSettlementSource());
                     }
                     else
                     {
-                        // Update existing source properties
-                        existingSource.url = sourceDTO.url;
-                        // Add other properties as needed
+                        existing.url = srcDto.url;
+                        this.Entry(existing).State = EntityState.Modified;
                     }
                 }
 
-                await this.SaveChangesAsync(); // Use this.SaveChangesAsync
-                await transaction.CommitAsync();
+                await this.SaveChangesAsync();
+                await tx.CommitAsync();
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
+                await tx.RollbackAsync();
                 throw new Exception($"Failed to add or update series for ticker {dto.series_ticker}: {ex.Message}", ex);
             }
         }
+
         #endregion
 
         #region Events

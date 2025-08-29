@@ -84,7 +84,7 @@ namespace SmokehouseBot.Services
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _statusTrackerService = statusTrackerService;
 
-            _recalculationTimer = new System.Timers.Timer(30000); // 30 seconds
+            _recalculationTimer = new System.Timers.Timer(3000); // 3 seconds
             _recalculationTimer.Elapsed += (sender, e) => OnRecalculationTimerElapsed(sender, e);
             _recalculationTimer.AutoReset = true;
 

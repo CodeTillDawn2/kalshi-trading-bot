@@ -1433,11 +1433,11 @@ namespace SmokehouseDTOs
         public Dictionary<int, int> GetYesBids()
         {
             var dict = new Dictionary<int, int>();
-            foreach (var entry in OrderbookData.Where(e => ((JsonElement)e["side"]).GetString() == "yes"))
+            foreach (var entry in OrderbookData.Where(e => (e["side"].ToString()) == "yes"))
             {
-                var priceElement = (JsonElement)entry["price"];
-                var contractsElement = (JsonElement)entry["resting_contracts"];
-                dict[priceElement.GetInt32()] = contractsElement.GetInt32();
+                int price = Int32.Parse(entry["price"].ToString());
+                int rc = Int32.Parse(entry["resting_contracts"].ToString());
+                dict[price] = rc;
             }
             return dict;
         }
@@ -1445,11 +1445,11 @@ namespace SmokehouseDTOs
         public Dictionary<int, int> GetNoBids()
         {
             var dict = new Dictionary<int, int>();
-            foreach (var entry in OrderbookData.Where(e => ((JsonElement)e["side"]).GetString() == "no"))
+            foreach (var entry in OrderbookData.Where(e => (e["side"].ToString()) == "no"))
             {
-                var priceElement = (JsonElement)entry["price"];
-                var contractsElement = (JsonElement)entry["resting_contracts"];
-                dict[priceElement.GetInt32()] = contractsElement.GetInt32();
+                int price = Int32.Parse(entry["price"].ToString());
+                int rc = Int32.Parse(entry["resting_contracts"].ToString());
+                dict[price] = rc;
             }
             return dict;
         }

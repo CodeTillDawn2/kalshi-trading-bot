@@ -712,7 +712,7 @@ namespace SmokehouseBot.Management
                 if (IsDataReady())
                 {
                     UpdatePerformanceMetrics();
-                    await CreateSnapshot();
+                    await CreateSnapshots();
                     await _marketManager.HandleMarketResets(); ;
                     await _marketManager.MonitorWatchList(_thisBrain, _performanceMetrics);
                 }
@@ -728,17 +728,18 @@ namespace SmokehouseBot.Management
 
         }
 
-        private async Task CreateSnapshot()
+        private async Task CreateSnapshots()
         {
 
             _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
             CacheSnapshot? snapshot = null;
             var stopwatch = Stopwatch.StartNew();
-            bool lockAcquired = await _snapshotLock.WaitAsync(TimeSpan.FromSeconds(10));
+            int expectedSnapshotLength = 25;
+            bool lockAcquired = await _snapshotLock.WaitAsync(TimeSpan.FromSeconds(expectedSnapshotLength));
             if (!lockAcquired)
             {
-                _logger.LogWarning("BRAIN: Timeout waiting for snapshot lock after 10 seconds.");
+                _logger.LogWarning($"BRAIN: Timeout waiting for snapshot lock after {expectedSnapshotLength} seconds.");
                 return;
             }
 
@@ -768,7 +769,7 @@ namespace SmokehouseBot.Management
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     if (!kvp.Value.ReceivedFirstSnapshot) continue;
-                    kvp.Value.RefreshAllMetadata();
+                    kvp.Value.RefreshTickerMetadata();
                     var marketSnapshot = CreateMarketSnapshot(snapshotDate, kvp);
                     marketSnapshots.Add(marketSnapshot);
                 }
@@ -814,9 +815,10 @@ namespace SmokehouseBot.Management
             {
                 _snapshotLock.Release();
                 stopwatch.Stop();
-                if (stopwatch.ElapsedMilliseconds > 5000)
+                int maxMillis = 25000;
+                if (stopwatch.ElapsedMilliseconds > maxMillis)
                 {
-                    _logger.LogWarning("BRAIN: Snapshot lock held for {Elapsed} ms, exceeding threshold of 5000 ms.", stopwatch.ElapsedMilliseconds);
+                    _logger.LogWarning("BRAIN: Snapshot lock held for {Elapsed} ms, exceeding threshold of {maxMillis} ms.", stopwatch.ElapsedMilliseconds, maxMillis);
                 }
             }
 

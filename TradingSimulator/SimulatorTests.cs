@@ -117,6 +117,8 @@ namespace TradingSimulator.Simulator
         }
 
 
+
+
         public void SetProcessedMarkets(List<string> markets)
         {
             _processedMarkets = new HashSet<string>(markets);
@@ -267,57 +269,226 @@ namespace TradingSimulator.Simulator
             return (0, null, null, null, null, null, null, null, null, null);
         }
 
-        private List<PricePoint> DetectDiscrepancies(List<MarketSnapshot> snapshots, double majorChangeFactor = 5.0, double averagingWindowMin = 5.0)
+
+        private List<PricePoint> DetectDiscrepancies(
+            List<MarketSnapshot> s,
+            double relativeSlack = 1.5,
+            double averagingWindowMin = 5.0,
+            int minAbsChangeToFlag = 500,
+            int minAbsChangeOnZeroVelocity = 100,
+            double shortIntervalExponent = 0.5,
+            double gapThresholdMin = 1.5)  // Threshold for detecting gaps (e.g., >1.5 min for ~1-min snapshots)
         {
-            var discrepancyPoints = new List<PricePoint>();
+            var outPts = new List<PricePoint>();
+            if (s == null || s.Count <= 1) return outPts;
 
-            for (int i = 1; i < snapshots.Count; i++)
+            for (int i = 1; i < s.Count; i++)
             {
-                var prev = snapshots[i - 1];
-                var curr = snapshots[i];
+                var curr = s[i];
+                var prev = s[i - 1];
 
-                double timeMin = (curr.Timestamp - prev.Timestamp).TotalMinutes;
+                // Only flag on mature snapshots, but allow immature ones to contribute to rolling calculations
+                if (!curr.ChangeMetricsMature) continue;
 
-                // Yes side: Compute expected depth change from velocities (averaged over last 5 minutes)
-                double velocityYes = curr.VelocityPerMinute_Bottom_Yes_Bid + curr.VelocityPerMinute_Top_Yes_Bid;
-                double expectedDeltaYes = velocityYes * timeMin;
-                long actualDeltaYes = curr.TotalOrderbookDepth_Yes - prev.TotalOrderbookDepth_Yes;
+                double dtMin = (curr.Timestamp - prev.Timestamp).TotalMinutes;
+                if (dtMin <= 0) continue;  // Skip invalid timestamps
 
-                // Adjust leniency for short intervals relative to averaging window
-                double effectiveFactorYes = majorChangeFactor * (timeMin < averagingWindowMin ? (averagingWindowMin / timeMin) : 1.0);
+                // Actual raw deltas (cents)
+                double dy = curr.TotalOrderbookDepth_Yes - prev.TotalOrderbookDepth_Yes;
+                double dn = curr.TotalOrderbookDepth_No - prev.TotalOrderbookDepth_No;
 
-                bool isZeroVelocityChangeYes = (velocityYes == 0) && (Math.Abs(actualDeltaYes) > 0);
-                bool isMajorVsMinorYes = Math.Abs(actualDeltaYes) > (Math.Abs(expectedDeltaYes) * effectiveFactorYes);
+                // Instantaneous expected from actual velocity fields ($/min)
+                double vYes = curr.VelocityPerMinute_Top_Yes_Bid + curr.VelocityPerMinute_Bottom_Yes_Bid;
+                double vNo = curr.VelocityPerMinute_Top_No_Bid + curr.VelocityPerMinute_Bottom_No_Bid;
+                double expYes = vYes * dtMin;  // $/min * min = $
+                double expNo = vNo * dtMin;    // $/min * min = $
 
-                // No side: Compute expected depth change from velocities (averaged over last 5 minutes)
-                double velocityNo = curr.VelocityPerMinute_Bottom_No_Bid + curr.VelocityPerMinute_Top_No_Bid;
-                double expectedDeltaNo = velocityNo * timeMin;
-                long actualDeltaNo = curr.TotalOrderbookDepth_No - prev.TotalOrderbookDepth_No;
+                // Instantaneous observed from actual deltas ($/min)
+                double obsYes = dy / (100.0 * dtMin);
+                double obsNo = dn / (100.0 * dtMin);
 
-                // Adjust leniency similarly for No side
-                double effectiveFactorNo = majorChangeFactor * (timeMin < averagingWindowMin ? (averagingWindowMin / timeMin) : 1.0);
+                // Rolling window setup: time-bound, using actual data only (no decay)
+                DateTime windowStart = curr.Timestamp.AddMinutes(-averagingWindowMin);
+                double windowDt = 0.0;
+                double windowDy = 0.0;
+                double windowDn = 0.0;
+                double windowVYesSum = 0.0;  // Aggregate expected ($/min * min = $)
+                double windowVNoSum = 0.0;
+                string gapNote = string.Empty;
 
-                bool isZeroVelocityChangeNo = (velocityNo == 0) && (Math.Abs(actualDeltaNo) > 0);
-                bool isMajorVsMinorNo = Math.Abs(actualDeltaNo) > (Math.Abs(expectedDeltaNo) * effectiveFactorNo);
-
-                bool isDiscrepancyYes = isZeroVelocityChangeYes || isMajorVsMinorYes;
-                bool isDiscrepancyNo = isZeroVelocityChangeNo || isMajorVsMinorNo;
-
-                if (isDiscrepancyYes || isDiscrepancyNo)
+                // Start with current pair's actual data
+                bool hasGapInCurrent = dtMin > gapThresholdMin;
+                if (hasGapInCurrent)
                 {
-                    string memo = "";
-                    if (isDiscrepancyYes)
-                        memo += $"Yes Actual ΔDepth={actualDeltaYes} (cents equiv.), Expected={expectedDeltaYes:F2}, Velocity={velocityYes:F2}; ";
-                    if (isDiscrepancyNo)
-                        memo += $"No Actual ΔDepth={actualDeltaNo} (cents equiv.), Expected={expectedDeltaNo:F2}, Velocity={velocityNo:F2}";
+                    gapNote = $"Gap of {dtMin:0.##} min detected; isolated change rolling off from {prev.Timestamp:yyyy-MM-ddTHH:mm:ss.fffffffK}.";
+                }
+                else
+                {
+                    windowDy += dy;
+                    windowDn += dn;
+                    windowVYesSum += vYes * dtMin;
+                    windowVNoSum += vNo * dtMin;
+                    windowDt += dtMin;
+                }
 
-                    // Place marker at midpoint price for visibility
-                    double midPrice = (curr.BestYesBid + curr.BestYesAsk) / 2.0;
-                    discrepancyPoints.Add(new PricePoint(curr.Timestamp, midPrice, "Obvious Discrepancy: " + memo.Trim()));
+                // Extend backward using actual prior pairs, but stop at gaps (immature snapshots can contribute)
+                int j = i - 1;
+                while (j > 0 && s[j].Timestamp >= windowStart)
+                {
+                    var priorPrev = s[j - 1];
+                    double priorDt = (s[j].Timestamp - priorPrev.Timestamp).TotalMinutes;
+                    if (priorDt > gapThresholdMin)
+                    {
+                        gapNote = $"Gap of {priorDt:0.##} min detected; change rolling off from {priorPrev.Timestamp:yyyy-MM-ddTHH:mm:ss.fffffffK}.";
+                        break;  // Exclude pre-gap data
+                    }
+
+                    double priorVYes = s[j].VelocityPerMinute_Top_Yes_Bid + s[j].VelocityPerMinute_Bottom_Yes_Bid;
+                    double priorVNo = s[j].VelocityPerMinute_Top_No_Bid + s[j].VelocityPerMinute_Bottom_No_Bid;
+
+                    double priorDy = s[j].TotalOrderbookDepth_Yes - priorPrev.TotalOrderbookDepth_Yes;
+                    double priorDn = s[j].TotalOrderbookDepth_No - priorPrev.TotalOrderbookDepth_No;
+
+                    windowDy += priorDy;
+                    windowDn += priorDn;
+                    windowVYesSum += priorVYes * priorDt;
+                    windowVNoSum += priorVNo * priorDt;
+                    windowDt += priorDt;
+
+                    j--;
+                }
+
+                // Rolling observed (actual deltas / time, $/min) and expected ($/min, averaged over window)
+                double rollObsYes5m = (windowDt > 0) ? (windowDy / 100.0) / windowDt : 0.0;
+                double rollObsNo5m = (windowDt > 0) ? (windowDn / 100.0) / windowDt : 0.0;
+                double rollExpYes = (windowDt > 0) ? windowVYesSum / windowDt : 0.0;
+                double rollExpNo = (windowDt > 0) ? windowVNoSum / windowDt : 0.0;
+
+                // Full window rolling observed ($/min)
+                double rollObsYesWin = (windowDt > 0) ? (windowDy / 100.0) / windowDt : 0.0;
+                double rollObsNoWin = (windowDt > 0) ? (windowDn / 100.0) / windowDt : 0.0;
+
+                // Scale only for short valid windows
+                double scale = 1.0;
+                if (windowDt > 0 && windowDt < averagingWindowMin)
+                {
+                    scale = Math.Pow(averagingWindowMin / windowDt, shortIntervalExponent);
+                }
+
+                // Rolling thresholds and discrepancy checks (using cents for deltas)
+                double windowExpYesCents = windowVYesSum * 100;
+                double windowExpNoCents = windowVNoSum * 100;
+                double thrYes = Math.Abs(windowExpYesCents) * relativeSlack * scale;
+                double thrNo = Math.Abs(windowExpNoCents) * relativeSlack * scale;
+                bool discYes = (windowDt > 0) && Math.Abs(windowDy - windowExpYesCents) > Math.Max(thrYes, minAbsChangeToFlag);
+                bool discNo = (windowDt > 0) && Math.Abs(windowDn - windowExpNoCents) > Math.Max(thrNo, minAbsChangeToFlag);
+
+                // Zero-velocity checks (instantaneous, using actual data; only on mature snapshots)
+                bool zeroVelYesDisc = (vYes == 0 && Math.Abs(dy) >= minAbsChangeOnZeroVelocity);
+                bool zeroVelNoDisc = (vNo == 0 && Math.Abs(dn) >= minAbsChangeOnZeroVelocity);
+                if (zeroVelYesDisc) discYes = true;
+                if (zeroVelNoDisc) discNo = true;
+
+                // Flag if discrepancy (rolling or zero-velocity)
+                if (discYes || discNo)
+                {
+                    // Collect last 7 snapshots for reporting (or fewer)
+                    var lastSnapshots = s.Skip(Math.Max(0, i - 6)).Take(7).ToList();
+
+                    // Generate memo with original-like reporting
+                    string memo = GenerateMemo(curr, lastSnapshots, windowDt, windowDy, windowDn, rollExpYes, rollExpNo, rollObsYes5m, rollObsNo5m, rollObsYesWin, rollObsNoWin, gapNote, averagingWindowMin, scale, shortIntervalExponent, zeroVelYesDisc, zeroVelNoDisc);
+
+                    outPts.Add(new PricePoint(curr.Timestamp, (curr.BestYesBid + curr.BestYesAsk) / 2.0, memo));
+
+                    // Separate logging to file (similar to original AppendDiscrepancyLog)
+                    AppendDiscrepancyLog(curr.MarketTicker ?? "UnknownMarket", memo);
                 }
             }
 
-            return discrepancyPoints;
+            return outPts;
+        }
+
+        private string GenerateMemo(
+            MarketSnapshot curr,
+            List<MarketSnapshot> lastSnapshots,
+            double windowDt,
+            double windowDy,
+            double windowDn,
+            double rollExpYes,
+            double rollExpNo,
+            double rollObsYes5m,
+            double rollObsNo5m,
+            double rollObsYesWin,
+            double rollObsNoWin,
+            string gapNote,
+            double averagingWindowMin,
+            double scale,
+            double shortIntervalExponent,
+            bool zeroVelYesDisc,
+            bool zeroVelNoDisc)
+        {
+            var sb = new System.Text.StringBuilder();
+
+            // Header with type (similar to original)
+            string discType = zeroVelYesDisc ? "[YES ZERO-VELOCITY]" : zeroVelNoDisc ? "[NO ZERO-VELOCITY]" : "[DISCREPANCY]";
+            sb.AppendLine($"{discType} {curr.Timestamp:yyyy-MM-ddTHH:mm:ss.fffffffK}");
+
+            // Window summary
+            int steps = lastSnapshots.Count - 1;  // Approximate steps in window
+            sb.AppendLine($"Window: size={steps} steps, duration={windowDt:0.##} min");
+
+            // Gap note if any
+            if (!string.IsNullOrEmpty(gapNote))
+            {
+                sb.AppendLine(gapNote);
+            }
+
+            // Table of last snapshots (with padded columns for alignment)
+            sb.AppendLine("Last 7 snapshots (oldest first):");
+
+            // Define column widths (adjust as needed for your data; positive for right-align, negative for left-align)
+            string headerFormat = "{0,-35} {1,8} {2,18} {3,20} {4,21} {5,12} {6,17} {7,19} {8,20} {9,12}";
+            string header = string.Format(headerFormat,
+                "Timestamp (UTC)", "WinMin", "RollExpYes($/min)", "RollObsYes_5m($/min)", "RollObsYes_Win($/min)",
+                "YesDepth(¢)", "RollExpNo($/min)", "RollObsNo_5m($/min)", "RollObsNo_Win($/min)", "NoDepth(¢)");
+            sb.AppendLine("    " + header);
+
+            string rowFormat = "{0,-35} {1,8:0.##} {2,18:0.##} {3,20:0.##} {4,21:0.##} {5,12:0.##} {6,17:0.##} {7,19:0.##} {8,20:0.##} {9,12:0.##}";
+            foreach (var snap in lastSnapshots)
+            {
+                // For each snapshot, compute its local values for reporting (using actual data)
+                double localVYes = snap.VelocityPerMinute_Top_Yes_Bid + snap.VelocityPerMinute_Bottom_Yes_Bid;
+                double localVNo = snap.VelocityPerMinute_Top_No_Bid + snap.VelocityPerMinute_Bottom_No_Bid;
+                // Note: RollObs_5m and Win use the end-window values for consistency with original; adjust if per-row rolls needed
+                double winMin = (curr.Timestamp - snap.Timestamp).TotalMinutes;  // Approximate WinMin
+
+                string row = string.Format(rowFormat,
+                    snap.Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffffffK"), winMin, localVYes, rollObsYes5m, rollObsYesWin,
+                    snap.TotalOrderbookDepth_Yes, localVNo, rollObsNo5m, rollObsNoWin, snap.TotalOrderbookDepth_No);
+                sb.AppendLine("    " + row);
+            }
+
+            // Rolling math section (using actual data)
+            sb.AppendLine("Rolling math (end snapshot):");
+            sb.AppendLine($"  5-min: ΔYes(¢)={windowDy:0.##} ⇒ {rollObsYes5m:0.##} $/min, ΔNo(¢)={windowDn:0.##} ⇒ {rollObsNo5m:0.##} $/min");
+            sb.AppendLine($"  Window: ΔYes(¢)={windowDy:0.##} ⇒ {rollObsYesWin:0.##} $/min, ΔNo(¢)={windowDn:0.##} ⇒ {rollObsNoWin:0.##} $/min (Σdt={windowDt:0.##} min)");
+            sb.AppendLine($"  Expected (HUD-scale): Yes={rollExpYes:0.##} $/min, No={rollExpNo:0.##} $/min (ExpScale={(int)scale})");
+
+            // Computation details
+            sb.AppendLine("Computation details:");
+            sb.AppendLine($"    Short-Window Scale = (Window Minutes<{averagingWindowMin:0.##}? ( {averagingWindowMin:0.##}/Window Minutes )^{shortIntervalExponent:0.###} : 1) = {scale:0.######}");
+            sb.AppendLine($"    Expected Yes ΔDepth (¢) = Sum(Expected Yes Flow×min)*100 = {rollExpYes * windowDt:0.######}*100 = {windowDy:0.##} c");  // Adjusted for example; refine as needed
+            sb.AppendLine($"    Observed Yes ΔDepth (¢) = currY-oldY = {windowDy:0.##}");
+            sb.AppendLine($"MID={(curr.BestYesBid + curr.BestYesAsk) / 2.0:0.##}");
+
+            return sb.ToString();
+        }
+
+        // Separate logging method (reintroduced similar to original)
+        private void AppendDiscrepancyLog(string marketTicker, string memo)
+        {
+            string logPath = Path.Combine(_cacheDirectory, "discrepancies.log");  // Or a per-market file if preferred
+            File.AppendAllText(logPath, $"Market: {marketTicker}\n{memo}\n\n");
         }
 
         private void SaveMarketDataToFile(

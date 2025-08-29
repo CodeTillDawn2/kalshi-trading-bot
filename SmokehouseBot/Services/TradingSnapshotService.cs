@@ -164,7 +164,7 @@ namespace SmokehouseBot.Services
                     if (snapshotsToSave.Any())
                     {
                         var fileJson = JsonSerializer.Serialize(snapshotsToSave, options);
-                        var fileName = $"SnapshotGroup_{timestampString}.json";
+                        var fileName = $"Snapshot_{timestampString}.json";
                         var fullPath = Path.Combine(_snapshotDirectory, fileName);
                         await File.WriteAllTextAsync(fullPath, fileJson, Encoding.Unicode);
                         _logger.LogInformation("Saved {Count} snapshots to file: {FilePath}", SavedCount, fullPath);

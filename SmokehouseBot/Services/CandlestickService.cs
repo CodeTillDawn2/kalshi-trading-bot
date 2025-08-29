@@ -111,6 +111,8 @@ namespace SmokehouseBot.Services
                     _logger.LogInformation("Error updating last candlestick for {0}, likely transient failure. ex: {0}, inner ex: {1}",
                         marketTicker, ex.Message, ex.InnerException?.Message);
                 }
+
+                marketData.RefreshCandlestickMetadata();
                 
 
             }

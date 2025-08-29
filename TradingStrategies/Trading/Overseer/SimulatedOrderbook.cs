@@ -79,14 +79,9 @@ namespace TradingStrategies.Trading.Overseer
             DateTime initTime = snapshot.Timestamp; // Assume all initial orders at snapshot time
             foreach (var entry in snapshot.OrderbookData)
             {
-                // Properly extract from Dictionary<string, object> where object is JsonElement
-                var priceElement = (JsonElement)entry["price"];
-                var contractsElement = (JsonElement)entry["resting_contracts"];
-                var sideElement = (JsonElement)entry["side"];
-
-                int price = priceElement.GetInt32();
-                int contracts = contractsElement.GetInt32();
-                string side = sideElement.GetString();
+                int price = Int32.Parse(entry["price"].ToString());
+                int contracts = Int32.Parse(entry["resting_contracts"].ToString());
+                string side = entry["side"].ToString();
 
                 if (price < 1 || price > 99) continue;
 

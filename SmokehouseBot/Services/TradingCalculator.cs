@@ -730,7 +730,7 @@ namespace SmokehouseBot.Services
             if (double.IsNaN(adx) || double.IsInfinity(adx))
             {
                 log.AppendLine($"Invalid ADX: {adx}.");
-                _logger.LogWarning("{Log}", log.ToString());
+                _logger.LogDebug("{Log}", log.ToString());
                 return null;
             }
 

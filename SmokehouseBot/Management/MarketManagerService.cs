@@ -463,7 +463,7 @@ namespace SmokehouseBot.Management
                 {
                     List<MarketDTO> candidates = await context.GetMarkets(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active },
                         hasMarketWatch: false);
-                    List<string> candidateMarkets = candidates.OrderByDescending(x => x.volume_24h).Take(marketsToAdd).Select(x => x.market_ticker).ToList();
+                    List<string> candidateMarkets = candidates.OrderByDescending(x => x.volume_24h).Take(Math.Max(marketsToAdd * 2,20)).Select(x => x.market_ticker).ToList();
 
                     if (candidateMarkets.Any())
                     {
@@ -499,18 +499,28 @@ namespace SmokehouseBot.Management
 
                             var existingDoubleCheck = await context.GetMarketWatches_cached(marketTickers: new HashSet<string> { market.Ticker });
 
-                            if (existingDoubleCheck.Count == 0 && market.Score >= minimumInterest) // Strict check
+                            if (existingDoubleCheck.Count == 0) // Strict check
                             {
                                 MarketWatchDTO newWatch = new MarketWatchDTO
                                 {
                                     market_ticker = market.Ticker,
                                     InterestScore = market.Score,
-                                    InterestScoreDate = DateTime.Now,
-                                    BrainLock = _brainStatus.BrainLock,
-                                    LastWatched = DateTime.Now
+                                    InterestScoreDate = DateTime.Now
                                 };
 
+                                if (market.Score >= minimumInterest)
+                                {
+                                    newWatch.BrainLock = _brainStatus.BrainLock;
+                                    newWatch.LastWatched = DateTime.Now;
+                                }
+
                                 await context.AddOrUpdateMarketWatch(newWatch);
+
+                                if (market.Score < minimumInterest)
+                                {
+                                    _logger.LogInformation("BRAIN: Added market {market} to market watches but score too low to watch. Interest: {score}", market.Ticker, market.Score);
+                                    continue;
+                                }
 
                                 marketsAddedList.Add(market.Ticker);
                                 _serviceFactory.GetDataCache().WatchedMarkets.Add(newWatch.market_ticker);

@@ -43,7 +43,7 @@ namespace SmokehouseBot.KalshiAPI
         private readonly ConcurrentQueue<(string Action, string[] MarketTickers, string ChannelAction)> _queuedSubscriptionUpdates = new();
         private bool _isConnected = false;
         private const int DebounceIntervalMs = 1000;
-        private const int SubscriptionConfirmTimeoutSeconds = 10;
+        private const int SubscriptionConfirmTimeoutSeconds = 20;
         private Task _queueProcessorTask = null!;
         private Task _confirmCheckTask = null!;
         private Dictionary<string, HashSet<string>> _subscriptionState = new Dictionary<string, HashSet<string>>();

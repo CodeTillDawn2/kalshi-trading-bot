@@ -357,7 +357,7 @@ namespace SmokehouseBot.State
             }
 
             UpdateTradingMetrics();
-            CalculateSlope();
+            
         }
 
         private void CalculateSlope()
@@ -378,7 +378,7 @@ namespace SmokehouseBot.State
 
             var first = recentTickers.First();
             var last = recentTickers.Last();
-            var timeDiffMin = (last.LoggedDate - first.LoggedDate).TotalMinutes;
+            var timeDiffMin = (DateTime.UtcNow - first.LoggedDate).TotalMinutes;
 
             if (timeDiffMin <= 0)
             {
@@ -387,8 +387,9 @@ namespace SmokehouseBot.State
                 return;
             }
 
-            _yesBidSlopePerMinute = (last.yes_bid - first.yes_bid) / timeDiffMin;
-            _noBidSlopePerMinute = ((100 - last.yes_ask) - (100 - first.yes_ask)) / timeDiffMin;
+            _yesBidSlopePerMinute = Math.Round((last.yes_bid - first.yes_bid) / timeDiffMin,2);
+            _noBidSlopePerMinute = Math.Round(((100 - last.yes_ask) - (100 - first.yes_ask)) / timeDiffMin);
+
         }
 
         private double? _rsi_Short;
@@ -504,6 +505,8 @@ namespace SmokehouseBot.State
             _obv_Long = (long)_tradingCalculator.CalculateOBV(dayCopy);
             
             ADX = _tradingCalculator.CalculateADX(minuteCopy, _calculationConfig.ADX_Periods);
+
+            CalculateSlope();
 
             _logger.LogDebug("**Ended updating trading metrics for {marketTicker}**", _marketTicker);
         }

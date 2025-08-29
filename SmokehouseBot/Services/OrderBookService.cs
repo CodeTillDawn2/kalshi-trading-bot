@@ -723,9 +723,9 @@ namespace SmokehouseBot.Services
                         }
                         List<OrderbookData>? originalOrderbook =
                             new List<OrderbookData>(orderbook);
+                        marketData.ChangeTracker.LogOrderbookSnapshot(originalOrderbook, updatedOrderbook);
                         _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData = updatedOrderbook;
                         marketData.OrderbookData = updatedOrderbook;
-                        marketData.ChangeTracker.LogOrderbookSnapshot(originalOrderbook, updatedOrderbook);
 
                         _logger.LogDebug("Stored OrderbookData for {MarketTicker}: [{Entries}]",
                             marketTicker,
@@ -778,6 +778,7 @@ namespace SmokehouseBot.Services
                         marketTicker, message.Price.Value, message.Side, message.Delta.Value, orderbook.Count, message.Seq);
 
                     orderData = orderbook.FirstOrDefault(o => o.Price == message.Price && o.Side == message.Side);
+
                     if (orderData != null)
                     {
                         _logger.LogDebug("DELTA-Found existing orderData for {MarketTicker}, Price: {Price}, Side: {Side}, RestingContracts: {RestingContracts}",
@@ -789,6 +790,17 @@ namespace SmokehouseBot.Services
                     {
                         _logger.LogDebug("DELTA-No existing orderData found for {MarketTicker}, Price: {Price}, Side: {Side}",
                             marketTicker, message.Price.Value, message.Side);
+                    }
+
+                    if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
+                    {
+                        _logger.LogDebug("TRADEMON-Logging orderbook delta for {0}... Side={1}, Price={2}, Delta={3}",
+                            marketData.MarketTicker, message.Side, message.Price.Value, message.Delta.Value);
+                        marketData.ChangeTracker.LogChange(message.Side, message.Price.Value, message.Delta.Value);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Market {MarketTicker} not found in cache for delta update", marketTicker);
                     }
 
                     if (message.Delta.Value <= 0 && orderData == null)
@@ -841,16 +853,7 @@ namespace SmokehouseBot.Services
                         marketTicker, string.Join("; ", orderbook.Select(o => $"Price={o.Price},Side={o.Side},Contracts={o.RestingContracts}")));
                 }
 
-                if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
-                {
-                    _logger.LogDebug("TRADEMON-Logging orderbook delta for {0}... Side={1}, Price={2}, Delta={3}",
-                        marketData.MarketTicker, message.Side, message.Price.Value, message.Delta.Value);
-                    marketData.ChangeTracker.LogChange(message.Side, message.Price.Value, message.Delta.Value);
-                }
-                else
-                {
-                    _logger.LogWarning("Market {MarketTicker} not found in cache for delta update", marketTicker);
-                }
+          
 
                 return orderbook;
             }

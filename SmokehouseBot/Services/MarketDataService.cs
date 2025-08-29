@@ -858,7 +858,7 @@ namespace SmokehouseBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to ensure market data for {MarketTicker}", marketTicker);
+                _logger.LogWarning("Failed to ensure market data for {MarketTicker}. Error {0}. {1}", marketTicker, ex.Message, ex.InnerException?.Message);
                 return null;
             }
         }

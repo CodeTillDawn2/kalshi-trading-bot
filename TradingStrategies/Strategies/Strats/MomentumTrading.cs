@@ -311,12 +311,11 @@ namespace TradingStrategies.Strategies.Strats
             Pair($"Best Yes Bid: {F(snapshot.BestYesBid)}", $"Best Yes Ask: {F(snapshot.BestYesAsk)}"),
             Pair($"Path: {(pathTaken.Count==0 ? "none" : string.Join(" > ", pathTaken))}", $"SimPos: {I(simulationPosition)}"),
 
+            Pair($"Depth$ Yes: {F(depthYes)}", $"Depth$ No: {F(depthNo)}"),            
             Pair($"Vel/min Yes: {F(vSumYes)}", $"Vel/min No: {F(vSumNo)}"),
             Pair($"Thr Yes: {F(thrYes)}", $"Thr No: {F(thrNo)}"),
             Pair($"Top 10% Yes: {F(snapshot.VelocityPerMinute_Top_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Top_No_Bid)}"),
             Pair($"Bottom 90% Yes: {F(snapshot.VelocityPerMinute_Bottom_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Bottom_No_Bid)}"),
-
-            Pair($"Depth$ Yes: {F(depthYes)}", $"Depth$ No: {F(depthNo)}"),
             Pair($"Flow Yes: {F(flowYes)}", $"Flow No: {F(flowNo)}"),
 
             Pair($"TR/min Yes: {F(snapshot.TradeRatePerMinute_Yes)}", $"TR/min No: {F(snapshot.TradeRatePerMinute_No)}"),
