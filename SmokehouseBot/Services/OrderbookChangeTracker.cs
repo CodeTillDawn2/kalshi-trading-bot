@@ -590,8 +590,7 @@ namespace SmokehouseBot.Services
                 return;
             }
             List<OrderbookData> bids = new List<OrderbookData>(Market.GetBids());
-            double elapsedMinutes = GetElapsedMinutes();
-            _logger.LogDebug("RecalculateMetrics for {MarketTicker}: elapsedMinutes={ElapsedMinutes}", _marketTicker, elapsedMinutes);
+            _logger.LogDebug("RecalculateMetrics for {MarketTicker}: ChangeWindowDuration.TotalMinutes={ChangeWindowDuration.TotalMinutes}", _marketTicker, ChangeWindowDuration.TotalMinutes);
 
             double velocitySumYes = validYesChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
             double orderVolumeYesBid = validYesChanges.Where(c => !c.IsTradeRelated).Sum(c => c.Price / 100.0 * c.DeltaContracts);
@@ -643,12 +642,12 @@ namespace SmokehouseBot.Services
                 _marketTicker, tradeVolumeNo, validNoChanges.Count(c => c.IsTradeRelated));
             _logger.LogDebug("RateSum total dollar delta for {MarketTicker}: {RateSum:F2}", _marketTicker, rateSum);
 
-            RefreshOrderbookChangeOverTimeMetrics(validYesChanges.Concat(validNoChanges).ToList(), bids, elapsedMinutes);
-            RefreshTradeChangeOverTimeMetrics(validYesChanges.Concat(validNoChanges).ToList(), elapsedMinutes);
+            RefreshOrderbookChangeOverTimeMetrics(validYesChanges.Concat(validNoChanges).ToList(), bids);
+            RefreshTradeChangeOverTimeMetrics(validYesChanges.Concat(validNoChanges).ToList());
         }
 
         private void RefreshOrderbookChangeOverTimeMetrics(List<OrderbookChange> orderbookChanges,
-    List<OrderbookData> bids, double elapsedMinutes)
+    List<OrderbookData> bids)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -693,29 +692,7 @@ namespace SmokehouseBot.Services
                 NoBottomVelocity.Volume, NoBottomVelocity.Levels);
         }
 
-        private double ComputeEffectiveWindowMinutes(IEnumerable<OrderbookChange> changes)
-        {
-            if (_cancellationToken.IsCancellationRequested)
-            {
-                _logger.LogDebug("Effective window calculation cancelled for {MarketTicker}", _marketTicker);
-                return 0;
-            }
-
-            var orderedChanges = changes.OrderBy(c => c.Timestamp).ToList();
-            if (!orderedChanges.Any())
-            {
-                return 0;
-            }
-
-            var earliest = orderedChanges.First().Timestamp;
-            var latest = orderedChanges.Last().Timestamp;
-            var spanMinutes = (latest - earliest).TotalMinutes;
-
-            // Cap at ChangeWindowDuration to align with roll-off
-            return Math.Min(spanMinutes, ChangeWindowDuration.TotalMinutes);
-        }
-
-        private void RefreshTradeChangeOverTimeMetrics(List<OrderbookChange> orderbookChanges, double elapsedMinutes)
+        private void RefreshTradeChangeOverTimeMetrics(List<OrderbookChange> orderbookChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -738,12 +715,12 @@ namespace SmokehouseBot.Services
                 .Where(c => c.Side == "no" && c.IsTradeRelated && !c.IsCanceled)
                 .ToList();
 
-            var yesBidNetOrderRate = GetYesNetOrderVolumePerMinute(yesMakerNonTradeChanges, elapsedMinutes);
-            var noBidNetOrderRate = GetNoNetOrderVolumePerMinute(noMakerNonTradeChanges, elapsedMinutes);
-            var yesTradeRate = GetTradeRatePerMinute_MakerYes(yesMakerTradeRelatedChanges, elapsedMinutes);
-            var noTradeRate = GetTradeRatePerMinute_MakerNo(noMakerTradeRelatedChanges, elapsedMinutes);
-            var averageTradeSizeYes = GetAverageTradeSize_MakerYes(yesMakerTradeRelatedChanges, elapsedMinutes);
-            var averageTradeSizeNo = GetAverageTradeSize_MakerNo(noMakerTradeRelatedChanges, elapsedMinutes);
+            var yesBidNetOrderRate = GetYesNetOrderVolumePerMinute(yesMakerNonTradeChanges);
+            var noBidNetOrderRate = GetNoNetOrderVolumePerMinute(noMakerNonTradeChanges);
+            var yesTradeRate = GetTradeRatePerMinute_MakerYes(yesMakerTradeRelatedChanges);
+            var noTradeRate = GetTradeRatePerMinute_MakerNo(noMakerTradeRelatedChanges);
+            var averageTradeSizeYes = GetAverageTradeSize_MakerYes(yesMakerTradeRelatedChanges);
+            var averageTradeSizeNo = GetAverageTradeSize_MakerNo(noMakerTradeRelatedChanges);
 
             Market.OrderVolumePerMinute_YesBid = Math.Round(yesBidNetOrderRate.Volume, 2);
             Market.OrderVolumePerMinute_NoBid = Math.Round(noBidNetOrderRate.Volume, 2);
@@ -1011,30 +988,30 @@ namespace SmokehouseBot.Services
             }
         }
 
-        private double GetElapsedMinutes()
-        {
-            if (_cancellationToken.IsCancellationRequested)
-            {
-                _logger.LogDebug("Elapsed minutes calculation cancelled for {MarketTicker}", _marketTicker);
-                return 0;
-            }
+        //private double GetChangeWindowDuration.TotalMinutes()
+        //{
+        //    if (_cancellationToken.IsCancellationRequested)
+        //    {
+        //        _logger.LogDebug("Elapsed minutes calculation cancelled for {MarketTicker}", _marketTicker);
+        //        return 0;
+        //    }
 
-            if (LastMarketOpenTime == DateTime.MinValue)
-            {
-                return 0;
-            }
-            TimeSpan elapsed = DateTime.UtcNow - LastMarketOpenTime;
-            double minutes = Math.Min(elapsed.TotalMinutes, _config.Value.ChangeWindowDuration.TotalMinutes);
-            _logger.LogDebug("Calculated elapsed minutes for {MarketTicker}: {ElapsedMinutes} minutes (capped at ChangeWindowDuration={ChangeWindowDuration} minutes)",
-                _marketTicker, minutes, _config.Value.ChangeWindowDuration.TotalMinutes);
-            return minutes;
-        }
+        //    if (LastMarketOpenTime == DateTime.MinValue)
+        //    {
+        //        return 0;
+        //    }
+        //    TimeSpan elapsed = DateTime.UtcNow - LastMarketOpenTime;
+        //    double minutes = Math.Min(elapsed.TotalMinutes, _config.Value.ChangeWindowDuration.TotalMinutes);
+        //    _logger.LogDebug("Calculated elapsed minutes for {MarketTicker}: {ChangeWindowDuration.TotalMinutes} minutes (capped at ChangeWindowDuration={ChangeWindowDuration} minutes)",
+        //        _marketTicker, minutes, _config.Value.ChangeWindowDuration.TotalMinutes);
+        //    return minutes;
+        //}
 
 
         #endregion
 
         #region Velocity and Rate Calculations
-        // Revised GetBottomNoVelocityPerMinute (remove elapsedMinutes parameter)
+        // Revised GetBottomNoVelocityPerMinute (remove ChangeWindowDuration.TotalMinutes parameter)
         public (double Volume, int Levels) GetBottomNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1062,9 +1039,8 @@ namespace SmokehouseBot.Services
             }
 
             var bottomChanges = validChanges.Where(c => c.Price < threshold).ToList();
-            double effectiveMinutes = ComputeEffectiveWindowMinutes(bottomChanges);
             _logger.LogDebug("Calculating VelocityPerMinute_Bottom_No_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, NoBidsCount={NoBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
-                _marketTicker, threshold, levels, bottomChanges.Count, noBids.Count, effectiveMinutes);
+                _marketTicker, threshold, levels, bottomChanges.Count, noBids.Count, ChangeWindowDuration.TotalMinutes);
 
             foreach (var change in bottomChanges)
             {
@@ -1076,9 +1052,9 @@ namespace SmokehouseBot.Services
             if (bottomChanges.Any())
             {
                 double totalDollarDelta = bottomChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = effectiveMinutes > 0 ? totalDollarDelta / effectiveMinutes : 0;
+                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
                 _logger.LogDebug("VelocityPerMinute_Bottom_No_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, effectiveMinutes, volume, levels);
+                    _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, levels);
             }
             else
             {
@@ -1108,7 +1084,7 @@ namespace SmokehouseBot.Services
             return Bids.Where(x => x.Price < upperBound).Count();
         }
 
-        // Revised GetBottomYesVelocityPerMinute (remove elapsedMinutes parameter)
+        // Revised GetBottomYesVelocityPerMinute (remove ChangeWindowDuration.TotalMinutes parameter)
         public (double Volume, int Levels) GetBottomYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1136,9 +1112,8 @@ namespace SmokehouseBot.Services
             }
 
             var bottomChanges = validChanges.Where(c => c.Price < threshold).ToList();
-            double effectiveMinutes = ComputeEffectiveWindowMinutes(bottomChanges);
             _logger.LogDebug("Calculating VelocityPerMinute_Bottom_Yes_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, YesBidsCount={YesBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
-                _marketTicker, threshold, levels, bottomChanges.Count, yesBids.Count, effectiveMinutes);
+                _marketTicker, threshold, levels, bottomChanges.Count, yesBids.Count, ChangeWindowDuration.TotalMinutes);
 
             foreach (var change in bottomChanges)
             {
@@ -1150,9 +1125,9 @@ namespace SmokehouseBot.Services
             if (bottomChanges.Any())
             {
                 double totalDollarDelta = bottomChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = effectiveMinutes > 0 ? totalDollarDelta / effectiveMinutes : 0;
+                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
                 _logger.LogDebug("VelocityPerMinute_Bottom_Yes_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, effectiveMinutes, volume, levels);
+                    _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, levels);
             }
             else
             {
@@ -1189,9 +1164,8 @@ namespace SmokehouseBot.Services
             }
 
             var topChanges = validChanges.Where(c => c.Price >= threshold).ToList();
-            double effectiveMinutes = ComputeEffectiveWindowMinutes(topChanges);
             _logger.LogDebug("Calculating VelocityPerMinute_Top_No_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, NoBidsCount={NoBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
-                _marketTicker, threshold, levels, topChanges.Count, noBids.Count, effectiveMinutes);
+                _marketTicker, threshold, levels, topChanges.Count, noBids.Count, ChangeWindowDuration.TotalMinutes);
 
             foreach (var change in topChanges)
             {
@@ -1203,9 +1177,9 @@ namespace SmokehouseBot.Services
             if (topChanges.Any())
             {
                 double totalDollarDelta = topChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = effectiveMinutes > 0 ? totalDollarDelta / effectiveMinutes : 0;
+                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
                 _logger.LogDebug("VelocityPerMinute_Top_No_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, effectiveMinutes, volume, levels);
+                    _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, levels);
             }
             else
             {
@@ -1242,9 +1216,8 @@ namespace SmokehouseBot.Services
             }
 
             var topChanges = validChanges.Where(c => c.Price >= threshold).ToList();
-            double effectiveMinutes = ComputeEffectiveWindowMinutes(topChanges);
             _logger.LogDebug("Calculating VelocityPerMinute_Top_Yes_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, YesBidsCount={YesBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
-                _marketTicker, threshold, levels, topChanges.Count, yesBids.Count, effectiveMinutes);
+                _marketTicker, threshold, levels, topChanges.Count, yesBids.Count, ChangeWindowDuration.TotalMinutes);
 
             foreach (var change in topChanges)
             {
@@ -1256,9 +1229,9 @@ namespace SmokehouseBot.Services
             if (topChanges.Any())
             {
                 double totalDollarDelta = topChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = effectiveMinutes > 0 ? totalDollarDelta / effectiveMinutes : 0;
+                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
                 _logger.LogDebug("VelocityPerMinute_Top_Yes_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, effectiveMinutes, volume, levels);
+                    _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, levels);
             }
             else
             {
@@ -1268,7 +1241,7 @@ namespace SmokehouseBot.Services
             return (Math.Round(volume, 2), levels);
         }
 
-        public (double Volume, int Count) GetYesNetOrderVolumePerMinute(List<OrderbookChange> yesBidChanges, double minutes)
+        public (double Volume, int Count) GetYesNetOrderVolumePerMinute(List<OrderbookChange> yesBidChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -1288,15 +1261,15 @@ namespace SmokehouseBot.Services
             }
 
             double totalDollarDelta = validChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-            double volume = minutes > 0 ? totalDollarDelta / minutes : 0;
+            double volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
             volume = Math.Round(volume, 2);
 
             _logger.LogDebug("OrderRatePerMinute_YesBid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, Minutes={Minutes:F2}, Rate={Rate:F2} dollars/minute, Count={Count}",
-                _marketTicker, totalDollarDelta, minutes, volume, orderCount);
+                _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, orderCount);
             return (volume, orderCount);
         }
 
-        public (double Volume, int Count) GetNoNetOrderVolumePerMinute(List<OrderbookChange> noBidChanges, double minutes)
+        public (double Volume, int Count) GetNoNetOrderVolumePerMinute(List<OrderbookChange> noBidChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -1316,15 +1289,15 @@ namespace SmokehouseBot.Services
             }
 
             double totalDollarDelta = validChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-            double volume = minutes > 0 ? totalDollarDelta / minutes : 0;
+            double volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
             volume = Math.Round(volume, 2);
 
             _logger.LogDebug("OrderRatePerMinute_NoBid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, Minutes={Minutes:F2}, Rate={Rate:F2} dollars/minute, Count={Count}",
-                _marketTicker, totalDollarDelta, minutes, volume, orderCount);
+                _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, orderCount);
             return (volume, orderCount);
         }
 
-        public (double rate, double volume) GetTradeRatePerMinute_MakerYes(List<OrderbookChange> yesTradeRelatedChanges, double elapsedMinutes)
+        public (double rate, double volume) GetTradeRatePerMinute_MakerYes(List<OrderbookChange> yesTradeRelatedChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -1342,7 +1315,7 @@ namespace SmokehouseBot.Services
                 _marketTicker, yesTradeRelatedChanges.Count);
 
             double volume;
-            double rate = elapsedMinutes > 0 ? yesTradeRelatedChanges.Count / elapsedMinutes : 0;
+            double rate = ChangeWindowDuration.TotalMinutes > 0 ? yesTradeRelatedChanges.Count / ChangeWindowDuration.TotalMinutes : 0;
 
             if (!yesTradeRelatedChanges.Any())
             {
@@ -1352,15 +1325,15 @@ namespace SmokehouseBot.Services
             else
             {
                 double totalTradeDollar = yesTradeRelatedChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = elapsedMinutes > 0 ? totalTradeDollar / elapsedMinutes : 0;
+                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalTradeDollar / ChangeWindowDuration.TotalMinutes : 0;
                 _logger.LogDebug("tradeVolumePerMinute_Yes for {MarketTicker}: TotalTradeDollar={TotalTradeDollar:F2}, Minutes={Minutes:F2}, Rate={Rate:F2}, Volume={Volume:F2} dollars/minute",
-                    _marketTicker, totalTradeDollar, elapsedMinutes, rate, volume);
+                    _marketTicker, totalTradeDollar, ChangeWindowDuration.TotalMinutes, rate, volume);
             }
 
             return (Math.Round(rate, 2), volume);
         }
 
-        public (double rate, double volume) GetTradeRatePerMinute_MakerNo(List<OrderbookChange> noTradeRelatedChanges, double elapsedMinutes)
+        public (double rate, double volume) GetTradeRatePerMinute_MakerNo(List<OrderbookChange> noTradeRelatedChanges)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -1378,7 +1351,7 @@ namespace SmokehouseBot.Services
                 _marketTicker, noTradeRelatedChanges.Count);
 
             double volume;
-            double rate = elapsedMinutes > 0 ? noTradeRelatedChanges.Count / elapsedMinutes : 0;
+            double rate = ChangeWindowDuration.TotalMinutes > 0 ? noTradeRelatedChanges.Count / ChangeWindowDuration.TotalMinutes : 0;
 
             if (!noTradeRelatedChanges.Any())
             {
@@ -1388,15 +1361,15 @@ namespace SmokehouseBot.Services
             else
             {
                 double totalTradeDollar = noTradeRelatedChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = elapsedMinutes > 0 ? totalTradeDollar / elapsedMinutes : 0;
+                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalTradeDollar / ChangeWindowDuration.TotalMinutes : 0;
                 _logger.LogDebug("tradeVolumePerMinute_No for {MarketTicker}: TotalTradeDollar={TotalTradeDollar:F2}, Minutes={Minutes:F2}, Rate={Rate:F2}, Volume={Volume:F2} dollars/minute",
-                    _marketTicker, totalTradeDollar, elapsedMinutes, rate, volume);
+                    _marketTicker, totalTradeDollar, ChangeWindowDuration.TotalMinutes, rate, volume);
             }
 
             return (Math.Round(rate, 2), volume);
         }
 
-        public double GetAverageTradeSize_MakerYes(List<OrderbookChange> tradeEvents, double elapsedMinutes)
+        public double GetAverageTradeSize_MakerYes(List<OrderbookChange> tradeEvents)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -1424,7 +1397,7 @@ namespace SmokehouseBot.Services
             return Math.Round(averageDollar, 2);
         }
 
-        public double GetAverageTradeSize_MakerNo(List<OrderbookChange> tradeEvents, double elapsedMinutes)
+        public double GetAverageTradeSize_MakerNo(List<OrderbookChange> tradeEvents)
         {
             if (_cancellationToken.IsCancellationRequested)
             {

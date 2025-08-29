@@ -82,3 +82,5 @@ SimulatorGUI/SimulatorGUI.csproj.Backup.tmp
 KalshiUI/bin/Debug/net8.0-windows/appsettings.local.json
 /TradingGUI/bin
 /TradingGUI/obj
+/KalshiBotAPI/obj
+/KalshiBotOverseer/obj

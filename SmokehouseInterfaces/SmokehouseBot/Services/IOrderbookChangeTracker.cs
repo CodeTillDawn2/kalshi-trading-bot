@@ -20,12 +20,12 @@ namespace SmokehouseBot.Services.Interfaces
         (double Volume, int Levels) GetBottomYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges,  int threshold);
         (double Volume, int Levels) GetTopNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges,  int threshold);
         (double Volume, int Levels) GetTopYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges,  int threshold);
-        (double Volume, int Count) GetYesNetOrderVolumePerMinute(List<OrderbookChange> yesBidChanges, double minutes);
-        (double Volume, int Count) GetNoNetOrderVolumePerMinute(List<OrderbookChange> noBidChanges, double minutes);
-        (double rate, double volume) GetTradeRatePerMinute_MakerYes(List<OrderbookChange> yesTradeRelatedChanges, double elapsedMinutes);
-        (double rate, double volume) GetTradeRatePerMinute_MakerNo(List<OrderbookChange> noTradeRelatedChanges, double elapsedMinutes);
-        double GetAverageTradeSize_MakerYes(List<OrderbookChange> tradeEvents, double elapsedMinutes);
-        double GetAverageTradeSize_MakerNo(List<OrderbookChange> tradeEvents, double elapsedMinutes);
+        (double Volume, int Count) GetYesNetOrderVolumePerMinute(List<OrderbookChange> yesBidChanges);
+        (double Volume, int Count) GetNoNetOrderVolumePerMinute(List<OrderbookChange> noBidChanges);
+        (double rate, double volume) GetTradeRatePerMinute_MakerYes(List<OrderbookChange> yesTradeRelatedChanges);
+        (double rate, double volume) GetTradeRatePerMinute_MakerNo(List<OrderbookChange> noTradeRelatedChanges);
+        double GetAverageTradeSize_MakerYes(List<OrderbookChange> tradeEvents);
+        double GetAverageTradeSize_MakerNo(List<OrderbookChange> tradeEvents);
         int GetTradeCount_MakerYes();
         int GetTradeCount_MakerNo();
         int GetTopLevels(List<OrderbookData> Bids, int lowerBound);

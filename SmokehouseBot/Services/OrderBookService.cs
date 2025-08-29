@@ -766,11 +766,7 @@ namespace SmokehouseBot.Services
             try
             {
                 OrderbookData orderData;
-                int price = message.Price.Value;
-                if (message.Side == "no")
-                {
-                    price = 100 - price;
-                }
+
                 var lockObj = _orderbookLocks.GetOrAdd(marketTicker, _ => new object());
                 lock (lockObj)
                 {
@@ -806,7 +802,7 @@ namespace SmokehouseBot.Services
                     if (message.Delta.Value <= 0 && orderData == null)
                     {
                         _logger.LogWarning(new OrderbookTransientFailureException(marketTicker, "DELTA-Received non-positive delta for non-existent level"),
-                            "DELTA-Received non-positive delta for non-existent level: {MarketTicker}, Price: {Price}, Side: {Side}, Delta: {Delta}, CurrentOrderBookCount: {Count}",
+                            "DELTA-Received non-positive delta for non-existent level: {MarketTicker}, Price: {message.Price}, Side: {Side}, Delta: {Delta}, CurrentOrderBookCount: {Count}",
                             marketTicker, message.Price, message.Side, message.Delta.Value, orderbook.Count);
                         return orderbook;
                     }

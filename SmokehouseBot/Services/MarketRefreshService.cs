@@ -223,7 +223,7 @@ namespace SmokehouseBot.Services
                 }
                     
             }
-            _logger.LogInformation("Refresh - Refreshed {} markets in {ElapsedMinutes} minutes", $"{MarketsRefreshed}/{watchedMarkets.Count}", Math.Round((double)stopwatch.ElapsedMilliseconds / 1000 / 60, 2));
+            _logger.LogInformation("Refresh - Refreshed {} markets in {ChangeWindowDuration.TotalMinutes} minutes", $"{MarketsRefreshed}/{watchedMarkets.Count}", Math.Round((double)stopwatch.ElapsedMilliseconds / 1000 / 60, 2));
             
             
             //Additional refresh loop to utilize extra time so we aren't refreshing ALL of the low activity ones at once
@@ -258,7 +258,7 @@ namespace SmokehouseBot.Services
                         }
                     }
                 }
-                _logger.LogInformation("Refresh - Force Refreshed {0} markets in {ElapsedMinutes} minutes", ForcedRefreshCount, Math.Round((double)stopwatch.ElapsedMilliseconds / 1000 / 60, 2));
+                _logger.LogInformation("Refresh - Force Refreshed {0} markets in {ChangeWindowDuration.TotalMinutes} minutes", ForcedRefreshCount, Math.Round((double)stopwatch.ElapsedMilliseconds / 1000 / 60, 2));
             } 
             
             
