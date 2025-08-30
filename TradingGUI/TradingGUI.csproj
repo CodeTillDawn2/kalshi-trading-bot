@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="MarketDashboardControl.cs">
+    <Compile Update="SnapshotViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
   </ItemGroup>

@@ -373,103 +373,19 @@ namespace SimulatorWinForms
             if (!string.IsNullOrWhiteSpace(market))
                 await LoadChart(market);
         }
-
         private async Task LoadChart(string market)
         {
-            formsPlot1.Plot.Clear();
-            _tooltipPoints.Clear();
-
-            var baseMarket = Regex.Replace(market ?? "", @"_(\d+)$", "");
-            var canonical = Path.Combine(_cacheDir, $"{baseMarket}.json");
-
-            CachedMarketData merged = null;
-
-            if (File.Exists(canonical))
-            {
-                var json = File.ReadAllText(canonical);
-                merged = JsonSerializer.Deserialize<CachedMarketData>(json);
-            }
-            else
-            {
-                var parts = Directory.GetFiles(_cacheDir, $"{baseMarket}_*.json");
-                if (parts == null || parts.Length == 0)
-                {
-                    AppendLog($"Missing files for {baseMarket}");
-                    return;
-                }
-
-                merged = new CachedMarketData
-                {
-                    Market = baseMarket,
-                    PnL = 0,
-                    BidPoints = new List<PricePoint>(),
-                    AskPoints = new List<PricePoint>(),
-                    BuyPoints = new List<PricePoint>(),
-                    SellPoints = new List<PricePoint>(),
-                    ExitPoints = new List<PricePoint>(),
-                    EventPoints = new List<PricePoint>(),
-                    IntendedLongPoints = new List<PricePoint>(),
-                    IntendedShortPoints = new List<PricePoint>(),
-                    DiscrepancyPoints = new List<PricePoint>()  // NEW
-                };
-
-                foreach (var fp in parts)
-                {
-                    var json = File.ReadAllText(fp);
-                    var d = JsonSerializer.Deserialize<CachedMarketData>(json);
-                    if (d == null) continue;
-                    merged.PnL += d.PnL;
-                    if (d.BidPoints != null) merged.BidPoints.AddRange(d.BidPoints);
-                    if (d.AskPoints != null) merged.AskPoints.AddRange(d.AskPoints);
-                    if (d.BuyPoints != null) merged.BuyPoints.AddRange(d.BuyPoints);
-                    if (d.SellPoints != null) merged.SellPoints.AddRange(d.SellPoints);
-                    if (d.ExitPoints != null) merged.ExitPoints.AddRange(d.ExitPoints);
-                    if (d.EventPoints != null) merged.EventPoints.AddRange(d.EventPoints);
-                    if (d.IntendedLongPoints != null) merged.IntendedLongPoints.AddRange(d.IntendedLongPoints);
-                    if (d.IntendedShortPoints != null) merged.IntendedShortPoints.AddRange(d.IntendedShortPoints);
-                    if (d.DiscrepancyPoints != null) merged.DiscrepancyPoints.AddRange(d.DiscrepancyPoints);  // NEW
-                }
-
-                merged.BidPoints = merged.BidPoints.OrderBy(p => p.Date).ToList();
-                merged.AskPoints = merged.AskPoints.OrderBy(p => p.Date).ToList();
-                merged.BuyPoints = merged.BuyPoints.OrderBy(p => p.Date).ToList();
-                merged.SellPoints = merged.SellPoints.OrderBy(p => p.Date).ToList();
-                merged.ExitPoints = merged.ExitPoints.OrderBy(p => p.Date).ToList();
-                merged.EventPoints = merged.EventPoints.OrderBy(p => p.Date).ToList();
-                merged.IntendedLongPoints = merged.IntendedLongPoints.OrderBy(p => p.Date).ToList();
-                merged.IntendedShortPoints = merged.IntendedShortPoints.OrderBy(p => p.Date).ToList();
-                merged.DiscrepancyPoints = merged.DiscrepancyPoints.OrderBy(p => p.Date).ToList();  // NEW
-            }
-
-            if (merged == null)
-            {
-                AppendLog($"No data for {baseMarket}");
-                return;
-            }
-
-            AddPoints(merged.AskPoints, "Ask", Color.OrangeRed, 4, collectTooltips: false, connectLine: true);
-            AddPoints(merged.BidPoints, "Bid", Color.DodgerBlue, 4, collectTooltips: false, connectLine: true);
-            AddPoints(merged.BuyPoints, "Buy", Color.Green, 12, collectTooltips: true);
-            AddPoints(merged.SellPoints, "Sell", Color.Red, 12, collectTooltips: true);
-            AddPoints(merged.ExitPoints, "Exit", Color.Black, 12, collectTooltips: true); // NEW
-            AddPoints(merged.EventPoints, "Event", Color.Purple, 0, collectTooltips: true);
-            AddPoints(merged.DiscrepancyPoints, "Discrepancy", Color.Magenta, 8, collectTooltips: true);  // NEW
-
-            formsPlot1.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
-            formsPlot1.Plot.AxisAuto();
-            var lim = formsPlot1.Plot.GetAxisLimits();
-            double xPad = (lim.XMax - lim.XMin) * 0.05;
-            double yPad = (lim.YMax - lim.YMin) * 0.10;
-            formsPlot1.Plot.SetAxisLimits(lim.XMin - xPad, lim.XMax + xPad, lim.YMin - yPad, lim.YMax + yPad);
-
+            _lastTooltipMemo = null;
             _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Gray, 1);
             _hoverLine.IsVisible = false;
-            formsPlot1.Render();
 
-            AppendLog($"Loaded Chart for {market}");
+            _tooltipPoints = SimulatorWinForms.Charting.MarketChartRenderer.Render(
+                formsPlot1,
+                _cacheDir,
+                market,
+                AppendLog);
 
             _snapshots = await _simulator.ReturnSnapshotsForMarket(market);
-
             AppendLog($"Loaded snapshots for {market}");
         }
 

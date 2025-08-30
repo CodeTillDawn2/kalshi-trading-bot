@@ -19,7 +19,6 @@ namespace SimulatorWinForms
         public SnapshotViewer()
         {
             InitializeComponent();
-            timeframeCombo.SelectedIndexChanged += TimeframeCombo_SelectedIndexChanged;
             backButton.Click += (s, e) => BackAction?.Invoke();
         }
 
@@ -54,18 +53,6 @@ namespace SimulatorWinForms
             priceChart.Plot.Clear();
             if (historySnapshots == null || historySnapshots.Count == 0) return;
             DateTime maxTime = currentSnapshot.Timestamp;
-            TimeSpan span;
-            switch (timeframeCombo.SelectedItem?.ToString())
-            {
-                case "15 Minutes": span = TimeSpan.FromMinutes(15); break;
-                case "1 Hour": span = TimeSpan.FromHours(1); break;
-                case "1 Day": span = TimeSpan.FromDays(1); break;
-                case "3 Days": span = TimeSpan.FromDays(3); break;
-                case "1 Week": span = TimeSpan.FromDays(7); break;
-                case "1 Month": span = TimeSpan.FromDays(30); break;
-                default: span = maxTime - historySnapshots.FirstOrDefault()?.Timestamp ?? TimeSpan.Zero; break;
-            }
-            DateTime minTime = maxTime - span;
             priceChart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
             priceChart.Plot.AxisAuto();
             priceChart.Refresh();
