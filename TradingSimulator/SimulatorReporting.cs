@@ -44,7 +44,18 @@ namespace TradingSimulator.Simulator
     double shortIntervalExponent = 0.5,
     double gapThresholdMin = 1.5,
     double leakageFactor = 0.05,
-    double winsorPct = 0.2)
+    double winsorPct = 0.2,
+    // tunables from prior version
+    bool useMaxMagnitudeForThreshold = false,
+    double ratioSlack = 0.5,
+    bool hardFlagOnSignFlip = true,
+    bool suppressSpikes = true,
+    double domRatio = 0.90,
+    double gapShare = 0.85,
+    double edgeMult = 8.0,
+    // NEW: do not apply ratio rule unless |expected| >= ratioFloor
+    double ratioFloor = 0.5 // $/min
+)
         {
             var outPts = new List<PricePoint>();
             if (s == null || s.Count <= 1) return outPts;
@@ -65,12 +76,14 @@ namespace TradingSimulator.Simulator
 
                 if (windowDt <= 0) continue;
 
-                var (expYesRateWin, expNoRateWin) = ComputeExpectedFlowsWinsorized(instYesList, instNoList, winsorPct);
+                var (expYesRateWin, expNoRateWin) =
+                    ComputeExpectedFlowsWinsorized(instYesList, instNoList, winsorPct);
 
                 double scale = (windowDt < averagingWindowMin)
                     ? Math.Pow(averagingWindowMin / windowDt, shortIntervalExponent)
                     : 1.0;
 
+                // leakage tolerance
                 double toleranceYes = 0.0, toleranceNo = 0.0;
                 int oldestIncludedIndex = FindOldestIncludedIndex(i, s, averagingWindowMin, gapThresholdMin);
                 if (oldestIncludedIndex > 1)
@@ -89,54 +102,67 @@ namespace TradingSimulator.Simulator
                     }
                 }
 
-                double magYes = Math.Max(Math.Abs(expYesRateWin), Math.Abs(rollObsYes5m));
-                double magNo = Math.Max(Math.Abs(expNoRateWin), Math.Abs(rollObsNo5m));
+                // base magnitudes
+                double magYes = useMaxMagnitudeForThreshold
+                                ? Math.Max(Math.Abs(expYesRateWin), Math.Abs(rollObsYes5m))
+                                : Math.Abs(expYesRateWin);
+                double magNo = useMaxMagnitudeForThreshold
+                                ? Math.Max(Math.Abs(expNoRateWin), Math.Abs(rollObsNo5m))
+                                : Math.Abs(expNoRateWin);
 
-                double thrYes = Math.Max(magYes * relativeSlack * scale + toleranceYes,
-                                         (double)minAbsChangeToFlag / (100.0 * averagingWindowMin));
-                double thrNo = Math.Max(magNo  * relativeSlack * scale + toleranceNo,
-                                         (double)minAbsChangeToFlag / (100.0 * averagingWindowMin));
+                double floorRate = (double)minAbsChangeToFlag / (100.0 * averagingWindowMin);
 
-                bool discYes = Math.Abs(rollObsYes5m - expYesRateWin) > thrYes;
-                bool discNo = Math.Abs(rollObsNo5m  - expNoRateWin)  > thrNo;
+                double thrYes = Math.Max(magYes * relativeSlack * scale + toleranceYes, floorRate);
+                double thrNo = Math.Max(magNo  * relativeSlack * scale + toleranceNo, floorRate);
+
+                // residual tests
+                double residYes = Math.Abs(rollObsYes5m - expYesRateWin);
+                double residNo = Math.Abs(rollObsNo5m  - expNoRateWin);
+
+                // NEW: gate ratio rule by ratioFloor to avoid tiny-exp blowups
+                bool ratioHitYes = (Math.Abs(expYesRateWin) >= Math.Max(floorRate, ratioFloor)) &&
+                                   (Math.Abs(rollObsYes5m / (expYesRateWin == 0 ? 1e-9 : expYesRateWin) - 1.0) > ratioSlack);
+                bool ratioHitNo = (Math.Abs(expNoRateWin)  >= Math.Max(floorRate, ratioFloor)) &&
+                                   (Math.Abs(rollObsNo5m  / (expNoRateWin  == 0 ? 1e-9 : expNoRateWin)  - 1.0) > ratioSlack);
+
+                bool signFlipYes = hardFlagOnSignFlip &&
+                                   (Math.Sign(rollObsYes5m) != Math.Sign(expYesRateWin)) &&
+                                   (Math.Max(Math.Abs(rollObsYes5m), Math.Abs(expYesRateWin)) >= floorRate);
+                bool signFlipNo = hardFlagOnSignFlip &&
+                                   (Math.Sign(rollObsNo5m) != Math.Sign(expNoRateWin)) &&
+                                   (Math.Max(Math.Abs(rollObsNo5m), Math.Abs(expNoRateWin))  >= floorRate);
+
+                bool discYes = (residYes > thrYes) || ratioHitYes || signFlipYes;
+                bool discNo = (residNo  > thrNo)  || ratioHitNo  || signFlipNo;
 
                 if (!(discYes || discNo)) continue;
 
-                // ----- Spike-driven suppression -----
-                // params
-                const double DOM_RATIO = 0.75;  // Rule A
-                const double GAP_SHARE = 0.70;  // Rule B
-                const double EDGE_MULT = 5.0;   // Rule C
-
+                // spike-driven suppression (parametric)
                 bool Suppress(List<double> flows, double obsRate, double expRate)
                 {
-                    if (flows == null || flows.Count == 0) return false;
+                    if (!suppressSpikes || flows == null || flows.Count == 0) return false;
 
                     double net = flows.Sum();
                     if (Math.Abs(net) < 1e-12) return false;
 
-                    int m = 0;
-                    double maxAbs = double.NegativeInfinity;
+                    int m = 0; double maxAbs = double.NegativeInfinity;
                     for (int k = 0; k < flows.Count; k++)
                     {
                         double v = Math.Abs(flows[k]);
                         if (v > maxAbs) { maxAbs = v; m = k; }
                     }
-
-                    bool ruleA = (Math.Abs(flows[m]) / Math.Abs(net) >= DOM_RATIO) &&
+                    bool ruleA = (Math.Abs(flows[m]) / Math.Abs(net) >= domRatio) &&
                                  (Math.Sign(flows[m]) == Math.Sign(net));
 
                     double avgRaw = flows.Average();
-                    // winsorized avg already used as expRate
                     double gapCents = Math.Abs((avgRaw - expRate) * windowDt * 100.0);
-                    double residCents = Math.Abs(((obsRate - expRate) * windowDt * 100.0));
-                    bool ruleB = residCents > 0 && (gapCents / residCents >= GAP_SHARE);
+                    double residCents = Math.Abs((obsRate - expRate) * windowDt * 100.0);
+                    bool ruleB = residCents > 0 && (gapCents / residCents >= gapShare);
 
-                    // Edge spike if dominant minute is first or last and far above median|flow|
                     var absSorted = flows.Select(Math.Abs).OrderBy(x => x).ToArray();
                     double medianAbs = absSorted[absSorted.Length / 2];
                     bool isEdge = (m == 0 || m == flows.Count - 1);
-                    bool ruleC = isEdge && (Math.Abs(flows[m]) >= EDGE_MULT * (medianAbs <= 1e-12 ? 1.0 : medianAbs));
+                    bool ruleC = isEdge && (Math.Abs(flows[m]) >= edgeMult * (medianAbs <= 1e-12 ? 1.0 : medianAbs));
 
                     return ruleA || ruleB || ruleC;
                 }
@@ -147,7 +173,6 @@ namespace TradingSimulator.Simulator
                 if (suppressYes && !discNo) continue;
                 if (suppressNo  && !discYes) continue;
                 if (suppressYes && suppressNo) continue;
-                // -----------------------------------
 
                 double expDepthYesC = expYesRateWin * windowDt * 100.0;
                 double expDepthNoC = expNoRateWin  * windowDt * 100.0;
@@ -171,7 +196,6 @@ namespace TradingSimulator.Simulator
 
             return outPts;
         }
-
 
         // Winsorized expected flows per window (clip extremes at percentile bounds, then average)
         private static (double expYes, double expNo) ComputeExpectedFlowsWinsorized(
