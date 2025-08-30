@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿// MainForm.cs: Full class with restored tooltip/hover (black line), back button fix via BackAction, and axis restore on back
+using System.Text.Json;
 using TradingSimulator.Simulator;
 using TradingSimulator.TestObjects;
 using System.Text.RegularExpressions;
@@ -20,6 +21,8 @@ namespace SimulatorWinForms
         private readonly Dictionary<string, double> _bestPnL = new(StringComparer.OrdinalIgnoreCase);
 
         List<MarketSnapshot> _snapshots = new();
+
+        private (double xMin, double xMax, double yMin, double yMax) _savedChartLimits;
 
         public MainForm()
         {
@@ -65,8 +68,8 @@ namespace SimulatorWinForms
                 _tooltipOverlay.MaximumSize = new Size(dgvMarkets.Width - 16, 0);
             };
 
-            // thin vertical hover indicator (no pattern property in this ScottPlot version)
-            _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Gray, 1);
+            // thin vertical hover indicator (black now)
+            _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Black, 1);
             _hoverLine.IsVisible = false;
 
             // wire a MouseDown handler to allow swapping the chart with the dashboard on click
@@ -174,54 +177,17 @@ namespace SimulatorWinForms
                         }
                     }
                 }
-                else
+
+                foreach (var b in bases.OrderBy(b => b))
                 {
-                    AppendLog($"Missing cache directory: {_cacheDir} (entries still loaded from snapshots).");
+                    var row = dgvMarkets.Rows.Add(false, b, pnlByBase.TryGetValue(b, out var pnl) ? pnl.ToString("F2") : "");
+                    dgvMarkets.Rows[row].Cells["CheckedCol"].Value = _checkedMarketNames.Contains(b);
                 }
-
-                foreach (var b in bases)
-                {
-                    string pnlText = pnlByBase.TryGetValue(b, out var pnl) ? pnl.ToString("F2") : "";
-                    dgvMarkets.Rows.Add(_checkedMarketNames.Contains(b), b, pnlText);
-                }
-
-                AppendLog($"Loaded {bases.Count} valid markets from snapshot groups (cache used only for PnL if available).");
-
-                RestoreCheckboxes();
             }
             catch (Exception ex)
             {
-                AppendLog($"Market load failed: {ex.Message}");
+                AppendLog($"LoadCache failed: {ex}");
             }
-        }
-
-        private void EnsureSimulatorSetup()
-        {
-            if (_simSetup) return;
-            _simulator.Setup();
-            _simSetup = true;
-        }
-
-        private List<string> GetCheckedMarkets()
-        {
-            return _checkedMarketNames.ToList();
-        }
-
-        private void dgvMarkets_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex < 0 || dgvMarkets.Columns[e.ColumnIndex].Name != "CheckedCol")
-                return;
-
-            var row = dgvMarkets.Rows[e.RowIndex];
-            var isChecked = Convert.ToBoolean(row.Cells["CheckedCol"].Value);
-            var marketName = row.Cells["Market"].Value?.ToString();
-
-            if (marketName == null) return;
-
-            if (isChecked)
-                _checkedMarketNames.Add(marketName);
-            else
-                _checkedMarketNames.Remove(marketName);
         }
 
         private void RestoreCheckboxes()
@@ -234,23 +200,30 @@ namespace SimulatorWinForms
             }
         }
 
-
-        private void AddPoints(List<PricePoint> pts, string fallbackLabel, Color color, int size, bool collectTooltips, bool connectLine = false)
+        private void dgvMarkets_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            if (pts == null || pts.Count == 0) return;
-
-            double[] xs = pts.Select(p => p.Date.ToOADate()).ToArray();
-            double[] ys = pts.Select(p => (double)p.Price).ToArray();
-
-            formsPlot1.Plot.AddScatter(xs, ys, color, markerSize: size, lineWidth: connectLine ? 1 : 0);
-
-            if (!collectTooltips) return;
-
-            for (int i = 0; i < pts.Count; i++)
+            if (e.ColumnIndex == dgvMarkets.Columns["CheckedCol"].Index)
             {
-                string memo = string.IsNullOrWhiteSpace(pts[i].Memo) ? fallbackLabel : pts[i].Memo.Trim();
-                _tooltipPoints.Add((xs[i], ys[i], memo));
+                var marketName = dgvMarkets.Rows[e.RowIndex].Cells["Market"].Value?.ToString();
+                if (marketName == null) return;
+
+                if ((bool)dgvMarkets.Rows[e.RowIndex].Cells["CheckedCol"].Value)
+                    _checkedMarketNames.Add(marketName);
+                else
+                    _checkedMarketNames.Remove(marketName);
             }
+        }
+
+        private List<string> GetCheckedMarkets()
+        {
+            return _checkedMarketNames.ToList();
+        }
+
+        private void EnsureSimulatorSetup()
+        {
+            if (_simSetup) return;
+            _simulator.Setup();
+            _simSetup = true;
         }
 
         private void FormsPlot1_MouseMove(object sender, MouseEventArgs e)
@@ -296,7 +269,8 @@ namespace SimulatorWinForms
         {
             _tooltipOverlay.Visible = false;
             _lastTooltipMemo = null;
-            _hoverLine.IsVisible = false;
+            if (_hoverLine != null)
+                _hoverLine.IsVisible = false;
             formsPlot1.Render();
         }
 
@@ -376,14 +350,16 @@ namespace SimulatorWinForms
         private async Task LoadChart(string market)
         {
             _lastTooltipMemo = null;
-            _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Gray, 1);
-            _hoverLine.IsVisible = false;
 
             _tooltipPoints = SimulatorWinForms.Charting.MarketChartRenderer.Render(
                 formsPlot1,
                 _cacheDir,
                 market,
                 AppendLog);
+
+            _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Black, 1);
+            _hoverLine.IsVisible = false;
+            formsPlot1.Refresh();  // Ensure the plot is refreshed after adding the line
 
             _snapshots = await _simulator.ReturnSnapshotsForMarket(market);
             AppendLog($"Loaded snapshots for {market}");
@@ -451,7 +427,7 @@ namespace SimulatorWinForms
         }
 
         /// <summary>
-        /// Replaces the right-side panel content with a new MarketDashboardControl.
+        /// Replaces the right-side panel content with a new SnapshotViewer.
         /// If one already exists, it is reused. This allows users to view a richer
         /// set of data and controls similar to the provided HTML dashboard when they
         /// click on the chart.
@@ -459,14 +435,26 @@ namespace SimulatorWinForms
         /// <param name="xOADate">The x-coordinate of the click in OADate time.</param>
         private void ShowDashboardAt(double xOADate)
         {
-            // Attempt to reuse an existing dashboard control stored in the Tag property
+            _savedChartLimits = (formsPlot1.Plot.GetAxisLimits().XMin, formsPlot1.Plot.GetAxisLimits().XMax, formsPlot1.Plot.GetAxisLimits().YMin, formsPlot1.Plot.GetAxisLimits().YMax);
+
             if (rightPane.Tag is not SnapshotViewer dashboard)
             {
                 dashboard = new SnapshotViewer();
                 rightPane.Tag = dashboard;
             }
 
-            // Clear current content and insert dashboard
+            dashboard.CacheDir = _cacheDir;  // Pass the cache directory
+
+            // Find the closest snapshot to the clicked xOADate (implement based on your _snapshots)
+            DateTime clickedTime = DateTime.FromOADate(xOADate);
+            MarketSnapshot closest = _snapshots.OrderBy(s => Math.Abs((s.Timestamp - clickedTime).TotalSeconds)).FirstOrDefault();
+            List<MarketSnapshot> history = _snapshots;  // Or filter as needed
+
+            dashboard.Populate(closest, history);
+
+            // Set back action to switch back to chart
+            dashboard.BackAction = ShowChart;
+
             rightPane.SuspendLayout();
             rightPane.Controls.Clear();
             dashboard.Dock = DockStyle.Fill;
@@ -476,6 +464,22 @@ namespace SimulatorWinForms
             AppendLog("Switched right pane to dashboard view.");
         }
 
+        /// <summary>
+        /// Switches the right pane back to the chart view and restores the previous axis limits.
+        /// </summary>
+        private void ShowChart()
+        {
+            rightPane.SuspendLayout();
+            rightPane.Controls.Clear();
+            formsPlot1.Dock = DockStyle.Fill;
+            rightPane.Controls.Add(formsPlot1);
+            rightPane.ResumeLayout();
+
+            formsPlot1.Plot.SetAxisLimits(_savedChartLimits.xMin, _savedChartLimits.xMax, _savedChartLimits.yMin, _savedChartLimits.yMax);
+            formsPlot1.Refresh();
+
+            AppendLog("Switched back to chart view.");
+        }
 
     }
 }

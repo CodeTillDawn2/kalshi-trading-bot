@@ -1,4 +1,5 @@
-﻿using SmokehouseDTOs;
+﻿// MarketChartRenderer.cs (full file with modifications: adjusted per-series collectTooltips to match old behavior)
+using SmokehouseDTOs;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TradingSimulator.TestObjects;
@@ -11,10 +12,11 @@ namespace SimulatorWinForms.Charting
             ScottPlot.FormsPlot plot,
             string cacheDir,
             string market,
-            Action<string> log)
+            Action<string> log,
+            bool collectTooltips = true)  // Optional, but we'll override per series to match old
         {
             plot.Plot.Clear();
-            var tooltipPoints = new List<(double x, double y, string memo)>();
+            var tooltipPoints = collectTooltips ? new List<(double x, double y, string memo)>() : null;
 
             var baseMarket = Regex.Replace(market ?? "", @"_(\d+)$", "");
             var canonical = Path.Combine(cacheDir, $"{baseMarket}.json");
@@ -31,7 +33,7 @@ namespace SimulatorWinForms.Charting
                 if (parts == null || parts.Length == 0)
                 {
                     log?.Invoke($"Missing files for {baseMarket}");
-                    return tooltipPoints;
+                    return tooltipPoints ?? new List<(double x, double y, string memo)>();
                 }
 
                 merged = new CachedMarketData
@@ -79,9 +81,10 @@ namespace SimulatorWinForms.Charting
             if (merged == null)
             {
                 log?.Invoke($"No data for {baseMarket}");
-                return tooltipPoints;
+                return tooltipPoints ?? new List<(double x, double y, string memo)>();
             }
 
+            // Match old behavior: no tooltips for lines (Ask, Bid), yes for points
             Add(plot, merged.AskPoints, "Ask", Color.OrangeRed, 4, false, true, tooltipPoints);
             Add(plot, merged.BidPoints, "Bid", Color.DodgerBlue, 4, false, true, tooltipPoints);
             Add(plot, merged.BuyPoints, "Buy", Color.Green, 12, true, false, tooltipPoints);
@@ -100,7 +103,7 @@ namespace SimulatorWinForms.Charting
             plot.Render();
             log?.Invoke($"Loaded Chart for {market}");
 
-            return tooltipPoints;
+            return tooltipPoints ?? new List<(double x, double y, string memo)>();
         }
 
         private static void Add(
@@ -120,7 +123,7 @@ namespace SimulatorWinForms.Charting
 
             plot.Plot.AddScatter(xs, ys, color, markerSize: size, lineWidth: connectLine ? 1 : 0);
 
-            if (!collectTooltips) return;
+            if (!collectTooltips || tooltipPoints == null) return;
 
             for (int i = 0; i < pts.Count; i++)
             {
