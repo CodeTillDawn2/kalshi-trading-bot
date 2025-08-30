@@ -1,7 +1,4 @@
-﻿// SimulatorTests.cs
-// Unified discrepancy detection using winsorized window-expected flows (same basis as observed)
-
-using KalshiBotData.Data;
+﻿using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -35,17 +32,16 @@ namespace TradingSimulator.Simulator
     {
         private readonly string _cacheDirectory = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
 
-        public List<PricePoint> DetectDiscrepancies(
+        public List<PricePoint> DetectVelocityDiscrepancies(
     List<MarketSnapshot> s,
+    bool CreateLog,
     double relativeSlack = 1.5,
     double averagingWindowMin = 5.0,
     int minAbsChangeToFlag = 500,
-    int minAbsChangeOnZeroVelocity = 100, // unused; kept for signature compatibility
     double shortIntervalExponent = 0.5,
     double gapThresholdMin = 1.5,
     double leakageFactor = 0.05,
     double winsorPct = 0.2,
-    // tunables from prior version
     bool useMaxMagnitudeForThreshold = false,
     double ratioSlack = 0.5,
     bool hardFlagOnSignFlip = true,
@@ -53,7 +49,6 @@ namespace TradingSimulator.Simulator
     double domRatio = 0.90,
     double gapShare = 0.85,
     double edgeMult = 8.0,
-    // NEW: do not apply ratio rule unless |expected| >= ratioFloor
     double ratioFloor = 0.5 // $/min
 )
         {
@@ -119,7 +114,7 @@ namespace TradingSimulator.Simulator
                 double residYes = Math.Abs(rollObsYes5m - expYesRateWin);
                 double residNo = Math.Abs(rollObsNo5m  - expNoRateWin);
 
-                // NEW: gate ratio rule by ratioFloor to avoid tiny-exp blowups
+                // Gate ratio rule by ratioFloor to avoid tiny-exp blowups
                 bool ratioHitYes = (Math.Abs(expYesRateWin) >= Math.Max(floorRate, ratioFloor)) &&
                                    (Math.Abs(rollObsYes5m / (expYesRateWin == 0 ? 1e-9 : expYesRateWin) - 1.0) > ratioSlack);
                 bool ratioHitNo = (Math.Abs(expNoRateWin)  >= Math.Max(floorRate, ratioFloor)) &&
@@ -191,7 +186,8 @@ namespace TradingSimulator.Simulator
                     expDepthYesC, expDepthNoC);
 
                 outPts.Add(new PricePoint(curr.Timestamp, (curr.BestYesBid + curr.BestYesAsk) / 2.0, memo));
-                AppendDiscrepancyLog(curr.MarketTicker ?? "UnknownMarket", memo);
+                if (CreateLog)
+                    AppendDiscrepancyLog(curr.MarketTicker ?? "UnknownMarket", memo);
             }
 
             return outPts;
@@ -284,7 +280,9 @@ namespace TradingSimulator.Simulator
 
         private void AppendDiscrepancyLog(string marketTicker, string memo)
         {
-            string logPath = Path.Combine(_cacheDirectory, "discrepancies.log");
+            string timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+            string logFilename = $"discrepancies_{timestamp}.log";
+            string logPath = Path.Combine(_cacheDirectory, logFilename);
             File.AppendAllText(logPath, $"Market: {marketTicker}\n{memo}\n\n");
         }
 

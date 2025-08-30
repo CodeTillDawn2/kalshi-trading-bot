@@ -177,6 +177,7 @@ namespace TradingSimulator.Simulator
          IServiceScopeFactory scopeFactory,
          string progressPrefix = "",
          bool writeToFile = false,
+         bool detectVelocityDiscrepancies = false,
          SnapshotGroupDTO? group = null,
          bool ignoreProcessedCache = false)
         {
@@ -192,10 +193,13 @@ namespace TradingSimulator.Simulator
                 var helper = new MarketTypeHelper();
                 foreach (var s in marketSnapshots) s.MarketType = helper.GetMarketType(s).ToString();
 
-                // NEW: Detect discrepancies
-                var discrepancyPoints = _simulatorReporting.DetectDiscrepancies(marketSnapshots);
-                OnTestProgress?.Invoke($"{progressPrefix}Detected {discrepancyPoints.Count} orderbook discrepancies in {marketTicker}.");
-
+                // Detect discrepancies
+                List<PricePoint> discrepancyPoints = new List<PricePoint>();
+                if (detectVelocityDiscrepancies)
+                {
+                    discrepancyPoints = _simulatorReporting.DetectVelocityDiscrepancies(marketSnapshots, writeToFile);
+                    OnTestProgress?.Invoke($"{progressPrefix}Detected {discrepancyPoints.Count} orderbook discrepancies in {marketTicker}.");
+                }
                 var scenario = new Scenario(strategiesDict);
                 var pathData = await Task.Run(() => _overseer.TestScenario(scenario, marketSnapshots, writeToFile, 100, group));
 
@@ -372,7 +376,7 @@ namespace TradingSimulator.Simulator
                     await ProcessMarketAsync(
                         market, marketSnapshots, strategies, _scopeFactory,
                         progressPrefix: $"[{label}/{dto.StrategyName}] ",
-                        writeToFile: writeToFile, group: groupForId,
+                        writeToFile: writeToFile, detectVelocityDiscrepancies: true, group: groupForId,
                         ignoreProcessedCache: true).ConfigureAwait(false);
 
                 totalDiscrepancies += disc?.Count ?? 0;
@@ -594,7 +598,7 @@ namespace TradingSimulator.Simulator
                         await ProcessMarketAsync(
                             market, marketSnapshots, strategies, _scopeFactory,
                             progressPrefix: $"[{label}/{dto.StrategyName}] ",
-                            writeToFile: writeToFile, group: groupForId,
+                            writeToFile: writeToFile, detectVelocityDiscrepancies: false, group: groupForId,
                             ignoreProcessedCache: true).ConfigureAwait(false);
 
                     totalDiscrepancies += disc?.Count ?? 0;
