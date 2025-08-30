@@ -6,31 +6,34 @@ using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs.KalshiAPI;
+using System.Threading;
 
 namespace KalshiBotOverseer
 {
     public class WebSocketMonitorServiceLite : IWebSocketMonitorService
     {
-        private readonly ILogger<IWebSocketMonitorService> _logger;
+        private readonly ILogger<WebSocketMonitorServiceLite> _logger;
         private bool _isConnected = false;
         private Task _monitorTask;
-        private readonly IScopeManagerService _scopeManagerService;
-        private IStatusTrackerService _statusTrackerService;
+        private readonly IServiceScopeFactory _scopeFactory;
         private IKalshiWebSocketClient _webSocketClient;
 
         private bool _exchangeStatus;
         private bool _tradingStatus;
         private DateTime _lastWebSocketTimestamp;
 
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
+        public CancellationToken CancellationToken { get; private set; }
+
         public WebSocketMonitorServiceLite(
-            ILogger<IWebSocketMonitorService> logger,
+            ILogger<WebSocketMonitorServiceLite> logger,
             IKalshiWebSocketClient webSocketClient,
-            IScopeManagerService scopeManagerService,
-            IStatusTrackerService statusTrackerService)
+            IServiceScopeFactory scopeFactory)
         {
-            _scopeManagerService = scopeManagerService;
+            CancellationToken = _cancellationTokenSource.Token;
+            _scopeFactory = scopeFactory;
             _webSocketClient = webSocketClient;
-            _statusTrackerService = statusTrackerService;
             _logger = logger;
             _logger.LogDebug("WebSocketMonitorServiceLite instance created");
         }
@@ -40,13 +43,11 @@ namespace KalshiBotOverseer
             _logger.LogDebug("WebSocketMonitorServiceLite starting...");
             try
             {
-                _logger.LogDebug("Initial cache state: InitializationCompleted.IsCompleted={IsCompleted}", _statusTrackerService.InitializationCompleted.Task.IsCompleted);
-
                 _logger.LogDebug("Starting exchange status monitoring...");
                 _monitorTask = Task.Run(async () =>
                 {
                     await MonitorExchangeStatusAsync();
-                }, _statusTrackerService.GetCancellationToken());
+                }, CancellationToken);
                 _logger.LogDebug("Started exchange status monitoring");
             }
             catch (Exception ex)
@@ -59,7 +60,8 @@ namespace KalshiBotOverseer
 
         public async Task StopServicesAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("WebSocketMonitorServiceLite.StopAsync called at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, _statusTrackerService.GetCancellationToken().IsCancellationRequested);
+            _logger.LogInformation("WebSocketMonitorServiceLite.StopAsync called at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow,
+                CancellationToken.IsCancellationRequested);
             try
             {
                 if (_isConnected)
@@ -112,12 +114,13 @@ namespace KalshiBotOverseer
 
         private async Task MonitorExchangeStatusAsync(bool immediate = false)
         {
-            _logger.LogDebug("MonitorExchangeStatusAsync started at {0}, Immediate={Immediate}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, immediate, _statusTrackerService.GetCancellationToken().IsCancellationRequested);
+            _logger.LogDebug("MonitorExchangeStatusAsync started at {0}, Immediate={Immediate}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, immediate, 
+                CancellationToken.IsCancellationRequested);
             try
             {
                 if (!immediate)
                 {
-                    while (!_statusTrackerService.GetCancellationToken().IsCancellationRequested)
+                    while (!CancellationToken.IsCancellationRequested)
                     {
                         try
                         {
@@ -129,7 +132,7 @@ namespace KalshiBotOverseer
                             _tradingStatus = status.trading_active;
                             _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _exchangeStatus, _tradingStatus);
 
-                            if (status.exchange_active && !_isConnected && _statusTrackerService.InitializationCompleted.Task.IsCompleted)
+                            if (status.exchange_active && !_isConnected)
                             {
                                 _logger.LogInformation("Exchange is active, connecting WebSocket");
                                 var client = _webSocketClient;
@@ -152,7 +155,7 @@ namespace KalshiBotOverseer
                                 _logger.LogWarning("WebSocket connection reset due to inactive exchange, will try again in one minute");
                             }
 
-                            await Task.Delay(TimeSpan.FromMinutes(1), _statusTrackerService.GetCancellationToken()).ConfigureAwait(false);
+                            await Task.Delay(TimeSpan.FromMinutes(1), CancellationToken).ConfigureAwait(false);
                         }
                         catch (OperationCanceledException)
                         {
@@ -165,7 +168,7 @@ namespace KalshiBotOverseer
                             _isConnected = false;
                             _exchangeStatus = false;
                             _tradingStatus = false;
-                            await Task.Delay(TimeSpan.FromMinutes(5), _statusTrackerService.GetCancellationToken()).ConfigureAwait(false);
+                            await Task.Delay(TimeSpan.FromMinutes(5), CancellationToken).ConfigureAwait(false);
                         }
                     }
                 }
@@ -179,9 +182,9 @@ namespace KalshiBotOverseer
                         ExchangeStatus status = await apiService.GetExchangeStatusAsync();
                         _exchangeStatus = status.exchange_active;
                         _tradingStatus = status.trading_active;
-                        _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _serviceFactory.GetDataCache().ExchangeStatus, _serviceFactory.GetDataCache().TradingStatus);
+                        _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _exchangeStatus, _tradingStatus);
 
-                        if (status.exchange_active && !_isConnected && _statusTrackerService.InitializationCompleted.Task.IsCompleted)
+                        if (status.exchange_active && !_isConnected)
                         {
                             _logger.LogInformation("Exchange is active, connecting WebSocket");
                             var client = _webSocketClient;
@@ -223,7 +226,8 @@ namespace KalshiBotOverseer
             }
             finally
             {
-                _logger.LogDebug("MonitorExchangeStatusAsync completed at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, _statusTrackerService.GetCancellationToken().IsCancellationRequested);
+                _logger.LogDebug("MonitorExchangeStatusAsync completed at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, 
+                    CancellationToken.IsCancellationRequested);
             }
         }
     }

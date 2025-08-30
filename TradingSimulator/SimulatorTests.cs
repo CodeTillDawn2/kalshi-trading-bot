@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using NUnit.Framework.Constraints;
 using SmokehouseBot.Configuration;
 using SmokehouseBot.Management;
 using SmokehouseBot.Management.Interfaces;
@@ -261,12 +262,15 @@ namespace TradingSimulator.Simulator
         }
 
 
-        private (double RollObsYes5m, double RollObsNo5m, double RollObsYesWin, double RollObsNoWin, double WindowDt, string GapNote)
-          ComputeRollingObs(MarketSnapshot curr, List<MarketSnapshot> fullSnapshots, double averagingWindowMin, double gapThresholdMin)
+        // Returns rolling averages and aggregated depth deltas across the window.
+        // Signature now returns windowDy, windowDn for correct 5‑minute window calculations.
+        private (double RollObsYes5m, double RollObsNo5m, double RollObsYesWin, double RollObsNoWin,
+                double WindowDt, string GapNote, double WindowDy, double WindowDn)
+            ComputeRollingObs(MarketSnapshot curr, List<MarketSnapshot> fullSnapshots,
+                              double averagingWindowMin, double gapThresholdMin)
         {
-            // Find the index of curr in fullSnapshots (assuming sorted list)
             int currIndex = fullSnapshots.IndexOf(curr);
-            if (currIndex < 1) return (0, 0, 0, 0, 0, "Insufficient data");
+            if (currIndex < 1) return (0, 0, 0, 0, 0, "Insufficient data", 0, 0);
 
             DateTime windowStart = curr.Timestamp.AddMinutes(-averagingWindowMin);
             double windowDt = 0.0;
@@ -274,60 +278,46 @@ namespace TradingSimulator.Simulator
             double windowDn = 0.0;
             string gapNote = string.Empty;
 
-            // Start from the immediate previous and extend backward
             int j = currIndex;
             while (j > 0 && fullSnapshots[j - 1].Timestamp >= windowStart)
             {
                 var prev = fullSnapshots[j - 1];
-                double dtMin = (curr.Timestamp - prev.Timestamp).TotalMinutes;  // Note: Use curr for dt in loop? No, pairwise.
                 double pairDt = (fullSnapshots[j].Timestamp - prev.Timestamp).TotalMinutes;
-
                 if (pairDt > gapThresholdMin)
                 {
                     gapNote = $"Gap of {pairDt:0.##} min detected; change rolling off from {prev.Timestamp:yyyy-MM-ddTHH:mm:ss.fffffffK}.";
                     break;
                 }
-                if (prev.Timestamp < windowStart)
-                {
-                    break;
-                }
+                if (prev.Timestamp < windowStart) break;
 
                 double dy = fullSnapshots[j].TotalOrderbookDepth_Yes - prev.TotalOrderbookDepth_Yes;
-                double dn = fullSnapshots[j].TotalOrderbookDepth_No - prev.TotalOrderbookDepth_No;
+                double dn = fullSnapshots[j].TotalOrderbookDepth_No  - prev.TotalOrderbookDepth_No;
 
                 windowDy += dy;
                 windowDn += dn;
                 windowDt += pairDt;
-
                 j--;
             }
 
             double rollObsYes5m = (windowDt > 0) ? (windowDy / 100.0) / windowDt : 0.0;
-            double rollObsNo5m = (windowDt > 0) ? (windowDn / 100.0) / windowDt : 0.0;
-            // Assuming RollObsWin is equivalent to 5m for this window size; adjust if Win differs
+            double rollObsNo5m = (windowDt > 0) ? (windowDn  / 100.0) / windowDt : 0.0;
             double rollObsYesWin = rollObsYes5m;
             double rollObsNoWin = rollObsNo5m;
 
-            return (rollObsYes5m, rollObsNo5m, rollObsYesWin, rollObsNoWin, windowDt, gapNote);
+            return (rollObsYes5m, rollObsNo5m, rollObsYesWin, rollObsNoWin, windowDt, gapNote, windowDy, windowDn);
         }
 
 
-        // Add this method to the SimulatorTests class if not already present
-        private void AppendDiscrepancyLog(string marketTicker, string memo)
-        {
-            string logPath = Path.Combine(_cacheDirectory, "discrepancies.log");  // Or a per-market file if preferred
-            File.AppendAllText(logPath, $"Market: {marketTicker}\n{memo}\n\n");
-        }
-
+        // Detect discrepancies: destructure the new return values and pass the correct windowDy/windowDn to GenerateMemo.
         private List<PricePoint> DetectDiscrepancies(
-    List<MarketSnapshot> s,
-    double relativeSlack = 1.5,
-    double averagingWindowMin = 5.0,
-    int minAbsChangeToFlag = 500,
-    int minAbsChangeOnZeroVelocity = 100,
-    double shortIntervalExponent = 0.5,
-    double gapThresholdMin = 1.5,
-    double leakageFactor = 0.05)  // New parameter: Fraction for potential edge leakage (e.g., delay/max_interval)
+            List<MarketSnapshot> s,
+            double relativeSlack = 1.5,
+            double averagingWindowMin = 5.0,
+            int minAbsChangeToFlag = 500,
+            int minAbsChangeOnZeroVelocity = 100,
+            double shortIntervalExponent = 0.5,
+            double gapThresholdMin = 1.5,
+            double leakageFactor = 0.05)
         {
             var outPts = new List<PricePoint>();
             if (s == null || s.Count <= 1) return outPts;
@@ -336,23 +326,20 @@ namespace TradingSimulator.Simulator
             {
                 var curr = s[i];
                 var prev = s[i - 1];
-
                 if (!curr.ChangeMetricsMature) continue;
 
                 double dtMin = (curr.Timestamp - prev.Timestamp).TotalMinutes;
                 if (dtMin <= 0) continue;
 
                 double dy = curr.TotalOrderbookDepth_Yes - prev.TotalOrderbookDepth_Yes;
-                double dn = curr.TotalOrderbookDepth_No - prev.TotalOrderbookDepth_No;
+                double dn = curr.TotalOrderbookDepth_No  - prev.TotalOrderbookDepth_No;
 
                 double vYes = curr.VelocityPerMinute_Top_Yes_Bid + curr.VelocityPerMinute_Bottom_Yes_Bid;
-                double vNo = curr.VelocityPerMinute_Top_No_Bid + curr.VelocityPerMinute_Bottom_No_Bid;
+                double vNo = curr.VelocityPerMinute_Top_No_Bid  + curr.VelocityPerMinute_Bottom_No_Bid;
 
-                double obsYes = dy / (100.0 * dtMin);
-                double obsNo = dn / (100.0 * dtMin);
-
-                // Compute rolling for current using helper
-                var (rollObsYes5m, rollObsNo5m, rollObsYesWin, rollObsNoWin, windowDt, gapNote) =
+                // Compute rolling with aggregated windowDy/windowDn
+                var (rollObsYes5m, rollObsNo5m, rollObsYesWin, rollObsNoWin,
+                     windowDt, gapNote, windowDy, windowDn) =
                     ComputeRollingObs(curr, s, averagingWindowMin, gapThresholdMin);
 
                 double rollExpYes = vYes;
@@ -360,56 +347,67 @@ namespace TradingSimulator.Simulator
 
                 double scale = 1.0;
                 if (windowDt > 0 && windowDt < averagingWindowMin)
-                {
                     scale = Math.Pow(averagingWindowMin / windowDt, shortIntervalExponent);
-                }
 
-                // New: Identify pre-window interval for tolerance (if available)
                 double toleranceYes = 0.0;
                 double toleranceNo = 0.0;
-                int oldestIncludedIndex = FindOldestIncludedIndex(i, s, averagingWindowMin, gapThresholdMin);  // Helper to find oldest j +1 or equivalent
-                if (oldestIncludedIndex > 1)  // Ensure pre-snapshot exists
+                int oldestIncludedIndex = FindOldestIncludedIndex(i, s, averagingWindowMin, gapThresholdMin);
+                if (oldestIncludedIndex > 1)
                 {
                     var preSnap = s[oldestIncludedIndex - 1];
                     var prePrevSnap = s[oldestIncludedIndex - 2];
                     double preDt = (preSnap.Timestamp - prePrevSnap.Timestamp).TotalMinutes;
-                    if (preDt > 0 && preDt <= gapThresholdMin)  // Valid pre-interval without gap
+                    if (preDt > 0 && preDt <= gapThresholdMin)
                     {
                         double preDy = preSnap.TotalOrderbookDepth_Yes - prePrevSnap.TotalOrderbookDepth_Yes;
-                        double preDn = preSnap.TotalOrderbookDepth_No - prePrevSnap.TotalOrderbookDepth_No;
+                        double preDn = preSnap.TotalOrderbookDepth_No  - prePrevSnap.TotalOrderbookDepth_No;
                         double preVelYes = preDy / (100.0 * preDt);
                         double preVelNo = preDn / (100.0 * preDt);
                         toleranceYes = Math.Abs(preVelYes) * leakageFactor;
-                        toleranceNo = Math.Abs(preVelNo) * leakageFactor;
+                        toleranceNo  = Math.Abs(preVelNo)  * leakageFactor;
                     }
                 }
 
-                // Discrepancy checks with added tolerance
                 double baseThrYes = Math.Abs(rollExpYes) * relativeSlack * scale;
-                double thrYes = baseThrYes + toleranceYes;
-                double baseThrNo = Math.Abs(rollExpNo) * relativeSlack * scale;
-                double thrNo = baseThrNo + toleranceNo;
-                bool discYes = Math.Abs(rollObsYes5m - rollExpYes) > Math.Max(thrYes, (double)minAbsChangeToFlag / (100.0 * averagingWindowMin));
-                bool discNo = Math.Abs(rollObsNo5m - rollExpNo) > Math.Max(thrNo, (double)minAbsChangeToFlag / (100.0 * averagingWindowMin));
+                double thrYes = Math.Max(baseThrYes + toleranceYes, (double)minAbsChangeToFlag / (100.0 * averagingWindowMin));
+                double baseThrNo = Math.Abs(rollExpNo)  * relativeSlack * scale;
+                double thrNo = Math.Max(baseThrNo  + toleranceNo, (double)minAbsChangeToFlag / (100.0 * averagingWindowMin));
+
+                bool discYes = Math.Abs(rollObsYes5m - rollExpYes) > thrYes;
+                bool discNo = Math.Abs(rollObsNo5m  - rollExpNo)  > thrNo;
 
                 bool zeroVelYesDisc = (vYes == 0 && Math.Abs(dy) >= minAbsChangeOnZeroVelocity);
-                bool zeroVelNoDisc = (vNo == 0 && Math.Abs(dn) >= minAbsChangeOnZeroVelocity);
+                bool zeroVelNoDisc = (vNo  == 0 && Math.Abs(dn) >= minAbsChangeOnZeroVelocity);
                 if (zeroVelYesDisc) discYes = true;
-                if (zeroVelNoDisc) discNo = true;
+                if (zeroVelNoDisc) discNo  = true;
 
                 if (discYes || discNo)
                 {
                     var lastSnapshots = s.Skip(Math.Max(0, i - 6)).Take(7).ToList();
-
-                    string memo = GenerateMemo(curr, lastSnapshots, s, averagingWindowMin, gapThresholdMin, windowDt, dy, dn, rollExpYes, rollExpNo, rollObsYes5m, rollObsNo5m, rollObsYesWin, rollObsNoWin, gapNote, scale, shortIntervalExponent, zeroVelYesDisc, zeroVelNoDisc, toleranceYes, toleranceNo, leakageFactor);
+                    string memo = GenerateMemo(
+                        curr, lastSnapshots, s,
+                        averagingWindowMin, gapThresholdMin,
+                        windowDt, windowDy, windowDn,
+                        rollExpYes, rollExpNo,
+                        rollObsYes5m, rollObsNo5m,
+                        rollObsYesWin, rollObsNoWin,
+                        gapNote, scale, shortIntervalExponent,
+                        zeroVelYesDisc, zeroVelNoDisc,
+                        toleranceYes, toleranceNo, leakageFactor);
 
                     outPts.Add(new PricePoint(curr.Timestamp, (curr.BestYesBid + curr.BestYesAsk) / 2.0, memo));
-
                     AppendDiscrepancyLog(curr.MarketTicker ?? "UnknownMarket", memo);
                 }
             }
 
             return outPts;
+        }
+
+
+        private void AppendDiscrepancyLog(string marketTicker, string memo)
+        {
+            string logPath = Path.Combine(_cacheDirectory, "discrepancies.log");  // Or a per-market file if preferred
+            File.AppendAllText(logPath, $"Market: {marketTicker}\n{memo}\n\n");
         }
 
         // Updated helper signature to include gapThresholdMin
@@ -427,6 +425,7 @@ namespace TradingSimulator.Simulator
             }
             return j + 1;  // Oldest included is the current j after loop (adjusted for decrement)
         }
+        // Updated report generation: new columns for your rolling averages and the orderbook-derived instantaneous flow.
         private string GenerateMemo(
             MarketSnapshot curr,
             List<MarketSnapshot> lastSnapshots,
@@ -447,7 +446,7 @@ namespace TradingSimulator.Simulator
             double shortIntervalExponent,
             bool zeroVelYesDisc,
             bool zeroVelNoDisc,
-            double toleranceYes,  // New: Include in memo for transparency
+            double toleranceYes,
             double toleranceNo,
             double leakageFactor)
         {
@@ -458,52 +457,168 @@ namespace TradingSimulator.Simulator
 
             int steps = lastSnapshots.Count - 1;
             sb.AppendLine($"Window: size={steps} steps, duration={windowDt:0.##} min");
-
             if (!string.IsNullOrEmpty(gapNote))
-            {
                 sb.AppendLine(gapNote);
-            }
 
             sb.AppendLine("Last 7 snapshots (oldest first):");
-
-            string headerFormat = "{0,-35} {1,8} {2,18} {3,20} {4,21} {5,12} {6,17} {7,19} {8,20} {9,12}";
+            string headerFormat = "{0,-35} {1,8} {2,28} {3,32} {4,12} {5,28} {6,32} {7,12}";
             string header = string.Format(headerFormat,
-                "Timestamp (UTC)", "WinMin", "RollExpYes($/min)", "RollObsYes_5m($/min)", "RollObsYes_Win($/min)",
-                "YesDepth(¢)", "RollExpNo($/min)", "RollObsNo_5m($/min)", "RollObsNo_Win($/min)", "NoDepth(¢)");
+                "Timestamp (UTC)",
+                "WinMin",
+                "Your Rolling Yes ($/min)",
+                "Orderbook Flow Yes (inst $/min)",
+                "YesDepth(¢)",
+                "Your Rolling No ($/min)",
+                "Orderbook Flow No (inst $/min)",
+                "NoDepth(¢)");
             sb.AppendLine("    " + header);
 
-            string rowFormat = "{0,-35} {1,8:0.##} {2,18:0.##} {3,20:0.##} {4,21:0.##} {5,12:0.##} {6,17:0.##} {7,19:0.##} {8,20:0.##} {9,12:0.##}";
-
+            string rowFormat = "{0,-35} {1,8:0.##} {2,28:0.##} {3,32:0.##} {4,12:0.##} {5,28:0.##} {6,32:0.##} {7,12:0.##}";
             foreach (var snap in lastSnapshots)
             {
-                double localVYes = snap.VelocityPerMinute_Top_Yes_Bid + snap.VelocityPerMinute_Bottom_Yes_Bid;
-                double localVNo = snap.VelocityPerMinute_Top_No_Bid + snap.VelocityPerMinute_Bottom_No_Bid;
+                // Rolling velocities from the snapshot (user’s data)
+                double yourRollingYes = snap.VelocityPerMinute_Top_Yes_Bid + snap.VelocityPerMinute_Bottom_Yes_Bid;
+                double yourRollingNo = snap.VelocityPerMinute_Top_No_Bid  + snap.VelocityPerMinute_Bottom_No_Bid;
 
-                var (snapRollObsYes5m, snapRollObsNo5m, snapRollObsYesWin, snapRollObsNoWin, _, _) =
-                    ComputeRollingObs(snap, fullSnapshots, averagingWindowMin, gapThresholdMin);
+                // Instantaneous orderbook-derived flow between consecutive snapshots
+                double instFlowYes = 0.0, instFlowNo = 0.0;
+                int idx = fullSnapshots.IndexOf(snap);
+                if (idx > 0)
+                {
+                    var prevSnap = fullSnapshots[idx - 1];
+                    double dtRow = (snap.Timestamp - prevSnap.Timestamp).TotalMinutes;
+                    if (dtRow > 0)
+                    {
+                        double dyRow = snap.TotalOrderbookDepth_Yes - prevSnap.TotalOrderbookDepth_Yes;
+                        double dnRow = snap.TotalOrderbookDepth_No  - prevSnap.TotalOrderbookDepth_No;
+                        instFlowYes = (dyRow / 100.0) / dtRow;
+                        instFlowNo  = (dnRow  / 100.0) / dtRow;
+                    }
+                }
 
                 double winMin = (curr.Timestamp - snap.Timestamp).TotalMinutes;
-
-                string row = string.Format(rowFormat,
-                    snap.Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffffffK"), winMin, localVYes, snapRollObsYes5m, snapRollObsYesWin,
-                    snap.TotalOrderbookDepth_Yes, localVNo, snapRollObsNo5m, snapRollObsNoWin, snap.TotalOrderbookDepth_No);
-                sb.AppendLine("    " + row);
+                sb.AppendLine("    " + string.Format(rowFormat,
+                    snap.Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffffffK"),
+                    winMin,
+                    yourRollingYes,
+                    instFlowYes,
+                    snap.TotalOrderbookDepth_Yes,
+                    yourRollingNo,
+                    instFlowNo,
+                    snap.TotalOrderbookDepth_No));
             }
 
-            sb.AppendLine("Rolling math (end snapshot):");
-            sb.AppendLine($"  5-min: ΔYes(¢)={windowDy:0.##} ⇒ {rollObsYes5m:0.##} $/min, ΔNo(¢)={windowDn:0.##} ⇒ {rollObsNo5m:0.##} $/min");
-            sb.AppendLine($"  Window: ΔYes(¢)={windowDy:0.##} ⇒ {rollObsYesWin:0.##} $/min, ΔNo(¢)={windowDn:0.##} ⇒ {rollObsNoWin:0.##} $/min (Σdt={windowDt:0.##} min)");
-            sb.AppendLine($"  Expected (HUD-scale): Yes={rollExpYes:0.##} $/min, No={rollExpNo:0.##} $/min (ExpScale={scale:0.##})");
+            // Rolling orderbook flow summary for the window
+            sb.AppendLine("Rolling math (end snapshot - orderbook flow):");
+            sb.AppendLine($"  Window: ΔYes(¢)={windowDy:0.##} ⇒ {rollObsYes5m:0.##} $/min, ΔNo(¢)={windowDn:0.##} ⇒ {rollObsNo5m:0.##} $/min (Σdt={windowDt:0.##} min)");
 
+            // If the HUD velocities are zero but the depth-change indicates a flow, infer an implied expected velocity
+            double displayExpYes = (Math.Abs(rollExpYes) < 1e-9 && Math.Abs(windowDy) > 0 && windowDt > 0)
+                ? (windowDy / 100.0) / windowDt
+                : rollExpYes;
+            double displayExpNo = (Math.Abs(rollExpNo)  < 1e-9 && Math.Abs(windowDn)  > 0 && windowDt > 0)
+                ? (windowDn / 100.0) / windowDt
+                : rollExpNo;
+            sb.AppendLine($"  Detection Expected (may use implied): Yes={displayExpYes:0.##} $/min, No={displayExpNo:0.##} $/min (ExpScale={scale:0.##})");
+
+            // Details for debugging
             sb.AppendLine("Computation details:");
             sb.AppendLine($"    Short-Window Scale = (Window Minutes<{averagingWindowMin:0.##}? ( {averagingWindowMin:0.##}/Window Minutes )^{shortIntervalExponent:0.###} : 1) = {scale:0.######}");
-            sb.AppendLine($"    Expected Yes ΔDepth (¢) = Sum(Expected Yes Flow×min)*100 = {rollExpYes * windowDt:0.######}*100 = {rollExpYes * windowDt * 100:0.##} c");
-            sb.AppendLine($"    Observed Yes ΔDepth (¢) = currY-oldY = {windowDy:0.##}");
-            sb.AppendLine($"    Edge Tolerance (Leakage Factor={leakageFactor:0.###}): Yes={toleranceYes:0.##} $/min, No={toleranceNo:0.##} $/min");  // New: Report tolerance in memo
+            sb.AppendLine($"    Expected ΔDepth (¢) = Sum(Expected Flow×min)*100 = {displayExpYes * windowDt:0.######}*100 = {(displayExpYes * windowDt * 100):0.##} c");
+            sb.AppendLine($"    Observed ΔDepth (¢) = windowΔ = {windowDy:0.##}");
+            sb.AppendLine($"    Edge Tolerance (Leakage Factor={leakageFactor:0.###}): Yes={toleranceYes:0.##} $/min, No={toleranceNo:0.##} $/min");
             sb.AppendLine($"MID={(curr.BestYesBid + curr.BestYesAsk) / 2.0:0.##}");
+
+            if (Math.Abs(rollObsYes5m - displayExpYes) < 1e-6 && Math.Abs(rollObsNo5m - displayExpNo) < 1e-6)
+                sb.AppendLine("Resolution hint: Implied==Observed; likely timing skew cancel with adjacent snapshot.");
 
             return sb.ToString();
         }
+
+        private List<PricePoint> CoalesceDiscrepancies(
+    List<PricePoint> pts,
+    int maxPairGapMinutes,
+    double maxVelocityDiff)
+        {
+            if (pts == null || pts.Count < 2) return pts;
+
+            var keep = new bool[pts.Count];
+            Array.Fill(keep, true);
+
+            // Extract compact metrics from memo lines
+            bool TryParseMetrics(string memo, out double obsYes, out double expYes, out double obsNo, out double expNo)
+            {
+                obsYes = expYes = obsNo = expNo = 0;
+                // Parse "Window: ΔYes(¢)=X ⇒ Y $/min, ΔNo(¢)=Z ⇒ W $/min" and "Expected (HUD-scale): Yes=A $/min, No=B $/min"
+                // Safe parsing; failures just return false -> no coalescing.
+                try
+                {
+                    var lines = memo.Split('\n');
+                    var roll = lines.FirstOrDefault(l => l.StartsWith("  Window:", StringComparison.Ordinal));
+                    var exp = lines.FirstOrDefault(l => l.StartsWith("  Expected (HUD-scale):", StringComparison.Ordinal));
+                    if (roll == null || exp == null) return false;
+
+                    // Y and W
+                    int yi = roll.IndexOf("⇒", StringComparison.Ordinal);
+                    int yiEnd = roll.IndexOf("$", yi + 1, StringComparison.Ordinal);
+                    int wi = roll.LastIndexOf("⇒", StringComparison.Ordinal);
+                    int wiEnd = roll.LastIndexOf("$", StringComparison.Ordinal);
+                    if (yi < 0 || yiEnd < 0 || wi < 0 || wiEnd < 0) return false;
+                    var yStr = roll.Substring(yi + 1, yiEnd - (yi + 1)).Replace("$/min", "").Trim();
+                    var wStr = roll.Substring(wi + 1, wiEnd - (wi + 1)).Replace("$/min", "").Trim();
+                    if (!double.TryParse(yStr, out obsYes)) return false;
+                    if (!double.TryParse(wStr, out obsNo)) return false;
+
+                    // A and B
+                    var parts = exp.Split(new[] { "Yes=", "No=", "$/min" }, StringSplitOptions.RemoveEmptyEntries);
+                    // parts like: ["  Expected (HUD-scale): ", "A ", " , ", "B ", " (ExpScale=..."]
+                    var nums = parts.Where(p => double.TryParse(p.Trim(), out _))
+                                    .Select(p => double.Parse(p.Trim()))
+                                    .ToList();
+                    if (nums.Count < 2) return false;
+                    expYes = nums[0];
+                    expNo  = nums[1];
+                    return true;
+                }
+                catch { return false; }
+            }
+
+            for (int i = 1; i < pts.Count; i++)
+            {
+                if (!keep[i]) continue;
+                for (int j = i - 1; j >= 0; j--)
+                {
+                    if (!keep[j]) continue;
+                    var dt = (pts[i].Date - pts[j].Date).TotalMinutes;
+                    if (dt > maxPairGapMinutes) break;
+
+                    if (TryParseMetrics(pts[i].Memo, out var oYi, out var eYi, out var oNi, out var eNi) &&
+                        TryParseMetrics(pts[j].Memo, out var oYj, out var eYj, out var oNj, out var eNj))
+                    {
+                        // Compare residuals (Observed-Expected) for Yes and No
+                        double riY = oYi - eYi, rjY = oYj - eYj;
+                        double riN = oNi - eNi, rjN = oNj - eNj;
+
+                        bool cancelsY = Math.Abs(riY + rjY) <= maxVelocityDiff;
+                        bool cancelsN = Math.Abs(riN + rjN) <= maxVelocityDiff;
+
+                        if (cancelsY || cancelsN)
+                        {
+                            keep[i] = false;
+                            keep[j] = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            var result = new List<PricePoint>(pts.Count);
+            for (int k = 0; k < pts.Count; k++)
+                if (keep[k]) result.Add(pts[k]);
+            return result;
+        }
+
+
 
         private void SaveMarketDataToFile(
             string marketTicker, double finalPnL,

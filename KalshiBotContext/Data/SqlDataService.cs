@@ -1,11 +1,13 @@
 ﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs.Exceptions;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Text.Json;
 
-namespace SmokehouseBot.Services
+namespace KalshiBotData.Data
 {
     public class SqlDataService : ISqlDataService
     {

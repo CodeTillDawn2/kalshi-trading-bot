@@ -1,10 +1,11 @@
-﻿// Modified Program.cs
+﻿// Updated Program.cs with IConfiguration registration
 using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotOverseer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services;
@@ -12,17 +13,36 @@ using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
 using System;
 using System.Threading;
+using System.IO;
 
 class Program
 {
     static async Task Main(string[] args)
     {
+        // Set up configuration
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
+            .AddCommandLine(args)
+            .Build();
+
         // Set up dependency injection
         var services = new ServiceCollection();
 
+        // Add configuration as singleton
+        services.AddSingleton<IConfiguration>(configuration);
+
+        // Add logging services
+        services.AddLogging(builder =>
+        {
+            builder.AddConsole();
+            builder.SetMinimumLevel(LogLevel.Debug);
+        });
+
         // Register required services 
-        services.AddScoped<IKalshiAPIService, KalshiAPIService>(); 
-        services.AddScoped<IKalshiWebSocketClient, KalshiWebSocketClient>(); 
+        services.AddScoped<IKalshiAPIService, KalshiAPIService>();
+        services.AddScoped<IKalshiWebSocketClient, KalshiWebSocketClient>();
 
         // Register the new WebSocketMonitorServiceLite as singleton
         services.AddSingleton<IWebSocketMonitorService, WebSocketMonitorServiceLite>();
@@ -37,7 +57,7 @@ class Program
         var cancellationTokenSource = new CancellationTokenSource();
         monitorService.StartServices(cancellationTokenSource.Token);
 
-        // Get the event subscriber and start it (subscribes to events)
+        // Get the overseer and start it (subscribes to events)
         var eventSubscriber = serviceProvider.GetRequiredService<Overseer>();
         eventSubscriber.Start();
 
