@@ -2,6 +2,7 @@
 using TradingSimulator.Simulator;
 using TradingSimulator.TestObjects;
 using System.Text.RegularExpressions;
+using SmokehouseDTOs;
 
 namespace SimulatorWinForms
 {
@@ -17,6 +18,9 @@ namespace SimulatorWinForms
         private ScottPlot.Plottable.VLine _hoverLine;
 
         private readonly Dictionary<string, double> _bestPnL = new(StringComparer.OrdinalIgnoreCase);
+
+        List<MarketSnapshot> _snapshots = new();
+
         public MainForm()
         {
             InitializeComponent();
@@ -179,6 +183,7 @@ namespace SimulatorWinForms
                 }
 
                 AppendLog($"Loaded {bases.Count} valid markets from snapshot groups (cache used only for PnL if available).");
+
                 RestoreCheckboxes();
             }
             catch (Exception ex)
@@ -358,15 +363,15 @@ namespace SimulatorWinForms
 
 
 
-        private void DgvMarkets_SelectionChanged(object sender, EventArgs e)
+        private async void DgvMarkets_SelectionChanged(object sender, EventArgs e)
         {
             if (dgvMarkets.SelectedRows.Count == 0) return;
             string market = dgvMarkets.SelectedRows[0].Cells["Market"].Value?.ToString();
             if (!string.IsNullOrWhiteSpace(market))
-                LoadChart(market);
+                await LoadChart(market);
         }
 
-        private void LoadChart(string market)
+        private async Task LoadChart(string market)
         {
             formsPlot1.Plot.Clear();
             _tooltipPoints.Clear();
@@ -457,6 +462,12 @@ namespace SimulatorWinForms
             _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Gray, 1);
             _hoverLine.IsVisible = false;
             formsPlot1.Render();
+
+            AppendLog($"Loaded Chart for {market}");
+
+            _snapshots = await _simulator.ReturnSnapshotsForMarket(market);
+
+            AppendLog($"Loaded snapshots for {market}");
         }
 
 

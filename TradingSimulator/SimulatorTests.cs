@@ -151,9 +151,9 @@ namespace TradingSimulator.Simulator
         }
 
         public async Task<List<SnapshotGroupDTO>> GetFilteredSnapshotGroupsAsync(
-            IKalshiBotContext context, int? maxGroups, List<string>? marketsToRun)
+            IKalshiBotContext context, List<string>? marketsToRun)
         {
-            var groups = await context.GetSnapshotGroups_cached(maxGroups: maxGroups).ConfigureAwait(false);
+            var groups = await context.GetSnapshotGroups_cached().ConfigureAwait(false);
             var filtered = new List<SnapshotGroupDTO>();
             foreach (var g in groups)
             {
@@ -304,13 +304,43 @@ namespace TradingSimulator.Simulator
             File.WriteAllText(filePath, json);
         }
 
+        public async Task<List<MarketSnapshot>> ReturnSnapshotsForMarket(string marketName)
+        {
+            // prep context once
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+
+            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, marketsToRun: new() { marketName }).ConfigureAwait(false);
+            var marketGroups = filteredGroups.Where(g => g.MarketTicker == marketName).ToList();
+
+            var allSnapshotData = new List<SnapshotDTO>();
+            foreach (var g in marketGroups)
+            {
+                var snaps = await context.GetSnapshots_cached(
+                    marketTicker: g.MarketTicker,
+                    startDate: g.StartTime,
+                    endDate: g.EndTime).ConfigureAwait(false);
+                allSnapshotData.AddRange(snaps);
+            }
+            allSnapshotData = allSnapshotData.OrderBy(x => x.SnapshotDate).ToList();
+
+            var cache = await _snapshotService.LoadManySnapshots(allSnapshotData).ConfigureAwait(false);
+            var marketSnapshots = cache
+                .SelectMany(kvp => kvp.Value)
+                .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue)
+                .OrderBy(ms => ms.Timestamp)
+                .ToList();
+
+
+            return marketSnapshots; 
+        }
+
 
         public async Task RunSelectedSetForGuiAsync(
             string setKey,
             string weightName,
             bool writeToFile,
-            List<string>? marketsToRun = null,
-            int? maxGroups = null)
+            List<string>? marketsToRun = null)
         {
             // map provided setKey -> family
             var family = MapFamilyFromSetKey(setKey);
@@ -339,7 +369,7 @@ namespace TradingSimulator.Simulator
             };
 
             // filter groups/markets
-            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, marketsToRun).ConfigureAwait(false);
+            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, marketsToRun).ConfigureAwait(false);
             var uniqueMarkets = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
 
             OnTestProgress?.Invoke($"{label}/{dto.StrategyName}: 1 strategy set × {uniqueMarkets.Count} markets");
@@ -435,7 +465,6 @@ namespace TradingSimulator.Simulator
 
         public async Task RunMultipleAllStrategiesForGuiAsync(
             bool writeToFile,
-            int? maxGroups = null,
             List<string>? marketsToRun = null)
         {
             // run all families automatically
@@ -452,7 +481,6 @@ namespace TradingSimulator.Simulator
                 await RunMultipleForGuiAsync(
                     family: fam,
                     writeToFile: writeToFile,
-                    maxGroups: maxGroups,
                     marketsToRun: marketsToRun).ConfigureAwait(false);
             }
         }
@@ -464,13 +492,13 @@ namespace TradingSimulator.Simulator
             return await context.GetSnapshotGroupNames();
         }
 
-        public async Task<List<string>> GetValidBaseMarketsAsync(List<string>? basesToInclude = null, int? maxGroups = null)
+        public async Task<List<string>> GetValidBaseMarketsAsync(List<string>? basesToInclude = null)
         {
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
             // Reuse the existing filtering logic, passing basesToInclude as marketsToRun
-            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, basesToInclude).ConfigureAwait(false);
+            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, basesToInclude).ConfigureAwait(false);
 
             // Extract base tickers (remove trailing _num if present), filter distinct non-empty, sort case-insensitively
             var validBases = filteredGroups
@@ -553,7 +581,6 @@ namespace TradingSimulator.Simulator
         public async Task RunMultipleForGuiAsync(
             StrategyFamily family,
             bool writeToFile,
-            int? maxGroups = null,
             List<string>? marketsToRun = null)
         {
             var (strategiesList, paramSets, label) = ResolveFamily(family);
@@ -574,12 +601,12 @@ namespace TradingSimulator.Simulator
                 });
             }
 
-            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, marketsToRun).ConfigureAwait(false);
+            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, marketsToRun).ConfigureAwait(false);
             var uniqueMarkets = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
 
             OnTestProgress?.Invoke($"{label}: {strategiesList.Count} strategy sets × {uniqueMarkets.Count} markets");
 
-            // NEW: Running counter for discrepancies
+            // Running counter for discrepancies
             int totalDiscrepancies = 0;
 
             for (int mIdx = 0; mIdx < uniqueMarkets.Count; mIdx++)
@@ -601,11 +628,9 @@ namespace TradingSimulator.Simulator
                 var cache = await _snapshotService.LoadManySnapshots(allSnapshotData).ConfigureAwait(false);
                 var marketSnapshots = cache
                     .SelectMany(kvp => kvp.Value)
-                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue && ms.BestYesBid > 0 && ms.BestYesAsk > 0)
+                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue)
                     .OrderBy(ms => ms.Timestamp)
                     .ToList();
-
-                if (marketSnapshots.Count == 0) continue;
 
                 var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
 
