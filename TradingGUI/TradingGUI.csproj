@@ -18,4 +18,10 @@
     <ProjectReference Include="..\TradingSimulator\TradingSimulator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="MarketDashboardControl2.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

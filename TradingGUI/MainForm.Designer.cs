@@ -9,6 +9,10 @@
         private System.Windows.Forms.Button btnReload;
         private System.Windows.Forms.Button btnRunSet;
         private ScottPlot.FormsPlot formsPlot1;
+        // Panel container for the right side of the layout. This enables swapping the
+        // chart view with other controls (e.g., a dashboard) at runtime without
+        // disrupting the table layout structure.
+        private Panel rightPane;
         private System.Windows.Forms.ToolTip toolTip1;
         private Button btnCheckAll;
         private Button btnUncheckAll;
@@ -31,6 +35,7 @@
             btnReload = new Button();
             btnRunSet = new Button();
             formsPlot1 = new ScottPlot.FormsPlot();
+            rightPane = new Panel();
             layout = new TableLayoutPanel();
             buttonPanel = new FlowLayoutPanel();
             btnCheckAll = new Button();
@@ -109,13 +114,22 @@
             btnRunSet.Click += btnRunSet_Click;
             // 
             // formsPlot1
-            // 
+            //
             formsPlot1.Dock = DockStyle.Fill;
-            formsPlot1.Location = new Point(304, 3);
-            formsPlot1.Margin = new Padding(4, 3, 4, 3);
+            // When hosted inside rightPane, location and margin are governed by the parent
+            formsPlot1.Location = new Point(0, 0);
+            formsPlot1.Margin = new Padding(0);
             formsPlot1.Name = "formsPlot1";
+            // size will be controlled by the container; set a default
             formsPlot1.Size = new Size(792, 504);
             formsPlot1.TabIndex = 1;
+
+            // rightPane
+            //
+            rightPane.Dock = DockStyle.Fill;
+            rightPane.Margin = new Padding(0);
+            rightPane.Name = "rightPane";
+            rightPane.Controls.Add(formsPlot1);
             // 
             // layout
             // 
@@ -123,7 +137,7 @@
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 300F));
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             layout.Controls.Add(dgvMarkets, 0, 0);
-            layout.Controls.Add(formsPlot1, 1, 0);
+            layout.Controls.Add(rightPane, 1, 0);
             layout.Controls.Add(rtbLog, 0, 1);
             layout.Controls.Add(buttonPanel, 0, 2);
             layout.Dock = DockStyle.Fill;

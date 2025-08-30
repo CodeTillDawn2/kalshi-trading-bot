@@ -68,6 +68,9 @@ namespace SimulatorWinForms
             // thin vertical hover indicator (no pattern property in this ScottPlot version)
             _hoverLine = formsPlot1.Plot.AddVerticalLine(0, Color.Gray, 1);
             _hoverLine.IsVisible = false;
+
+            // wire a MouseDown handler to allow swapping the chart with the dashboard on click
+            formsPlot1.MouseDown += FormsPlot1_MouseDown;
         }
 
         private void ResetPnLForMarkets(IEnumerable<string> markets)
@@ -515,6 +518,46 @@ namespace SimulatorWinForms
                 _simulator.TearDown();
                 _simSetup = false;
             }
+        }
+
+        /// <summary>
+        /// Handles mouse down events on the ScottPlot chart. When the user clicks
+        /// anywhere on the plot area, the view is replaced with a dashboard control
+        /// that emulates the web-based layout. The click position's x-coordinate
+        /// in OADate form is passed to the dashboard for potential use (not used
+        /// currently but reserved for future enhancements).
+        /// </summary>
+        private void FormsPlot1_MouseDown(object sender, MouseEventArgs e)
+        {
+            // Convert pixel position to OADate coordinate
+            double xVal = formsPlot1.Plot.GetCoordinateX(e.X);
+            ShowDashboardAt(xVal);
+        }
+
+        /// <summary>
+        /// Replaces the right-side panel content with a new MarketDashboardControl.
+        /// If one already exists, it is reused. This allows users to view a richer
+        /// set of data and controls similar to the provided HTML dashboard when they
+        /// click on the chart.
+        /// </summary>
+        /// <param name="xOADate">The x-coordinate of the click in OADate time.</param>
+        private void ShowDashboardAt(double xOADate)
+        {
+            // Attempt to reuse an existing dashboard control stored in the Tag property
+            if (rightPane.Tag is not MarketDashboardControl2 dashboard)
+            {
+                dashboard = new MarketDashboardControl2();
+                rightPane.Tag = dashboard;
+            }
+
+            // Clear current content and insert dashboard
+            rightPane.SuspendLayout();
+            rightPane.Controls.Clear();
+            dashboard.Dock = DockStyle.Fill;
+            rightPane.Controls.Add(dashboard);
+            rightPane.ResumeLayout();
+
+            AppendLog("Switched right pane to dashboard view.");
         }
 
 
