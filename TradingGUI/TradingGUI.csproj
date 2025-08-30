@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="MarketDashboardControl2.cs">
+    <Compile Update="MarketDashboardControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
   </ItemGroup>

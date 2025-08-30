@@ -544,9 +544,9 @@ namespace SimulatorWinForms
         private void ShowDashboardAt(double xOADate)
         {
             // Attempt to reuse an existing dashboard control stored in the Tag property
-            if (rightPane.Tag is not MarketDashboardControl2 dashboard)
+            if (rightPane.Tag is not SnapshotViewer dashboard)
             {
-                dashboard = new MarketDashboardControl2();
+                dashboard = new SnapshotViewer();
                 rightPane.Tag = dashboard;
             }
 
