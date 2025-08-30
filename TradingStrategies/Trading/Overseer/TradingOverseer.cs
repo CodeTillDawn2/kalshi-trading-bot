@@ -19,7 +19,7 @@ namespace TradingStrategies
         private StrategySelectionHelper _strategySelectionHelper;
         // Cache for market types: maps (MarketTicker, Timestamp) to MarketType for per-snapshot caching
         private readonly Dictionary<(string Ticker, DateTime Timestamp), MarketType> _marketTypeCache;
-
+        private readonly string _cacheDirectory = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
         public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService)
         {
             _scopeFactory = scopeFactory;
@@ -618,7 +618,7 @@ namespace TradingStrategies
 
         private List<(PathPerformance performance, List<EventLog> events)> GenerateReportsAndPerformances(SnapshotGroupDTO group, List<SimulationPath> activePaths, List<MarketSnapshot> snapshots, double initialCash, bool writeToFile)
         {
-            string outputDir = @"C:\BotTestingOutput";
+            string outputDir = _cacheDirectory;
             string uniqueId = group != null ? Path.GetFileNameWithoutExtension(group.JsonPath) : snapshots.FirstOrDefault()?.MarketTicker;
 
             var finalSnapshot = snapshots.Last();
