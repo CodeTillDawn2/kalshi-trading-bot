@@ -24,6 +24,8 @@ namespace SimulatorWinForms
 
         private (double xMin, double xMax, double yMin, double yMax) _savedChartLimits;
 
+        private SnapshotViewer _snapshotViewer;
+
         public MainForm()
         {
             InitializeComponent();
@@ -75,6 +77,7 @@ namespace SimulatorWinForms
             // wire a MouseDown handler to allow swapping the chart with the dashboard on click
             formsPlot1.MouseDown += FormsPlot1_MouseDown;
         }
+
 
         private void ResetPnLForMarkets(IEnumerable<string> markets)
         {
@@ -415,7 +418,7 @@ namespace SimulatorWinForms
         /// <summary>
         /// Handles mouse down events on the ScottPlot chart. When the user clicks
         /// anywhere on the plot area, the view is replaced with a dashboard control
-        /// that emulates the web-based layout. The click position's x-coordinate
+        /// that emulates the web-based layout on the full window. The click position's x-coordinate
         /// in OADate form is passed to the dashboard for potential use (not used
         /// currently but reserved for future enhancements).
         /// </summary>
@@ -427,53 +430,57 @@ namespace SimulatorWinForms
         }
 
         /// <summary>
-        /// Replaces the right-side panel content with a new SnapshotViewer.
+        /// Replaces the entire form content with a new SnapshotViewer.
         /// If one already exists, it is reused. This allows users to view a richer
         /// set of data and controls similar to the provided HTML dashboard when they
-        /// click on the chart.
+        /// click on the chart, filling the whole window.
         /// </summary>
         /// <param name="xOADate">The x-coordinate of the click in OADate time.</param>
         private void ShowDashboardAt(double xOADate)
         {
             _savedChartLimits = (formsPlot1.Plot.GetAxisLimits().XMin, formsPlot1.Plot.GetAxisLimits().XMax, formsPlot1.Plot.GetAxisLimits().YMin, formsPlot1.Plot.GetAxisLimits().YMax);
 
-            if (rightPane.Tag is not SnapshotViewer dashboard)
+            if (_snapshotViewer == null)
             {
-                dashboard = new SnapshotViewer();
-                rightPane.Tag = dashboard;
+                _snapshotViewer = new SnapshotViewer();
             }
 
-            dashboard.CacheDir = _cacheDir;  // Pass the cache directory
+            _snapshotViewer.CacheDir = _cacheDir;  // Pass the cache directory
 
-            // Find the closest snapshot to the clicked xOADate (implement based on your _snapshots)
+            // Find the closest snapshot to the clicked xOADate
             DateTime clickedTime = DateTime.FromOADate(xOADate);
             MarketSnapshot closest = _snapshots.OrderBy(s => Math.Abs((s.Timestamp - clickedTime).TotalSeconds)).FirstOrDefault();
+            if (closest == null) return;
+
             List<MarketSnapshot> history = _snapshots;  // Or filter as needed
 
-            dashboard.Populate(closest, history);
+            _snapshotViewer.Populate(closest, history);
 
-            // Set back action to switch back to chart
-            dashboard.BackAction = ShowChart;
+            // Set back action to switch back to main layout
+            _snapshotViewer.BackAction = HideDashboard;
 
-            rightPane.SuspendLayout();
-            rightPane.Controls.Clear();
-            dashboard.Dock = DockStyle.Fill;
-            rightPane.Controls.Add(dashboard);
-            rightPane.ResumeLayout();
+            // Replace entire form content with dashboard
+            this.SuspendLayout();
+            this.Controls.Remove(layout);
+            _snapshotViewer.Dock = DockStyle.Fill;
+            this.Controls.Add(_snapshotViewer);
+            this.ResumeLayout();
 
-            AppendLog("Switched right pane to dashboard view.");
+            _snapshotViewer.Focus();  // Ensure the UserControl has focus for key events
+
+            AppendLog("Switched to full dashboard view.");
         }
 
         /// <summary>
-        /// Switches the right pane back to the chart view and restores the previous axis limits.
+        /// Switches the form back to the main layout view and restores the previous axis limits.
         /// </summary>
-        private void ShowChart()
+        private void HideDashboard()
         {
-            rightPane.SuspendLayout();
-            rightPane.Controls.Clear();
-            formsPlot1.Dock = DockStyle.Fill;
-            rightPane.Controls.Add(formsPlot1);
-            rightPane.ResumeLayout();
+            this.SuspendLayout();
+            this.Controls.Remove(_snapshotViewer);
+            layout.Dock = DockStyle.Fill;
+            this.Controls.Add(layout);
+            this.ResumeLayout();
 
             formsPlot1.Plot.SetAxisLimits(_savedChartLimits.xMin, _savedChartLimits.xMax, _savedChartLimits.yMin, _savedChartLimits.yMax);
             formsPlot1.Refresh();
