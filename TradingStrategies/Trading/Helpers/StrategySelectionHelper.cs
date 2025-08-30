@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using TradingStrategies.Strategies;
+﻿using TradingStrategies.Strategies;
 using TradingStrategies.Strategies.Strats;
 using static SmokehouseInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Strategies.Strats.BollingerBreakout;
@@ -22,7 +20,7 @@ namespace TradingStrategies.Trading.Helpers
                 ["Nothing"] = GetNothingEverHappensStrategy,
                 ["FlowMo"] = GetFlowMomentumStrategy,
                 ["Momentum"] = GetFlowMomentumStrategy
-                
+
             };
         }
 
@@ -31,7 +29,7 @@ namespace TradingStrategies.Trading.Helpers
 
 
 
-        public static readonly List<(string Name, Dictionary<BollingerBreakout.ParamKey, double> Parameters)> 
+        public static readonly List<(string Name, Dictionary<BollingerBreakout.ParamKey, double> Parameters)>
             BollingerParameterSets = new List<(string, Dictionary<ParamKey, double>)>
         {
             (
@@ -1537,7 +1535,7 @@ namespace TradingStrategies.Trading.Helpers
     })
 };
 
-        public static readonly List<(string Name, Dictionary<NothingEverHappensStrat.ParamKey, double> Parameters)> 
+        public static readonly List<(string Name, Dictionary<NothingEverHappensStrat.ParamKey, double> Parameters)>
             NothingEverHappensParameterSets = new List<(string, Dictionary<NothingEverHappensStrat.ParamKey, double>)>
         {
             (

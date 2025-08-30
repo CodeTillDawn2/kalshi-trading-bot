@@ -1,21 +1,14 @@
 ﻿// Updated TradingOverseer.cs with Memo added to EventLog
-using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
+using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
 using TradingStrategies.Trading.Helpers;
-using SmokehouseBot.Services.Interfaces;
 using TradingStrategies.Trading.Overseer;
-using TradingStrategies.Classification;
 using static SmokehouseInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Trading.Overseer.ReportGenerator;
-using TradingStrategies.Extensions;
 
 namespace TradingStrategies
 {

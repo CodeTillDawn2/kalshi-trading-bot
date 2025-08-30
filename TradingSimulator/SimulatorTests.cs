@@ -3,6 +3,7 @@
 
 using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -15,26 +16,16 @@ using SmokehouseBot.Services;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
+using System.Text.Json;
+using TradingSimulator.Strategies;
+using TradingSimulator.TestObjects;
 using TradingStrategies;
 using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;
-using Microsoft.EntityFrameworkCore;
-using static TradingStrategies.Trading.Overseer.ReportGenerator;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
-using TradingSimulator.Strategies;
 using TradingStrategies.Strategies;
 using TradingStrategies.Trading.Helpers;
-using System.Threading.Tasks;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
-using System.Text.Json;
-using TradingSimulator.TestObjects;
-using static TradingStrategies.Strategies.Strats.BollingerBreakout;
-using System.Threading;
+using static SmokehouseInterfaces.Enums.StrategyEnums;
 
 namespace TradingSimulator.Simulator
 {

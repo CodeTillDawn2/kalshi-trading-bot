@@ -7,7 +7,7 @@ namespace KalshiBotData.Models
 
     public class Snapshot
     {
-        
+
         public string MarketTicker { get; set; }
         public DateTime SnapshotDate { get; set; }
         public int JSONSchemaVersion { get; set; }

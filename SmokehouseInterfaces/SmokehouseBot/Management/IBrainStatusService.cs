@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace SmokehouseBot.Management.Interfaces
+﻿namespace SmokehouseBot.Management.Interfaces
 {
     public interface IBrainStatusService : IDisposable
     {

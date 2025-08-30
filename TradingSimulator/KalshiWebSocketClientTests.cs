@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using KalshiBotAPI.Configuration;
+using KalshiBotAPI.Websockets;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using SmokehouseBot.Configuration;
-using SmokehouseBot.KalshiAPI;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services;
 using SmokehouseBot.Services.Interfaces;
@@ -71,7 +72,7 @@ namespace TradingSimulator.Tests
             Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.local.json");
             _sqlService = new SqlDataService(_configuration, _sqlLoggerMock.Object);
 
-            _client = new KalshiWebSocketClient(_kalshiConfigOptions, _loggingConfigOptions, _loggerMock.Object, _statusTracker.Object, _sqlDataService.Object);
+            _client = new KalshiWebSocketClient(_kalshiConfigOptions, _loggerMock.Object, _statusTracker.Object, _sqlDataService.Object, false);
         }
 
         [TearDown]

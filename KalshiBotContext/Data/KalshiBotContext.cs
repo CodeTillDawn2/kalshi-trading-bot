@@ -8,8 +8,6 @@ using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
 using SmokehouseInterfaces.Constants;
 using System.Data;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace KalshiBotData.Data
 {
@@ -319,7 +317,7 @@ namespace KalshiBotData.Data
                 }
 
             }
-            
+
         }
 
         public async Task<List<MarketDTO>> GetMarkets(
@@ -873,7 +871,7 @@ namespace KalshiBotData.Data
                 return snapshotSchema.ToSnapshotSchemaDTO();
             }
             return null;
-                
+
         }
         #endregion
 
@@ -1639,7 +1637,7 @@ namespace KalshiBotData.Data
 
             modelBuilder.Entity<WeightSetMarket>()
                 .ToTable("t_WeightSetMarkets")
-                .HasKey(wsm => new { wsm.WeightSetID, wsm.MarketTicker }); 
+                .HasKey(wsm => new { wsm.WeightSetID, wsm.MarketTicker });
 
             modelBuilder.Entity<WeightSetMarket>()
                 .Property(wsm => wsm.MarketTicker)
@@ -1659,7 +1657,7 @@ namespace KalshiBotData.Data
                 .HasOne(wsm => wsm.WeightSet)
                 .WithMany(ws => ws.WeightSetMarkets)
                 .HasForeignKey(wsm => wsm.WeightSetID)
-                .OnDelete(DeleteBehavior.Cascade); 
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

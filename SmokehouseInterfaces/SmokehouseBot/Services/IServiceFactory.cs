@@ -1,5 +1,4 @@
 ﻿using KalshiBotAPI.WebSockets.Interfaces;
-using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.State.Interfaces;
 using TradingStrategies.Helpers.Interfaces;

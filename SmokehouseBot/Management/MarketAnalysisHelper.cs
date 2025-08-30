@@ -3,10 +3,8 @@ using Microsoft.Extensions.Options;
 using SmokehouseBot.Configuration;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
-using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
 using SmokehouseInterfaces.Constants;
-using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
 
 namespace SmokehouseBot.Management
@@ -82,7 +80,7 @@ namespace SmokehouseBot.Management
 
 
                 string snapshotDirectory = _executionConfig.HardDataStorageLocation;
-                snapshotDirectory = Path.Combine(snapshotDirectory,"Preprocessed", "SnapshotGroups");
+                snapshotDirectory = Path.Combine(snapshotDirectory, "Preprocessed", "SnapshotGroups");
 
                 // Pass SnapshotDTOs directly to SplitIntoValidGroups
                 var validPeriods = _snapshotPeriodHelper.SplitIntoValidGroups(rawSnapshots, snapshotDirectory);

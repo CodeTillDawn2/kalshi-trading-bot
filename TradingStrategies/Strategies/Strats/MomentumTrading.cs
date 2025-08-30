@@ -1,8 +1,5 @@
 ﻿using SmokehouseDTOs;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.Json;
 using static SmokehouseInterfaces.Enums.StrategyEnums;
 
@@ -311,7 +308,7 @@ namespace TradingStrategies.Strategies.Strats
             Pair($"Best Yes Bid: {F(snapshot.BestYesBid)}", $"Best Yes Ask: {F(snapshot.BestYesAsk)}"),
             Pair($"Path: {(pathTaken.Count==0 ? "none" : string.Join(" > ", pathTaken))}", $"SimPos: {I(simulationPosition)}"),
 
-            Pair($"Depth$ Yes: {F(depthYes)}", $"Depth$ No: {F(depthNo)}"),            
+            Pair($"Depth$ Yes: {F(depthYes)}", $"Depth$ No: {F(depthNo)}"),
             Pair($"Vel/min Yes: {F(vSumYes)}", $"Vel/min No: {F(vSumNo)}"),
             Pair($"Thr Yes: {F(thrYes)}", $"Thr No: {F(thrNo)}"),
             Pair($"Top 10% Yes: {F(snapshot.VelocityPerMinute_Top_Yes_Bid)}", $"No: {F(snapshot.VelocityPerMinute_Top_No_Bid)}"),

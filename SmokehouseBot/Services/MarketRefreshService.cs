@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
-using SmokehouseBot.State;
 using SmokehouseDTOs.Exceptions;
-using System.Collections.Generic;
 using System.Diagnostics;
 using TradingStrategies.Configuration;
 
@@ -221,11 +219,11 @@ namespace SmokehouseBot.Services
                         _logger.LogInformation("Refresh - No market refresh needed for {marketTicker}. Last ticker: {last}, Last Sync {sync}", marketTicker, lastTicker.LoggedDate, marketData.LastSuccessfulSync);
                     }
                 }
-                    
+
             }
             _logger.LogInformation("Refresh - Refreshed {} markets in {ChangeWindowDuration.TotalMinutes} minutes", $"{MarketsRefreshed}/{watchedMarkets.Count}", Math.Round((double)stopwatch.ElapsedMilliseconds / 1000 / 60, 2));
-            
-            
+
+
             //Additional refresh loop to utilize extra time so we aren't refreshing ALL of the low activity ones at once
             if (watchedMarkets.Count > 0 && MarketsRefreshed / watchedMarkets.Count < .25)
             {
@@ -259,10 +257,10 @@ namespace SmokehouseBot.Services
                     }
                 }
                 _logger.LogInformation("Refresh - Force Refreshed {0} markets in {ChangeWindowDuration.TotalMinutes} minutes", ForcedRefreshCount, Math.Round((double)stopwatch.ElapsedMilliseconds / 1000 / 60, 2));
-            } 
-            
-            
-            
+            }
+
+
+
             await _serviceFactory.GetMarketDataService().FetchPositionsAsync();
             LastWorkDuration = DateTime.UtcNow - workStartTime;
             LastWorkMarketCount = watchedMarkets.Count;

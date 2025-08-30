@@ -33,13 +33,14 @@ namespace SmokehouseBot.Services
         private DateTime _lastEventTime = DateTime.MinValue;
 
         #region Properties
-        public IMarketData Market { 
-            get 
+        public IMarketData Market
+        {
+            get
             {
                 if (_cache == null || !_cache.Markets.ContainsKey(_marketTicker) || _cancellationToken.IsCancellationRequested)
                     return null;
                 return _cache.Markets[_marketTicker];
-            } 
+            }
         }
 
         private bool FirstSnapshotReceived { get; set; } = false;

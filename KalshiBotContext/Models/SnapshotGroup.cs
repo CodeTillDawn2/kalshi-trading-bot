@@ -11,7 +11,7 @@
         public int YesEnd { get; set; }
         public int NoEnd { get; set; }
         public double AverageLiquidity { get; set; }
-        public int SnapshotSchema {get; set; }
+        public int SnapshotSchema { get; set; }
         public string JsonPath { get; set; }
         public DateTime ProcessedDttm { get; set; }
 

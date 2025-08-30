@@ -1,6 +1,4 @@
 ﻿using SmokehouseDTOs;
-using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using static SmokehouseInterfaces.Enums.StrategyEnums;
 
@@ -94,9 +92,9 @@ namespace TradingStrategies.Strategies.Strats
                     $",BidImbalance:{snapshot.BidCountImbalance}";
 
                 // Stage 1: Bollinger Breakout Detection
-                if (isSqueeze && upper.HasValue && currentMid > upper.Value 
+                if (isSqueeze && upper.HasValue && currentMid > upper.Value
                     && snapshot.VelocityPerMinute_Top_Yes_Bid > velocityThresholdBollingerYes
-                    && snapshot.BestYesAsk <= 100 - MinNumberOfPointsFromResolved 
+                    && snapshot.BestYesAsk <= 100 - MinNumberOfPointsFromResolved
                     && snapshot.BidCountImbalance > -MaxBidImbalance && snapshot.BidCountImbalance < MaxBidImbalance
                     && snapshot.VelocityPerMinute_Top_Yes_Bid > snapshot.VelocityPerMinute_Top_No_Bid
                     )
@@ -104,9 +102,9 @@ namespace TradingStrategies.Strategies.Strats
                     candidateAction = ActionType.Long;
                     signalStrength += 1.0; // Base score for breakout
                 }
-                else if (isSqueeze && lower.HasValue && currentMid < lower.Value 
+                else if (isSqueeze && lower.HasValue && currentMid < lower.Value
                     && snapshot.VelocityPerMinute_Top_No_Bid > velocityThresholdBollingerNo
-                    && snapshot.BestYesBid >= MinNumberOfPointsFromResolved 
+                    && snapshot.BestYesBid >= MinNumberOfPointsFromResolved
                     && snapshot.BidCountImbalance > -MaxBidImbalance && snapshot.BidCountImbalance < MaxBidImbalance
                     && snapshot.VelocityPerMinute_Top_No_Bid > snapshot.VelocityPerMinute_Top_Yes_Bid
                     )

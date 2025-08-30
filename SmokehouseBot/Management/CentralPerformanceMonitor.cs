@@ -1,7 +1,7 @@
-﻿using KalshiBotData.Data.Interfaces;
+﻿using KalshiBotAPI.WebSockets.Interfaces;
+using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
 using SmokehouseBot.Configuration;
-using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs.Data;
@@ -54,7 +54,7 @@ namespace SmokehouseBot.Management
             RefreshInterval = TimeSpan.FromMinutes(_tradingConfig.RefreshIntervalMinutes);
             BrainInstance = _executionConfig.BrainInstance;
             _queueCountSamples = new ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>>();
-            
+
         }
 
         public double CalculateAverageWebsocketEventsReceived(string marketTicker)
@@ -84,7 +84,7 @@ namespace SmokehouseBot.Management
             // Calculate the average events per minute
             double averageEventsPerMinute = totalEvents / minutesElapsed;
 
-            return Math.Round(averageEventsPerMinute,2);
+            return Math.Round(averageEventsPerMinute, 2);
         }
 
         public void RecordExecutionTime(string methodName, long milliseconds)

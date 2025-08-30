@@ -1,10 +1,13 @@
-﻿using KalshiBotData.Data;
+﻿using KalshiBotAPI.Configuration;
+using KalshiBotAPI.KalshiAPI;
+using KalshiBotAPI.Websockets;
+using KalshiBotAPI.WebSockets.Interfaces;
+using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmokehouseBot.Configuration;
 using SmokehouseBot.Hubs;
-using SmokehouseBot.KalshiAPI;
 using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Logging;
 using SmokehouseBot.Management;
@@ -12,17 +15,12 @@ using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseBot.State;
+using SmokehouseBot.State.Interfaces;
 using SmokehouseDTOs.Data;
-using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Classification;
+using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
-using SmokehouseBot.State.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
-using KalshiBotAPI.WebSockets.Interfaces;
-using KalshiBotAPI.KalshiAPI;
-using KalshiBotAPI.WebSockets;
-using KalshiBotAPI.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -139,7 +137,13 @@ builder.Services.AddScoped<ICandlestickService, CandlestickService>();
 builder.Services.AddScoped<IBroadcastService, BroadcastService>();
 builder.Services.AddScoped<IMarketRefreshService, MarketRefreshService>();
 builder.Services.AddScoped<IWebSocketMonitorService, WebSocketMonitorService>();
-builder.Services.AddScoped<IKalshiWebSocketClient, KalshiWebSocketClient>();
+builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
+    sp.GetRequiredService<IOptions<KalshiConfig>>(),
+    sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
+    sp.GetRequiredService<IStatusTrackerService>(),
+    sp.GetRequiredService<ISqlDataService>(),
+    sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents
+));
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper, OvernightActivitiesHelper>();
 builder.Services.AddScoped<ISnapshotPeriodHelper, SnapshotPeriodHelper>();

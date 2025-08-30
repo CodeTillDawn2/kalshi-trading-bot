@@ -1,16 +1,8 @@
 ﻿using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
 using SmokehouseBot.Configuration;
-using SmokehouseBot.Exceptions;
-using SmokehouseBot.Logging;
 using SmokehouseBot.Management.Interfaces;
-using SmokehouseBot.Services.Interfaces;
-using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
-using System.Collections.Concurrent;
-using System.Net.WebSockets;
-using System.Text.RegularExpressions;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace SmokehouseBot.Management
 {

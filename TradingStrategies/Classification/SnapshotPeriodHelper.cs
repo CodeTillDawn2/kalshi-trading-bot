@@ -2,7 +2,6 @@
 using Newtonsoft.Json.Linq;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
-using System.IO;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Trading.Helpers;
 
@@ -303,6 +302,6 @@ namespace TradingStrategies.Classification
             return GapLessThanMaxActiveGap;
         }
 
-     
+
     }
 }

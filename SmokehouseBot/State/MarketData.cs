@@ -357,7 +357,7 @@ namespace SmokehouseBot.State
             }
 
             UpdateTradingMetrics();
-            
+
         }
 
         private void CalculateSlope()
@@ -387,7 +387,7 @@ namespace SmokehouseBot.State
                 return;
             }
 
-            _yesBidSlopePerMinute = Math.Round((last.yes_bid - first.yes_bid) / timeDiffMin,2);
+            _yesBidSlopePerMinute = Math.Round((last.yes_bid - first.yes_bid) / timeDiffMin, 2);
             _noBidSlopePerMinute = Math.Round(((100 - last.yes_ask) - (100 - first.yes_ask)) / timeDiffMin);
 
         }
@@ -503,7 +503,7 @@ namespace SmokehouseBot.State
             _obv_Medium = (long)_tradingCalculator.CalculateOBV(hourCopy);
 
             _obv_Long = (long)_tradingCalculator.CalculateOBV(dayCopy);
-            
+
             ADX = _tradingCalculator.CalculateADX(minuteCopy, _calculationConfig.ADX_Periods);
 
             CalculateSlope();
@@ -884,7 +884,7 @@ namespace SmokehouseBot.State
             return result.OrderBy(pc => pc.Timestamp).ToList();
         }
 
-       
+
 
         private List<PseudoCandlestick> _minutePseudoCandlesticks = new List<PseudoCandlestick>();
         private List<PseudoCandlestick> _hourPseudoCandlesticks = new List<PseudoCandlestick>();

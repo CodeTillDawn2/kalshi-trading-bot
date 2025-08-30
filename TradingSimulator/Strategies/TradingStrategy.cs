@@ -5,8 +5,8 @@ using Microsoft.Extensions.Options;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
 using TradingSimulator.Simulator;
-using TradingStrategies.Configuration;
 using TradingStrategies.Classification.Interfaces;
+using TradingStrategies.Configuration;
 
 namespace TradingSimulator.Strategies
 {

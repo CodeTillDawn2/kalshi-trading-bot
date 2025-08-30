@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace SmokehouseDTOs.KalshiAPI
+﻿namespace SmokehouseDTOs.KalshiAPI
 {
 
     public class ExchangeScheduleResponse

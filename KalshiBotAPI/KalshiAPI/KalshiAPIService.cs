@@ -673,7 +673,7 @@ namespace KalshiBotAPI.KalshiAPI
                 RecordExecutionTime(nameof(FetchEventAsync), stopwatch.ElapsedMilliseconds);
                 return eventResponse;
             }
-            catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key")) 
+            catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key"))
             {
                 stopwatch.Stop();
                 _logger.LogWarning(ex, "Duplicate event ticker {EventTicker} encountered while saving event data", eventTicker);

@@ -4,7 +4,6 @@ using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
 using SmokehouseBot.Configuration;
-using SmokehouseBot.Helpers;
 using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
@@ -114,7 +113,7 @@ namespace SmokehouseBot.Services
                 }
 
                 marketData.RefreshCandlestickMetadata();
-                
+
 
             }
             catch (OperationCanceledException)
@@ -158,7 +157,7 @@ namespace SmokehouseBot.Services
                     {
                         _logger.LogWarning("Market data not found for {marketTicker}", marketTicker);
                     }
-                    else 
+                    else
                     {
                         _logger.LogInformation("Market data not found for {marketTicker}, but it was recently removed.", marketTicker);
                     }
@@ -201,7 +200,7 @@ namespace SmokehouseBot.Services
                                 _logger.LogWarning("Error loading candlesticks for {interval}, market {market}. Returning empty list.", interval, marketTicker);
                                 newCandlesticks = new List<CandlestickData>();
                             }
-                            
+
                             // Validate newCandlesticks
                             if (newCandlesticks == null)
                             {
@@ -604,8 +603,8 @@ namespace SmokehouseBot.Services
             catch (Exception ex)
             {
                 _logger.LogWarning("Failed candlestick processing for {MarketTicker} at {Interval}: ParquetFilesLoaded={ParquetFilesLoaded}, ParquetFilesSkipped={ParquetFilesSkipped}, ParquetCandlesticksLoaded={ParquetCandlesticksLoaded}, SqlCandlesticksLoaded={SqlCount}, ForwardFilledAdded={ForwardFilledCount}, TotalCandlesticks={TotalCount}, Exception: {0}, Inner: {1}",
-                              marketTicker, interval, parquetFilesLoaded, parquetFilesSkipped, 
-                              parquetCandlesticksLoaded, rawCandlesticks.Count(), forwardFilledCount, 
+                              marketTicker, interval, parquetFilesLoaded, parquetFilesSkipped,
+                              parquetCandlesticksLoaded, rawCandlesticks.Count(), forwardFilledCount,
                               finalCandlesticks.Count, ex.Message, ex.InnerException?.Message);
 
             }

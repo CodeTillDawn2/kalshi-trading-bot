@@ -86,7 +86,7 @@ namespace SmokehouseBot.Logging
                         {
                             // Log the database failure to console and file
                             var errorMessage = $"Failed to save log to database: {ex.Message}, Inner: {ex.InnerException?.Message}";
-                            Console.WriteLine(errorMessage); 
+                            Console.WriteLine(errorMessage);
                             try
                             {
                                 File.AppendAllText("logs/logging.log", errorMessage + "\n");

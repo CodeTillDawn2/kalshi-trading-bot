@@ -1,17 +1,10 @@
 ﻿using KalshiBotAPI.Configuration;
 using KalshiBotAPI.WebSockets.Interfaces;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
-using SmokehouseBot.Configuration;
-using SmokehouseBot.Hubs;
-using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
-using SmokehouseBot.State;
 using SmokehouseBot.State.Interfaces;
-using SmokehouseDTOs.Data;
 using SmokehouseDTOs.Exceptions;
-using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
 
 namespace SmokehouseBot.Services
@@ -38,12 +31,12 @@ namespace SmokehouseBot.Services
             {
 
                 _scopeManager.InitializeScope();
-                
+
                 var kalshiConfig = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IOptions<KalshiConfig>>();
-              
+
 
                 _brainLock = brainLock;
-                
+
 
                 if (kalshiConfig.Value.KeyFile == null || !File.Exists(kalshiConfig.Value.KeyFile))
                 {
@@ -75,7 +68,7 @@ namespace SmokehouseBot.Services
         public IWebSocketMonitorService? GetWebSocketHostedService() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<IWebSocketMonitorService>() ?? null;
         public ICentralErrorHandler? GetSmokehouseErrorHandler() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<ICentralErrorHandler>() ?? null;
 
-       
+
 
         public void ResetAll()
         {

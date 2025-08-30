@@ -84,3 +84,4 @@ KalshiUI/bin/Debug/net8.0-windows/appsettings.local.json
 /TradingGUI/obj
 /KalshiBotAPI/obj
 /KalshiBotOverseer/obj
+/KalshiBotAPI/bin

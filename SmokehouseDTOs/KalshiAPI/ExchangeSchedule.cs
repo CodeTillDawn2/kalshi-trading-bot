@@ -9,6 +9,6 @@ namespace SmokehouseDTOs.KalshiAPI
         public List<StandardHours> StandardHours { get; set; } = new();
 
         [JsonPropertyName("maintenance_windows")]
-        public List<object> MaintenanceWindows { get; set; } = new(); 
+        public List<object> MaintenanceWindows { get; set; } = new();
     }
 }

@@ -1,6 +1,5 @@
-﻿using System.Text.Json;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
-using SmokehouseDTOs;
+﻿using SmokehouseDTOs;
+using System.Text.Json;
 using TradingStrategies.Strategies.Strats;
 
 namespace TradingStrategies.Strategies

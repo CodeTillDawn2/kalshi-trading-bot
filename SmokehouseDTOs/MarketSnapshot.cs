@@ -1,7 +1,6 @@
-﻿using SmokehouseDTOs.Data;
+﻿using SmokehouseDTOs.Converters;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using SmokehouseDTOs.Converters;
 
 namespace SmokehouseDTOs
 {
@@ -655,7 +654,7 @@ namespace SmokehouseDTOs
         #endregion
 
         #region Order Book Velocities
-      
+
         /// <summary>
         /// Gets or sets the velocity of order book changes for bottom "Yes" bid prices, in dollars per minute.
         /// </summary>

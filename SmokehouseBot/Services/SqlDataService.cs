@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
-using SmokehouseBot.Exceptions;
 using SmokehouseBot.Services.Interfaces;
+using SmokehouseDTOs.Exceptions;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Text.Json;

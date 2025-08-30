@@ -1,15 +1,13 @@
-﻿using SmokehouseBot.Helpers;
+﻿using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
+using SmokehouseBot.State.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
+using SmokehouseDTOs.Exceptions;
+using SmokehouseDTOs.Helpers;
 using SmokehouseDTOs.KalshiAPI;
 using System.Collections.Concurrent;
 using System.Text.Json;
-using SmokehouseBot.State.Interfaces;
-using SmokehouseBot.Management.Interfaces;
-using System.Linq.Expressions;
-using SmokehouseDTOs.Exceptions;
-using SmokehouseDTOs.Helpers;
 
 namespace SmokehouseBot.Services
 {
@@ -603,7 +601,7 @@ namespace SmokehouseBot.Services
                 return;
             }
 
-                marketData.LastOrderbookEventTimestamp = DateTime.UtcNow;
+            marketData.LastOrderbookEventTimestamp = DateTime.UtcNow;
 
             try
             {
@@ -734,7 +732,7 @@ namespace SmokehouseBot.Services
 
                         marketData.ReceivedFirstSnapshot = true;
                     }
-                    
+
                     _logger.LogDebug("DELTA-Orderbook Snapshot processed for {MarketTicker}, {Count} orders added", marketTicker, updatedOrderbook.Count);
                 }
             }
@@ -754,7 +752,7 @@ namespace SmokehouseBot.Services
         {
             if (!_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker)) return new List<OrderbookData>();
             _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-            
+
             var orderbook = _serviceFactory.GetDataCache().Markets[marketTicker]?.OrderbookData;
             if (orderbook == null && _serviceFactory.GetDataCache().WatchedMarkets.Contains(marketTicker))
             {
@@ -850,7 +848,7 @@ namespace SmokehouseBot.Services
                         marketTicker, string.Join("; ", orderbook.Select(o => $"Price={o.Price},Side={o.Side},Contracts={o.RestingContracts}")));
                 }
 
-          
+
 
                 return orderbook;
             }

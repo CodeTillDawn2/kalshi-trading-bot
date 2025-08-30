@@ -1,10 +1,8 @@
 ﻿// File: TradingStrategies/Strategies/Strats/LowLiquidityExitExec.cs
 
 using SmokehouseDTOs;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
 using System.Text.Json;
-using System;
-using System.Collections.Generic;
+using static SmokehouseInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Strategies.Strats
 {

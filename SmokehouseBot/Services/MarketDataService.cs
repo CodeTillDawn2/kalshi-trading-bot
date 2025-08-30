@@ -2,9 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmokehouseBot.Configuration;
-using SmokehouseBot.Helpers;
 using SmokehouseBot.KalshiAPI.Interfaces;
-using SmokehouseBot.Management;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseBot.State;
@@ -527,7 +525,7 @@ namespace SmokehouseBot.Services
                         _serviceFactory.GetDataCache().Markets[marketTicker].ChangeTracker.Shutdown();
                         _serviceFactory.GetDataCache().Markets.TryRemove(marketTicker, out var _);
                     }
-                    if (!_serviceFactory.GetDataCache().RecentlyRemovedMarkets.Contains(marketTicker)) 
+                    if (!_serviceFactory.GetDataCache().RecentlyRemovedMarkets.Contains(marketTicker))
                         _serviceFactory.GetDataCache().RecentlyRemovedMarkets.Add(marketTicker);
                     _serviceFactory.GetDataCache().WatchedMarkets.Remove(marketTicker);
                     _logger.LogInformation("Stats: Removed {MarketTicker} from WatchedMarkets, current WatchedMarkets: {WatchedMarkets}", marketTicker, string.Join(", ", _serviceFactory.GetDataCache().WatchedMarkets));
@@ -1134,69 +1132,69 @@ namespace SmokehouseBot.Services
 
             try
             {
-          
-                    if (ticker.LoggedDate == default)
-                    {
-                        ticker.LoggedDate = ticker.ts > 0
-                            ? UnixHelper.ConvertFromUnixTimestamp(ticker.ts).ToUniversalTime()
-                            : DateTime.UtcNow;
-                    }
-                    if (ticker.ProcessedDate == default)
-                    {
-                        ticker.ProcessedDate = DateTime.UtcNow;
-                    }
 
-                    // Deduplicate in _tickerDeduplication
-                    var key = (ticker.LoggedDate, ticker.market_ticker);
-                    if (_tickerDeduplication.TryGetValue(key, out var existingTicker))
+                if (ticker.LoggedDate == default)
+                {
+                    ticker.LoggedDate = ticker.ts > 0
+                        ? UnixHelper.ConvertFromUnixTimestamp(ticker.ts).ToUniversalTime()
+                        : DateTime.UtcNow;
+                }
+                if (ticker.ProcessedDate == default)
+                {
+                    ticker.ProcessedDate = DateTime.UtcNow;
+                }
+
+                // Deduplicate in _tickerDeduplication
+                var key = (ticker.LoggedDate, ticker.market_ticker);
+                if (_tickerDeduplication.TryGetValue(key, out var existingTicker))
+                {
+                    _logger.LogWarning("Replacing duplicate ticker for {MarketTicker}: ts={TS}, Old: Ask={OldAsk}, Bid={OldBid}, New: Ask={NewAsk}, Bid={NewBid}, LoggedDate={LoggedDate}",
+                        marketTicker, ticker.ts, existingTicker.yes_ask, existingTicker.yes_bid, ticker.yes_ask, ticker.yes_bid, ticker.LoggedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                    _tickerDeduplication[key] = ticker;
+                }
+                else
+                {
+                    _tickerDeduplication.TryAdd(key, ticker);
+                    _preppedTickers.Add(ticker);
+                }
+
+                // Thread-safe cleanup of old tickers
+                var cutoff = DateTime.UtcNow.AddDays(-1);
+                var currentTickers = marketData.Tickers.ToList(); // Snapshot for safe enumeration
+                if (currentTickers.Any(t => t.LoggedDate < cutoff))
+                {
+                    var newBag = new ConcurrentBag<TickerDTO>(currentTickers.Where(t => t.LoggedDate >= cutoff));
+                    if (!currentTickers.Any(t => t.LoggedDate == ticker.LoggedDate))
                     {
-                        _logger.LogWarning("Replacing duplicate ticker for {MarketTicker}: ts={TS}, Old: Ask={OldAsk}, Bid={OldBid}, New: Ask={NewAsk}, Bid={NewBid}, LoggedDate={LoggedDate}",
-                            marketTicker, ticker.ts, existingTicker.yes_ask, existingTicker.yes_bid, ticker.yes_ask, ticker.yes_bid, ticker.LoggedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
-                        _tickerDeduplication[key] = ticker;
+                        newBag.Add(ticker);
                     }
                     else
                     {
-                        _tickerDeduplication.TryAdd(key, ticker);
-                        _preppedTickers.Add(ticker);
+                        _logger.LogWarning("Duplicate ticker in marketData for {MarketTicker}: ts={TS}, Ask={Ask}, Bid={Bid}, LoggedDate={LoggedDate}",
+                            marketTicker, ticker.ts, ticker.yes_ask, ticker.yes_bid, ticker.LoggedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
                     }
-
-                    // Thread-safe cleanup of old tickers
-                    var cutoff = DateTime.UtcNow.AddDays(-1);
-                    var currentTickers = marketData.Tickers.ToList(); // Snapshot for safe enumeration
-                    if (currentTickers.Any(t => t.LoggedDate < cutoff))
+                    marketData.Tickers = newBag; // Atomic replacement
+                    _logger.LogDebug("Cleaned up tickers for {MarketTicker}. New count: {Count}, Latest: {Latest}",
+                        marketTicker, newBag.Count,
+                        newBag.OrderByDescending(t => t.LoggedDate).FirstOrDefault()?.LoggedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") ?? "None");
+                }
+                else
+                {
+                    // No cleanup needed, just add if not duplicate
+                    if (!currentTickers.Any(t => t.LoggedDate == ticker.LoggedDate))
                     {
-                        var newBag = new ConcurrentBag<TickerDTO>(currentTickers.Where(t => t.LoggedDate >= cutoff));
-                        if (!currentTickers.Any(t => t.LoggedDate == ticker.LoggedDate))
-                        {
-                            newBag.Add(ticker);
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Duplicate ticker in marketData for {MarketTicker}: ts={TS}, Ask={Ask}, Bid={Bid}, LoggedDate={LoggedDate}",
-                                marketTicker, ticker.ts, ticker.yes_ask, ticker.yes_bid, ticker.LoggedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
-                        }
-                        marketData.Tickers = newBag; // Atomic replacement
-                        _logger.LogDebug("Cleaned up tickers for {MarketTicker}. New count: {Count}, Latest: {Latest}",
-                            marketTicker, newBag.Count,
-                            newBag.OrderByDescending(t => t.LoggedDate).FirstOrDefault()?.LoggedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") ?? "None");
+                        marketData.Tickers.Add(ticker);
+                        _logger.LogDebug("Added ticker for {MarketTicker}. Tickers count: {Count}, Latest: {Latest}",
+                            marketTicker, marketData.Tickers.Count,
+                            marketData.Tickers.OrderByDescending(t => t.LoggedDate).FirstOrDefault()?.LoggedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") ?? "None");
                     }
                     else
                     {
-                        // No cleanup needed, just add if not duplicate
-                        if (!currentTickers.Any(t => t.LoggedDate == ticker.LoggedDate))
-                        {
-                            marketData.Tickers.Add(ticker);
-                            _logger.LogDebug("Added ticker for {MarketTicker}. Tickers count: {Count}, Latest: {Latest}",
-                                marketTicker, marketData.Tickers.Count,
-                                marketData.Tickers.OrderByDescending(t => t.LoggedDate).FirstOrDefault()?.LoggedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") ?? "None");
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Duplicate ticker in marketData for {MarketTicker}: ts={TS}, Ask={Ask}, Bid={Bid}, LoggedDate={LoggedDate}",
-                                marketTicker, ticker.ts, ticker.yes_ask, ticker.yes_bid, ticker.LoggedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
-                        }
+                        _logger.LogWarning("Duplicate ticker in marketData for {MarketTicker}: ts={TS}, Ask={Ask}, Bid={Bid}, LoggedDate={LoggedDate}",
+                            marketTicker, ticker.ts, ticker.yes_ask, ticker.yes_bid, ticker.LoggedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
                     }
-                
+                }
+
                 marketData.UpdateCurrentPrice(ticker.yes_ask, ticker.yes_bid, ticker.LoggedDate, "Ticker");
                 NotifyTickerAdded(marketTicker);
             }

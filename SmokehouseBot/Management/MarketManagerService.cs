@@ -1,11 +1,9 @@
 ﻿using KalshiBotData.Data.Interfaces;
-using KalshiBotData.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmokehouseBot.Configuration;
 using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
-using SmokehouseBot.Services;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
@@ -294,12 +292,12 @@ namespace SmokehouseBot.Management
                             await _serviceFactory.GetMarketDataService().AddMarketWatch(market);
                         }
                     }
-                    
+
                 }
                 else
                 {
                     _logger.LogInformation("Stats: Skipped readding {0} after reset because already watched. Watched: {0}", market,
-                        String.Join(",",_serviceFactory.GetDataCache().WatchedMarkets));
+                        String.Join(",", _serviceFactory.GetDataCache().WatchedMarkets));
                 }
             }
 
@@ -318,7 +316,7 @@ namespace SmokehouseBot.Management
                     _logger.LogInformation("Stats: Removing {market} for reset", market);
                     await _serviceFactory.GetMarketDataService().UnwatchMarket(market);
                     MarketsToAddAfterReset.Add(market);
-                    
+
                 }
                 MarketsToReset.RemoveAll(x => x == market);
             }
@@ -458,12 +456,12 @@ namespace SmokehouseBot.Management
                     }
                 }
 
-                int marketsToAdd = Math.Min(marketsToAddCount - marketsAdded,_executionConfig.MaxMarketsPerSubscriptionAction);
+                int marketsToAdd = Math.Min(marketsToAddCount - marketsAdded, _executionConfig.MaxMarketsPerSubscriptionAction);
                 if (marketsToAdd > 0)
                 {
                     List<MarketDTO> candidates = await context.GetMarkets(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active },
                         hasMarketWatch: false);
-                    List<string> candidateMarkets = candidates.OrderByDescending(x => x.volume_24h).Take(Math.Max(marketsToAdd * 2,20)).Select(x => x.market_ticker).ToList();
+                    List<string> candidateMarkets = candidates.OrderByDescending(x => x.volume_24h).Take(Math.Max(marketsToAdd * 2, 20)).Select(x => x.market_ticker).ToList();
 
                     if (candidateMarkets.Any())
                     {

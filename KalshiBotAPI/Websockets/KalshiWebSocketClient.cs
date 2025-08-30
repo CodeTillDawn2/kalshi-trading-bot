@@ -1,10 +1,11 @@
-﻿using KalshiBotAPI.WebSockets.Interfaces;
+﻿using KalshiBotAPI.Configuration;
+using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
+using SmokehouseDTOs.Exceptions;
 using SmokehouseInterfaces.Constants;
 using SmokehouseInterfaces.Enums;
 using System.Collections.Concurrent;
@@ -12,11 +13,9 @@ using System.Data;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
-using KalshiBotAPI.Configuration;
 using System.Text.Json;
-using SmokehouseDTOs.Exceptions;
 
-namespace KalshiBotAPI.WebSockets
+namespace KalshiBotAPI.Websockets
 {
     public class KalshiWebSocketClient : IKalshiWebSocketClient
     {
@@ -24,7 +23,6 @@ namespace KalshiBotAPI.WebSockets
         private readonly IStatusTrackerService _statusTrackerService;
         private readonly ILogger<IKalshiWebSocketClient> _logger;
         private readonly KalshiConfig _kalshiConfig;
-        private readonly LoggingConfig _loggingConfig;
         private readonly RSA _privateKey;
         private ClientWebSocket? _webSocket = null!;
         private int _messageId = 1;
@@ -92,20 +90,22 @@ namespace KalshiBotAPI.WebSockets
         private Dictionary<string, long> _marketOrderbooEventsReceived = new Dictionary<string, long>();
         private Dictionary<string, long> _marketTradeEventsReceived = new Dictionary<string, long>();
 
+        public bool WriteToSQL { get; private set; }
+
         public KalshiWebSocketClient(
             IOptions<KalshiConfig> kalshiConfig,
-            IOptions<LoggingConfig> loggingConfig,
             ILogger<IKalshiWebSocketClient> logger,
             IStatusTrackerService statusTrackerService,
-            ISqlDataService sqlDataService)
+            ISqlDataService sqlDataService,
+            bool writeToSql)
         {
             _kalshiConfig = kalshiConfig.Value;
-            _loggingConfig = loggingConfig.Value;
             _logger = logger;
             _statusTrackerService = statusTrackerService;
             _sqlDataService = sqlDataService;
             _privateKey = RSA.Create();
             _privateKey.ImportFromPem(File.ReadAllText(_kalshiConfig.KeyFile));
+            WriteToSQL = writeToSql;
 
             // Initialize event counts
             _eventCounts.TryAdd("OrderBook", 0);
@@ -500,7 +500,7 @@ namespace KalshiBotAPI.WebSockets
 
         public async Task ConnectAsync(int retryCount = 0)
         {
-            if ((!_allowReconnect && !_isConnected) || !_statusTrackerService.InitializationCompleted.Task.IsCompleted)
+            if (!_allowReconnect && !_isConnected || !_statusTrackerService.InitializationCompleted.Task.IsCompleted)
             {
                 _logger.LogDebug("Reconnection disabled, skipping connect attempt");
                 return;
@@ -556,7 +556,7 @@ namespace KalshiBotAPI.WebSockets
                 }
 
                 // Subscribe to non-market-specific channels
-                foreach (var channel in new[] { "fill", "lifecycle" 
+                foreach (var channel in new[] { "fill", "lifecycle"
                 })
                 {
                     _globalCancellationToken.ThrowIfCancellationRequested();
@@ -904,7 +904,7 @@ namespace KalshiBotAPI.WebSockets
                 }
                 else
                 {
-                    string[] marketsToSubscribeTo = (new[] { "orderbook_delta", "ticker", "trade" }.Contains(channel)) ? newSubscriptions : Array.Empty<string>();
+                    string[] marketsToSubscribeTo = new[] { "orderbook_delta", "ticker", "trade" }.Contains(channel) ? newSubscriptions : Array.Empty<string>();
 
                     if (new[] { "orderbook_delta", "ticker", "trade" }.Contains(channel) && newSubscriptions.Length == 0)
                     {
@@ -1571,7 +1571,7 @@ namespace KalshiBotAPI.WebSockets
 
                         CheckMarketSubscription("orderbook_delta", data.GetProperty("msg"));
 
-                        if (_loggingConfig.StoreWebSocketEvents)
+                        if (WriteToSQL)
                         {
                             await _sqlDataService.StoreOrderBookAsync(data, offerType);
                             _logger.LogDebug("Stored orderbook: Type={Type}, MarketTicker={Ticker}, QueueCount={QueueCount}",
@@ -1633,7 +1633,7 @@ namespace KalshiBotAPI.WebSockets
                         if (TradeReceived != null)
                             TradeReceived?.Invoke(this, new TradeEventArgs(data));
 
-                        if (_loggingConfig.StoreWebSocketEvents) 
+                        if (WriteToSQL)
                             await _sqlDataService.StoreTradeAsync(data);
                         break;
 
@@ -1643,7 +1643,7 @@ namespace KalshiBotAPI.WebSockets
                         _logger.LogDebug("Received fill message");
                         if (FillReceived != null)
                             FillReceived?.Invoke(this, new FillEventArgs(data));
-                        if (_loggingConfig.StoreWebSocketEvents)
+                        if (WriteToSQL)
                             await _sqlDataService.StoreFillAsync(data);
                         break;
 
@@ -1653,7 +1653,7 @@ namespace KalshiBotAPI.WebSockets
                         _logger.LogDebug("Received market lifecycle message");
                         if (MarketLifecycleReceived != null)
                             MarketLifecycleReceived?.Invoke(this, new MarketLifecycleEventArgs(data));
-                        if (_loggingConfig.StoreWebSocketEvents)
+                        if (WriteToSQL)
                             await _sqlDataService.StoreMarketLifecycleAsync(data);
                         break;
 
@@ -1662,7 +1662,7 @@ namespace KalshiBotAPI.WebSockets
                         _logger.LogDebug("Received event lifecycle message");
                         if (EventLifecycleReceived != null)
                             EventLifecycleReceived?.Invoke(this, new EventLifecycleEventArgs(data));
-                        if (_loggingConfig.StoreWebSocketEvents)
+                        if (WriteToSQL)
                             await _sqlDataService.StoreEventLifecycleAsync(data);
                         break;
 

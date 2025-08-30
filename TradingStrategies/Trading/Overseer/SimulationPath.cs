@@ -1,6 +1,5 @@
-﻿using static SmokehouseInterfaces.Enums.StrategyEnums;
-using TradingStrategies.Strategies;
-using SmokehouseDTOs;
+﻿using TradingStrategies.Strategies;
+using static SmokehouseInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Trading.Overseer
 {

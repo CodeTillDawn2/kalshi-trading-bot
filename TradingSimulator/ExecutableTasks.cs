@@ -8,8 +8,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using SmokehouseBot.Configuration;
-using SmokehouseBot.Helpers;
-using SmokehouseBot.KalshiAPI;
 using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management;
 using SmokehouseBot.Management.Interfaces;
@@ -20,7 +18,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using TradingSimulator.Strategies;
 using TradingStrategies.Classification;
-using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;
 
 
@@ -142,7 +139,7 @@ namespace TradingSimulator.Executable
 
             _serviceProvider = services.BuildServiceProvider();
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
-            
+
             _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig);
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _marketAnalysisHelper, _executionConfig, _sqlDataService);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _snapshotOptions, Options.Create(tradingConfig), _scopeFactory);
@@ -196,7 +193,7 @@ namespace TradingSimulator.Executable
 
             while (RecordsReturned != 0)
             {
-                var allUnvalidatedSnapshots = await _dbContext.GetSnapshots(isValidated: false, endDate: startTime, 
+                var allUnvalidatedSnapshots = await _dbContext.GetSnapshots(isValidated: false, endDate: startTime,
                     MaxRecords: 2000);
                 RecordsReturned = allUnvalidatedSnapshots.Count;
 
@@ -248,8 +245,8 @@ namespace TradingSimulator.Executable
                                 market.category = marketCategory;
                                 await dbContext.AddOrUpdateMarket(market);
                             }
-                            
-                            
+
+
                         }
 
                         foreach (var snapshotList in cacheSnapshotDict.Values)
@@ -305,21 +302,21 @@ namespace TradingSimulator.Executable
                                     //    });
                                     //}
 
-                           
+
 
                                     //if (result.IsValid)
                                     //{
-                                        var snapshotToUpdate = snapshots.FirstOrDefault(x => x.MarketTicker == cacheSnapshot.MarketTicker && x.SnapshotDate == cacheSnapshot.Timestamp);
-                                        if (snapshotToUpdate != null)
+                                    var snapshotToUpdate = snapshots.FirstOrDefault(x => x.MarketTicker == cacheSnapshot.MarketTicker && x.SnapshotDate == cacheSnapshot.Timestamp);
+                                    if (snapshotToUpdate != null)
+                                    {
+                                        snapshotToUpdate.IsValidated = true;
+                                        if (SaveUpdatedJSON)
                                         {
-                                            snapshotToUpdate.IsValidated = true;
-                                            if (SaveUpdatedJSON)
-                                            {
-                                                cacheSnapshot.MarketCategory = marketCategory;
-                                                snapshotToUpdate.RawJSON = JsonSerializer.Serialize(cacheSnapshot, options);
-                                            }
+                                            cacheSnapshot.MarketCategory = marketCategory;
+                                            snapshotToUpdate.RawJSON = JsonSerializer.Serialize(cacheSnapshot, options);
                                         }
-                                        validCount++;
+                                    }
+                                    validCount++;
                                     //}
                                 }
                                 catch
@@ -345,7 +342,7 @@ namespace TradingSimulator.Executable
                             //        errorCount++;
                             //    }
                             //}
-          
+
                         }
 
                         //await ExportDiscrepancyReportForMarket(
@@ -368,7 +365,7 @@ namespace TradingSimulator.Executable
                 }
             }
 
-            
+
 
             await ExportDiscrepancyReport(); // Update global report
         }

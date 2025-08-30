@@ -175,7 +175,7 @@ namespace SmokehouseBot.Services
 
         public void Dispose()
         {
-            
+
             _realTimeBroadcastTask?.Dispose();
             _performanceBroadcastTask?.Dispose();
         }
@@ -389,7 +389,7 @@ namespace SmokehouseBot.Services
         {
             var stopwatch = Stopwatch.StartNew();
             IncrementBroadcastCount(nameof(BroadcastOrderbookAsync));
-            var cancellationToken = _statusTracker  .GetCancellationToken();
+            var cancellationToken = _statusTracker.GetCancellationToken();
             cancellationToken.ThrowIfCancellationRequested();
             if (connectionId == null && !ChartHub.HasConnectedClients())
             {

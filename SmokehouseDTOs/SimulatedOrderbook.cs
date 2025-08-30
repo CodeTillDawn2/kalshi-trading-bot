@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using SmokehouseDTOs;
 using System.Text.Json;
-using SmokehouseDTOs;
 
 namespace TradingStrategies.Trading.Overseer
 {

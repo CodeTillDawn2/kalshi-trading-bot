@@ -1,7 +1,5 @@
 ﻿using KalshiBotData.Data.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using SmokehouseBot.Helpers;
 using SmokehouseBot.Services.Interfaces;
@@ -10,9 +8,7 @@ using SmokehouseDTOs.Converters;
 using SmokehouseDTOs.Data;
 using SmokehouseDTOs.Exceptions;
 using SmokehouseInterfaces.Constants;
-using System.IO;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;

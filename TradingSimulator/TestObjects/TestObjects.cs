@@ -1,8 +1,5 @@
 ﻿// Updated TradingSimulator.TestObjects with EventPoints in CachedMarketData
 using TradingSimulator.Strategies;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace TradingSimulator.TestObjects
 {

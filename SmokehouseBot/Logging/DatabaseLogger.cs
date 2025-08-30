@@ -1,5 +1,4 @@
 ﻿using SmokehouseBot.Configuration;
-using SmokehouseBot.Management;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseDTOs.Data;
 

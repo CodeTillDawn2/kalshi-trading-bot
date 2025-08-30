@@ -1,8 +1,6 @@
 ﻿// Updated Strategy.cs for merged Strat
 using SmokehouseDTOs;
 using static SmokehouseInterfaces.Enums.StrategyEnums;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace TradingStrategies.Strategies
 {
@@ -44,7 +42,7 @@ namespace TradingStrategies.Strategies
                     decisionsByType[action] = new List<(double, ActionDecision)>();
                 }
                 decisionsByType[action].Add((weight, decision));
-                
+
             }
 
             if (actionVotes.Count == 0) return new ActionDecision { Type = ActionType.None, Memo = "No action votes" };

@@ -1,9 +1,7 @@
 ﻿using SmokehouseDTOs;
+using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
 using static SmokehouseInterfaces.Enums.StrategyEnums;
-using System;
-using System.Collections.Generic;
-using TradingStrategies.Extensions;
 
 namespace TradingStrategies.Trading.Overseer
 {

@@ -1,8 +1,8 @@
-﻿using SmokehouseBot.Exceptions;
-using SmokehouseBot.Logging;
+﻿using SmokehouseBot.Logging;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
+using SmokehouseDTOs.Exceptions;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text.RegularExpressions;
