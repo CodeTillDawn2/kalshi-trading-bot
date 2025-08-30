@@ -18,6 +18,7 @@ using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using TradingSimulator.Strategies;
 using TradingSimulator.TestObjects;
 using TradingStrategies;
@@ -149,8 +150,7 @@ namespace TradingSimulator.Simulator
             yield return ("SimplePriceRiseStrategy", SimplePriceRiseStrategy);
         }
 
-        // SimulatorTests.cs
-        private async Task<List<SnapshotGroupDTO>> GetFilteredSnapshotGroupsAsync(
+        public async Task<List<SnapshotGroupDTO>> GetFilteredSnapshotGroupsAsync(
             IKalshiBotContext context, int? maxGroups, List<string>? marketsToRun)
         {
             var groups = await context.GetSnapshotGroups_cached(maxGroups: maxGroups).ConfigureAwait(false);
@@ -158,8 +158,14 @@ namespace TradingSimulator.Simulator
             foreach (var g in groups)
             {
                 var recorded = g.EndTime - g.StartTime;
-                if (recorded.TotalHours < 1) continue;              // FIX: TotalHours
-                if (marketsToRun != null && !marketsToRun.Contains(g.MarketTicker)) continue;
+                if (recorded.TotalHours < 1) continue;  // Skip if insufficient duration
+
+                if (marketsToRun != null)
+                {
+                    var baseTicker = Regex.Replace(g.MarketTicker ?? "", @"_(\d+)$", "");
+                    if (!marketsToRun.Contains(baseTicker, StringComparer.OrdinalIgnoreCase)) continue;
+                }
+
                 filtered.Add(g);
             }
             return filtered;
@@ -361,11 +367,9 @@ namespace TradingSimulator.Simulator
                 var cache = await _snapshotService.LoadManySnapshots(allSnapshotData).ConfigureAwait(false);
                 var marketSnapshots = cache
                     .SelectMany(kvp => kvp.Value)
-                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue && ms.BestYesBid > 0 && ms.BestYesAsk > 0)
+                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue)
                     .OrderBy(ms => ms.Timestamp)
                     .ToList();
-
-                if (marketSnapshots.Count == 0) continue;
 
                 var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
 
@@ -460,6 +464,24 @@ namespace TradingSimulator.Simulator
             return await context.GetSnapshotGroupNames();
         }
 
+        public async Task<List<string>> GetValidBaseMarketsAsync(List<string>? basesToInclude = null, int? maxGroups = null)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+
+            // Reuse the existing filtering logic, passing basesToInclude as marketsToRun
+            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, maxGroups, basesToInclude).ConfigureAwait(false);
+
+            // Extract base tickers (remove trailing _num if present), filter distinct non-empty, sort case-insensitively
+            var validBases = filteredGroups
+                .Select(g => Regex.Replace(g.MarketTicker ?? "", @"_(\d+)$", ""))
+                .Where(b => !string.IsNullOrWhiteSpace(b))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            validBases.Sort(StringComparer.OrdinalIgnoreCase);
+            return validBases;
+        }
 
         public enum StrategyFamily
         {

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using TradingSimulator.Simulator;
 using TradingSimulator.TestObjects;
+using System.Text.RegularExpressions;
 
 namespace SimulatorWinForms
 {
@@ -86,7 +87,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private async Task LoadCache()
+        private async Task LoadCache(List<string> includeBases = null)
         {
             dgvMarkets.Columns.Clear();
             dgvMarkets.Rows.Clear();
@@ -106,18 +107,29 @@ namespace SimulatorWinForms
                 if (dgvMarkets.Columns["CheckedCol"] is DataGridViewCheckBoxColumn c) c.Width = 32;
             };
 
-            // Always drive entries from snapshot groups
+            // Always drive entries from snapshot groups, filtered for validity
             try
             {
                 _simulator.EnsureInitialized();
 
-                var groupNames = await _simulator.GetSnapshotGroupNames();
-                var bases = groupNames
-                    .Select(g => System.Text.RegularExpressions.Regex.Replace(g ?? "", @"_(\d+)$", ""))
-                    .Where(b => !string.IsNullOrWhiteSpace(b))
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .OrderBy(b => b, StringComparer.OrdinalIgnoreCase)
-                    .ToList();
+                List<string> basesToUse;
+                if (includeBases == null)
+                {
+                    // Compute all possible bases from all group names
+                    var groupNames = await _simulator.GetSnapshotGroupNames();
+                    basesToUse = groupNames
+                        .Select(g => Regex.Replace(g ?? "", @"_(\d+)$", ""))
+                        .Where(b => !string.IsNullOrWhiteSpace(b))
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+                }
+                else
+                {
+                    basesToUse = includeBases;
+                }
+
+                // Retrieve valid base markets, filtered by basesToUse
+                var bases = await _simulator.GetValidBaseMarketsAsync(basesToInclude: basesToUse);
 
                 // Optional enrichment from cache (if present)
                 var pnlByBase = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
@@ -166,17 +178,14 @@ namespace SimulatorWinForms
                     dgvMarkets.Rows.Add(_checkedMarketNames.Contains(b), b, pnlText);
                 }
 
-                AppendLog($"Loaded {bases.Count} markets from snapshot groups (cache used only for PnL if available).");
+                AppendLog($"Loaded {bases.Count} valid markets from snapshot groups (cache used only for PnL if available).");
                 RestoreCheckboxes();
             }
             catch (Exception ex)
             {
-                AppendLog($"Snapshot group load failed: {ex.Message}");
+                AppendLog($"Market load failed: {ex.Message}");
             }
         }
-
-
-
 
         private void EnsureSimulatorSetup()
         {
@@ -362,7 +371,7 @@ namespace SimulatorWinForms
             formsPlot1.Plot.Clear();
             _tooltipPoints.Clear();
 
-            var baseMarket = System.Text.RegularExpressions.Regex.Replace(market ?? "", @"_(\d+)$", "");
+            var baseMarket = Regex.Replace(market ?? "", @"_(\d+)$", "");
             var canonical = Path.Combine(_cacheDir, $"{baseMarket}.json");
 
             CachedMarketData merged = null;
