@@ -132,12 +132,13 @@ namespace TradingStrategies.Trading.Overseer
             book[price].Add((qty, timestamp)); // Add to end (newest)
         }
 
-        public void ApplyDeltas(Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas)
+        public void ApplyDeltas(Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas, DateTime snapshotTime)
         {
-            DateTime currentTime = DateTime.UtcNow; // Or pass snapshot.Timestamp for sim consistency
-            ApplyDeltasInternal(YesBids, yesDeltas, currentTime);
-            ApplyDeltasInternal(NoBids, noDeltas, currentTime);
+            // Use the snapshot's timestamp so newly-added volume sits behind any prior snapshot volume.
+            ApplyDeltasInternal(YesBids, yesDeltas, snapshotTime);
+            ApplyDeltasInternal(NoBids, noDeltas, snapshotTime);
         }
+
 
         private void ApplyDeltasInternal(List<(int count, DateTime timestamp)>[] book, Dictionary<int, int> deltas, DateTime currentTime)
         {

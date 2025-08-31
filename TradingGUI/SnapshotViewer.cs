@@ -1,4 +1,6 @@
-﻿// SnapshotViewer.cs (replace the entire class with this updated version)
+﻿// Updated SnapshotViewer.cs with AutoScroll additions
+
+// SnapshotViewer.cs (replace the entire class with this updated version)
 using ScottPlot;
 using SmokehouseDTOs;
 using System;
@@ -23,6 +25,12 @@ namespace SimulatorWinForms
         {
             InitializeComponent();
             backButton.Click += (s, e) => BackAction?.Invoke();
+
+            // Add AutoScroll to containers to handle overflow
+            marketInfoContainer.AutoScroll = true;
+            positionsContainer.AutoScroll = true;
+            orderbookContainer.AutoScroll = true;
+            chartContainer.AutoScroll = true;
 
             AddMouseDownHandlers(this);
         }
@@ -96,6 +104,11 @@ namespace SimulatorWinForms
             UpdateUIFromSnapshot();  // Full UI update
         }
 
+        private string FormatTimeSpan(TimeSpan? ts)
+        {
+            return ts.HasValue ? $"{ts.Value.Days} days, {ts.Value.Hours} hours" : "--";
+        }
+
         private void UpdateUIFromSnapshot()
         {
             // Clear and repopulate order book (assuming OrderbookData contains bid levels only, as per note)
@@ -119,27 +132,27 @@ namespace SimulatorWinForms
             // Populate other UI elements based on actual MarketSnapshot properties
             // Prices section (mapping "Ask" to No_Bid properties, "Bid" to Yes_Bid properties)
             allTimeHighAskPrice.Text = currentSnapshot.AllTimeHighNo_Bid.Bid.ToString();
-            allTimeHighAskTime.Text = currentSnapshot.AllTimeHighNo_Bid.When.ToString("HH:mm:ss");
+            allTimeHighAskTime.Text = currentSnapshot.AllTimeHighNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
             allTimeHighBidPrice.Text = currentSnapshot.AllTimeHighYes_Bid.Bid.ToString();
-            allTimeHighBidTime.Text = currentSnapshot.AllTimeHighYes_Bid.When.ToString("HH:mm:ss");
+            allTimeHighBidTime.Text = currentSnapshot.AllTimeHighYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
 
             recentHighAskPrice.Text = currentSnapshot.RecentHighNo_Bid.Bid.ToString();
-            recentHighAskTime.Text = currentSnapshot.RecentHighNo_Bid.When.ToString("HH:mm:ss");
+            recentHighAskTime.Text = currentSnapshot.RecentHighNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
             recentHighBidPrice.Text = currentSnapshot.RecentHighYes_Bid.Bid.ToString();
-            recentHighBidTime.Text = currentSnapshot.RecentHighYes_Bid.When.ToString("HH:mm:ss");
+            recentHighBidTime.Text = currentSnapshot.RecentHighYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
 
             currentPriceAsk.Text = currentSnapshot.BestNoBid.ToString();
             currentPriceBid.Text = currentSnapshot.BestYesBid.ToString();
 
             recentLowAskPrice.Text = currentSnapshot.RecentLowNo_Bid.Bid.ToString();
-            recentLowAskTime.Text = currentSnapshot.RecentLowNo_Bid.When.ToString("HH:mm:ss");
+            recentLowAskTime.Text = currentSnapshot.RecentLowNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
             recentLowBidPrice.Text = currentSnapshot.RecentLowYes_Bid.Bid.ToString();
-            recentLowBidTime.Text = currentSnapshot.RecentLowYes_Bid.When.ToString("HH:mm:ss");
+            recentLowBidTime.Text = currentSnapshot.RecentLowYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
 
             allTimeLowAskPrice.Text = currentSnapshot.AllTimeLowNo_Bid.Bid.ToString();
-            allTimeLowAskTime.Text = currentSnapshot.AllTimeLowNo_Bid.When.ToString("HH:mm:ss");
+            allTimeLowAskTime.Text = currentSnapshot.AllTimeLowNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
             allTimeLowBidPrice.Text = currentSnapshot.AllTimeLowYes_Bid.Bid.ToString();
-            allTimeLowBidTime.Text = currentSnapshot.AllTimeLowYes_Bid.When.ToString("HH:mm:ss");
+            allTimeLowBidTime.Text = currentSnapshot.AllTimeLowYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
 
             // Trading metrics (using medium timeframe where applicable)
             rsiValue.Text = currentSnapshot.RSI_Medium?.ToString("F2") ?? "--";
@@ -150,12 +163,14 @@ namespace SimulatorWinForms
             vwapValue.Text = currentSnapshot.VWAP_Medium?.ToString("F2") ?? "--";
             stochasticValue.Text = currentSnapshot.StochasticOscillator_Medium.K.HasValue ? $"K: {currentSnapshot.StochasticOscillator_Medium.K:F2}, D: {currentSnapshot.StochasticOscillator_Medium.D:F2}" : "--";
             obvValue.Text = currentSnapshot.OBV_Medium.ToString();
+            psarValue.Text = currentSnapshot.PSAR.ToString() ?? "--";
+            adxValue.Text = currentSnapshot.ADX.ToString() ?? "--";
 
             // Other info
             chartHeader.Text = currentSnapshot.MarketTicker ?? "--";
             categoryValue.Text = currentSnapshot.MarketCategory ?? "--";
-            timeLeftValue.Text = currentSnapshot.TimeLeft?.ToString(@"hh\:mm\:ss") ?? "--";
-            marketAgeValue.Text = currentSnapshot.MarketAge?.ToString(@"hh\:mm\:ss") ?? "--";
+            timeLeftValue.Text = FormatTimeSpan(currentSnapshot.TimeLeft);
+            marketAgeValue.Text = FormatTimeSpan(currentSnapshot.MarketAge);
 
             // Flow/Momentum (displaying Yes and No separately to match index.html)
             topVelocityYesValue.Text = currentSnapshot.VelocityPerMinute_Top_Yes_Bid.ToString("F2");
@@ -168,6 +183,8 @@ namespace SimulatorWinForms
             tradeVolumeNoValue.Text = currentSnapshot.TradeVolumePerMinute_No.ToString("F2");
             avgTradeSizeYesValue.Text = currentSnapshot.AverageTradeSize_Yes.ToString("F2");
             avgTradeSizeNoValue.Text = currentSnapshot.AverageTradeSize_No.ToString("F2");
+            slopeYesValue.Text = currentSnapshot.YesBidSlopePerMinute.ToString("F2") ?? "--";
+            slopeNoValue.Text = currentSnapshot.NoBidSlopePerMinute.ToString("F2") ?? "--";
 
             // Context (displaying Yes and No separately where applicable to match index.html)
             spreadValue.Text = currentSnapshot.YesSpread.ToString();
@@ -187,6 +204,10 @@ namespace SimulatorWinForms
             positionUpsideValue.Text = currentSnapshot.PositionUpside.ToString("F2");
             positionDownsideValue.Text = currentSnapshot.PositionDownside.ToString("F2");
             restingOrdersValue.Text = currentSnapshot.RestingOrders?.Count.ToString() ?? "0";
+            simulatedPositionValue.Text = "??";
+
+            // For the new textbox (populate with example text; adjust as needed)
+            positionTextBox.Text = "Read-only details about the position or simulation logs.";
         }
 
         private void UpdateChart()

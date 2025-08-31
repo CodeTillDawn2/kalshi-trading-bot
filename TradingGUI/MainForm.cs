@@ -404,7 +404,7 @@ namespace SimulatorWinForms
             {
                 await _simulator.RunSelectedSetForGuiAsync(
                     setKey: "Momentum",
-                    weightName: "MT_J15",
+                    weightName: "MT_J06",
                     writeToFile: true,
                     marketsToRun: sel);
             }

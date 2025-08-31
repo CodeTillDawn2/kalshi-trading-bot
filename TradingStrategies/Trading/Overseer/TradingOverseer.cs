@@ -467,7 +467,7 @@ namespace TradingStrategies
                 newPosition += posDelta;
 
                 // taker fees
-                newCash -= 0.0007 * totalCost;
+                newCash -= 0.07 * totalCost;
             }
             else if (action == ActionType.PostYes)
             {
