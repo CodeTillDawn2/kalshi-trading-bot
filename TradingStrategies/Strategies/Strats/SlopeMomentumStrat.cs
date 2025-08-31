@@ -16,28 +16,20 @@ namespace TradingStrategies.Strategies.Strats
 
         public enum ParamKey
         {
-            // Entry gating (symmetric)
+            // Entry gating
             MinDistanceFromBounds,          // ticks away from 0/100
-            VelocityToDepthRatio,           // base flow threshold (on normalized flow = v/depth)
-            MaxVelocityThresholdRatio,      // clamp (safety; usually same or slightly higher than base)
+            VelocityToDepthRatio,           // normalized flow threshold (v/depth)
             MinRatioDifference,             // min |flowYes - flowNo|
-            MinConsecutiveBars,             // sustain 2–4 bars
-            MinSignalStrength,              // additional flow floor (normalized), e.g., 0.02–0.20
+            MinConsecutiveBars,             // sustain N bars
 
-            // Confirmations (shares among trades)
-            TradeRateShareMin,              // min share of trade *rate* for chosen side
-            TradeEventShareMin,             // min share of trade *events* for chosen side
+            // Confirmations
+            TradeRateShareMin,              // share of trade rate (chosen side)
+            TradeEventShareMin,             // share of trade events (chosen side)
 
-            // Spikes (context)
-            SpikeMinRelativeIncrease,       // vNow >= X * vPrev
-
-            // Exits
-            ExitOppositeSignalStrength,     // min opposite flow to allow a flip
-            ExitRsiDevThreshold,            // |RSI_Short - 50| <= this => flatten
-
-            // Slope gating
-            MinSlope,                       // minimum slope required for entry
-            ExitMinSlopeRequirement         // min slope to continue holding; symmetric by side
+            // Exits / slope
+            ExitOppositeSignalStrength,     // min opposite flow needed to allow flip
+            MinSlope,                       // min slope required for entry
+            ExitMinSlopeRequirement         // min slope to keep holding (symmetric)
         }
 
         public SlopeMomentumStrat(
@@ -51,19 +43,13 @@ namespace TradingStrategies.Strategies.Strats
             {
                 { ParamKey.MinDistanceFromBounds, 6 },
                 { ParamKey.VelocityToDepthRatio, 0.08 },
-                { ParamKey.MaxVelocityThresholdRatio, 0.18 },
                 { ParamKey.MinRatioDifference, 0.10 },
                 { ParamKey.MinConsecutiveBars, 2 },
-                { ParamKey.MinSignalStrength, 0.06 },
 
                 { ParamKey.TradeRateShareMin, 0.60 },
                 { ParamKey.TradeEventShareMin, 0.40 },
 
-                { ParamKey.SpikeMinRelativeIncrease, 2.8 },
-
                 { ParamKey.ExitOppositeSignalStrength, 0.12 },
-                { ParamKey.ExitRsiDevThreshold, 5.6 },
-
                 { ParamKey.MinSlope, 0.10 },
                 { ParamKey.ExitMinSlopeRequirement, 0.02 }
             };
@@ -79,21 +65,15 @@ namespace TradingStrategies.Strategies.Strats
             // ---- knobs
             int minDist = (int)Math.Round(_params[ParamKey.MinDistanceFromBounds]);
             double baseVD = _params[ParamKey.VelocityToDepthRatio];
-            double maxVD = _params[ParamKey.MaxVelocityThresholdRatio];
             double minDiff = _params[ParamKey.MinRatioDifference];
             int minBars = (int)Math.Round(_params[ParamKey.MinConsecutiveBars]);
-            double flowFloor = _params[ParamKey.MinSignalStrength];
 
             double shareTRMin = _params[ParamKey.TradeRateShareMin];
             double shareTEMin = _params[ParamKey.TradeEventShareMin];
 
-            double spikeRelMin = _params[ParamKey.SpikeMinRelativeIncrease];
-
             double exitOpp = _params[ParamKey.ExitOppositeSignalStrength];
-            double exitRsiDev = _params[ParamKey.ExitRsiDevThreshold];
-
             double minSlope = _params[ParamKey.MinSlope];
-            double exitMinSlope = _params[ParamKey.ExitMinSlopeRequirement]; // NEW
+            double exitMinSlope = _params[ParamKey.ExitMinSlopeRequirement];
 
             // ---- static gates: stay away from 0/100 edges
             if (snapshot.BestYesAsk >= 100 - minDist || snapshot.BestYesBid <= minDist)
@@ -102,109 +82,87 @@ namespace TradingStrategies.Strategies.Strats
             if (prev is null)
                 return AD(ActionType.None, 0, 0, "warmup:no_prev");
 
-            // ---- flows (per-minute velocities)
+            // ---- flows (per-minute velocities you have)
             double vYes = snapshot.VelocityPerMinute_Top_Yes_Bid + snapshot.VelocityPerMinute_Bottom_Yes_Bid;
             double vNo = snapshot.VelocityPerMinute_Top_No_Bid  + snapshot.VelocityPerMinute_Bottom_No_Bid;
 
-            // ---- depth (avoid 0)
+            // ---- depth (scale to avoid huge ratios; avoid zero)
             double depthYes = Math.Max(snapshot.TotalOrderbookDepth_Yes / 100.0, 1e-9);
             double depthNo = Math.Max(snapshot.TotalOrderbookDepth_No  / 100.0, 1e-9);
 
-            // normalized flow
+            // ---- normalized flows
             double flowYes = vYes / depthYes;
             double flowNo = vNo  / depthNo;
 
-            // clamp threshold
-            double useVD = Math.Min(baseVD, maxVD);
-
-            // edge
+            // ---- “edge versus other side”
             double ratioEdge = Math.Abs(flowYes - flowNo);
 
-            // ---- confirmations (trade *counts* for TE share)
-            double totalRate = Math.Max(snapshot.TradeRatePerMinute_Yes + snapshot.TradeRatePerMinute_No, 1e-9);
-            double trShareYes = snapshot.TradeRatePerMinute_Yes / totalRate;
-            double trShareNo = snapshot.TradeRatePerMinute_No  / totalRate;
+            // ---- side dominance via shares
+            double trShareYes = snapshot.TradeRateShareYes;
+            double trShareNo = 1.0 - trShareYes;
+            double teShareYes = snapshot.TradeEventShareYes;
+            double teShareNo = 1.0 - teShareYes;
 
-            double totalTrades = Math.Max((double)(snapshot.TradeCount_Yes + snapshot.TradeCount_No), 1e-9);
-            double teShareYes = snapshot.TradeCount_Yes / totalTrades;
-            double teShareNo = snapshot.TradeCount_No  / totalTrades;
+            // ---- slope
+            double yesSlope = snapshot.YesBidSlopePerMinute;
+            double noSlope = snapshot.NoBidSlopePerMinute;
 
-            bool confirmYes = trShareYes >= shareTRMin && teShareYes >= shareTEMin;
-            bool confirmNo = trShareNo  >= shareTRMin && teShareNo  >= shareTEMin;
+            // ---- consecutive bars state
+            bool yesPassThisBar =
+                (flowYes >= baseVD) &&
+                (ratioEdge >= minDiff) &&
+                (trShareYes >= shareTRMin) &&
+                (teShareYes >= shareTEMin) &&
+                (yesSlope >= minSlope);
 
-            // ---- spikes
-            double pvYes = prev.VelocityPerMinute_Top_Yes_Bid + prev.VelocityPerMinute_Bottom_Yes_Bid;
-            double pvNo = prev.VelocityPerMinute_Top_No_Bid  + prev.VelocityPerMinute_Bottom_No_Bid;
-            bool spikeYes = pvYes > 0 && (vYes / Math.Max(pvYes, 1e-9)) >= spikeRelMin;
-            bool spikeNo = pvNo  > 0 && (vNo  / Math.Max(pvNo, 1e-9)) >= spikeRelMin;
+            bool noPassThisBar =
+                (flowNo >= baseVD) &&
+                (ratioEdge >= minDiff) &&
+                (trShareNo >= shareTRMin) &&
+                (teShareNo >= shareTEMin) &&
+                (noSlope <= -minSlope);
 
-            // ---- sustained momentum candidate
+            _consecYes = yesPassThisBar ? (_consecYes + 1) : 0;
+            _consecNo  = noPassThisBar ? (_consecNo  + 1) : 0;
+
+            // ---- entry candidate
             ActionType candidate = ActionType.None;
+            if (_consecYes >= minBars && _consecNo == 0) candidate = ActionType.Long;
+            if (_consecNo  >= minBars && _consecYes == 0) candidate = ActionType.Short;
 
-            bool longOk = (flowYes >= useVD) && (flowYes > flowNo + minDiff) && (ratioEdge >= minDiff)
-                           && confirmYes && (flowYes >= flowFloor) && (snapshot.YesBidSlopePerMinute >= minSlope);
-
-            bool shortOk = (flowNo  >= useVD) && (flowNo  > flowYes + minDiff) && (ratioEdge >= minDiff)
-                           && confirmNo  && (flowNo  >= flowFloor) && (snapshot.NoBidSlopePerMinute  >= minSlope);
-
-            if (longOk) { _consecYes++; _consecNo = 0; if (_consecYes >= minBars) candidate = ActionType.Long; }
-            else if (shortOk) { _consecNo++; _consecYes = 0; if (_consecNo >= minBars) candidate = ActionType.Short; }
-            else { _consecYes = 0; _consecNo = 0; }
-
-            // ---- exits: RSI flatten first
-            double rsiShort = snapshot.RSI_Short ?? 50.0;
-            double prevRsi = prev.RSI_Short ?? 50.0;
-            double rsiDelta = rsiShort - prevRsi;
-
-            if (simulationPosition != 0 && Math.Abs(rsiShort - 50.0) <= exitRsiDev)
-            {
-                return AD(
-                    ActionType.Exit,
-                    simulationPosition > 0 ? snapshot.BestYesBid : snapshot.BestNoBid,
-                    Math.Abs(simulationPosition),
-                    Memo(inv, "exit:RSI_flat",
-                         minDist, baseVD, maxVD, minDiff, minBars, flowFloor,
-                         shareTRMin, shareTEMin, spikeRelMin, exitOpp, exitRsiDev, exitMinSlope, minSlope,
-                         vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
-                         trShareYes, trShareNo, teShareYes, teShareNo, spikeYes, spikeNo,
-                         _consecYes, _consecNo, rsiShort, rsiDelta, simulationPosition, candidate,
-                         snapshot.YesBidSlopePerMinute, snapshot.NoBidSlopePerMinute)
-                );
-            }
-
-            // ---- NEW: slope-based exits (symmetric)
-            if (simulationPosition > 0 && (snapshot.YesBidSlopePerMinute < exitMinSlope))
+            // ---- slope-based exits while holding
+            if (simulationPosition > 0 && yesSlope < exitMinSlope)
             {
                 return AD(
                     ActionType.Exit,
                     snapshot.BestYesBid,
                     Math.Abs(simulationPosition),
                     Memo(inv, "exit:slope_below_threshold_long",
-                         minDist, baseVD, maxVD, minDiff, minBars, flowFloor,
-                         shareTRMin, shareTEMin, spikeRelMin, exitOpp, exitRsiDev, exitMinSlope, minSlope,
+                         minDist, baseVD, minDiff, minBars,
+                         shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
                          vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
-                         trShareYes, trShareNo, teShareYes, teShareNo, spikeYes, spikeNo,
-                         _consecYes, _consecNo, rsiShort, rsiDelta, simulationPosition, candidate,
-                         snapshot.YesBidSlopePerMinute, snapshot.NoBidSlopePerMinute)
+                         trShareYes, trShareNo, teShareYes, teShareNo,
+                         _consecYes, _consecNo, simulationPosition, candidate,
+                         yesSlope, noSlope)
                 );
             }
-            if (simulationPosition < 0 && (snapshot.NoBidSlopePerMinute > -exitMinSlope))
+            if (simulationPosition < 0 && noSlope > -exitMinSlope)
             {
                 return AD(
                     ActionType.Exit,
                     snapshot.BestNoBid,
                     Math.Abs(simulationPosition),
                     Memo(inv, "exit:slope_above_threshold_short",
-                         minDist, baseVD, maxVD, minDiff, minBars, flowFloor,
-                         shareTRMin, shareTEMin, spikeRelMin, exitOpp, exitRsiDev, exitMinSlope, minSlope,
+                         minDist, baseVD, minDiff, minBars,
+                         shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
                          vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
-                         trShareYes, trShareNo, teShareYes, teShareNo, spikeYes, spikeNo,
-                         _consecYes, _consecNo, rsiShort, rsiDelta, simulationPosition, candidate,
-                         snapshot.YesBidSlopePerMinute, snapshot.NoBidSlopePerMinute)
+                         trShareYes, trShareNo, teShareYes, teShareNo,
+                         _consecYes, _consecNo, simulationPosition, candidate,
+                         yesSlope, noSlope)
                 );
             }
 
-            // flip-suppression safety
+            // ---- flip safety: require opposite flow strength to flip
             if (simulationPosition > 0 && candidate == ActionType.Short && Math.Abs(flowNo)  < exitOpp) candidate = ActionType.None;
             if (simulationPosition < 0 && candidate == ActionType.Long  && Math.Abs(flowYes) < exitOpp) candidate = ActionType.None;
 
@@ -212,24 +170,24 @@ namespace TradingStrategies.Strategies.Strats
             {
                 return AD(ActionType.None, 0, 0,
                     Memo(inv, "entry:pass",
-                         minDist, baseVD, maxVD, minDiff, minBars, flowFloor,
-                         shareTRMin, shareTEMin, spikeRelMin, exitOpp, exitRsiDev, exitMinSlope, minSlope,
+                         minDist, baseVD, minDiff, minBars,
+                         shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
                          vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
-                         trShareYes, trShareNo, teShareYes, teShareNo, spikeYes, spikeNo,
-                         _consecYes, _consecNo, rsiShort, rsiDelta, simulationPosition, candidate,
-                         snapshot.YesBidSlopePerMinute, snapshot.NoBidSlopePerMinute));
+                         trShareYes, trShareNo, teShareYes, teShareNo,
+                         _consecYes, _consecNo, simulationPosition, candidate,
+                         yesSlope, noSlope));
             }
 
             int pricePoint = (candidate == ActionType.Long) ? snapshot.BestYesBid : snapshot.BestNoBid;
 
             return AD(candidate, pricePoint, 1,
                 Memo(inv, "entry:go",
-                     minDist, baseVD, maxVD, minDiff, minBars, flowFloor,
-                     shareTRMin, shareTEMin, spikeRelMin, exitOpp, exitRsiDev, exitMinSlope, minSlope,
+                     minDist, baseVD, minDiff, minBars,
+                     shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
                      vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
-                     trShareYes, trShareNo, teShareYes, teShareNo, spikeYes, spikeNo,
-                     _consecYes, _consecNo, rsiShort, rsiDelta, simulationPosition, candidate,
-                     snapshot.YesBidSlopePerMinute, snapshot.NoBidSlopePerMinute));
+                     trShareYes, trShareNo, teShareYes, teShareNo,
+                     _consecYes, _consecNo, simulationPosition, candidate,
+                     yesSlope, noSlope));
         }
 
         private static ActionDecision AD(ActionType t, int p, int q, string memo)
@@ -237,11 +195,12 @@ namespace TradingStrategies.Strategies.Strats
 
         private static string Memo(
             IFormatProvider inv, string tail,
-            int minDist, double baseVD, double maxVD, double minDiff, int minBars, double flowFloor,
-            double shareTRMin, double shareTEMin, double spikeRelMin, double exitOpp, double exitRsiDev, double exitMinSlope, double minSlope,
+            int minDist, double baseVD, double minDiff, int minBars,
+            double shareTRMin, double shareTEMin, double exitOpp, double minSlope, double exitMinSlope,
             double vYes, double vNo, double depthYes, double depthNo, double flowYes, double flowNo, double ratioEdge,
-            double trShareYes, double trShareNo, double teShareYes, double teShareNo, bool spikeYes, bool spikeNo,
-            int consecY, int consecN, double rsiShort, double rsiDelta, int position, ActionType candidate, double yesSlope, double noSlope)
+            double trShareYes, double trShareNo, double teShareYes, double teShareNo,
+            int consecY, int consecN, int position, ActionType candidate,
+            double yesSlope, double noSlope)
         {
             string F(double d) => d.ToString("0.###", inv);
             var parts = new List<string>
@@ -251,7 +210,7 @@ namespace TradingStrategies.Strategies.Strats
                 $"vYes={F(vYes)}","vNo={F(vNo)}",
                 $"depthYes={F(depthYes)}","depthNo={F(depthNo)}",
                 $"flowYes={F(flowYes)}","flowNo={F(flowNo)}",
-                $"flowThr(base)={F(baseVD)}","flowThr(max)={F(maxVD)}",
+                $"flowThr(base)={F(baseVD)}",
                 $"ratioEdge={F(ratioEdge)}>=minDiff:{F(minDiff)}",
 
                 $"TRshareYes={F(trShareYes)}>=min:{F(shareTRMin)}",
@@ -259,19 +218,13 @@ namespace TradingStrategies.Strategies.Strats
                 $"TEshareYes={F(teShareYes)}>=min:{F(shareTEMin)}",
                 $"TEshareNo={F(teShareNo)}>=min:{F(shareTEMin)}",
 
-                $"spikeY={(spikeYes ? "Yes" : "No")}",
-                $"spikeN={(spikeNo  ? "Yes" : "No")}",
-                $"spikeRelMin={F(spikeRelMin)}",
-
                 $"barsY={consecY}","barsN={consecN}","minBars={minBars}",
-                $"flowFloor={F(flowFloor)}",
 
-                $"rsi={F(rsiShort)}","rsiDelta={F(rsiDelta)}","rsiDevThr={F(exitRsiDev)}","oppFlipThr={F(exitOpp)}",
+                $"oppFlipThr={F(exitOpp)}",
+                $"yesSlope={F(yesSlope)}","noSlope={F(noSlope)}",
+                $"minSlope={F(minSlope)}","exitMinSlope={F(exitMinSlope)}",
 
                 $"pos={position}","candidate={candidate}",
-
-                $"yesSlope={F(yesSlope)}",$"noSlope={F(noSlope)}",$"minSlope={F(minSlope)}",$"exitMinSlope={F(exitMinSlope)}",
-
                 tail
             };
             return string.Join(",", parts);
@@ -288,585 +241,640 @@ namespace TradingStrategies.Strategies.Strats
                 parameters = dict
             });
         }
-
         public static readonly List<(string Name, Dictionary<SlopeMomentumStrat.ParamKey, double> Parameters)>
 SlopeMomentumParameterSets = new List<(string, Dictionary<SlopeMomentumStrat.ParamKey, double>)>
 {
+    // ---------------- G1: Balanced ----------------
     (
-        "SlopeMomentum_SlopeE0p03_Exit0p02",
+        "G1_Balanced_S0p00_XS0p00",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.03 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.02 }
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
         }
     ),
     (
-        "SlopeMomentum_SlopeE0p03_Exit0p03",
+        "G1_Balanced_S0p00_XS0p04",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.03 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.03 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p03_Exit0p04",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.03 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
             { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
         }
     ),
     (
-        "SlopeMomentum_SlopeE0p03_Exit0p06",
+        "G1_Balanced_S0p00_XS0p08",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.03 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.06 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p03_Exit0p08",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.03 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
             { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
         }
     ),
-
     (
-        "SlopeMomentum_SlopeE0p05_Exit0p02",
+        "G1_Balanced_S0p04_XS0p00",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.05 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.02 }
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
         }
     ),
     (
-        "SlopeMomentum_SlopeE0p05_Exit0p03",
+        "G1_Balanced_S0p04_XS0p04",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.05 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.03 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p05_Exit0p04",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.05 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
             { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
         }
     ),
     (
-        "SlopeMomentum_SlopeE0p05_Exit0p06",
+        "G1_Balanced_S0p04_XS0p08",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.05 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.06 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p05_Exit0p08",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.05 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
             { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
         }
     ),
-
     (
-        "SlopeMomentum_SlopeE0p07_Exit0p02",
+        "G1_Balanced_S0p08_XS0p00",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.07 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.02 }
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.08 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
         }
     ),
     (
-        "SlopeMomentum_SlopeE0p07_Exit0p03",
+        "G1_Balanced_S0p08_XS0p04",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.07 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.03 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p07_Exit0p04",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.07 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.08 },
             { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
         }
     ),
     (
-        "SlopeMomentum_SlopeE0p07_Exit0p06",
+        "G1_Balanced_S0p08_XS0p08",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.07 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.06 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p07_Exit0p08",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.07 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.08 },
             { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
         }
     ),
-
     (
-        "SlopeMomentum_SlopeE0p10_Exit0p02",
+        "G1_Balanced_S0p12_XS0p00",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.10 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.02 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p10_Exit0p03",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.10 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.03 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p10_Exit0p04",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.10 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p10_Exit0p06",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.10 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.06 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p10_Exit0p08",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.10 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
-        }
-    ),
-
-    (
-        "SlopeMomentum_SlopeE0p12_Exit0p02",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
             { SlopeMomentumStrat.ParamKey.MinSlope, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.02 }
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
         }
     ),
     (
-        "SlopeMomentum_SlopeE0p12_Exit0p03",
+        "G1_Balanced_S0p12_XS0p04",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.03 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p12_Exit0p04",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
             { SlopeMomentumStrat.ParamKey.MinSlope, 0.12 },
             { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
         }
     ),
     (
-        "SlopeMomentum_SlopeE0p12_Exit0p06",
+        "G1_Balanced_S0p12_XS0p08",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
             { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
             { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
             { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
             { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
             { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.06 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p12_Exit0p08",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
             { SlopeMomentumStrat.ParamKey.MinSlope, 0.12 },
             { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
         }
     ),
 
+    // ---------------- G2: Loose & Fast ----------------
     (
-        "SlopeMomentum_SlopeE0p15_Exit0p02",
+        "G2_LooseFast_S0p00_XS0p00",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.15 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.02 }
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
         }
     ),
     (
-        "SlopeMomentum_SlopeE0p15_Exit0p03",
+        "G2_LooseFast_S0p00_XS0p04",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.15 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.03 }
-        }
-    ),
-    (
-        "SlopeMomentum_SlopeE0p15_Exit0p04",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.15 },
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
             { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
         }
     ),
     (
-        "SlopeMomentum_SlopeE0p15_Exit0p06",
+        "G2_LooseFast_S0p00_XS0p08",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.15 },
-            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.06 }
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
         }
     ),
     (
-        "SlopeMomentum_SlopeE0p15_Exit0p08",
+        "G2_LooseFast_S0p04_XS0p00",
         new Dictionary<SlopeMomentumStrat.ParamKey, double>
         {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-            { SlopeMomentumStrat.ParamKey.MaxVelocityThresholdRatio, 0.18 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
-            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
-            { SlopeMomentumStrat.ParamKey.MinSignalStrength, 0.06 },
-            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
-            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
-            { SlopeMomentumStrat.ParamKey.SpikeMinRelativeIncrease, 2.8 },
-            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-            { SlopeMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.6 },
-            { SlopeMomentumStrat.ParamKey.MinSlope, 0.15 },
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
+        }
+    ),
+    (
+        "G2_LooseFast_S0p04_XS0p04",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
+        }
+    ),
+    (
+        "G2_LooseFast_S0p04_XS0p08",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
             { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
         }
-    )
+    ),
+    (
+        "G2_LooseFast_S0p08_XS0p00",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.08 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
+        }
+    ),
+    (
+        "G2_LooseFast_S0p08_XS0p04",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.08 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
+        }
+    ),
+    (
+        "G2_LooseFast_S0p08_XS0p08",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.08 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
+        }
+    ),
+    (
+        "G2_LooseFast_S0p12_XS0p00",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.12 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
+        }
+    ),
+    (
+        "G2_LooseFast_S0p12_XS0p04",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.12 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
+        }
+    ),
+    (
+        "G2_LooseFast_S0p12_XS0p08",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 4 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.08 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.55 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.35 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.12 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
+        }
+    ),
+
+    // ---------------- G3: Tight & Strict ----------------
+    (
+        "G3_TightStrict_S0p00_XS0p00",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
+        }
+    ),
+    (
+        "G3_TightStrict_S0p00_XS0p04",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
+        }
+    ),
+    (
+        "G3_TightStrict_S0p00_XS0p08",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
+        }
+    ),
+    (
+        "G3_TightStrict_S0p04_XS0p00",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
+        }
+    ),
+    (
+        "G3_TightStrict_S0p04_XS0p04",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
+        }
+    ),
+    (
+        "G3_TightStrict_S0p04_XS0p08",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
+        }
+    ),
+    (
+        "G3_TightStrict_S0p08_XS0p00",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.08 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
+        }
+    ),
+    (
+        "G3_TightStrict_S0p08_XS0p04",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.08 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
+        }
+    ),
+    (
+        "G3_TightStrict_S0p08_XS0p08",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.08 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
+        }
+    ),
+    (
+        "G3_TightStrict_S0p12_XS0p00",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.12 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
+        }
+    ),
+    (
+        "G3_TightStrict_S0p12_XS0p04",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.12 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
+        }
+    ),
+    (
+        "G3_TightStrict_S0p12_XS0p08",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.10 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 3 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.70 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.50 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.16 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.12 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
+        }
+    ),
+
+    // ---------------- G4: Depth-Biased (edge-diff emphasis) ----------------
+    (
+        "G4_DepthBiased_S0p00_XS0p00",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 7 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.07 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.65 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.45 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.14 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
+        }
+    ),
+    (
+        "G4_DepthBiased_S0p00_XS0p04",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 7 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.07 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.65 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.45 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.14 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
+        }
+    ),
+    (
+        "G4_DepthBiased_S0p00_XS0p08",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 7 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.07 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.65 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.45 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.14 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.00 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.08 }
+        }
+    ),
+    (
+        "G4_DepthBiased_S0p04_XS0p00",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 7 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.07 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.65 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.45 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.14 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.00 }
+        }
+    ),
+    (
+        "G4_DepthBiased_S0p04_XS0p04",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 7 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.07 },
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 },
+            { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 2 },
+            { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.65 },
+            { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.45 },
+            { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.14 },
+            { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
+            { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
+        }
+    ),
+    (
+        "G4_DepthBiased_S0p04_XS0p08",
+        new Dictionary<SlopeMomentumStrat.ParamKey, double>
+        {
+            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 7 },
+            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.07 },
+            { SlopeMomentumStrat.Key.MinRatioDifference, 0.12 } // <-- ensure your enum is ParamKey; keep consistent
+        }
+    ),
 };
 
     }
