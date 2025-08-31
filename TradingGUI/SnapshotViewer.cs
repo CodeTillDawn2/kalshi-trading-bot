@@ -152,11 +152,8 @@ namespace SimulatorWinForms
             obvValue.Text = currentSnapshot.OBV_Medium.ToString();
 
             // Other info
-            titleValue.Text = currentSnapshot.MarketTicker ?? "--";
-            subtitleValue.Text = currentSnapshot.MarketCategory ?? "--";
-            marketTypeValue.Text = currentSnapshot.MarketType ?? "--";
-            priceGoodBadValue.Text = currentSnapshot.GoodBadPriceYes ?? "--";
-            marketBehaviorValue.Text = currentSnapshot.MarketBehaviorYes ?? "--";
+            chartHeader.Text = currentSnapshot.MarketTicker ?? "--";
+            categoryValue.Text = currentSnapshot.MarketCategory ?? "--";
             timeLeftValue.Text = currentSnapshot.TimeLeft?.ToString(@"hh\:mm\:ss") ?? "--";
             marketAgeValue.Text = currentSnapshot.MarketAge?.ToString(@"hh\:mm\:ss") ?? "--";
 
