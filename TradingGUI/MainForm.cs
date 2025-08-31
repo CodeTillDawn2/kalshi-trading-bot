@@ -26,6 +26,11 @@ namespace SimulatorWinForms
 
         private SnapshotViewer _snapshotViewer;
 
+        // Original dimensions for scaling reference
+        private const int OriginalWidth = 1100;
+        private const float MinScale = 0.8f;  // Minimum font scale (80% of original)
+        private const float MaxScale = 2.0f;  // Maximum font scale (200% of original)
+
         public MainForm()
         {
             InitializeComponent();
@@ -76,8 +81,10 @@ namespace SimulatorWinForms
 
             // wire a MouseDown handler to allow swapping the chart with the dashboard on click
             formsPlot1.MouseDown += FormsPlot1_MouseDown;
-        }
 
+            // Add resize handler for dynamic scaling
+            this.ResizeEnd += MainForm_ResizeEnd;
+        }
 
         private void ResetPnLForMarkets(IEnumerable<string> markets)
         {
@@ -486,6 +493,42 @@ namespace SimulatorWinForms
             formsPlot1.Refresh();
 
             AppendLog("Switched back to chart view.");
+        }
+
+        private void MainForm_ResizeEnd(object sender, EventArgs e)
+        {
+            // Calculate scale factor based on width (clamp between min and max)
+            float scaleFactor = Math.Clamp((float)this.Width / OriginalWidth, MinScale, MaxScale);
+
+            // Scale fonts for DataGridView (including headers)
+            dgvMarkets.Font = new Font(dgvMarkets.Font.FontFamily, 8.25f * scaleFactor);  // Default WinForms font size is ~8.25
+            dgvMarkets.ColumnHeadersDefaultCellStyle.Font = new Font(dgvMarkets.Font.FontFamily, 8.25f * scaleFactor, FontStyle.Bold);
+            dgvMarkets.AutoResizeColumns();  // Ensure columns adjust
+
+            // Scale RichTextBox font
+            rtbLog.Font = new Font("Consolas", 9f * scaleFactor);
+
+            // Scale button fonts
+            foreach (Control control in buttonPanel.Controls)
+            {
+                if (control is Button button)
+                {
+                    button.Font = new Font(button.Font.FontFamily, 8.25f * scaleFactor);
+                }
+            }
+
+            // Scale ScottPlot fonts (adjust labels, ticks, etc.)
+            var plot = formsPlot1.Plot;
+            plot.XAxis.LabelStyle(fontSize: 12f * scaleFactor);
+            plot.YAxis.LabelStyle(fontSize: 12f * scaleFactor);
+            plot.XAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
+            plot.YAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
+
+            // Refresh the plot to apply changes
+            formsPlot1.Refresh();
+
+            // Refresh tooltip overlay font if needed
+            _tooltipOverlay.Font = new Font(_tooltipOverlay.Font.FontFamily, 9f * scaleFactor);
         }
 
     }

@@ -134,8 +134,8 @@
             // layout
             // 
             layout.ColumnCount = 2;
-            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 300F));
-            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F)); 
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70F)); 
             layout.Controls.Add(dgvMarkets, 0, 0);
             layout.Controls.Add(rightPane, 1, 0);
             layout.Controls.Add(rtbLog, 0, 1);
@@ -144,9 +144,9 @@
             layout.Location = new Point(0, 0);
             layout.Name = "layout";
             layout.RowCount = 3;
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));   // main area
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 96F));   // log
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));   // buttons
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 85F));  
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));   
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 5F));    
             layout.Size = new Size(1100, 650);
             layout.TabIndex = 0;
             // 
@@ -194,6 +194,8 @@
             layout.ResumeLayout(false);
             buttonPanel.ResumeLayout(false);
             ResumeLayout(false);
+            AutoScaleMode = AutoScaleMode.Font;
+            MinimumSize = new Size(800, 600);
         }
 
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
