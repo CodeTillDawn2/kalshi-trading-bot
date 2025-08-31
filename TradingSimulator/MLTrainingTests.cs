@@ -10,14 +10,8 @@ using SmokehouseBot.Services;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using TradingSimulator.ML;               
-using TradingStrategies.Configuration;  
+using TradingStrategies.Configuration;
 
 namespace TradingSimulator.ML
 {

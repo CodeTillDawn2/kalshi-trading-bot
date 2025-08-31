@@ -19,6 +19,7 @@ namespace TradingStrategies.Trading.Helpers
                 ["Breakout2"] = GetBreakoutStrategy,
                 ["Nothing"] = GetNothingEverHappensStrategy,
                 ["FlowMo"] = GetFlowMomentumStrategy,
+                ["SloMo"] = GetSlopeMomentumStrategy,
                 ["Momentum"] = GetFlowMomentumStrategy
 
             };
@@ -2251,6 +2252,7 @@ namespace TradingStrategies.Trading.Helpers
                 "Bollinger" => BollingerParameterSets.Select(x => x.Name),
                 "Breakout2" => BreakoutParameterSets.Select(x => x.Name),
                 "FlowMo" => FlowMomentumParameterSets.Select(x => x.Name),
+                "SloMo" => SlopeMomentumStrat.SlopeMomentumParameterSets.Select(x => x.Name),
                 "Nothing" => NothingEverHappensParameterSets.Select(x => x.Name),
                 "Momentum" => MomentumTradingParameterSets.Select(x => x.Name),
                 _ => Enumerable.Empty<string>()
@@ -2267,6 +2269,7 @@ namespace TradingStrategies.Trading.Helpers
                 "Bollinger" => GetBollingerBreakoutStrategiesForTraining(),
                 "Breakout2" => GetBreakoutStrategiesForTraining(),
                 "FlowMo" => GetFlowMomentumStrategiesForTraining(),
+                "SloMo" => GetSlopeMomentumStrategiesForTraining(),
                 "Nothing" => GetNothingEverHappensStrategiesForTraining(),
                 "Momentum" => GetMomentumTradingStrategiesForTraining(),
                 _ => throw new ArgumentException($"Unknown set '{setKey}'", nameof(setKey))
@@ -2366,6 +2369,17 @@ namespace TradingStrategies.Trading.Helpers
 
             return CreateMarketStrategyMapping(strat);
         }
+        public Dictionary<MarketType, List<Strategy>> GetSlopeMomentumStrategy(string weightName)
+        {
+            // Use the first (default) parameter set for the standard strategy
+            var defaultParams = SlopeMomentumStrat.SlopeMomentumParameterSets.Where(x => x.Name == weightName).First();
+            var strat = new Strategy(
+                defaultParams.Name,
+                new List<Strat> { new SlopeMomentumStrat(mlParams: defaultParams.Parameters) }
+            );
+
+            return CreateMarketStrategyMapping(strat);
+        }
 
         public Dictionary<MarketType, List<Strategy>> GetMomentumTradingStrategy(string weightName)
         {
@@ -2407,6 +2421,25 @@ namespace TradingStrategies.Trading.Helpers
             {
                 // Create a new NothingEverHappensStrat with the current parameter set
                 var flowStrat = new FlowMomentumStrat(name: name, mlParams: parameters);
+                var flowStrategy = new Strategy(name, new List<Strat> { flowStrat });
+
+                // Create the market-to-strategy mapping for this parameter set
+                var strategiesDict = CreateMarketStrategyMapping(flowStrategy);
+
+                returnList.Add(strategiesDict);
+            }
+
+            return returnList;
+        }
+        public List<Dictionary<MarketType, List<Strategy>>> GetSlopeMomentumStrategiesForTraining()
+        {
+            var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
+
+            // Create a strategy set for each parameter configuration
+            foreach (var (name, parameters) in SlopeMomentumStrat.SlopeMomentumParameterSets)
+            {
+                // Create a new NothingEverHappensStrat with the current parameter set
+                var flowStrat = new SlopeMomentumStrat(name: name, mlParams: parameters);
                 var flowStrategy = new Strategy(name, new List<Strat> { flowStrat });
 
                 // Create the market-to-strategy mapping for this parameter set

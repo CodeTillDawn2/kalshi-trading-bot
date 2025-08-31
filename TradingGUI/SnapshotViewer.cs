@@ -1,13 +1,7 @@
 ﻿// Updated SnapshotViewer.cs with AutoScroll additions
 
 // SnapshotViewer.cs (replace the entire class with this updated version)
-using ScottPlot;
 using SmokehouseDTOs;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace SimulatorWinForms
 {
@@ -21,6 +15,11 @@ namespace SimulatorWinForms
 
         public string CacheDir { get; set; }  // New property to receive cache dir from MainForm
 
+        // Original dimensions for scaling reference (based on designer default size)
+        private const int OriginalWidth = 933;
+        private const float MinScale = 0.8f;  // Minimum font scale (80% of original)
+        private const float MaxScale = 2.0f;  // Maximum font scale (200% of original)
+
         public SnapshotViewer()
         {
             InitializeComponent();
@@ -33,6 +32,9 @@ namespace SimulatorWinForms
             chartContainer.AutoScroll = true;
 
             AddMouseDownHandlers(this);
+
+            // Add resize handler for dynamic scaling
+            this.Resize += SnapshotViewer_ResizeEnd;
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -239,6 +241,53 @@ namespace SimulatorWinForms
             priceChart.Plot.AxisAutoY();  // Auto-scale Y-axis
             priceChart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
             priceChart.Refresh();
+        }
+
+        private void SnapshotViewer_ResizeEnd(object sender, EventArgs e)
+        {
+            // Calculate scale factor based on width (clamp between min and max)
+            float scaleFactor = Math.Clamp((float)this.Width / OriginalWidth, MinScale, MaxScale);
+
+            // Scale fonts for labels, checkboxes, and values recursively
+            ScaleFonts(this, scaleFactor);
+
+            // Scale DataGridView (orderbookGrid)
+            orderbookGrid.Font = new Font(orderbookGrid.Font.FontFamily, 8.25f * scaleFactor);
+            orderbookGrid.ColumnHeadersDefaultCellStyle.Font = new Font(orderbookGrid.Font.FontFamily, 8.25f * scaleFactor, FontStyle.Bold);
+            orderbookGrid.AutoResizeColumns();
+
+            // Scale TextBox (positionTextBox)
+            positionTextBox.Font = new Font(positionTextBox.Font.FontFamily, 9f * scaleFactor);
+
+            // Scale Button (backButton)
+            backButton.Font = new Font(backButton.Font.FontFamily, 8.25f * scaleFactor);
+
+            // Scale ScottPlot fonts (priceChart)
+            var plot = priceChart.Plot;
+            plot.XAxis.LabelStyle(fontSize: 12f * scaleFactor);
+            plot.YAxis.LabelStyle(fontSize: 12f * scaleFactor);
+            plot.XAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
+            plot.YAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
+
+            // Refresh the chart to apply changes
+            priceChart.Refresh();
+        }
+
+        private void ScaleFonts(Control control, float scaleFactor)
+        {
+            if (control is Label label)
+            {
+                label.Font = new Font(label.Font.FontFamily, label.Font.Size * scaleFactor);
+            }
+            else if (control is CheckBox checkBox)
+            {
+                checkBox.Font = new Font(checkBox.Font.FontFamily, checkBox.Font.Size * scaleFactor);
+            }
+
+            foreach (Control child in control.Controls)
+            {
+                ScaleFonts(child, scaleFactor);
+            }
         }
     }
 }

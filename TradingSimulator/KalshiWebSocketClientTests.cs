@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 using Moq;
 using SmokehouseBot.Configuration;
 using SmokehouseBot.Management.Interfaces;
-using SmokehouseBot.Services;
 using SmokehouseBot.Services.Interfaces;
 using System.Net.WebSockets;
 using System.Text;

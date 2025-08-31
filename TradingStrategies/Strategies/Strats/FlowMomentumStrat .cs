@@ -1,4 +1,4 @@
-﻿// FlowMomentumStrat.cs (fixed gating; realistic flow thresholds; detailed memo)
+﻿// FlowMomentumStrat.cs (RSI flatten exit: short -> BestNoBid)
 using SmokehouseDTOs;
 using System.Globalization;
 using System.Text.Json;
@@ -34,7 +34,7 @@ namespace TradingStrategies.Strategies.Strats
 
             // Exits
             ExitOppositeSignalStrength,     // min opposite flow to allow a flip
-            ExitRsiDevThreshold             // |RSI_Short - 50| <= this => flatten
+            ExitRsiDevThreshold
         }
 
         public FlowMomentumStrat(
@@ -52,12 +52,9 @@ namespace TradingStrategies.Strategies.Strats
                 { ParamKey.MinRatioDifference, 0.10 },
                 { ParamKey.MinConsecutiveBars, 2 },
                 { ParamKey.MinSignalStrength, 0.06 },
-
                 { ParamKey.TradeRateShareMin, 0.60 },
                 { ParamKey.TradeEventShareMin, 0.40 },
-
                 { ParamKey.SpikeMinRelativeIncrease, 2.8 },
-
                 { ParamKey.ExitOppositeSignalStrength, 0.12 },
                 { ParamKey.ExitRsiDevThreshold, 5.6 }
             };
@@ -70,7 +67,6 @@ namespace TradingStrategies.Strategies.Strats
 
             var inv = CultureInfo.InvariantCulture;
 
-            // ---- knobs
             int minDist = (int)Math.Round(_params[ParamKey.MinDistanceFromBounds]);
             double baseVD = _params[ParamKey.VelocityToDepthRatio];
             double maxVD = _params[ParamKey.MaxVelocityThresholdRatio];
@@ -106,10 +102,9 @@ namespace TradingStrategies.Strategies.Strats
             double flowNo = vNo / depthNo;
 
             // clamp the threshold once
-            double useVD = Math.Min(baseVD, Math.Max(baseVD, 0.0) + (maxVD - baseVD)); // effectively: useVD = Math.Min(baseVD, maxVD)
+            double useVD = Math.Min(baseVD, Math.Max(baseVD, 0.0) + (maxVD - baseVD));
             useVD = Math.Min(baseVD, maxVD);
 
-            // edge
             double ratioEdge = Math.Abs(flowYes - flowNo);
 
             // ---- confirmations (TRATE share from rates; TE share from trade counts ONLY)
@@ -158,15 +153,16 @@ namespace TradingStrategies.Strategies.Strats
 
             if (simulationPosition != 0 && Math.Abs(rsiShort - 50.0) <= exitRsiDev)
             {
-                return AD(ActionType.Exit,
-                          simulationPosition > 0 ? snapshot.BestYesBid : snapshot.BestYesAsk,
-                          Math.Abs(simulationPosition),
-                          Memo(inv, "exit:RSI_flat",
-                               minDist, baseVD, maxVD, minDiff, minBars, flowFloor,
-                               shareTRMin, shareTEMin, spikeRelMin, exitOpp, exitRsiDev,
-                               vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
-                               trShareYes, trShareNo, teShareYes, teShareNo, spikeYes, spikeNo,
-                               _consecYes, _consecNo, rsiShort, rsiDelta, simulationPosition, candidate));
+                return AD(
+                    ActionType.Exit,
+                    simulationPosition > 0 ? snapshot.BestYesBid : snapshot.BestNoBid, // <-- fix
+                    Math.Abs(simulationPosition),
+                    Memo(inv, "exit:RSI_flat",
+                         minDist, baseVD, maxVD, minDiff, minBars, flowFloor,
+                         shareTRMin, shareTEMin, spikeRelMin, exitOpp, exitRsiDev,
+                         vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
+                         trShareYes, trShareNo, teShareYes, teShareNo, spikeYes, spikeNo,
+                         _consecYes, _consecNo, rsiShort, rsiDelta, simulationPosition, candidate));
             }
 
             if (simulationPosition > 0 && candidate == ActionType.Short && Math.Abs(flowNo) < exitOpp) candidate = ActionType.None;
@@ -209,38 +205,23 @@ namespace TradingStrategies.Strategies.Strats
 
             var parts = new List<string>
             {
-                // (1) gates
                 $"gate:minDist={minDist}",
-
-                // (2) normalized flow
                 $"vYes={F(vYes)}","vNo={F(vNo)}",
                 $"depthYes={F(depthYes)}","depthNo={F(depthNo)}",
                 $"flowYes={F(flowYes)}","flowNo={F(flowNo)}",
                 $"flowThr(base)={F(baseVD)}","flowThr(max)={F(maxVD)}",
                 $"ratioEdge={F(ratioEdge)}>=minDiff:{F(minDiff)}",
-
-                // (3) confirmations
                 $"TRshareYes={F(trShareYes)}>=min:{F(shareTRMin)}",
                 $"TRshareNo={F(trShareNo)}>=min:{F(shareTRMin)}",
                 $"TEshareYes={F(teShareYes)}>=min:{F(shareTEMin)}",
                 $"TEshareNo={F(teShareNo)}>=min:{F(shareTEMin)}",
-
-                // (4) spike context
                 $"spikeY={(spikeYes ? "Yes" : "No")}",
                 $"spikeN={(spikeNo  ? "Yes" : "No")}",
                 $"spikeRelMin={F(spikeRelMin)}",
-
-                // (5) sustain
                 $"barsY={consecY}","barsN={consecN}","minBars={minBars}",
                 $"flowFloor={F(flowFloor)}",
-
-                // (6) exits
                 $"rsi={F(rsiShort)}","rsiDelta={F(rsiDelta)}","rsiDevThr={F(exitRsiDev)}","oppFlipThr={F(exitOpp)}",
-
-                // (7) pos + candidate
                 $"pos={position}","candidate={candidate}",
-
-                // (8) tail
                 tail
             };
 

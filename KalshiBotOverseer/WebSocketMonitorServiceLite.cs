@@ -1,12 +1,9 @@
 ﻿using KalshiBotAPI.WebSockets.Interfaces;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SmokehouseBot.KalshiAPI.Interfaces;
-using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs.KalshiAPI;
-using System.Threading;
 
 namespace KalshiBotOverseer
 {
@@ -114,7 +111,7 @@ namespace KalshiBotOverseer
 
         private async Task MonitorExchangeStatusAsync(bool immediate = false)
         {
-            _logger.LogDebug("MonitorExchangeStatusAsync started at {0}, Immediate={Immediate}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, immediate, 
+            _logger.LogDebug("MonitorExchangeStatusAsync started at {0}, Immediate={Immediate}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, immediate,
                 CancellationToken.IsCancellationRequested);
             try
             {
@@ -226,7 +223,7 @@ namespace KalshiBotOverseer
             }
             finally
             {
-                _logger.LogDebug("MonitorExchangeStatusAsync completed at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, 
+                _logger.LogDebug("MonitorExchangeStatusAsync completed at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow,
                     CancellationToken.IsCancellationRequested);
             }
         }

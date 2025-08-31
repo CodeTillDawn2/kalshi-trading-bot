@@ -3,17 +3,12 @@ using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotOverseer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
 using SmokehouseBot.KalshiAPI.Interfaces;
-using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services;
 using SmokehouseBot.Services.Interfaces;
-using SmokehouseDTOs;
-using System;
-using System.Threading;
-using System.IO;
 
 class Program
 {

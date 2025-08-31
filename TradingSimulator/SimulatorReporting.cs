@@ -1,29 +1,5 @@
-﻿using KalshiBotData.Data;
-using KalshiBotData.Data.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Moq;
-using NUnit.Framework.Constraints;
-using SmokehouseBot.Configuration;
-using SmokehouseBot.Management;
-using SmokehouseBot.Management.Interfaces;
-using SmokehouseBot.Services;
-using SmokehouseBot.Services.Interfaces;
-using SmokehouseDTOs;
-using SmokehouseDTOs.Data;
-using System.Text.Json;
-using TradingSimulator.Strategies;
+﻿using SmokehouseDTOs;
 using TradingSimulator.TestObjects;
-using TradingStrategies;
-using TradingStrategies.Classification;
-using TradingStrategies.Classification.Interfaces;
-using TradingStrategies.Configuration;
-using TradingStrategies.Strategies;
-using TradingStrategies.Trading.Helpers;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
 
 namespace TradingSimulator.Simulator
 {

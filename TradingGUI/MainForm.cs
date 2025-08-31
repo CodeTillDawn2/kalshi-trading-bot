@@ -1,9 +1,9 @@
 ﻿// MainForm.cs: Full class with restored tooltip/hover (black line), back button fix via BackAction, and axis restore on back
+using SmokehouseDTOs;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using TradingSimulator.Simulator;
 using TradingSimulator.TestObjects;
-using System.Text.RegularExpressions;
-using SmokehouseDTOs;
 
 namespace SimulatorWinForms
 {

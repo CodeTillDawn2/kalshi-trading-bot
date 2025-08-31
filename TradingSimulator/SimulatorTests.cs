@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using NUnit.Framework.Constraints;
 using SmokehouseBot.Configuration;
 using SmokehouseBot.Management;
 using SmokehouseBot.Management.Interfaces;
@@ -26,6 +25,7 @@ using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;
 using TradingStrategies.Strategies;
+using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Trading.Helpers;
 using static SmokehouseInterfaces.Enums.StrategyEnums;
 
@@ -332,7 +332,7 @@ namespace TradingSimulator.Simulator
                 .ToList();
 
 
-            return marketSnapshots; 
+            return marketSnapshots;
         }
 
 
@@ -453,7 +453,8 @@ namespace TradingSimulator.Simulator
             var k = setKey.Trim().ToLowerInvariant();
             if (k.Contains("breakout")) return StrategyFamily.Breakout;
             if (k.Contains("bollinger")) return StrategyFamily.Bollinger;
-            if (k.Contains("flowmo") || k.Contains("flow")) return StrategyFamily.FlowMo;
+            if (k.Contains("flowmo")) return StrategyFamily.FlowMo;
+            if (k.Contains("sloMo")) return StrategyFamily.SloMo;
             if (k.Contains("nothing")) return StrategyFamily.NothingHappens;
             if (k.Contains("momentum")) return StrategyFamily.Momentum;
             // specific short names
@@ -472,7 +473,8 @@ namespace TradingSimulator.Simulator
                 //StrategyFamily.Bollinger,
                 //StrategyFamily.FlowMo,
                 //StrategyFamily.Breakout,
-                StrategyFamily.Momentum,
+                //StrategyFamily.Momentum,
+                StrategyFamily.SloMo,
                 //StrategyFamily.NothingHappens
             };
 
@@ -515,6 +517,7 @@ namespace TradingSimulator.Simulator
         {
             Bollinger,
             FlowMo,
+            SloMo,
             Breakout,
             NothingHappens,
             Momentum
@@ -546,7 +549,14 @@ namespace TradingSimulator.Simulator
                             .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
                         "FlowMo"
                     );
-
+                case StrategyFamily.SloMo:
+                    return (
+                        helper.GetTrainingMappings("SloMo"),
+                        (SlopeMomentumStrat.SlopeMomentumParameterSets
+                            ?? throw new InvalidOperationException("SlopeMomentumParameterSets is null."))
+                            .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
+                        "SloMo"
+                    );
                 case StrategyFamily.Breakout:
                     return (
                         helper.GetBreakoutStrategiesForTraining(),

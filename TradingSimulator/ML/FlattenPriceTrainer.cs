@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using Microsoft.ML;
+﻿using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Trainers.LightGbm;
 using Microsoft.VisualBasic.FileIO;
+using System.Globalization;
 
 namespace TradingSimulator.ML
 {
@@ -72,11 +68,11 @@ namespace TradingSimulator.ML
                   .Append(ml.Transforms.NormalizeMinMax("Features"))
                   .Append(ml.Regression.Trainers.LightGbm(new LightGbmRegressionTrainer.Options
                   {
-                      NumberOfLeaves = cfg.NumberOfLeaves,                
+                      NumberOfLeaves = cfg.NumberOfLeaves,
                       MinimumExampleCountPerLeaf = cfg.MinExamplesPerLeaf,
-                      NumberOfIterations = cfg.NumIterations,         
-                      LearningRate = cfg.LearningRate                    
-                                                         
+                      NumberOfIterations = cfg.NumIterations,
+                      LearningRate = cfg.LearningRate
+
                   }));
 
             var model = pipeline.Fit(trainDv);

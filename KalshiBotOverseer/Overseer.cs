@@ -1,5 +1,4 @@
 ﻿// New class: EventSubscriber.cs (place in appropriate namespace, e.g., SmokehouseBot.Services)
-using System;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
 using SmokehouseDTOs; // Assuming logging is used
