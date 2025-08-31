@@ -1,4 +1,4 @@
-﻿// Updated SnapshotViewer.cs with AutoScroll additions
+﻿// Updated SnapshotViewer.cs with intelligent isotropic font scaling
 
 // SnapshotViewer.cs (replace the entire class with this updated version)
 using SmokehouseDTOs;
@@ -17,6 +17,7 @@ namespace SimulatorWinForms
 
         // Original dimensions for scaling reference (based on designer default size)
         private const int OriginalWidth = 933;
+        private const int OriginalHeight = 692;
         private const float MinScale = 0.8f;  // Minimum font scale (80% of original)
         private const float MaxScale = 2.0f;  // Maximum font scale (200% of original)
 
@@ -245,8 +246,10 @@ namespace SimulatorWinForms
 
         private void SnapshotViewer_ResizeEnd(object sender, EventArgs e)
         {
-            // Calculate scale factor based on width (clamp between min and max)
-            float scaleFactor = Math.Clamp((float)this.Width / OriginalWidth, MinScale, MaxScale);
+            // Calculate isotropic scale factor: min of width and height ratios (clamp between min and max)
+            float widthScale = (float)this.Width / OriginalWidth;
+            float heightScale = (float)this.Height / OriginalHeight;
+            float scaleFactor = Math.Clamp(Math.Min(widthScale, heightScale), MinScale, MaxScale);
 
             // Scale fonts for labels, checkboxes, and values recursively
             ScaleFonts(this, scaleFactor);

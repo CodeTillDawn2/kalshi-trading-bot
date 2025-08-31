@@ -281,7 +281,7 @@ namespace TradingStrategies.Strategies.Strats
                 $"pos={position}","candidate={candidate}",
 
                 // (8) slopes
-                $"yesSlope={F(yesSlope)}","noSlope={F(noSlope)}","minSlope={F(minSlope)}",
+                $"yesSlope={F(yesSlope)}",$"noSlope={F(noSlope)}",$"minSlope={F(minSlope)}",
 
                 // (9) tail
                 tail
