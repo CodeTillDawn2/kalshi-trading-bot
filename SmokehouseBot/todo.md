@@ -26,6 +26,7 @@
 - [ ] Detect upcoming downtimes and react to them, schedule maintenance
 - [ ] ticker_v2
 - [ ] Need some kind of "traffic cop" intermediary to handle graceful handoffs, potentially handle some of the maintenance duties
+- [ ] Is no slope flipped the wrong direction from what would be expected?
 
 
 # v0.2.6

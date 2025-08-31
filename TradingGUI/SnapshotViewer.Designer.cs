@@ -95,6 +95,7 @@ namespace SimulatorWinForms
             marketAgeLabel = new Label();
             marketAgeValue = new Label();
             flowMomentumGrid = new TableLayoutPanel();
+            label1 = new Label();
             flowHeader = new Label();
             flowHeaderYes = new Label();
             flowHeaderNo = new Label();
@@ -117,6 +118,7 @@ namespace SimulatorWinForms
             slopeYesValue = new Label();
             slopeNoValue = new Label();
             contextGrid = new TableLayoutPanel();
+            label2 = new Label();
             contextHeader = new Label();
             contextHeaderYes = new Label();
             contextHeaderNo = new Label();
@@ -135,7 +137,6 @@ namespace SimulatorWinForms
             totalContractsNoValue = new Label();
             positionsContainer = new Panel();
             positionsLayout = new TableLayoutPanel();
-            positionTextBox = new TextBox();
             positionsGrid = new TableLayoutPanel();
             positionSizeLabel = new CheckBox();
             positionSizeValue = new Label();
@@ -1064,6 +1065,7 @@ namespace SimulatorWinForms
             flowMomentumGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             flowMomentumGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             flowMomentumGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            flowMomentumGrid.Controls.Add(label1, 0, 0);
             flowMomentumGrid.Controls.Add(flowHeader, 0, 0);
             flowMomentumGrid.Controls.Add(flowHeaderYes, 1, 0);
             flowMomentumGrid.Controls.Add(flowHeaderNo, 2, 0);
@@ -1100,6 +1102,15 @@ namespace SimulatorWinForms
             flowMomentumGrid.Size = new Size(124, 178);
             flowMomentumGrid.TabIndex = 1;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Dock = DockStyle.Fill;
+            label1.Location = new Point(3, 22);
+            label1.Name = "label1";
+            label1.Size = new Size(56, 22);
+            label1.TabIndex = 21;
+            // 
             // flowHeader
             // 
             flowHeader.AutoSize = true;
@@ -1115,9 +1126,9 @@ namespace SimulatorWinForms
             // 
             flowHeaderYes.AutoSize = true;
             flowHeaderYes.Dock = DockStyle.Fill;
-            flowHeaderYes.Location = new Point(3, 22);
+            flowHeaderYes.Location = new Point(65, 22);
             flowHeaderYes.Name = "flowHeaderYes";
-            flowHeaderYes.Size = new Size(56, 22);
+            flowHeaderYes.Size = new Size(25, 22);
             flowHeaderYes.TabIndex = 1;
             flowHeaderYes.Text = "Yes";
             // 
@@ -1125,7 +1136,7 @@ namespace SimulatorWinForms
             // 
             flowHeaderNo.AutoSize = true;
             flowHeaderNo.Dock = DockStyle.Fill;
-            flowHeaderNo.Location = new Point(65, 22);
+            flowHeaderNo.Location = new Point(96, 22);
             flowHeaderNo.Name = "flowHeaderNo";
             flowHeaderNo.Size = new Size(25, 22);
             flowHeaderNo.TabIndex = 2;
@@ -1135,9 +1146,9 @@ namespace SimulatorWinForms
             // 
             topVelocityLabel.AutoSize = true;
             topVelocityLabel.Dock = DockStyle.Fill;
-            topVelocityLabel.Location = new Point(96, 25);
+            topVelocityLabel.Location = new Point(3, 47);
             topVelocityLabel.Name = "topVelocityLabel";
-            topVelocityLabel.Size = new Size(25, 16);
+            topVelocityLabel.Size = new Size(56, 16);
             topVelocityLabel.TabIndex = 3;
             topVelocityLabel.Text = "Top Velocity:";
             // 
@@ -1145,9 +1156,9 @@ namespace SimulatorWinForms
             // 
             topVelocityYesValue.AutoSize = true;
             topVelocityYesValue.Dock = DockStyle.Fill;
-            topVelocityYesValue.Location = new Point(3, 44);
+            topVelocityYesValue.Location = new Point(65, 44);
             topVelocityYesValue.Name = "topVelocityYesValue";
-            topVelocityYesValue.Size = new Size(56, 22);
+            topVelocityYesValue.Size = new Size(25, 22);
             topVelocityYesValue.TabIndex = 4;
             topVelocityYesValue.Text = "--";
             // 
@@ -1155,7 +1166,7 @@ namespace SimulatorWinForms
             // 
             topVelocityNoValue.AutoSize = true;
             topVelocityNoValue.Dock = DockStyle.Fill;
-            topVelocityNoValue.Location = new Point(65, 44);
+            topVelocityNoValue.Location = new Point(96, 44);
             topVelocityNoValue.Name = "topVelocityNoValue";
             topVelocityNoValue.Size = new Size(25, 22);
             topVelocityNoValue.TabIndex = 5;
@@ -1165,9 +1176,9 @@ namespace SimulatorWinForms
             // 
             bottomVelocityLabel.AutoSize = true;
             bottomVelocityLabel.Dock = DockStyle.Fill;
-            bottomVelocityLabel.Location = new Point(96, 47);
+            bottomVelocityLabel.Location = new Point(3, 69);
             bottomVelocityLabel.Name = "bottomVelocityLabel";
-            bottomVelocityLabel.Size = new Size(25, 16);
+            bottomVelocityLabel.Size = new Size(56, 16);
             bottomVelocityLabel.TabIndex = 6;
             bottomVelocityLabel.Text = "Bottom Velocity:";
             // 
@@ -1175,9 +1186,9 @@ namespace SimulatorWinForms
             // 
             bottomVelocityYesValue.AutoSize = true;
             bottomVelocityYesValue.Dock = DockStyle.Fill;
-            bottomVelocityYesValue.Location = new Point(3, 66);
+            bottomVelocityYesValue.Location = new Point(65, 66);
             bottomVelocityYesValue.Name = "bottomVelocityYesValue";
-            bottomVelocityYesValue.Size = new Size(56, 22);
+            bottomVelocityYesValue.Size = new Size(25, 22);
             bottomVelocityYesValue.TabIndex = 7;
             bottomVelocityYesValue.Text = "--";
             // 
@@ -1185,7 +1196,7 @@ namespace SimulatorWinForms
             // 
             bottomVelocityNoValue.AutoSize = true;
             bottomVelocityNoValue.Dock = DockStyle.Fill;
-            bottomVelocityNoValue.Location = new Point(65, 66);
+            bottomVelocityNoValue.Location = new Point(96, 66);
             bottomVelocityNoValue.Name = "bottomVelocityNoValue";
             bottomVelocityNoValue.Size = new Size(25, 22);
             bottomVelocityNoValue.TabIndex = 8;
@@ -1195,9 +1206,9 @@ namespace SimulatorWinForms
             // 
             netOrderRateLabel.AutoSize = true;
             netOrderRateLabel.Dock = DockStyle.Fill;
-            netOrderRateLabel.Location = new Point(96, 69);
+            netOrderRateLabel.Location = new Point(3, 91);
             netOrderRateLabel.Name = "netOrderRateLabel";
-            netOrderRateLabel.Size = new Size(25, 16);
+            netOrderRateLabel.Size = new Size(56, 16);
             netOrderRateLabel.TabIndex = 9;
             netOrderRateLabel.Text = "Net Order Rate:";
             // 
@@ -1205,9 +1216,9 @@ namespace SimulatorWinForms
             // 
             netOrderRateYesValue.AutoSize = true;
             netOrderRateYesValue.Dock = DockStyle.Fill;
-            netOrderRateYesValue.Location = new Point(3, 88);
+            netOrderRateYesValue.Location = new Point(65, 88);
             netOrderRateYesValue.Name = "netOrderRateYesValue";
-            netOrderRateYesValue.Size = new Size(56, 22);
+            netOrderRateYesValue.Size = new Size(25, 22);
             netOrderRateYesValue.TabIndex = 10;
             netOrderRateYesValue.Text = "--";
             // 
@@ -1215,7 +1226,7 @@ namespace SimulatorWinForms
             // 
             netOrderRateNoValue.AutoSize = true;
             netOrderRateNoValue.Dock = DockStyle.Fill;
-            netOrderRateNoValue.Location = new Point(65, 88);
+            netOrderRateNoValue.Location = new Point(96, 88);
             netOrderRateNoValue.Name = "netOrderRateNoValue";
             netOrderRateNoValue.Size = new Size(25, 22);
             netOrderRateNoValue.TabIndex = 11;
@@ -1225,9 +1236,9 @@ namespace SimulatorWinForms
             // 
             tradeVolumeLabel.AutoSize = true;
             tradeVolumeLabel.Dock = DockStyle.Fill;
-            tradeVolumeLabel.Location = new Point(96, 91);
+            tradeVolumeLabel.Location = new Point(3, 113);
             tradeVolumeLabel.Name = "tradeVolumeLabel";
-            tradeVolumeLabel.Size = new Size(25, 16);
+            tradeVolumeLabel.Size = new Size(56, 16);
             tradeVolumeLabel.TabIndex = 12;
             tradeVolumeLabel.Text = "Trade Volume:";
             // 
@@ -1235,9 +1246,9 @@ namespace SimulatorWinForms
             // 
             tradeVolumeYesValue.AutoSize = true;
             tradeVolumeYesValue.Dock = DockStyle.Fill;
-            tradeVolumeYesValue.Location = new Point(3, 110);
+            tradeVolumeYesValue.Location = new Point(65, 110);
             tradeVolumeYesValue.Name = "tradeVolumeYesValue";
-            tradeVolumeYesValue.Size = new Size(56, 22);
+            tradeVolumeYesValue.Size = new Size(25, 22);
             tradeVolumeYesValue.TabIndex = 13;
             tradeVolumeYesValue.Text = "--";
             // 
@@ -1245,7 +1256,7 @@ namespace SimulatorWinForms
             // 
             tradeVolumeNoValue.AutoSize = true;
             tradeVolumeNoValue.Dock = DockStyle.Fill;
-            tradeVolumeNoValue.Location = new Point(65, 110);
+            tradeVolumeNoValue.Location = new Point(96, 110);
             tradeVolumeNoValue.Name = "tradeVolumeNoValue";
             tradeVolumeNoValue.Size = new Size(25, 22);
             tradeVolumeNoValue.TabIndex = 14;
@@ -1255,9 +1266,9 @@ namespace SimulatorWinForms
             // 
             avgTradeSizeLabel.AutoSize = true;
             avgTradeSizeLabel.Dock = DockStyle.Fill;
-            avgTradeSizeLabel.Location = new Point(96, 113);
+            avgTradeSizeLabel.Location = new Point(3, 135);
             avgTradeSizeLabel.Name = "avgTradeSizeLabel";
-            avgTradeSizeLabel.Size = new Size(25, 16);
+            avgTradeSizeLabel.Size = new Size(56, 16);
             avgTradeSizeLabel.TabIndex = 15;
             avgTradeSizeLabel.Text = "Avg Trade Size:";
             // 
@@ -1265,9 +1276,9 @@ namespace SimulatorWinForms
             // 
             avgTradeSizeYesValue.AutoSize = true;
             avgTradeSizeYesValue.Dock = DockStyle.Fill;
-            avgTradeSizeYesValue.Location = new Point(3, 132);
+            avgTradeSizeYesValue.Location = new Point(65, 132);
             avgTradeSizeYesValue.Name = "avgTradeSizeYesValue";
-            avgTradeSizeYesValue.Size = new Size(56, 22);
+            avgTradeSizeYesValue.Size = new Size(25, 22);
             avgTradeSizeYesValue.TabIndex = 16;
             avgTradeSizeYesValue.Text = "--";
             // 
@@ -1275,7 +1286,7 @@ namespace SimulatorWinForms
             // 
             avgTradeSizeNoValue.AutoSize = true;
             avgTradeSizeNoValue.Dock = DockStyle.Fill;
-            avgTradeSizeNoValue.Location = new Point(65, 132);
+            avgTradeSizeNoValue.Location = new Point(96, 132);
             avgTradeSizeNoValue.Name = "avgTradeSizeNoValue";
             avgTradeSizeNoValue.Size = new Size(25, 22);
             avgTradeSizeNoValue.TabIndex = 17;
@@ -1285,9 +1296,9 @@ namespace SimulatorWinForms
             // 
             slopeLabel.AutoSize = true;
             slopeLabel.Dock = DockStyle.Fill;
-            slopeLabel.Location = new Point(96, 135);
+            slopeLabel.Location = new Point(3, 157);
             slopeLabel.Name = "slopeLabel";
-            slopeLabel.Size = new Size(25, 16);
+            slopeLabel.Size = new Size(56, 18);
             slopeLabel.TabIndex = 18;
             slopeLabel.Text = "Slope:";
             // 
@@ -1295,9 +1306,9 @@ namespace SimulatorWinForms
             // 
             slopeYesValue.AutoSize = true;
             slopeYesValue.Dock = DockStyle.Fill;
-            slopeYesValue.Location = new Point(3, 154);
+            slopeYesValue.Location = new Point(65, 154);
             slopeYesValue.Name = "slopeYesValue";
-            slopeYesValue.Size = new Size(56, 24);
+            slopeYesValue.Size = new Size(25, 24);
             slopeYesValue.TabIndex = 19;
             slopeYesValue.Text = "--";
             // 
@@ -1305,7 +1316,7 @@ namespace SimulatorWinForms
             // 
             slopeNoValue.AutoSize = true;
             slopeNoValue.Dock = DockStyle.Fill;
-            slopeNoValue.Location = new Point(65, 154);
+            slopeNoValue.Location = new Point(96, 154);
             slopeNoValue.Name = "slopeNoValue";
             slopeNoValue.Size = new Size(25, 24);
             slopeNoValue.TabIndex = 20;
@@ -1318,6 +1329,7 @@ namespace SimulatorWinForms
             contextGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             contextGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             contextGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            contextGrid.Controls.Add(label2, 0, 0);
             contextGrid.Controls.Add(contextHeader, 0, 0);
             contextGrid.Controls.Add(contextHeaderYes, 1, 0);
             contextGrid.Controls.Add(contextHeaderNo, 2, 0);
@@ -1348,6 +1360,15 @@ namespace SimulatorWinForms
             contextGrid.Size = new Size(124, 180);
             contextGrid.TabIndex = 2;
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Dock = DockStyle.Fill;
+            label2.Location = new Point(3, 26);
+            label2.Name = "label2";
+            label2.Size = new Size(56, 26);
+            label2.TabIndex = 16;
+            // 
             // contextHeader
             // 
             contextHeader.AutoSize = true;
@@ -1363,9 +1384,9 @@ namespace SimulatorWinForms
             // 
             contextHeaderYes.AutoSize = true;
             contextHeaderYes.Dock = DockStyle.Fill;
-            contextHeaderYes.Location = new Point(3, 26);
+            contextHeaderYes.Location = new Point(65, 26);
             contextHeaderYes.Name = "contextHeaderYes";
-            contextHeaderYes.Size = new Size(56, 26);
+            contextHeaderYes.Size = new Size(25, 26);
             contextHeaderYes.TabIndex = 1;
             contextHeaderYes.Text = "Yes";
             // 
@@ -1373,7 +1394,7 @@ namespace SimulatorWinForms
             // 
             contextHeaderNo.AutoSize = true;
             contextHeaderNo.Dock = DockStyle.Fill;
-            contextHeaderNo.Location = new Point(65, 26);
+            contextHeaderNo.Location = new Point(96, 26);
             contextHeaderNo.Name = "contextHeaderNo";
             contextHeaderNo.Size = new Size(25, 26);
             contextHeaderNo.TabIndex = 2;
@@ -1383,9 +1404,9 @@ namespace SimulatorWinForms
             // 
             spreadLabel.AutoSize = true;
             spreadLabel.Dock = DockStyle.Fill;
-            spreadLabel.Location = new Point(96, 26);
+            spreadLabel.Location = new Point(3, 52);
             spreadLabel.Name = "spreadLabel";
-            spreadLabel.Size = new Size(25, 26);
+            spreadLabel.Size = new Size(56, 26);
             spreadLabel.TabIndex = 3;
             spreadLabel.Text = "Spread:";
             // 
@@ -1394,9 +1415,9 @@ namespace SimulatorWinForms
             spreadValue.AutoSize = true;
             contextGrid.SetColumnSpan(spreadValue, 2);
             spreadValue.Dock = DockStyle.Fill;
-            spreadValue.Location = new Point(3, 52);
+            spreadValue.Location = new Point(65, 52);
             spreadValue.Name = "spreadValue";
-            spreadValue.Size = new Size(87, 26);
+            spreadValue.Size = new Size(56, 26);
             spreadValue.TabIndex = 4;
             spreadValue.Text = "--";
             // 
@@ -1404,9 +1425,9 @@ namespace SimulatorWinForms
             // 
             imbalLabel.AutoSize = true;
             imbalLabel.Dock = DockStyle.Fill;
-            imbalLabel.Location = new Point(96, 55);
+            imbalLabel.Location = new Point(3, 81);
             imbalLabel.Name = "imbalLabel";
-            imbalLabel.Size = new Size(25, 20);
+            imbalLabel.Size = new Size(56, 20);
             imbalLabel.TabIndex = 5;
             imbalLabel.Text = "Imbal:";
             // 
@@ -1415,9 +1436,9 @@ namespace SimulatorWinForms
             imbalValue.AutoSize = true;
             contextGrid.SetColumnSpan(imbalValue, 2);
             imbalValue.Dock = DockStyle.Fill;
-            imbalValue.Location = new Point(3, 78);
+            imbalValue.Location = new Point(65, 78);
             imbalValue.Name = "imbalValue";
-            imbalValue.Size = new Size(87, 26);
+            imbalValue.Size = new Size(56, 26);
             imbalValue.TabIndex = 6;
             imbalValue.Text = "--";
             // 
@@ -1425,9 +1446,9 @@ namespace SimulatorWinForms
             // 
             depthTop4Label.AutoSize = true;
             depthTop4Label.Dock = DockStyle.Fill;
-            depthTop4Label.Location = new Point(96, 81);
+            depthTop4Label.Location = new Point(3, 107);
             depthTop4Label.Name = "depthTop4Label";
-            depthTop4Label.Size = new Size(25, 20);
+            depthTop4Label.Size = new Size(56, 20);
             depthTop4Label.TabIndex = 7;
             depthTop4Label.Text = "Depth Top 4:";
             // 
@@ -1435,9 +1456,9 @@ namespace SimulatorWinForms
             // 
             depthTop4YesValue.AutoSize = true;
             depthTop4YesValue.Dock = DockStyle.Fill;
-            depthTop4YesValue.Location = new Point(3, 104);
+            depthTop4YesValue.Location = new Point(65, 104);
             depthTop4YesValue.Name = "depthTop4YesValue";
-            depthTop4YesValue.Size = new Size(56, 26);
+            depthTop4YesValue.Size = new Size(25, 26);
             depthTop4YesValue.TabIndex = 8;
             depthTop4YesValue.Text = "--";
             // 
@@ -1445,7 +1466,7 @@ namespace SimulatorWinForms
             // 
             depthTop4NoValue.AutoSize = true;
             depthTop4NoValue.Dock = DockStyle.Fill;
-            depthTop4NoValue.Location = new Point(65, 104);
+            depthTop4NoValue.Location = new Point(96, 104);
             depthTop4NoValue.Name = "depthTop4NoValue";
             depthTop4NoValue.Size = new Size(25, 26);
             depthTop4NoValue.TabIndex = 9;
@@ -1455,9 +1476,9 @@ namespace SimulatorWinForms
             // 
             centerMassLabel.AutoSize = true;
             centerMassLabel.Dock = DockStyle.Fill;
-            centerMassLabel.Location = new Point(96, 107);
+            centerMassLabel.Location = new Point(3, 133);
             centerMassLabel.Name = "centerMassLabel";
-            centerMassLabel.Size = new Size(25, 20);
+            centerMassLabel.Size = new Size(56, 20);
             centerMassLabel.TabIndex = 10;
             centerMassLabel.Text = "Center Mass:";
             // 
@@ -1465,9 +1486,9 @@ namespace SimulatorWinForms
             // 
             centerMassYesValue.AutoSize = true;
             centerMassYesValue.Dock = DockStyle.Fill;
-            centerMassYesValue.Location = new Point(3, 130);
+            centerMassYesValue.Location = new Point(65, 130);
             centerMassYesValue.Name = "centerMassYesValue";
-            centerMassYesValue.Size = new Size(56, 26);
+            centerMassYesValue.Size = new Size(25, 26);
             centerMassYesValue.TabIndex = 11;
             centerMassYesValue.Text = "--";
             // 
@@ -1475,7 +1496,7 @@ namespace SimulatorWinForms
             // 
             centerMassNoValue.AutoSize = true;
             centerMassNoValue.Dock = DockStyle.Fill;
-            centerMassNoValue.Location = new Point(65, 130);
+            centerMassNoValue.Location = new Point(96, 130);
             centerMassNoValue.Name = "centerMassNoValue";
             centerMassNoValue.Size = new Size(25, 26);
             centerMassNoValue.TabIndex = 12;
@@ -1485,9 +1506,9 @@ namespace SimulatorWinForms
             // 
             totalContractsLabel.AutoSize = true;
             totalContractsLabel.Dock = DockStyle.Fill;
-            totalContractsLabel.Location = new Point(96, 133);
+            totalContractsLabel.Location = new Point(3, 159);
             totalContractsLabel.Name = "totalContractsLabel";
-            totalContractsLabel.Size = new Size(25, 20);
+            totalContractsLabel.Size = new Size(56, 18);
             totalContractsLabel.TabIndex = 13;
             totalContractsLabel.Text = "Total Contracts:";
             // 
@@ -1495,9 +1516,9 @@ namespace SimulatorWinForms
             // 
             totalContractsYesValue.AutoSize = true;
             totalContractsYesValue.Dock = DockStyle.Fill;
-            totalContractsYesValue.Location = new Point(3, 156);
+            totalContractsYesValue.Location = new Point(65, 156);
             totalContractsYesValue.Name = "totalContractsYesValue";
-            totalContractsYesValue.Size = new Size(56, 24);
+            totalContractsYesValue.Size = new Size(25, 24);
             totalContractsYesValue.TabIndex = 14;
             totalContractsYesValue.Text = "--";
             // 
@@ -1505,7 +1526,7 @@ namespace SimulatorWinForms
             // 
             totalContractsNoValue.AutoSize = true;
             totalContractsNoValue.Dock = DockStyle.Fill;
-            totalContractsNoValue.Location = new Point(65, 156);
+            totalContractsNoValue.Location = new Point(96, 156);
             totalContractsNoValue.Name = "totalContractsNoValue";
             totalContractsNoValue.Size = new Size(25, 24);
             totalContractsNoValue.TabIndex = 15;
@@ -1528,30 +1549,19 @@ namespace SimulatorWinForms
             positionsLayout.AutoSize = true;
             positionsLayout.ColumnCount = 1;
             positionsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            positionsLayout.Controls.Add(positionTextBox, 0, 0);
-            positionsLayout.Controls.Add(positionsGrid, 0, 1);
+            positionsLayout.Controls.Add(positionsGrid, 0, 0);
             positionsLayout.Dock = DockStyle.Fill;
             positionsLayout.Location = new Point(6, 6);
             positionsLayout.Margin = new Padding(0);
             positionsLayout.Name = "positionsLayout";
-            positionsLayout.RowCount = 2;
-            positionsLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
-            positionsLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 70F));
+            positionsLayout.RowCount = 1;
+            positionsLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             positionsLayout.Size = new Size(579, 143);
             positionsLayout.TabIndex = 0;
             // 
-            // positionTextBox
-            // 
-            positionTextBox.Dock = DockStyle.Fill;
-            positionTextBox.Location = new Point(3, 3);
-            positionTextBox.Multiline = true;
-            positionTextBox.Name = "positionTextBox";
-            positionTextBox.ReadOnly = true;
-            positionTextBox.Size = new Size(573, 36);
-            positionTextBox.TabIndex = 0;
-            // 
             // positionsGrid
             // 
+            positionsGrid.Anchor = AnchorStyles.Right;
             positionsGrid.AutoSize = true;
             positionsGrid.ColumnCount = 2;
             positionsGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
@@ -1572,8 +1582,7 @@ namespace SimulatorWinForms
             positionsGrid.Controls.Add(restingOrdersValue, 1, 6);
             positionsGrid.Controls.Add(simulatedPositionLabel, 0, 7);
             positionsGrid.Controls.Add(simulatedPositionValue, 1, 7);
-            positionsGrid.Dock = DockStyle.Fill;
-            positionsGrid.Location = new Point(3, 45);
+            positionsGrid.Location = new Point(353, 3);
             positionsGrid.Name = "positionsGrid";
             positionsGrid.RowCount = 8;
             positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
@@ -1584,7 +1593,7 @@ namespace SimulatorWinForms
             positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
             positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
             positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            positionsGrid.Size = new Size(573, 95);
+            positionsGrid.Size = new Size(223, 137);
             positionsGrid.TabIndex = 1;
             // 
             // positionSizeLabel
@@ -1593,7 +1602,7 @@ namespace SimulatorWinForms
             positionSizeLabel.Dock = DockStyle.Fill;
             positionSizeLabel.Location = new Point(3, 3);
             positionSizeLabel.Name = "positionSizeLabel";
-            positionSizeLabel.Size = new Size(337, 5);
+            positionSizeLabel.Size = new Size(127, 11);
             positionSizeLabel.TabIndex = 0;
             positionSizeLabel.Text = "Position Size:";
             // 
@@ -1601,9 +1610,9 @@ namespace SimulatorWinForms
             // 
             positionSizeValue.AutoSize = true;
             positionSizeValue.Dock = DockStyle.Fill;
-            positionSizeValue.Location = new Point(346, 0);
+            positionSizeValue.Location = new Point(136, 0);
             positionSizeValue.Name = "positionSizeValue";
-            positionSizeValue.Size = new Size(224, 11);
+            positionSizeValue.Size = new Size(84, 17);
             positionSizeValue.TabIndex = 1;
             positionSizeValue.Text = "--";
             // 
@@ -1611,9 +1620,9 @@ namespace SimulatorWinForms
             // 
             lastTradeLabel.AutoSize = true;
             lastTradeLabel.Dock = DockStyle.Fill;
-            lastTradeLabel.Location = new Point(3, 11);
+            lastTradeLabel.Location = new Point(3, 17);
             lastTradeLabel.Name = "lastTradeLabel";
-            lastTradeLabel.Size = new Size(337, 11);
+            lastTradeLabel.Size = new Size(127, 17);
             lastTradeLabel.TabIndex = 2;
             lastTradeLabel.Text = "Last Trade:";
             // 
@@ -1621,9 +1630,9 @@ namespace SimulatorWinForms
             // 
             lastTradeValue.AutoSize = true;
             lastTradeValue.Dock = DockStyle.Fill;
-            lastTradeValue.Location = new Point(346, 11);
+            lastTradeValue.Location = new Point(136, 17);
             lastTradeValue.Name = "lastTradeValue";
-            lastTradeValue.Size = new Size(224, 11);
+            lastTradeValue.Size = new Size(84, 17);
             lastTradeValue.TabIndex = 3;
             lastTradeValue.Text = "--";
             // 
@@ -1631,9 +1640,9 @@ namespace SimulatorWinForms
             // 
             positionRoiLabel.AutoSize = true;
             positionRoiLabel.Dock = DockStyle.Fill;
-            positionRoiLabel.Location = new Point(3, 25);
+            positionRoiLabel.Location = new Point(3, 37);
             positionRoiLabel.Name = "positionRoiLabel";
-            positionRoiLabel.Size = new Size(337, 5);
+            positionRoiLabel.Size = new Size(127, 11);
             positionRoiLabel.TabIndex = 4;
             positionRoiLabel.Text = "Position ROI:";
             // 
@@ -1641,9 +1650,9 @@ namespace SimulatorWinForms
             // 
             positionRoiValue.AutoSize = true;
             positionRoiValue.Dock = DockStyle.Fill;
-            positionRoiValue.Location = new Point(346, 22);
+            positionRoiValue.Location = new Point(136, 34);
             positionRoiValue.Name = "positionRoiValue";
-            positionRoiValue.Size = new Size(224, 11);
+            positionRoiValue.Size = new Size(84, 17);
             positionRoiValue.TabIndex = 5;
             positionRoiValue.Text = "--";
             // 
@@ -1651,9 +1660,9 @@ namespace SimulatorWinForms
             // 
             buyinPriceLabel.AutoSize = true;
             buyinPriceLabel.Dock = DockStyle.Fill;
-            buyinPriceLabel.Location = new Point(3, 33);
+            buyinPriceLabel.Location = new Point(3, 51);
             buyinPriceLabel.Name = "buyinPriceLabel";
-            buyinPriceLabel.Size = new Size(337, 11);
+            buyinPriceLabel.Size = new Size(127, 17);
             buyinPriceLabel.TabIndex = 6;
             buyinPriceLabel.Text = "Buyin Price:";
             // 
@@ -1661,9 +1670,9 @@ namespace SimulatorWinForms
             // 
             buyinPriceValue.AutoSize = true;
             buyinPriceValue.Dock = DockStyle.Fill;
-            buyinPriceValue.Location = new Point(346, 33);
+            buyinPriceValue.Location = new Point(136, 51);
             buyinPriceValue.Name = "buyinPriceValue";
-            buyinPriceValue.Size = new Size(224, 11);
+            buyinPriceValue.Size = new Size(84, 17);
             buyinPriceValue.TabIndex = 7;
             buyinPriceValue.Text = "--";
             // 
@@ -1671,9 +1680,9 @@ namespace SimulatorWinForms
             // 
             positionUpsideLabel.AutoSize = true;
             positionUpsideLabel.Dock = DockStyle.Fill;
-            positionUpsideLabel.Location = new Point(3, 44);
+            positionUpsideLabel.Location = new Point(3, 68);
             positionUpsideLabel.Name = "positionUpsideLabel";
-            positionUpsideLabel.Size = new Size(337, 11);
+            positionUpsideLabel.Size = new Size(127, 17);
             positionUpsideLabel.TabIndex = 8;
             positionUpsideLabel.Text = "Position Upside:";
             // 
@@ -1681,9 +1690,9 @@ namespace SimulatorWinForms
             // 
             positionUpsideValue.AutoSize = true;
             positionUpsideValue.Dock = DockStyle.Fill;
-            positionUpsideValue.Location = new Point(346, 44);
+            positionUpsideValue.Location = new Point(136, 68);
             positionUpsideValue.Name = "positionUpsideValue";
-            positionUpsideValue.Size = new Size(224, 11);
+            positionUpsideValue.Size = new Size(84, 17);
             positionUpsideValue.TabIndex = 9;
             positionUpsideValue.Text = "--";
             // 
@@ -1691,9 +1700,9 @@ namespace SimulatorWinForms
             // 
             positionDownsideLabel.AutoSize = true;
             positionDownsideLabel.Dock = DockStyle.Fill;
-            positionDownsideLabel.Location = new Point(3, 55);
+            positionDownsideLabel.Location = new Point(3, 85);
             positionDownsideLabel.Name = "positionDownsideLabel";
-            positionDownsideLabel.Size = new Size(337, 11);
+            positionDownsideLabel.Size = new Size(127, 17);
             positionDownsideLabel.TabIndex = 10;
             positionDownsideLabel.Text = "Position Downside:";
             // 
@@ -1701,9 +1710,9 @@ namespace SimulatorWinForms
             // 
             positionDownsideValue.AutoSize = true;
             positionDownsideValue.Dock = DockStyle.Fill;
-            positionDownsideValue.Location = new Point(346, 55);
+            positionDownsideValue.Location = new Point(136, 85);
             positionDownsideValue.Name = "positionDownsideValue";
-            positionDownsideValue.Size = new Size(224, 11);
+            positionDownsideValue.Size = new Size(84, 17);
             positionDownsideValue.TabIndex = 11;
             positionDownsideValue.Text = "--";
             // 
@@ -1711,9 +1720,9 @@ namespace SimulatorWinForms
             // 
             restingOrdersLabel.AutoSize = true;
             restingOrdersLabel.Dock = DockStyle.Fill;
-            restingOrdersLabel.Location = new Point(3, 69);
+            restingOrdersLabel.Location = new Point(3, 105);
             restingOrdersLabel.Name = "restingOrdersLabel";
-            restingOrdersLabel.Size = new Size(337, 5);
+            restingOrdersLabel.Size = new Size(127, 11);
             restingOrdersLabel.TabIndex = 12;
             restingOrdersLabel.Text = "Resting Orders:";
             // 
@@ -1721,9 +1730,9 @@ namespace SimulatorWinForms
             // 
             restingOrdersValue.AutoSize = true;
             restingOrdersValue.Dock = DockStyle.Fill;
-            restingOrdersValue.Location = new Point(346, 66);
+            restingOrdersValue.Location = new Point(136, 102);
             restingOrdersValue.Name = "restingOrdersValue";
-            restingOrdersValue.Size = new Size(224, 11);
+            restingOrdersValue.Size = new Size(84, 17);
             restingOrdersValue.TabIndex = 13;
             restingOrdersValue.Text = "--";
             // 
@@ -1731,9 +1740,9 @@ namespace SimulatorWinForms
             // 
             simulatedPositionLabel.AutoSize = true;
             simulatedPositionLabel.Dock = DockStyle.Fill;
-            simulatedPositionLabel.Location = new Point(3, 80);
+            simulatedPositionLabel.Location = new Point(3, 122);
             simulatedPositionLabel.Name = "simulatedPositionLabel";
-            simulatedPositionLabel.Size = new Size(337, 12);
+            simulatedPositionLabel.Size = new Size(127, 12);
             simulatedPositionLabel.TabIndex = 14;
             simulatedPositionLabel.Text = "Simulated Position:";
             // 
@@ -1741,9 +1750,9 @@ namespace SimulatorWinForms
             // 
             simulatedPositionValue.AutoSize = true;
             simulatedPositionValue.Dock = DockStyle.Fill;
-            simulatedPositionValue.Location = new Point(346, 77);
+            simulatedPositionValue.Location = new Point(136, 119);
             simulatedPositionValue.Name = "simulatedPositionValue";
-            simulatedPositionValue.Size = new Size(224, 18);
+            simulatedPositionValue.Size = new Size(84, 18);
             simulatedPositionValue.TabIndex = 15;
             simulatedPositionValue.Text = "--";
             // 
@@ -1992,8 +2001,6 @@ namespace SimulatorWinForms
         private Label totalContractsYesValue;
         private Label totalContractsNoValue;
         private Panel positionsContainer;
-        private TableLayoutPanel positionsLayout;
-        private TextBox positionTextBox;
         private TableLayoutPanel positionsGrid;
         private CheckBox positionSizeLabel;
         private Label positionSizeValue;
@@ -2017,5 +2024,8 @@ namespace SimulatorWinForms
         private DataGridViewTextBoxColumn sizeCol;
         private DataGridViewTextBoxColumn valueCol;
         private Button backButton;
+        private Label label1;
+        private Label label2;
+        private TableLayoutPanel positionsLayout;
     }
 }

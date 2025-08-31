@@ -209,8 +209,6 @@ namespace SimulatorWinForms
             restingOrdersValue.Text = currentSnapshot.RestingOrders?.Count.ToString() ?? "0";
             simulatedPositionValue.Text = "??";
 
-            // For the new textbox (populate with example text; adjust as needed)
-            positionTextBox.Text = "Read-only details about the position or simulation logs.";
         }
 
         private void UpdateChart()
@@ -258,9 +256,6 @@ namespace SimulatorWinForms
             orderbookGrid.Font = new Font(orderbookGrid.Font.FontFamily, 8.25f * scaleFactor);
             orderbookGrid.ColumnHeadersDefaultCellStyle.Font = new Font(orderbookGrid.Font.FontFamily, 8.25f * scaleFactor, FontStyle.Bold);
             orderbookGrid.AutoResizeColumns();
-
-            // Scale TextBox (positionTextBox)
-            positionTextBox.Font = new Font(positionTextBox.Font.FontFamily, 9f * scaleFactor);
 
             // Scale Button (backButton)
             backButton.Font = new Font(backButton.Font.FontFamily, 8.25f * scaleFactor);

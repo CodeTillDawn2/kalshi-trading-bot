@@ -387,8 +387,8 @@ namespace SmokehouseBot.State
                 return;
             }
 
-            _yesBidSlopePerMinute = Math.Round((last.yes_bid - first.yes_bid) / timeDiffMin, 2);
-            _noBidSlopePerMinute = Math.Round(((100 - last.yes_ask) - (100 - first.yes_ask)) / timeDiffMin);
+            _yesBidSlopePerMinute = Math.Round((last.yes_bid - first.yes_bid) / timeDiffMin, 2, MidpointRounding.AwayFromZero);
+            _noBidSlopePerMinute  = Math.Round(((100 - last.yes_ask) - (100 - first.yes_ask)) / timeDiffMin, 2, MidpointRounding.AwayFromZero);
 
         }
 

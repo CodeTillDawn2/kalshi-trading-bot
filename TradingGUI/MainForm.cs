@@ -411,7 +411,7 @@ namespace SimulatorWinForms
             {
                 await _simulator.RunSelectedSetForGuiAsync(
                     setKey: "Slomo",
-                    weightName: "SlopeMomentum_MinRatioDiff_Low2",
+                    weightName: "FloMo_Testing",
                     writeToFile: true,
                     marketsToRun: sel);
             }

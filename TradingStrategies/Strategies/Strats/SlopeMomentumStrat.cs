@@ -54,47 +54,29 @@ namespace TradingStrategies.Strategies.Strats
                 { ParamKey.ExitMinSlopeRequirement, 0.02 }
             };
         }
-
         public override ActionDecision GetAction(MarketSnapshot snapshot, MarketSnapshot? prev, int simulationPosition = 0)
         {
-            if (!snapshot.ChangeMetricsMature)
-                return AD(ActionType.None, 0, 0, "warmup:not_mature");
-
             var inv = CultureInfo.InvariantCulture;
 
-            // ---- knobs
             int minDist = (int)Math.Round(_params[ParamKey.MinDistanceFromBounds]);
             double baseVD = _params[ParamKey.VelocityToDepthRatio];
             double minDiff = _params[ParamKey.MinRatioDifference];
             int minBars = (int)Math.Round(_params[ParamKey.MinConsecutiveBars]);
-
             double shareTRMin = _params[ParamKey.TradeRateShareMin];
             double shareTEMin = _params[ParamKey.TradeEventShareMin];
-
             double exitOpp = _params[ParamKey.ExitOppositeSignalStrength];
             double minSlope = _params[ParamKey.MinSlope];
             double exitMinSlope = _params[ParamKey.ExitMinSlopeRequirement];
 
-            // ---- static gates: stay away from 0/100 edges
-            if (snapshot.BestYesAsk >= 100 - minDist || snapshot.BestYesBid <= minDist)
-                return AD(ActionType.None, 0, 0, "gate:near_boundary");
-
-            if (prev is null)
-                return AD(ActionType.None, 0, 0, "warmup:no_prev");
-
-            // ---- flows (per-minute velocities you have)
             double vYes = snapshot.VelocityPerMinute_Top_Yes_Bid + snapshot.VelocityPerMinute_Bottom_Yes_Bid;
             double vNo = snapshot.VelocityPerMinute_Top_No_Bid  + snapshot.VelocityPerMinute_Bottom_No_Bid;
 
-            // ---- depth (scale to avoid huge ratios; avoid zero)
             double depthYes = Math.Max(snapshot.TotalOrderbookDepth_Yes / 100.0, 1e-9);
             double depthNo = Math.Max(snapshot.TotalOrderbookDepth_No  / 100.0, 1e-9);
 
-            // ---- normalized flows
             double flowYes = vYes / depthYes;
             double flowNo = vNo  / depthNo;
 
-            // ---- “edge versus other side”
             double ratioEdge = Math.Abs(flowYes - flowNo);
 
             double totalRate = Math.Max(snapshot.TradeRatePerMinute_Yes + snapshot.TradeRatePerMinute_No, 1e-9);
@@ -105,132 +87,251 @@ namespace TradingStrategies.Strategies.Strats
             double teShareYes = snapshot.TradeCount_Yes / totalTrades;
             double teShareNo = snapshot.TradeCount_No  / totalTrades;
 
-            // ---- slope
             double yesSlope = snapshot.YesBidSlopePerMinute;
             double noSlope = snapshot.NoBidSlopePerMinute;
 
-            // ---- consecutive bars state
+            if (!snapshot.ChangeMetricsMature)
+            {
+                return AD(ActionType.None, 0, 0,
+                    Memo(inv, "warmup:not_mature",
+                         minDist, baseVD, minDiff, minBars, shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
+                         vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
+                         trShareYes, trShareNo, teShareYes, teShareNo,
+                         _consecYes, _consecNo, simulationPosition, ActionType.None,
+                         yesSlope, noSlope, false, false, false));
+            }
+
+            if (snapshot.BestYesAsk >= 100 - minDist || snapshot.BestYesBid <= minDist)
+            {
+                return AD(ActionType.None, 0, 0,
+                    Memo(inv, "gate:near_boundary",
+                         minDist, baseVD, minDiff, minBars, shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
+                         vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
+                         trShareYes, trShareNo, teShareYes, teShareNo,
+                         _consecYes, _consecNo, simulationPosition, ActionType.None,
+                         yesSlope, noSlope, false, false, false));
+            }
+
+            if (prev is null)
+            {
+                return AD(ActionType.None, 0, 0,
+                    Memo(inv, "warmup:no_prev",
+                         minDist, baseVD, minDiff, minBars, shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
+                         vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
+                         trShareYes, trShareNo, teShareYes, teShareNo,
+                         _consecYes, _consecNo, simulationPosition, ActionType.None,
+                         yesSlope, noSlope, false, false, false));
+            }
+
+            // Entry slope gates
+            bool slopeAgreeForLong = (yesSlope >=  minSlope) && (noSlope <= -minSlope);
+            bool slopeAgreeForShort = (yesSlope <= -minSlope) && (noSlope >=  minSlope);
+
             bool yesPassThisBar =
-                (flowYes >= baseVD) &&
-                (ratioEdge >= minDiff) &&
-                (trShareYes >= shareTRMin) &&
-                (teShareYes >= shareTEMin) &&
-                (yesSlope >= minSlope);
+                (flowYes >= baseVD) && (ratioEdge >= minDiff) &&
+                (trShareYes >= shareTRMin) && (teShareYes >= shareTEMin) &&
+                slopeAgreeForLong;
 
             bool noPassThisBar =
-                (flowNo >= baseVD) &&
-                (ratioEdge >= minDiff) &&
-                (trShareNo >= shareTRMin) &&
-                (teShareNo >= shareTEMin) &&
-                (noSlope <= -minSlope);
+                (flowNo >= baseVD) && (ratioEdge >= minDiff) &&
+                (trShareNo >= shareTRMin) && (teShareNo >= shareTEMin) &&
+                slopeAgreeForShort;
 
             _consecYes = yesPassThisBar ? (_consecYes + 1) : 0;
             _consecNo  = noPassThisBar ? (_consecNo  + 1) : 0;
 
-            // ---- entry candidate
             ActionType candidate = ActionType.None;
             if (_consecYes >= minBars && _consecNo == 0) candidate = ActionType.Long;
             if (_consecNo  >= minBars && _consecYes == 0) candidate = ActionType.Short;
 
-            // ---- slope-based exits while holding
-            if (simulationPosition > 0 && yesSlope < exitMinSlope)
+            // Exit logic (sign-aware)
+            if (simulationPosition > 0 && (yesSlope <= -exitMinSlope || noSlope >= exitMinSlope))
             {
-                return AD(
-                    ActionType.Exit,
-                    snapshot.BestYesBid,
-                    Math.Abs(simulationPosition),
-                    Memo(inv, "exit:slope_below_threshold_long",
-                         minDist, baseVD, minDiff, minBars,
-                         shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
+                return AD(ActionType.Exit, snapshot.BestYesBid, Math.Abs(simulationPosition),
+                    Memo(inv, "exit:slope_long",
+                         minDist, baseVD, minDiff, minBars, shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
                          vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
                          trShareYes, trShareNo, teShareYes, teShareNo,
                          _consecYes, _consecNo, simulationPosition, candidate,
-                         yesSlope, noSlope)
-                );
+                         yesSlope, noSlope, yesPassThisBar, noPassThisBar, false));
             }
-            if (simulationPosition < 0 && noSlope > -exitMinSlope)
+            if (simulationPosition < 0 && (yesSlope >= exitMinSlope || noSlope <= -exitMinSlope))
             {
-                return AD(
-                    ActionType.Exit,
-                    snapshot.BestNoBid,
-                    Math.Abs(simulationPosition),
-                    Memo(inv, "exit:slope_above_threshold_short",
-                         minDist, baseVD, minDiff, minBars,
-                         shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
+                return AD(ActionType.Exit, snapshot.BestNoBid, Math.Abs(simulationPosition),
+                    Memo(inv, "exit:slope_short",
+                         minDist, baseVD, minDiff, minBars, shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
                          vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
                          trShareYes, trShareNo, teShareYes, teShareNo,
                          _consecYes, _consecNo, simulationPosition, candidate,
-                         yesSlope, noSlope)
-                );
+                         yesSlope, noSlope, yesPassThisBar, noPassThisBar, false));
             }
 
-            // ---- flip safety: require opposite flow strength to flip
-            if (simulationPosition > 0 && candidate == ActionType.Short && Math.Abs(flowNo)  < exitOpp) candidate = ActionType.None;
-            if (simulationPosition < 0 && candidate == ActionType.Long  && Math.Abs(flowYes) < exitOpp) candidate = ActionType.None;
+            var candidateBeforeFlip = candidate;
+            bool flipBlocked = false;
+            if (simulationPosition > 0 && candidate == ActionType.Short && Math.Abs(flowNo) < exitOpp) { flipBlocked = true; candidate = ActionType.None; }
+            if (simulationPosition < 0 && candidate == ActionType.Long  && Math.Abs(flowYes) < exitOpp) { flipBlocked = true; candidate = ActionType.None; }
 
             if (candidate == ActionType.None)
             {
                 return AD(ActionType.None, 0, 0,
                     Memo(inv, "entry:pass",
-                         minDist, baseVD, minDiff, minBars,
-                         shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
+                         minDist, baseVD, minDiff, minBars, shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
                          vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
                          trShareYes, trShareNo, teShareYes, teShareNo,
-                         _consecYes, _consecNo, simulationPosition, candidate,
-                         yesSlope, noSlope));
+                         _consecYes, _consecNo, simulationPosition, candidateBeforeFlip,
+                         yesSlope, noSlope, yesPassThisBar, noPassThisBar, flipBlocked));
             }
 
             int pricePoint = (candidate == ActionType.Long) ? snapshot.BestYesBid : snapshot.BestNoBid;
 
             return AD(candidate, pricePoint, 1,
                 Memo(inv, "entry:go",
-                     minDist, baseVD, minDiff, minBars,
-                     shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
+                     minDist, baseVD, minDiff, minBars, shareTRMin, shareTEMin, exitOpp, minSlope, exitMinSlope,
                      vYes, vNo, depthYes, depthNo, flowYes, flowNo, ratioEdge,
                      trShareYes, trShareNo, teShareYes, teShareNo,
                      _consecYes, _consecNo, simulationPosition, candidate,
-                     yesSlope, noSlope));
+                     yesSlope, noSlope, yesPassThisBar, noPassThisBar, flipBlocked));
         }
+        private static string Memo(
+    IFormatProvider inv, string tail,
+    int minDist, double baseVD, double minDiff, int minBars,
+    double shareTRMin, double shareTEMin, double exitOpp, double minSlope, double exitMinSlope,
+    double vYes, double vNo, double depthYesScaled, double depthNoScaled, double flowYes, double flowNo, double ratioEdge,
+    double trShareYes, double trShareNo, double teShareYes, double teShareNo,
+    int consecY, int consecN, int position, ActionType candidateBeforeFlip,
+    double yesSlope, double noSlope, bool yesPassThisBar, bool noPassThisBar, bool flipBlocked)
+        {
+            string F(double d) => d.ToString("0.###", inv);
+
+            double depthYesTrue = Math.Max(depthYesScaled * 100.0, 1e-9);
+            double depthNoTrue = Math.Max(depthNoScaled  * 100.0, 1e-9);
+            double flowYesTrue = vYes / depthYesTrue;
+            double flowNoTrue = vNo  / depthNoTrue;
+
+            bool IsWarmupOrGate() => tail.StartsWith("warmup:") || tail.StartsWith("gate:");
+            bool LongSlopeOK() => (yesSlope >=  minSlope) && (noSlope <= -minSlope);
+            bool ShortSlopeOK() => (yesSlope <= -minSlope) && (noSlope >=  minSlope);
+
+            bool LongBarsOK() =>
+                (flowYes >= baseVD) && (ratioEdge >= minDiff) &&
+                (trShareYes >= shareTRMin) && (teShareYes >= shareTEMin);
+            bool ShortBarsOK() =>
+                (flowNo >= baseVD) && (ratioEdge >= minDiff) &&
+                (trShareNo >= shareTRMin) && (teShareNo >= shareTEMin);
+
+            string FirstFailLong()
+            {
+                if (IsWarmupOrGate()) return tail.StartsWith("warmup:") ? "warmup" : "boundary";
+                if (!LongSlopeOK()) return (yesSlope < minSlope) ? "y slope too low" : "n slope not negative enough";
+                if (!LongBarsOK()) return (flowYes < baseVD) ? "velocity not high enough"
+                                      : (ratioEdge < minDiff) ? "edge diff too small"
+                                      : (trShareYes < shareTRMin) ? "trade rate share too low"
+                                      : "trade count share too low";
+                if (consecY < minBars) return "not enough consecutive bars";
+                if (consecN > 0) return "opposite side also passing";
+                if (flipBlocked) return "flip blocked by opposite flow threshold";
+                return "passed";
+            }
+
+            string FirstFailShort()
+            {
+                if (IsWarmupOrGate()) return tail.StartsWith("warmup:") ? "warmup" : "boundary";
+                if (!ShortSlopeOK()) return (yesSlope > -minSlope) ? "y slope not negative enough" : "n slope too low";
+                if (!ShortBarsOK()) return (flowNo < baseVD) ? "velocity not high enough"
+                                      : (ratioEdge < minDiff) ? "edge diff too small"
+                                      : (trShareNo < shareTRMin) ? "trade rate share too low"
+                                      : "trade count share too low";
+                if (consecN < minBars) return "not enough consecutive bars";
+                if (consecY > 0) return "opposite side also passing";
+                if (flipBlocked) return "flip blocked by opposite flow threshold";
+                return "passed";
+            }
+
+            string longStatus = FirstFailLong();
+            string shortStatus = FirstFailShort();
+
+            string line1 = (longStatus == "passed") ? "Long setup passed" : $"Would have long'd but {longStatus}";
+            string line2 = (shortStatus == "passed") ? "Short setup passed" : $"Would have shorted but {shortStatus}";
+
+            // Persistent "would have exited but ..." when holding a position (unless we actually exited on this bar)
+            string WouldExitBut()
+            {
+                if (tail.StartsWith("exit:") || position == 0) return null;
+
+                if (position > 0)
+                {
+                    var why = new List<string>();
+                    if (!(yesSlope <= -exitMinSlope)) why.Add($"y {F(yesSlope)} > -{F(exitMinSlope)}");
+                    if (!(noSlope  >=  exitMinSlope)) why.Add($"n {F(noSlope)} < {F(exitMinSlope)}");
+                    return $"Would have exited long but {string.Join("; ", why)}";
+                }
+                else
+                {
+                    var why = new List<string>();
+                    if (!(yesSlope >=  exitMinSlope)) why.Add($"y {F(yesSlope)} < {F(exitMinSlope)}");
+                    if (!(noSlope  <= -exitMinSlope)) why.Add($"n {F(noSlope)} > -{F(exitMinSlope)}");
+                    return $"Would have exited short but {string.Join("; ", why)}";
+                }
+            }
+
+            string ExitLine()
+            {
+                if (!tail.StartsWith("exit:")) return null;
+
+                if (tail == "exit:slope_long" || position > 0)
+                {
+                    var why = new List<string>();
+                    if (yesSlope <= -exitMinSlope) why.Add($"y {F(yesSlope)} <= -{F(exitMinSlope)}");
+                    if (noSlope  >=  exitMinSlope) why.Add($"n {F(noSlope)} >= {F(exitMinSlope)}");
+                    return $"Exited long due to slope breach: {string.Join("; ", why)} | slopes y/n=[{F(yesSlope)},{F(noSlope)}], vel y/n=[{F(vYes)},{F(vNo)}], depth-norm y/n=[{F(flowYesTrue)},{F(flowNoTrue)}]";
+                }
+                else
+                {
+                    var why = new List<string>();
+                    if (yesSlope >=  exitMinSlope) why.Add($"y {F(yesSlope)} >= {F(exitMinSlope)}");
+                    if (noSlope  <= -exitMinSlope) why.Add($"n {F(noSlope)} <= -{F(exitMinSlope)}");
+                    return $"Exited short due to slope breach: {string.Join("; ", why)} | slopes y/n=[{F(yesSlope)},{F(noSlope)}], vel y/n=[{F(vYes)},{F(vNo)}], depth-norm y/n=[{F(flowYesTrue)},{F(flowNoTrue)}]";
+                }
+            }
+
+            string act;
+            var exitLine = ExitLine();
+            if (exitLine != null)
+                act = exitLine;
+            else if (tail.StartsWith("entry:go"))
+                act = (candidateBeforeFlip == ActionType.Long)
+                    ? $"Longed: slopes y/n=[{F(yesSlope)},{F(noSlope)}], vel y/n=[{F(vYes)},{F(vNo)}], depth-norm y/n=[{F(flowYesTrue)},{F(flowNoTrue)}]"
+                    : $"Shorted: slopes y/n=[{F(yesSlope)},{F(noSlope)}], vel y/n=[{F(vYes)},{F(vNo)}], depth-norm y/n=[{F(flowYesTrue)},{F(flowNoTrue)}]";
+            else
+                act = $"No trade: slopes y/n=[{F(yesSlope)},{F(noSlope)}], vel y/n=[{F(vYes)},{F(vNo)}], depth-norm y/n=[{F(flowYesTrue)},{F(flowNoTrue)}]";
+
+            var raw = new List<string>
+    {
+        $"gate:minDist={minDist}",
+        $"vYes={F(vYes)}", $"vNo={F(vNo)}",
+        $"depthYes={F(depthYesScaled)}", $"depthNo={F(depthNoScaled)}",
+        $"flowYes={F(flowYes)}", $"flowNo={F(flowNo)}",
+        $"flowThr(base)={F(baseVD)}",
+        $"ratioEdge={F(ratioEdge)}>=minDiff:{F(minDiff)}",
+        $"TRshareYes={F(trShareYes)}>=min:{F(shareTRMin)}",
+        $"TRshareNo={F(trShareNo)}>=min:{F(shareTRMin)}",
+        $"TEshareYes={F(teShareYes)}>=min:{F(shareTEMin)}",
+        $"TEshareNo={F(teShareNo)}>=min:{F(shareTEMin)}",
+        $"barsY={consecY}", $"barsN={consecN}", $"minBars={minBars}",
+        $"oppFlipThr={F(exitOpp)}",
+        $"yesSlope={F(yesSlope)}", $"noSlope={F(noSlope)}",
+        $"minSlope={F(minSlope)}", $"exitMinSlope={F(exitMinSlope)}",
+        $"pos={position}", $"candidate={candidateBeforeFlip}",
+        tail
+    };
+
+            return string.Join(" | ", new[] { line1, line2, WouldExitBut(), act }) + "," + string.Join(",", raw);
+        }
+
 
         private static ActionDecision AD(ActionType t, int p, int q, string memo)
             => new ActionDecision { Type = t, Price = p, Qty = q, Memo = memo };
 
-        private static string Memo(
-            IFormatProvider inv, string tail,
-            int minDist, double baseVD, double minDiff, int minBars,
-            double shareTRMin, double shareTEMin, double exitOpp, double minSlope, double exitMinSlope,
-            double vYes, double vNo, double depthYes, double depthNo, double flowYes, double flowNo, double ratioEdge,
-            double trShareYes, double trShareNo, double teShareYes, double teShareNo,
-            int consecY, int consecN, int position, ActionType candidate,
-            double yesSlope, double noSlope)
-        {
-            string F(double d) => d.ToString("0.###", inv);
-            var parts = new List<string>
-            {
-                $"gate:minDist={minDist}",
-
-                $"vYes={F(vYes)}","vNo={F(vNo)}",
-                $"depthYes={F(depthYes)}","depthNo={F(depthNo)}",
-                $"flowYes={F(flowYes)}","flowNo={F(flowNo)}",
-                $"flowThr(base)={F(baseVD)}",
-                $"ratioEdge={F(ratioEdge)}>=minDiff:{F(minDiff)}",
-
-                $"TRshareYes={F(trShareYes)}>=min:{F(shareTRMin)}",
-                $"TRshareNo={F(trShareNo)}>=min:{F(shareTRMin)}",
-                $"TEshareYes={F(teShareYes)}>=min:{F(shareTEMin)}",
-                $"TEshareNo={F(teShareNo)}>=min:{F(shareTEMin)}",
-
-                $"barsY={consecY}","barsN={consecN}","minBars={minBars}",
-
-                $"oppFlipThr={F(exitOpp)}",
-                $"yesSlope={F(yesSlope)}","noSlope={F(noSlope)}",
-                $"minSlope={F(minSlope)}","exitMinSlope={F(exitMinSlope)}",
-
-                $"pos={position}","candidate={candidate}",
-                tail
-            };
-            return string.Join(",", parts);
-        }
 
         public override string ToJson()
         {
@@ -246,6 +347,21 @@ namespace TradingStrategies.Strategies.Strats
         public static readonly List<(string Name, Dictionary<SlopeMomentumStrat.ParamKey, double> Parameters)>
 SlopeMomentumParameterSets = new List<(string, Dictionary<SlopeMomentumStrat.ParamKey, double>)>
 {
+    
+    (    "FloMo_Testing",
+    new Dictionary<SlopeMomentumStrat.ParamKey, double>
+    {
+        { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
+        { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+        { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.10 },
+        { SlopeMomentumStrat.ParamKey.MinConsecutiveBars, 1 },
+        { SlopeMomentumStrat.ParamKey.TradeRateShareMin, 0.60 },
+        { SlopeMomentumStrat.ParamKey.TradeEventShareMin, 0.40 },
+        { SlopeMomentumStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
+        { SlopeMomentumStrat.ParamKey.MinSlope, 0.20 },
+        { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.75 }
+    }
+),
     // ---------------- G1: Balanced ----------------
     (
         "G1_Balanced_S0p00_XS0p00",
