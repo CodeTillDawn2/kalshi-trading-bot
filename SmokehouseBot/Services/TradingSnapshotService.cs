@@ -184,11 +184,6 @@ namespace SmokehouseBot.Services
         // Updated LoadManySnapshots method in TradingSnapshotService.cs with parallelization
         public async Task<Dictionary<string, List<MarketSnapshot>>> LoadManySnapshots(List<SnapshotDTO> snapshots, bool forceLoad = false)
         {
-            if (!forceLoad)
-            {
-                _logger.LogWarning("Schema mismatch detected while deserializing snapshots");
-                return new Dictionary<string, List<MarketSnapshot>>();
-            }
             try
             {
                 var result = new Dictionary<string, List<MarketSnapshot>>();
