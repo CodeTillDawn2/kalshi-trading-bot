@@ -111,44 +111,11 @@ namespace TradingSimulator.Simulator
             OnTestProgress?.Invoke("Setup completed.");
         }
 
-
-
-
-        public void SetProcessedMarkets(List<string> markets)
-        {
-            _processedMarkets = new HashSet<string>(markets);
-        }
-
-        private static void SimplePriceDropStrategy(MarketSnapshot current, MarketSnapshot previous, SnapshotConfig config, TradingContext context)
-        {
-            var currentBid = current.BestYesBid;
-            var previousBid = previous.BestYesBid;
-            var priceChangePercent = ((double)currentBid - previousBid) / previousBid * 100;
-            context.SharedVariables["PriceChangePercent"] = priceChangePercent;
-            if (priceChangePercent <= -5.0)
-                context.Decision.AddSignal("PriceDrop", 1.0);
-        }
-
-        private static void SimplePriceRiseStrategy(MarketSnapshot current, MarketSnapshot previous, SnapshotConfig config, TradingContext context)
-        {
-            var currentBid = current.BestYesBid;
-            var previousBid = previous.BestYesBid;
-            var priceChangePercent = ((double)currentBid - previousBid) / previousBid * 100;
-            context.SharedVariables["PriceChangePercent"] = priceChangePercent;
-            if (priceChangePercent >= 5.0)
-                context.Decision.AddSignal("PriceRise", 1.0);
-        }
-
         public void EnsureInitialized()
         {
             if (_scopeFactory == null) Setup();
         }
 
-        private static IEnumerable<(string Name, TradingStrategyFunc<MarketSnapshot> Func)> GetTradingStrategies()
-        {
-            yield return ("SimplePriceDropStrategy", SimplePriceDropStrategy);
-            yield return ("SimplePriceRiseStrategy", SimplePriceRiseStrategy);
-        }
 
         public async Task<List<SnapshotGroupDTO>> GetFilteredSnapshotGroupsAsync(
             IKalshiBotContext context, List<string>? marketsToRun)
