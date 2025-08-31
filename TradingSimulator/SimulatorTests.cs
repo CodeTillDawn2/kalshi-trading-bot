@@ -454,7 +454,7 @@ namespace TradingSimulator.Simulator
             if (k.Contains("breakout")) return StrategyFamily.Breakout;
             if (k.Contains("bollinger")) return StrategyFamily.Bollinger;
             if (k.Contains("flowmo")) return StrategyFamily.FlowMo;
-            if (k.Contains("sloMo")) return StrategyFamily.SloMo;
+            if (k.Contains("slomo")) return StrategyFamily.SloMo;
             if (k.Contains("nothing")) return StrategyFamily.NothingHappens;
             if (k.Contains("momentum")) return StrategyFamily.Momentum;
             // specific short names
@@ -660,21 +660,20 @@ namespace TradingSimulator.Simulator
 
                     totalDiscrepancies += disc?.Count ?? 0;
 
-                    if (bid != null)
+         
+                    if (writeToFile)
+                        SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
+                            disc, fileNameSuffix: $"_{label}_{dto.StrategyName}");
+
+                    dto.WeightSetMarkets.Add(new WeightSetMarketDTO
                     {
-                        if (writeToFile)
-                            SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
-                                disc, fileNameSuffix: $"_{label}_{dto.StrategyName}");
+                        MarketTicker = market,
+                        PnL = (decimal)finalPnL,
+                        LastRun = DateTime.UtcNow
+                    });
 
-                        dto.WeightSetMarkets.Add(new WeightSetMarketDTO
-                        {
-                            MarketTicker = market,
-                            PnL = (decimal)finalPnL,
-                            LastRun = DateTime.UtcNow
-                        });
-
-                        OnProfitLossUpdate?.Invoke(market, finalPnL);
-                    }
+                    OnProfitLossUpdate?.Invoke(market, finalPnL);
+                    
                 }
 
                 OnMarketProcessed?.Invoke(market);
