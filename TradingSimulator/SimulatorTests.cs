@@ -235,7 +235,7 @@ namespace TradingSimulator.Simulator
             }
             finally
             {
-                OnTestProgress?.Invoke($"{progressPrefix}Cleared memory for market: {marketTicker}");
+                
             }
             return (0, null, null, null, null, null, null, null, null, null);
         }
