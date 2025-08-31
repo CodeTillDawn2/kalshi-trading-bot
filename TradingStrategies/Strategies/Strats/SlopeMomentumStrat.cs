@@ -867,16 +867,7 @@ SlopeMomentumParameterSets = new List<(string, Dictionary<SlopeMomentumStrat.Par
             { SlopeMomentumStrat.ParamKey.MinSlope, 0.04 },
             { SlopeMomentumStrat.ParamKey.ExitMinSlopeRequirement, 0.04 }
         }
-    ),
-    (
-        "G4_DepthBiased_S0p04_XS0p08",
-        new Dictionary<SlopeMomentumStrat.ParamKey, double>
-        {
-            { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 7 },
-            { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.07 },
-            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 } // <-- ensure your enum is ParamKey; keep consistent
-        }
-    ),
+    )
 };
 
     }
