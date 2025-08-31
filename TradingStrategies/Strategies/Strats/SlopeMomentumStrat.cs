@@ -97,11 +97,13 @@ namespace TradingStrategies.Strategies.Strats
             // ---- “edge versus other side”
             double ratioEdge = Math.Abs(flowYes - flowNo);
 
-            // ---- side dominance via shares
-            double trShareYes = snapshot.TradeRateShareYes;
-            double trShareNo = 1.0 - trShareYes;
-            double teShareYes = snapshot.TradeEventShareYes;
-            double teShareNo = 1.0 - teShareYes;
+            double totalRate = Math.Max(snapshot.TradeRatePerMinute_Yes + snapshot.TradeRatePerMinute_No, 1e-9);
+            double trShareYes = snapshot.TradeRatePerMinute_Yes / totalRate;
+            double trShareNo = snapshot.TradeRatePerMinute_No  / totalRate;
+
+            double totalTrades = Math.Max((double)(snapshot.TradeCount_Yes + snapshot.TradeCount_No), 1e-9);
+            double teShareYes = snapshot.TradeCount_Yes / totalTrades;
+            double teShareNo = snapshot.TradeCount_No  / totalTrades;
 
             // ---- slope
             double yesSlope = snapshot.YesBidSlopePerMinute;
@@ -872,7 +874,7 @@ SlopeMomentumParameterSets = new List<(string, Dictionary<SlopeMomentumStrat.Par
         {
             { SlopeMomentumStrat.ParamKey.MinDistanceFromBounds, 7 },
             { SlopeMomentumStrat.ParamKey.VelocityToDepthRatio, 0.07 },
-            { SlopeMomentumStrat.Key.MinRatioDifference, 0.12 } // <-- ensure your enum is ParamKey; keep consistent
+            { SlopeMomentumStrat.ParamKey.MinRatioDifference, 0.12 } // <-- ensure your enum is ParamKey; keep consistent
         }
     ),
 };
