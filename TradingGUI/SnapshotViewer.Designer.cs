@@ -265,9 +265,10 @@ namespace SimulatorWinForms
             // priceChart
             // 
             priceChart.Dock = DockStyle.Fill;
-            priceChart.Location = new Point(3, 49);
+            priceChart.Location = new Point(4, 49);
+            priceChart.Margin = new Padding(4, 3, 4, 3);
             priceChart.Name = "priceChart";
-            priceChart.Size = new Size(573, 416);
+            priceChart.Size = new Size(571, 416);
             priceChart.TabIndex = 1;
             // 
             // marketInfoContainer

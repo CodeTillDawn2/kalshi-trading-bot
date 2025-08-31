@@ -36,9 +36,8 @@ namespace TradingStrategies.Strategies.Strats
             ExitRsiDevThreshold,            // |RSI_Short - 50| <= this => flatten
 
             // Slope gating
-            MinSlope,                        // minimum slope required for entry
-            ExitMinSlopeRequirement      // min slope to continue holding; symmetric by side
-
+            MinSlope,                       // minimum slope required for entry
+            ExitMinSlopeRequirement         // min slope to continue holding; symmetric by side
         }
 
         public SlopeMomentumStrat(
@@ -64,7 +63,8 @@ namespace TradingStrategies.Strategies.Strats
 
                 { ParamKey.ExitOppositeSignalStrength, 0.12 },
                 { ParamKey.ExitRsiDevThreshold, 5.6 },
-                { ParamKey.MinSlope, 0.1 },
+
+                { ParamKey.MinSlope, 0.10 },
                 { ParamKey.ExitMinSlopeRequirement, 0.02 }
             };
         }
@@ -102,66 +102,56 @@ namespace TradingStrategies.Strategies.Strats
             if (prev is null)
                 return AD(ActionType.None, 0, 0, "warmup:no_prev");
 
-            // ---- flows (per-minute velocities you have)
+            // ---- flows (per-minute velocities)
             double vYes = snapshot.VelocityPerMinute_Top_Yes_Bid + snapshot.VelocityPerMinute_Bottom_Yes_Bid;
-            double vNo = snapshot.VelocityPerMinute_Top_No_Bid + snapshot.VelocityPerMinute_Bottom_No_Bid;
+            double vNo = snapshot.VelocityPerMinute_Top_No_Bid  + snapshot.VelocityPerMinute_Bottom_No_Bid;
 
-            // ---- depth (scale to avoid huge ratios; avoid zero)
+            // ---- depth (avoid 0)
             double depthYes = Math.Max(snapshot.TotalOrderbookDepth_Yes / 100.0, 1e-9);
-            double depthNo = Math.Max(snapshot.TotalOrderbookDepth_No / 100.0, 1e-9);
+            double depthNo = Math.Max(snapshot.TotalOrderbookDepth_No  / 100.0, 1e-9);
 
-            // normalized flow (THIS is what we gate on)
+            // normalized flow
             double flowYes = vYes / depthYes;
-            double flowNo = vNo / depthNo;
+            double flowNo = vNo  / depthNo;
 
-            // clamp the threshold once
+            // clamp threshold
             double useVD = Math.Min(baseVD, maxVD);
 
             // edge
             double ratioEdge = Math.Abs(flowYes - flowNo);
 
-            // ---- confirmations (TRATE share from rates; TE share from trade counts ONLY)
+            // ---- confirmations (trade *counts* for TE share)
             double totalRate = Math.Max(snapshot.TradeRatePerMinute_Yes + snapshot.TradeRatePerMinute_No, 1e-9);
             double trShareYes = snapshot.TradeRatePerMinute_Yes / totalRate;
-            double trShareNo = snapshot.TradeRatePerMinute_No / totalRate;
+            double trShareNo = snapshot.TradeRatePerMinute_No  / totalRate;
 
             double totalTrades = Math.Max((double)(snapshot.TradeCount_Yes + snapshot.TradeCount_No), 1e-9);
             double teShareYes = snapshot.TradeCount_Yes / totalTrades;
-            double teShareNo = snapshot.TradeCount_No / totalTrades;
+            double teShareNo = snapshot.TradeCount_No  / totalTrades;
 
             bool confirmYes = trShareYes >= shareTRMin && teShareYes >= shareTEMin;
-            bool confirmNo = trShareNo >= shareTRMin && teShareNo >= shareTEMin;
+            bool confirmNo = trShareNo  >= shareTRMin && teShareNo  >= shareTEMin;
 
-            // ---- spikes (relative)
+            // ---- spikes
             double pvYes = prev.VelocityPerMinute_Top_Yes_Bid + prev.VelocityPerMinute_Bottom_Yes_Bid;
-            double pvNo = prev.VelocityPerMinute_Top_No_Bid + prev.VelocityPerMinute_Bottom_No_Bid;
+            double pvNo = prev.VelocityPerMinute_Top_No_Bid  + prev.VelocityPerMinute_Bottom_No_Bid;
             bool spikeYes = pvYes > 0 && (vYes / Math.Max(pvYes, 1e-9)) >= spikeRelMin;
-            bool spikeNo = pvNo > 0 && (vNo / Math.Max(pvNo, 1e-9)) >= spikeRelMin;
+            bool spikeNo = pvNo  > 0 && (vNo  / Math.Max(pvNo, 1e-9)) >= spikeRelMin;
 
-            // ---- sustained momentum candidate (single consistent gating)
+            // ---- sustained momentum candidate
             ActionType candidate = ActionType.None;
 
             bool longOk = (flowYes >= useVD) && (flowYes > flowNo + minDiff) && (ratioEdge >= minDiff)
-                          && confirmYes && (flowYes >= flowFloor) && (snapshot.YesBidSlopePerMinute >= minSlope);
-            bool shortOk = (flowNo >= useVD) && (flowNo > flowYes + minDiff) && (ratioEdge >= minDiff)
-                           && confirmNo && (flowNo >= flowFloor) && (snapshot.NoBidSlopePerMinute >= minSlope);
+                           && confirmYes && (flowYes >= flowFloor) && (snapshot.YesBidSlopePerMinute >= minSlope);
 
-            if (longOk)
-            {
-                _consecYes++; _consecNo = 0;
-                if (_consecYes >= minBars) candidate = ActionType.Long;
-            }
-            else if (shortOk)
-            {
-                _consecNo++; _consecYes = 0;
-                if (_consecNo >= minBars) candidate = ActionType.Short;
-            }
-            else
-            {
-                _consecYes = 0; _consecNo = 0;
-            }
+            bool shortOk = (flowNo  >= useVD) && (flowNo  > flowYes + minDiff) && (ratioEdge >= minDiff)
+                           && confirmNo  && (flowNo  >= flowFloor) && (snapshot.NoBidSlopePerMinute  >= minSlope);
 
-            // ---- exits (flatten on stall, flip only if opposite strong)
+            if (longOk) { _consecYes++; _consecNo = 0; if (_consecYes >= minBars) candidate = ActionType.Long; }
+            else if (shortOk) { _consecNo++; _consecYes = 0; if (_consecNo >= minBars) candidate = ActionType.Short; }
+            else { _consecYes = 0; _consecNo = 0; }
+
+            // ---- exits: RSI flatten first
             double rsiShort = snapshot.RSI_Short ?? 50.0;
             double prevRsi = prev.RSI_Short ?? 50.0;
             double rsiDelta = rsiShort - prevRsi;
@@ -182,8 +172,7 @@ namespace TradingStrategies.Strategies.Strats
                 );
             }
 
-            // NEW: slope exit thresholds (symmetric by side)
-            // Long must maintain yesSlope >= exitMinSlope
+            // ---- NEW: slope-based exits (symmetric)
             if (simulationPosition > 0 && (snapshot.YesBidSlopePerMinute < exitMinSlope))
             {
                 return AD(
@@ -199,7 +188,6 @@ namespace TradingStrategies.Strategies.Strats
                          snapshot.YesBidSlopePerMinute, snapshot.NoBidSlopePerMinute)
                 );
             }
-            // Short must maintain noSlope <= -exitMinSlope
             if (simulationPosition < 0 && (snapshot.NoBidSlopePerMinute > -exitMinSlope))
             {
                 return AD(
@@ -216,9 +204,9 @@ namespace TradingStrategies.Strategies.Strats
                 );
             }
 
-            // (retain flip-safety)
-            if (simulationPosition > 0 && candidate == ActionType.Short && Math.Abs(flowNo) < exitOpp) candidate = ActionType.None;
-            if (simulationPosition < 0 && candidate == ActionType.Long && Math.Abs(flowYes) < exitOpp) candidate = ActionType.None;
+            // flip-suppression safety
+            if (simulationPosition > 0 && candidate == ActionType.Short && Math.Abs(flowNo)  < exitOpp) candidate = ActionType.None;
+            if (simulationPosition < 0 && candidate == ActionType.Long  && Math.Abs(flowYes) < exitOpp) candidate = ActionType.None;
 
             if (candidate == ActionType.None)
             {
@@ -243,7 +231,6 @@ namespace TradingStrategies.Strategies.Strats
                      _consecYes, _consecNo, rsiShort, rsiDelta, simulationPosition, candidate,
                      snapshot.YesBidSlopePerMinute, snapshot.NoBidSlopePerMinute));
         }
-
 
         private static ActionDecision AD(ActionType t, int p, int q, string memo)
             => new ActionDecision { Type = t, Price = p, Qty = q, Memo = memo };
@@ -290,7 +277,6 @@ namespace TradingStrategies.Strategies.Strats
             return string.Join(",", parts);
         }
 
-
         public override string ToJson()
         {
             var dict = _params.ToDictionary(k => k.Key.ToString(), v => v.Value);
@@ -302,7 +288,6 @@ namespace TradingStrategies.Strategies.Strats
                 parameters = dict
             });
         }
-
 
         public static readonly List<(string Name, Dictionary<SlopeMomentumStrat.ParamKey, double> Parameters)>
 SlopeMomentumParameterSets = new List<(string, Dictionary<SlopeMomentumStrat.ParamKey, double>)>
@@ -883,7 +868,6 @@ SlopeMomentumParameterSets = new List<(string, Dictionary<SlopeMomentumStrat.Par
         }
     )
 };
-
 
     }
 }
