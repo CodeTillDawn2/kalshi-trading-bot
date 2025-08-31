@@ -42,8 +42,6 @@ namespace SimulatorWinForms
             return base.ProcessCmdKey(ref msg, keyData);  // Allow other keys to pass through
         }
 
-
-
         private void AddMouseDownHandlers(Control control)
         {
             control.MouseDown += Control_MouseDown;
@@ -162,19 +160,27 @@ namespace SimulatorWinForms
             timeLeftValue.Text = currentSnapshot.TimeLeft?.ToString(@"hh\:mm\:ss") ?? "--";
             marketAgeValue.Text = currentSnapshot.MarketAge?.ToString(@"hh\:mm\:ss") ?? "--";
 
-            // Flow/Momentum (using Yes where ambiguous)
-            topVelocityValue.Text = currentSnapshot.VelocityPerMinute_Top_Yes_Bid.ToString("F2");
-            bottomVelocityValue.Text = currentSnapshot.VelocityPerMinute_Bottom_Yes_Bid.ToString("F2");
-            netOrderRateValue.Text = (currentSnapshot.TradeRatePerMinute_Yes - currentSnapshot.TradeRatePerMinute_No).ToString("F2");
-            tradeVolumeValue.Text = (currentSnapshot.TradeVolumePerMinute_Yes + currentSnapshot.TradeVolumePerMinute_No).ToString("F2");
-            avgTradeSizeValue.Text = ((currentSnapshot.AverageTradeSize_Yes + currentSnapshot.AverageTradeSize_No) / 2).ToString("F2");
+            // Flow/Momentum (displaying Yes and No separately to match index.html)
+            topVelocityYesValue.Text = currentSnapshot.VelocityPerMinute_Top_Yes_Bid.ToString("F2");
+            topVelocityNoValue.Text = currentSnapshot.VelocityPerMinute_Top_No_Bid.ToString("F2");
+            bottomVelocityYesValue.Text = currentSnapshot.VelocityPerMinute_Bottom_Yes_Bid.ToString("F2");
+            bottomVelocityNoValue.Text = currentSnapshot.VelocityPerMinute_Bottom_No_Bid.ToString("F2");
+            netOrderRateYesValue.Text = currentSnapshot.TradeRatePerMinute_Yes.ToString("F2");
+            netOrderRateNoValue.Text = currentSnapshot.TradeRatePerMinute_No.ToString("F2");
+            tradeVolumeYesValue.Text = currentSnapshot.TradeVolumePerMinute_Yes.ToString("F2");
+            tradeVolumeNoValue.Text = currentSnapshot.TradeVolumePerMinute_No.ToString("F2");
+            avgTradeSizeYesValue.Text = currentSnapshot.AverageTradeSize_Yes.ToString("F2");
+            avgTradeSizeNoValue.Text = currentSnapshot.AverageTradeSize_No.ToString("F2");
 
-            // Context
+            // Context (displaying Yes and No separately where applicable to match index.html)
             spreadValue.Text = currentSnapshot.YesSpread.ToString();
             imbalValue.Text = currentSnapshot.BidVolumeImbalance.ToString("F2");
-            depthTop4Value.Text = currentSnapshot.DepthAtTop4YesBids.ToString();
-            centerMassValue.Text = currentSnapshot.YesBidCenterOfMass.ToString("F2");
-            totalContractsValue.Text = currentSnapshot.TotalBidContracts_Yes.ToString();
+            depthTop4YesValue.Text = currentSnapshot.DepthAtTop4YesBids.ToString();
+            depthTop4NoValue.Text = currentSnapshot.DepthAtTop4NoBids.ToString();
+            centerMassYesValue.Text = currentSnapshot.YesBidCenterOfMass.ToString("F2");
+            centerMassNoValue.Text = currentSnapshot.NoBidCenterOfMass.ToString("F2");
+            totalContractsYesValue.Text = currentSnapshot.TotalBidContracts_Yes.ToString();
+            totalContractsNoValue.Text = currentSnapshot.TotalBidContracts_No.ToString();
 
             // Positions
             positionSizeValue.Text = currentSnapshot.PositionSize.ToString();
