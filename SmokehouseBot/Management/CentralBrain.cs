@@ -728,9 +728,9 @@ namespace SmokehouseBot.Management
 
             _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
-            CacheSnapshot? snapshot = null;
+            CacheSnapshot? allSnapshots = null;
             var stopwatch = Stopwatch.StartNew();
-            int expectedSnapshotLength = 25;
+            int expectedSnapshotLength = 30;
             bool lockAcquired = await _snapshotLock.WaitAsync(TimeSpan.FromSeconds(expectedSnapshotLength));
             if (!lockAcquired)
             {
@@ -769,11 +769,8 @@ namespace SmokehouseBot.Management
                     marketSnapshots.Add(marketSnapshot);
                 }
 
-                var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
-                var timeout = TimeSpan.FromSeconds(1);
-
                 cancellationToken.ThrowIfCancellationRequested();
-                snapshot = new CacheSnapshot(snapshotDate, _serviceFactory.GetDataCache().SoftwareVersion, _snapshotConfig.SnapshotSchemaVersion,
+                allSnapshots = new CacheSnapshot(snapshotDate, _serviceFactory.GetDataCache().SoftwareVersion, _snapshotConfig.SnapshotSchemaVersion,
                     _serviceFactory.GetDataCache().AccountBalance, _serviceFactory.GetDataCache().PortfolioValue, _serviceFactory.GetDataCache().LastWebSocketTimestamp, marketSnapshots);
 
 
@@ -784,12 +781,12 @@ namespace SmokehouseBot.Management
 
                     var snapshotService = _serviceFactory.GetTradingSnapshotService();
                     cancellationToken.ThrowIfCancellationRequested();
-                    int savedSnapshotCount = await snapshotService.SaveSnapshotAsync(_brainInstance, snapshot);
+                    int savedSnapshotCount = await snapshotService.SaveSnapshotAsync(_brainInstance, allSnapshots);
 
                     if (savedSnapshotCount > 0) _errorHandler.LastSuccessfulSnapshot = DateTime.Now;
 
                     _logger.LogInformation("BRAIN: {count} snapshots saved at {Timestamp}, Refresh Usage: {usage}%, Queue Usage {queue}%, EventQueue: {eventQueue}, TickerQueue: {tickerQueue}, NotificationQueue: {notificationQueue}, Orderbook Queue: {orderbookQueue}",
-                        savedSnapshotCount, snapshot.Timestamp, Math.Round(percentUsage, 1), Math.Round(_performanceTracker.GetQueueHighCountPercentage(), 1), Math.Round(_performanceMetrics.EventQueueAvg, 1), Math.Round(_performanceMetrics.TickerQueueAvg, 1), Math.Round(_performanceMetrics.NotificationQueueAvg, 1), Math.Round(_performanceMetrics.OrderbookQueueAvg, 1));
+                        savedSnapshotCount, allSnapshots.Timestamp, Math.Round(percentUsage, 1), Math.Round(_performanceTracker.GetQueueHighCountPercentage(), 1), Math.Round(_performanceMetrics.EventQueueAvg, 1), Math.Round(_performanceMetrics.TickerQueueAvg, 1), Math.Round(_performanceMetrics.NotificationQueueAvg, 1), Math.Round(_performanceMetrics.OrderbookQueueAvg, 1));
                 }
                 else
                 {
@@ -819,9 +816,9 @@ namespace SmokehouseBot.Management
 
             try
             {
-                _logger.LogDebug("BRAIN: Triggering analysis for snapshot at {Timestamp}, Markets {0}", snapshot.Timestamp, String.Join(",", snapshot.Markets));
+                _logger.LogDebug("BRAIN: Triggering analysis for snapshot at {Timestamp}, Markets {0}", allSnapshots.Timestamp, String.Join(",", allSnapshots.Markets));
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-                AnalyzeMarketsAsync(snapshot);
+                AnalyzeMarketsAsync(allSnapshots);
             }
             catch (OperationCanceledException)
             {
