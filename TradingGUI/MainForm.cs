@@ -460,8 +460,23 @@ namespace SimulatorWinForms
             if (closest == null) return;
 
             List<MarketSnapshot> history = _snapshots;  // Or filter as needed
+                                                        // Precompute memos per snapshot for alignment during navigation
+            var memosPerSnapshot = new List<string>(history.Count);
+            double tolerance = 1e-6;  // Adjust if needed; ~0.1 ms for OA dates
 
-            _snapshotViewer.Populate(closest, history);
+            foreach (var snap in history)
+            {
+                double snapOADate = snap.Timestamp.ToOADate();
+                var matchingMemos = _tooltipPoints
+                    .Where(p => Math.Abs(p.x - snapOADate) < tolerance)
+                    .Select(p => p.memo.Trim())  // Trim any leading/trailing spaces
+                    .ToList();
+
+                string joined = matchingMemos.Any() ? string.Join("\n", matchingMemos) : "No events at this time.";
+                memosPerSnapshot.Add(joined);
+            }
+
+            _snapshotViewer.Populate(closest, history, memosPerSnapshot);
 
             // Set back action to switch back to main layout
             _snapshotViewer.BackAction = HideDashboard;

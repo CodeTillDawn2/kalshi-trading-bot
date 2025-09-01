@@ -10,6 +10,8 @@ namespace SimulatorWinForms
         private MarketSnapshot currentSnapshot;
         private List<MarketSnapshot> historySnapshots;
         private int currentIndex;
+        private List<string> memos;
+        private string memoText = "";
 
         public Action BackAction { get; set; }
 
@@ -81,6 +83,7 @@ namespace SimulatorWinForms
 
             currentIndex = newIndex;
             currentSnapshot = historySnapshots[currentIndex];
+            memoText = memos[newIndex];
             UpdateUIFromSnapshot();  // Full UI update
         }
 
@@ -97,13 +100,14 @@ namespace SimulatorWinForms
             UpdateUIFromSnapshot();  // Full UI update
         }
 
-        public void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history)
+        public void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history, List<string> memosList)
         {
             currentSnapshot = snapshot;
             historySnapshots = history.OrderBy(s => s.Timestamp).ToList();
             currentIndex = historySnapshots.FindIndex(s => s.Timestamp == snapshot.Timestamp);
             if (currentIndex < 0) currentIndex = 0; // Fallback to first if not found
-
+            memos = memosList;
+            memoText = memosList[currentIndex];
             UpdateUIFromSnapshot();  // Full UI update
         }
 
@@ -131,6 +135,8 @@ namespace SimulatorWinForms
 
             // Update chart (moves vertical line and zooms)
             UpdateChart();
+
+            strategyOutputTextbox.Text = memoText;
 
             // Populate other UI elements based on actual MarketSnapshot properties
             // Prices section (mapping "Ask" to No_Bid properties, "Bid" to Yes_Bid properties)
@@ -191,9 +197,21 @@ namespace SimulatorWinForms
 
             // Context (displaying Yes and No separately where applicable to match index.html)
             spreadValue.Text = currentSnapshot.YesSpread.ToString();
-            imbalValue.Text = currentSnapshot.BidVolumeImbalance.ToString("F2");
+
+            double imbalance = 1;
+            if (currentSnapshot.TotalOrderbookDepth_Yes == 0 || currentSnapshot.TotalOrderbookDepth_No == 0)
+            {
+                imbalance = 0;
+            }
+            else
+            {
+                imbalance = Math.Round((double)currentSnapshot.TotalOrderbookDepth_Yes / currentSnapshot.TotalOrderbookDepth_No,2);
+            }
+            imbalValue.Text = imbalance.ToString();
             depthTop4YesValue.Text = currentSnapshot.DepthAtTop4YesBids.ToString();
             depthTop4NoValue.Text = currentSnapshot.DepthAtTop4NoBids.ToString();
+            totalDepthYesValue.Text = currentSnapshot.TotalOrderbookDepth_Yes.ToString();
+            totalDepthNoValue.Text = currentSnapshot.TotalOrderbookDepth_No.ToString();
             centerMassYesValue.Text = currentSnapshot.YesBidCenterOfMass.ToString("F2");
             centerMassNoValue.Text = currentSnapshot.NoBidCenterOfMass.ToString("F2");
             totalContractsYesValue.Text = currentSnapshot.TotalBidContracts_Yes.ToString();
