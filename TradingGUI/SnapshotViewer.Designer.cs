@@ -137,9 +137,18 @@ namespace SimulatorWinForms
             totalContractsNoValue = new Label();
             positionsContainer = new Panel();
             positionsLayout = new TableLayoutPanel();
+            orderbookContainer = new Panel();
+            orderbookGrid = new DataGridView();
+            priceCol = new DataGridViewTextBoxColumn();
+            sizeCol = new DataGridViewTextBoxColumn();
+            valueCol = new DataGridViewTextBoxColumn();
+            backButton = new Button();
+            chartHeader = new Label();
             positionsGrid = new TableLayoutPanel();
-            positionSizeLabel = new CheckBox();
             positionSizeValue = new Label();
+            positionSizeLabel = new CheckBox();
+            simulatedPositionValue = new Label();
+            simulatedPositionLabel = new CheckBox();
             lastTradeLabel = new Label();
             lastTradeValue = new Label();
             positionRoiLabel = new CheckBox();
@@ -152,15 +161,7 @@ namespace SimulatorWinForms
             positionDownsideValue = new Label();
             restingOrdersLabel = new CheckBox();
             restingOrdersValue = new Label();
-            simulatedPositionLabel = new CheckBox();
-            simulatedPositionValue = new Label();
-            orderbookContainer = new Panel();
-            orderbookGrid = new DataGridView();
-            priceCol = new DataGridViewTextBoxColumn();
-            sizeCol = new DataGridViewTextBoxColumn();
-            valueCol = new DataGridViewTextBoxColumn();
-            backButton = new Button();
-            chartHeader = new Label();
+            strategyOutputTextbox = new TextBox();
             mainLayout.SuspendLayout();
             dashboardGrid.SuspendLayout();
             chartContainer.SuspendLayout();
@@ -184,9 +185,9 @@ namespace SimulatorWinForms
             contextGrid.SuspendLayout();
             positionsContainer.SuspendLayout();
             positionsLayout.SuspendLayout();
-            positionsGrid.SuspendLayout();
             orderbookContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)orderbookGrid).BeginInit();
+            positionsGrid.SuspendLayout();
             SuspendLayout();
             // 
             // mainLayout
@@ -220,8 +221,9 @@ namespace SimulatorWinForms
             dashboardGrid.Margin = new Padding(4, 3, 4, 3);
             dashboardGrid.Name = "dashboardGrid";
             dashboardGrid.RowCount = 2;
-            dashboardGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 75F));
-            dashboardGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            dashboardGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 69.43164F));
+            dashboardGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 30.5683556F));
+            dashboardGrid.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             dashboardGrid.Size = new Size(925, 651);
             dashboardGrid.TabIndex = 0;
             // 
@@ -234,7 +236,7 @@ namespace SimulatorWinForms
             chartContainer.Margin = new Padding(4, 3, 4, 3);
             chartContainer.Name = "chartContainer";
             chartContainer.Padding = new Padding(6);
-            chartContainer.Size = new Size(593, 482);
+            chartContainer.Size = new Size(593, 446);
             chartContainer.TabIndex = 0;
             // 
             // chartLayout
@@ -251,7 +253,7 @@ namespace SimulatorWinForms
             chartLayout.RowCount = 2;
             chartLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
             chartLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 90F));
-            chartLayout.Size = new Size(579, 468);
+            chartLayout.Size = new Size(579, 432);
             chartLayout.TabIndex = 0;
             // 
             // chartControls
@@ -260,16 +262,16 @@ namespace SimulatorWinForms
             chartControls.Dock = DockStyle.Fill;
             chartControls.Location = new Point(3, 3);
             chartControls.Name = "chartControls";
-            chartControls.Size = new Size(573, 40);
+            chartControls.Size = new Size(573, 37);
             chartControls.TabIndex = 0;
             // 
             // priceChart
             // 
             priceChart.Dock = DockStyle.Fill;
-            priceChart.Location = new Point(4, 49);
+            priceChart.Location = new Point(4, 46);
             priceChart.Margin = new Padding(4, 3, 4, 3);
             priceChart.Name = "priceChart";
-            priceChart.Size = new Size(571, 416);
+            priceChart.Size = new Size(571, 383);
             priceChart.TabIndex = 1;
             // 
             // marketInfoContainer
@@ -281,7 +283,7 @@ namespace SimulatorWinForms
             marketInfoContainer.Margin = new Padding(4, 3, 4, 3);
             marketInfoContainer.Name = "marketInfoContainer";
             marketInfoContainer.Padding = new Padding(6);
-            marketInfoContainer.Size = new Size(316, 482);
+            marketInfoContainer.Size = new Size(316, 446);
             marketInfoContainer.TabIndex = 1;
             // 
             // infoGrid
@@ -298,7 +300,7 @@ namespace SimulatorWinForms
             infoGrid.Name = "infoGrid";
             infoGrid.RowCount = 1;
             infoGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            infoGrid.Size = new Size(302, 468);
+            infoGrid.Size = new Size(302, 432);
             infoGrid.TabIndex = 0;
             // 
             // leftColumn
@@ -312,9 +314,9 @@ namespace SimulatorWinForms
             leftColumn.Location = new Point(3, 3);
             leftColumn.Name = "leftColumn";
             leftColumn.RowCount = 2;
-            leftColumn.RowStyles.Add(new RowStyle(SizeType.Percent, 49.35065F));
-            leftColumn.RowStyles.Add(new RowStyle(SizeType.Percent, 50.64935F));
-            leftColumn.Size = new Size(160, 462);
+            leftColumn.RowStyles.Add(new RowStyle(SizeType.Percent, 46.9483566F));
+            leftColumn.RowStyles.Add(new RowStyle(SizeType.Percent, 53.0516434F));
+            leftColumn.Size = new Size(160, 426);
             leftColumn.TabIndex = 0;
             leftColumn.Paint += leftColumn_Paint;
             // 
@@ -353,7 +355,7 @@ namespace SimulatorWinForms
             pricesGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 15.6756754F));
             pricesGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 19.45946F));
             pricesGrid.RowStyles.Add(new RowStyle(SizeType.Absolute, 35F));
-            pricesGrid.Size = new Size(154, 222);
+            pricesGrid.Size = new Size(154, 194);
             pricesGrid.TabIndex = 0;
             // 
             // pricesHeaderEmpty
@@ -362,7 +364,7 @@ namespace SimulatorWinForms
             pricesHeaderEmpty.Dock = DockStyle.Fill;
             pricesHeaderEmpty.Location = new Point(3, 0);
             pricesHeaderEmpty.Name = "pricesHeaderEmpty";
-            pricesHeaderEmpty.Size = new Size(39, 39);
+            pricesHeaderEmpty.Size = new Size(39, 33);
             pricesHeaderEmpty.TabIndex = 0;
             // 
             // pricesHeaderNo
@@ -371,7 +373,7 @@ namespace SimulatorWinForms
             pricesHeaderNo.Dock = DockStyle.Fill;
             pricesHeaderNo.Location = new Point(48, 0);
             pricesHeaderNo.Name = "pricesHeaderNo";
-            pricesHeaderNo.Size = new Size(49, 39);
+            pricesHeaderNo.Size = new Size(49, 33);
             pricesHeaderNo.TabIndex = 1;
             pricesHeaderNo.Text = "No";
             // 
@@ -381,7 +383,7 @@ namespace SimulatorWinForms
             pricesHeaderYes.Dock = DockStyle.Fill;
             pricesHeaderYes.Location = new Point(103, 0);
             pricesHeaderYes.Name = "pricesHeaderYes";
-            pricesHeaderYes.Size = new Size(48, 39);
+            pricesHeaderYes.Size = new Size(48, 33);
             pricesHeaderYes.TabIndex = 2;
             pricesHeaderYes.Text = "Yes";
             // 
@@ -390,9 +392,9 @@ namespace SimulatorWinForms
             allTimeHighLabel.AutoSize = true;
             allTimeHighLabel.Dock = DockStyle.Fill;
             allTimeHighLabel.Font = new Font("Segoe UI", 7F);
-            allTimeHighLabel.Location = new Point(3, 39);
+            allTimeHighLabel.Location = new Point(3, 33);
             allTimeHighLabel.Name = "allTimeHighLabel";
-            allTimeHighLabel.Size = new Size(39, 43);
+            allTimeHighLabel.Size = new Size(39, 36);
             allTimeHighLabel.TabIndex = 3;
             allTimeHighLabel.Text = "All Time High";
             // 
@@ -405,12 +407,12 @@ namespace SimulatorWinForms
             allTimeHighAsk.Controls.Add(allTimeHighAskTime, 0, 1);
             allTimeHighAsk.Dock = DockStyle.Fill;
             allTimeHighAsk.Font = new Font("Segoe UI", 7F);
-            allTimeHighAsk.Location = new Point(48, 42);
+            allTimeHighAsk.Location = new Point(48, 36);
             allTimeHighAsk.Name = "allTimeHighAsk";
             allTimeHighAsk.RowCount = 2;
             allTimeHighAsk.RowStyles.Add(new RowStyle());
             allTimeHighAsk.RowStyles.Add(new RowStyle());
-            allTimeHighAsk.Size = new Size(49, 37);
+            allTimeHighAsk.Size = new Size(49, 30);
             allTimeHighAsk.TabIndex = 4;
             // 
             // allTimeHighAskPrice
@@ -423,6 +425,7 @@ namespace SimulatorWinForms
             allTimeHighAskPrice.Size = new Size(43, 12);
             allTimeHighAskPrice.TabIndex = 0;
             allTimeHighAskPrice.Text = "--";
+            allTimeHighAskPrice.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // allTimeHighAskTime
             // 
@@ -431,9 +434,10 @@ namespace SimulatorWinForms
             allTimeHighAskTime.Font = new Font("Segoe UI", 7F);
             allTimeHighAskTime.Location = new Point(3, 12);
             allTimeHighAskTime.Name = "allTimeHighAskTime";
-            allTimeHighAskTime.Size = new Size(43, 25);
+            allTimeHighAskTime.Size = new Size(43, 18);
             allTimeHighAskTime.TabIndex = 1;
             allTimeHighAskTime.Text = "--";
+            allTimeHighAskTime.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // allTimeHighBid
             // 
@@ -443,11 +447,11 @@ namespace SimulatorWinForms
             allTimeHighBid.Controls.Add(allTimeHighBidTime, 0, 1);
             allTimeHighBid.Dock = DockStyle.Fill;
             allTimeHighBid.Font = new Font("Segoe UI", 7F);
-            allTimeHighBid.Location = new Point(103, 42);
+            allTimeHighBid.Location = new Point(103, 36);
             allTimeHighBid.Name = "allTimeHighBid";
             allTimeHighBid.RowStyles.Add(new RowStyle());
             allTimeHighBid.RowStyles.Add(new RowStyle());
-            allTimeHighBid.Size = new Size(48, 37);
+            allTimeHighBid.Size = new Size(48, 30);
             allTimeHighBid.TabIndex = 5;
             // 
             // allTimeHighBidPrice
@@ -460,6 +464,7 @@ namespace SimulatorWinForms
             allTimeHighBidPrice.Size = new Size(42, 12);
             allTimeHighBidPrice.TabIndex = 0;
             allTimeHighBidPrice.Text = "--";
+            allTimeHighBidPrice.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // allTimeHighBidTime
             // 
@@ -468,18 +473,19 @@ namespace SimulatorWinForms
             allTimeHighBidTime.Font = new Font("Segoe UI", 7F);
             allTimeHighBidTime.Location = new Point(3, 12);
             allTimeHighBidTime.Name = "allTimeHighBidTime";
-            allTimeHighBidTime.Size = new Size(42, 25);
+            allTimeHighBidTime.Size = new Size(42, 18);
             allTimeHighBidTime.TabIndex = 1;
             allTimeHighBidTime.Text = "--";
+            allTimeHighBidTime.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // recentHighLabel
             // 
             recentHighLabel.AutoSize = true;
             recentHighLabel.Dock = DockStyle.Fill;
             recentHighLabel.Font = new Font("Segoe UI", 7F);
-            recentHighLabel.Location = new Point(3, 82);
+            recentHighLabel.Location = new Point(3, 69);
             recentHighLabel.Name = "recentHighLabel";
-            recentHighLabel.Size = new Size(39, 38);
+            recentHighLabel.Size = new Size(39, 32);
             recentHighLabel.TabIndex = 6;
             recentHighLabel.Text = "Recent High";
             // 
@@ -490,11 +496,11 @@ namespace SimulatorWinForms
             recentHighAsk.Controls.Add(recentHighAskPrice, 0, 0);
             recentHighAsk.Controls.Add(recentHighAskTime, 0, 1);
             recentHighAsk.Dock = DockStyle.Fill;
-            recentHighAsk.Location = new Point(48, 85);
+            recentHighAsk.Location = new Point(48, 72);
             recentHighAsk.Name = "recentHighAsk";
             recentHighAsk.RowStyles.Add(new RowStyle());
             recentHighAsk.RowStyles.Add(new RowStyle());
-            recentHighAsk.Size = new Size(49, 32);
+            recentHighAsk.Size = new Size(49, 26);
             recentHighAsk.TabIndex = 7;
             // 
             // recentHighAskPrice
@@ -507,6 +513,7 @@ namespace SimulatorWinForms
             recentHighAskPrice.Size = new Size(43, 12);
             recentHighAskPrice.TabIndex = 0;
             recentHighAskPrice.Text = "--";
+            recentHighAskPrice.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // recentHighAskTime
             // 
@@ -515,9 +522,10 @@ namespace SimulatorWinForms
             recentHighAskTime.Font = new Font("Segoe UI", 7F);
             recentHighAskTime.Location = new Point(3, 12);
             recentHighAskTime.Name = "recentHighAskTime";
-            recentHighAskTime.Size = new Size(43, 20);
+            recentHighAskTime.Size = new Size(43, 14);
             recentHighAskTime.TabIndex = 1;
             recentHighAskTime.Text = "--";
+            recentHighAskTime.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // recentHighBid
             // 
@@ -526,11 +534,11 @@ namespace SimulatorWinForms
             recentHighBid.Controls.Add(recentHighBidPrice, 0, 0);
             recentHighBid.Controls.Add(recentHighBidTime, 0, 1);
             recentHighBid.Dock = DockStyle.Fill;
-            recentHighBid.Location = new Point(103, 85);
+            recentHighBid.Location = new Point(103, 72);
             recentHighBid.Name = "recentHighBid";
             recentHighBid.RowStyles.Add(new RowStyle());
             recentHighBid.RowStyles.Add(new RowStyle());
-            recentHighBid.Size = new Size(48, 32);
+            recentHighBid.Size = new Size(48, 26);
             recentHighBid.TabIndex = 8;
             // 
             // recentHighBidPrice
@@ -543,6 +551,7 @@ namespace SimulatorWinForms
             recentHighBidPrice.Size = new Size(42, 12);
             recentHighBidPrice.TabIndex = 0;
             recentHighBidPrice.Text = "--";
+            recentHighBidPrice.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // recentHighBidTime
             // 
@@ -551,18 +560,19 @@ namespace SimulatorWinForms
             recentHighBidTime.Font = new Font("Segoe UI", 7F);
             recentHighBidTime.Location = new Point(3, 12);
             recentHighBidTime.Name = "recentHighBidTime";
-            recentHighBidTime.Size = new Size(42, 20);
+            recentHighBidTime.Size = new Size(42, 14);
             recentHighBidTime.TabIndex = 1;
             recentHighBidTime.Text = "--";
+            recentHighBidTime.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // currentPriceLabel
             // 
             currentPriceLabel.AutoSize = true;
             currentPriceLabel.Dock = DockStyle.Fill;
             currentPriceLabel.Font = new Font("Segoe UI", 7F);
-            currentPriceLabel.Location = new Point(3, 120);
+            currentPriceLabel.Location = new Point(3, 101);
             currentPriceLabel.Name = "currentPriceLabel";
-            currentPriceLabel.Size = new Size(39, 29);
+            currentPriceLabel.Size = new Size(39, 24);
             currentPriceLabel.TabIndex = 9;
             currentPriceLabel.Text = "Current";
             // 
@@ -571,31 +581,33 @@ namespace SimulatorWinForms
             currentPriceAsk.AutoSize = true;
             currentPriceAsk.Dock = DockStyle.Fill;
             currentPriceAsk.Font = new Font("Segoe UI", 7F);
-            currentPriceAsk.Location = new Point(48, 120);
+            currentPriceAsk.Location = new Point(48, 101);
             currentPriceAsk.Name = "currentPriceAsk";
-            currentPriceAsk.Size = new Size(49, 29);
+            currentPriceAsk.Size = new Size(49, 24);
             currentPriceAsk.TabIndex = 10;
             currentPriceAsk.Text = "--";
+            currentPriceAsk.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // currentPriceBid
             // 
             currentPriceBid.AutoSize = true;
             currentPriceBid.Dock = DockStyle.Fill;
             currentPriceBid.Font = new Font("Segoe UI", 7F);
-            currentPriceBid.Location = new Point(103, 120);
+            currentPriceBid.Location = new Point(103, 101);
             currentPriceBid.Name = "currentPriceBid";
-            currentPriceBid.Size = new Size(48, 29);
+            currentPriceBid.Size = new Size(48, 24);
             currentPriceBid.TabIndex = 11;
             currentPriceBid.Text = "--";
+            currentPriceBid.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // recentLowLabel
             // 
             recentLowLabel.AutoSize = true;
             recentLowLabel.Dock = DockStyle.Fill;
             recentLowLabel.Font = new Font("Segoe UI", 7F);
-            recentLowLabel.Location = new Point(3, 149);
+            recentLowLabel.Location = new Point(3, 125);
             recentLowLabel.Name = "recentLowLabel";
-            recentLowLabel.Size = new Size(39, 36);
+            recentLowLabel.Size = new Size(39, 30);
             recentLowLabel.TabIndex = 12;
             recentLowLabel.Text = "Recent Low";
             // 
@@ -606,11 +618,11 @@ namespace SimulatorWinForms
             recentLowAsk.Controls.Add(recentLowAskPrice, 0, 0);
             recentLowAsk.Controls.Add(recentLowAskTime, 0, 1);
             recentLowAsk.Dock = DockStyle.Fill;
-            recentLowAsk.Location = new Point(48, 152);
+            recentLowAsk.Location = new Point(48, 128);
             recentLowAsk.Name = "recentLowAsk";
             recentLowAsk.RowStyles.Add(new RowStyle());
             recentLowAsk.RowStyles.Add(new RowStyle());
-            recentLowAsk.Size = new Size(49, 30);
+            recentLowAsk.Size = new Size(49, 24);
             recentLowAsk.TabIndex = 13;
             // 
             // recentLowAskPrice
@@ -623,6 +635,7 @@ namespace SimulatorWinForms
             recentLowAskPrice.Size = new Size(43, 12);
             recentLowAskPrice.TabIndex = 0;
             recentLowAskPrice.Text = "--";
+            recentLowAskPrice.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // recentLowAskTime
             // 
@@ -631,9 +644,10 @@ namespace SimulatorWinForms
             recentLowAskTime.Font = new Font("Segoe UI", 7F);
             recentLowAskTime.Location = new Point(3, 12);
             recentLowAskTime.Name = "recentLowAskTime";
-            recentLowAskTime.Size = new Size(43, 18);
+            recentLowAskTime.Size = new Size(43, 12);
             recentLowAskTime.TabIndex = 1;
             recentLowAskTime.Text = "--";
+            recentLowAskTime.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // recentLowBid
             // 
@@ -642,11 +656,11 @@ namespace SimulatorWinForms
             recentLowBid.Controls.Add(recentLowBidPrice, 0, 0);
             recentLowBid.Controls.Add(recentLowBidTime, 0, 1);
             recentLowBid.Dock = DockStyle.Fill;
-            recentLowBid.Location = new Point(103, 152);
+            recentLowBid.Location = new Point(103, 128);
             recentLowBid.Name = "recentLowBid";
             recentLowBid.RowStyles.Add(new RowStyle());
             recentLowBid.RowStyles.Add(new RowStyle());
-            recentLowBid.Size = new Size(48, 30);
+            recentLowBid.Size = new Size(48, 24);
             recentLowBid.TabIndex = 14;
             // 
             // recentLowBidPrice
@@ -659,6 +673,7 @@ namespace SimulatorWinForms
             recentLowBidPrice.Size = new Size(42, 12);
             recentLowBidPrice.TabIndex = 0;
             recentLowBidPrice.Text = "--";
+            recentLowBidPrice.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // recentLowBidTime
             // 
@@ -667,18 +682,19 @@ namespace SimulatorWinForms
             recentLowBidTime.Font = new Font("Segoe UI", 7F);
             recentLowBidTime.Location = new Point(3, 12);
             recentLowBidTime.Name = "recentLowBidTime";
-            recentLowBidTime.Size = new Size(42, 18);
+            recentLowBidTime.Size = new Size(42, 12);
             recentLowBidTime.TabIndex = 1;
             recentLowBidTime.Text = "--";
+            recentLowBidTime.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // allTimeLowLabel
             // 
             allTimeLowLabel.AutoSize = true;
             allTimeLowLabel.Dock = DockStyle.Fill;
             allTimeLowLabel.Font = new Font("Segoe UI", 7F);
-            allTimeLowLabel.Location = new Point(3, 185);
+            allTimeLowLabel.Location = new Point(3, 155);
             allTimeLowLabel.Name = "allTimeLowLabel";
-            allTimeLowLabel.Size = new Size(39, 37);
+            allTimeLowLabel.Size = new Size(39, 39);
             allTimeLowLabel.TabIndex = 15;
             allTimeLowLabel.Text = "All Time Low";
             // 
@@ -689,11 +705,11 @@ namespace SimulatorWinForms
             allTimeLowAsk.Controls.Add(allTimeLowAskPrice, 0, 0);
             allTimeLowAsk.Controls.Add(allTimeLowAskTime, 0, 1);
             allTimeLowAsk.Dock = DockStyle.Fill;
-            allTimeLowAsk.Location = new Point(48, 188);
+            allTimeLowAsk.Location = new Point(48, 158);
             allTimeLowAsk.Name = "allTimeLowAsk";
             allTimeLowAsk.RowStyles.Add(new RowStyle());
             allTimeLowAsk.RowStyles.Add(new RowStyle());
-            allTimeLowAsk.Size = new Size(49, 31);
+            allTimeLowAsk.Size = new Size(49, 33);
             allTimeLowAsk.TabIndex = 16;
             // 
             // allTimeLowAskPrice
@@ -706,6 +722,7 @@ namespace SimulatorWinForms
             allTimeLowAskPrice.Size = new Size(43, 12);
             allTimeLowAskPrice.TabIndex = 0;
             allTimeLowAskPrice.Text = "--";
+            allTimeLowAskPrice.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // allTimeLowAskTime
             // 
@@ -714,9 +731,10 @@ namespace SimulatorWinForms
             allTimeLowAskTime.Font = new Font("Segoe UI", 7F);
             allTimeLowAskTime.Location = new Point(3, 12);
             allTimeLowAskTime.Name = "allTimeLowAskTime";
-            allTimeLowAskTime.Size = new Size(43, 19);
+            allTimeLowAskTime.Size = new Size(43, 21);
             allTimeLowAskTime.TabIndex = 1;
             allTimeLowAskTime.Text = "--";
+            allTimeLowAskTime.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // allTimeLowBid
             // 
@@ -725,11 +743,11 @@ namespace SimulatorWinForms
             allTimeLowBid.Controls.Add(allTimeLowBidPrice, 0, 0);
             allTimeLowBid.Controls.Add(allTimeLowBidTime, 0, 1);
             allTimeLowBid.Dock = DockStyle.Fill;
-            allTimeLowBid.Location = new Point(103, 188);
+            allTimeLowBid.Location = new Point(103, 158);
             allTimeLowBid.Name = "allTimeLowBid";
             allTimeLowBid.RowStyles.Add(new RowStyle());
             allTimeLowBid.RowStyles.Add(new RowStyle());
-            allTimeLowBid.Size = new Size(48, 31);
+            allTimeLowBid.Size = new Size(48, 33);
             allTimeLowBid.TabIndex = 17;
             // 
             // allTimeLowBidPrice
@@ -742,6 +760,7 @@ namespace SimulatorWinForms
             allTimeLowBidPrice.Size = new Size(42, 12);
             allTimeLowBidPrice.TabIndex = 0;
             allTimeLowBidPrice.Text = "--";
+            allTimeLowBidPrice.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // allTimeLowBidTime
             // 
@@ -750,9 +769,10 @@ namespace SimulatorWinForms
             allTimeLowBidTime.Font = new Font("Segoe UI", 7F);
             allTimeLowBidTime.Location = new Point(3, 12);
             allTimeLowBidTime.Name = "allTimeLowBidTime";
-            allTimeLowBidTime.Size = new Size(42, 19);
+            allTimeLowBidTime.Size = new Size(42, 21);
             allTimeLowBidTime.TabIndex = 1;
             allTimeLowBidTime.Text = "--";
+            allTimeLowBidTime.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // tradingMetricsGrid
             // 
@@ -782,7 +802,7 @@ namespace SimulatorWinForms
             tradingMetricsGrid.Controls.Add(adxLabel, 0, 10);
             tradingMetricsGrid.Controls.Add(adxValue, 1, 10);
             tradingMetricsGrid.Dock = DockStyle.Fill;
-            tradingMetricsGrid.Location = new Point(3, 231);
+            tradingMetricsGrid.Location = new Point(3, 203);
             tradingMetricsGrid.Name = "tradingMetricsGrid";
             tradingMetricsGrid.RowCount = 11;
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
@@ -796,7 +816,7 @@ namespace SimulatorWinForms
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
-            tradingMetricsGrid.Size = new Size(154, 228);
+            tradingMetricsGrid.Size = new Size(154, 220);
             tradingMetricsGrid.TabIndex = 1;
             // 
             // tradingMetricsHeader
@@ -1015,7 +1035,7 @@ namespace SimulatorWinForms
             adxLabel.Font = new Font("Segoe UI", 7F);
             adxLabel.Location = new Point(3, 203);
             adxLabel.Name = "adxLabel";
-            adxLabel.Size = new Size(86, 22);
+            adxLabel.Size = new Size(86, 14);
             adxLabel.TabIndex = 19;
             adxLabel.Text = "ADX:";
             // 
@@ -1026,7 +1046,7 @@ namespace SimulatorWinForms
             adxValue.Font = new Font("Segoe UI", 7F);
             adxValue.Location = new Point(95, 200);
             adxValue.Name = "adxValue";
-            adxValue.Size = new Size(56, 28);
+            adxValue.Size = new Size(56, 20);
             adxValue.TabIndex = 20;
             adxValue.Text = "--";
             // 
@@ -1045,7 +1065,7 @@ namespace SimulatorWinForms
             rightColumn.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             rightColumn.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
             rightColumn.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
-            rightColumn.Size = new Size(130, 462);
+            rightColumn.Size = new Size(130, 426);
             rightColumn.TabIndex = 1;
             // 
             // otherInfoGrid
@@ -1067,7 +1087,7 @@ namespace SimulatorWinForms
             otherInfoGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 33.33F));
             otherInfoGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 33.33F));
             otherInfoGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 33.33F));
-            otherInfoGrid.Size = new Size(124, 86);
+            otherInfoGrid.Size = new Size(124, 79);
             otherInfoGrid.TabIndex = 0;
             // 
             // CategoryLabel
@@ -1077,7 +1097,7 @@ namespace SimulatorWinForms
             CategoryLabel.Font = new Font("Segoe UI", 7F);
             CategoryLabel.Location = new Point(3, 0);
             CategoryLabel.Name = "CategoryLabel";
-            CategoryLabel.Size = new Size(68, 28);
+            CategoryLabel.Size = new Size(68, 26);
             CategoryLabel.TabIndex = 0;
             CategoryLabel.Text = "Category:";
             // 
@@ -1088,18 +1108,19 @@ namespace SimulatorWinForms
             categoryValue.Font = new Font("Segoe UI", 7F);
             categoryValue.Location = new Point(77, 0);
             categoryValue.Name = "categoryValue";
-            categoryValue.Size = new Size(44, 28);
+            categoryValue.Size = new Size(44, 26);
             categoryValue.TabIndex = 1;
             categoryValue.Text = "--";
+            categoryValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // timeLeftLabel
             // 
             timeLeftLabel.AutoSize = true;
             timeLeftLabel.Dock = DockStyle.Fill;
             timeLeftLabel.Font = new Font("Segoe UI", 7F);
-            timeLeftLabel.Location = new Point(3, 28);
+            timeLeftLabel.Location = new Point(3, 26);
             timeLeftLabel.Name = "timeLeftLabel";
-            timeLeftLabel.Size = new Size(68, 28);
+            timeLeftLabel.Size = new Size(68, 26);
             timeLeftLabel.TabIndex = 2;
             timeLeftLabel.Text = "Time Left:";
             // 
@@ -1108,20 +1129,21 @@ namespace SimulatorWinForms
             timeLeftValue.AutoSize = true;
             timeLeftValue.Dock = DockStyle.Fill;
             timeLeftValue.Font = new Font("Segoe UI", 7F);
-            timeLeftValue.Location = new Point(77, 28);
+            timeLeftValue.Location = new Point(77, 26);
             timeLeftValue.Name = "timeLeftValue";
-            timeLeftValue.Size = new Size(44, 28);
+            timeLeftValue.Size = new Size(44, 26);
             timeLeftValue.TabIndex = 3;
             timeLeftValue.Text = "--";
+            timeLeftValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // marketAgeLabel
             // 
             marketAgeLabel.AutoSize = true;
             marketAgeLabel.Dock = DockStyle.Fill;
             marketAgeLabel.Font = new Font("Segoe UI", 7F);
-            marketAgeLabel.Location = new Point(3, 56);
+            marketAgeLabel.Location = new Point(3, 52);
             marketAgeLabel.Name = "marketAgeLabel";
-            marketAgeLabel.Size = new Size(68, 30);
+            marketAgeLabel.Size = new Size(68, 27);
             marketAgeLabel.TabIndex = 4;
             marketAgeLabel.Text = "Market Age:";
             // 
@@ -1130,11 +1152,12 @@ namespace SimulatorWinForms
             marketAgeValue.AutoSize = true;
             marketAgeValue.Dock = DockStyle.Fill;
             marketAgeValue.Font = new Font("Segoe UI", 7F);
-            marketAgeValue.Location = new Point(77, 56);
+            marketAgeValue.Location = new Point(77, 52);
             marketAgeValue.Name = "marketAgeValue";
-            marketAgeValue.Size = new Size(44, 30);
+            marketAgeValue.Size = new Size(44, 27);
             marketAgeValue.TabIndex = 5;
             marketAgeValue.Text = "--";
+            marketAgeValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // flowMomentumGrid
             // 
@@ -1166,7 +1189,7 @@ namespace SimulatorWinForms
             flowMomentumGrid.Controls.Add(slopeYesValue, 1, 6);
             flowMomentumGrid.Controls.Add(slopeNoValue, 2, 6);
             flowMomentumGrid.Dock = DockStyle.Fill;
-            flowMomentumGrid.Location = new Point(3, 95);
+            flowMomentumGrid.Location = new Point(3, 88);
             flowMomentumGrid.Name = "flowMomentumGrid";
             flowMomentumGrid.RowCount = 7;
             flowMomentumGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
@@ -1177,16 +1200,16 @@ namespace SimulatorWinForms
             flowMomentumGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
             flowMomentumGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
             flowMomentumGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            flowMomentumGrid.Size = new Size(124, 178);
+            flowMomentumGrid.Size = new Size(124, 164);
             flowMomentumGrid.TabIndex = 1;
             // 
             // label1
             // 
             label1.AutoSize = true;
             label1.Dock = DockStyle.Fill;
-            label1.Location = new Point(3, 22);
+            label1.Location = new Point(3, 20);
             label1.Name = "label1";
-            label1.Size = new Size(56, 22);
+            label1.Size = new Size(56, 20);
             label1.TabIndex = 21;
             // 
             // flowHeader
@@ -1197,7 +1220,7 @@ namespace SimulatorWinForms
             flowHeader.Font = new Font("Segoe UI", 7F);
             flowHeader.Location = new Point(3, 0);
             flowHeader.Name = "flowHeader";
-            flowHeader.Size = new Size(118, 22);
+            flowHeader.Size = new Size(118, 20);
             flowHeader.TabIndex = 0;
             flowHeader.Text = "Flow/Momentum";
             // 
@@ -1206,9 +1229,9 @@ namespace SimulatorWinForms
             flowHeaderYes.AutoSize = true;
             flowHeaderYes.Dock = DockStyle.Fill;
             flowHeaderYes.Font = new Font("Segoe UI", 7F);
-            flowHeaderYes.Location = new Point(65, 22);
+            flowHeaderYes.Location = new Point(65, 20);
             flowHeaderYes.Name = "flowHeaderYes";
-            flowHeaderYes.Size = new Size(25, 22);
+            flowHeaderYes.Size = new Size(25, 20);
             flowHeaderYes.TabIndex = 1;
             flowHeaderYes.Text = "Yes";
             // 
@@ -1217,9 +1240,9 @@ namespace SimulatorWinForms
             flowHeaderNo.AutoSize = true;
             flowHeaderNo.Dock = DockStyle.Fill;
             flowHeaderNo.Font = new Font("Segoe UI", 7F);
-            flowHeaderNo.Location = new Point(96, 22);
+            flowHeaderNo.Location = new Point(96, 20);
             flowHeaderNo.Name = "flowHeaderNo";
-            flowHeaderNo.Size = new Size(25, 22);
+            flowHeaderNo.Size = new Size(25, 20);
             flowHeaderNo.TabIndex = 2;
             flowHeaderNo.Text = "No";
             // 
@@ -1228,9 +1251,9 @@ namespace SimulatorWinForms
             topVelocityLabel.AutoSize = true;
             topVelocityLabel.Dock = DockStyle.Fill;
             topVelocityLabel.Font = new Font("Segoe UI", 7F);
-            topVelocityLabel.Location = new Point(3, 47);
+            topVelocityLabel.Location = new Point(3, 43);
             topVelocityLabel.Name = "topVelocityLabel";
-            topVelocityLabel.Size = new Size(56, 16);
+            topVelocityLabel.Size = new Size(56, 14);
             topVelocityLabel.TabIndex = 3;
             topVelocityLabel.Text = "Top Velocity:";
             // 
@@ -1239,31 +1262,33 @@ namespace SimulatorWinForms
             topVelocityYesValue.AutoSize = true;
             topVelocityYesValue.Dock = DockStyle.Fill;
             topVelocityYesValue.Font = new Font("Segoe UI", 7F);
-            topVelocityYesValue.Location = new Point(65, 44);
+            topVelocityYesValue.Location = new Point(65, 40);
             topVelocityYesValue.Name = "topVelocityYesValue";
-            topVelocityYesValue.Size = new Size(25, 22);
+            topVelocityYesValue.Size = new Size(25, 20);
             topVelocityYesValue.TabIndex = 4;
             topVelocityYesValue.Text = "--";
+            topVelocityYesValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // topVelocityNoValue
             // 
             topVelocityNoValue.AutoSize = true;
             topVelocityNoValue.Dock = DockStyle.Fill;
             topVelocityNoValue.Font = new Font("Segoe UI", 7F);
-            topVelocityNoValue.Location = new Point(96, 44);
+            topVelocityNoValue.Location = new Point(96, 40);
             topVelocityNoValue.Name = "topVelocityNoValue";
-            topVelocityNoValue.Size = new Size(25, 22);
+            topVelocityNoValue.Size = new Size(25, 20);
             topVelocityNoValue.TabIndex = 5;
             topVelocityNoValue.Text = "--";
+            topVelocityNoValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // bottomVelocityLabel
             // 
             bottomVelocityLabel.AutoSize = true;
             bottomVelocityLabel.Dock = DockStyle.Fill;
             bottomVelocityLabel.Font = new Font("Segoe UI", 7F);
-            bottomVelocityLabel.Location = new Point(3, 69);
+            bottomVelocityLabel.Location = new Point(3, 63);
             bottomVelocityLabel.Name = "bottomVelocityLabel";
-            bottomVelocityLabel.Size = new Size(56, 16);
+            bottomVelocityLabel.Size = new Size(56, 14);
             bottomVelocityLabel.TabIndex = 6;
             bottomVelocityLabel.Text = "Bottom Velocity:";
             // 
@@ -1272,31 +1297,33 @@ namespace SimulatorWinForms
             bottomVelocityYesValue.AutoSize = true;
             bottomVelocityYesValue.Dock = DockStyle.Fill;
             bottomVelocityYesValue.Font = new Font("Segoe UI", 7F);
-            bottomVelocityYesValue.Location = new Point(65, 66);
+            bottomVelocityYesValue.Location = new Point(65, 60);
             bottomVelocityYesValue.Name = "bottomVelocityYesValue";
-            bottomVelocityYesValue.Size = new Size(25, 22);
+            bottomVelocityYesValue.Size = new Size(25, 20);
             bottomVelocityYesValue.TabIndex = 7;
             bottomVelocityYesValue.Text = "--";
+            bottomVelocityYesValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // bottomVelocityNoValue
             // 
             bottomVelocityNoValue.AutoSize = true;
             bottomVelocityNoValue.Dock = DockStyle.Fill;
             bottomVelocityNoValue.Font = new Font("Segoe UI", 7F);
-            bottomVelocityNoValue.Location = new Point(96, 66);
+            bottomVelocityNoValue.Location = new Point(96, 60);
             bottomVelocityNoValue.Name = "bottomVelocityNoValue";
-            bottomVelocityNoValue.Size = new Size(25, 22);
+            bottomVelocityNoValue.Size = new Size(25, 20);
             bottomVelocityNoValue.TabIndex = 8;
             bottomVelocityNoValue.Text = "--";
+            bottomVelocityNoValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // netOrderRateLabel
             // 
             netOrderRateLabel.AutoSize = true;
             netOrderRateLabel.Dock = DockStyle.Fill;
             netOrderRateLabel.Font = new Font("Segoe UI", 7F);
-            netOrderRateLabel.Location = new Point(3, 91);
+            netOrderRateLabel.Location = new Point(3, 83);
             netOrderRateLabel.Name = "netOrderRateLabel";
-            netOrderRateLabel.Size = new Size(56, 16);
+            netOrderRateLabel.Size = new Size(56, 14);
             netOrderRateLabel.TabIndex = 9;
             netOrderRateLabel.Text = "Net Order Rate:";
             // 
@@ -1305,31 +1332,33 @@ namespace SimulatorWinForms
             netOrderRateYesValue.AutoSize = true;
             netOrderRateYesValue.Dock = DockStyle.Fill;
             netOrderRateYesValue.Font = new Font("Segoe UI", 7F);
-            netOrderRateYesValue.Location = new Point(65, 88);
+            netOrderRateYesValue.Location = new Point(65, 80);
             netOrderRateYesValue.Name = "netOrderRateYesValue";
-            netOrderRateYesValue.Size = new Size(25, 22);
+            netOrderRateYesValue.Size = new Size(25, 20);
             netOrderRateYesValue.TabIndex = 10;
             netOrderRateYesValue.Text = "--";
+            netOrderRateYesValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // netOrderRateNoValue
             // 
             netOrderRateNoValue.AutoSize = true;
             netOrderRateNoValue.Dock = DockStyle.Fill;
             netOrderRateNoValue.Font = new Font("Segoe UI", 7F);
-            netOrderRateNoValue.Location = new Point(96, 88);
+            netOrderRateNoValue.Location = new Point(96, 80);
             netOrderRateNoValue.Name = "netOrderRateNoValue";
-            netOrderRateNoValue.Size = new Size(25, 22);
+            netOrderRateNoValue.Size = new Size(25, 20);
             netOrderRateNoValue.TabIndex = 11;
             netOrderRateNoValue.Text = "--";
+            netOrderRateNoValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // tradeVolumeLabel
             // 
             tradeVolumeLabel.AutoSize = true;
             tradeVolumeLabel.Dock = DockStyle.Fill;
             tradeVolumeLabel.Font = new Font("Segoe UI", 7F);
-            tradeVolumeLabel.Location = new Point(3, 113);
+            tradeVolumeLabel.Location = new Point(3, 103);
             tradeVolumeLabel.Name = "tradeVolumeLabel";
-            tradeVolumeLabel.Size = new Size(56, 16);
+            tradeVolumeLabel.Size = new Size(56, 14);
             tradeVolumeLabel.TabIndex = 12;
             tradeVolumeLabel.Text = "Trade Volume:";
             // 
@@ -1338,31 +1367,33 @@ namespace SimulatorWinForms
             tradeVolumeYesValue.AutoSize = true;
             tradeVolumeYesValue.Dock = DockStyle.Fill;
             tradeVolumeYesValue.Font = new Font("Segoe UI", 7F);
-            tradeVolumeYesValue.Location = new Point(65, 110);
+            tradeVolumeYesValue.Location = new Point(65, 100);
             tradeVolumeYesValue.Name = "tradeVolumeYesValue";
-            tradeVolumeYesValue.Size = new Size(25, 22);
+            tradeVolumeYesValue.Size = new Size(25, 20);
             tradeVolumeYesValue.TabIndex = 13;
             tradeVolumeYesValue.Text = "--";
+            tradeVolumeYesValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // tradeVolumeNoValue
             // 
             tradeVolumeNoValue.AutoSize = true;
             tradeVolumeNoValue.Dock = DockStyle.Fill;
             tradeVolumeNoValue.Font = new Font("Segoe UI", 7F);
-            tradeVolumeNoValue.Location = new Point(96, 110);
+            tradeVolumeNoValue.Location = new Point(96, 100);
             tradeVolumeNoValue.Name = "tradeVolumeNoValue";
-            tradeVolumeNoValue.Size = new Size(25, 22);
+            tradeVolumeNoValue.Size = new Size(25, 20);
             tradeVolumeNoValue.TabIndex = 14;
             tradeVolumeNoValue.Text = "--";
+            tradeVolumeNoValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // avgTradeSizeLabel
             // 
             avgTradeSizeLabel.AutoSize = true;
             avgTradeSizeLabel.Dock = DockStyle.Fill;
             avgTradeSizeLabel.Font = new Font("Segoe UI", 7F);
-            avgTradeSizeLabel.Location = new Point(3, 135);
+            avgTradeSizeLabel.Location = new Point(3, 123);
             avgTradeSizeLabel.Name = "avgTradeSizeLabel";
-            avgTradeSizeLabel.Size = new Size(56, 16);
+            avgTradeSizeLabel.Size = new Size(56, 14);
             avgTradeSizeLabel.TabIndex = 15;
             avgTradeSizeLabel.Text = "Avg Trade Size:";
             // 
@@ -1371,29 +1402,31 @@ namespace SimulatorWinForms
             avgTradeSizeYesValue.AutoSize = true;
             avgTradeSizeYesValue.Dock = DockStyle.Fill;
             avgTradeSizeYesValue.Font = new Font("Segoe UI", 7F);
-            avgTradeSizeYesValue.Location = new Point(65, 132);
+            avgTradeSizeYesValue.Location = new Point(65, 120);
             avgTradeSizeYesValue.Name = "avgTradeSizeYesValue";
-            avgTradeSizeYesValue.Size = new Size(25, 22);
+            avgTradeSizeYesValue.Size = new Size(25, 20);
             avgTradeSizeYesValue.TabIndex = 16;
             avgTradeSizeYesValue.Text = "--";
+            avgTradeSizeYesValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // avgTradeSizeNoValue
             // 
             avgTradeSizeNoValue.AutoSize = true;
             avgTradeSizeNoValue.Dock = DockStyle.Fill;
             avgTradeSizeNoValue.Font = new Font("Segoe UI", 7F);
-            avgTradeSizeNoValue.Location = new Point(96, 132);
+            avgTradeSizeNoValue.Location = new Point(96, 120);
             avgTradeSizeNoValue.Name = "avgTradeSizeNoValue";
-            avgTradeSizeNoValue.Size = new Size(25, 22);
+            avgTradeSizeNoValue.Size = new Size(25, 20);
             avgTradeSizeNoValue.TabIndex = 17;
             avgTradeSizeNoValue.Text = "--";
+            avgTradeSizeNoValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // slopeLabel
             // 
             slopeLabel.AutoSize = true;
             slopeLabel.Dock = DockStyle.Fill;
             slopeLabel.Font = new Font("Segoe UI", 7F);
-            slopeLabel.Location = new Point(3, 157);
+            slopeLabel.Location = new Point(3, 143);
             slopeLabel.Name = "slopeLabel";
             slopeLabel.Size = new Size(56, 18);
             slopeLabel.TabIndex = 18;
@@ -1404,22 +1437,24 @@ namespace SimulatorWinForms
             slopeYesValue.AutoSize = true;
             slopeYesValue.Dock = DockStyle.Fill;
             slopeYesValue.Font = new Font("Segoe UI", 7F);
-            slopeYesValue.Location = new Point(65, 154);
+            slopeYesValue.Location = new Point(65, 140);
             slopeYesValue.Name = "slopeYesValue";
             slopeYesValue.Size = new Size(25, 24);
             slopeYesValue.TabIndex = 19;
             slopeYesValue.Text = "--";
+            slopeYesValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // slopeNoValue
             // 
             slopeNoValue.AutoSize = true;
             slopeNoValue.Dock = DockStyle.Fill;
             slopeNoValue.Font = new Font("Segoe UI", 7F);
-            slopeNoValue.Location = new Point(96, 154);
+            slopeNoValue.Location = new Point(96, 140);
             slopeNoValue.Name = "slopeNoValue";
             slopeNoValue.Size = new Size(25, 24);
             slopeNoValue.TabIndex = 20;
             slopeNoValue.Text = "--";
+            slopeNoValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // contextGrid
             // 
@@ -1446,7 +1481,7 @@ namespace SimulatorWinForms
             contextGrid.Controls.Add(totalContractsYesValue, 1, 5);
             contextGrid.Controls.Add(totalContractsNoValue, 2, 5);
             contextGrid.Dock = DockStyle.Fill;
-            contextGrid.Location = new Point(3, 279);
+            contextGrid.Location = new Point(3, 258);
             contextGrid.Name = "contextGrid";
             contextGrid.RowCount = 6;
             contextGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
@@ -1456,16 +1491,16 @@ namespace SimulatorWinForms
             contextGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
             contextGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
             contextGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            contextGrid.Size = new Size(124, 180);
+            contextGrid.Size = new Size(124, 165);
             contextGrid.TabIndex = 2;
             // 
             // label2
             // 
             label2.AutoSize = true;
             label2.Dock = DockStyle.Fill;
-            label2.Location = new Point(3, 25);
+            label2.Location = new Point(3, 23);
             label2.Name = "label2";
-            label2.Size = new Size(56, 25);
+            label2.Size = new Size(56, 23);
             label2.TabIndex = 16;
             // 
             // contextHeader
@@ -1476,7 +1511,7 @@ namespace SimulatorWinForms
             contextHeader.Font = new Font("Segoe UI", 7F);
             contextHeader.Location = new Point(3, 0);
             contextHeader.Name = "contextHeader";
-            contextHeader.Size = new Size(118, 25);
+            contextHeader.Size = new Size(118, 23);
             contextHeader.TabIndex = 0;
             contextHeader.Text = "Context";
             // 
@@ -1485,9 +1520,9 @@ namespace SimulatorWinForms
             contextHeaderYes.AutoSize = true;
             contextHeaderYes.Dock = DockStyle.Fill;
             contextHeaderYes.Font = new Font("Segoe UI", 7F);
-            contextHeaderYes.Location = new Point(65, 25);
+            contextHeaderYes.Location = new Point(65, 23);
             contextHeaderYes.Name = "contextHeaderYes";
-            contextHeaderYes.Size = new Size(25, 25);
+            contextHeaderYes.Size = new Size(25, 23);
             contextHeaderYes.TabIndex = 1;
             contextHeaderYes.Text = "Yes";
             // 
@@ -1496,9 +1531,9 @@ namespace SimulatorWinForms
             contextHeaderNo.AutoSize = true;
             contextHeaderNo.Dock = DockStyle.Fill;
             contextHeaderNo.Font = new Font("Segoe UI", 7F);
-            contextHeaderNo.Location = new Point(96, 25);
+            contextHeaderNo.Location = new Point(96, 23);
             contextHeaderNo.Name = "contextHeaderNo";
-            contextHeaderNo.Size = new Size(25, 25);
+            contextHeaderNo.Size = new Size(25, 23);
             contextHeaderNo.TabIndex = 2;
             contextHeaderNo.Text = "No";
             // 
@@ -1507,9 +1542,9 @@ namespace SimulatorWinForms
             spreadLabel.AutoSize = true;
             spreadLabel.Dock = DockStyle.Fill;
             spreadLabel.Font = new Font("Segoe UI", 7F);
-            spreadLabel.Location = new Point(3, 50);
+            spreadLabel.Location = new Point(3, 46);
             spreadLabel.Name = "spreadLabel";
-            spreadLabel.Size = new Size(56, 25);
+            spreadLabel.Size = new Size(56, 23);
             spreadLabel.TabIndex = 3;
             spreadLabel.Text = "Spread:";
             // 
@@ -1519,20 +1554,21 @@ namespace SimulatorWinForms
             contextGrid.SetColumnSpan(spreadValue, 2);
             spreadValue.Dock = DockStyle.Fill;
             spreadValue.Font = new Font("Segoe UI", 7F);
-            spreadValue.Location = new Point(65, 50);
+            spreadValue.Location = new Point(65, 46);
             spreadValue.Name = "spreadValue";
-            spreadValue.Size = new Size(56, 25);
+            spreadValue.Size = new Size(56, 23);
             spreadValue.TabIndex = 4;
             spreadValue.Text = "--";
+            spreadValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // imbalLabel
             // 
             imbalLabel.AutoSize = true;
             imbalLabel.Dock = DockStyle.Fill;
             imbalLabel.Font = new Font("Segoe UI", 7F);
-            imbalLabel.Location = new Point(3, 78);
+            imbalLabel.Location = new Point(3, 72);
             imbalLabel.Name = "imbalLabel";
-            imbalLabel.Size = new Size(56, 19);
+            imbalLabel.Size = new Size(56, 17);
             imbalLabel.TabIndex = 5;
             imbalLabel.Text = "Imbal:";
             // 
@@ -1542,20 +1578,21 @@ namespace SimulatorWinForms
             contextGrid.SetColumnSpan(imbalValue, 2);
             imbalValue.Dock = DockStyle.Fill;
             imbalValue.Font = new Font("Segoe UI", 7F);
-            imbalValue.Location = new Point(65, 75);
+            imbalValue.Location = new Point(65, 69);
             imbalValue.Name = "imbalValue";
-            imbalValue.Size = new Size(56, 25);
+            imbalValue.Size = new Size(56, 23);
             imbalValue.TabIndex = 6;
             imbalValue.Text = "--";
+            imbalValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // depthTop4Label
             // 
             depthTop4Label.AutoSize = true;
             depthTop4Label.Dock = DockStyle.Fill;
             depthTop4Label.Font = new Font("Segoe UI", 7F);
-            depthTop4Label.Location = new Point(3, 103);
+            depthTop4Label.Location = new Point(3, 95);
             depthTop4Label.Name = "depthTop4Label";
-            depthTop4Label.Size = new Size(56, 19);
+            depthTop4Label.Size = new Size(56, 17);
             depthTop4Label.TabIndex = 7;
             depthTop4Label.Text = "Depth Top 4:";
             // 
@@ -1564,31 +1601,33 @@ namespace SimulatorWinForms
             depthTop4YesValue.AutoSize = true;
             depthTop4YesValue.Dock = DockStyle.Fill;
             depthTop4YesValue.Font = new Font("Segoe UI", 7F);
-            depthTop4YesValue.Location = new Point(65, 100);
+            depthTop4YesValue.Location = new Point(65, 92);
             depthTop4YesValue.Name = "depthTop4YesValue";
-            depthTop4YesValue.Size = new Size(25, 25);
+            depthTop4YesValue.Size = new Size(25, 23);
             depthTop4YesValue.TabIndex = 8;
             depthTop4YesValue.Text = "--";
+            depthTop4YesValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // depthTop4NoValue
             // 
             depthTop4NoValue.AutoSize = true;
             depthTop4NoValue.Dock = DockStyle.Fill;
             depthTop4NoValue.Font = new Font("Segoe UI", 7F);
-            depthTop4NoValue.Location = new Point(96, 100);
+            depthTop4NoValue.Location = new Point(96, 92);
             depthTop4NoValue.Name = "depthTop4NoValue";
-            depthTop4NoValue.Size = new Size(25, 25);
+            depthTop4NoValue.Size = new Size(25, 23);
             depthTop4NoValue.TabIndex = 9;
             depthTop4NoValue.Text = "--";
+            depthTop4NoValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // centerMassLabel
             // 
             centerMassLabel.AutoSize = true;
             centerMassLabel.Dock = DockStyle.Fill;
             centerMassLabel.Font = new Font("Segoe UI", 7F);
-            centerMassLabel.Location = new Point(3, 128);
+            centerMassLabel.Location = new Point(3, 118);
             centerMassLabel.Name = "centerMassLabel";
-            centerMassLabel.Size = new Size(56, 19);
+            centerMassLabel.Size = new Size(56, 17);
             centerMassLabel.TabIndex = 10;
             centerMassLabel.Text = "Center Mass:";
             // 
@@ -1597,31 +1636,33 @@ namespace SimulatorWinForms
             centerMassYesValue.AutoSize = true;
             centerMassYesValue.Dock = DockStyle.Fill;
             centerMassYesValue.Font = new Font("Segoe UI", 7F);
-            centerMassYesValue.Location = new Point(65, 125);
+            centerMassYesValue.Location = new Point(65, 115);
             centerMassYesValue.Name = "centerMassYesValue";
-            centerMassYesValue.Size = new Size(25, 25);
+            centerMassYesValue.Size = new Size(25, 23);
             centerMassYesValue.TabIndex = 11;
             centerMassYesValue.Text = "--";
+            centerMassYesValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // centerMassNoValue
             // 
             centerMassNoValue.AutoSize = true;
             centerMassNoValue.Dock = DockStyle.Fill;
             centerMassNoValue.Font = new Font("Segoe UI", 7F);
-            centerMassNoValue.Location = new Point(96, 125);
+            centerMassNoValue.Location = new Point(96, 115);
             centerMassNoValue.Name = "centerMassNoValue";
-            centerMassNoValue.Size = new Size(25, 25);
+            centerMassNoValue.Size = new Size(25, 23);
             centerMassNoValue.TabIndex = 12;
             centerMassNoValue.Text = "--";
+            centerMassNoValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // totalContractsLabel
             // 
             totalContractsLabel.AutoSize = true;
             totalContractsLabel.Dock = DockStyle.Fill;
             totalContractsLabel.Font = new Font("Segoe UI", 7F);
-            totalContractsLabel.Location = new Point(3, 153);
+            totalContractsLabel.Location = new Point(3, 141);
             totalContractsLabel.Name = "totalContractsLabel";
-            totalContractsLabel.Size = new Size(56, 24);
+            totalContractsLabel.Size = new Size(56, 21);
             totalContractsLabel.TabIndex = 13;
             totalContractsLabel.Text = "Total Contracts:";
             // 
@@ -1630,22 +1671,24 @@ namespace SimulatorWinForms
             totalContractsYesValue.AutoSize = true;
             totalContractsYesValue.Dock = DockStyle.Fill;
             totalContractsYesValue.Font = new Font("Segoe UI", 7F);
-            totalContractsYesValue.Location = new Point(65, 150);
+            totalContractsYesValue.Location = new Point(65, 138);
             totalContractsYesValue.Name = "totalContractsYesValue";
-            totalContractsYesValue.Size = new Size(25, 30);
+            totalContractsYesValue.Size = new Size(25, 27);
             totalContractsYesValue.TabIndex = 14;
             totalContractsYesValue.Text = "--";
+            totalContractsYesValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // totalContractsNoValue
             // 
             totalContractsNoValue.AutoSize = true;
             totalContractsNoValue.Dock = DockStyle.Fill;
             totalContractsNoValue.Font = new Font("Segoe UI", 7F);
-            totalContractsNoValue.Location = new Point(96, 150);
+            totalContractsNoValue.Location = new Point(96, 138);
             totalContractsNoValue.Name = "totalContractsNoValue";
-            totalContractsNoValue.Size = new Size(25, 30);
+            totalContractsNoValue.Size = new Size(25, 27);
             totalContractsNoValue.TabIndex = 15;
             totalContractsNoValue.Text = "--";
+            totalContractsNoValue.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // positionsContainer
             // 
@@ -1653,240 +1696,30 @@ namespace SimulatorWinForms
             positionsContainer.Controls.Add(positionsLayout);
             positionsContainer.Dock = DockStyle.Fill;
             positionsContainer.Font = new Font("Segoe UI", 7F);
-            positionsContainer.Location = new Point(4, 491);
+            positionsContainer.Location = new Point(4, 455);
             positionsContainer.Margin = new Padding(4, 3, 4, 3);
             positionsContainer.Name = "positionsContainer";
             positionsContainer.Padding = new Padding(6);
-            positionsContainer.Size = new Size(593, 157);
+            positionsContainer.Size = new Size(593, 193);
             positionsContainer.TabIndex = 2;
             // 
             // positionsLayout
             // 
             positionsLayout.AutoSize = true;
-            positionsLayout.ColumnCount = 1;
-            positionsLayout.ColumnStyles.Add(new ColumnStyle());
-            positionsLayout.Controls.Add(positionsGrid, 0, 0);
+            positionsLayout.ColumnCount = 2;
+            positionsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70.8117447F));
+            positionsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 29.1882553F));
+            positionsLayout.Controls.Add(strategyOutputTextbox, 0, 0);
+            positionsLayout.Controls.Add(positionsGrid, 1, 0);
             positionsLayout.Dock = DockStyle.Fill;
             positionsLayout.Location = new Point(6, 6);
             positionsLayout.Margin = new Padding(0);
             positionsLayout.Name = "positionsLayout";
             positionsLayout.RowCount = 1;
             positionsLayout.RowStyles.Add(new RowStyle());
-            positionsLayout.Size = new Size(579, 143);
+            positionsLayout.Size = new Size(579, 179);
             positionsLayout.TabIndex = 0;
-            // 
-            // positionsGrid
-            // 
-            positionsGrid.Anchor = AnchorStyles.Right;
-            positionsGrid.AutoSize = true;
-            positionsGrid.ColumnCount = 2;
-            positionsGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
-            positionsGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
-            positionsGrid.Controls.Add(positionSizeLabel, 0, 0);
-            positionsGrid.Controls.Add(positionSizeValue, 1, 0);
-            positionsGrid.Controls.Add(lastTradeLabel, 0, 1);
-            positionsGrid.Controls.Add(lastTradeValue, 1, 1);
-            positionsGrid.Controls.Add(positionRoiLabel, 0, 2);
-            positionsGrid.Controls.Add(positionRoiValue, 1, 2);
-            positionsGrid.Controls.Add(buyinPriceLabel, 0, 3);
-            positionsGrid.Controls.Add(buyinPriceValue, 1, 3);
-            positionsGrid.Controls.Add(positionUpsideLabel, 0, 4);
-            positionsGrid.Controls.Add(positionUpsideValue, 1, 4);
-            positionsGrid.Controls.Add(positionDownsideLabel, 0, 5);
-            positionsGrid.Controls.Add(positionDownsideValue, 1, 5);
-            positionsGrid.Controls.Add(restingOrdersLabel, 0, 6);
-            positionsGrid.Controls.Add(restingOrdersValue, 1, 6);
-            positionsGrid.Controls.Add(simulatedPositionLabel, 0, 7);
-            positionsGrid.Controls.Add(simulatedPositionValue, 1, 7);
-            positionsGrid.Location = new Point(388, 3);
-            positionsGrid.Name = "positionsGrid";
-            positionsGrid.RowCount = 8;
-            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            positionsGrid.Size = new Size(188, 176);
-            positionsGrid.TabIndex = 1;
-            // 
-            // positionSizeLabel
-            // 
-            positionSizeLabel.AutoSize = true;
-            positionSizeLabel.Dock = DockStyle.Fill;
-            positionSizeLabel.Font = new Font("Segoe UI", 7F);
-            positionSizeLabel.Location = new Point(3, 3);
-            positionSizeLabel.Name = "positionSizeLabel";
-            positionSizeLabel.Size = new Size(106, 16);
-            positionSizeLabel.TabIndex = 0;
-            positionSizeLabel.Text = "Position Size:";
-            // 
-            // positionSizeValue
-            // 
-            positionSizeValue.AutoSize = true;
-            positionSizeValue.Dock = DockStyle.Fill;
-            positionSizeValue.Font = new Font("Segoe UI", 7F);
-            positionSizeValue.Location = new Point(115, 0);
-            positionSizeValue.Name = "positionSizeValue";
-            positionSizeValue.Size = new Size(70, 22);
-            positionSizeValue.TabIndex = 1;
-            positionSizeValue.Text = "--";
-            // 
-            // lastTradeLabel
-            // 
-            lastTradeLabel.AutoSize = true;
-            lastTradeLabel.Dock = DockStyle.Fill;
-            lastTradeLabel.Font = new Font("Segoe UI", 7F);
-            lastTradeLabel.Location = new Point(3, 22);
-            lastTradeLabel.Name = "lastTradeLabel";
-            lastTradeLabel.Size = new Size(106, 22);
-            lastTradeLabel.TabIndex = 2;
-            lastTradeLabel.Text = "Last Trade:";
-            // 
-            // lastTradeValue
-            // 
-            lastTradeValue.AutoSize = true;
-            lastTradeValue.Dock = DockStyle.Fill;
-            lastTradeValue.Font = new Font("Segoe UI", 7F);
-            lastTradeValue.Location = new Point(115, 22);
-            lastTradeValue.Name = "lastTradeValue";
-            lastTradeValue.Size = new Size(70, 22);
-            lastTradeValue.TabIndex = 3;
-            lastTradeValue.Text = "--";
-            // 
-            // positionRoiLabel
-            // 
-            positionRoiLabel.AutoSize = true;
-            positionRoiLabel.Dock = DockStyle.Fill;
-            positionRoiLabel.Font = new Font("Segoe UI", 7F);
-            positionRoiLabel.Location = new Point(3, 47);
-            positionRoiLabel.Name = "positionRoiLabel";
-            positionRoiLabel.Size = new Size(106, 16);
-            positionRoiLabel.TabIndex = 4;
-            positionRoiLabel.Text = "Position ROI:";
-            // 
-            // positionRoiValue
-            // 
-            positionRoiValue.AutoSize = true;
-            positionRoiValue.Dock = DockStyle.Fill;
-            positionRoiValue.Font = new Font("Segoe UI", 7F);
-            positionRoiValue.Location = new Point(115, 44);
-            positionRoiValue.Name = "positionRoiValue";
-            positionRoiValue.Size = new Size(70, 22);
-            positionRoiValue.TabIndex = 5;
-            positionRoiValue.Text = "--";
-            // 
-            // buyinPriceLabel
-            // 
-            buyinPriceLabel.AutoSize = true;
-            buyinPriceLabel.Dock = DockStyle.Fill;
-            buyinPriceLabel.Font = new Font("Segoe UI", 7F);
-            buyinPriceLabel.Location = new Point(3, 66);
-            buyinPriceLabel.Name = "buyinPriceLabel";
-            buyinPriceLabel.Size = new Size(106, 22);
-            buyinPriceLabel.TabIndex = 6;
-            buyinPriceLabel.Text = "Buyin Price:";
-            // 
-            // buyinPriceValue
-            // 
-            buyinPriceValue.AutoSize = true;
-            buyinPriceValue.Dock = DockStyle.Fill;
-            buyinPriceValue.Font = new Font("Segoe UI", 7F);
-            buyinPriceValue.Location = new Point(115, 66);
-            buyinPriceValue.Name = "buyinPriceValue";
-            buyinPriceValue.Size = new Size(70, 22);
-            buyinPriceValue.TabIndex = 7;
-            buyinPriceValue.Text = "--";
-            // 
-            // positionUpsideLabel
-            // 
-            positionUpsideLabel.AutoSize = true;
-            positionUpsideLabel.Dock = DockStyle.Fill;
-            positionUpsideLabel.Font = new Font("Segoe UI", 7F);
-            positionUpsideLabel.Location = new Point(3, 88);
-            positionUpsideLabel.Name = "positionUpsideLabel";
-            positionUpsideLabel.Size = new Size(106, 22);
-            positionUpsideLabel.TabIndex = 8;
-            positionUpsideLabel.Text = "Position Upside:";
-            // 
-            // positionUpsideValue
-            // 
-            positionUpsideValue.AutoSize = true;
-            positionUpsideValue.Dock = DockStyle.Fill;
-            positionUpsideValue.Font = new Font("Segoe UI", 7F);
-            positionUpsideValue.Location = new Point(115, 88);
-            positionUpsideValue.Name = "positionUpsideValue";
-            positionUpsideValue.Size = new Size(70, 22);
-            positionUpsideValue.TabIndex = 9;
-            positionUpsideValue.Text = "--";
-            // 
-            // positionDownsideLabel
-            // 
-            positionDownsideLabel.AutoSize = true;
-            positionDownsideLabel.Dock = DockStyle.Fill;
-            positionDownsideLabel.Font = new Font("Segoe UI", 7F);
-            positionDownsideLabel.Location = new Point(3, 110);
-            positionDownsideLabel.Name = "positionDownsideLabel";
-            positionDownsideLabel.Size = new Size(106, 22);
-            positionDownsideLabel.TabIndex = 10;
-            positionDownsideLabel.Text = "Position Downside:";
-            // 
-            // positionDownsideValue
-            // 
-            positionDownsideValue.AutoSize = true;
-            positionDownsideValue.Dock = DockStyle.Fill;
-            positionDownsideValue.Font = new Font("Segoe UI", 7F);
-            positionDownsideValue.Location = new Point(115, 110);
-            positionDownsideValue.Name = "positionDownsideValue";
-            positionDownsideValue.Size = new Size(70, 22);
-            positionDownsideValue.TabIndex = 11;
-            positionDownsideValue.Text = "--";
-            // 
-            // restingOrdersLabel
-            // 
-            restingOrdersLabel.AutoSize = true;
-            restingOrdersLabel.Dock = DockStyle.Fill;
-            restingOrdersLabel.Font = new Font("Segoe UI", 7F);
-            restingOrdersLabel.Location = new Point(3, 135);
-            restingOrdersLabel.Name = "restingOrdersLabel";
-            restingOrdersLabel.Size = new Size(106, 16);
-            restingOrdersLabel.TabIndex = 12;
-            restingOrdersLabel.Text = "Resting Orders:";
-            // 
-            // restingOrdersValue
-            // 
-            restingOrdersValue.AutoSize = true;
-            restingOrdersValue.Dock = DockStyle.Fill;
-            restingOrdersValue.Font = new Font("Segoe UI", 7F);
-            restingOrdersValue.Location = new Point(115, 132);
-            restingOrdersValue.Name = "restingOrdersValue";
-            restingOrdersValue.Size = new Size(70, 22);
-            restingOrdersValue.TabIndex = 13;
-            restingOrdersValue.Text = "--";
-            // 
-            // simulatedPositionLabel
-            // 
-            simulatedPositionLabel.AutoSize = true;
-            simulatedPositionLabel.Dock = DockStyle.Fill;
-            simulatedPositionLabel.Font = new Font("Segoe UI", 7F);
-            simulatedPositionLabel.Location = new Point(3, 157);
-            simulatedPositionLabel.Name = "simulatedPositionLabel";
-            simulatedPositionLabel.Size = new Size(106, 16);
-            simulatedPositionLabel.TabIndex = 14;
-            simulatedPositionLabel.Text = "Simulated Position:";
-            // 
-            // simulatedPositionValue
-            // 
-            simulatedPositionValue.AutoSize = true;
-            simulatedPositionValue.Dock = DockStyle.Fill;
-            simulatedPositionValue.Font = new Font("Segoe UI", 7F);
-            simulatedPositionValue.Location = new Point(115, 154);
-            simulatedPositionValue.Name = "simulatedPositionValue";
-            simulatedPositionValue.Size = new Size(70, 22);
-            simulatedPositionValue.TabIndex = 15;
-            simulatedPositionValue.Text = "--";
+            positionsLayout.Paint += positionsLayout_Paint;
             // 
             // orderbookContainer
             // 
@@ -1894,11 +1727,11 @@ namespace SimulatorWinForms
             orderbookContainer.Controls.Add(orderbookGrid);
             orderbookContainer.Dock = DockStyle.Fill;
             orderbookContainer.Font = new Font("Segoe UI", 7F);
-            orderbookContainer.Location = new Point(605, 491);
+            orderbookContainer.Location = new Point(605, 455);
             orderbookContainer.Margin = new Padding(4, 3, 4, 3);
             orderbookContainer.Name = "orderbookContainer";
             orderbookContainer.Padding = new Padding(6);
-            orderbookContainer.Size = new Size(316, 157);
+            orderbookContainer.Size = new Size(316, 193);
             orderbookContainer.TabIndex = 3;
             // 
             // orderbookGrid
@@ -1914,7 +1747,7 @@ namespace SimulatorWinForms
             orderbookGrid.Name = "orderbookGrid";
             orderbookGrid.ReadOnly = true;
             orderbookGrid.RowHeadersVisible = false;
-            orderbookGrid.Size = new Size(302, 143);
+            orderbookGrid.Size = new Size(302, 179);
             orderbookGrid.TabIndex = 0;
             // 
             // priceCol
@@ -1958,6 +1791,237 @@ namespace SimulatorWinForms
             chartHeader.TabIndex = 0;
             chartHeader.Text = "Chart Header";
             chartHeader.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // positionsGrid
+            // 
+            positionsGrid.AutoSize = true;
+            positionsGrid.ColumnCount = 2;
+            positionsGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
+            positionsGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
+            positionsGrid.Controls.Add(positionSizeValue, 1, 7);
+            positionsGrid.Controls.Add(positionSizeLabel, 0, 7);
+            positionsGrid.Controls.Add(simulatedPositionValue, 1, 0);
+            positionsGrid.Controls.Add(simulatedPositionLabel, 0, 0);
+            positionsGrid.Controls.Add(lastTradeLabel, 0, 1);
+            positionsGrid.Controls.Add(lastTradeValue, 1, 1);
+            positionsGrid.Controls.Add(positionRoiLabel, 0, 2);
+            positionsGrid.Controls.Add(positionRoiValue, 1, 2);
+            positionsGrid.Controls.Add(buyinPriceLabel, 0, 3);
+            positionsGrid.Controls.Add(buyinPriceValue, 1, 3);
+            positionsGrid.Controls.Add(positionUpsideLabel, 0, 4);
+            positionsGrid.Controls.Add(positionUpsideValue, 1, 4);
+            positionsGrid.Controls.Add(positionDownsideLabel, 0, 5);
+            positionsGrid.Controls.Add(positionDownsideValue, 1, 5);
+            positionsGrid.Controls.Add(restingOrdersLabel, 0, 6);
+            positionsGrid.Controls.Add(restingOrdersValue, 1, 6);
+            positionsGrid.Dock = DockStyle.Right;
+            positionsGrid.Location = new Point(416, 3);
+            positionsGrid.Name = "positionsGrid";
+            positionsGrid.RowCount = 8;
+            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            positionsGrid.Size = new Size(160, 176);
+            positionsGrid.TabIndex = 2;
+            // 
+            // positionSizeValue
+            // 
+            positionSizeValue.AutoSize = true;
+            positionSizeValue.Dock = DockStyle.Fill;
+            positionSizeValue.Font = new Font("Segoe UI", 7F);
+            positionSizeValue.Location = new Point(99, 154);
+            positionSizeValue.Name = "positionSizeValue";
+            positionSizeValue.Size = new Size(58, 22);
+            positionSizeValue.TabIndex = 19;
+            positionSizeValue.Text = "--";
+            positionSizeValue.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // positionSizeLabel
+            // 
+            positionSizeLabel.AutoSize = true;
+            positionSizeLabel.Dock = DockStyle.Fill;
+            positionSizeLabel.Font = new Font("Segoe UI", 7F);
+            positionSizeLabel.Location = new Point(3, 157);
+            positionSizeLabel.Name = "positionSizeLabel";
+            positionSizeLabel.Size = new Size(90, 16);
+            positionSizeLabel.TabIndex = 18;
+            positionSizeLabel.Text = "Position Size:";
+            // 
+            // simulatedPositionValue
+            // 
+            simulatedPositionValue.AutoSize = true;
+            simulatedPositionValue.Dock = DockStyle.Fill;
+            simulatedPositionValue.Font = new Font("Segoe UI", 7F);
+            simulatedPositionValue.Location = new Point(99, 0);
+            simulatedPositionValue.Name = "simulatedPositionValue";
+            simulatedPositionValue.Size = new Size(58, 22);
+            simulatedPositionValue.TabIndex = 17;
+            simulatedPositionValue.Text = "--";
+            simulatedPositionValue.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // simulatedPositionLabel
+            // 
+            simulatedPositionLabel.AutoSize = true;
+            simulatedPositionLabel.Dock = DockStyle.Fill;
+            simulatedPositionLabel.Font = new Font("Segoe UI", 7F);
+            simulatedPositionLabel.Location = new Point(3, 3);
+            simulatedPositionLabel.Name = "simulatedPositionLabel";
+            simulatedPositionLabel.Size = new Size(90, 16);
+            simulatedPositionLabel.TabIndex = 16;
+            simulatedPositionLabel.Text = "Simulated Pos:";
+            // 
+            // lastTradeLabel
+            // 
+            lastTradeLabel.AutoSize = true;
+            lastTradeLabel.Dock = DockStyle.Fill;
+            lastTradeLabel.Font = new Font("Segoe UI", 7F);
+            lastTradeLabel.Location = new Point(3, 22);
+            lastTradeLabel.Name = "lastTradeLabel";
+            lastTradeLabel.Size = new Size(90, 22);
+            lastTradeLabel.TabIndex = 2;
+            lastTradeLabel.Text = "Last Trade:";
+            // 
+            // lastTradeValue
+            // 
+            lastTradeValue.AutoSize = true;
+            lastTradeValue.Dock = DockStyle.Fill;
+            lastTradeValue.Font = new Font("Segoe UI", 7F);
+            lastTradeValue.Location = new Point(99, 22);
+            lastTradeValue.Name = "lastTradeValue";
+            lastTradeValue.Size = new Size(58, 22);
+            lastTradeValue.TabIndex = 3;
+            lastTradeValue.Text = "--";
+            lastTradeValue.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // positionRoiLabel
+            // 
+            positionRoiLabel.AutoSize = true;
+            positionRoiLabel.Dock = DockStyle.Fill;
+            positionRoiLabel.Font = new Font("Segoe UI", 7F);
+            positionRoiLabel.Location = new Point(3, 47);
+            positionRoiLabel.Name = "positionRoiLabel";
+            positionRoiLabel.Size = new Size(90, 16);
+            positionRoiLabel.TabIndex = 4;
+            positionRoiLabel.Text = "Position ROI:";
+            // 
+            // positionRoiValue
+            // 
+            positionRoiValue.AutoSize = true;
+            positionRoiValue.Dock = DockStyle.Fill;
+            positionRoiValue.Font = new Font("Segoe UI", 7F);
+            positionRoiValue.Location = new Point(99, 44);
+            positionRoiValue.Name = "positionRoiValue";
+            positionRoiValue.Size = new Size(58, 22);
+            positionRoiValue.TabIndex = 5;
+            positionRoiValue.Text = "--";
+            positionRoiValue.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // buyinPriceLabel
+            // 
+            buyinPriceLabel.AutoSize = true;
+            buyinPriceLabel.Dock = DockStyle.Fill;
+            buyinPriceLabel.Font = new Font("Segoe UI", 7F);
+            buyinPriceLabel.Location = new Point(3, 66);
+            buyinPriceLabel.Name = "buyinPriceLabel";
+            buyinPriceLabel.Size = new Size(90, 22);
+            buyinPriceLabel.TabIndex = 6;
+            buyinPriceLabel.Text = "Buyin Price:";
+            // 
+            // buyinPriceValue
+            // 
+            buyinPriceValue.AutoSize = true;
+            buyinPriceValue.Dock = DockStyle.Fill;
+            buyinPriceValue.Font = new Font("Segoe UI", 7F);
+            buyinPriceValue.Location = new Point(99, 66);
+            buyinPriceValue.Name = "buyinPriceValue";
+            buyinPriceValue.Size = new Size(58, 22);
+            buyinPriceValue.TabIndex = 7;
+            buyinPriceValue.Text = "--";
+            buyinPriceValue.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // positionUpsideLabel
+            // 
+            positionUpsideLabel.AutoSize = true;
+            positionUpsideLabel.Dock = DockStyle.Fill;
+            positionUpsideLabel.Font = new Font("Segoe UI", 7F);
+            positionUpsideLabel.Location = new Point(3, 88);
+            positionUpsideLabel.Name = "positionUpsideLabel";
+            positionUpsideLabel.Size = new Size(90, 22);
+            positionUpsideLabel.TabIndex = 8;
+            positionUpsideLabel.Text = "Position Upside:";
+            // 
+            // positionUpsideValue
+            // 
+            positionUpsideValue.AutoSize = true;
+            positionUpsideValue.Dock = DockStyle.Fill;
+            positionUpsideValue.Font = new Font("Segoe UI", 7F);
+            positionUpsideValue.Location = new Point(99, 88);
+            positionUpsideValue.Name = "positionUpsideValue";
+            positionUpsideValue.Size = new Size(58, 22);
+            positionUpsideValue.TabIndex = 9;
+            positionUpsideValue.Text = "--";
+            positionUpsideValue.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // positionDownsideLabel
+            // 
+            positionDownsideLabel.AutoSize = true;
+            positionDownsideLabel.Dock = DockStyle.Fill;
+            positionDownsideLabel.Font = new Font("Segoe UI", 7F);
+            positionDownsideLabel.Location = new Point(3, 110);
+            positionDownsideLabel.Name = "positionDownsideLabel";
+            positionDownsideLabel.Size = new Size(90, 22);
+            positionDownsideLabel.TabIndex = 10;
+            positionDownsideLabel.Text = "Position Downside:";
+            // 
+            // positionDownsideValue
+            // 
+            positionDownsideValue.AutoSize = true;
+            positionDownsideValue.Dock = DockStyle.Fill;
+            positionDownsideValue.Font = new Font("Segoe UI", 7F);
+            positionDownsideValue.Location = new Point(99, 110);
+            positionDownsideValue.Name = "positionDownsideValue";
+            positionDownsideValue.Size = new Size(58, 22);
+            positionDownsideValue.TabIndex = 11;
+            positionDownsideValue.Text = "--";
+            positionDownsideValue.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // restingOrdersLabel
+            // 
+            restingOrdersLabel.AutoSize = true;
+            restingOrdersLabel.Dock = DockStyle.Fill;
+            restingOrdersLabel.Font = new Font("Segoe UI", 7F);
+            restingOrdersLabel.Location = new Point(3, 135);
+            restingOrdersLabel.Name = "restingOrdersLabel";
+            restingOrdersLabel.Size = new Size(90, 16);
+            restingOrdersLabel.TabIndex = 12;
+            restingOrdersLabel.Text = "Resting Orders:";
+            // 
+            // restingOrdersValue
+            // 
+            restingOrdersValue.AutoSize = true;
+            restingOrdersValue.Dock = DockStyle.Fill;
+            restingOrdersValue.Font = new Font("Segoe UI", 7F);
+            restingOrdersValue.Location = new Point(99, 132);
+            restingOrdersValue.Name = "restingOrdersValue";
+            restingOrdersValue.Size = new Size(58, 22);
+            restingOrdersValue.TabIndex = 13;
+            restingOrdersValue.Text = "--";
+            restingOrdersValue.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // strategyOutputTextbox
+            // 
+            strategyOutputTextbox.Dock = DockStyle.Fill;
+            strategyOutputTextbox.Location = new Point(3, 3);
+            strategyOutputTextbox.Multiline = true;
+            strategyOutputTextbox.Name = "strategyOutputTextbox";
+            strategyOutputTextbox.ReadOnly = true;
+            strategyOutputTextbox.Size = new Size(404, 176);
+            strategyOutputTextbox.TabIndex = 4;
             // 
             // SnapshotViewer
             // 
@@ -2012,10 +2076,10 @@ namespace SimulatorWinForms
             positionsContainer.PerformLayout();
             positionsLayout.ResumeLayout(false);
             positionsLayout.PerformLayout();
-            positionsGrid.ResumeLayout(false);
-            positionsGrid.PerformLayout();
             orderbookContainer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)orderbookGrid).EndInit();
+            positionsGrid.ResumeLayout(false);
+            positionsGrid.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -2135,9 +2199,21 @@ namespace SimulatorWinForms
         private Label totalContractsYesValue;
         private Label totalContractsNoValue;
         private Panel positionsContainer;
+        private Panel orderbookContainer;
+        private DataGridView orderbookGrid;
+        private DataGridViewTextBoxColumn priceCol;
+        private DataGridViewTextBoxColumn sizeCol;
+        private DataGridViewTextBoxColumn valueCol;
+        private Button backButton;
+        private Label label1;
+        private Label label2;
+        private TableLayoutPanel positionsLayout;
+        private TextBox strategyOutputTextbox;
         private TableLayoutPanel positionsGrid;
-        private CheckBox positionSizeLabel;
         private Label positionSizeValue;
+        private CheckBox positionSizeLabel;
+        private Label simulatedPositionValue;
+        private CheckBox simulatedPositionLabel;
         private Label lastTradeLabel;
         private Label lastTradeValue;
         private CheckBox positionRoiLabel;
@@ -2150,16 +2226,5 @@ namespace SimulatorWinForms
         private Label positionDownsideValue;
         private CheckBox restingOrdersLabel;
         private Label restingOrdersValue;
-        private CheckBox simulatedPositionLabel;
-        private Label simulatedPositionValue;
-        private Panel orderbookContainer;
-        private DataGridView orderbookGrid;
-        private DataGridViewTextBoxColumn priceCol;
-        private DataGridViewTextBoxColumn sizeCol;
-        private DataGridViewTextBoxColumn valueCol;
-        private Button backButton;
-        private Label label1;
-        private Label label2;
-        private TableLayoutPanel positionsLayout;
     }
 }

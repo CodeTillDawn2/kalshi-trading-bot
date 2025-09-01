@@ -292,5 +292,10 @@ namespace SimulatorWinForms
         {
 
         }
+
+        private void positionsLayout_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
