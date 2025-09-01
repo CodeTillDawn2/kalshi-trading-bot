@@ -77,11 +77,15 @@ namespace SmokehouseBot.State
         private double _positionROI;
         private double _positionROIAmt;
         private double _expectedFees;
-        private double _yesBidSlopePerMinute = 0;
-        private double _noBidSlopePerMinute = 0;
+        private double _yesBidSlopePerMinute_Short = 0;
+        private double _noBidSlopePerMinute_Short = 0;
+        private double _yesBidSlopePerMinute_Medium = 0;
+        private double _noBidSlopePerMinute_Medium = 0;
 
-        public double YesBidSlopePerMinute { get { return _yesBidSlopePerMinute; } set { _yesBidSlopePerMinute = value; } }
-        public double NoBidSlopePerMinute { get { return _noBidSlopePerMinute; } set { _noBidSlopePerMinute = value; } }
+        public double YesBidSlopePerMinute_Short { get { return _yesBidSlopePerMinute_Short; } set { _yesBidSlopePerMinute_Short = value; } }
+        public double NoBidSlopePerMinute_Short { get { return _noBidSlopePerMinute_Short; } set { _noBidSlopePerMinute_Short = value; } }
+        public double YesBidSlopePerMinute_Medium { get { return _yesBidSlopePerMinute_Medium; } set { _yesBidSlopePerMinute_Medium = value; } }
+        public double NoBidSlopePerMinute_Medium { get { return _noBidSlopePerMinute_Medium; } set { _noBidSlopePerMinute_Medium = value; } }
 
         public string MarketType { get; set; }
 
@@ -364,31 +368,66 @@ namespace SmokehouseBot.State
         {
             var now = DateTime.UtcNow;
             var fiveMinAgo = now.AddMinutes(-5);
+            var fifteenMinAgo = now.AddMinutes(-15);
+
             var recentTickers = _tickers
                 .Where(t => t.LoggedDate >= fiveMinAgo && t.LoggedDate <= now)
                 .OrderBy(t => t.LoggedDate)
                 .ToList();
 
-            if (recentTickers.Count < 2)
+            var recentTickers_m = _tickers
+                .Where(t => t.LoggedDate >= fifteenMinAgo && t.LoggedDate <= now)
+                .OrderBy(t => t.LoggedDate)
+                .ToList();
+
+            // 5-minute
+            if (recentTickers.Count >= 2)
             {
-                _yesBidSlopePerMinute = 0;
-                _noBidSlopePerMinute = 0;
-                return;
+                var first = recentTickers.First();
+                var last = recentTickers.Last();
+                var dt = (now - first.LoggedDate).TotalMinutes;
+
+                if (dt > 0)
+                {
+                    _yesBidSlopePerMinute_Short = Math.Round((last.yes_bid - first.yes_bid) / dt, 2, MidpointRounding.AwayFromZero);
+                    _noBidSlopePerMinute_Short  = Math.Round(((100 - last.yes_ask) - (100 - first.yes_ask)) / dt, 2, MidpointRounding.AwayFromZero);
+                }
+                else
+                {
+                    _yesBidSlopePerMinute_Short = 0;
+                    _noBidSlopePerMinute_Short  = 0;
+                }
+            }
+            else
+            {
+                _yesBidSlopePerMinute_Short = 0;
+                _noBidSlopePerMinute_Short  = 0;
             }
 
-            var first = recentTickers.First();
-            var last = recentTickers.Last();
-            var timeDiffMin = (DateTime.UtcNow - first.LoggedDate).TotalMinutes;
-
-            if (timeDiffMin <= 0)
+            // 15-minute
+            if (recentTickers_m.Count >= 2)
             {
-                _yesBidSlopePerMinute = 0;
-                _noBidSlopePerMinute = 0;
-                return;
+                var first_m = recentTickers_m.First();
+                var last_m = recentTickers_m.Last();
+                var dtm = (now - first_m.LoggedDate).TotalMinutes;
+
+                if (dtm > 0)
+                {
+                    _yesBidSlopePerMinute_Medium = Math.Round((last_m.yes_bid - first_m.yes_bid) / dtm, 2, MidpointRounding.AwayFromZero);
+                    _noBidSlopePerMinute_Medium  = Math.Round(((100 - last_m.yes_ask) - (100 - first_m.yes_ask)) / dtm, 2, MidpointRounding.AwayFromZero);
+                }
+                else
+                {
+                    _yesBidSlopePerMinute_Medium = 0;
+                    _noBidSlopePerMinute_Medium  = 0;
+                }
+            }
+            else
+            {
+                _yesBidSlopePerMinute_Medium = 0;
+                _noBidSlopePerMinute_Medium  = 0;
             }
 
-            _yesBidSlopePerMinute = Math.Round((last.yes_bid - first.yes_bid) / timeDiffMin, 2, MidpointRounding.AwayFromZero);
-            _noBidSlopePerMinute  = Math.Round(((100 - last.yes_ask) - (100 - first.yes_ask)) / timeDiffMin, 2, MidpointRounding.AwayFromZero);
 
         }
 

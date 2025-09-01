@@ -133,8 +133,10 @@ namespace SmokehouseBot.State.Interfaces
         List<PseudoCandlestick> BuildPseudoCandlesticks(string period, int lookbackPeriods = 34);
         List<SupportResistanceLevel> GetFilteredSupportResistanceLevels();
 
-        double YesBidSlopePerMinute { get; set; }
-        double NoBidSlopePerMinute { get; set; }
+        double YesBidSlopePerMinute_Short { get; set; }
+        double NoBidSlopePerMinute_Short { get; set; }
+        double YesBidSlopePerMinute_Medium { get; set; }
+        double NoBidSlopePerMinute_Medium { get; set; }
 
         public double? PSAR { get; set; }
         public double? ADX { get; set; }

@@ -42,8 +42,11 @@ namespace SmokehouseDTOs
         public string? MarketType() => Changed("MarketType") ? _current.MarketType : null;
         public int? SnapshotSchemaVersion() => Changed("SnapshotSchemaVersion") ? _current.SnapshotSchemaVersion : (int?)null;
 
-        public double? YesBidSlopePerMinute() => Changed("YesBidSlopePerMinute") ? _current.YesBidSlopePerMinute : (double?)null;
-        public double? NoBidSlopePerMinute() => Changed("NoBidSlopePerMinute") ? _current.NoBidSlopePerMinute : (double?)null;
+        public double? YesBidSlopePerMinute_Short() => Changed("YesBidSlopePerMinute_Short") ? _current.YesBidSlopePerMinute_Short : (double?)null;
+        public double? NoBidSlopePerMinute_Short() => Changed("NoBidSlopePerMinute_Short") ? _current.NoBidSlopePerMinute_Short : (double?)null;
+
+        public double? YesBidSlopePerMinute_Medium() => Changed("YesBidSlopePerMinute_Medium") ? _current.YesBidSlopePerMinute_Medium : (double?)null;
+        public double? NoBidSlopePerMinute_Medium() => Changed("NoBidSlopePerMinute_Medium") ? _current.NoBidSlopePerMinute_Medium : (double?)null;
         public long? TotalOrderbookDepth_Yes() => Changed("TotalOrderbookDepth_Yes") ? _current.TotalOrderbookDepth_Yes : (long?)null;
         public long? TotalOrderbookDepth_No() => Changed("TotalOrderbookDepth_No") ? _current.TotalOrderbookDepth_No : (long?)null;
 

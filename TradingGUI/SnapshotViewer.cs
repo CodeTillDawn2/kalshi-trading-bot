@@ -186,8 +186,8 @@ namespace SimulatorWinForms
             tradeVolumeNoValue.Text = currentSnapshot.TradeVolumePerMinute_No.ToString("F2");
             avgTradeSizeYesValue.Text = currentSnapshot.AverageTradeSize_Yes.ToString("F2");
             avgTradeSizeNoValue.Text = currentSnapshot.AverageTradeSize_No.ToString("F2");
-            slopeYesValue.Text = currentSnapshot.YesBidSlopePerMinute.ToString("F2") ?? "--";
-            slopeNoValue.Text = currentSnapshot.NoBidSlopePerMinute.ToString("F2") ?? "--";
+            slopeYesValue.Text = currentSnapshot.YesBidSlopePerMinute_Short.ToString("F2") ?? "--";
+            slopeNoValue.Text = currentSnapshot.NoBidSlopePerMinute_Short.ToString("F2") ?? "--";
 
             // Context (displaying Yes and No separately where applicable to match index.html)
             spreadValue.Text = currentSnapshot.YesSpread.ToString();
@@ -286,6 +286,11 @@ namespace SimulatorWinForms
             {
                 ScaleFonts(child, scaleFactor);
             }
+        }
+
+        private void leftColumn_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

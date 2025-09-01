@@ -122,7 +122,8 @@ namespace TradingSimulator.ML
                 "VelocityPerMinute_Bottom_Yes_Bid", "LevelCount_Bottom_Yes_Bid",
                 "VelocityPerMinute_Top_No_Bid", "LevelCount_Top_No_Bid",
                 "VelocityPerMinute_Bottom_No_Bid", "LevelCount_Bottom_No_Bid",
-                "YesSpread", "DepthAtBestYesBid", "YesBidSlopePerMinute", "NoBidSlopePerMinute"));
+                "YesSpread", "DepthAtBestYesBid", "YesBidSlopePerMinute_Short", "NoBidSlopePerMinute_Short"
+                , "YesBidSlopePerMinute_Medium", "NoBidSlopePerMinute_Medium"));
 
             foreach (var series in markets)
             {
@@ -141,8 +142,11 @@ namespace TradingSimulator.ML
                         F(s.VelocityPerMinute_Bottom_No_Bid), s.LevelCount_Bottom_No_Bid,
                         s.YesSpread,
                         s.DepthAtBestYesBid,
-                        F(s.YesBidSlopePerMinute),
-                        F(s.NoBidSlopePerMinute)));
+                        F(s.YesBidSlopePerMinute_Short),
+                        F(s.NoBidSlopePerMinute_Short),
+                        F(s.YesBidSlopePerMinute_Medium),
+                        F(s.NoBidSlopePerMinute_Medium)
+                        ));
                 }
             }
             return path;

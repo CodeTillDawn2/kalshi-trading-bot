@@ -87,8 +87,8 @@ namespace TradingStrategies.Strategies.Strats
             double teShareYes = snapshot.TradeCount_Yes / totalTrades;
             double teShareNo = snapshot.TradeCount_No  / totalTrades;
 
-            double yesSlope = snapshot.YesBidSlopePerMinute;
-            double noSlope = snapshot.NoBidSlopePerMinute;
+            double yesSlope = snapshot.YesBidSlopePerMinute_Short;
+            double noSlope = snapshot.NoBidSlopePerMinute_Short;
 
             if (!snapshot.ChangeMetricsMature)
             {

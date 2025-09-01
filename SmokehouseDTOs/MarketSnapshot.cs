@@ -117,8 +117,10 @@ namespace SmokehouseDTOs
             long totalOrderbookDepth_No,
             double totalBidVolume_Yes,
             double totalBidVolume_No,
-            double yesBidSlopePerMinute,
-            double noBidSlopePerMinute,
+            double yesBidSlopePerMinute_Short,
+            double noBidSlopePerMinute_Short,
+            double yesBidSlopePerMinute_Medium,
+            double noBidSlopePerMinute_Medium,
             double? psar,
             double? adx)
         {
@@ -227,8 +229,10 @@ namespace SmokehouseDTOs
             TotalOrderbookDepth_No = totalOrderbookDepth_No;
             TotalBidVolume_Yes = totalBidVolume_Yes;
             TotalBidVolume_No = totalBidVolume_No;
-            YesBidSlopePerMinute = yesBidSlopePerMinute;
-            NoBidSlopePerMinute = noBidSlopePerMinute;
+            YesBidSlopePerMinute_Short = yesBidSlopePerMinute_Short;
+            NoBidSlopePerMinute_Short = noBidSlopePerMinute_Short;
+            YesBidSlopePerMinute_Medium = yesBidSlopePerMinute_Medium;
+            NoBidSlopePerMinute_Medium = noBidSlopePerMinute_Medium;
             ADX = adx;
             PSAR = psar;
         }
@@ -257,9 +261,10 @@ namespace SmokehouseDTOs
 
         #region Historical Prices
 
-        public double YesBidSlopePerMinute { get; set; }
-        public double NoBidSlopePerMinute { get; set; }
-
+        public double YesBidSlopePerMinute_Short { get; set; }
+        public double NoBidSlopePerMinute_Short { get; set; }
+        public double YesBidSlopePerMinute_Medium { get; set; }
+        public double NoBidSlopePerMinute_Medium { get; set; }
 
         /// <summary>
         /// Gets or sets the all-time high bid price for the "Yes" contract and its timestamp.
@@ -1569,8 +1574,10 @@ namespace SmokehouseDTOs
                 ExpectedFees = this.ExpectedFees,
                 TotalOrderbookDepth_Yes = this.TotalOrderbookDepth_Yes,
                 TotalOrderbookDepth_No = this.TotalOrderbookDepth_No,
-                YesBidSlopePerMinute = this.YesBidSlopePerMinute,
-                NoBidSlopePerMinute = this.NoBidSlopePerMinute,
+                YesBidSlopePerMinute_Short = this.YesBidSlopePerMinute_Short,
+                NoBidSlopePerMinute_Short = this.NoBidSlopePerMinute_Short,
+                YesBidSlopePerMinute_Medium = this.YesBidSlopePerMinute_Medium,
+                NoBidSlopePerMinute_Medium = this.NoBidSlopePerMinute_Medium,
                 PSAR = this.PSAR,
                 ADX = this.ADX
             };
