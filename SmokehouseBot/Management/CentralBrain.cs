@@ -810,7 +810,7 @@ namespace SmokehouseBot.Management
             {
                 _snapshotLock.Release();
                 stopwatch.Stop();
-                int maxMillis = 25000;
+                int maxMillis = 30000;
                 if (stopwatch.ElapsedMilliseconds > maxMillis)
                 {
                     _logger.LogWarning("BRAIN: Snapshot lock held for {Elapsed} ms, exceeding threshold of {maxMillis} ms.", stopwatch.ElapsedMilliseconds, maxMillis);

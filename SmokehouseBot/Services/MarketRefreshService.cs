@@ -238,7 +238,7 @@ namespace SmokehouseBot.Services
                     {
                         var lastTicker = marketData.Tickers.OrderByDescending(t => t.LoggedDate).FirstOrDefault();
                         if ((lastTicker == null || marketData.LastSuccessfulSync <= DateTime.UtcNow.AddMinutes(-15)) &&
-                             (DateTime.UtcNow - lastTicker.LoggedDate) >= TimeSpan.FromMinutes(5))
+                             (lastTicker == null || (DateTime.UtcNow - lastTicker.LoggedDate) >= TimeSpan.FromMinutes(5)))
                         {
                             await _serviceFactory.GetMarketDataService().SyncMarketDataAsync(marketTicker);
 
