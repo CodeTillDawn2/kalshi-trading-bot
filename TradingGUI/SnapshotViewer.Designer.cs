@@ -1724,11 +1724,12 @@ namespace SimulatorWinForms
             // strategyOutputTextbox
             // 
             strategyOutputTextbox.Dock = DockStyle.Fill;
-            strategyOutputTextbox.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            strategyOutputTextbox.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             strategyOutputTextbox.Location = new Point(3, 3);
             strategyOutputTextbox.Multiline = true;
             strategyOutputTextbox.Name = "strategyOutputTextbox";
             strategyOutputTextbox.ReadOnly = true;
+            strategyOutputTextbox.ScrollBars = ScrollBars.Vertical;
             strategyOutputTextbox.Size = new Size(391, 192);
             strategyOutputTextbox.TabIndex = 4;
             // 

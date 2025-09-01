@@ -17,6 +17,9 @@ namespace SimulatorWinForms
         private bool _simSetup;
         private Label _tooltipOverlay;
         private ScottPlot.Plottable.VLine _hoverLine;
+        private bool _isRightPanning;
+        private Point _panStartPx;
+        private (double xMin, double xMax, double yMin, double yMax) _panStartLimits;
 
         private readonly Dictionary<string, double> _bestPnL = new(StringComparer.OrdinalIgnoreCase);
 
@@ -238,6 +241,37 @@ namespace SimulatorWinForms
 
         private void FormsPlot1_MouseMove(object sender, MouseEventArgs e)
         {
+            // Right-drag panning
+            if (_isRightPanning && e.Button == MouseButtons.Right)
+            {
+                // compute data-space deltas from pixel movement
+                double xNow = formsPlot1.Plot.GetCoordinateX(e.X);
+                double xStart = formsPlot1.Plot.GetCoordinateX(_panStartPx.X);
+                double yNow = formsPlot1.Plot.GetCoordinateY(e.Y);
+                double yStart = formsPlot1.Plot.GetCoordinateY(_panStartPx.Y);
+
+                double dx = xNow - xStart;
+                double dy = yNow - yStart;
+
+                formsPlot1.Plot.SetAxisLimits(
+                    _panStartLimits.xMin - dx,
+                    _panStartLimits.xMax - dx,
+                    _panStartLimits.yMin - dy,
+                    _panStartLimits.yMax - dy);
+
+                formsPlot1.Refresh();
+                return; // skip tooltip/hover while panning
+            }
+
+            // if the right button is no longer held, end pan
+            if (_isRightPanning && e.Button != MouseButtons.Right)
+            {
+                _isRightPanning = false;
+                formsPlot1.Cursor = Cursors.Default;
+                _panStartPx = Point.Empty;
+            }
+
+            // ----- existing tooltip/hover logic (unchanged) -----
             if (_tooltipPoints == null || _tooltipPoints.Count == 0)
                 return;
 
@@ -248,12 +282,8 @@ namespace SimulatorWinForms
             for (int i = 0; i < _tooltipPoints.Count; i++)
             {
                 int px = (int)Math.Round(formsPlot1.Plot.GetPixelX(_tooltipPoints[i].x));
-                int dx = Math.Abs(px - mxPx);
-                if (dx < bestDxPx)
-                {
-                    bestDxPx = dx;
-                    bestIdx = i;
-                }
+                int dxpx = Math.Abs(px - mxPx);
+                if (dxpx < bestDxPx) { bestDxPx = dxpx; bestIdx = i; }
             }
 
             string memo = _tooltipPoints[bestIdx].memo;
@@ -275,14 +305,19 @@ namespace SimulatorWinForms
         }
 
 
+
         private void FormsPlot1_MouseLeave(object sender, EventArgs e)
         {
+            _isRightPanning = false;
+            formsPlot1.Cursor = Cursors.Default;
+
             _tooltipOverlay.Visible = false;
             _lastTooltipMemo = null;
             if (_hoverLine != null)
                 _hoverLine.IsVisible = false;
             formsPlot1.Render();
         }
+
 
 
         private void BtnCheckAll_Click(object sender, EventArgs e)
@@ -431,10 +466,26 @@ namespace SimulatorWinForms
         /// </summary>
         private void FormsPlot1_MouseDown(object sender, MouseEventArgs e)
         {
-            // Convert pixel position to OADate coordinate
-            double xVal = formsPlot1.Plot.GetCoordinateX(e.X);
-            ShowDashboardAt(xVal);
+            if (e.Button == MouseButtons.Left)
+            {
+                double xVal = formsPlot1.Plot.GetCoordinateX(e.X);
+                ShowDashboardAt(xVal);
+                return;
+            }
+
+            if (e.Button == MouseButtons.Right)
+            {
+                // prevent ScottPlot’s default right-drag zoom from fighting our pan (if available)
+                try { formsPlot1.Configuration.RightClickDragZoom = false; } catch { /* ignore if not supported */ }
+
+                var lim = formsPlot1.Plot.GetAxisLimits();
+                _panStartLimits = (lim.XMin, lim.XMax, lim.YMin, lim.YMax);
+                _panStartPx = e.Location;
+                _isRightPanning = true;
+                formsPlot1.Cursor = Cursors.SizeAll;
+            }
         }
+
 
         /// <summary>
         /// Replaces the entire form content with a new SnapshotViewer.
@@ -459,8 +510,9 @@ namespace SimulatorWinForms
             MarketSnapshot closest = _snapshots.OrderBy(s => Math.Abs((s.Timestamp - clickedTime).TotalSeconds)).FirstOrDefault();
             if (closest == null) return;
 
-            List<MarketSnapshot> history = _snapshots;  // Or filter as needed
-                                                        // Precompute memos per snapshot for alignment during navigation
+            List<MarketSnapshot> history = _snapshots;  // Already ordered by timestamp
+
+            // Precompute memos per snapshot for alignment during navigation
             var memosPerSnapshot = new List<string>(history.Count);
             double tolerance = 1e-6;  // Adjust if needed; ~0.1 ms for OA dates
 
@@ -469,7 +521,8 @@ namespace SimulatorWinForms
                 double snapOADate = snap.Timestamp.ToOADate();
                 var matchingMemos = _tooltipPoints
                     .Where(p => Math.Abs(p.x - snapOADate) < tolerance)
-                    .Select(p => p.memo.Trim())  // Trim any leading/trailing spaces
+                    .Select(p => p.memo.Trim())
+                    .Distinct()
                     .ToList();
 
                 string joined = matchingMemos.Any() ? string.Join("\n", matchingMemos) : "No events at this time.";
