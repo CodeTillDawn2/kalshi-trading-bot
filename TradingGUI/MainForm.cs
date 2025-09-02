@@ -445,8 +445,8 @@ namespace SimulatorWinForms
             try
             {
                 await _simulator.RunSelectedSetForGuiAsync(
-                    setKey: "Yeti",
-                    weightName: "Yeti_Testing",
+                    setKey: "TryAgain",
+                    weightName: "TryAgain_Testing",
                     writeToFile: true,
                     marketsToRun: sel);
             }

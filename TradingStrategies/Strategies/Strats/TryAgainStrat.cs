@@ -8,7 +8,7 @@ using static SmokehouseInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Strategies.Strats
 {
-    public class YetiStrat : Strat
+    public class TryAgainStrat : Strat
     {
         public string Name { get; private set; }
         public override double Weight { get; }
@@ -40,8 +40,8 @@ namespace TradingStrategies.Strategies.Strats
         }
 
 
-        public YetiStrat(
-    string name = nameof(YetiStrat),
+        public TryAgainStrat(
+    string name = nameof(TryAgainStrat),
     double weight = 1.0,
     Dictionary<ParamKey, double> mlParams = null)
         {
@@ -449,85 +449,85 @@ namespace TradingStrategies.Strategies.Strats
             var dict = _params.ToDictionary(k => k.Key.ToString(), v => v.Value);
             return JsonSerializer.Serialize(new
             {
-                type = "YetiStrat",
+                type = "TryAgainStrat",
                 name = Name,
                 weight = Weight,
                 parameters = dict
             });
         }
 
-        public static readonly List<(string Name, Dictionary<YetiStrat.ParamKey, double> Parameters)>
-            YetiStratParameterSets = new()
+        public static readonly List<(string Name, Dictionary<TryAgainStrat.ParamKey, double> Parameters)>
+            TryAgainStratParameterSets = new()
             {
-               ("Yeti_Testing",
-               new Dictionary<YetiStrat.ParamKey, double>
+               ("TryAgain_Testing",
+               new Dictionary<TryAgainStrat.ParamKey, double>
                {
-                   { YetiStrat.ParamKey.MinDistanceFromBounds, 6 },
-                   { YetiStrat.ParamKey.VelocityToDepthRatio, 0.6 },
-                   { YetiStrat.ParamKey.MinRatioDifference, 0.05 },
-                   { YetiStrat.ParamKey.MinConsecutiveBars, 2 },
-                   { YetiStrat.ParamKey.TradeRateShareMin, 0.1 },
-                   { YetiStrat.ParamKey.TradeEventShareMin, 0.10 },
-                   { YetiStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-                   { YetiStrat.ParamKey.MinSlope, 0.80 },
-                   { YetiStrat.ParamKey.MinSlope_Medium, 0.20 },
-                   { YetiStrat.ParamKey.ExitMinSlopeRequirement_Medium, 0.1 },
-                   { YetiStrat.ParamKey.ExitMinSlopeRequirement, 1 },
-                   { YetiStrat.ParamKey.Top10VelocityWeight, 5 }
+                   { TryAgainStrat.ParamKey.MinDistanceFromBounds, 6 },
+                   { TryAgainStrat.ParamKey.VelocityToDepthRatio, 0.6 },
+                   { TryAgainStrat.ParamKey.MinRatioDifference, 0.05 },
+                   { TryAgainStrat.ParamKey.MinConsecutiveBars, 2 },
+                   { TryAgainStrat.ParamKey.TradeRateShareMin, 0.1 },
+                   { TryAgainStrat.ParamKey.TradeEventShareMin, 0.10 },
+                   { TryAgainStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
+                   { TryAgainStrat.ParamKey.MinSlope, 0.80 },
+                   { TryAgainStrat.ParamKey.MinSlope_Medium, 0.20 },
+                   { TryAgainStrat.ParamKey.ExitMinSlopeRequirement_Medium, 0.1 },
+                   { TryAgainStrat.ParamKey.ExitMinSlopeRequirement, 1 },
+                   { TryAgainStrat.ParamKey.Top10VelocityWeight, 5 }
                }),
-               ("Default", new Dictionary<YetiStrat.ParamKey, double>
+               ("Default", new Dictionary<TryAgainStrat.ParamKey, double>
                {
-                   { YetiStrat.ParamKey.MinDistanceFromBounds, 6 },
-                   { YetiStrat.ParamKey.VelocityToDepthRatio, 0.08 },
-                   { YetiStrat.ParamKey.MinRatioDifference, 0.10 },
-                   { YetiStrat.ParamKey.MinConsecutiveBars, 2 },
-                   { YetiStrat.ParamKey.TradeRateShareMin, 0.60 },
-                   { YetiStrat.ParamKey.TradeEventShareMin, 0.40 },
-                   { YetiStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-                   { YetiStrat.ParamKey.MinSlope, 0.10 },
-                   { YetiStrat.ParamKey.ExitMinSlopeRequirement, 0.02 }
+                   { TryAgainStrat.ParamKey.MinDistanceFromBounds, 6 },
+                   { TryAgainStrat.ParamKey.VelocityToDepthRatio, 0.08 },
+                   { TryAgainStrat.ParamKey.MinRatioDifference, 0.10 },
+                   { TryAgainStrat.ParamKey.MinConsecutiveBars, 2 },
+                   { TryAgainStrat.ParamKey.TradeRateShareMin, 0.60 },
+                   { TryAgainStrat.ParamKey.TradeEventShareMin, 0.40 },
+                   { TryAgainStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
+                   { TryAgainStrat.ParamKey.MinSlope, 0.10 },
+                   { TryAgainStrat.ParamKey.ExitMinSlopeRequirement, 0.02 }
                }),
-               ("Aggressive", new Dictionary<YetiStrat.ParamKey, double>
+               ("Aggressive", new Dictionary<TryAgainStrat.ParamKey, double>
                {
-                   { YetiStrat.ParamKey.MinDistanceFromBounds, 4 },
-                   { YetiStrat.ParamKey.VelocityToDepthRatio, 0.06 },
-                   { YetiStrat.ParamKey.MinRatioDifference, 0.10 },
-                   { YetiStrat.ParamKey.MinConsecutiveBars, 1 },
-                   { YetiStrat.ParamKey.TradeRateShareMin, 0.60 },
-                   { YetiStrat.ParamKey.TradeEventShareMin, 0.40 },
-                   { YetiStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
-                   { YetiStrat.ParamKey.MinSlope, 0.20 },
-                   { YetiStrat.ParamKey.ExitMinSlopeRequirement, 0.75 }
+                   { TryAgainStrat.ParamKey.MinDistanceFromBounds, 4 },
+                   { TryAgainStrat.ParamKey.VelocityToDepthRatio, 0.06 },
+                   { TryAgainStrat.ParamKey.MinRatioDifference, 0.10 },
+                   { TryAgainStrat.ParamKey.MinConsecutiveBars, 1 },
+                   { TryAgainStrat.ParamKey.TradeRateShareMin, 0.60 },
+                   { TryAgainStrat.ParamKey.TradeEventShareMin, 0.40 },
+                   { TryAgainStrat.ParamKey.ExitOppositeSignalStrength, 0.12 },
+                   { TryAgainStrat.ParamKey.MinSlope, 0.20 },
+                   { TryAgainStrat.ParamKey.ExitMinSlopeRequirement, 0.75 }
                })
             };
 
-        public static List<(string Name, Dictionary<YetiStrat.ParamKey, double> Parameters)> YetiDefaultGrid()
+        public static List<(string Name, Dictionary<TryAgainStrat.ParamKey, double> Parameters)> TryAgainDefaultGrid()
         {
-            return BuildYetiParamGrid(
-                (YetiStrat.ParamKey.MinDistanceFromBounds, 2, 8, 3),     // 3: 2,5,8
-                (YetiStrat.ParamKey.VelocityToDepthRatio, 0.20, 1.20, 0.30),   // 4: 0.20,0.50,0.80,1.10
-                (YetiStrat.ParamKey.MinRatioDifference, 0.10, 0.60, 0.25),   // 3: 0.10,0.35,0.60
-                (YetiStrat.ParamKey.MinConsecutiveBars, 2, 5, 1.5),   // 3: 2.0,3.5,5.0
-                (YetiStrat.ParamKey.TradeRateShareMin, 0.45, 0.65, 0.10),   // 3
-                (YetiStrat.ParamKey.TradeEventShareMin, 0.45, 0.65, 0.10),   // 3
-                (YetiStrat.ParamKey.ExitOppositeSignalStrength, 0.30, 1.20, 0.45),   // 3: 0.30,0.75,1.20
-                (YetiStrat.ParamKey.MinSlope, 0.50, 2.00, 0.75),   // 3: 0.50,1.25,2.00
-                (YetiStrat.ParamKey.MinSlope_Medium, 0.20, 1.00, 0.25),   // 4: 0.20,0.45,0.70,0.95
-                (YetiStrat.ParamKey.ExitMinSlopeRequirement, 0.20, 1.00, 0.25),   // 4
-                (YetiStrat.ParamKey.ExitMinSlopeRequirement_Medium, 0.10, 0.80, 0.20),   // 4: 0.10,0.30,0.50,0.70
-                (YetiStrat.ParamKey.Top10VelocityWeight, 1.00, 2.00, 0.30)    // 4: 1.00,1.30,1.60,1.90
+            return BuildTryAgainParamGrid(
+                (TryAgainStrat.ParamKey.MinDistanceFromBounds, 2, 8, 3),     // 3: 2,5,8
+                (TryAgainStrat.ParamKey.VelocityToDepthRatio, 0.20, 1.20, 0.30),   // 4: 0.20,0.50,0.80,1.10
+                (TryAgainStrat.ParamKey.MinRatioDifference, 0.10, 0.60, 0.25),   // 3: 0.10,0.35,0.60
+                (TryAgainStrat.ParamKey.MinConsecutiveBars, 2, 5, 1.5),   // 3: 2.0,3.5,5.0
+                (TryAgainStrat.ParamKey.TradeRateShareMin, 0.45, 0.65, 0.10),   // 3
+                (TryAgainStrat.ParamKey.TradeEventShareMin, 0.45, 0.65, 0.10),   // 3
+                (TryAgainStrat.ParamKey.ExitOppositeSignalStrength, 0.30, 1.20, 0.45),   // 3: 0.30,0.75,1.20
+                (TryAgainStrat.ParamKey.MinSlope, 0.50, 2.00, 0.75),   // 3: 0.50,1.25,2.00
+                (TryAgainStrat.ParamKey.MinSlope_Medium, 0.20, 1.00, 0.25),   // 4: 0.20,0.45,0.70,0.95
+                (TryAgainStrat.ParamKey.ExitMinSlopeRequirement, 0.20, 1.00, 0.25),   // 4
+                (TryAgainStrat.ParamKey.ExitMinSlopeRequirement_Medium, 0.10, 0.80, 0.20),   // 4: 0.10,0.30,0.50,0.70
+                (TryAgainStrat.ParamKey.Top10VelocityWeight, 1.00, 2.00, 0.30)    // 4: 1.00,1.30,1.60,1.90
             );
         }
 
 
 
-        public static List<(string Name, Dictionary<YetiStrat.ParamKey, double> Parameters)> BuildYetiParamGrid(
-            params (YetiStrat.ParamKey Key, double Min, double Max, double Step)[] specs)
+        public static List<(string Name, Dictionary<TryAgainStrat.ParamKey, double> Parameters)> BuildTryAgainParamGrid(
+            params (TryAgainStrat.ParamKey Key, double Min, double Max, double Step)[] specs)
         {
-            var result = new List<(string, Dictionary<YetiStrat.ParamKey, double>)>();
+            var result = new List<(string, Dictionary<TryAgainStrat.ParamKey, double>)>();
             if (specs == null || specs.Length == 0) return result;
 
-            var keys = new YetiStrat.ParamKey[specs.Length];
+            var keys = new TryAgainStrat.ParamKey[specs.Length];
             var ranges = new List<double[]>(specs.Length);
 
             for (int i = 0; i < specs.Length; i++)
@@ -551,7 +551,7 @@ namespace TradingStrategies.Strategies.Strats
 
             while (true)
             {
-                var map = new Dictionary<YetiStrat.ParamKey, double>(ranges.Count);
+                var map = new Dictionary<TryAgainStrat.ParamKey, double>(ranges.Count);
                 for (int i = 0; i < ranges.Count; i++) map[keys[i]] = ranges[i][idx[i]];
                 string name = $"G{result.Count:000000}";
                 result.Add((name, map));

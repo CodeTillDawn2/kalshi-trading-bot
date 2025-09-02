@@ -434,7 +434,7 @@ namespace TradingSimulator.Simulator
             if (k.Contains("breakout")) return StrategyFamily.Breakout;
             if (k.Contains("bollinger")) return StrategyFamily.Bollinger;
             if (k.Contains("flowmo")) return StrategyFamily.FlowMo;
-            if (k.Contains("yeti")) return StrategyFamily.Yeti;
+            if (k.Contains("TryAgain")) return StrategyFamily.TryAgain;
             if (k.Contains("slomo")) return StrategyFamily.SloMo;
             if (k.Contains("nothing")) return StrategyFamily.NothingHappens;
             if (k.Contains("momentum")) return StrategyFamily.Momentum;
@@ -455,8 +455,8 @@ namespace TradingSimulator.Simulator
                 //StrategyFamily.FlowMo,
                 //StrategyFamily.Breakout,
                 //StrategyFamily.Momentum,
-                StrategyFamily.SloMo,
-                //StrategyFamily.Yeti,
+                //StrategyFamily.SloMo,
+                StrategyFamily.TryAgain,
                 //StrategyFamily.NothingHappens
             };
 
@@ -499,7 +499,7 @@ namespace TradingSimulator.Simulator
         {
             Bollinger,
             FlowMo,
-            Yeti,
+            TryAgain,
             SloMo,
             Breakout,
             NothingHappens,
@@ -531,13 +531,13 @@ namespace TradingSimulator.Simulator
                             .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
                         "FlowMo"
                     );
-                case StrategyFamily.Yeti:
+                case StrategyFamily.TryAgain:
                     return (
-                        helper.GetTrainingMappings("Yeti"),
-                        (YetiStrat.YetiDefaultGrid()
-                            ?? throw new InvalidOperationException("YetiStratParameterSets is null."))
+                        helper.GetTrainingMappings("TryAgain"),
+                        (TryAgainStrat.TryAgainDefaultGrid()
+                            ?? throw new InvalidOperationException("TryAgainStratParameterSets is null."))
                             .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
-                        "Yeti"
+                        "TryAgain"
                     );
                 case StrategyFamily.SloMo:
                     return (
