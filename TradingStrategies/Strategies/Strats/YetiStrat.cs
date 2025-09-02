@@ -501,23 +501,24 @@ namespace TradingStrategies.Strategies.Strats
                })
             };
 
-        public static List<(string Name, Dictionary<YetiStrat.ParamKey, double> Parameters)> YetiDefaultGrid()
+        public static List<(string Name, Dictionary<YetiStrat.ParamKey, double> Parameters)> YetiDefaultGridList_Under10GB()
         {
             return BuildYetiParamGrid(
-                (ParamKey.MinDistanceFromBounds, 2, 8, 2),
-                (ParamKey.VelocityToDepthRatio, 0.20, 1.20, 0.20),
-                (ParamKey.MinRatioDifference, 0.10, 0.60, 0.10),
-                (ParamKey.MinConsecutiveBars, 2, 5, 1),
-                (ParamKey.TradeRateShareMin, 0.45, 0.65, 0.10),
-                (ParamKey.TradeEventShareMin, 0.45, 0.65, 0.10),
-                (ParamKey.ExitOppositeSignalStrength, 0.30, 1.20, 0.30),
-                (ParamKey.MinSlope, 0.50, 2.00, 0.50),
-                (ParamKey.MinSlope_Medium, 0.20, 1.00, 0.20),
-                (ParamKey.ExitMinSlopeRequirement, 0.20, 1.00, 0.20),
-                (ParamKey.ExitMinSlopeRequirement_Medium, 0.10, 0.80, 0.10),
-                (ParamKey.Top10VelocityWeight, 1.00, 2.00, 0.25)
+                (YetiStrat.ParamKey.MinDistanceFromBounds, 2, 8, 3),     // 3: 2,5,8
+                (YetiStrat.ParamKey.VelocityToDepthRatio, 0.20, 1.20, 0.30),   // 4: 0.20,0.50,0.80,1.10
+                (YetiStrat.ParamKey.MinRatioDifference, 0.10, 0.60, 0.25),   // 3: 0.10,0.35,0.60
+                (YetiStrat.ParamKey.MinConsecutiveBars, 2, 5, 1.5),   // 3: 2.0,3.5,5.0
+                (YetiStrat.ParamKey.TradeRateShareMin, 0.45, 0.65, 0.10),   // 3
+                (YetiStrat.ParamKey.TradeEventShareMin, 0.45, 0.65, 0.10),   // 3
+                (YetiStrat.ParamKey.ExitOppositeSignalStrength, 0.30, 1.20, 0.45),   // 3: 0.30,0.75,1.20
+                (YetiStrat.ParamKey.MinSlope, 0.50, 2.00, 0.75),   // 3: 0.50,1.25,2.00
+                (YetiStrat.ParamKey.MinSlope_Medium, 0.20, 1.00, 0.25),   // 4: 0.20,0.45,0.70,0.95
+                (YetiStrat.ParamKey.ExitMinSlopeRequirement, 0.20, 1.00, 0.25),   // 4
+                (YetiStrat.ParamKey.ExitMinSlopeRequirement_Medium, 0.10, 0.80, 0.20),   // 4: 0.10,0.30,0.50,0.70
+                (YetiStrat.ParamKey.Top10VelocityWeight, 1.00, 2.00, 0.30)    // 4: 1.00,1.30,1.60,1.90
             );
         }
+
 
 
         public static List<(string Name, Dictionary<YetiStrat.ParamKey, double> Parameters)> BuildYetiParamGrid(
