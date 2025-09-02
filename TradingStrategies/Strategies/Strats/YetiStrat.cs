@@ -501,7 +501,7 @@ namespace TradingStrategies.Strategies.Strats
                })
             };
 
-        public static List<(string Name, Dictionary<YetiStrat.ParamKey, double> Parameters)> YetiDefaultGridList_Under10GB()
+        public static List<(string Name, Dictionary<YetiStrat.ParamKey, double> Parameters)> YetiDefaultGrid()
         {
             return BuildYetiParamGrid(
                 (YetiStrat.ParamKey.MinDistanceFromBounds, 2, 8, 3),     // 3: 2,5,8
