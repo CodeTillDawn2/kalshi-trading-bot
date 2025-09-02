@@ -19,6 +19,7 @@ namespace TradingStrategies.Trading.Helpers
                 ["Breakout2"] = GetBreakoutStrategy,
                 ["Nothing"] = GetNothingEverHappensStrategy,
                 ["FlowMo"] = GetFlowMomentumStrategy,
+                ["Yeti"] = GetYetiStrategy,
                 ["SloMo"] = GetSlopeMomentumStrategy,
                 ["Momentum"] = GetFlowMomentumStrategy
 
@@ -2270,6 +2271,7 @@ namespace TradingStrategies.Trading.Helpers
                 "Breakout2" => GetBreakoutStrategiesForTraining(),
                 "FlowMo" => GetFlowMomentumStrategiesForTraining(),
                 "SloMo" => GetSlopeMomentumStrategiesForTraining(),
+                "Yeti" => GetYetiStrategiesForTraining(),
                 "Nothing" => GetNothingEverHappensStrategiesForTraining(),
                 "Momentum" => GetMomentumTradingStrategiesForTraining(),
                 _ => throw new ArgumentException($"Unknown set '{setKey}'", nameof(setKey))
@@ -2369,6 +2371,18 @@ namespace TradingStrategies.Trading.Helpers
 
             return CreateMarketStrategyMapping(strat);
         }
+
+        public Dictionary<MarketType, List<Strategy>> GetYetiStrategy(string weightName)
+        {
+            // Use the first (default) parameter set for the standard strategy
+            var defaultParams = YetiStrat.YetiDefaultGrid().Where(x => x.Name == weightName).First();
+            var strat = new Strategy(
+                defaultParams.Name,
+                new List<Strat> { new YetiStrat(mlParams: defaultParams.Parameters) }
+            );
+
+            return CreateMarketStrategyMapping(strat);
+        }
         public Dictionary<MarketType, List<Strategy>> GetSlopeMomentumStrategy(string weightName)
         {
             // Use the first (default) parameter set for the standard strategy
@@ -2444,6 +2458,25 @@ namespace TradingStrategies.Trading.Helpers
 
                 // Create the market-to-strategy mapping for this parameter set
                 var strategiesDict = CreateMarketStrategyMapping(flowStrategy);
+
+                returnList.Add(strategiesDict);
+            }
+
+            return returnList;
+        }
+        public List<Dictionary<MarketType, List<Strategy>>> GetYetiStrategiesForTraining()
+        {
+            var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
+
+            // Create a strategy set for each parameter configuration
+            foreach (var (name, parameters) in YetiStrat.YetiDefaultGrid())
+            {
+                // Create a new NothingEverHappensStrat with the current parameter set
+                var yetiStrat = new YetiStrat(name: name, mlParams: parameters);
+                var yetiStrategy = new Strategy(name, new List<Strat> { yetiStrat });
+
+                // Create the market-to-strategy mapping for this parameter set
+                var strategiesDict = CreateMarketStrategyMapping(yetiStrategy);
 
                 returnList.Add(strategiesDict);
             }

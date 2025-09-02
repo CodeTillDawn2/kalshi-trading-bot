@@ -48,15 +48,15 @@ namespace KalshiBotData.Extensions
                 throw new Exception("Brain instance name doesn't match for Update BrainInstance");
             }
             brainInstance.BrainLock = brainInstanceDTO.BrainLock;
-            brainInstance.WatchPositions = brainInstanceDTO.WatchPositions;
-            brainInstance.WatchOrders = brainInstanceDTO.WatchOrders;
-            brainInstance.ManagedWatchList = brainInstanceDTO.ManagedWatchList;
-            brainInstance.TargetWatches = brainInstanceDTO.TargetWatches;
+            //brainInstance.WatchPositions = brainInstanceDTO.WatchPositions;
+            //brainInstance.WatchOrders = brainInstanceDTO.WatchOrders;
+            //brainInstance.ManagedWatchList = brainInstanceDTO.ManagedWatchList;
+            //brainInstance.TargetWatches = brainInstanceDTO.TargetWatches;
             brainInstance.LastSeen = brainInstanceDTO.LastSeen;
-            brainInstance.CaptureSnapshots = brainInstanceDTO.CaptureSnapshots;
-            brainInstance.MinimumInterest = brainInstanceDTO.MinimumInterest;
-            brainInstance.UsageMin = brainInstanceDTO.UsageMin;
-            brainInstance.UsageMax = brainInstanceDTO.UsageMax;
+            //brainInstance.CaptureSnapshots = brainInstanceDTO.CaptureSnapshots;
+            //brainInstance.MinimumInterest = brainInstanceDTO.MinimumInterest;
+            //brainInstance.UsageMin = brainInstanceDTO.UsageMin;
+            //brainInstance.UsageMax = brainInstanceDTO.UsageMax;
             return brainInstance;
         }
     }

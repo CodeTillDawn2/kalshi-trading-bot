@@ -1,6 +1,7 @@
 ﻿# Backlog
 - [ ] Look into warnings during deploy
 - [ ] SignalR for sending messages across network?
+- [ ] I heard they might switch to "fractional cents"
 
 # Front End
 - [ ] Restructure front end for maintainability and performance
@@ -12,6 +13,7 @@
 - [ ] Test on phone
 - [ ] Add information about your resting orders to the front end
 - [ ] Change position label to be more clear
+- [ ] https://kalshi.com/eventpreview/KXTOPALBUMBYTAYLORSWIFT-25DEC/preview_card
 
 # Soon
 - [ ] Alerts?

@@ -235,7 +235,7 @@ namespace TradingSimulator.Simulator
             }
             finally
             {
-                
+
             }
             return (0, null, null, null, null, null, null, null, null, null);
         }
@@ -344,6 +344,19 @@ namespace TradingSimulator.Simulator
             // NEW: Running counter for discrepancies
             int totalDiscrepancies = 0;
 
+            // Clear cache directory if writeToFile is true
+            if (writeToFile)
+            {
+                if (Directory.Exists(_cacheDirectory))
+                {
+                    foreach (var file in Directory.GetFiles(_cacheDirectory))
+                    {
+                        File.Delete(file);
+                    }
+                    OnTestProgress?.Invoke("Cleared cache directory before processing.");
+                }
+            }
+
             // iterate markets
             for (int mIdx = 0; mIdx < uniqueMarkets.Count; mIdx++)
             {
@@ -421,6 +434,7 @@ namespace TradingSimulator.Simulator
             if (k.Contains("breakout")) return StrategyFamily.Breakout;
             if (k.Contains("bollinger")) return StrategyFamily.Bollinger;
             if (k.Contains("flowmo")) return StrategyFamily.FlowMo;
+            if (k.Contains("yeti")) return StrategyFamily.Yeti;
             if (k.Contains("slomo")) return StrategyFamily.SloMo;
             if (k.Contains("nothing")) return StrategyFamily.NothingHappens;
             if (k.Contains("momentum")) return StrategyFamily.Momentum;
@@ -442,6 +456,7 @@ namespace TradingSimulator.Simulator
                 //StrategyFamily.Breakout,
                 //StrategyFamily.Momentum,
                 StrategyFamily.SloMo,
+                //StrategyFamily.Yeti,
                 //StrategyFamily.NothingHappens
             };
 
@@ -484,6 +499,7 @@ namespace TradingSimulator.Simulator
         {
             Bollinger,
             FlowMo,
+            Yeti,
             SloMo,
             Breakout,
             NothingHappens,
@@ -507,7 +523,6 @@ namespace TradingSimulator.Simulator
                             .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
                         "Bollinger"
                     );
-
                 case StrategyFamily.FlowMo:
                     return (
                         helper.GetTrainingMappings("FlowMo"),
@@ -515,6 +530,14 @@ namespace TradingSimulator.Simulator
                             ?? throw new InvalidOperationException("FlowMomentumParameterSets is null."))
                             .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
                         "FlowMo"
+                    );
+                case StrategyFamily.Yeti:
+                    return (
+                        helper.GetTrainingMappings("Yeti"),
+                        (YetiStrat.YetiDefaultGrid()
+                            ?? throw new InvalidOperationException("YetiStratParameterSets is null."))
+                            .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
+                        "Yeti"
                     );
                 case StrategyFamily.SloMo:
                     return (
@@ -627,7 +650,7 @@ namespace TradingSimulator.Simulator
 
                     totalDiscrepancies += disc?.Count ?? 0;
 
-         
+
                     if (writeToFile)
                         SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
                             disc, fileNameSuffix: $"_{label}_{dto.StrategyName}");
@@ -640,7 +663,7 @@ namespace TradingSimulator.Simulator
                     });
 
                     OnProfitLossUpdate?.Invoke(market, finalPnL);
-                    
+
                 }
 
                 OnMarketProcessed?.Invoke(market);
