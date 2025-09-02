@@ -504,18 +504,18 @@ namespace TradingStrategies.Strategies.Strats
         public static List<(string Name, Dictionary<TryAgainStrat.ParamKey, double> Parameters)> TryAgainDefaultGrid()
         {
             return BuildTryAgainParamGrid(
-                (TryAgainStrat.ParamKey.MinDistanceFromBounds, 2, 8, 3),     // 3: 2,5,8
+                (TryAgainStrat.ParamKey.MinDistanceFromBounds, 6, 6, 1),     // 3: 2,5,8
                 (TryAgainStrat.ParamKey.VelocityToDepthRatio, 0.20, 1.20, 0.30),   // 4: 0.20,0.50,0.80,1.10
-                (TryAgainStrat.ParamKey.MinRatioDifference, 0.10, 0.60, 0.25),   // 3: 0.10,0.35,0.60
-                (TryAgainStrat.ParamKey.MinConsecutiveBars, 2, 5, 1.5),   // 3: 2.0,3.5,5.0
+                (TryAgainStrat.ParamKey.MinRatioDifference, 0.20, 0.60, 0.2),   // 3: 0.10,0.35,0.60
+                (TryAgainStrat.ParamKey.MinConsecutiveBars, 1, 3, 1),   // 3: 2.0,3.5,5.0
                 (TryAgainStrat.ParamKey.TradeRateShareMin, 0.45, 0.65, 0.10),   // 3
                 (TryAgainStrat.ParamKey.TradeEventShareMin, 0.45, 0.65, 0.10),   // 3
-                (TryAgainStrat.ParamKey.ExitOppositeSignalStrength, 0.30, 1.20, 0.45),   // 3: 0.30,0.75,1.20
+                (TryAgainStrat.ParamKey.ExitOppositeSignalStrength, 0.30, 0.50, 0.1),   // 3: 0.30,0.75,1.20
                 (TryAgainStrat.ParamKey.MinSlope, 0.50, 2.00, 0.75),   // 3: 0.50,1.25,2.00
                 (TryAgainStrat.ParamKey.MinSlope_Medium, 0.20, 1.00, 0.25),   // 4: 0.20,0.45,0.70,0.95
-                (TryAgainStrat.ParamKey.ExitMinSlopeRequirement, 0.20, 1.00, 0.25),   // 4
+                (TryAgainStrat.ParamKey.ExitMinSlopeRequirement, 0.20, 1.00, 0.20),   // 4
                 (TryAgainStrat.ParamKey.ExitMinSlopeRequirement_Medium, 0.10, 0.80, 0.20),   // 4: 0.10,0.30,0.50,0.70
-                (TryAgainStrat.ParamKey.Top10VelocityWeight, 1.00, 2.00, 0.30)    // 4: 1.00,1.30,1.60,1.90
+                (TryAgainStrat.ParamKey.Top10VelocityWeight, 2.00, 4.00, 1.0)    // 4: 1.00,1.30,1.60,1.90
             );
         }
 
