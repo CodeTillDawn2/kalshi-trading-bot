@@ -11,5 +11,6 @@ namespace SmokehouseBot.Services.Interfaces
         void ResetLastSnapshot();
         Task<bool> CheckSchemaMatches();
         string SterilizeJSON(int currentVersion, string JSON);
+        public DateTime? NextExpectedSnapshotTimestamp { get; set; }
     }
 }

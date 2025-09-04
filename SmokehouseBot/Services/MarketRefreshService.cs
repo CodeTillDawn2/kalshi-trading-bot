@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.Extensions.Options;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs.Exceptions;
@@ -61,8 +62,9 @@ namespace SmokehouseBot.Services
 
                             if (!isTradingActive)
                             {
-                                _logger.LogDebug("Trading is inactive, waiting for trading to become active.");
+                                _logger.LogInformation("Trading is inactive, waiting for trading to become active.");
                                 await Task.Delay(TimeSpan.FromMinutes(1), _statusTracker.GetCancellationToken());
+                                _serviceFactory.GetTradingSnapshotService().NextExpectedSnapshotTimestamp = DateTime.UtcNow.AddMinutes(1);
                                 continue;
                             }
 

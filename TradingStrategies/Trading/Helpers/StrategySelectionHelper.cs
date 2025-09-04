@@ -2375,7 +2375,7 @@ namespace TradingStrategies.Trading.Helpers
         public Dictionary<MarketType, List<Strategy>> GetTryAgainStrategy(string weightName)
         {
             // Use the first (default) parameter set for the standard strategy
-            var defaultParams = TryAgainStrat.TryAgainDefaultGrid().Where(x => x.Name == weightName).First();
+            var defaultParams = TryAgainStrat.TryAgainStratParameterSets.Where(x => x.Name == weightName).First();
             var strat = new Strategy(
                 defaultParams.Name,
                 new List<Strat> { new TryAgainStrat(mlParams: defaultParams.Parameters) }
@@ -2469,7 +2469,7 @@ namespace TradingStrategies.Trading.Helpers
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
 
             // Create a strategy set for each parameter configuration
-            foreach (var (name, parameters) in TryAgainStrat.TryAgainDefaultGrid())
+            foreach (var (name, parameters) in TryAgainStrat.TryAgainStratParameterSets)
             {
                 // Create a new NothingEverHappensStrat with the current parameter set
                 var TryAgainiStrat = new TryAgainStrat(name: name, mlParams: parameters);

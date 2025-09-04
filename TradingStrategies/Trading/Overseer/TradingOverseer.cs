@@ -396,9 +396,73 @@ namespace TradingStrategies
         }
 
 
-        private bool HandleSpecificAction(ActionType action, HashSet<Strategy> strategiesForAction, MarketSnapshot effectiveSnapshot, MarketSnapshot? previousEffectiveSnapshot,
-      SimulatedOrderbook actionBook, List<(string action, string side, string type, int count, int price, DateTime? expiration)> actionResting, ref int newPosition, ref double newCash, ref double newRisk, SimulationPath path, DateTime timestamp, double maxRisk, int simulationPosition)
+        private bool HandleSpecificAction(
+    ActionType action,
+    HashSet<Strategy> strategiesForAction,
+    MarketSnapshot effectiveSnapshot,
+    MarketSnapshot? previousEffectiveSnapshot,
+    SimulatedOrderbook actionBook,
+    List<(string action, string side, string type, int count, int price, DateTime? expiration)> actionResting,
+    ref int newPosition,
+    ref double newCash,
+    ref double newRisk,
+    SimulationPath path,
+    DateTime timestamp,
+    double maxRisk,
+    int simulationPosition)
         {
+            // Combo actions: execute market take first, then replace resting with 100% of current position
+            if (action == ActionType.LongPostAsk || action == ActionType.ShortPostYes)
+            {
+                var takeAction = (action == ActionType.LongPostAsk) ? ActionType.Long : ActionType.Short;
+                HandleSpecificAction(takeAction, strategiesForAction, effectiveSnapshot, previousEffectiveSnapshot,
+                    actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, timestamp, maxRisk, simulationPosition);
+
+                int desiredQty = Math.Abs(newPosition);
+                if (desiredQty <= 0) return false;
+
+                // Pre-cancel any existing resting orders (replace, don't stack)
+                foreach (var order in actionResting)
+                {
+                    bool isYesSide = order.side == "yes";
+                    int bookPrice =
+                        (order.action == "sell" && isYesSide) ? (100 - order.price) :
+                        (order.action == "buy"  && !isYesSide) ? (100 - order.price) :
+                        order.price;
+
+                    var targetBook =
+                        (order.action == "buy"  && isYesSide) || (order.action == "sell" && !isYesSide)
+                        ? actionBook.YesBids
+                        : actionBook.NoBids;
+
+                    actionBook.ReduceDepth(targetBook, bookPrice, order.count);
+                }
+                actionResting.Clear();
+
+                var decision = strategiesForAction.First().GetAction(effectiveSnapshot, previousEffectiveSnapshot, simulationPosition);
+
+                if (action == ActionType.LongPostAsk && newPosition > 0)
+                {
+                    int sellPriceYes = decision.Price;   // YES ask
+                    int noBidPx = 100 - sellPriceYes;
+                    if (sellPriceYes > 0 && sellPriceYes < 100 && noBidPx >= 1 && noBidPx <= 99)
+                    {
+                        actionBook.AddToDepth(actionBook.NoBids, noBidPx, desiredQty, timestamp);
+                        actionResting.Add(("sell", "yes", "limit", desiredQty, sellPriceYes, decision.Expiration));
+                    }
+                }
+                else if (action == ActionType.ShortPostYes && newPosition < 0)
+                {
+                    int yesBidPx = decision.Price;
+                    if (yesBidPx > 0 && yesBidPx < 100)
+                    {
+                        actionBook.AddToDepth(actionBook.YesBids, yesBidPx, desiredQty, timestamp);
+                        actionResting.Add(("buy", "yes", "limit", desiredQty, yesBidPx, decision.Expiration));
+                    }
+                }
+                return false;
+            }
+
             int qty = 0;
             if (action == ActionType.Long || action == ActionType.Short || action == ActionType.Exit)
             {
@@ -410,9 +474,7 @@ namespace TradingStrategies
                 double totalCost = 0.0;
 
                 var bookToReduce = longSide ? actionBook.NoBids : actionBook.YesBids;
-
                 bool isPaying = action != ActionType.Exit;
-
                 double LevelPriceFunc(int price) => isPaying ? (100 - price) / 100.0 : price / 100.0;
 
                 double remainingRisk = maxRisk - newRisk;
@@ -445,69 +507,65 @@ namespace TradingStrategies
 
                 int filled = qty - remainingQty;
 
-                if (action != ActionType.Exit)
-                {
-                    newRisk += totalCost;
-                }
-                else
-                {
-                    newRisk = 0;
-                }
+                if (action != ActionType.Exit) newRisk += totalCost; else newRisk = 0;
 
-                if (isPaying)
-                {
-                    newCash -= totalCost;
-                }
-                else
-                {
-                    newCash += totalCost;
-                }
+                if (isPaying) newCash -= totalCost; else newCash += totalCost;
 
                 int posDelta = longSide ? filled : -filled;
                 newPosition += posDelta;
 
-                // taker fees
-                newCash -= 0.07 * totalCost;
+                newCash -= 0.07 * totalCost; // taker fees
             }
             else if (action == ActionType.PostYes)
             {
-                // PASS simulated position to get price/qty
                 var decision = strategiesForAction.First().GetAction(effectiveSnapshot, previousEffectiveSnapshot, simulationPosition);
                 int limitPrice = decision.Price;
-                qty = decision.Qty;
+                int postQty = decision.Qty;
                 DateTime? exp = decision.Expiration;
-                if (limitPrice > 0 && qty > 0)
+                if (limitPrice > 0 && postQty > 0)
                 {
-                    actionBook.AddToDepth(actionBook.YesBids, limitPrice, qty, effectiveSnapshot.Timestamp);
-                    actionResting.Add(("buy", "yes", "limit", qty, limitPrice, exp));
+                    actionBook.AddToDepth(actionBook.YesBids, limitPrice, postQty, effectiveSnapshot.Timestamp);
+                    actionResting.Add(("buy", "yes", "limit", postQty, limitPrice, exp));
                 }
             }
             else if (action == ActionType.PostAsk)
             {
-                // PASS simulated position to get price/qty
                 var decision = strategiesForAction.First().GetAction(effectiveSnapshot, previousEffectiveSnapshot, simulationPosition);
                 int sellPrice = decision.Price;
                 int bidPrice = 100 - sellPrice;
-                qty = decision.Qty;
+                int postQty = decision.Qty;
                 DateTime? exp = decision.Expiration;
-                if (bidPrice > 0 && qty > 0)
+                if (bidPrice > 0 && postQty > 0)
                 {
-                    actionBook.AddToDepth(actionBook.NoBids, bidPrice, qty, effectiveSnapshot.Timestamp);
-                    actionResting.Add(("sell", "yes", "limit", qty, sellPrice, exp));
+                    actionBook.AddToDepth(actionBook.NoBids, bidPrice, postQty, effectiveSnapshot.Timestamp);
+                    actionResting.Add(("sell", "yes", "limit", postQty, sellPrice, exp));
                 }
             }
             else if (action == ActionType.Cancel)
             {
                 foreach (var order in actionResting)
                 {
-                    var targetBook = (order.action == "buy" && order.side == "yes") || (order.action == "sell" && order.side == "no") ? actionBook.YesBids : actionBook.NoBids;
-                    actionBook.ReduceDepth(targetBook, order.price, order.count);
+                    bool isYesSide = order.side == "yes";
+                    int bookPrice =
+                        (order.action == "sell" && isYesSide) ? (100 - order.price) :
+                        (order.action == "buy"  && !isYesSide) ? (100 - order.price) :
+                        order.price;
+
+                    var targetBook =
+                        (order.action == "buy"  && isYesSide) || (order.action == "sell" && !isYesSide)
+                        ? actionBook.YesBids
+                        : actionBook.NoBids;
+
+                    actionBook.ReduceDepth(targetBook, bookPrice, order.count);
                 }
                 actionResting.Clear();
             }
 
             return false;
         }
+
+
+
         private (string, string) SummarizeRestingOrders(List<(string action, string side, string type, int count, int price, DateTime? expiration)> restingOrders)
         {
             var yesBidsSummary = new Dictionary<int, int>();

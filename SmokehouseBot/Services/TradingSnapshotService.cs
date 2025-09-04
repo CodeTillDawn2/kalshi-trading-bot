@@ -22,7 +22,7 @@ namespace SmokehouseBot.Services
         private readonly IOptions<SnapshotConfig> _snapshotConfig;
         private readonly IOptions<TradingConfig> _tradingConfig;
         private DateTime? _lastSnapshotTimestamp; // Actual timestamp of the last saved snapshot
-        private DateTime? _nextExpectedSnapshotTimestamp; // The timestamp when the next snapshot is ideally expected
+        public DateTime? NextExpectedSnapshotTimestamp { get; set; } // The timestamp when the next snapshot is ideally expected
         private bool _isFirstSnapshot = true;
         private readonly TimeSpan _expectedInterval;
         private readonly TimeSpan _tolerance;
@@ -60,17 +60,17 @@ namespace SmokehouseBot.Services
 
                 if (_isFirstSnapshot)
                 {
-                    _nextExpectedSnapshotTimestamp = timestamp + _expectedInterval;
+                    NextExpectedSnapshotTimestamp = timestamp + _expectedInterval;
                 }
                 else if (_lastSnapshotTimestamp.HasValue)
                 {
-                    if (_nextExpectedSnapshotTimestamp.HasValue && timestamp > _nextExpectedSnapshotTimestamp.Value + discardThreshold)
+                    if (NextExpectedSnapshotTimestamp.HasValue && timestamp > NextExpectedSnapshotTimestamp.Value + discardThreshold)
                     {
                         _logger.LogWarning(
                             "BRAIN: Skipping extremely late snapshot: {CurrentTimestamp} is {TimeSinceExpected} seconds " +
                             "after its expected time of {ExpectedTimestamp} (tolerance {DiscardThresholdSeconds}s). Discarding.",
-                            timestampString, (timestamp - _nextExpectedSnapshotTimestamp.Value).TotalSeconds,
-                            _nextExpectedSnapshotTimestamp.Value.ToString("yyyyMMddTHHmmssZ"), discardThreshold.TotalSeconds);
+                            timestampString, (timestamp - NextExpectedSnapshotTimestamp.Value).TotalSeconds,
+                            NextExpectedSnapshotTimestamp.Value.ToString("yyyyMMddTHHmmssZ"), discardThreshold.TotalSeconds);
                         return 0;
                     }
 
@@ -167,7 +167,7 @@ namespace SmokehouseBot.Services
                     }
 
                     _lastSnapshotTimestamp = timestamp;
-                    _nextExpectedSnapshotTimestamp = timestamp + _expectedInterval;
+                    NextExpectedSnapshotTimestamp = timestamp + _expectedInterval;
                     _isFirstSnapshot = false;
                 }
 
@@ -317,7 +317,7 @@ namespace SmokehouseBot.Services
         public void ResetLastSnapshot()
         {
             _lastSnapshotTimestamp = null;
-            _nextExpectedSnapshotTimestamp = null; // Reset the expected timestamp as well
+            NextExpectedSnapshotTimestamp = null; // Reset the expected timestamp as well
         }
 
         public async Task<bool> CheckSchemaMatches()

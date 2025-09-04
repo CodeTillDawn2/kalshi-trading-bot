@@ -368,7 +368,7 @@ namespace SimulatorWinForms
             }
 
             // only show if this beats the session-best for this market
-            if (!_bestPnL.TryGetValue(market, out var best) || pnl > best)
+            if (!_bestPnL.TryGetValue(market, out var best) || (pnl > best && pnl != 0))
             {
                 _bestPnL[market] = pnl;
 
@@ -446,7 +446,7 @@ namespace SimulatorWinForms
             {
                 await _simulator.RunSelectedSetForGuiAsync(
                     setKey: "TryAgain",
-                    weightName: "TryAgain_Testing",
+                    weightName: "TryAgain_S091",
                     writeToFile: true,
                     marketsToRun: sel);
             }

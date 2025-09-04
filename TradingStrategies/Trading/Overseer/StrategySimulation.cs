@@ -61,14 +61,17 @@ namespace TradingStrategies.Trading.Overseer
             var action = decision.Type;
             if (action == ActionType.None) return;
 
+            bool isComboLongPostAsk = action == ActionType.LongPostAsk;
+            bool isComboShortPostYes = action == ActionType.ShortPostYes;
+
             if (action == ActionType.PostYes || action == ActionType.PostAsk || action == ActionType.Cancel)
             {
                 HandleLimitAction(decision, effectiveSnapshot);
                 return;
             }
 
-            bool longSide = action == ActionType.Long || (action == ActionType.Exit && Position < 0);
-            bool shortSide = action == ActionType.Short || (action == ActionType.Exit && Position > 0);
+            bool longSide = action == ActionType.Long  || action == ActionType.Exit && Position < 0 || isComboLongPostAsk;
+            bool shortSide = action == ActionType.Short || action == ActionType.Exit && Position > 0 || isComboShortPostYes;
             if (!longSide && !shortSide) return;
 
             string tradeSide = longSide ? "no" : "yes";
@@ -110,25 +113,76 @@ namespace TradingStrategies.Trading.Overseer
                 tempCash += totalCost;
             }
 
-            // Apply taker fees
+            // taker fees
             tempCash -= 0.07 * totalCost;
 
             int posDelta = longSide ? filled : -filled;
             tempPosition += posDelta;
 
-            // Simulate self-fill if applicable
             int avgPrice = (int)(totalCost / filled * 100);
             int effectiveAvgPrice = isPaying ? (100 - avgPrice) : avgPrice;
             SimulateFillsFromTrade(SimulatedRestingOrders, tradeSide, effectiveAvgPrice, filled, ref tempPosition, ref tempCash, effectiveSnapshot.Timestamp);
 
+            // Commit
             Cash = tempCash;
             Position = tempPosition;
 
             if (action == ActionType.Exit)
             {
-                Position = 0; // Ensure closed
+                Position = 0;
+                return;
+            }
+
+            // Pre-cancel any existing resting orders (replace, don't stack)
+            if (isComboLongPostAsk || isComboShortPostYes)
+            {
+                foreach (var order in SimulatedRestingOrders)
+                {
+                    bool isYesSide = order.side == "yes";
+                    int bookPrice =
+                        (order.action == "sell" && isYesSide) ? (100 - order.price) :
+                        (order.action == "buy"  && !isYesSide) ? (100 - order.price) :
+                        order.price;
+
+                    var targetBook =
+                        (order.action == "buy"  && isYesSide) || (order.action == "sell" && !isYesSide)
+                        ? SimulatedBook.YesBids
+                        : SimulatedBook.NoBids;
+
+                    SimulatedBook.ReduceDepth(targetBook, bookPrice, order.count);
+                }
+                SimulatedRestingOrders.Clear();
+            }
+
+            // Combo “take then rest” sized to 100% of current position
+            if (isComboLongPostAsk && Position > 0)
+            {
+                int sellYesPrice = decision.Price;   // 1..99 (YES ask)
+                int noBidPrice = 100 - sellYesPrice;
+                int postQty = Position;         // 100% of position
+                if (sellYesPrice > 0 && sellYesPrice < 100 && noBidPrice >= 1 && noBidPrice <= 99 && postQty > 0)
+                {
+                    if (SimulatedBook.NoBids[noBidPrice] == null)
+                        SimulatedBook.NoBids[noBidPrice] = new List<(int count, DateTime timestamp)>();
+                    SimulatedBook.NoBids[noBidPrice].Add((postQty, effectiveSnapshot.Timestamp));
+                    SimulatedRestingOrders.Add(("sell", "yes", "limit", postQty, sellYesPrice, decision.Expiration));
+                }
+            }
+            else if (isComboShortPostYes && Position < 0)
+            {
+                int yesBidPrice = decision.Price;    // 1..99 (YES bid)
+                int postQty = -Position;         // 100% of position
+                if (yesBidPrice > 0 && yesBidPrice < 100 && postQty > 0)
+                {
+                    if (SimulatedBook.YesBids[yesBidPrice] == null)
+                        SimulatedBook.YesBids[yesBidPrice] = new List<(int count, DateTime timestamp)>();
+                    SimulatedBook.YesBids[yesBidPrice].Add((postQty, effectiveSnapshot.Timestamp));
+                    SimulatedRestingOrders.Add(("buy", "yes", "limit", postQty, yesBidPrice, decision.Expiration));
+                }
             }
         }
+
+
 
         private void HandleLimitAction(ActionDecision decision, MarketSnapshot effectiveSnapshot)
         {

@@ -104,7 +104,11 @@
             /// <summary>
             /// Cancel resting
             /// </summary>
-            Cancel
+            Cancel,
+            /// <summary>Market long, then immediately post a YES ask (resting sell) for what you just bought</summary>
+            LongPostAsk,
+            /// <summary>Market short, then immediately post a YES bid (resting buy) for what you just sold</summary>
+            ShortPostYes
         }
 
         public enum ComparisonOperator
