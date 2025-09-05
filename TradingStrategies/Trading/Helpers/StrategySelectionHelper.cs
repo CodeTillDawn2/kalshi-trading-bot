@@ -19,17 +19,13 @@ namespace TradingStrategies.Trading.Helpers
                 ["Breakout2"] = GetBreakoutStrategy,
                 ["Nothing"] = GetNothingEverHappensStrategy,
                 ["FlowMo"] = GetFlowMomentumStrategy,
+                ["MLShared"] = GetMLSharedStrategy,
                 ["TryAgain"] = GetTryAgainStrategy,
                 ["SloMo"] = GetSlopeMomentumStrategy,
                 ["Momentum"] = GetFlowMomentumStrategy
 
             };
         }
-
-
-
-
-
 
         public static readonly List<(string Name, Dictionary<BollingerBreakout.ParamKey, double> Parameters)>
             BollingerParameterSets = new List<(string, Dictionary<ParamKey, double>)>
@@ -2256,6 +2252,7 @@ namespace TradingStrategies.Trading.Helpers
                 "SloMo" => SlopeMomentumStrat.SlopeMomentumParameterSets.Select(x => x.Name),
                 "Nothing" => NothingEverHappensParameterSets.Select(x => x.Name),
                 "Momentum" => MomentumTradingParameterSets.Select(x => x.Name),
+                "MLShared" => MLEntrySeekerShared.MLSharedParameterSets.Select(x => x.Name),
                 _ => Enumerable.Empty<string>()
             };
         public Dictionary<MarketType, List<Strategy>> GetMapping(string setKey, string weightName)
@@ -2272,6 +2269,7 @@ namespace TradingStrategies.Trading.Helpers
                 "FlowMo" => GetFlowMomentumStrategiesForTraining(),
                 "SloMo" => GetSlopeMomentumStrategiesForTraining(),
                 "TryAgain" => GetTryAgainStrategiesForTraining(),
+                "MLShared" => GetMLSharedStrategiesForTraining(),
                 "Nothing" => GetNothingEverHappensStrategiesForTraining(),
                 "Momentum" => GetMomentumTradingStrategiesForTraining(),
                 _ => throw new ArgumentException($"Unknown set '{setKey}'", nameof(setKey))
@@ -2284,7 +2282,43 @@ namespace TradingStrategies.Trading.Helpers
             "LowLiquidity",
             new List<Strat> { new LowLiquidityExitExec() }
         );
+        public Dictionary<MarketType, List<Strategy>> GetMLSharedStrategy(string weightName)
+        {
+            var selectedParams = MLEntrySeekerShared.MLSharedParameterSets
+                .FirstOrDefault(x => x.Name == weightName);
 
+            var mlStrat = new MLEntrySeekerShared(
+                name: $"MLShared_{selectedParams.Name}",
+                evaluationOnly: false,
+                weight: 1.0,
+                p: selectedParams.Parameters);
+
+            var strat = new Strategy(selectedParams.Name, new List<Strat> { mlStrat });
+
+            return CreateMarketStrategyMapping(strat);
+        }
+
+        public List<Dictionary<MarketType, List<Strategy>>> GetMLSharedStrategiesForTraining()
+        {
+            var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
+
+            foreach (var (name, parameters) in MLEntrySeekerShared.MLSharedParameterSets)
+            {
+                var mlStrat = new MLEntrySeekerShared(
+                    name: $"MLShared_{name}",
+                    evaluationOnly: false,
+                    weight: 1.0,
+                    p: parameters);
+
+                var mlStrategy = new Strategy(name, new List<Strat> { mlStrat });
+
+                var strategiesDict = CreateMarketStrategyMapping(mlStrategy);
+
+                returnList.Add(strategiesDict);
+            }
+
+            return returnList;
+        }
 
 
         // Define the market-to-strategy mapping as a static method

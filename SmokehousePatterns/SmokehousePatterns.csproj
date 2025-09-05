@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SmokehouseDTOs\SmokehouseDTOs.csproj" />
     <ProjectReference Include="..\SmokehouseInterfaces\SmokehouseInterfaces.csproj" />
   </ItemGroup>
 

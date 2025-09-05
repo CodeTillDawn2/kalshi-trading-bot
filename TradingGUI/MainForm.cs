@@ -599,5 +599,24 @@ namespace SimulatorWinForms
             _tooltipOverlay.Font = new Font(_tooltipOverlay.Font.FontFamily, 9f * scaleFactor);
         }
 
+        private async void btnRunML_Click(object sender, EventArgs e)
+        {
+            var sel = GetCheckedMarkets();
+
+            // Reset UI PnL for selected markets before the run
+            ResetPnLForMarkets(sel);
+            EnsureSimulatorSetup();
+            try
+            {
+                await _simulator.RunMLTrainingAndSimulationForGuiAsync(
+                    writeToFile: true,
+                    marketsToRun: sel);
+            }
+            finally
+            {
+                _simulator.TearDown();
+                _simSetup = false;
+            }
+        }
     }
 }

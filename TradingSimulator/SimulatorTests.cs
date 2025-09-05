@@ -24,6 +24,7 @@ using TradingStrategies;
 using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;
+using TradingStrategies.ML;
 using TradingStrategies.Strategies;
 using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Trading.Helpers;
@@ -437,6 +438,7 @@ namespace TradingSimulator.Simulator
             if (k.Contains("slomo")) return StrategyFamily.SloMo;
             if (k.Contains("nothing")) return StrategyFamily.NothingHappens;
             if (k.Contains("momentum")) return StrategyFamily.Momentum;
+            if (k.Contains("ml") || k == "mlshared") return StrategyFamily.MLShared;
             // specific short names
             if (k is "b2" or "breakout2") return StrategyFamily.Breakout;
             if (k is "bb" or "bollingerbreakout") return StrategyFamily.Bollinger;
@@ -455,7 +457,8 @@ namespace TradingSimulator.Simulator
                 //StrategyFamily.Breakout,
                 //StrategyFamily.Momentum,
                 //StrategyFamily.SloMo,
-                StrategyFamily.TryAgain,
+                //StrategyFamily.TryAgain,
+                StrategyFamily.MLShared,
                 //StrategyFamily.NothingHappens
             };
 
@@ -502,15 +505,16 @@ namespace TradingSimulator.Simulator
             SloMo,
             Breakout,
             NothingHappens,
+            MLShared,
             Momentum
         }
 
         private (List<Dictionary<MarketType, List<Strategy>>> Strategies,
-                 List<(string Name, object Parameters)> ParamSets,
-                 string Label)
-        ResolveFamily(StrategyFamily family)
+         List<(string Name, object Parameters)> ParamSets,
+         string Label)
+ResolveFamily(StrategyFamily family)
         {
-            var helper = new StrategySelectionHelper();
+            var helper = new StrategySelectionHelper();  // Instantiate here for access to instance methods
 
             switch (family)
             {
@@ -548,16 +552,15 @@ namespace TradingSimulator.Simulator
                     );
                 case StrategyFamily.Breakout:
                     return (
-                        helper.GetBreakoutStrategiesForTraining(),
+                        helper.GetTrainingMappings("Breakout2"),  // Note: Uses "Breakout2" key as per helper
                         (StrategySelectionHelper.BreakoutParameterSets
                             ?? throw new InvalidOperationException("BreakoutParameterSets is null."))
                             .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
                         "Breakout"
                     );
-
                 case StrategyFamily.NothingHappens:
                     return (
-                        helper.GetNothingEverHappensStrategiesForTraining(),
+                        helper.GetTrainingMappings("Nothing"),
                         (StrategySelectionHelper.NothingEverHappensParameterSets
                             ?? throw new InvalidOperationException("NothingEverHappensParameterSets is null."))
                             .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
@@ -565,17 +568,230 @@ namespace TradingSimulator.Simulator
                     );
                 case StrategyFamily.Momentum:
                     return (
-                        helper.GetMomentumTradingStrategiesForTraining(),
+                        helper.GetTrainingMappings("Momentum"),
                         (StrategySelectionHelper.MomentumTradingParameterSets
                             ?? throw new InvalidOperationException("MomentumTradingParameterSets is null."))
                             .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
                         "Momentum"
+                    );
+                case StrategyFamily.MLShared:  // New case, using the updated helper
+                    return (
+                        helper.GetTrainingMappings("MLShared"),
+                        (MLEntrySeekerShared.MLSharedParameterSets
+                            ?? throw new InvalidOperationException("MLSharedParameterSets is null."))
+                            .Select(ps => (ps.Name, (object)ps.Parameters)).ToList(),
+                        "MLShared"
                     );
                 default:
                     throw new ArgumentOutOfRangeException(nameof(family));
             }
         }
 
+        /// <summary>
+        /// Runs offline training, evaluation, and online simulation for MLShared strategy.
+        /// Produces only a best-fit report ranking parameter sets by proximity to large spikes.
+        /// Includes diagnostic logging to console to identify issues with entry generation.
+        /// </summary>
+        public async Task RunMLTrainingAndSimulationForGuiAsync(
+            bool writeToFile,
+            List<string>? marketsToRun = null)
+        {
+            var label = "MLShared";
+            var helper = new StrategySelectionHelper();
+            var paramSets = MLEntrySeekerShared.MLSharedParameterSets;
+
+            using var scope = _scopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+
+            // Initialize DTOs for results
+            var weightSetDtos = new List<WeightSetDTO>(paramSets.Count);
+            for (int i = 0; i < paramSets.Count; i++)
+            {
+                var (name, parameters) = paramSets[i];
+                weightSetDtos.Add(new WeightSetDTO
+                {
+                    StrategyName = name,
+                    Weights = JsonSerializer.Serialize(parameters),
+                    LastRun = DateTime.UtcNow,
+                    WeightSetMarkets = new List<WeightSetMarketDTO>()
+                });
+            }
+
+            // Load snapshots
+            var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, marketsToRun).ConfigureAwait(false);
+            var uniqueMarkets = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
+            var dataset = new Dictionary<string, List<MarketSnapshot>>();
+            foreach (var market in uniqueMarkets)
+            {
+                var marketGroups = filteredGroups.Where(g => g.MarketTicker == market).ToList();
+                var allSnapshotData = new List<SnapshotDTO>();
+                foreach (var g in marketGroups)
+                {
+                    var snaps = await context.GetSnapshots_cached(
+                        marketTicker: g.MarketTicker,
+                        startDate: g.StartTime,
+                        endDate: g.EndTime).ConfigureAwait(false);
+                    allSnapshotData.AddRange(snaps);
+                }
+                allSnapshotData = allSnapshotData.OrderBy(x => x.SnapshotDate).ToList();
+                var cache = await _snapshotService.LoadManySnapshots(allSnapshotData).ConfigureAwait(false);
+                var marketSnapshots = cache
+                    .SelectMany(kvp => kvp.Value)
+                    .Where(ms => ms != null && ms.Timestamp > DateTime.MinValue)
+                    .OrderBy(ms => ms.Timestamp)
+                    .ToList();
+                if (marketSnapshots.Any())
+                {
+                    Console.WriteLine($"Loaded {marketSnapshots.Count} snapshots for {market}");
+                    dataset[market] = marketSnapshots;
+                }
+            }
+
+            if (!dataset.Any())
+            {
+                OnTestProgress?.Invoke("No valid data found for ML training and simulation.");
+                Console.WriteLine("No snapshots loaded for any markets.");
+                return;
+            }
+
+            // Split dataset: 80% train, 20% test
+            var trainData = new Dictionary<string, List<MarketSnapshot>>();
+            var testData = new Dictionary<string, List<MarketSnapshot>>();
+            foreach (var kvp in dataset)
+            {
+                var snapshots = kvp.Value;
+                int splitIdx = (int)(snapshots.Count * 0.8);
+                trainData[kvp.Key] = snapshots.Take(splitIdx).ToList();
+                testData[kvp.Key] = snapshots.Skip(splitIdx).ToList();
+                Console.WriteLine($"Split for {kvp.Key}: {trainData[kvp.Key].Count} train, {testData[kvp.Key].Count} test");
+            }
+
+            // Offline training and evaluation
+            var strategiesList = new List<Dictionary<MarketType, List<Strategy>>>();
+            var metrics = new List<(string Name, double AvgEntryScore, double AvgPeakSize, double AvgTimeToPeak)>();
+            for (int i = 0; i < paramSets.Count; i++)
+            {
+                var (name, parameters) = paramSets[i];
+                var mlStrat = new MLEntrySeekerShared(
+                    name: name,
+                    evaluationOnly: false,
+                    weight: 1.0,
+                    p: parameters);
+                mlStrat.PreTrain(trainData);
+                var strategiesDict = helper.GetMLSharedStrategy(name);
+                strategiesList.Add(strategiesDict);
+                metrics.Add((name, 0.0, 0.0, 0.0));
+            }
+
+            // Clear ResearchBus before run
+            ResearchBus.Clear();
+
+            for (int mIdx = 0; mIdx < uniqueMarkets.Count; mIdx++)
+            {
+                var market = uniqueMarkets[mIdx];
+                var marketSnapshots = dataset[market];
+                var groupForId = new SnapshotGroupDTO { MarketTicker = market, JsonPath = $"{market}.json" };
+
+                for (int setIdx = 0; setIdx < strategiesList.Count; setIdx++)
+                {
+                    var strategies = strategiesList[setIdx];
+                    var dto = weightSetDtos[setIdx];
+                    var (finalPnL, _, _, _, _, _, _, _, _, _) = await ProcessMarketAsync(
+                        market, marketSnapshots, strategies, _scopeFactory,
+                        progressPrefix: "",
+                        writeToFile: false,
+                        detectVelocityDiscrepancies: true,
+                        group: groupForId,
+                        ignoreProcessedCache: true).ConfigureAwait(false);
+
+                    dto.WeightSetMarkets.Add(new WeightSetMarketDTO
+                    {
+                        MarketTicker = market,
+                        PnL = (decimal)finalPnL,
+                        LastRun = DateTime.UtcNow
+                    });
+                }
+            }
+
+            // Generate best-fit report
+            if (!ResearchBus.Entries.Any())
+            {
+                OnTestProgress?.Invoke("No entries detected. Check dataset for price movements or adjust thresholds.");
+                Console.WriteLine("ResearchBus is empty. No entries logged during simulation.");
+                return;
+            }
+
+            var entryMetrics = ResearchBus.Entries
+                .GroupBy(e => e.ParameterSet)
+                .Select(g =>
+                {
+                    var avgScore = g.Average(e => e.Score);
+                    var avgPeakSize = g.Average(e => e.PeakSizeTicks);
+                    var avgTimeToPeak = g.Average(e => e.TimeToPeak.TotalSeconds);
+                    var composite = avgPeakSize / (avgTimeToPeak + 1e-6);
+                    Console.WriteLine($"Metrics for {g.Key}: AvgScore={avgScore:F3}, AvgPeakSize={avgPeakSize:F3}, AvgTimeToPeak={avgTimeToPeak:F3}, Composite={composite:F3}");
+                    return (Name: g.Key, AvgEntryScore: avgScore, AvgPeakSize: avgPeakSize, AvgTimeToPeak: avgTimeToPeak, Composite: composite);
+                })
+                .ToList();
+
+            // Merge with metrics
+            for (int i = 0; i < metrics.Count; i++)
+            {
+                var entry = entryMetrics.FirstOrDefault(em => em.Name == metrics[i].Name);
+                if (entry.Name != null)
+                {
+                    metrics[i] = (metrics[i].Name, entry.AvgEntryScore, entry.AvgPeakSize, entry.AvgTimeToPeak);
+                }
+            }
+
+            // Rank by composite
+            var rankedMetrics = metrics
+                .Select(m => (m.Name, m.AvgEntryScore, m.AvgPeakSize, m.AvgTimeToPeak, Composite: m.AvgPeakSize / (m.AvgTimeToPeak + 1e-6)))
+                .OrderByDescending(m => m.Composite)
+                .ToList();
+
+            // Log report to GUI
+            OnTestProgress?.Invoke("\n=== Best-Fit Parameter Set Report (Based on Proximity to Large Spikes) ===");
+            OnTestProgress?.Invoke("Rank | ParameterSet | AvgEntryScore | AvgPeakSize | AvgTimeToPeak (sec) | Composite (PeakSize/TimeToPeak) | Parameters");
+            int rank = 1;
+            double prevComposite = double.MaxValue;
+            for (int i = 0; i < rankedMetrics.Count; i++)
+            {
+                var m = rankedMetrics[i];
+                if (Math.Abs(m.Composite - prevComposite) > 1e-6) rank = i + 1;
+                prevComposite = m.Composite;
+                var paramSet = paramSets.FirstOrDefault(ps => ps.Name == m.Name).Parameters;
+                var paramStr = string.Join(", ", paramSet.Select(kv => $"{kv.Key}={kv.Value:F3}"));
+                OnTestProgress?.Invoke($"{rank} | {m.Name} | {m.AvgEntryScore:F3} | {m.AvgPeakSize:F3} | {m.AvgTimeToPeak:F3} | {m.Composite:F3} | {paramStr}");
+            }
+
+            // Save report to file if requested
+            if (writeToFile)
+            {
+                string reportPath = Path.Combine(_cacheDirectory, $"MLShared_BestFitReport_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+                using var sw = new StreamWriter(reportPath);
+                sw.WriteLine("Rank,ParameterSet,AvgEntryScore,AvgPeakSize,AvgTimeToPeak,Composite,Parameters");
+                prevComposite = double.MaxValue;
+                rank = 1;
+                for (int i = 0; i < rankedMetrics.Count; i++)
+                {
+                    var m = rankedMetrics[i];
+                    if (Math.Abs(m.Composite - prevComposite) > 1e-6) rank = i + 1;
+                    prevComposite = m.Composite;
+                    var paramSet = paramSets.FirstOrDefault(ps => ps.Name == m.Name).Parameters;
+                    var paramStr = string.Join("; ", paramSet.Select(kv => $"{kv.Key}={kv.Value:F3}"));
+                    sw.WriteLine($"{rank},{m.Name},{m.AvgEntryScore:F3},{m.AvgPeakSize:F3},{m.AvgTimeToPeak:F3},{m.Composite:F3},\"{paramStr}\"");
+                }
+                OnTestProgress?.Invoke($"Saved best-fit report to {reportPath}");
+            }
+
+            foreach (var dto in weightSetDtos)
+            {
+                using var saveScope = _scopeFactory.CreateScope();
+                var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
+            }
+        }
 
         public async Task RunMultipleForGuiAsync(
             StrategyFamily family,
@@ -679,9 +895,16 @@ namespace TradingSimulator.Simulator
                 OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{uniqueMarkets.Count} markets)");
             }
 
+            string csvPath = Path.Combine(_cacheDirectory, $"{label}_ResearchBus_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+            ResearchBus.DumpCsv(csvPath);
+            OnTestProgress?.Invoke($"Dumped ResearchBus to {csvPath}");
+
             OnTestProgress?.Invoke($"Total discrepancies across all markets: {totalDiscrepancies} (widespread if >10% of snapshots).");
             OnTestProgress?.Invoke($"{label}: all strategy sets completed");
         }
+
+        
+
         [TearDown]
         public void TearDown()
         {

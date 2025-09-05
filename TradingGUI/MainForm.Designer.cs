@@ -40,7 +40,9 @@
             buttonPanel = new FlowLayoutPanel();
             btnCheckAll = new Button();
             btnUncheckAll = new Button();
+            btnRunML = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvMarkets).BeginInit();
+            rightPane.SuspendLayout();
             layout.SuspendLayout();
             buttonPanel.SuspendLayout();
             SuspendLayout();
@@ -59,7 +61,7 @@
             dgvMarkets.Location = new Point(3, 3);
             dgvMarkets.Name = "dgvMarkets";
             dgvMarkets.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvMarkets.Size = new Size(294, 504);
+            dgvMarkets.Size = new Size(324, 546);
             dgvMarkets.TabIndex = 0;
             // 
             // dataGridViewTextBoxColumn1
@@ -79,10 +81,10 @@
             rtbLog.Dock = DockStyle.Fill;
             rtbLog.Font = new Font("Consolas", 9F);
             rtbLog.ForeColor = Color.Lime;
-            rtbLog.Location = new Point(3, 513);
+            rtbLog.Location = new Point(3, 555);
             rtbLog.Name = "rtbLog";
             rtbLog.ReadOnly = true;
-            rtbLog.Size = new Size(1094, 90);
+            rtbLog.Size = new Size(1094, 59);
             rtbLog.TabIndex = 2;
             rtbLog.Text = "";
             // 
@@ -114,28 +116,29 @@
             btnRunSet.Click += btnRunSet_Click;
             // 
             // formsPlot1
-            //
+            // 
             formsPlot1.Dock = DockStyle.Fill;
-            // When hosted inside rightPane, location and margin are governed by the parent
             formsPlot1.Location = new Point(0, 0);
             formsPlot1.Margin = new Padding(0);
             formsPlot1.Name = "formsPlot1";
-            // size will be controlled by the container; set a default
-            formsPlot1.Size = new Size(792, 504);
+            formsPlot1.Size = new Size(770, 552);
             formsPlot1.TabIndex = 1;
-
+            // 
             // rightPane
-            //
+            // 
+            rightPane.Controls.Add(formsPlot1);
             rightPane.Dock = DockStyle.Fill;
+            rightPane.Location = new Point(330, 0);
             rightPane.Margin = new Padding(0);
             rightPane.Name = "rightPane";
-            rightPane.Controls.Add(formsPlot1);
+            rightPane.Size = new Size(770, 552);
+            rightPane.TabIndex = 1;
             // 
             // layout
             // 
             layout.ColumnCount = 2;
-            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F)); 
-            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70F)); 
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70F));
             layout.Controls.Add(dgvMarkets, 0, 0);
             layout.Controls.Add(rightPane, 1, 0);
             layout.Controls.Add(rtbLog, 0, 1);
@@ -144,27 +147,28 @@
             layout.Location = new Point(0, 0);
             layout.Name = "layout";
             layout.RowCount = 3;
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 85F));  
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));   
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 5F));    
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 85F));
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 5F));
             layout.Size = new Size(1100, 650);
             layout.TabIndex = 0;
             // 
             // buttonPanel
             // 
-            layout.SetColumnSpan(buttonPanel, 2);            // full width
-            buttonPanel.WrapContents = false;                // single row
-            buttonPanel.AutoScroll = true;                   // allow overflow scroll if needed
+            buttonPanel.AutoScroll = true;
+            layout.SetColumnSpan(buttonPanel, 2);
             buttonPanel.Controls.Add(btnRun);
             buttonPanel.Controls.Add(btnReload);
             buttonPanel.Controls.Add(btnRunSet);
             buttonPanel.Controls.Add(btnCheckAll);
             buttonPanel.Controls.Add(btnUncheckAll);
+            buttonPanel.Controls.Add(btnRunML);
             buttonPanel.Dock = DockStyle.Fill;
-            buttonPanel.Location = new Point(3, 613);
+            buttonPanel.Location = new Point(3, 620);
             buttonPanel.Name = "buttonPanel";
-            buttonPanel.Size = new Size(1094, 34);
+            buttonPanel.Size = new Size(1094, 27);
             buttonPanel.TabIndex = 3;
+            buttonPanel.WrapContents = false;
             // 
             // btnCheckAll
             // 
@@ -184,23 +188,35 @@
             btnUncheckAll.Text = "Uncheck All";
             btnUncheckAll.Click += BtnUncheckAll_Click;
             // 
+            // btnRunML
+            // 
+            btnRunML.Location = new Point(438, 3);
+            btnRunML.Name = "btnRunML";
+            btnRunML.Size = new Size(90, 23);
+            btnRunML.TabIndex = 5;
+            btnRunML.Text = "Run ML";
+            btnRunML.Click += btnRunML_Click;
+            // 
             // MainForm
             // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1100, 650);
             Controls.Add(layout);
+            MinimumSize = new Size(800, 600);
             Name = "MainForm";
             Text = "Trading Strategy Viewer";
             ((System.ComponentModel.ISupportInitialize)dgvMarkets).EndInit();
+            rightPane.ResumeLayout(false);
             layout.ResumeLayout(false);
             buttonPanel.ResumeLayout(false);
             ResumeLayout(false);
-            AutoScaleMode = AutoScaleMode.Font;
-            MinimumSize = new Size(800, 600);
         }
 
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private TableLayoutPanel layout;
         private FlowLayoutPanel buttonPanel;
+        private Button btnRunML;
     }
 }
