@@ -122,7 +122,19 @@ namespace SmokehouseDTOs
             double yesBidSlopePerMinute_Medium,
             double noBidSlopePerMinute_Medium,
             double? psar,
-            double? adx)
+            double? adx,
+            double currentTradeRatePerMinuteYes,
+            double currentTradeRatePerMinuteNo,
+            double currentTradeVolumePerMinuteYes,
+            double currentTradeVolumePerMinuteNo,
+            double currentTradeCountYes,
+            double currentTradeCountNo,
+            double currentOrderVolumePerMinuteYesBid,
+            double currentOrderVolumePerMinuteNoBid,
+            double currentNonTradeRelatedOrderCountYes,
+            double currentNonTradeRelatedOrderCountNo,
+            double currentAverageTradeSizeYes,
+            double currentAverageTradeSizeNo)
         {
             Timestamp = marketTimestamp;
             MarketTicker = marketTicker;
@@ -235,6 +247,18 @@ namespace SmokehouseDTOs
             NoBidSlopePerMinute_Medium = noBidSlopePerMinute_Medium;
             ADX = adx;
             PSAR = psar;
+            CurrentTradeRatePerMinute_Yes = currentTradeRatePerMinuteYes;
+            CurrentTradeRatePerMinute_No = currentTradeRatePerMinuteNo;
+            CurrentTradeVolumePerMinute_Yes = currentTradeVolumePerMinuteYes;
+            CurrentTradeVolumePerMinute_No = currentTradeVolumePerMinuteNo;
+            CurrentTradeCount_Yes = currentTradeCountYes;
+            CurrentTradeCount_No = currentTradeCountNo;
+            CurrentOrderVolumePerMinute_YesBid = currentOrderVolumePerMinuteYesBid;
+            CurrentOrderVolumePerMinute_NoBid = currentOrderVolumePerMinuteNoBid;
+            CurrentNonTradeRelatedOrderCount_Yes = currentNonTradeRelatedOrderCountYes;
+            CurrentNonTradeRelatedOrderCount_No = currentNonTradeRelatedOrderCountNo;
+            CurrentAverageTradeSize_Yes = currentAverageTradeSizeYes;
+            CurrentAverageTradeSize_No = currentAverageTradeSizeNo;
         }
 
         public DateTime Timestamp { get; set; }
@@ -1458,6 +1482,92 @@ namespace SmokehouseDTOs
             return dict;
         }
 
+        private double _currentTradeRatePerMinute_Yes;
+        private double _currentTradeRatePerMinute_No;
+        private double _currentTradeVolumePerMinute_No;
+        private double _currentTradeVolumePerMinute_Yes;
+        private double _currentTradeCount_Yes;
+        private double _currentTradeCount_No;
+        private double _currentOrderVolumePerMinute_YesBid;
+        private double _currentOrderVolumePerMinute_NoBid;
+        private double _currentNonTradeRelatedOrderCount_Yes;
+        private double _currentNonTradeRelatedOrderCount_No;
+        private double _currentAverageTradeSize_Yes;
+        private double _currentAverageTradeSize_No;
+
+        public double CurrentTradeRatePerMinute_Yes
+        {
+            get => _currentTradeRatePerMinute_Yes;
+            set => _currentTradeRatePerMinute_Yes = value;
+        }
+
+        public double CurrentTradeRatePerMinute_No
+        {
+            get => _currentTradeRatePerMinute_No;
+            set => _currentTradeRatePerMinute_No = value;
+        }
+
+        public double CurrentTradeVolumePerMinute_No
+        {
+            get => _currentTradeVolumePerMinute_No;
+            set => _currentTradeVolumePerMinute_No = value;
+        }
+
+        public double CurrentTradeVolumePerMinute_Yes
+        {
+            get => _currentTradeVolumePerMinute_Yes;
+            set => _currentTradeVolumePerMinute_Yes = value;
+        }
+
+        public double CurrentTradeCount_Yes
+        {
+            get => _currentTradeCount_Yes;
+            set => _currentTradeCount_Yes = value;
+        }
+
+        public double CurrentTradeCount_No
+        {
+            get => _currentTradeCount_No;
+            set => _currentTradeCount_No = value;
+        }
+
+        public double CurrentOrderVolumePerMinute_YesBid
+        {
+            get => _currentOrderVolumePerMinute_YesBid;
+            set => _currentOrderVolumePerMinute_YesBid = value;
+        }
+
+        public double CurrentOrderVolumePerMinute_NoBid
+        {
+            get => _currentOrderVolumePerMinute_NoBid;
+            set => _currentOrderVolumePerMinute_NoBid = value;
+        }
+
+        public double CurrentNonTradeRelatedOrderCount_Yes
+        {
+            get => _currentNonTradeRelatedOrderCount_Yes;
+            set => _currentNonTradeRelatedOrderCount_Yes = value;
+        }
+
+        public double CurrentNonTradeRelatedOrderCount_No
+        {
+            get => _currentNonTradeRelatedOrderCount_No;
+            set => _currentNonTradeRelatedOrderCount_No = value;
+        }
+
+        public double CurrentAverageTradeSize_Yes
+        {
+            get => _currentAverageTradeSize_Yes;
+            set => _currentAverageTradeSize_Yes = value;
+        }
+
+        public double CurrentAverageTradeSize_No
+        {
+            get => _currentAverageTradeSize_No;
+            set => _currentAverageTradeSize_No = value;
+        }
+
+
         public MarketSnapshot Clone()
         {
             return new MarketSnapshot
@@ -1467,7 +1577,7 @@ namespace SmokehouseDTOs
                 MarketCategory = this.MarketCategory,
                 MarketStatus = this.MarketStatus,
                 SnapshotSchemaVersion = this.SnapshotSchemaVersion,
-                OrderbookData = this.OrderbookData?.Select(dict => new Dictionary<string, object>(dict)).ToList(),  // Deep copy dictionaries
+                OrderbookData = this.OrderbookData?.Select(dict => new Dictionary<string, object>(dict)).ToList(),
                 AllTimeHighYes_Bid = this.AllTimeHighYes_Bid,
                 AllTimeLowYes_Bid = this.AllTimeLowYes_Bid,
                 AllTimeHighNo_Bid = this.AllTimeHighNo_Bid,
@@ -1490,7 +1600,7 @@ namespace SmokehouseDTOs
                 PositionUpside = this.PositionUpside,
                 PositionDownside = this.PositionDownside,
                 TotalTraded = this.TotalTraded,
-                RestingOrders = this.RestingOrders?.Select(o => o).ToList(),  // Value tuple copy
+                RestingOrders = this.RestingOrders?.Select(o => o).ToList(),
                 RealizedPnl = this.RealizedPnl,
                 FeesPaid = this.FeesPaid,
                 PositionROI = this.PositionROI,
@@ -1579,9 +1689,24 @@ namespace SmokehouseDTOs
                 YesBidSlopePerMinute_Medium = this.YesBidSlopePerMinute_Medium,
                 NoBidSlopePerMinute_Medium = this.NoBidSlopePerMinute_Medium,
                 PSAR = this.PSAR,
-                ADX = this.ADX
+                ADX = this.ADX,
+
+                // NEW FIELDS
+                CurrentTradeRatePerMinute_Yes = this.CurrentTradeRatePerMinute_Yes,
+                CurrentTradeRatePerMinute_No = this.CurrentTradeRatePerMinute_No,
+                CurrentTradeVolumePerMinute_Yes = this.CurrentTradeVolumePerMinute_Yes,
+                CurrentTradeVolumePerMinute_No = this.CurrentTradeVolumePerMinute_No,
+                CurrentTradeCount_Yes = this.CurrentTradeCount_Yes,
+                CurrentTradeCount_No = this.CurrentTradeCount_No,
+                CurrentOrderVolumePerMinute_YesBid = this.CurrentOrderVolumePerMinute_YesBid,
+                CurrentOrderVolumePerMinute_NoBid = this.CurrentOrderVolumePerMinute_NoBid,
+                CurrentNonTradeRelatedOrderCount_Yes = this.CurrentNonTradeRelatedOrderCount_Yes,
+                CurrentNonTradeRelatedOrderCount_No = this.CurrentNonTradeRelatedOrderCount_No,
+                CurrentAverageTradeSize_Yes = this.CurrentAverageTradeSize_Yes,
+                CurrentAverageTradeSize_No = this.CurrentAverageTradeSize_No
             };
         }
+
 
         public sealed record Difference(string Path, object? Left, object? Right);
 
