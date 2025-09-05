@@ -8,6 +8,9 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Timers;
 using TradingStrategies.Configuration;
+using System.Linq;
+using System.Collections.Generic;
+using System;
 
 namespace SmokehouseBot.Services
 {
@@ -85,7 +88,7 @@ namespace SmokehouseBot.Services
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _statusTrackerService = statusTrackerService;
 
-            _recalculationTimer = new System.Timers.Timer(3000); // 3 seconds
+            _recalculationTimer = new System.Timers.Timer(10000); // 10 seconds
             _recalculationTimer.Elapsed += (sender, e) => OnRecalculationTimerElapsed(sender, e);
             _recalculationTimer.AutoReset = true;
 
@@ -505,6 +508,12 @@ namespace SmokehouseBot.Services
         #region Metric Recalculation
         private void OnRecalculationTimerElapsed(object sender, ElapsedEventArgs e)
         {
+            RecalculateAllMetrics();
+        }
+
+        public void RecalculateAllMetrics()
+        {
+            // Do not run if cancellation has been requested.
             if (_cancellationToken.IsCancellationRequested)
             {
                 _logger.LogDebug("Recalculation cancelled for {MarketTicker}", _marketTicker);
@@ -512,7 +521,16 @@ namespace SmokehouseBot.Services
             }
 
             _logger.LogDebug("Recalculation timer triggered for {MarketTicker}", _marketTicker);
+
+            // Perform standard metrics recalculation (includes cleanup of old events/trades).
             RecalculateMetrics();
+
+            // After standard metrics, compute and push snapshot‑scoped metrics onto Market.  This call
+            // writes directly to the Market's "Current*" fields.  Those fields are expected
+            // to exist on the Market type; if they do not, the assignment will fail to compile.
+            // It is invoked on the same 3‑second cadence as the general metrics so that both
+            // sets of measurements remain in sync.
+            UpdateCurrentSnapshotMetrics();
         }
 
         private void RecalculateMetrics()
@@ -1473,6 +1491,112 @@ namespace SmokehouseBot.Services
 
             return tradeCount;
         }
+        #endregion
+
+        #region Current snapshot metrics updater
+        /// <summary>
+        /// Computes snapshot‑scoped metrics (raw counts, volumes, and averages) for the
+        /// interval strictly after <see cref="IMarketData.LastSnapshotTaken"/> and writes
+        /// them into corresponding properties on the Market object.  This method is
+        /// invoked from the periodic recalculation timer so that snapshot metrics are
+        /// refreshed on the same cadence as the general metrics.  It writes directly to
+        /// fields such as CurrentTradeRatePerMinute_Yes/No, CurrentTradeVolumePerMinute_Yes/No,
+        /// CurrentTradeCount_Yes/No, CurrentOrderVolumePerMinute_YesBid/NoBid,
+        /// CurrentNonTradeRelatedOrderCount_Yes/No, and CurrentAverageTradeSize_Yes/No.  All
+        /// rate and volume metrics are normalized per minute over the elapsed time since
+        /// the last snapshot, and counts (trade and non‑trade) are likewise normalized per
+        /// minute.  Average trade size remains a raw (per‑trade) value.  Assignments
+        /// will fail to compile if the target properties do not yet exist on the Market
+        /// class; the user indicated they will add these themselves.
+        /// </summary>
+        private void UpdateCurrentSnapshotMetrics()
+        {
+            // Obtain a consistent snapshot of orderbook changes under lock to avoid
+            // enumerating the concurrent queue during updates.
+            OrderbookChange[] snapshot;
+            lock (_matchingLock)
+            {
+                snapshot = _orderbookChanges.ToArray();
+            }
+
+            // If there is no market or no snapshot tracking, there is nothing to update.
+            var market = Market;
+            if (market == null) return;
+            DateTime since = market.LastSnapshotTaken;
+
+            // Calculate the minutes elapsed since the last snapshot; avoid division by zero
+            double minutes = Math.Max(1e-9, (DateTime.UtcNow - since).TotalMinutes);
+
+            // Filter recent changes (strictly after snapshot) that haven't been canceled.
+            var recent = snapshot.Where(c => !c.IsCanceled && c.Timestamp > since).ToArray();
+
+            // Separate trade‑related vs non‑trade‑related changes by side.
+            var yesTrades = recent.Where(c => c.IsTradeRelated && c.Side == "yes").ToList();
+            var noTrades  = recent.Where(c => c.IsTradeRelated && c.Side == "no").ToList();
+
+            var yesOrders = recent.Where(c => !c.IsTradeRelated && c.Side == "yes").ToList();
+            var noOrders  = recent.Where(c => !c.IsTradeRelated && c.Side == "no").ToList();
+
+            // Raw counts
+            int tradeCountYesRaw = yesTrades.Count;
+            int tradeCountNoRaw  = noTrades.Count;
+            int nonTradeYesRaw   = yesOrders.Count;
+            int nonTradeNoRaw    = noOrders.Count;
+
+            // Normalize counts per minute (counts per minute)
+            double tradeCountPerMinYes = tradeCountYesRaw / minutes;
+            double tradeCountPerMinNo  = tradeCountNoRaw  / minutes;
+            double nonTradePerMinYes   = nonTradeYesRaw   / minutes;
+            double nonTradePerMinNo    = nonTradeNoRaw    / minutes;
+
+            // Per-minute volumes (dollarized). Use absolute delta for trade-related volumes and signed delta for orders
+            double tradeVolPerMinYes = yesTrades.Sum(c => (c.Price / 100.0) * Math.Abs(c.DeltaContracts)) / minutes;
+            double tradeVolPerMinNo  = noTrades.Sum (c => (c.Price / 100.0) * Math.Abs(c.DeltaContracts)) / minutes;
+            double orderVolPerMinYes = yesOrders.Sum(c => (c.Price / 100.0) * c.DeltaContracts) / minutes;
+            double orderVolPerMinNo  = noOrders.Sum (c => (c.Price / 100.0) * c.DeltaContracts) / minutes;
+
+            // Average trade size (dollarized per trade) remains raw (not normalized per minute)
+            double avgTradeSizeYes = 0;
+            if (tradeCountYesRaw > 0)
+            {
+                double totalDollarYes = yesTrades.Sum(t => Math.Abs(t.DeltaContracts) * (t.Price / 100.0));
+                avgTradeSizeYes = totalDollarYes / tradeCountYesRaw;
+            }
+
+            double avgTradeSizeNo = 0;
+            if (tradeCountNoRaw > 0)
+            {
+                double totalDollarNo = noTrades.Sum(t => Math.Abs(t.DeltaContracts) * (t.Price / 100.0));
+                avgTradeSizeNo = totalDollarNo / tradeCountNoRaw;
+            }
+
+            // Round values for consistent precision
+            tradeCountPerMinYes = Math.Round(tradeCountPerMinYes, 2);
+            tradeCountPerMinNo  = Math.Round(tradeCountPerMinNo,  2);
+            tradeVolPerMinYes   = Math.Round(tradeVolPerMinYes,   2);
+            tradeVolPerMinNo    = Math.Round(tradeVolPerMinNo,    2);
+            orderVolPerMinYes   = Math.Round(orderVolPerMinYes,   2);
+            orderVolPerMinNo    = Math.Round(orderVolPerMinNo,    2);
+            nonTradePerMinYes   = Math.Round(nonTradePerMinYes,   2);
+            nonTradePerMinNo    = Math.Round(nonTradePerMinNo,    2);
+            avgTradeSizeYes     = Math.Round(avgTradeSizeYes,     2);
+            avgTradeSizeNo      = Math.Round(avgTradeSizeNo,      2);
+
+            // Assign normalized metrics directly to Market fields.  Counts are stored as per-minute values.
+            market.CurrentTradeRatePerMinute_Yes        = tradeCountPerMinYes;
+            market.CurrentTradeRatePerMinute_No         = tradeCountPerMinNo;
+            market.CurrentTradeVolumePerMinute_Yes      = tradeVolPerMinYes;
+            market.CurrentTradeVolumePerMinute_No       = tradeVolPerMinNo;
+            market.CurrentTradeCount_Yes                = tradeCountPerMinYes;
+            market.CurrentTradeCount_No                 = tradeCountPerMinNo;
+            market.CurrentOrderVolumePerMinute_YesBid   = orderVolPerMinYes;
+            market.CurrentOrderVolumePerMinute_NoBid    = orderVolPerMinNo;
+            market.CurrentNonTradeRelatedOrderCount_Yes = nonTradePerMinYes;
+            market.CurrentNonTradeRelatedOrderCount_No  = nonTradePerMinNo;
+            market.CurrentAverageTradeSize_Yes          = avgTradeSizeYes;
+            market.CurrentAverageTradeSize_No           = avgTradeSizeNo;
+        }
+
         #endregion
 
         #region Dispose

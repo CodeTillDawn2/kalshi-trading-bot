@@ -49,10 +49,11 @@ namespace SmokehouseBot.Services
             }
         }
 
-        public async Task<int> SaveSnapshotAsync(string BrainInstance, CacheSnapshot cacheSnapshot)
+        public async Task<List<string>> SaveSnapshotAsync(string BrainInstance, CacheSnapshot cacheSnapshot)
         {
             try
             {
+                List<string> snapshotsActuallySaved = new List<string>();
                 var timestamp = cacheSnapshot.Timestamp;
                 var timestampString = timestamp.ToString("yyyyMMddTHHmmssZ");
 
@@ -71,7 +72,7 @@ namespace SmokehouseBot.Services
                             "after its expected time of {ExpectedTimestamp} (tolerance {DiscardThresholdSeconds}s). Discarding.",
                             timestampString, (timestamp - NextExpectedSnapshotTimestamp.Value).TotalSeconds,
                             NextExpectedSnapshotTimestamp.Value.ToString("yyyyMMddTHHmmssZ"), discardThreshold.TotalSeconds);
-                        return 0;
+                        return new List<string>();
                     }
 
                     var actualTimeSinceLastSnapshot = timestamp - _lastSnapshotTimestamp.Value;
@@ -154,6 +155,7 @@ namespace SmokehouseBot.Services
                         };
 
                         snapshotsToSave.Add(snapshotData);
+                        snapshotsActuallySaved.Add(marketSnapshot.Value.MarketTicker);
                         SavedCount += 1;
                     }
 
@@ -171,12 +173,12 @@ namespace SmokehouseBot.Services
                     _isFirstSnapshot = false;
                 }
 
-                return SavedCount;
+                return snapshotsActuallySaved;
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Error saving snapshot at {Timestamp}", cacheSnapshot.Timestamp);
-                return 0;
+                return new List<string>();
             }
         }
 

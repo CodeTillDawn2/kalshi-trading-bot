@@ -18,6 +18,7 @@ namespace SmokehouseBot.State.Interfaces
         List<OrderbookData> OrderbookData { get; set; }
         DateTime LastWebSocketMessageReceived { get; set; }
         DateTime LastOrderbookEventTimestamp { get; set; }
+        DateTime LastSnapshotTaken { get; set; }
         string CurrentPriceSource { get; }
         (int Ask, int Bid, DateTime When) TickerPriceYes { get; }
         (int Ask, int Bid, DateTime When) TickerPriceNo { get; }
@@ -130,6 +131,7 @@ namespace SmokehouseBot.State.Interfaces
         void RefreshCandlestickMetadata();
         void RefreshTickerMetadata();
         void RefreshPositionMetadata();
+        void RecalculateOrderbookChangeMetrics();
         List<PseudoCandlestick> BuildPseudoCandlesticks(string period, int lookbackPeriods = 34);
         List<SupportResistanceLevel> GetFilteredSupportResistanceLevels();
 
@@ -140,5 +142,17 @@ namespace SmokehouseBot.State.Interfaces
 
         public double? PSAR { get; set; }
         public double? ADX { get; set; }
+        double CurrentTradeRatePerMinute_Yes { get; set; }
+        double CurrentTradeRatePerMinute_No { get; set; }
+        double CurrentTradeVolumePerMinute_No { get; set; }
+        double CurrentTradeVolumePerMinute_Yes { get; set; }
+        double CurrentTradeCount_Yes { get; set; }
+        double CurrentTradeCount_No { get; set; }
+        double CurrentOrderVolumePerMinute_YesBid { get; set; }
+        double CurrentOrderVolumePerMinute_NoBid { get; set; }
+        double CurrentNonTradeRelatedOrderCount_Yes { get; set; }
+        double CurrentNonTradeRelatedOrderCount_No { get; set; }
+        double CurrentAverageTradeSize_Yes { get; set; }
+        double CurrentAverageTradeSize_No { get; set; }
     }
 }

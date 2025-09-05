@@ -1,5 +1,6 @@
 ﻿// CentralBrain.cs
 using KalshiBotData.Data.Interfaces;
+using KalshiBotData.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmokehouseBot.Configuration;
@@ -765,7 +766,9 @@ namespace SmokehouseBot.Management
                     cancellationToken.ThrowIfCancellationRequested();
                     if (!kvp.Value.ReceivedFirstSnapshot) continue;
                     kvp.Value.RefreshTickerMetadata();
+                    kvp.Value.RecalculateOrderbookChangeMetrics();
                     var marketSnapshot = CreateMarketSnapshot(snapshotDate, kvp);
+                    kvp.Value.LastSnapshotTaken = DateTime.UtcNow;
                     marketSnapshots.Add(marketSnapshot);
                 }
 
@@ -781,8 +784,8 @@ namespace SmokehouseBot.Management
 
                     var snapshotService = _serviceFactory.GetTradingSnapshotService();
                     cancellationToken.ThrowIfCancellationRequested();
-                    int savedSnapshotCount = await snapshotService.SaveSnapshotAsync(_brainInstance, allSnapshots);
-
+                    List<string> snapshotsSaved = await snapshotService.SaveSnapshotAsync(_brainInstance, allSnapshots);
+                    int savedSnapshotCount = snapshotsSaved.Count();
                     if (savedSnapshotCount > 0) _errorHandler.LastSuccessfulSnapshot = DateTime.Now;
 
                     _logger.LogInformation("BRAIN: {count} snapshots saved at {Timestamp}, Refresh Usage: {usage}%, Queue Usage {queue}%, EventQueue: {eventQueue}, TickerQueue: {tickerQueue}, NotificationQueue: {notificationQueue}, Orderbook Queue: {orderbookQueue}",

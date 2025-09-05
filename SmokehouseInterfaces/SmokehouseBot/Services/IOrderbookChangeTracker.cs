@@ -30,6 +30,7 @@ namespace SmokehouseBot.Services.Interfaces
         int GetTradeCount_MakerNo();
         int GetTopLevels(List<OrderbookData> Bids, int lowerBound);
         int GetBottomLevels(List<OrderbookData> Bids, int upperBound);
+        void RecalculateAllMetrics();
         void Shutdown();
     }
 }

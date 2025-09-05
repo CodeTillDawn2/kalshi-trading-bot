@@ -5,7 +5,7 @@ namespace SmokehouseBot.Services.Interfaces
 {
     public interface ITradingSnapshotService
     {
-        Task<int> SaveSnapshotAsync(string BrainInstance, CacheSnapshot cacheSnapshot);
+        Task<List<string>> SaveSnapshotAsync(string BrainInstance, CacheSnapshot cacheSnapshot);
         Task<Dictionary<string, List<MarketSnapshot>>> LoadManySnapshots(List<SnapshotDTO> snapshots, bool forceLoad = false);
         bool SnapshotIsValid(MarketSnapshot marketSnapshot);
         void ResetLastSnapshot();

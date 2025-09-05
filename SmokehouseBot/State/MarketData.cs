@@ -26,6 +26,7 @@ namespace SmokehouseBot.State
         private List<OrderbookData> _orderbookData;
         private DateTime _lastWebSocketMessageReceived;
         private DateTime _lastOrderbookEventTimestamp;
+        private DateTime _lastSnapshotTaken;
         private string _marketCategory = "";
 
         public string MarketCategory { get => _marketCategory; set => _marketCategory = value; }
@@ -154,6 +155,16 @@ namespace SmokehouseBot.State
         {
             get => _lastOrderbookEventTimestamp;
             set => _lastOrderbookEventTimestamp = value;
+        }
+        public DateTime LastSnapshotTaken
+        {
+            get => _lastSnapshotTaken;
+            set => _lastSnapshotTaken = value;
+        }
+
+        public void RecalculateOrderbookChangeMetrics()
+        {
+            _changeTracker.RecalculateAllMetrics();
         }
 
         public IOrderbookChangeTracker ChangeTracker => _changeTracker;
@@ -972,6 +983,93 @@ namespace SmokehouseBot.State
                 _allSupportResistanceLevels = value;
             }
         }
+
+        private double _currentTradeRatePerMinute_Yes;
+        private double _currentTradeRatePerMinute_No;
+        private double _currentTradeVolumePerMinute_No;
+        private double _currentTradeVolumePerMinute_Yes;
+        private double _currentTradeCount_Yes;
+        private double _currentTradeCount_No;
+        private double _currentOrderVolumePerMinute_YesBid;
+        private double _currentOrderVolumePerMinute_NoBid;
+        private double _currentNonTradeRelatedOrderCount_Yes;
+        private double _currentNonTradeRelatedOrderCount_No;
+        private double _currentAverageTradeSize_Yes;
+        private double _currentAverageTradeSize_No;
+
+        public double CurrentTradeRatePerMinute_Yes
+        {
+            get => _currentTradeRatePerMinute_Yes;
+            set => _currentTradeRatePerMinute_Yes = value;
+        }
+
+        public double CurrentTradeRatePerMinute_No
+        {
+            get => _currentTradeRatePerMinute_No;
+            set => _currentTradeRatePerMinute_No = value;
+        }
+
+        public double CurrentTradeVolumePerMinute_No
+        {
+            get => _currentTradeVolumePerMinute_No;
+            set => _currentTradeVolumePerMinute_No = value;
+        }
+
+        public double CurrentTradeVolumePerMinute_Yes
+        {
+            get => _currentTradeVolumePerMinute_Yes;
+            set => _currentTradeVolumePerMinute_Yes = value;
+        }
+
+        public double CurrentTradeCount_Yes
+        {
+            get => _currentTradeCount_Yes;
+            set => _currentTradeCount_Yes = value;
+        }
+
+        public double CurrentTradeCount_No
+        {
+            get => _currentTradeCount_No;
+            set => _currentTradeCount_No = value;
+        }
+
+        public double CurrentOrderVolumePerMinute_YesBid
+        {
+            get => _currentOrderVolumePerMinute_YesBid;
+            set => _currentOrderVolumePerMinute_YesBid = value;
+        }
+
+        public double CurrentOrderVolumePerMinute_NoBid
+        {
+            get => _currentOrderVolumePerMinute_NoBid;
+            set => _currentOrderVolumePerMinute_NoBid = value;
+        }
+
+        public double CurrentNonTradeRelatedOrderCount_Yes
+        {
+            get => _currentNonTradeRelatedOrderCount_Yes;
+            set => _currentNonTradeRelatedOrderCount_Yes = value;
+        }
+
+        public double CurrentNonTradeRelatedOrderCount_No
+        {
+            get => _currentNonTradeRelatedOrderCount_No;
+            set => _currentNonTradeRelatedOrderCount_No = value;
+        }
+
+        public double CurrentAverageTradeSize_Yes
+        {
+            get => _currentAverageTradeSize_Yes;
+            set => _currentAverageTradeSize_Yes = value;
+        }
+
+        public double CurrentAverageTradeSize_No
+        {
+            get => _currentAverageTradeSize_No;
+            set => _currentAverageTradeSize_No = value;
+        }
+
+
         public List<SupportResistanceLevel> GetFilteredSupportResistanceLevels()
         {
             if (AllSupportResistanceLevels == null)
