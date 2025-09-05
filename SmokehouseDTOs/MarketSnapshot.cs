@@ -144,6 +144,8 @@ namespace SmokehouseDTOs
             MarketStatus = marketStatus;
             BestYesBid = bestYesBid;
             BestNoBid = bestNoBid;
+            BestYesBidD = bestYesBid / 100.0;
+            BestNoBidD = bestNoBid / 100.0;
             OrderbookData = orderbookData;
             AllTimeHighYes_Bid = allTimeHighYesBid;
             AllTimeLowYes_Bid = allTimeLowYesBid;
@@ -809,6 +811,27 @@ namespace SmokehouseDTOs
         /// 0 if no "No" bid orders.
         /// </remarks>
         public int BestNoBid { get; set; }
+
+
+        /// <summary>
+        /// Gets or sets the best "Yes" bid price in the order book.
+        /// </summary>
+        /// <remarks>
+        /// Highest price offered to buy "Yes" contracts, in cents. This is the dollars version of the price which is included to ease the transition later.
+        /// Sourced from <see cref="MarketData.BestYesBid"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// 0 if no "Yes" bid orders.
+        /// </remarks>
+        public double BestYesBidD { get; set; }
+
+        /// <summary>
+        /// Gets or sets the best "No" bid price in the order book. This is the dollars version of the price which is included to ease the transition later.
+        /// </summary>
+        /// <remarks>
+        /// Highest price offered to buy "No" contracts, in cents.
+        /// Sourced from <see cref="MarketData.BestNoBid"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// 0 if no "No" bid orders.
+        /// </remarks>
+        public double BestNoBidD { get; set; }
 
         /// <summary>
         /// Gets or sets the best "Yes" ask price in the order book.
@@ -1708,7 +1731,9 @@ namespace SmokehouseDTOs
                 CurrentNonTradeRelatedOrderCount_No = this.CurrentNonTradeRelatedOrderCount_No,
                 CurrentAverageTradeSize_Yes = this.CurrentAverageTradeSize_Yes,
                 CurrentAverageTradeSize_No = this.CurrentAverageTradeSize_No,
-                LastTenCandlesticks = this.LastTenCandlesticks
+                LastTenCandlesticks = this.LastTenCandlesticks,
+                BestNoBidD = this.BestNoBidD,
+                BestYesBidD = this.BestYesBidD
             };
         }
 
