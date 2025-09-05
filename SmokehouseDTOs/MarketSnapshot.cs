@@ -134,7 +134,8 @@ namespace SmokehouseDTOs
             double currentNonTradeRelatedOrderCountYes,
             double currentNonTradeRelatedOrderCountNo,
             double currentAverageTradeSizeYes,
-            double currentAverageTradeSizeNo)
+            double currentAverageTradeSizeNo,
+            List<PseudoCandlestick> lastTenCandlesticks)
         {
             Timestamp = marketTimestamp;
             MarketTicker = marketTicker;
@@ -259,6 +260,7 @@ namespace SmokehouseDTOs
             CurrentNonTradeRelatedOrderCount_No = currentNonTradeRelatedOrderCountNo;
             CurrentAverageTradeSize_Yes = currentAverageTradeSizeYes;
             CurrentAverageTradeSize_No = currentAverageTradeSizeNo;
+            LastTenCandlesticks = lastTenCandlesticks;
         }
 
         public DateTime Timestamp { get; set; }
@@ -1567,6 +1569,9 @@ namespace SmokehouseDTOs
             set => _currentAverageTradeSize_No = value;
         }
 
+        public List<PseudoCandlestick> LastTenCandlesticks { get { return _lastTenCandlesticks; } set { _lastTenCandlesticks = value; } }
+
+        private List<PseudoCandlestick> _lastTenCandlesticks;
 
         public MarketSnapshot Clone()
         {
@@ -1691,7 +1696,6 @@ namespace SmokehouseDTOs
                 PSAR = this.PSAR,
                 ADX = this.ADX,
 
-                // NEW FIELDS
                 CurrentTradeRatePerMinute_Yes = this.CurrentTradeRatePerMinute_Yes,
                 CurrentTradeRatePerMinute_No = this.CurrentTradeRatePerMinute_No,
                 CurrentTradeVolumePerMinute_Yes = this.CurrentTradeVolumePerMinute_Yes,
@@ -1703,7 +1707,8 @@ namespace SmokehouseDTOs
                 CurrentNonTradeRelatedOrderCount_Yes = this.CurrentNonTradeRelatedOrderCount_Yes,
                 CurrentNonTradeRelatedOrderCount_No = this.CurrentNonTradeRelatedOrderCount_No,
                 CurrentAverageTradeSize_Yes = this.CurrentAverageTradeSize_Yes,
-                CurrentAverageTradeSize_No = this.CurrentAverageTradeSize_No
+                CurrentAverageTradeSize_No = this.CurrentAverageTradeSize_No,
+                LastTenCandlesticks = this.LastTenCandlesticks
             };
         }
 

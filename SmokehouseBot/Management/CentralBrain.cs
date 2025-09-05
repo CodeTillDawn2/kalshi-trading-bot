@@ -990,7 +990,6 @@ namespace SmokehouseBot.Management
                kvp.Value.NoBidSlopePerMinute_Medium,
                kvp.Value.PSAR,
                kvp.Value.ADX,
-               // NEW CURRENT-* ARGS
                kvp.Value.CurrentTradeRatePerMinute_Yes,
                kvp.Value.CurrentTradeRatePerMinute_No,
                kvp.Value.CurrentTradeVolumePerMinute_Yes,
@@ -1002,7 +1001,8 @@ namespace SmokehouseBot.Management
                kvp.Value.CurrentNonTradeRelatedOrderCount_Yes,
                kvp.Value.CurrentNonTradeRelatedOrderCount_No,
                kvp.Value.CurrentAverageTradeSize_Yes,
-               kvp.Value.CurrentAverageTradeSize_No
+               kvp.Value.CurrentAverageTradeSize_No,
+               kvp.Value.LastTenCandlesticks
            );
 
         }
