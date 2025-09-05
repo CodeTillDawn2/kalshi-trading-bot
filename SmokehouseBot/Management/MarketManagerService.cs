@@ -28,6 +28,7 @@ namespace SmokehouseBot.Management
         private readonly TradingConfig _tradingConfig;
         private IStatusTrackerService _statusTrackerService;
         private bool MonitoringWatchList = false;
+        private readonly object _resetLock = new();
 
         public MarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
@@ -52,9 +53,13 @@ namespace SmokehouseBot.Management
 
         public void ClearMarketsToReset()
         {
-            MarketsToAddAfterReset.Clear();
-            MarketsToReset.Clear();
+            lock (_resetLock)
+            {
+                MarketsToAddAfterReset.Clear();
+                MarketsToReset.Clear();
+            }
         }
+
 
         public async Task HandleMarketResets()
         {
@@ -75,8 +80,12 @@ namespace SmokehouseBot.Management
 
         public void TriggerMarketReset(string marketTicker)
         {
-            MarketsToReset.Add(marketTicker);
+            lock (_resetLock)
+            {
+                MarketsToReset.Add(marketTicker);
+            }
         }
+
 
         public async Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics metrics)
         {
@@ -89,12 +98,13 @@ namespace SmokehouseBot.Management
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
                 int removedCount = await RemoveEndedMarkets(context);
                 if (removedCount > 0)
-                    _logger.LogInformation("BRAIN: Removed {count} markets due to them being ended.", removedCount);
+                    _logger.LogInformation("BRAIN: Removed {Count} markets due to them being ended.", removedCount);
 
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
                 var token = cts.Token;
+
                 if (_performanceMonitor.LastPerformanceSampleDate == null)
                 {
                     _logger.LogInformation("Stats: No performance metric available for MarketRefreshService.");
@@ -122,14 +132,13 @@ namespace SmokehouseBot.Management
                     || (Math.Abs(metrics.CurrentCount - watchedMarkets.Count()) > maxDif)
                     || MarketsToAddAfterReset.Count() > 0)
                 {
-                    _logger.LogDebug("Stats: Waiting for markets to settle. Percentage={percentage:F2}%, CurrentCount={currentCount}, ActualCount={actualCount}, Refresh Usage: {usage}, Queue Usage {queue}, Markets to add after reset: {0}, Recent Adjustment? {1}",
+                    _logger.LogDebug("Stats: Waiting for markets to settle. Percentage={Percentage:F2}%, CurrentCount={CurrentCount}, ActualCount={ActualCount}, RefreshUsage={RefreshUsage}, QueueUsage={QueueUsage}, MarketsToAddAfterReset={MarketsToAdd}, RecentAdjustment={RecentAdjustment}",
                         metrics.CurrentUsage, metrics.CurrentCount, actualMarketCount, Math.Round(metrics.CurrentUsage, 2), _performanceMonitor.GetQueueHighCountPercentage(), MarketsToAddAfterReset.Count(), _recentMarketAdjustment);
                     MonitoringWatchList = false;
                     return;
                 }
 
                 int actualTarget;
-
                 if (brain.ManagedWatchList)
                 {
                     actualTarget = CalculateTarget(metrics, brain);
@@ -147,10 +156,11 @@ namespace SmokehouseBot.Management
 
                 if (actualTarget < actualMarketCount && (!brain.ManagedWatchList || metrics.CurrentUsage > brain.UsageMax))
                 {
-                    _logger.LogInformation("BRAIN: Usage is too high - attempting to remove up to {0} markets.", actualMarketCount - actualTarget);
+                    int toRemove = actualMarketCount - actualTarget;
+                    _logger.LogInformation("BRAIN: Usage is too high - attempting to remove up to {ToRemove} markets.", toRemove);
 
-                    int removed = await RemoveLowestInterestMarkets(context, apiService, brain, actualMarketCount - actualTarget, token);
-                    _logger.LogInformation("BRAIN: Usage too high: {percentage:F2}%. Removed {count} markets to target {actualTarget} markets",
+                    int removed = await RemoveLowestInterestMarkets(context, apiService, brain, toRemove, token);
+                    _logger.LogInformation("BRAIN: Usage too high: {Percentage:F2}%. Removed {Count} markets to target {ActualTarget} markets",
                         metrics.CurrentUsage, removed, actualTarget);
                 }
                 else if (actualTarget > actualMarketCount && (!brain.ManagedWatchList || metrics.CurrentUsage < brain.UsageMin))
@@ -160,19 +170,16 @@ namespace SmokehouseBot.Management
                     List<string> addedMarkets = await AddHighInterestMarkets(context, apiService, actualTarget - actualMarketCount, dto.MinimumInterest);
                     if (addedMarkets.Count > 0 && _serviceFactory.GetDataCache().WatchedMarkets != null)
                     {
-                        _logger.LogInformation("BRAIN: Usage too low: {percentage:F2}% with {actualMarketCount} markets. Added up to {count} markets.",
+                        _logger.LogInformation("BRAIN: Usage too low: {Percentage:F2}% with {ActualMarketCount} markets. Added up to {Count} markets.",
                             metrics.CurrentUsage, actualMarketCount, actualTarget - actualMarketCount);
                         foreach (var ticker in addedMarkets)
-                        {
-                            _logger.LogInformation("BRAIN: Added {market} to watch list during Monitor Watch List", ticker);
-                        }
+                            _logger.LogInformation("BRAIN: Added {Market} to watch list during Monitor Watch List", ticker);
                     }
                 }
                 else if (brain.ManagedWatchList)
                 {
                     BrainInstanceDTO? dto = await context.GetBrainInstance(_executionConfig.BrainInstance);
-                    _logger.LogInformation("BRAIN: Usage within acceptable range: {percentage:F2}%. Checking for uninteresting markets.",
-                        metrics.CurrentUsage);
+                    _logger.LogInformation("BRAIN: Usage within acceptable range: {Percentage:F2}%. Checking for uninteresting markets.", metrics.CurrentUsage);
                     await RemoveUninterestingMarkets(context, apiService, brain, dto.MinimumInterest);
                 }
 
@@ -188,6 +195,7 @@ namespace SmokehouseBot.Management
             }
             MonitoringWatchList = false;
         }
+
 
         public int CalculateTarget(PerformanceMetrics metrics, BrainInstanceDTO brain)
         {
@@ -266,12 +274,17 @@ namespace SmokehouseBot.Management
 
         private async Task ResetMarkets()
         {
-            var marketsToAdd = MarketsToAddAfterReset.Distinct().ToList();
+            List<string> marketsToAdd;
+            lock (_resetLock)
+            {
+                marketsToAdd = MarketsToAddAfterReset.Distinct().ToList();
+            }
+
             foreach (var market in marketsToAdd)
             {
                 if (_statusTrackerService.GetCancellationToken().IsCancellationRequested)
                 {
-                    MarketsToAddAfterReset.Clear();
+                    lock (_resetLock) { MarketsToAddAfterReset.Clear(); }
                     return;
                 }
 
@@ -284,44 +297,45 @@ namespace SmokehouseBot.Management
                 {
                     List<MarketDTO> mkts = await context.GetMarkets(includedMarkets: new HashSet<string>() { market });
                     MarketDTO? mkt = mkts.FirstOrDefault();
-                    if (mkt != null)
+                    if (mkt != null && !KalshiConstants.MarketIsEnded(mkt.status))
                     {
-                        if (!KalshiConstants.MarketIsEnded(mkt.status))
-                        {
-                            _logger.LogInformation("Stats: Adding back {market} after reset, with status {status}", market, mkt.status);
-                            await _serviceFactory.GetMarketDataService().AddMarketWatch(market);
-                        }
+                        _logger.LogInformation("Stats: Adding back {market} after reset, with status {status}", market, mkt.status);
+                        await _serviceFactory.GetMarketDataService().AddMarketWatch(market);
                     }
-
                 }
                 else
                 {
-                    _logger.LogInformation("Stats: Skipped readding {0} after reset because already watched. Watched: {0}", market,
-                        String.Join(",", _serviceFactory.GetDataCache().WatchedMarkets));
+                    _logger.LogInformation("Stats: Skipped readding {Market} after reset because already watched. Watched: {Watched}",
+                        market, string.Join(",", _serviceFactory.GetDataCache().WatchedMarkets));
                 }
             }
 
-            MarketsToAddAfterReset.Clear();
+            lock (_resetLock) { MarketsToAddAfterReset.Clear(); }
 
-            var marketsToReset = MarketsToReset.Distinct().ToList();
+            List<string> marketsToReset;
+            lock (_resetLock)
+            {
+                marketsToReset = MarketsToReset.Distinct().ToList();
+            }
+
             foreach (var market in marketsToReset)
             {
                 if (_statusTrackerService.GetCancellationToken().IsCancellationRequested)
                 {
-                    MarketsToReset.Clear();
+                    lock (_resetLock) { MarketsToReset.Clear(); }
                     return;
                 }
+
                 if (_serviceFactory.GetDataCache().WatchedMarkets.Contains(market))
                 {
                     _logger.LogInformation("Stats: Removing {market} for reset", market);
                     await _serviceFactory.GetMarketDataService().UnwatchMarket(market);
-                    MarketsToAddAfterReset.Add(market);
-
+                    lock (_resetLock) { MarketsToAddAfterReset.Add(market); }
                 }
-                MarketsToReset.RemoveAll(x => x == market);
+                lock (_resetLock) { MarketsToReset.RemoveAll(x => x == market); }
             }
-
         }
+
 
         private async Task<int> RemoveLowestInterestMarkets(IKalshiBotContext context, IKalshiAPIService apiService, BrainInstanceDTO brain,
             int marketsToRemoveCount, CancellationToken token)
@@ -391,7 +405,7 @@ namespace SmokehouseBot.Management
 
             foreach (MarketWatchDTO watch in finalizedWatches)
             {
-                if (_serviceFactory.GetDataCache().WatchedMarkets.Contains(watch.market_ticker))
+                if (!_serviceFactory.GetDataCache().WatchedMarkets.Contains(watch.market_ticker))
                 {
                     _logger.LogInformation("Stats: Skipped removing {0} because it wasn't actually still being watched", watch.market_ticker);
                     watch.BrainLock = null;
@@ -400,12 +414,11 @@ namespace SmokehouseBot.Management
                 }
                 _logger.LogInformation("Stats: Removing ended market {market}", watch.market_ticker);
                 await _serviceFactory.GetMarketDataService().UnwatchMarket(watch.market_ticker);
-                marketsRemoved = marketsRemoved - 1;
+                marketsRemoved = marketsRemoved + 1;
 
             }
+
             await context.RemoveMarketWatches(finalizedWatches);
-
-
             return marketsRemoved;
         }
 
@@ -550,63 +563,66 @@ namespace SmokehouseBot.Management
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
                 var token = cts.Token;
-                var marketDataService = _serviceFactory.GetMarketDataService();
-                var marketsToRemove = await context.GetMarketWatches_cached(
-                    brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock },
+
+                var candidates = await context.GetMarketWatches_cached(
+                    brainLocksIncluded: new HashSet<Guid> { _brainStatus.BrainLock },
                     maxInterestScore: minimumInterest
-                    );
+                );
 
                 var interestScoreCutoff = DateTime.Now.AddHours(-3);
-                var tickersToScore = marketsToRemove
+                var tickersToScore = candidates
                     .Where(x => x.InterestScore == null || x.InterestScoreDate <= interestScoreCutoff)
                     .Select(x => x.market_ticker)
                     .Distinct()
                     .ToList();
 
-                _logger.LogDebug("API: Getting market interest score for {0} in {1}", tickersToScore, "RemoveUninterestingMarkets");
-                var marketScores = tickersToScore.Any()
-                    ? await _serviceFactory.GetMarketInterestScoreHelper().GetMarketInterestScores(_scopeFactory, tickersToScore)
-                    : new List<(string Ticker, double Score)>();
-
-                foreach (var watch in marketsToRemove.ToList())
+                if (tickersToScore.Any())
                 {
+                    _logger.LogDebug("API: Getting market interest score for {@Tickers} in {Context}", tickersToScore, "RemoveUninterestingMarkets");
+                    var scores = await _serviceFactory.GetMarketInterestScoreHelper()
+                        .GetMarketInterestScores(_scopeFactory, tickersToScore);
 
-                    var score = marketScores.FirstOrDefault(x => x.Ticker == watch.market_ticker);
-                    if (score.Ticker != null)
+                    foreach (var w in candidates)
                     {
-                        watch.InterestScore = score.Score;
-                        watch.InterestScoreDate = DateTime.Now;
+                        var s = scores.FirstOrDefault(x => x.Ticker == w.market_ticker);
+                        if (s.Ticker != null)
+                        {
+                            w.InterestScore = s.Score;
+                            w.InterestScoreDate = DateTime.Now;
+                        }
                     }
                 }
 
-                // Ensure that if these are toggled on, they don't get unwatched
                 if (brain.WatchPositions || brain.WatchOrders)
                 {
-                    var MarketPositions = await context.GetMarketPositions_cached(
-                        marketTickers: marketsToRemove.Select(x => x.market_ticker).ToHashSet());
+                    var marketPositions = await context.GetMarketPositions_cached(
+                        marketTickers: candidates.Select(x => x.market_ticker).ToHashSet());
 
                     if (brain.WatchPositions)
                     {
-                        marketsToRemove.RemoveWhere(x => MarketPositions.Where(x => x.Position != 0)
-                            .Select(x => x.Ticker).Contains(x.market_ticker));
+                        var protectedByPosition = marketPositions
+                            .Where(p => p.Position != 0)
+                            .Select(p => p.Ticker)
+                            .ToHashSet();
+                        candidates = candidates.Where(x => !protectedByPosition.Contains(x.market_ticker)).ToHashSet();
                     }
 
                     if (brain.WatchOrders)
                     {
-                        marketsToRemove.RemoveWhere(x => MarketPositions.Where(x => x.RestingOrdersCount != 0)
-                            .Select(x => x.Ticker).Contains(x.market_ticker));
+                        var protectedByOrders = marketPositions
+                            .Where(p => p.RestingOrdersCount != 0)
+                            .Select(p => p.Ticker)
+                            .ToHashSet();
+                        candidates = candidates.Where(x => !protectedByOrders.Contains(x.market_ticker)).ToHashSet();
                     }
                 }
 
-                foreach (var watch in marketsToRemove.ToList())
+                foreach (var watch in candidates)
                 {
-                    if (watch.InterestScore > minimumInterest)
+                    if ((watch.InterestScore ?? double.MinValue) <= minimumInterest)
                     {
-                        watch.LastWatched = DateTime.Now;
-                    }
-                    else
-                    {
-                        _logger.LogInformation("Stats: Removing market {MarketTicker} due to low interest. {0}", watch.market_ticker, watch.InterestScore);
+                        _logger.LogInformation("Stats: Removing market {MarketTicker} due to low interest. Interest={InterestScore}",
+                            watch.market_ticker, watch.InterestScore);
                         await _serviceFactory.GetMarketDataService().UnwatchMarket(watch.market_ticker);
                     }
                 }
@@ -620,6 +636,7 @@ namespace SmokehouseBot.Management
                 _logger.LogError(ex, "Failed to remove uninteresting markets");
             }
         }
+
 
     }
 }
