@@ -1,8 +1,9 @@
-﻿namespace SmokehousePatterns
+﻿namespace SmokehouseDTOs
 {
     // Helper class to cache ask price values
     public class CandleMids
     {
+        public string? MarketTicker { get; set; }
         public DateTime Timestamp { get; set; }
         public double Open { get; set; }
         public double Close { get; set; }

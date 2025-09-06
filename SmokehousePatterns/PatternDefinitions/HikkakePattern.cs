@@ -1,4 +1,5 @@
-﻿using SmokehousePatterns.Helpers;
+﻿using SmokehouseDTOs;
+using SmokehousePatterns.Helpers;
 using static SmokehousePatterns.Helpers.PatternUtils;
 
 namespace SmokehousePatterns.PatternDefinitions

@@ -181,9 +181,7 @@ namespace SmokehouseDTOs
 
         public TimeSpan? HoldTime() => Changed("HoldTime") ? _current.HoldTime : (TimeSpan?)null;
 
-        public double? OrderVolumePerMinute_YesAsk() => Changed("OrderVolumePerMinute_YesAsk") ? _current.OrderVolumePerMinute_YesAsk : (double?)null;
         public double? OrderVolumePerMinute_YesBid() => Changed("OrderVolumePerMinute_YesBid") ? _current.OrderVolumePerMinute_YesBid : (double?)null;
-        public double? OrderVolumePerMinute_NoAsk() => Changed("OrderVolumePerMinute_NoAsk") ? _current.OrderVolumePerMinute_NoAsk : (double?)null;
         public double? OrderVolumePerMinute_NoBid() => Changed("OrderVolumePerMinute_NoBid") ? _current.OrderVolumePerMinute_NoBid : (double?)null;
 
         public double? TolerancePercentage() => Changed("TolerancePercentage") ? _current.TolerancePercentage : (double?)null;

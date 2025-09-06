@@ -934,7 +934,7 @@ namespace SmokehouseBot.State
             return result.OrderBy(pc => pc.Timestamp).ToList();
         }
 
-        public List<PseudoCandlestick> LastTenCandlesticks { get { return _minutePseudoCandlesticks.TakeLast(10).ToList(); } }
+        public List<PseudoCandlestick> RecentCandlesticks { get { return _minutePseudoCandlesticks.TakeLast(15).ToList(); } }
 
         private List<PseudoCandlestick> _minutePseudoCandlesticks = new List<PseudoCandlestick>();
         private List<PseudoCandlestick> _hourPseudoCandlesticks = new List<PseudoCandlestick>();

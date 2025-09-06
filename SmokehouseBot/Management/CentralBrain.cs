@@ -1002,7 +1002,7 @@ namespace SmokehouseBot.Management
                kvp.Value.CurrentNonTradeRelatedOrderCount_No,
                kvp.Value.CurrentAverageTradeSize_Yes,
                kvp.Value.CurrentAverageTradeSize_No,
-               kvp.Value.LastTenCandlesticks
+               kvp.Value.RecentCandlesticks
            );
 
         }

@@ -154,6 +154,6 @@ namespace SmokehouseBot.State.Interfaces
         double CurrentNonTradeRelatedOrderCount_No { get; set; }
         double CurrentAverageTradeSize_Yes { get; set; }
         double CurrentAverageTradeSize_No { get; set; }
-        List<PseudoCandlestick> LastTenCandlesticks { get; }
+        List<PseudoCandlestick> RecentCandlesticks { get; }
     }
 }

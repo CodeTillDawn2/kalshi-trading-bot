@@ -9,46 +9,46 @@ namespace SmokehousePatterns
     public class PatternDetector
     {
         // Detects patterns and exports them to JSON, skipping existing files
-        public async Task DetectAndExportPatterns(string parquetFilePath, string outputDirectory, int lookback, int lookforward, int intervalType)
-        {
-            string marketName = Path.GetFileNameWithoutExtension(parquetFilePath).Replace("_MarketStates", "");
-            string patternsFilePath = Path.Combine(outputDirectory, $"{marketName}_patterns.json");
+        //public async Task DetectAndExportPatterns(string parquetFilePath, string outputDirectory, int lookback, int lookforward, int intervalType)
+        //{
+        //    string marketName = Path.GetFileNameWithoutExtension(parquetFilePath).Replace("_MarketStates", "");
+        //    string patternsFilePath = Path.Combine(outputDirectory, $"{marketName}_patterns.json");
 
-            if (File.Exists(patternsFilePath)) return;
+        //    if (File.Exists(patternsFilePath)) return;
 
-            var marketStates = await ReadParquetFile(parquetFilePath);
-            if (marketStates == null || marketStates.Count < 2) return;
+        //    var marketStates = await ReadParquetFile(parquetFilePath);
+        //    if (marketStates == null || marketStates.Count < 2) return;
 
-            int trendLookback = GetTrendLookback(intervalType);
-            var detailedPatterns = await PatternSearch.DetectPatterns(marketStates, trendLookback, lookforward);
+        //    int trendLookback = GetTrendLookback(intervalType);
+        //    var detailedPatterns = await PatternSearch.DetectPatterns(marketStates, trendLookback, lookforward);
 
-            Directory.CreateDirectory(outputDirectory);
-            using (var writer = new StreamWriter(patternsFilePath))
-            using (var jsonWriter = new JsonTextWriter(writer) { Formatting = Formatting.Indented })
-            {
-                jsonWriter.WriteStartArray();
-                foreach (var patternEntry in detailedPatterns)
-                {
-                    int index = patternEntry.Key;
-                    var current = marketStates[index];
+        //    Directory.CreateDirectory(outputDirectory);
+        //    using (var writer = new StreamWriter(patternsFilePath))
+        //    using (var jsonWriter = new JsonTextWriter(writer) { Formatting = Formatting.Indented })
+        //    {
+        //        jsonWriter.WriteStartArray();
+        //        foreach (var patternEntry in detailedPatterns)
+        //        {
+        //            int index = patternEntry.Key;
+        //            var current = marketStates[index];
 
-                    foreach (var pattern in patternEntry.Value)
-                    {
-                        int lookbackStart = Math.Max(0, index - (pattern.Candles.Count - 1) - lookback);
-                        int lookbackCount = Math.Min(lookback, index - (pattern.Candles.Count - 1) - lookbackStart);
-                        var lookbackStates = lookbackCount > 0 ? marketStates.GetRange(lookbackStart, lookbackCount) : new List<MarketState>();
+        //            foreach (var pattern in patternEntry.Value)
+        //            {
+        //                int lookbackStart = Math.Max(0, index - (pattern.Candles.Count - 1) - lookback);
+        //                int lookbackCount = Math.Min(lookback, index - (pattern.Candles.Count - 1) - lookbackStart);
+        //                var lookbackStates = lookbackCount > 0 ? marketStates.GetRange(lookbackStart, lookbackCount) : new List<MarketState>();
 
-                        int forwardCount = Math.Min(lookforward, marketStates.Count - index - 1);
-                        var forwardStates = forwardCount > 0 ? marketStates.GetRange(index + 1, forwardCount) : new List<MarketState>();
+        //                int forwardCount = Math.Min(lookforward, marketStates.Count - index - 1);
+        //                var forwardStates = forwardCount > 0 ? marketStates.GetRange(index + 1, forwardCount) : new List<MarketState>();
 
-                        var occurrence = CollectPatternOccurrence(pattern, current, marketStates, index, lookbackStates, forwardStates, lookback, lookforward, intervalType);
-                        if (occurrence != null)
-                            JsonSerializer.CreateDefault().Serialize(jsonWriter, occurrence);
-                    }
-                }
-                jsonWriter.WriteEndArray();
-            }
-        }
+        //                var occurrence = CollectPatternOccurrence(pattern, current, marketStates, index, lookbackStates, forwardStates, lookback, lookforward, intervalType);
+        //                if (occurrence != null)
+        //                    JsonSerializer.CreateDefault().Serialize(jsonWriter, occurrence);
+        //            }
+        //        }
+        //        jsonWriter.WriteEndArray();
+        //    }
+        //}
 
         public async Task BuildPatternConfig(string patternsFilePath, string configOutputDir, int lookback, int lookforward, int intervalType)
         {

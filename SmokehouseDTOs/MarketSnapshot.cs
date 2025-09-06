@@ -135,7 +135,7 @@ namespace SmokehouseDTOs
             double currentNonTradeRelatedOrderCountNo,
             double currentAverageTradeSizeYes,
             double currentAverageTradeSizeNo,
-            List<PseudoCandlestick> lastTenCandlesticks)
+            List<PseudoCandlestick> recentCandlesticks)
         {
             Timestamp = marketTimestamp;
             MarketTicker = marketTicker;
@@ -262,7 +262,7 @@ namespace SmokehouseDTOs
             CurrentNonTradeRelatedOrderCount_No = currentNonTradeRelatedOrderCountNo;
             CurrentAverageTradeSize_Yes = currentAverageTradeSizeYes;
             CurrentAverageTradeSize_No = currentAverageTradeSizeNo;
-            LastTenCandlesticks = lastTenCandlesticks;
+            RecentCandlesticks = recentCandlesticks;
         }
 
         public DateTime Timestamp { get; set; }
@@ -1269,16 +1269,6 @@ namespace SmokehouseDTOs
         public TimeSpan? HoldTime { get; set; }
 
         /// <summary>
-        /// Gets or sets the order rate for "Yes" ask orders, in dollars per minute.
-        /// </summary>
-        /// <remarks>
-        /// Rate of non-trade-related "Yes" ask (No bid) order changes.
-        /// Sourced from <see cref="MarketData.OrderVolumePerMinute_YesAsk"/>, computed by <see cref="OrderbookChangeTracker.GetNoNetOrderRatePerMinute"/> (negated).
-        /// Sums dollar value (price/100 * delta contracts) divided by elapsed minutes.
-        /// </remarks>
-        public double OrderVolumePerMinute_YesAsk { get; set; }
-
-        /// <summary>
         /// Gets or sets the order rate for "Yes" bid orders, in dollars per minute.
         /// </summary>
         /// <remarks>
@@ -1287,16 +1277,6 @@ namespace SmokehouseDTOs
         /// Sums dollar value (price/100 * delta contracts) divided by elapsed minutes.
         /// </remarks>
         public double OrderVolumePerMinute_YesBid { get; set; }
-
-        /// <summary>
-        /// Gets or sets the order rate for "No" ask orders, in dollars per minute.
-        /// </summary>
-        /// <remarks>
-        /// Rate of non-trade-related "No" ask (Yes bid) order changes.
-        /// Sourced from <see cref="MarketData.OrderVolumePerMinute_NoAsk"/>, computed by <see cref="OrderbookChangeTracker.GetYesNetOrderRatePerMinute"/> (negated).
-        /// Sums dollar value (price/100 * delta contracts) divided by elapsed minutes.
-        /// </remarks>
-        public double OrderVolumePerMinute_NoAsk { get; set; }
 
         /// <summary>
         /// Gets or sets the order rate for "No" bid orders, in dollars per minute.
@@ -1592,7 +1572,7 @@ namespace SmokehouseDTOs
             set => _currentAverageTradeSize_No = value;
         }
 
-        public List<PseudoCandlestick> LastTenCandlesticks { get { return _lastTenCandlesticks; } set { _lastTenCandlesticks = value; } }
+        public List<PseudoCandlestick> RecentCandlesticks { get { return _lastTenCandlesticks; } set { _lastTenCandlesticks = value; } }
 
         private List<PseudoCandlestick> _lastTenCandlesticks;
 
@@ -1700,9 +1680,7 @@ namespace SmokehouseDTOs
                 GoodBadPriceNo = this.GoodBadPriceNo,
                 MarketType = this.MarketType,
                 HoldTime = this.HoldTime,
-                OrderVolumePerMinute_YesAsk = this.OrderVolumePerMinute_YesAsk,
                 OrderVolumePerMinute_YesBid = this.OrderVolumePerMinute_YesBid,
-                OrderVolumePerMinute_NoAsk = this.OrderVolumePerMinute_NoAsk,
                 OrderVolumePerMinute_NoBid = this.OrderVolumePerMinute_NoBid,
                 NonTradeRelatedOrderCount_Yes = this.NonTradeRelatedOrderCount_Yes,
                 NonTradeRelatedOrderCount_No = this.NonTradeRelatedOrderCount_No,
@@ -1731,7 +1709,7 @@ namespace SmokehouseDTOs
                 CurrentNonTradeRelatedOrderCount_No = this.CurrentNonTradeRelatedOrderCount_No,
                 CurrentAverageTradeSize_Yes = this.CurrentAverageTradeSize_Yes,
                 CurrentAverageTradeSize_No = this.CurrentAverageTradeSize_No,
-                LastTenCandlesticks = this.LastTenCandlesticks,
+                RecentCandlesticks = this.RecentCandlesticks,
                 BestNoBidD = this.BestNoBidD,
                 BestYesBidD = this.BestYesBidD
             };

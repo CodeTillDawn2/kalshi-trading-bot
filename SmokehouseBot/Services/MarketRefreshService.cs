@@ -170,12 +170,12 @@ namespace SmokehouseBot.Services
 
             var workStartTime = DateTime.UtcNow;
             var stopwatch = Stopwatch.StartNew();
-
             int MarketsRefreshed = 0;
 
             foreach (var marketTicker in watchedMarkets)
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+
                 var marketData = _serviceFactory.GetMarketDataService().GetMarketDetails(marketTicker);
                 if (marketData == null)
                 {
@@ -196,78 +196,92 @@ namespace SmokehouseBot.Services
                     else
                     {
                         _logger.LogInformation("Market {MarketTicker} not found in watch list, must have been removed.", marketTicker);
+                        continue;
                     }
                 }
 
                 // Determine if a sync is needed
-                if (marketData != null)
+                var lastTicker = marketData.Tickers.OrderByDescending(t => t.LoggedDate).FirstOrDefault();
+                bool needsSync =
+                    lastTicker == null
+                    || marketData.LastSuccessfulSync <= DateTime.UtcNow.AddMinutes(-31)
+                    || (lastTicker.LoggedDate > marketData.LastSuccessfulSync && (DateTime.UtcNow - lastTicker.LoggedDate) >= TimeSpan.FromMinutes(5));
+
+                if (needsSync)
                 {
-                    var lastTicker = marketData?.Tickers.OrderByDescending(t => t.LoggedDate).FirstOrDefault();
-                    if (lastTicker == null || marketData.LastSuccessfulSync <= DateTime.UtcNow.AddMinutes(-31) ||
-                         (lastTicker.LoggedDate > marketData.LastSuccessfulSync
-                        && (DateTime.UtcNow - lastTicker.LoggedDate) >= TimeSpan.FromMinutes(5)))
-                    {
-                        await _serviceFactory.GetMarketDataService().SyncMarketDataAsync(marketTicker);
+                    await _serviceFactory.GetMarketDataService().SyncMarketDataAsync(marketTicker);
+                    marketData.LastSuccessfulSync = DateTime.UtcNow;
 
-                        marketData.LastSuccessfulSync = DateTime.UtcNow;
-
-                        if (OnMarketUpdated != null)
-                            OnMarketUpdated?.Invoke(this, marketTicker);
-                        _logger.LogInformation($"Refresh - {marketTicker} refreshed successfully.");
-                        MarketsRefreshed = MarketsRefreshed++;
-                    }
-                    else
-                    {
-                        _logger.LogInformation("Refresh - No market refresh needed for {marketTicker}. Last ticker: {last}, Last Sync {sync}", marketTicker, lastTicker.LoggedDate, marketData.LastSuccessfulSync);
-                    }
+                    OnMarketUpdated?.Invoke(this, marketTicker);
+                    _logger.LogInformation("Refresh - {Market} refreshed successfully.", marketTicker);
+                    MarketsRefreshed++; // FIX: was MarketsRefreshed = MarketsRefreshed++;
                 }
-
-            }
-            _logger.LogInformation("Refresh - Refreshed {} markets in {ChangeWindowDuration.TotalMinutes} minutes", $"{MarketsRefreshed}/{watchedMarkets.Count}", Math.Round((double)stopwatch.ElapsedMilliseconds / 1000 / 60, 2));
-
-
-            //Additional refresh loop to utilize extra time so we aren't refreshing ALL of the low activity ones at once
-            if (watchedMarkets.Count > 0 && MarketsRefreshed / watchedMarkets.Count < .25)
-            {
-                int ForceRefreshMarkets = (int)Math.Round(watchedMarkets.Count * .25) - MarketsRefreshed;
-                int ForcedRefreshCount = 0;
-                foreach (var marketTicker in ShuffleList(watchedMarkets))
+                else
                 {
-                    if (ForcedRefreshCount >= ForceRefreshMarkets) break;
-                    _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                    var marketData = _serviceFactory.GetMarketDataService().GetMarketDetails(marketTicker);
-                    if (marketData != null)
+                    _logger.LogInformation("Refresh - No market refresh needed for {Market}. Last ticker: {Last}, Last Sync {Sync}",
+                        marketTicker, lastTicker?.LoggedDate, marketData.LastSuccessfulSync);
+                }
+            }
+
+            _logger.LogInformation("Refresh - Refreshed {Refreshed} markets in {Minutes} minutes",
+                $"{MarketsRefreshed}/{watchedMarkets.Count}", Math.Round(stopwatch.Elapsed.TotalMinutes, 2));
+
+            // --- Additional pass: only if <25% refreshed, and stay within a time budget ---
+            if (watchedMarkets.Count > 0)
+            {
+                double refreshRatio = (double)MarketsRefreshed / watchedMarkets.Count; // FIX: ensure double division
+                if (refreshRatio < 0.25)
+                {
+                    int targetForceTotal = (int)Math.Round(watchedMarkets.Count * 0.25);
+                    int remainingToForce = Math.Max(0, targetForceTotal - MarketsRefreshed);
+                    int ForcedRefreshCount = 0;
+
+                    // Simple time budget: stop forced pass if ≥60% of the interval has elapsed
+                    TimeSpan forcedBudget = TimeSpan.FromTicks((long)(_updateInterval.Ticks * 0.60));
+
+                    foreach (var marketTicker in ShuffleList(watchedMarkets))
                     {
+                        if (ForcedRefreshCount >= remainingToForce) break;
+                        if (stopwatch.Elapsed >= forcedBudget) { _logger.LogDebug("Forced pass stopped due to time budget."); break; }
+
+                        _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+
+                        var marketData = _serviceFactory.GetMarketDataService().GetMarketDetails(marketTicker);
+                        if (marketData == null) continue;
+
                         var lastTicker = marketData.Tickers.OrderByDescending(t => t.LoggedDate).FirstOrDefault();
-                        if ((lastTicker == null || marketData.LastSuccessfulSync <= DateTime.UtcNow.AddMinutes(-15)) &&
-                             (lastTicker == null || (DateTime.UtcNow - lastTicker.LoggedDate) >= TimeSpan.FromMinutes(5)))
+                        bool needsForce =
+                            (lastTicker == null || marketData.LastSuccessfulSync <= DateTime.UtcNow.AddMinutes(-15))
+                            && (lastTicker == null || (DateTime.UtcNow - lastTicker.LoggedDate) >= TimeSpan.FromMinutes(5));
+
+                        if (needsForce)
                         {
                             await _serviceFactory.GetMarketDataService().SyncMarketDataAsync(marketTicker);
-
                             marketData.LastSuccessfulSync = DateTime.UtcNow;
 
-                            if (OnMarketUpdated != null)
-                                OnMarketUpdated?.Invoke(this, marketTicker);
-                            _logger.LogInformation($"Refresh - {marketTicker} force refreshed successfully.");
-                            MarketsRefreshed = MarketsRefreshed++;
-                            ForcedRefreshCount = ForcedRefreshCount++;
+                            OnMarketUpdated?.Invoke(this, marketTicker);
+                            _logger.LogInformation("Refresh - {Market} force refreshed successfully.", marketTicker);
+                            MarketsRefreshed++;      // FIX
+                            ForcedRefreshCount++;    // FIX
                         }
                         else
                         {
-                            _logger.LogDebug("No market refresh needed for {marketTicker}. Last ticker: {last}, Last Sync {sync}", marketTicker, lastTicker.LoggedDate, marketData.LastSuccessfulSync);
+                            _logger.LogDebug("No forced refresh needed for {Market}. Last ticker: {Last}, Last Sync {Sync}",
+                                marketTicker, lastTicker?.LoggedDate, marketData.LastSuccessfulSync);
                         }
                     }
+
+                    _logger.LogInformation("Refresh - Force refreshed {Count} markets in {Minutes} minutes",
+                        ForcedRefreshCount, Math.Round(stopwatch.Elapsed.TotalMinutes, 2));
                 }
-                _logger.LogInformation("Refresh - Force Refreshed {0} markets in {ChangeWindowDuration.TotalMinutes} minutes", ForcedRefreshCount, Math.Round((double)stopwatch.ElapsedMilliseconds / 1000 / 60, 2));
             }
-
-
 
             await _serviceFactory.GetMarketDataService().FetchPositionsAsync();
             LastWorkDuration = DateTime.UtcNow - workStartTime;
             LastWorkMarketCount = watchedMarkets.Count;
             stopwatch.Stop();
         }
+
 
 
         public static List<T> ShuffleList<T>(List<T> list)

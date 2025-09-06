@@ -1,6 +1,8 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmokehouseDTOs.Converters
 {
@@ -69,7 +71,8 @@ namespace SmokehouseDTOs.Converters
             ("TradeVolumePerMinute_No","vmn"),
             ("AverageTradeSize_Yes","asy"),
             ("AverageTradeSize_No","asn"),
-            ("TradeCount_Yes","tcyP"),   // distinguish from TotalBidContracts_Yes (tcy)
+            // Distinguish from TotalBidContracts_Yes (tcy) / _No (tcn)
+            ("TradeCount_Yes","tcyP"),
             ("TradeCount_No","tcnP"),
 
             // --- "Current*" metrics (prefix c*) ---
@@ -118,15 +121,12 @@ namespace SmokehouseDTOs.Converters
             ("RecentHighNo_Bid","rhn"),
             ("RecentLowNo_Bid","rln"),
 
-            // Sub-keys inside extremes (your serializer currently uses ask/when in RawJSON)
-            ("Bid","bid"),   // fallback if tuples serialize as {Bid,When}
-            ("ask","a"),
-            ("when","w"),
-            ("When","w"),
+            // Sub-keys inside extremes (tuples serialize as {Bid,When})
+            ("Bid","a"),      // map tuple 'Bid' → short 'a' (price)
+            ("When","w"),     // map tuple 'When' → short 'w' (timestamp)
 
             // --- Support/Resistance ---
             ("AllSupportResistanceLevels","srl"),
-            // Row fields (unique shorts to avoid collisions)
             ("Price","prc"),
             ("TestCount","tst"),
             ("TotalVolume","tvol"),
@@ -155,25 +155,66 @@ namespace SmokehouseDTOs.Converters
             ("LastWebSocketMessageReceived","lws"),
             ("MarketBehaviorYes","mby"),
             ("MarketBehaviorNo","mbn"),
+            ("GoodBadPriceYes","gby"),
+            ("GoodBadPriceNo","gbn"),
             ("HoldTime","ht"),
 
+            // --- Highest/Recent volumes ---
+            ("HighestVolume_Day","hvd"),
+            ("HighestVolume_Hour","hvh"),
+            ("HighestVolume_Minute","hvm"),
+            ("RecentVolume_LastHour","rvlh"),
+            ("RecentVolume_LastThreeHours","rvl3"),
+            ("RecentVolume_LastMonth","rvlm"),
+
+            // --- Bollinger band subkeys ---
+            ("lower","lo"),
+            ("middle","mid"),
+            ("upper","up"),
+
+            // --- MACD subkeys ---
+            ("Signal","sig"),
+            ("Histogram","hist"),
+
             // --- Last 10 pseudo-candles ---
-            ("LastTenCandlesticks","lc10"),
-            ("Timestamp","cts"),   // candle timestamp (avoid clash with top-level ts)
+            ("RecentCandlesticks","rc"),
             ("MidClose","mcl"),
             ("MidHigh","mhi"),
             ("MidLow","mlo"),
             ("Volume","vol"),
             ("IsFromCandlestick","ifc"),
-            ("BestNoBidD","bnbd"),
+
+            // Dollars versions of best bids (from your model)
             ("BestYesBidD","bybd"),
+            ("BestNoBidD","bnbd"),
+            ("NoBidSlopePerMinute_Short","nbsls"),
+            ("YesBidSlopePerMinute_Short","ybsls"),
+            ("YesBidSlopePerMinute_Medium","ybslm"),
+            ("NoBidSlopePerMinute_Medium","nbslm"),
+            ("NonTradeRelatedOrderCount_Yes","ytroc"),
+            ("NonTradeRelatedOrderCount_No","ntroc"),
         };
 
-        // Fast lookup dictionaries
-        private static readonly Dictionary<string, string> LongToShort = Map.ToDictionary(x => x.Long, x => x.Short, StringComparer.Ordinal);
-        private static readonly Dictionary<string, string> ShortToLong = Map.ToDictionary(x => x.Short, x => x.Long, StringComparer.Ordinal);
+        // Lookup dictionaries (collision-safe for ShortToLong)
+        private static readonly Dictionary<string, string> LongToShort =
+            Map.ToDictionary(x => x.Long, x => x.Short, StringComparer.Ordinal);
 
-        public override SmokehouseDTOs.MarketSnapshot Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        private static readonly Dictionary<string, string> ShortToLong = BuildShortToLong();
+
+        private static Dictionary<string, string> BuildShortToLong()
+        {
+            var d = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var (Long, Short) in Map)
+            {
+                if (!d.ContainsKey(Short))
+                {
+                    d[Short] = Long; // first wins
+                }
+            }
+            return d;
+        }
+
+        public override SmokehouseDTOs.MarketSnapshot Read(ref Utf8JsonReader reader, System.Type typeToConvert, JsonSerializerOptions options)
         {
             using var doc = JsonDocument.ParseValue(ref reader);
             using var ms = new MemoryStream();
@@ -195,26 +236,51 @@ namespace SmokehouseDTOs.Converters
         }
 
         // Recursively rewrite property names using the maps.
-        private static void RewriteObject(JsonElement element, Utf8JsonWriter w, bool expand)
+        private static void RewriteObject(JsonElement element, Utf8JsonWriter w, bool expand, List<string>? path = null)
         {
+            path ??= new List<string>(8);
+
             switch (element.ValueKind)
             {
                 case JsonValueKind.Object:
                     w.WriteStartObject();
                     foreach (var prop in element.EnumerateObject())
                     {
-                        var name = prop.Name;
-                        var mapped = expand ? Expand(name) : Shrink(name);
+                        string mapped;
+                        if (expand)
+                        {
+                            // short -> long
+                            if (prop.Name == "cts" && IsInCandles(path))
+                                mapped = "Timestamp";
+                            else
+                                mapped = Expand(prop.Name);
+                        }
+                        else
+                        {
+                            // long -> short
+                            if (prop.Name == "Timestamp" && IsInCandles(path))
+                                mapped = "cts";
+                            else
+                                mapped = Shrink(prop.Name);
+                        }
+
                         w.WritePropertyName(mapped);
-                        RewriteObject(prop.Value, w, expand);
+
+                        // descend with updated path (use mapped so IsInCandles sees either long or short)
+                        path.Add(mapped);
+                        RewriteObject(prop.Value, w, expand, path);
+                        path.RemoveAt(path.Count - 1);
                     }
                     w.WriteEndObject();
                     break;
 
                 case JsonValueKind.Array:
                     w.WriteStartArray();
+                    // mark array level in path so ancestor check still works
+                    path.Add("[]");
                     foreach (var item in element.EnumerateArray())
-                        RewriteObject(item, w, expand);
+                        RewriteObject(item, w, expand, path);
+                    path.RemoveAt(path.Count - 1);
                     w.WriteEndArray();
                     break;
 
@@ -224,13 +290,28 @@ namespace SmokehouseDTOs.Converters
             }
         }
 
+        private static bool IsInCandles(IReadOnlyList<string> path)
+        {
+            // Accept either long or short ancestor name
+            for (int i = path.Count - 1; i >= 0; i--)
+                if (path[i] is "lc10" or "LastTenCandlesticks")
+                    return true;
+            return false;
+        }
+
         private static string Expand(string name)
         {
+            // Expand short -> long; handle special-case if needed
+            if (name == "w") return "When";
+            if (name == "a") return "Bid";
             return ShortToLong.TryGetValue(name, out var longName) ? longName : name;
         }
 
         private static string Shrink(string name)
         {
+            // Accept both casings for tuple member names
+            if (name is "When" or "when") return "w";
+            if (name is "Bid" or "bid") return "a";
             return LongToShort.TryGetValue(name, out var shortName) ? shortName : name;
         }
 

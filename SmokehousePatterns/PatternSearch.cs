@@ -1,4 +1,5 @@
-﻿using SmokehousePatterns.Helpers;
+﻿using SmokehouseDTOs;
+using SmokehousePatterns.Helpers;
 using SmokehousePatterns.PatternDefinitions;
 using static SmokehousePatterns.Helpers.PatternUtils;
 
@@ -10,37 +11,25 @@ namespace SmokehousePatterns
 
 
 
-        public static async Task<Dictionary<int, List<PatternDefinition>>> DetectPatterns(List<MarketState> marketStates,
-                int trendLookback, int lookforward)
+        public static async Task<Dictionary<int, List<PatternDefinition>>> DetectPatterns(CandleMids[] prices,
+                int trendLookback)
         {
-            if (marketStates == null || marketStates.Count < 2)
+            if (prices == null || prices.Length < 2)
                 return new Dictionary<int, List<PatternDefinition>>();
-
-            var prices = marketStates.Select(state => new CandleMids
-            {
-                Timestamp = state.Timestamp,
-                Open = state.MidOpen(),
-                Close = state.MidClose(),
-                High = state.MidHigh(),
-                Low = state.MidLow(),
-                Volume = state.Volume
-            }).ToArray();
 
             Dictionary<int, CandleMetrics> metricsCache = new Dictionary<int, CandleMetrics>();
 
             var detailedPatterns = new Dictionary<int, List<PatternDefinition>>();
             int initialCapacity = 10; // Reasonable initial size for patterns per candle
 
-            for (int i = 0; i < marketStates.Count; i++)
+            for (int i = 0; i < prices.Length; i++)
             {
                 TempIndices.Clear();
                 var patternsFound = new PatternDefinition[initialCapacity]; // Now stores PatternDefinition objects
                 int patternCount = 0;
 
-                var current = marketStates[i];
-                var currentAsk = prices[i];
-                var previous = i > 0 ? marketStates[i - 1] : null;
-                var previousAsk = i > 0 ? prices[i - 1] : null;
+                var current = prices[i];
+                var previous = i > 0 ? prices[i - 1] : null;
 
                 // Significance check to skip insignificant candles
                 bool isSignificant = IsPatternSignificant(current, previous);
@@ -49,9 +38,8 @@ namespace SmokehousePatterns
                 // 1-Candle Patterns
                 if (i >= 1)
                 {
-                    var previousCandle = marketStates[i - 1];
-                    bool hasContext = Math.Abs(current.MidClose() - previousCandle.MidClose()) >= 1.0 ||
-                                     current.Volume > previousCandle.Volume * 1.1;
+                    bool hasContext = Math.Abs(current.Close - previous.Close) >= 1.0 ||
+                                     current.Volume > previous.Volume * 1.1;
 
                     if (hasContext)
                     {
@@ -415,7 +403,7 @@ namespace SmokehousePatterns
 
                 if (patternCount > 0)
                 {
-                    var filteredPatterns = FilterPatterns(patternsFound, patternCount, marketStates, "C:\\Users\\Peter\\Documents\\GitHub\\kalshi-bot\\TestingOutput\\Pattern Exclusion Logs\\PatternLogs.txt");
+                    var filteredPatterns = FilterPatterns(patternsFound, patternCount, prices, "C:\\Users\\Peter\\Documents\\GitHub\\kalshi-bot\\TestingOutput\\Pattern Exclusion Logs\\PatternLogs.txt");
                     if (filteredPatterns.Count > 0)
                         detailedPatterns[i] = filteredPatterns;
                 }
@@ -437,7 +425,7 @@ namespace SmokehousePatterns
             Array.Resize(ref patternsFound, capacity);
         }
 
-        private static List<PatternDefinition> FilterPatterns(PatternDefinition[] patterns, int patternCount, List<MarketState> marketStates, string logFilePath)
+        private static List<PatternDefinition> FilterPatterns(PatternDefinition[] patterns, int patternCount, CandleMids[] candles, string logFilePath)
         {
             var filteredPatterns = new List<PatternDefinition>(patternCount);
             var patternsByCandle = new Dictionary<int, List<PatternDefinition>>();
@@ -464,8 +452,8 @@ namespace SmokehousePatterns
                     var candlePatterns = kvp.Value;
                     int index = kvp.Key;
 
-                    string market = index < marketStates.Count ? marketStates[index].MarketTicker : "Unknown Market";
-                    string timestamp = index < marketStates.Count ? marketStates[index].Timestamp.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown Timestamp";
+                    string market = index < candles.Length ? candles[index].MarketTicker : "Unknown Market";
+                    string timestamp = index < candles.Length ? candles[index].Timestamp.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown Timestamp";
 
                     logWriter.WriteLine($"Index {index} ({market}, {timestamp}): Patterns before filter: {string.Join(", ", candlePatterns.Select(p => p.Name))}");
 

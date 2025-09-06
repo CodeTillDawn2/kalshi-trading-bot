@@ -1,4 +1,6 @@
-﻿namespace SmokehousePatterns.Helpers
+﻿using SmokehouseDTOs;
+
+namespace SmokehousePatterns.Helpers
 {
     public static class TrendCalcs
     {

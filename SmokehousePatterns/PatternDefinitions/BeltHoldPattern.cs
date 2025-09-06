@@ -1,4 +1,5 @@
-﻿using SmokehousePatterns.Helpers;
+﻿using SmokehouseDTOs;
+using SmokehousePatterns.Helpers;
 using System.Diagnostics;
 using static SmokehousePatterns.Helpers.PatternUtils;
 using static SmokehousePatterns.Helpers.TrendCalcs;

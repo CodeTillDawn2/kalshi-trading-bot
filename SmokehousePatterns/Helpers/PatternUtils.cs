@@ -1,4 +1,5 @@
-﻿using static SmokehousePatterns.Helpers.TrendCalcs;
+﻿using SmokehouseDTOs;
+using static SmokehousePatterns.Helpers.TrendCalcs;
 namespace SmokehousePatterns.Helpers
 {
     public static class PatternUtils
@@ -156,16 +157,16 @@ namespace SmokehousePatterns.Helpers
         }
 
 
-        public static bool IsPatternSignificant(MarketState current, MarketState? previous)
+        public static bool IsPatternSignificant(CandleMids current, CandleMids? previous)
         {
             if (previous == null) return true; // Always process the first candle
 
-            double currentMidpoint = (current.AskClose + current.BidClose) / 2;
-            double previousMidpoint = (previous.AskClose + previous.BidClose) / 2;
+            double currentMidpoint = current.Close;
+            double previousMidpoint = previous.Close;
 
             return Math.Abs(currentMidpoint - previousMidpoint) >= 0.5 || // Moderate price movement
-               ((current.AskHigh + current.BidHigh) / 2.0 - (current.AskLow + current.BidLow) / 2.0) >= 1.0 || // Significant volatility
-               Math.Abs(currentMidpoint - ((current.AskOpen + current.BidOpen) / 2.0)) >= 0.5; // Notable body size
+               current.High - current.Low >= 1.0 || // Significant volatility
+               Math.Abs(currentMidpoint - current.Open) >= 0.5; // Notable body size
         }
 
         public static string AndrogenizePattern(string name)
