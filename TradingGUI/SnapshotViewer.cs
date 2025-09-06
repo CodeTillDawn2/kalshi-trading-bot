@@ -174,7 +174,7 @@ namespace SimulatorWinForms
             obvValue.Text = currentSnapshot.OBV_Medium.ToString();
             psarValue.Text = currentSnapshot.PSAR.ToString() ?? "--";
             adxValue.Text = currentSnapshot.ADX.ToString() ?? "--";
-            supportValue.Text = currentSnapshot.AllSupportResistanceLevels.Count != 1 ? currentSnapshot.AllSupportResistanceLevels.Count.ToString() 
+            supportValue.Text = currentSnapshot.AllSupportResistanceLevels.Count != 1 ? currentSnapshot.AllSupportResistanceLevels.Count.ToString()
                 : $"{currentSnapshot.AllSupportResistanceLevels.First().Price}";
 
             // Other info
@@ -207,7 +207,7 @@ namespace SimulatorWinForms
             }
             else
             {
-                imbalance = Math.Round((double)currentSnapshot.TotalOrderbookDepth_Yes / currentSnapshot.TotalOrderbookDepth_No,2);
+                imbalance = Math.Round((double)currentSnapshot.TotalOrderbookDepth_Yes / currentSnapshot.TotalOrderbookDepth_No, 2);
             }
             imbalValue.Text = imbalance.ToString();
             depthTop4YesValue.Text = currentSnapshot.DepthAtTop4YesBids.ToString();
@@ -308,6 +308,11 @@ namespace SimulatorWinForms
             }
         }
 
+        private void EvaluateChartFilters()
+        {
+
+        }
+
         private void leftColumn_Paint(object sender, PaintEventArgs e)
         {
 
@@ -316,6 +321,131 @@ namespace SimulatorWinForms
         private void positionsLayout_Paint(object sender, PaintEventArgs e)
         {
 
+        }
+
+        private void rsiLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void macdLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void emaLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void bollingerLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void atrLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void vwapLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void stochasticLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void obvLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void psarLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void adxLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void supportLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void simulatedPositionLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void positionRoiLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void positionSizeLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void topVelocityCB_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void bottomVelocityCB_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void netOrderRateCB_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void tradeVolumeCB_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void avgTradeSizeCB_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void slopeCB_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void imbalCB_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void depthTop4CB_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void totalDepthCB_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void centerMassCB_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void totalContractsCB_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
         }
     }
 }

@@ -65,6 +65,8 @@ namespace SimulatorWinForms
             allTimeLowBidPrice = new Label();
             allTimeLowBidTime = new Label();
             tradingMetricsGrid = new TableLayoutPanel();
+            supportValue = new Label();
+            supportLabel = new CheckBox();
             tradingMetricsHeader = new Label();
             rsiLabel = new CheckBox();
             rsiValue = new Label();
@@ -161,8 +163,6 @@ namespace SimulatorWinForms
             valueCol = new DataGridViewTextBoxColumn();
             backButton = new Button();
             chartHeader = new Label();
-            supportLabel = new CheckBox();
-            supportValue = new Label();
             mainLayout.SuspendLayout();
             dashboardGrid.SuspendLayout();
             chartContainer.SuspendLayout();
@@ -828,6 +828,29 @@ namespace SimulatorWinForms
             tradingMetricsGrid.Size = new Size(144, 220);
             tradingMetricsGrid.TabIndex = 1;
             // 
+            // supportValue
+            // 
+            supportValue.AutoSize = true;
+            supportValue.Dock = DockStyle.Fill;
+            supportValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            supportValue.Location = new Point(77, 198);
+            supportValue.Name = "supportValue";
+            supportValue.Size = new Size(64, 22);
+            supportValue.TabIndex = 22;
+            supportValue.Text = "--";
+            // 
+            // supportLabel
+            // 
+            supportLabel.AutoSize = true;
+            supportLabel.Dock = DockStyle.Fill;
+            supportLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            supportLabel.Location = new Point(3, 201);
+            supportLabel.Name = "supportLabel";
+            supportLabel.Size = new Size(68, 16);
+            supportLabel.TabIndex = 21;
+            supportLabel.Text = "Supports:";
+            supportLabel.CheckedChanged += supportLabel_CheckedChanged;
+            // 
             // tradingMetricsHeader
             // 
             tradingMetricsHeader.AutoSize = true;
@@ -849,6 +872,7 @@ namespace SimulatorWinForms
             rsiLabel.Size = new Size(68, 12);
             rsiLabel.TabIndex = 1;
             rsiLabel.Text = "RSI:";
+            rsiLabel.CheckedChanged += rsiLabel_CheckedChanged;
             // 
             // rsiValue
             // 
@@ -871,6 +895,7 @@ namespace SimulatorWinForms
             macdLabel.Size = new Size(68, 12);
             macdLabel.TabIndex = 3;
             macdLabel.Text = "MACD:";
+            macdLabel.CheckedChanged += macdLabel_CheckedChanged;
             // 
             // macdValue
             // 
@@ -893,6 +918,7 @@ namespace SimulatorWinForms
             emaLabel.Size = new Size(68, 12);
             emaLabel.TabIndex = 5;
             emaLabel.Text = "EMA:";
+            emaLabel.CheckedChanged += emaLabel_CheckedChanged;
             // 
             // emaValue
             // 
@@ -915,6 +941,7 @@ namespace SimulatorWinForms
             bollingerLabel.Size = new Size(68, 12);
             bollingerLabel.TabIndex = 7;
             bollingerLabel.Text = "Bollinger:";
+            bollingerLabel.CheckedChanged += bollingerLabel_CheckedChanged;
             // 
             // bollingerValue
             // 
@@ -937,6 +964,7 @@ namespace SimulatorWinForms
             atrLabel.Size = new Size(68, 12);
             atrLabel.TabIndex = 9;
             atrLabel.Text = "ATR:";
+            atrLabel.CheckedChanged += atrLabel_CheckedChanged;
             // 
             // atrValue
             // 
@@ -959,6 +987,7 @@ namespace SimulatorWinForms
             vwapLabel.Size = new Size(68, 12);
             vwapLabel.TabIndex = 11;
             vwapLabel.Text = "VWAP:";
+            vwapLabel.CheckedChanged += vwapLabel_CheckedChanged;
             // 
             // vwapValue
             // 
@@ -981,6 +1010,7 @@ namespace SimulatorWinForms
             stochasticLabel.Size = new Size(68, 12);
             stochasticLabel.TabIndex = 13;
             stochasticLabel.Text = "Stochastic:";
+            stochasticLabel.CheckedChanged += stochasticLabel_CheckedChanged;
             // 
             // stochasticValue
             // 
@@ -1003,6 +1033,7 @@ namespace SimulatorWinForms
             obvLabel.Size = new Size(68, 12);
             obvLabel.TabIndex = 15;
             obvLabel.Text = "OBV:";
+            obvLabel.CheckedChanged += obvLabel_CheckedChanged;
             // 
             // obvValue
             // 
@@ -1025,6 +1056,7 @@ namespace SimulatorWinForms
             psarLabel.Size = new Size(68, 12);
             psarLabel.TabIndex = 17;
             psarLabel.Text = "PSAR:";
+            psarLabel.CheckedChanged += psarLabel_CheckedChanged;
             // 
             // psarValue
             // 
@@ -1047,6 +1079,7 @@ namespace SimulatorWinForms
             adxLabel.Size = new Size(68, 12);
             adxLabel.TabIndex = 19;
             adxLabel.Text = "ADX:";
+            adxLabel.CheckedChanged += adxLabel_CheckedChanged;
             // 
             // adxValue
             // 
@@ -1245,6 +1278,7 @@ namespace SimulatorWinForms
             topVelocityCB.Size = new Size(85, 19);
             topVelocityCB.TabIndex = 3;
             topVelocityCB.Text = "Top Velocity:";
+            topVelocityCB.CheckedChanged += topVelocityCB_CheckedChanged;
             // 
             // topVelocityYesValue
             // 
@@ -1280,6 +1314,7 @@ namespace SimulatorWinForms
             bottomVelocityCB.Size = new Size(85, 19);
             bottomVelocityCB.TabIndex = 6;
             bottomVelocityCB.Text = "Bottom Velocity:";
+            bottomVelocityCB.CheckedChanged += bottomVelocityCB_CheckedChanged;
             // 
             // bottomVelocityYesValue
             // 
@@ -1315,6 +1350,7 @@ namespace SimulatorWinForms
             netOrderRateCB.Size = new Size(85, 19);
             netOrderRateCB.TabIndex = 9;
             netOrderRateCB.Text = "Net Order Rate:";
+            netOrderRateCB.CheckedChanged += netOrderRateCB_CheckedChanged;
             // 
             // netOrderRateYesValue
             // 
@@ -1350,6 +1386,7 @@ namespace SimulatorWinForms
             tradeVolumeCB.Size = new Size(85, 19);
             tradeVolumeCB.TabIndex = 12;
             tradeVolumeCB.Text = "Trade Volume:";
+            tradeVolumeCB.CheckedChanged += tradeVolumeCB_CheckedChanged;
             // 
             // tradeVolumeYesValue
             // 
@@ -1385,6 +1422,7 @@ namespace SimulatorWinForms
             avgTradeSizeCB.Size = new Size(85, 19);
             avgTradeSizeCB.TabIndex = 15;
             avgTradeSizeCB.Text = "Avg Trade Size:";
+            avgTradeSizeCB.CheckedChanged += avgTradeSizeCB_CheckedChanged;
             // 
             // avgTradeSizeYesValue
             // 
@@ -1420,6 +1458,7 @@ namespace SimulatorWinForms
             slopeCB.Size = new Size(85, 22);
             slopeCB.TabIndex = 18;
             slopeCB.Text = "5 Min Slope:";
+            slopeCB.CheckedChanged += slopeCB_CheckedChanged;
             // 
             // slopeYesValue
             // 
@@ -1519,6 +1558,7 @@ namespace SimulatorWinForms
             totalDepthCB.Size = new Size(81, 18);
             totalDepthCB.TabIndex = 16;
             totalDepthCB.Text = "Total Depth";
+            totalDepthCB.CheckedChanged += totalDepthCB_CheckedChanged;
             // 
             // contextHeaderYes
             // 
@@ -1546,7 +1586,7 @@ namespace SimulatorWinForms
             // 
             spreadLabel.AutoSize = true;
             spreadLabel.Dock = DockStyle.Fill;
-            spreadLabel.Font = new Font("Segoe UI", 7F);
+            spreadLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
             spreadLabel.Location = new Point(3, 15);
             spreadLabel.Name = "spreadLabel";
             spreadLabel.Size = new Size(81, 24);
@@ -1576,6 +1616,7 @@ namespace SimulatorWinForms
             imbalCB.Size = new Size(81, 18);
             imbalCB.TabIndex = 5;
             imbalCB.Text = "Imbal:";
+            imbalCB.CheckedChanged += imbalCB_CheckedChanged;
             // 
             // imbalValue
             // 
@@ -1600,6 +1641,7 @@ namespace SimulatorWinForms
             depthTop4CB.Size = new Size(81, 18);
             depthTop4CB.TabIndex = 7;
             depthTop4CB.Text = "Depth Top 4:";
+            depthTop4CB.CheckedChanged += depthTop4CB_CheckedChanged;
             // 
             // depthTop4YesValue
             // 
@@ -1635,6 +1677,7 @@ namespace SimulatorWinForms
             centerMassCB.Size = new Size(81, 18);
             centerMassCB.TabIndex = 10;
             centerMassCB.Text = "Center Mass:";
+            centerMassCB.CheckedChanged += centerMassCB_CheckedChanged;
             // 
             // centerMassYesValue
             // 
@@ -1670,6 +1713,7 @@ namespace SimulatorWinForms
             totalContractsCB.Size = new Size(81, 24);
             totalContractsCB.TabIndex = 13;
             totalContractsCB.Text = "Total Contracts:";
+            totalContractsCB.CheckedChanged += totalContractsCB_CheckedChanged;
             // 
             // totalContractsYesValue
             // 
@@ -1760,7 +1804,7 @@ namespace SimulatorWinForms
             positionsGrid.Controls.Add(positionDownsideValue, 1, 5);
             positionsGrid.Controls.Add(restingOrdersLabel, 0, 6);
             positionsGrid.Controls.Add(restingOrdersValue, 1, 6);
-            positionsGrid.Dock = DockStyle.Right;
+            positionsGrid.Dock = DockStyle.Top;
             positionsGrid.Location = new Point(400, 3);
             positionsGrid.Name = "positionsGrid";
             positionsGrid.RowCount = 8;
@@ -1772,17 +1816,17 @@ namespace SimulatorWinForms
             positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
             positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
             positionsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
-            positionsGrid.Size = new Size(158, 192);
+            positionsGrid.Size = new Size(158, 168);
             positionsGrid.TabIndex = 2;
             // 
             // positionSizeValue
             // 
             positionSizeValue.AutoSize = true;
             positionSizeValue.Dock = DockStyle.Fill;
-            positionSizeValue.Font = new Font("Segoe UI", 7F);
-            positionSizeValue.Location = new Point(97, 168);
+            positionSizeValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            positionSizeValue.Location = new Point(97, 147);
             positionSizeValue.Name = "positionSizeValue";
-            positionSizeValue.Size = new Size(58, 24);
+            positionSizeValue.Size = new Size(58, 21);
             positionSizeValue.TabIndex = 19;
             positionSizeValue.Text = "--";
             positionSizeValue.TextAlign = ContentAlignment.MiddleCenter;
@@ -1791,21 +1835,22 @@ namespace SimulatorWinForms
             // 
             positionSizeLabel.AutoSize = true;
             positionSizeLabel.Dock = DockStyle.Fill;
-            positionSizeLabel.Font = new Font("Segoe UI", 7F);
-            positionSizeLabel.Location = new Point(3, 171);
+            positionSizeLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            positionSizeLabel.Location = new Point(3, 150);
             positionSizeLabel.Name = "positionSizeLabel";
-            positionSizeLabel.Size = new Size(88, 18);
+            positionSizeLabel.Size = new Size(88, 15);
             positionSizeLabel.TabIndex = 18;
             positionSizeLabel.Text = "Position Size:";
+            positionSizeLabel.CheckedChanged += positionSizeLabel_CheckedChanged;
             // 
             // simulatedPositionValue
             // 
             simulatedPositionValue.AutoSize = true;
             simulatedPositionValue.Dock = DockStyle.Fill;
-            simulatedPositionValue.Font = new Font("Segoe UI", 7F);
+            simulatedPositionValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
             simulatedPositionValue.Location = new Point(97, 0);
             simulatedPositionValue.Name = "simulatedPositionValue";
-            simulatedPositionValue.Size = new Size(58, 24);
+            simulatedPositionValue.Size = new Size(58, 21);
             simulatedPositionValue.TabIndex = 17;
             simulatedPositionValue.Text = "--";
             simulatedPositionValue.TextAlign = ContentAlignment.MiddleCenter;
@@ -1814,21 +1859,22 @@ namespace SimulatorWinForms
             // 
             simulatedPositionLabel.AutoSize = true;
             simulatedPositionLabel.Dock = DockStyle.Fill;
-            simulatedPositionLabel.Font = new Font("Segoe UI", 7F);
+            simulatedPositionLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
             simulatedPositionLabel.Location = new Point(3, 3);
             simulatedPositionLabel.Name = "simulatedPositionLabel";
-            simulatedPositionLabel.Size = new Size(88, 18);
+            simulatedPositionLabel.Size = new Size(88, 15);
             simulatedPositionLabel.TabIndex = 16;
             simulatedPositionLabel.Text = "Simulated Pos:";
+            simulatedPositionLabel.CheckedChanged += simulatedPositionLabel_CheckedChanged;
             // 
             // lastTradeLabel
             // 
             lastTradeLabel.AutoSize = true;
             lastTradeLabel.Dock = DockStyle.Fill;
-            lastTradeLabel.Font = new Font("Segoe UI", 7F);
-            lastTradeLabel.Location = new Point(3, 24);
+            lastTradeLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lastTradeLabel.Location = new Point(3, 21);
             lastTradeLabel.Name = "lastTradeLabel";
-            lastTradeLabel.Size = new Size(88, 24);
+            lastTradeLabel.Size = new Size(88, 21);
             lastTradeLabel.TabIndex = 2;
             lastTradeLabel.Text = "Last Trade:";
             // 
@@ -1836,10 +1882,10 @@ namespace SimulatorWinForms
             // 
             lastTradeValue.AutoSize = true;
             lastTradeValue.Dock = DockStyle.Fill;
-            lastTradeValue.Font = new Font("Segoe UI", 7F);
-            lastTradeValue.Location = new Point(97, 24);
+            lastTradeValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lastTradeValue.Location = new Point(97, 21);
             lastTradeValue.Name = "lastTradeValue";
-            lastTradeValue.Size = new Size(58, 24);
+            lastTradeValue.Size = new Size(58, 21);
             lastTradeValue.TabIndex = 3;
             lastTradeValue.Text = "--";
             lastTradeValue.TextAlign = ContentAlignment.MiddleCenter;
@@ -1848,21 +1894,22 @@ namespace SimulatorWinForms
             // 
             positionRoiLabel.AutoSize = true;
             positionRoiLabel.Dock = DockStyle.Fill;
-            positionRoiLabel.Font = new Font("Segoe UI", 7F);
-            positionRoiLabel.Location = new Point(3, 51);
+            positionRoiLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            positionRoiLabel.Location = new Point(3, 45);
             positionRoiLabel.Name = "positionRoiLabel";
-            positionRoiLabel.Size = new Size(88, 18);
+            positionRoiLabel.Size = new Size(88, 15);
             positionRoiLabel.TabIndex = 4;
             positionRoiLabel.Text = "Position ROI:";
+            positionRoiLabel.CheckedChanged += positionRoiLabel_CheckedChanged;
             // 
             // positionRoiValue
             // 
             positionRoiValue.AutoSize = true;
             positionRoiValue.Dock = DockStyle.Fill;
-            positionRoiValue.Font = new Font("Segoe UI", 7F);
-            positionRoiValue.Location = new Point(97, 48);
+            positionRoiValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            positionRoiValue.Location = new Point(97, 42);
             positionRoiValue.Name = "positionRoiValue";
-            positionRoiValue.Size = new Size(58, 24);
+            positionRoiValue.Size = new Size(58, 21);
             positionRoiValue.TabIndex = 5;
             positionRoiValue.Text = "--";
             positionRoiValue.TextAlign = ContentAlignment.MiddleCenter;
@@ -1871,10 +1918,10 @@ namespace SimulatorWinForms
             // 
             buyinPriceLabel.AutoSize = true;
             buyinPriceLabel.Dock = DockStyle.Fill;
-            buyinPriceLabel.Font = new Font("Segoe UI", 7F);
-            buyinPriceLabel.Location = new Point(3, 72);
+            buyinPriceLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            buyinPriceLabel.Location = new Point(3, 63);
             buyinPriceLabel.Name = "buyinPriceLabel";
-            buyinPriceLabel.Size = new Size(88, 24);
+            buyinPriceLabel.Size = new Size(88, 21);
             buyinPriceLabel.TabIndex = 6;
             buyinPriceLabel.Text = "Buyin Price:";
             // 
@@ -1882,10 +1929,10 @@ namespace SimulatorWinForms
             // 
             buyinPriceValue.AutoSize = true;
             buyinPriceValue.Dock = DockStyle.Fill;
-            buyinPriceValue.Font = new Font("Segoe UI", 7F);
-            buyinPriceValue.Location = new Point(97, 72);
+            buyinPriceValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            buyinPriceValue.Location = new Point(97, 63);
             buyinPriceValue.Name = "buyinPriceValue";
-            buyinPriceValue.Size = new Size(58, 24);
+            buyinPriceValue.Size = new Size(58, 21);
             buyinPriceValue.TabIndex = 7;
             buyinPriceValue.Text = "--";
             buyinPriceValue.TextAlign = ContentAlignment.MiddleCenter;
@@ -1894,10 +1941,10 @@ namespace SimulatorWinForms
             // 
             positionUpsideLabel.AutoSize = true;
             positionUpsideLabel.Dock = DockStyle.Fill;
-            positionUpsideLabel.Font = new Font("Segoe UI", 7F);
-            positionUpsideLabel.Location = new Point(3, 96);
+            positionUpsideLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            positionUpsideLabel.Location = new Point(3, 84);
             positionUpsideLabel.Name = "positionUpsideLabel";
-            positionUpsideLabel.Size = new Size(88, 24);
+            positionUpsideLabel.Size = new Size(88, 21);
             positionUpsideLabel.TabIndex = 8;
             positionUpsideLabel.Text = "Position Upside:";
             // 
@@ -1905,10 +1952,10 @@ namespace SimulatorWinForms
             // 
             positionUpsideValue.AutoSize = true;
             positionUpsideValue.Dock = DockStyle.Fill;
-            positionUpsideValue.Font = new Font("Segoe UI", 7F);
-            positionUpsideValue.Location = new Point(97, 96);
+            positionUpsideValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            positionUpsideValue.Location = new Point(97, 84);
             positionUpsideValue.Name = "positionUpsideValue";
-            positionUpsideValue.Size = new Size(58, 24);
+            positionUpsideValue.Size = new Size(58, 21);
             positionUpsideValue.TabIndex = 9;
             positionUpsideValue.Text = "--";
             positionUpsideValue.TextAlign = ContentAlignment.MiddleCenter;
@@ -1917,10 +1964,10 @@ namespace SimulatorWinForms
             // 
             positionDownsideLabel.AutoSize = true;
             positionDownsideLabel.Dock = DockStyle.Fill;
-            positionDownsideLabel.Font = new Font("Segoe UI", 7F);
-            positionDownsideLabel.Location = new Point(3, 120);
+            positionDownsideLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            positionDownsideLabel.Location = new Point(3, 105);
             positionDownsideLabel.Name = "positionDownsideLabel";
-            positionDownsideLabel.Size = new Size(88, 24);
+            positionDownsideLabel.Size = new Size(88, 21);
             positionDownsideLabel.TabIndex = 10;
             positionDownsideLabel.Text = "Position Downside:";
             // 
@@ -1928,10 +1975,10 @@ namespace SimulatorWinForms
             // 
             positionDownsideValue.AutoSize = true;
             positionDownsideValue.Dock = DockStyle.Fill;
-            positionDownsideValue.Font = new Font("Segoe UI", 7F);
-            positionDownsideValue.Location = new Point(97, 120);
+            positionDownsideValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            positionDownsideValue.Location = new Point(97, 105);
             positionDownsideValue.Name = "positionDownsideValue";
-            positionDownsideValue.Size = new Size(58, 24);
+            positionDownsideValue.Size = new Size(58, 21);
             positionDownsideValue.TabIndex = 11;
             positionDownsideValue.Text = "--";
             positionDownsideValue.TextAlign = ContentAlignment.MiddleCenter;
@@ -1940,10 +1987,10 @@ namespace SimulatorWinForms
             // 
             restingOrdersLabel.AutoSize = true;
             restingOrdersLabel.Dock = DockStyle.Fill;
-            restingOrdersLabel.Font = new Font("Segoe UI", 7F);
-            restingOrdersLabel.Location = new Point(3, 147);
+            restingOrdersLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            restingOrdersLabel.Location = new Point(3, 129);
             restingOrdersLabel.Name = "restingOrdersLabel";
-            restingOrdersLabel.Size = new Size(88, 18);
+            restingOrdersLabel.Size = new Size(88, 15);
             restingOrdersLabel.TabIndex = 12;
             restingOrdersLabel.Text = "Resting Orders:";
             // 
@@ -1951,10 +1998,10 @@ namespace SimulatorWinForms
             // 
             restingOrdersValue.AutoSize = true;
             restingOrdersValue.Dock = DockStyle.Fill;
-            restingOrdersValue.Font = new Font("Segoe UI", 7F);
-            restingOrdersValue.Location = new Point(97, 144);
+            restingOrdersValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            restingOrdersValue.Location = new Point(97, 126);
             restingOrdersValue.Name = "restingOrdersValue";
-            restingOrdersValue.Size = new Size(58, 24);
+            restingOrdersValue.Size = new Size(58, 21);
             restingOrdersValue.TabIndex = 13;
             restingOrdersValue.Text = "--";
             restingOrdersValue.TextAlign = ContentAlignment.MiddleCenter;
@@ -2029,28 +2076,6 @@ namespace SimulatorWinForms
             chartHeader.TabIndex = 0;
             chartHeader.Text = "Chart Header";
             chartHeader.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // supportLabel
-            // 
-            supportLabel.AutoSize = true;
-            supportLabel.Dock = DockStyle.Fill;
-            supportLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            supportLabel.Location = new Point(3, 201);
-            supportLabel.Name = "supportLabel";
-            supportLabel.Size = new Size(68, 16);
-            supportLabel.TabIndex = 21;
-            supportLabel.Text = "Supports:";
-            // 
-            // supportValue
-            // 
-            supportValue.AutoSize = true;
-            supportValue.Dock = DockStyle.Fill;
-            supportValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            supportValue.Location = new Point(77, 198);
-            supportValue.Name = "supportValue";
-            supportValue.Size = new Size(64, 22);
-            supportValue.TabIndex = 22;
-            supportValue.Text = "--";
             // 
             // SnapshotViewer
             // 
