@@ -174,6 +174,8 @@ namespace SimulatorWinForms
             obvValue.Text = currentSnapshot.OBV_Medium.ToString();
             psarValue.Text = currentSnapshot.PSAR.ToString() ?? "--";
             adxValue.Text = currentSnapshot.ADX.ToString() ?? "--";
+            supportValue.Text = currentSnapshot.AllSupportResistanceLevels.Count != 1 ? currentSnapshot.AllSupportResistanceLevels.Count.ToString() 
+                : $"{currentSnapshot.AllSupportResistanceLevels.First().Price}";
 
             // Other info
             chartHeader.Text = currentSnapshot.MarketTicker ?? "--";

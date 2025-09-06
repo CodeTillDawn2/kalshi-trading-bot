@@ -161,6 +161,8 @@ namespace SimulatorWinForms
             valueCol = new DataGridViewTextBoxColumn();
             backButton = new Button();
             chartHeader = new Label();
+            supportLabel = new CheckBox();
+            supportValue = new Label();
             mainLayout.SuspendLayout();
             dashboardGrid.SuspendLayout();
             chartContainer.SuspendLayout();
@@ -784,6 +786,8 @@ namespace SimulatorWinForms
             tradingMetricsGrid.ColumnCount = 2;
             tradingMetricsGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 51.38889F));
             tradingMetricsGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 48.61111F));
+            tradingMetricsGrid.Controls.Add(supportValue, 1, 11);
+            tradingMetricsGrid.Controls.Add(supportLabel, 0, 11);
             tradingMetricsGrid.Controls.Add(tradingMetricsHeader, 0, 0);
             tradingMetricsGrid.Controls.Add(rsiLabel, 0, 1);
             tradingMetricsGrid.Controls.Add(rsiValue, 1, 1);
@@ -808,7 +812,7 @@ namespace SimulatorWinForms
             tradingMetricsGrid.Dock = DockStyle.Fill;
             tradingMetricsGrid.Location = new Point(3, 203);
             tradingMetricsGrid.Name = "tradingMetricsGrid";
-            tradingMetricsGrid.RowCount = 11;
+            tradingMetricsGrid.RowCount = 12;
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
@@ -820,6 +824,7 @@ namespace SimulatorWinForms
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
+            tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tradingMetricsGrid.Size = new Size(144, 220);
             tradingMetricsGrid.TabIndex = 1;
             // 
@@ -830,7 +835,7 @@ namespace SimulatorWinForms
             tradingMetricsHeader.Dock = DockStyle.Fill;
             tradingMetricsHeader.Location = new Point(3, 0);
             tradingMetricsHeader.Name = "tradingMetricsHeader";
-            tradingMetricsHeader.Size = new Size(138, 20);
+            tradingMetricsHeader.Size = new Size(138, 18);
             tradingMetricsHeader.TabIndex = 0;
             tradingMetricsHeader.Text = "Market Header";
             // 
@@ -838,10 +843,10 @@ namespace SimulatorWinForms
             // 
             rsiLabel.AutoSize = true;
             rsiLabel.Dock = DockStyle.Fill;
-            rsiLabel.Font = new Font("Segoe UI", 7F);
-            rsiLabel.Location = new Point(3, 23);
+            rsiLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            rsiLabel.Location = new Point(3, 21);
             rsiLabel.Name = "rsiLabel";
-            rsiLabel.Size = new Size(68, 14);
+            rsiLabel.Size = new Size(68, 12);
             rsiLabel.TabIndex = 1;
             rsiLabel.Text = "RSI:";
             // 
@@ -850,9 +855,9 @@ namespace SimulatorWinForms
             rsiValue.AutoSize = true;
             rsiValue.Dock = DockStyle.Fill;
             rsiValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            rsiValue.Location = new Point(77, 20);
+            rsiValue.Location = new Point(77, 18);
             rsiValue.Name = "rsiValue";
-            rsiValue.Size = new Size(64, 20);
+            rsiValue.Size = new Size(64, 18);
             rsiValue.TabIndex = 2;
             rsiValue.Text = "--";
             // 
@@ -860,10 +865,10 @@ namespace SimulatorWinForms
             // 
             macdLabel.AutoSize = true;
             macdLabel.Dock = DockStyle.Fill;
-            macdLabel.Font = new Font("Segoe UI", 7F);
-            macdLabel.Location = new Point(3, 43);
+            macdLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            macdLabel.Location = new Point(3, 39);
             macdLabel.Name = "macdLabel";
-            macdLabel.Size = new Size(68, 14);
+            macdLabel.Size = new Size(68, 12);
             macdLabel.TabIndex = 3;
             macdLabel.Text = "MACD:";
             // 
@@ -872,9 +877,9 @@ namespace SimulatorWinForms
             macdValue.AutoSize = true;
             macdValue.Dock = DockStyle.Fill;
             macdValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            macdValue.Location = new Point(77, 40);
+            macdValue.Location = new Point(77, 36);
             macdValue.Name = "macdValue";
-            macdValue.Size = new Size(64, 20);
+            macdValue.Size = new Size(64, 18);
             macdValue.TabIndex = 4;
             macdValue.Text = "--";
             // 
@@ -882,10 +887,10 @@ namespace SimulatorWinForms
             // 
             emaLabel.AutoSize = true;
             emaLabel.Dock = DockStyle.Fill;
-            emaLabel.Font = new Font("Segoe UI", 7F);
-            emaLabel.Location = new Point(3, 63);
+            emaLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            emaLabel.Location = new Point(3, 57);
             emaLabel.Name = "emaLabel";
-            emaLabel.Size = new Size(68, 14);
+            emaLabel.Size = new Size(68, 12);
             emaLabel.TabIndex = 5;
             emaLabel.Text = "EMA:";
             // 
@@ -894,9 +899,9 @@ namespace SimulatorWinForms
             emaValue.AutoSize = true;
             emaValue.Dock = DockStyle.Fill;
             emaValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            emaValue.Location = new Point(77, 60);
+            emaValue.Location = new Point(77, 54);
             emaValue.Name = "emaValue";
-            emaValue.Size = new Size(64, 20);
+            emaValue.Size = new Size(64, 18);
             emaValue.TabIndex = 6;
             emaValue.Text = "--";
             // 
@@ -904,10 +909,10 @@ namespace SimulatorWinForms
             // 
             bollingerLabel.AutoSize = true;
             bollingerLabel.Dock = DockStyle.Fill;
-            bollingerLabel.Font = new Font("Segoe UI", 7F);
-            bollingerLabel.Location = new Point(3, 83);
+            bollingerLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            bollingerLabel.Location = new Point(3, 75);
             bollingerLabel.Name = "bollingerLabel";
-            bollingerLabel.Size = new Size(68, 14);
+            bollingerLabel.Size = new Size(68, 12);
             bollingerLabel.TabIndex = 7;
             bollingerLabel.Text = "Bollinger:";
             // 
@@ -916,9 +921,9 @@ namespace SimulatorWinForms
             bollingerValue.AutoSize = true;
             bollingerValue.Dock = DockStyle.Fill;
             bollingerValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            bollingerValue.Location = new Point(77, 80);
+            bollingerValue.Location = new Point(77, 72);
             bollingerValue.Name = "bollingerValue";
-            bollingerValue.Size = new Size(64, 20);
+            bollingerValue.Size = new Size(64, 18);
             bollingerValue.TabIndex = 8;
             bollingerValue.Text = "--";
             // 
@@ -926,10 +931,10 @@ namespace SimulatorWinForms
             // 
             atrLabel.AutoSize = true;
             atrLabel.Dock = DockStyle.Fill;
-            atrLabel.Font = new Font("Segoe UI", 7F);
-            atrLabel.Location = new Point(3, 103);
+            atrLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            atrLabel.Location = new Point(3, 93);
             atrLabel.Name = "atrLabel";
-            atrLabel.Size = new Size(68, 14);
+            atrLabel.Size = new Size(68, 12);
             atrLabel.TabIndex = 9;
             atrLabel.Text = "ATR:";
             // 
@@ -938,9 +943,9 @@ namespace SimulatorWinForms
             atrValue.AutoSize = true;
             atrValue.Dock = DockStyle.Fill;
             atrValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            atrValue.Location = new Point(77, 100);
+            atrValue.Location = new Point(77, 90);
             atrValue.Name = "atrValue";
-            atrValue.Size = new Size(64, 20);
+            atrValue.Size = new Size(64, 18);
             atrValue.TabIndex = 10;
             atrValue.Text = "--";
             // 
@@ -948,10 +953,10 @@ namespace SimulatorWinForms
             // 
             vwapLabel.AutoSize = true;
             vwapLabel.Dock = DockStyle.Fill;
-            vwapLabel.Font = new Font("Segoe UI", 7F);
-            vwapLabel.Location = new Point(3, 123);
+            vwapLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            vwapLabel.Location = new Point(3, 111);
             vwapLabel.Name = "vwapLabel";
-            vwapLabel.Size = new Size(68, 14);
+            vwapLabel.Size = new Size(68, 12);
             vwapLabel.TabIndex = 11;
             vwapLabel.Text = "VWAP:";
             // 
@@ -960,9 +965,9 @@ namespace SimulatorWinForms
             vwapValue.AutoSize = true;
             vwapValue.Dock = DockStyle.Fill;
             vwapValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            vwapValue.Location = new Point(77, 120);
+            vwapValue.Location = new Point(77, 108);
             vwapValue.Name = "vwapValue";
-            vwapValue.Size = new Size(64, 20);
+            vwapValue.Size = new Size(64, 18);
             vwapValue.TabIndex = 12;
             vwapValue.Text = "--";
             // 
@@ -970,10 +975,10 @@ namespace SimulatorWinForms
             // 
             stochasticLabel.AutoSize = true;
             stochasticLabel.Dock = DockStyle.Fill;
-            stochasticLabel.Font = new Font("Segoe UI", 7F);
-            stochasticLabel.Location = new Point(3, 143);
+            stochasticLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            stochasticLabel.Location = new Point(3, 129);
             stochasticLabel.Name = "stochasticLabel";
-            stochasticLabel.Size = new Size(68, 14);
+            stochasticLabel.Size = new Size(68, 12);
             stochasticLabel.TabIndex = 13;
             stochasticLabel.Text = "Stochastic:";
             // 
@@ -982,9 +987,9 @@ namespace SimulatorWinForms
             stochasticValue.AutoSize = true;
             stochasticValue.Dock = DockStyle.Fill;
             stochasticValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            stochasticValue.Location = new Point(77, 140);
+            stochasticValue.Location = new Point(77, 126);
             stochasticValue.Name = "stochasticValue";
-            stochasticValue.Size = new Size(64, 20);
+            stochasticValue.Size = new Size(64, 18);
             stochasticValue.TabIndex = 14;
             stochasticValue.Text = "--";
             // 
@@ -992,10 +997,10 @@ namespace SimulatorWinForms
             // 
             obvLabel.AutoSize = true;
             obvLabel.Dock = DockStyle.Fill;
-            obvLabel.Font = new Font("Segoe UI", 7F);
-            obvLabel.Location = new Point(3, 163);
+            obvLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            obvLabel.Location = new Point(3, 147);
             obvLabel.Name = "obvLabel";
-            obvLabel.Size = new Size(68, 14);
+            obvLabel.Size = new Size(68, 12);
             obvLabel.TabIndex = 15;
             obvLabel.Text = "OBV:";
             // 
@@ -1004,9 +1009,9 @@ namespace SimulatorWinForms
             obvValue.AutoSize = true;
             obvValue.Dock = DockStyle.Fill;
             obvValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            obvValue.Location = new Point(77, 160);
+            obvValue.Location = new Point(77, 144);
             obvValue.Name = "obvValue";
-            obvValue.Size = new Size(64, 20);
+            obvValue.Size = new Size(64, 18);
             obvValue.TabIndex = 16;
             obvValue.Text = "--";
             // 
@@ -1014,10 +1019,10 @@ namespace SimulatorWinForms
             // 
             psarLabel.AutoSize = true;
             psarLabel.Dock = DockStyle.Fill;
-            psarLabel.Font = new Font("Segoe UI", 7F);
-            psarLabel.Location = new Point(3, 183);
+            psarLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            psarLabel.Location = new Point(3, 165);
             psarLabel.Name = "psarLabel";
-            psarLabel.Size = new Size(68, 14);
+            psarLabel.Size = new Size(68, 12);
             psarLabel.TabIndex = 17;
             psarLabel.Text = "PSAR:";
             // 
@@ -1026,9 +1031,9 @@ namespace SimulatorWinForms
             psarValue.AutoSize = true;
             psarValue.Dock = DockStyle.Fill;
             psarValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            psarValue.Location = new Point(77, 180);
+            psarValue.Location = new Point(77, 162);
             psarValue.Name = "psarValue";
-            psarValue.Size = new Size(64, 20);
+            psarValue.Size = new Size(64, 18);
             psarValue.TabIndex = 18;
             psarValue.Text = "--";
             // 
@@ -1036,10 +1041,10 @@ namespace SimulatorWinForms
             // 
             adxLabel.AutoSize = true;
             adxLabel.Dock = DockStyle.Fill;
-            adxLabel.Font = new Font("Segoe UI", 7F);
-            adxLabel.Location = new Point(3, 203);
+            adxLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            adxLabel.Location = new Point(3, 183);
             adxLabel.Name = "adxLabel";
-            adxLabel.Size = new Size(68, 14);
+            adxLabel.Size = new Size(68, 12);
             adxLabel.TabIndex = 19;
             adxLabel.Text = "ADX:";
             // 
@@ -1048,9 +1053,9 @@ namespace SimulatorWinForms
             adxValue.AutoSize = true;
             adxValue.Dock = DockStyle.Fill;
             adxValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            adxValue.Location = new Point(77, 200);
+            adxValue.Location = new Point(77, 180);
             adxValue.Name = "adxValue";
-            adxValue.Size = new Size(64, 20);
+            adxValue.Size = new Size(64, 18);
             adxValue.TabIndex = 20;
             adxValue.Text = "--";
             // 
@@ -2025,6 +2030,28 @@ namespace SimulatorWinForms
             chartHeader.Text = "Chart Header";
             chartHeader.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // supportLabel
+            // 
+            supportLabel.AutoSize = true;
+            supportLabel.Dock = DockStyle.Fill;
+            supportLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            supportLabel.Location = new Point(3, 201);
+            supportLabel.Name = "supportLabel";
+            supportLabel.Size = new Size(68, 16);
+            supportLabel.TabIndex = 21;
+            supportLabel.Text = "Supports:";
+            // 
+            // supportValue
+            // 
+            supportValue.AutoSize = true;
+            supportValue.Dock = DockStyle.Fill;
+            supportValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            supportValue.Location = new Point(77, 198);
+            supportValue.Name = "supportValue";
+            supportValue.Size = new Size(64, 22);
+            supportValue.TabIndex = 22;
+            supportValue.Text = "--";
+            // 
             // SnapshotViewer
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -2227,5 +2254,7 @@ namespace SimulatorWinForms
         private Label totalDepthNoValue;
         private Label totalDepthYesValue;
         private CheckBox totalDepthCB;
+        private Label supportValue;
+        private CheckBox supportLabel;
     }
 }
