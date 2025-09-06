@@ -9,9 +9,7 @@ namespace SmokehousePatterns
     {
         public static readonly List<int> TempIndices = new List<int>();
 
-
-
-        public static async Task<Dictionary<int, List<PatternDefinition>>> DetectPatterns(CandleMids[] prices,
+        public static Dictionary<int, List<PatternDefinition>> DetectPatterns(CandleMids[] prices,
                 int trendLookback)
         {
             if (prices == null || prices.Length < 2)

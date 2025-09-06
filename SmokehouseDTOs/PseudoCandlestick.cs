@@ -8,5 +8,7 @@
         public double MidLow { get; set; }       // Min yes_ask for tickers, or yes_ask_low for candlesticks
         public decimal Volume { get; set; }          // Summed volume in the minute
         public bool IsFromCandlestick { get; set; }  // Track source for debugging or logic
+
+
     }
 }

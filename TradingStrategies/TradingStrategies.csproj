@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SmokehouseDTOs\SmokehouseDTOs.csproj" />
     <ProjectReference Include="..\SmokehouseInterfaces\SmokehouseInterfaces.csproj" />
+    <ProjectReference Include="..\SmokehousePatterns\SmokehousePatterns.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,9 +1,12 @@
 ﻿using SmokehouseDTOs;
+using SmokehousePatterns;
+using SmokehousePatterns.PatternDefinitions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
+using TradingStrategies.Extensions;
 using static SmokehouseInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Strategies.Strats
@@ -136,7 +139,13 @@ namespace TradingStrategies.Strategies.Strats
                          _consecYes, _consecNo, simulationPosition, ActionType.None,
                          yS, nS, netS, yM, nM, netM, false, false, false, netFlow,
                          0, 0, 0, 0, ActionType.None, false, false, false, false,
-                         false, false));
+                         false, false, new List<PatternDefinition>()));
+
+
+            CandleMids[] mids = snapshot.RecentCandlesticks.ToCandleMids(snapshot.MarketTicker);
+
+            var patterns = PatternSearch.DetectPatterns(mids, 10);
+            var currentPatterns = patterns[patterns.Count - 1];
 
             if (snapshot.BestYesAsk >= 100 - minDist || snapshot.BestYesBid <= minDist)
                 return AD(ActionType.None, 0, 0,
@@ -149,7 +158,7 @@ namespace TradingStrategies.Strategies.Strats
                          _consecYes, _consecNo, simulationPosition, ActionType.None,
                          yS, nS, netS, yM, nM, netM, false, false, false, netFlow,
                          0, 0, 0, 0, ActionType.None, false, false, false, false,
-                         false, false));
+                         false, false, currentPatterns));
 
             if (prev is null)
                 return AD(ActionType.None, 0, 0,
@@ -162,7 +171,7 @@ namespace TradingStrategies.Strategies.Strats
                          _consecYes, _consecNo, simulationPosition, ActionType.None,
                          yS, nS, netS, yM, nM, netM, false, false, false, netFlow,
                          0, 0, 0, 0, ActionType.None, false, false, false, false,
-                         false, false));
+                         false, false, currentPatterns));
 
             int yesPrev = prev.BestYesBid, yesNow = snapshot.BestYesBid;
             int noPrev = prev.BestNoBid, noNow = snapshot.BestNoBid;
@@ -229,7 +238,7 @@ namespace TradingStrategies.Strategies.Strats
                          _consecYes, _consecNo, simulationPosition, ActionType.None,
                          yS, nS, netS, yM, nM, netM, counterYesPass, counterNoPass, false, netFlow,
                          yesPrev, yesNow, noPrev, noNow, ActionType.None, wouldEnterLong_NoSpread, wouldEnterShort_NoSpread, false, false,
-                         entryYesStrict_NoSpread, entryNoStrict_NoSpread));
+                         entryYesStrict_NoSpread, entryNoStrict_NoSpread, currentPatterns));
 
             bool priceDownLongExit = yesNow < yesPrev;
             bool priceUpShortExit = yesNow > yesPrev;
@@ -251,7 +260,7 @@ namespace TradingStrategies.Strategies.Strats
                          _consecYes, _consecNo, simulationPosition, ActionType.Exit,
                          yS, nS, netS, yM, nM, netM, counterYesPass, counterNoPass, false, netFlow,
                          yesPrev, yesNow, noPrev, noNow, ActionType.Exit, wouldEnterLong, wouldEnterShort, true, false,
-                         entryYesStrict, entryNoStrict));
+                         entryYesStrict, entryNoStrict, currentPatterns));
 
             if (wouldExitShort)
                 return AD(ActionType.Exit, snapshot.BestNoBid, Math.Abs(simulationPosition),
@@ -264,7 +273,7 @@ namespace TradingStrategies.Strategies.Strats
                          _consecYes, _consecNo, simulationPosition, ActionType.Exit,
                          yS, nS, netS, yM, nM, netM, counterYesPass, counterNoPass, false, netFlow,
                          yesPrev, yesNow, noPrev, noNow, ActionType.Exit, wouldEnterLong, wouldEnterShort, false, true,
-                         entryYesStrict, entryNoStrict));
+                         entryYesStrict, entryNoStrict, currentPatterns));
 
             var candidate = ActionType.None;
             if (wouldEnterLong) candidate = ActionType.Long;
@@ -286,7 +295,7 @@ namespace TradingStrategies.Strategies.Strats
                          _consecYes, _consecNo, simulationPosition, candidateBeforeFlip,
                          yS, nS, netS, yM, nM, netM, counterYesPass, counterNoPass, flipBlocked, netFlow,
                          yesPrev, yesNow, noPrev, noNow, ActionType.None, wouldEnterLong, wouldEnterShort, false, false,
-                         entryYesStrict, entryNoStrict));
+                         entryYesStrict, entryNoStrict, currentPatterns));
 
             int pricePoint = (candidate == ActionType.Long) ? snapshot.BestYesBid : snapshot.BestNoBid;
 
@@ -300,7 +309,7 @@ namespace TradingStrategies.Strategies.Strats
                      _consecYes, _consecNo, simulationPosition, candidate,
                      yS, nS, netS, yM, nM, netM, counterYesPass, counterNoPass, flipBlocked, netFlow,
                      yesPrev, yesNow, noPrev, noNow, candidate, wouldEnterLong, wouldEnterShort, false, false,
-                     entryYesStrict, entryNoStrict));
+                     entryYesStrict, entryNoStrict, currentPatterns));
         }
 
         private static string Memo(
@@ -318,7 +327,7 @@ namespace TradingStrategies.Strategies.Strats
     bool counterYesPass, bool counterNoPass, bool flipBlocked, double netFlow,
     int yesBidPrev, int yesBidNow, int noBidPrev, int noBidNow,
     ActionType actionTaken, bool wouldEnterLong, bool wouldEnterShort, bool wouldExitLong, bool wouldExitShort,
-    bool entryYesStrict, bool entryNoStrict)
+    bool entryYesStrict, bool entryNoStrict, List<PatternDefinition> patterns)
         {
             string F(double d) => d.ToString("0.###", inv);
 
@@ -462,6 +471,12 @@ namespace TradingStrategies.Strategies.Strats
             lines.Add($"Exit mins: Short {F(exitMinShort)}, Medium {F(exitMinMed)}");
             lines.Add($"Current Position: {position}");
             lines.Add($"Flip Blocked: {(flipBlocked ? "Yes" : "No")} (opp |net| thr: {F(exitOpp)})");
+            if (patterns != null && patterns.Count > 0)
+            {
+                lines.Add($"Patterns:");
+            }
+            foreach (var pattern in patterns)
+                lines.Add(pattern == null ? $"Name: {pattern?.Name}, Strength: {pattern?.Strength}, Certainty: {pattern?.Certainty}, Uncertainty: {pattern?.Uncertainty}" : "");
 
             return string.Join("\r\n", lines);
         }
