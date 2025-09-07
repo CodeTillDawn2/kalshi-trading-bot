@@ -564,6 +564,9 @@ namespace SimulatorWinForms
             // Immediately update all UI elements (fast operations)
             UpdateUIFast();
 
+            // Update orderbook from the new snapshot
+            UpdateUIFromSnapshot();
+
             // Start navigation mode and reset timer for expensive operations
             _isNavigating = true;
             _navigationTimer.Stop();
@@ -612,29 +615,39 @@ namespace SimulatorWinForms
             // Update strategy output immediately
             strategyOutputTextbox.Text = memoText;
 
+            marketTickerLabel.Text = currentSnapshot.MarketTicker;
+
             // Update price display elements
-            allTimeHighAskPrice.Text = currentSnapshot.AllTimeHighNo_Bid.Bid.ToString();
-            allTimeHighAskTime.Text = currentSnapshot.AllTimeHighNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            allTimeHighAskPrice.Text = (100 - currentSnapshot.AllTimeHighNo_Bid.Bid).ToString();
+            TimeSpan? allTimeHighAskTs = currentSnapshot.AllTimeHighNo_Bid.When != DateTime.MinValue ? currentSnapshot.Timestamp - currentSnapshot.AllTimeHighNo_Bid.When : (TimeSpan?)null;
+            allTimeHighAskTime.Text = FormatTimeSpan(allTimeHighAskTs);
             allTimeHighBidPrice.Text = currentSnapshot.AllTimeHighYes_Bid.Bid.ToString();
-            allTimeHighBidTime.Text = currentSnapshot.AllTimeHighYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            TimeSpan? allTimeHighBidTs = currentSnapshot.AllTimeHighYes_Bid.When != DateTime.MinValue ? currentSnapshot.Timestamp - currentSnapshot.AllTimeHighYes_Bid.When : (TimeSpan?)null;
+            allTimeHighBidTime.Text = FormatTimeSpan(allTimeHighBidTs);
 
-            recentHighAskPrice.Text = currentSnapshot.RecentHighNo_Bid.Bid.ToString();
-            recentHighAskTime.Text = currentSnapshot.RecentHighNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            recentHighAskPrice.Text = (100 - currentSnapshot.RecentHighNo_Bid.Bid).ToString();
+            TimeSpan? recentHighAskTs = currentSnapshot.RecentHighNo_Bid.When != DateTime.MinValue ? currentSnapshot.Timestamp - currentSnapshot.RecentHighNo_Bid.When : (TimeSpan?)null;
+            recentHighAskTime.Text = FormatTimeSpan(recentHighAskTs);
             recentHighBidPrice.Text = currentSnapshot.RecentHighYes_Bid.Bid.ToString();
-            recentHighBidTime.Text = currentSnapshot.RecentHighYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            TimeSpan? recentHighBidTs = currentSnapshot.RecentHighYes_Bid.When != DateTime.MinValue ? currentSnapshot.Timestamp - currentSnapshot.RecentHighYes_Bid.When : (TimeSpan?)null;
+            recentHighBidTime.Text = FormatTimeSpan(recentHighBidTs);
 
-            currentPriceAsk.Text = currentSnapshot.BestNoBid.ToString();
+            currentPriceAsk.Text = currentSnapshot.BestYesAsk.ToString();
             currentPriceBid.Text = currentSnapshot.BestYesBid.ToString();
 
-            recentLowAskPrice.Text = currentSnapshot.RecentLowNo_Bid.Bid.ToString();
-            recentLowAskTime.Text = currentSnapshot.RecentLowNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            recentLowAskPrice.Text = (100 - currentSnapshot.RecentLowNo_Bid.Bid).ToString();
+            TimeSpan? recentLowAskTs = currentSnapshot.RecentLowNo_Bid.When != DateTime.MinValue ? currentSnapshot.Timestamp - currentSnapshot.RecentLowNo_Bid.When : (TimeSpan?)null;
+            recentLowAskTime.Text = FormatTimeSpan(recentLowAskTs);
             recentLowBidPrice.Text = currentSnapshot.RecentLowYes_Bid.Bid.ToString();
-            recentLowBidTime.Text = currentSnapshot.RecentLowYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            TimeSpan? recentLowBidTs = currentSnapshot.RecentLowYes_Bid.When != DateTime.MinValue ? currentSnapshot.Timestamp - currentSnapshot.RecentLowYes_Bid.When : (TimeSpan?)null;
+            recentLowBidTime.Text = FormatTimeSpan(recentLowBidTs);
 
-            allTimeLowAskPrice.Text = currentSnapshot.AllTimeLowNo_Bid.Bid.ToString();
-            allTimeLowAskTime.Text = currentSnapshot.AllTimeLowNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            allTimeLowAskPrice.Text = (100 - currentSnapshot.AllTimeLowNo_Bid.Bid).ToString();
+            TimeSpan? allTimeLowAskTs = currentSnapshot.AllTimeLowNo_Bid.When != DateTime.MinValue ? currentSnapshot.Timestamp - currentSnapshot.AllTimeLowNo_Bid.When : (TimeSpan?)null;
+            allTimeLowAskTime.Text = FormatTimeSpan(allTimeLowAskTs);
             allTimeLowBidPrice.Text = currentSnapshot.AllTimeLowYes_Bid.Bid.ToString();
-            allTimeLowBidTime.Text = currentSnapshot.AllTimeLowYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            TimeSpan? allTimeLowBidTs = currentSnapshot.AllTimeLowYes_Bid.When != DateTime.MinValue ? currentSnapshot.Timestamp - currentSnapshot.AllTimeLowYes_Bid.When : (TimeSpan?)null;
+            allTimeLowBidTime.Text = FormatTimeSpan(allTimeLowBidTs);
 
             // Update trading metrics
             rsiValue.Text = currentSnapshot.RSI_Medium?.ToString("F2") ?? "--";
@@ -683,14 +696,14 @@ namespace SimulatorWinForms
                 imbalance = Math.Round((double)currentSnapshot.TotalOrderbookDepth_Yes / currentSnapshot.TotalOrderbookDepth_No, 2);
             }
             imbalValue.Text = imbalance.ToString();
-            depthTop4YesValue.Text = currentSnapshot.DepthAtTop4YesBids.ToString();
-            depthTop4NoValue.Text = currentSnapshot.DepthAtTop4NoBids.ToString();
-            totalDepthYesValue.Text = currentSnapshot.TotalOrderbookDepth_Yes.ToString();
-            totalDepthNoValue.Text = currentSnapshot.TotalOrderbookDepth_No.ToString();
+            depthTop4YesValue.Text = (currentSnapshot.DepthAtTop4YesBids / 100.0).ToString("F2");
+            depthTop4NoValue.Text = (currentSnapshot.DepthAtTop4NoBids / 100.0).ToString("F2");
+            totalDepthYesValue.Text = (currentSnapshot.TotalOrderbookDepth_Yes / 100.0).ToString("F2");
+            totalDepthNoValue.Text = (currentSnapshot.TotalOrderbookDepth_No / 100.0).ToString("F2");
             centerMassYesValue.Text = currentSnapshot.YesBidCenterOfMass.ToString("F2");
             centerMassNoValue.Text = currentSnapshot.NoBidCenterOfMass.ToString("F2");
-            totalContractsYesValue.Text = currentSnapshot.TotalBidContracts_Yes.ToString();
-            totalContractsNoValue.Text = currentSnapshot.TotalBidContracts_No.ToString();
+            totalContractsYesValue.Text = (currentSnapshot.TotalBidContracts_Yes / 100.0).ToString("F2");
+            totalContractsNoValue.Text = (currentSnapshot.TotalBidContracts_No / 100.0).ToString("F2");
 
             // Update positions
             positionSizeValue.Text = currentSnapshot.PositionSize.ToString();
@@ -808,18 +821,96 @@ namespace SimulatorWinForms
 
         private void UpdateUIFromSnapshot()
         {
-            // Clear and repopulate order book (assuming OrderbookData contains bid levels only, as per note)
+            // Clear and repopulate order book with bids and asks
             orderbookGrid.Rows.Clear();
-            if (currentSnapshot.OrderbookData != null)
+            if (currentSnapshot != null)
             {
-                // Populate bids (highest price first); assuming each dict has "price", "size", "value" keys
-                foreach (var level in currentSnapshot.OrderbookData.OrderByDescending(l => Convert.ToDouble(l["price"])))
+                // Get yes bids and no bids
+                var yesBids = currentSnapshot.GetYesBids();
+                var noBids = currentSnapshot.GetNoBids();
+
+                // Track the row index for the spacer
+                int spacerRowIndex = -1;
+
+                // Create separate lists for bids and asks
+                var bidList = new List<(int price, int size)>();
+                var askList = new List<(int price, int size)>();
+
+                // Add asks first (100 - no bid prices) - these will be on top in red
+                foreach (var bid in noBids)
                 {
-                    double price = Convert.ToDouble(level["price"]);
-                    int size = Convert.ToInt32(level["resting_contracts"]);
-                    double value = Convert.ToInt32(level["resting_contracts"]) * Convert.ToDouble(level["price"]);
-                    int rowIdx = orderbookGrid.Rows.Add(price, size, value);
+                    int askPrice = 100 - bid.Key;
+                    // Filter out very low/high prices that might be noise
+                    if (askPrice >= 1 && askPrice <= 99)
+                    {
+                        askList.Add((askPrice, bid.Value));
+                    }
+                }
+
+                // Add yes bids (keep original prices) - these will be on bottom in teal
+                foreach (var bid in yesBids)
+                {
+                    // Filter out very low prices that might be noise
+                    if (bid.Key >= 1 && bid.Key <= 99)
+                    {
+                        bidList.Add((bid.Key, bid.Value));
+                    }
+                }
+
+                // Sort bids ascending (lowest to highest) - for display purposes
+                bidList = bidList.OrderByDescending(b => b.price).ToList();
+
+                // Sort asks descending (highest to lowest) - for display purposes
+                askList = askList.OrderByDescending(a => a.price).ToList();
+
+                // Add all asks
+                foreach (var ask in askList)
+                {
+                    int rowIdx = orderbookGrid.Rows.Add(ask.price.ToString(), ask.size, ((ask.price * ask.size) / 100.0).ToString("F2"));
+                    orderbookGrid.Rows[rowIdx].Cells[0].Style.ForeColor = Color.OrangeRed;  // Red for asks
+                    orderbookGrid.Rows[rowIdx].Cells[1].Style.ForeColor = Color.OrangeRed;
+                    orderbookGrid.Rows[rowIdx].Cells[2].Style.ForeColor = Color.OrangeRed;
+                }
+
+                // Add spacer row
+                spacerRowIndex = orderbookGrid.Rows.Add("--", "--", "--");
+                orderbookGrid.Rows[spacerRowIndex].Cells[0].Style.ForeColor = Color.Gray;
+                orderbookGrid.Rows[spacerRowIndex].Cells[1].Style.ForeColor = Color.Gray;
+                orderbookGrid.Rows[spacerRowIndex].Cells[2].Style.ForeColor = Color.Gray;
+                orderbookGrid.Rows[spacerRowIndex].DefaultCellStyle.BackColor = Color.LightGray;
+
+                // Add all bids first
+                foreach (var bid in bidList)
+                {
+                    int rowIdx = orderbookGrid.Rows.Add(bid.price.ToString(), bid.size, ((bid.price * bid.size) / 100.0).ToString("F2"));
                     orderbookGrid.Rows[rowIdx].Cells[0].Style.ForeColor = Color.FromArgb(0, 206, 209);  // Teal for bids
+                    orderbookGrid.Rows[rowIdx].Cells[1].Style.ForeColor = Color.FromArgb(0, 206, 209);
+                    orderbookGrid.Rows[rowIdx].Cells[2].Style.ForeColor = Color.FromArgb(0, 206, 209);
+                }
+
+                // Scroll to center on the spread area (spacer row)
+                if (spacerRowIndex >= 0 && orderbookGrid.Rows.Count > 0)
+                {
+                    // Force a layout update to ensure DisplayedRowCount is accurate
+                    orderbookGrid.PerformLayout();
+
+                    int totalRows = orderbookGrid.Rows.Count;
+                    int visibleRows = orderbookGrid.DisplayedRowCount(false);
+                    if (visibleRows <= 0) visibleRows = 10; // Default if not yet calculated
+
+                    // Calculate the percentage position of the spacer row
+                    double spacerPercentage = (double)spacerRowIndex / Math.Max(1, totalRows - 1);
+
+                    // Calculate the row to scroll to so that the spacer is centered
+                    int scrollToRow = (int)(spacerRowIndex - (visibleRows / 2.0));
+
+                    // Ensure we don't scroll past the bounds
+                    scrollToRow = Math.Max(0, scrollToRow);
+                    int maxScrollRow = Math.Max(0, totalRows - visibleRows);
+                    scrollToRow = Math.Min(scrollToRow, maxScrollRow);
+
+                    // Set the scroll position
+                    orderbookGrid.FirstDisplayedScrollingRowIndex = scrollToRow;
                 }
             }
 

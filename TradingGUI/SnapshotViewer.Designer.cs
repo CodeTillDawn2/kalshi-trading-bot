@@ -32,7 +32,7 @@ namespace SimulatorWinForms
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            toolTip1 = new System.Windows.Forms.ToolTip(components);
+            toolTip1 = new ToolTip(components);
             mainLayout = new TableLayoutPanel();
             dashboardGrid = new TableLayoutPanel();
             chartContainer = new Panel();
@@ -177,17 +177,12 @@ namespace SimulatorWinForms
             valueCol = new DataGridViewTextBoxColumn();
             backButton = new Button();
             chartHeader = new Label();
-
-            // Configure tooltip
-            toolTip1.AutoPopDelay = 5000;
-            toolTip1.InitialDelay = 1000;
-            toolTip1.ReshowDelay = 500;
-            toolTip1.ShowAlways = true;
-
+            marketTickerLabel = new Label();
             mainLayout.SuspendLayout();
             dashboardGrid.SuspendLayout();
             chartContainer.SuspendLayout();
             chartLayout.SuspendLayout();
+            chartControls.SuspendLayout();
             marketInfoContainer.SuspendLayout();
             infoGrid.SuspendLayout();
             leftColumn.SuspendLayout();
@@ -211,6 +206,13 @@ namespace SimulatorWinForms
             orderbookContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)orderbookGrid).BeginInit();
             SuspendLayout();
+            // 
+            // toolTip1
+            // 
+            toolTip1.AutoPopDelay = 5000;
+            toolTip1.InitialDelay = 1000;
+            toolTip1.ReshowDelay = 500;
+            toolTip1.ShowAlways = true;
             // 
             // mainLayout
             // 
@@ -250,19 +252,19 @@ namespace SimulatorWinForms
             dashboardGrid.TabIndex = 0;
             // 
             // chartContainer
-            //
+            // 
             chartContainer.BorderStyle = BorderStyle.FixedSingle;
             chartContainer.Controls.Add(chartLayout);
             chartContainer.Dock = DockStyle.Fill;
-            chartContainer.Location = new Point(4, 3);
-            chartContainer.Margin = new Padding(2, 2, 2, 2);
+            chartContainer.Location = new Point(2, 2);
+            chartContainer.Margin = new Padding(2);
             chartContainer.Name = "chartContainer";
             chartContainer.Padding = new Padding(2);
-            chartContainer.Size = new Size(575, 446);
+            chartContainer.Size = new Size(579, 448);
             chartContainer.TabIndex = 0;
             // 
             // chartLayout
-            //
+            // 
             chartLayout.AutoSize = true;
             chartLayout.ColumnCount = 1;
             chartLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
@@ -277,36 +279,37 @@ namespace SimulatorWinForms
             chartLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
             chartLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 67.5F));
             chartLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 22.5F));
-            chartLayout.Size = new Size(561, 432);
+            chartLayout.Size = new Size(573, 442);
             chartLayout.TabIndex = 0;
             // 
             // chartControls
             // 
             chartControls.AutoSize = true;
+            chartControls.Controls.Add(marketTickerLabel);
             chartControls.Dock = DockStyle.Fill;
             chartControls.Location = new Point(3, 3);
             chartControls.Name = "chartControls";
-            chartControls.Size = new Size(555, 37);
+            chartControls.Size = new Size(567, 38);
             chartControls.TabIndex = 0;
             // 
             // priceChart
-            //
+            // 
             priceChart.Dock = DockStyle.Fill;
-            priceChart.Location = new Point(4, 46);
-            priceChart.Margin = new Padding(1, 1, 1, 1);
+            priceChart.Location = new Point(1, 45);
+            priceChart.Margin = new Padding(1);
             priceChart.Name = "priceChart";
-            priceChart.Size = new Size(553, 383);
+            priceChart.Size = new Size(571, 296);
             priceChart.TabIndex = 1;
-            //
+            // 
             // secondaryChart
-            //
+            // 
             secondaryChart.Dock = DockStyle.Fill;
-            secondaryChart.Location = new Point(4, 46);
-            secondaryChart.Margin = new Padding(1, 1, 1, 1);
+            secondaryChart.Location = new Point(1, 343);
+            secondaryChart.Margin = new Padding(1);
             secondaryChart.Name = "secondaryChart";
-            secondaryChart.Size = new Size(553, 383);
+            secondaryChart.Size = new Size(571, 98);
             secondaryChart.TabIndex = 2;
-            //
+            // 
             // marketInfoContainer
             // 
             marketInfoContainer.BorderStyle = BorderStyle.FixedSingle;
@@ -408,7 +411,8 @@ namespace SimulatorWinForms
             pricesHeaderNo.Name = "pricesHeaderNo";
             pricesHeaderNo.Size = new Size(43, 33);
             pricesHeaderNo.TabIndex = 1;
-            pricesHeaderNo.Text = "No";
+            pricesHeaderNo.Text = "Ask";
+            pricesHeaderNo.TextAlign = ContentAlignment.BottomCenter;
             // 
             // pricesHeaderYes
             // 
@@ -418,7 +422,8 @@ namespace SimulatorWinForms
             pricesHeaderYes.Name = "pricesHeaderYes";
             pricesHeaderYes.Size = new Size(45, 33);
             pricesHeaderYes.TabIndex = 2;
-            pricesHeaderYes.Text = "Yes";
+            pricesHeaderYes.Text = "Bid";
+            pricesHeaderYes.TextAlign = ContentAlignment.BottomCenter;
             // 
             // allTimeHighLabel
             // 
@@ -892,7 +897,7 @@ namespace SimulatorWinForms
             tradingMetricsHeader.Name = "tradingMetricsHeader";
             tradingMetricsHeader.Size = new Size(138, 18);
             tradingMetricsHeader.TabIndex = 0;
-            tradingMetricsHeader.Text = "Market Header";
+            tradingMetricsHeader.Text = "Technical";
             // 
             // rsiLabel
             // 
@@ -1288,6 +1293,7 @@ namespace SimulatorWinForms
             flowHeaderYes.Size = new Size(23, 16);
             flowHeaderYes.TabIndex = 1;
             flowHeaderYes.Text = "Yes";
+            flowHeaderYes.TextAlign = ContentAlignment.BottomCenter;
             // 
             // flowHeaderNo
             // 
@@ -1299,6 +1305,7 @@ namespace SimulatorWinForms
             flowHeaderNo.Size = new Size(26, 16);
             flowHeaderNo.TabIndex = 2;
             flowHeaderNo.Text = "No";
+            flowHeaderNo.TextAlign = ContentAlignment.BottomCenter;
             // 
             // topVelocityCB
             // 
@@ -1602,6 +1609,7 @@ namespace SimulatorWinForms
             contextHeaderYes.Size = new Size(26, 15);
             contextHeaderYes.TabIndex = 1;
             contextHeaderYes.Text = "Yes";
+            contextHeaderYes.TextAlign = ContentAlignment.BottomCenter;
             // 
             // contextHeaderNo
             // 
@@ -1613,6 +1621,7 @@ namespace SimulatorWinForms
             contextHeaderNo.Size = new Size(27, 15);
             contextHeaderNo.TabIndex = 2;
             contextHeaderNo.Text = "No";
+            contextHeaderNo.TextAlign = ContentAlignment.BottomCenter;
             // 
             // spreadLabel
             // 
@@ -2109,6 +2118,17 @@ namespace SimulatorWinForms
             chartHeader.Text = "Chart Header";
             chartHeader.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // marketTickerLabel
+            // 
+            marketTickerLabel.AutoSize = true;
+            marketTickerLabel.Dock = DockStyle.Fill;
+            marketTickerLabel.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            marketTickerLabel.Location = new Point(3, 0);
+            marketTickerLabel.Name = "marketTickerLabel";
+            marketTickerLabel.Size = new Size(118, 30);
+            marketTickerLabel.TabIndex = 0;
+            marketTickerLabel.Text = "TickerHere";
+            // 
             // SnapshotViewer
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -2124,7 +2144,8 @@ namespace SimulatorWinForms
             chartContainer.PerformLayout();
             chartLayout.ResumeLayout(false);
             chartLayout.PerformLayout();
-            secondaryChart.ResumeLayout(false);
+            chartControls.ResumeLayout(false);
+            chartControls.PerformLayout();
             marketInfoContainer.ResumeLayout(false);
             marketInfoContainer.PerformLayout();
             infoGrid.ResumeLayout(false);
@@ -2217,7 +2238,6 @@ namespace SimulatorWinForms
         private Label allTimeLowBidPrice;
         private Label allTimeLowBidTime;
         private TableLayoutPanel tradingMetricsGrid;
-        private Label tradingMetricsHeader;
         private CheckBox rsiLabel;
         private Label rsiValue;
         private CheckBox macdLabel;
@@ -2314,5 +2334,7 @@ namespace SimulatorWinForms
         private CheckBox totalDepthCB;
         private Label supportValue;
         private CheckBox supportLabel;
+        private Label tradingMetricsHeader;
+        private Label marketTickerLabel;
     }
 }

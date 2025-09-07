@@ -153,8 +153,8 @@ namespace SmokehouseDTOs
             AllTimeLowNo_Bid = allTimeLowNoBid;
             RecentHighYes_Bid = recentHighYesBid;
             RecentLowYes_Bid = recentLowYesBid;
-            RecentHighYes_Bid = recentHighNoBid;
-            RecentLowYes_Bid = recentLowNoBid;
+            RecentHighNo_Bid = recentHighNoBid;
+            RecentLowNo_Bid = recentLowNoBid;
             AllSupportResistanceLevels = allSupportResistanceLevels;
             PositionSize = positionSize;
             MarketExposure = marketExposure;

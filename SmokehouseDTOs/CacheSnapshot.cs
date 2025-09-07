@@ -70,9 +70,15 @@ namespace SmokehouseDTOs
                     reader.Read();
                     switch (prop)
                     {
-                        case "ask": ask = reader.GetInt32(); break;
-                        case "bid": bid = reader.GetInt32(); break;
-                        case "when": when = DateTime.Parse(reader.GetString()); break;
+                        case "ask":
+                        case "Item1": ask = reader.GetInt32(); break;
+                        case "bid":
+                        case "Item2": bid = reader.GetInt32(); break;
+                        case "when":
+                        case "Item3":
+                            string s = reader.GetString();
+                            if (DateTime.TryParse(s, null, System.Globalization.DateTimeStyles.RoundtripKind, out var dt)) when = dt;
+                            break;
                     }
                 }
                 throw new JsonException();
@@ -103,8 +109,10 @@ namespace SmokehouseDTOs
                     reader.Read();
                     switch (prop)
                     {
-                        case "ask": ask = reader.GetInt32(); break;
-                        case "bid": bid = reader.GetInt32(); break;
+                        case "ask":
+                        case "Item1": ask = reader.GetInt32(); break;
+                        case "bid":
+                        case "Item2": bid = reader.GetInt32(); break;
                     }
                 }
                 throw new JsonException();
@@ -134,8 +142,13 @@ namespace SmokehouseDTOs
                     reader.Read();
                     switch (prop)
                     {
-                        case "ask": ask = reader.GetInt32(); break;
-                        case "when": when = DateTime.Parse(reader.GetString()); break;
+                        case "ask":
+                        case "Bid": ask = reader.GetInt32(); break;
+                        case "w":
+                        case "When":
+                            string s = reader.GetString();
+                            if (DateTime.TryParse(s, null, System.Globalization.DateTimeStyles.RoundtripKind, out var dt)) when = dt;
+                            break;
                     }
                 }
                 throw new JsonException();
@@ -145,7 +158,7 @@ namespace SmokehouseDTOs
             {
                 writer.WriteStartObject();
                 writer.WriteNumber("ask", value.Item1);
-                writer.WriteString("when", value.Item2.ToString("O"));
+                writer.WriteString("w", value.Item2.ToString("O"));
                 writer.WriteEndObject();
             }
 
