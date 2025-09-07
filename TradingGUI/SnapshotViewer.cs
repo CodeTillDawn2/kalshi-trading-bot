@@ -66,24 +66,14 @@ namespace SimulatorWinForms
 
         private void SetupChartSynchronization()
         {
-            // Use a timer to periodically check for axis changes and sync the secondary chart
-            var syncTimer = new System.Windows.Forms.Timer();
-            syncTimer.Interval = 100; // Check every 100ms
-            syncTimer.Tick += (sender, args) =>
-            {
-                if (secondaryChart.Visible)
-                {
-                    CheckAndSyncSecondaryChart();
-                }
-            };
-            syncTimer.Start();
-
-            // Also sync when mouse is released on the main chart (after zoom/pan operations)
+            // Only sync when mouse is released on the main chart (after zoom/pan operations)
+            // Removed the timer to improve arrow key navigation responsiveness
             priceChart.MouseUp += (sender, args) =>
             {
                 if (secondaryChart.Visible)
                 {
-                    SyncSecondaryChartToMain();
+                    // Only sync X-axis for secondary chart to maintain full context
+                    SyncSecondaryChartXAxisOnly();
                 }
             };
         }
@@ -147,6 +137,23 @@ namespace SimulatorWinForms
             secondaryChart.Refresh();
         }
 
+        private void SyncSecondaryChartXAxisOnly()
+        {
+            if (!secondaryChart.Visible) return;
+
+            // Get the current X-axis limits from the main chart
+            var mainLimits = priceChart.Plot.GetAxisLimits();
+
+            // Apply only the X-axis limits to the secondary chart (keep full Y context)
+            secondaryChart.Plot.SetAxisLimitsX(mainLimits.XMin, mainLimits.XMax);
+
+            // Keep the full Y-axis context for secondary chart
+            secondaryChart.Plot.AxisAutoY();
+
+            // Refresh the secondary chart
+            secondaryChart.Refresh();
+        }
+
         // Panning support for snapshot viewer charts
         private bool _isPriceChartPanning = false;
         private bool _isSecondaryChartPanning = false;
@@ -183,8 +190,8 @@ namespace SimulatorWinForms
                 double dx = xNow - xStart;
                 double dy = yNow - yStart;
 
-                // Use larger movement threshold to prevent micro-movements from causing updates
-                if (Math.Abs(dx) > 0.01 || Math.Abs(dy) > 0.01)
+                // Use smaller movement threshold for more responsive panning
+                if (Math.Abs(dx) > 0.001 || Math.Abs(dy) > 0.001)
                 {
                     // Temporarily disable secondary chart updates to prevent interference
                     bool wasSecondaryVisible = secondaryChart.Visible;
@@ -250,16 +257,10 @@ namespace SimulatorWinForms
                 double dx = xNow - xStart;
                 double dy = yNow - yStart;
 
-                // Use larger movement threshold to prevent micro-movements from causing updates
-                if (Math.Abs(dx) > 0.01 || Math.Abs(dy) > 0.01)
+                // Use smaller movement threshold for more responsive panning
+                if (Math.Abs(dx) > 0.001 || Math.Abs(dy) > 0.001)
                 {
-                    // Temporarily disable main chart updates to prevent interference
-                    bool wasMainVisible = priceChart.Visible;
-                    if (wasMainVisible)
-                    {
-                        priceChart.Visible = false;
-                    }
-
+                    // Secondary chart pans independently - no interference with main chart
                     secondaryChart.Plot.SetAxisLimits(
                         _secondaryChartPanStartLimits.xMin - dx,
                         _secondaryChartPanStartLimits.xMax - dx,
@@ -268,15 +269,6 @@ namespace SimulatorWinForms
 
                     // Single refresh to minimize flicker
                     secondaryChart.Refresh();
-
-                    // Re-enable and sync main chart if it was visible
-                    if (wasMainVisible)
-                    {
-                        priceChart.Visible = true;
-                        var secLimits = secondaryChart.Plot.GetAxisLimits();
-                        priceChart.Plot.SetAxisLimitsX(secLimits.XMin, secLimits.XMax);
-                        priceChart.Refresh();
-                    }
                 }
             }
         }
@@ -1228,102 +1220,122 @@ namespace SimulatorWinForms
                 }
             }
 
-            // Top Velocity
+            // Top Velocity - Plot both Yes and No
             if (topVelocityCB.Checked)
             {
-                var topVelPoints = new List<double>();
+                var topVelYesPoints = new List<double>();
+                var topVelNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
                 foreach (var snapshot in historySnapshots)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
-                    topVelPoints.Add(snapshot.VelocityPerMinute_Top_Yes_Bid);
+                    topVelYesPoints.Add(snapshot.VelocityPerMinute_Top_Yes_Bid);
+                    topVelNoPoints.Add(snapshot.VelocityPerMinute_Top_No_Bid);
                 }
 
-                if (topVelPoints.Count > 1)
+                if (topVelYesPoints.Count > 1)
                 {
-                    var topVelScatter = chart.Plot.AddScatter(timePoints.ToArray(), topVelPoints.ToArray(), Color.DarkGreen, 2);
-                    topVelScatter.Label = "Top Velocity";
+                    var topVelYesScatter = chart.Plot.AddScatter(timePoints.ToArray(), topVelYesPoints.ToArray(), Color.DarkGreen, 2);
+                    topVelYesScatter.Label = "Top Velocity Yes";
+                    var topVelNoScatter = chart.Plot.AddScatter(timePoints.ToArray(), topVelNoPoints.ToArray(), Color.LightGreen, 2);
+                    topVelNoScatter.Label = "Top Velocity No";
                     legendItems.Add("Top Velocity");
                 }
             }
 
-            // Bottom Velocity
+            // Bottom Velocity - Plot both Yes and No
             if (bottomVelocityCB.Checked)
             {
-                var bottomVelPoints = new List<double>();
+                var bottomVelYesPoints = new List<double>();
+                var bottomVelNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
                 foreach (var snapshot in historySnapshots)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
-                    bottomVelPoints.Add(snapshot.VelocityPerMinute_Bottom_Yes_Bid);
+                    bottomVelYesPoints.Add(snapshot.VelocityPerMinute_Bottom_Yes_Bid);
+                    bottomVelNoPoints.Add(snapshot.VelocityPerMinute_Bottom_No_Bid);
                 }
 
-                if (bottomVelPoints.Count > 1)
+                if (bottomVelYesPoints.Count > 1)
                 {
-                    var bottomVelScatter = chart.Plot.AddScatter(timePoints.ToArray(), bottomVelPoints.ToArray(), Color.DarkRed, 2);
-                    bottomVelScatter.Label = "Bottom Velocity";
+                    var bottomVelYesScatter = chart.Plot.AddScatter(timePoints.ToArray(), bottomVelYesPoints.ToArray(), Color.DarkRed, 2);
+                    bottomVelYesScatter.Label = "Bottom Velocity Yes";
+                    var bottomVelNoScatter = chart.Plot.AddScatter(timePoints.ToArray(), bottomVelNoPoints.ToArray(), Color.LightCoral, 2);
+                    bottomVelNoScatter.Label = "Bottom Velocity No";
                     legendItems.Add("Bottom Velocity");
                 }
             }
 
-            // Net Order Rate
+            // Net Order Rate - Plot both Yes and No
             if (netOrderRateCB.Checked)
             {
-                var netOrderPoints = new List<double>();
+                var netOrderYesPoints = new List<double>();
+                var netOrderNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
                 foreach (var snapshot in historySnapshots)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
-                    netOrderPoints.Add(snapshot.TradeRatePerMinute_Yes);
+                    netOrderYesPoints.Add(snapshot.TradeRatePerMinute_Yes);
+                    netOrderNoPoints.Add(snapshot.TradeRatePerMinute_No);
                 }
 
-                if (netOrderPoints.Count > 1)
+                if (netOrderYesPoints.Count > 1)
                 {
-                    var netOrderScatter = chart.Plot.AddScatter(timePoints.ToArray(), netOrderPoints.ToArray(), Color.Purple, 2);
-                    netOrderScatter.Label = "Net Order Rate";
+                    var netOrderYesScatter = chart.Plot.AddScatter(timePoints.ToArray(), netOrderYesPoints.ToArray(), Color.Purple, 2);
+                    netOrderYesScatter.Label = "Net Order Rate Yes";
+                    var netOrderNoScatter = chart.Plot.AddScatter(timePoints.ToArray(), netOrderNoPoints.ToArray(), Color.MediumPurple, 2);
+                    netOrderNoScatter.Label = "Net Order Rate No";
                     legendItems.Add("Net Order Rate");
                 }
             }
 
-            // Trade Volume
+            // Trade Volume - Plot both Yes and No
             if (tradeVolumeCB.Checked)
             {
-                var tradeVolPoints = new List<double>();
+                var tradeVolYesPoints = new List<double>();
+                var tradeVolNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
                 foreach (var snapshot in historySnapshots)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
-                    tradeVolPoints.Add(snapshot.TradeVolumePerMinute_Yes);
+                    tradeVolYesPoints.Add(snapshot.TradeVolumePerMinute_Yes);
+                    tradeVolNoPoints.Add(snapshot.TradeVolumePerMinute_No);
                 }
 
-                if (tradeVolPoints.Count > 1)
+                if (tradeVolYesPoints.Count > 1)
                 {
-                    var tradeVolScatter = chart.Plot.AddScatter(timePoints.ToArray(), tradeVolPoints.ToArray(), Color.Orange, 2);
-                    tradeVolScatter.Label = "Trade Volume";
+                    var tradeVolYesScatter = chart.Plot.AddScatter(timePoints.ToArray(), tradeVolYesPoints.ToArray(), Color.Orange, 2);
+                    tradeVolYesScatter.Label = "Trade Volume Yes";
+                    var tradeVolNoScatter = chart.Plot.AddScatter(timePoints.ToArray(), tradeVolNoPoints.ToArray(), Color.DarkOrange, 2);
+                    tradeVolNoScatter.Label = "Trade Volume No";
                     legendItems.Add("Trade Volume");
                 }
             }
 
-            // Average Trade Size
+            // Average Trade Size - Plot both Yes and No
             if (avgTradeSizeCB.Checked)
             {
-                var avgSizePoints = new List<double>();
+                var avgSizeYesPoints = new List<double>();
+                var avgSizeNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
                 foreach (var snapshot in historySnapshots)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
-                    avgSizePoints.Add(snapshot.AverageTradeSize_Yes);
+                    avgSizeYesPoints.Add(snapshot.AverageTradeSize_Yes);
+                    avgSizeNoPoints.Add(snapshot.AverageTradeSize_No);
                 }
 
-                if (avgSizePoints.Count > 1)
+                if (avgSizeYesPoints.Count > 1)
                 {
-                    var avgSizeScatter = chart.Plot.AddScatter(timePoints.ToArray(), avgSizePoints.ToArray(), Color.Pink, 2);
-                    avgSizeScatter.Label = "Avg Trade Size";
+                    var avgSizeYesScatter = chart.Plot.AddScatter(timePoints.ToArray(), avgSizeYesPoints.ToArray(), Color.Pink, 2);
+                    avgSizeYesScatter.Label = "Avg Trade Size Yes";
+                    var avgSizeNoScatter = chart.Plot.AddScatter(timePoints.ToArray(), avgSizeNoPoints.ToArray(), Color.LightPink, 2);
+                    avgSizeNoScatter.Label = "Avg Trade Size No";
                     legendItems.Add("Avg Trade Size");
                 }
             }
@@ -1357,42 +1369,50 @@ namespace SimulatorWinForms
                 }
             }
 
-            // Depth Top 4
+            // Depth Top 4 - Plot both Yes and No
             if (depthTop4CB.Checked)
             {
-                var depthPoints = new List<double>();
+                var depthYesPoints = new List<double>();
+                var depthNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
                 foreach (var snapshot in historySnapshots)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
-                    depthPoints.Add(snapshot.DepthAtTop4YesBids);
+                    depthYesPoints.Add(snapshot.DepthAtTop4YesBids);
+                    depthNoPoints.Add(snapshot.DepthAtTop4NoBids);
                 }
 
-                if (depthPoints.Count > 1)
+                if (depthYesPoints.Count > 1)
                 {
-                    var depthScatter = chart.Plot.AddScatter(timePoints.ToArray(), depthPoints.ToArray(), Color.Maroon, 2);
-                    depthScatter.Label = "Depth Top 4";
+                    var depthYesScatter = chart.Plot.AddScatter(timePoints.ToArray(), depthYesPoints.ToArray(), Color.Maroon, 2);
+                    depthYesScatter.Label = "Depth Top 4 Yes";
+                    var depthNoScatter = chart.Plot.AddScatter(timePoints.ToArray(), depthNoPoints.ToArray(), Color.IndianRed, 2);
+                    depthNoScatter.Label = "Depth Top 4 No";
                     legendItems.Add("Depth Top 4");
                 }
             }
 
-            // Center Mass
+            // Center Mass - Plot both Yes and No
             if (centerMassCB.Checked)
             {
-                var centerMassPoints = new List<double>();
+                var centerMassYesPoints = new List<double>();
+                var centerMassNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
                 foreach (var snapshot in historySnapshots)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
-                    centerMassPoints.Add(snapshot.YesBidCenterOfMass);
+                    centerMassYesPoints.Add(snapshot.YesBidCenterOfMass);
+                    centerMassNoPoints.Add(snapshot.NoBidCenterOfMass);
                 }
 
-                if (centerMassPoints.Count > 1)
+                if (centerMassYesPoints.Count > 1)
                 {
-                    var centerMassScatter = chart.Plot.AddScatter(timePoints.ToArray(), centerMassPoints.ToArray(), Color.Olive, 2);
-                    centerMassScatter.Label = "Center Mass";
+                    var centerMassYesScatter = chart.Plot.AddScatter(timePoints.ToArray(), centerMassYesPoints.ToArray(), Color.Olive, 2);
+                    centerMassYesScatter.Label = "Center Mass Yes";
+                    var centerMassNoScatter = chart.Plot.AddScatter(timePoints.ToArray(), centerMassNoPoints.ToArray(), Color.OliveDrab, 2);
+                    centerMassNoScatter.Label = "Center Mass No";
                     legendItems.Add("Center Mass");
                 }
             }
@@ -1417,22 +1437,26 @@ namespace SimulatorWinForms
                 }
             }
 
-            // Total Depth
+            // Total Depth - Plot both Yes and No
             if (totalDepthCB.Checked)
             {
-                var depthPoints = new List<double>();
+                var depthYesPoints = new List<double>();
+                var depthNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
                 foreach (var snapshot in historySnapshots)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
-                    depthPoints.Add(snapshot.TotalOrderbookDepth_Yes);
+                    depthYesPoints.Add(snapshot.TotalOrderbookDepth_Yes);
+                    depthNoPoints.Add(snapshot.TotalOrderbookDepth_No);
                 }
 
-                if (depthPoints.Count > 1)
+                if (depthYesPoints.Count > 1)
                 {
-                    var depthScatter = chart.Plot.AddScatter(timePoints.ToArray(), depthPoints.ToArray(), Color.Gold, 2);
-                    depthScatter.Label = "Total Depth";
+                    var depthYesScatter = chart.Plot.AddScatter(timePoints.ToArray(), depthYesPoints.ToArray(), Color.Gold, 2);
+                    depthYesScatter.Label = "Total Depth Yes";
+                    var depthNoScatter = chart.Plot.AddScatter(timePoints.ToArray(), depthNoPoints.ToArray(), Color.Yellow, 2);
+                    depthNoScatter.Label = "Total Depth No";
                     legendItems.Add("Total Depth");
                 }
             }
