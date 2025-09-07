@@ -9,6 +9,7 @@ namespace SimulatorWinForms
     {
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.ToolTip toolTip1;
+        private FormsPlot secondaryChart;
 
         protected override void Dispose(bool disposing)
         {
@@ -29,6 +30,7 @@ namespace SimulatorWinForms
             chartLayout = new TableLayoutPanel();
             chartControls = new FlowLayoutPanel();
             priceChart = new FormsPlot();
+            secondaryChart = new FormsPlot();
             marketInfoContainer = new Panel();
             infoGrid = new TableLayoutPanel();
             leftColumn = new TableLayoutPanel();
@@ -239,31 +241,33 @@ namespace SimulatorWinForms
             dashboardGrid.TabIndex = 0;
             // 
             // chartContainer
-            // 
+            //
             chartContainer.BorderStyle = BorderStyle.FixedSingle;
             chartContainer.Controls.Add(chartLayout);
             chartContainer.Dock = DockStyle.Fill;
             chartContainer.Location = new Point(4, 3);
-            chartContainer.Margin = new Padding(4, 3, 4, 3);
+            chartContainer.Margin = new Padding(2, 2, 2, 2);
             chartContainer.Name = "chartContainer";
-            chartContainer.Padding = new Padding(6);
+            chartContainer.Padding = new Padding(2);
             chartContainer.Size = new Size(575, 446);
             chartContainer.TabIndex = 0;
             // 
             // chartLayout
-            // 
+            //
             chartLayout.AutoSize = true;
             chartLayout.ColumnCount = 1;
             chartLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             chartLayout.Controls.Add(chartControls, 0, 0);
             chartLayout.Controls.Add(priceChart, 0, 1);
+            chartLayout.Controls.Add(secondaryChart, 0, 2);
             chartLayout.Dock = DockStyle.Fill;
-            chartLayout.Location = new Point(6, 6);
+            chartLayout.Location = new Point(2, 2);
             chartLayout.Margin = new Padding(0);
             chartLayout.Name = "chartLayout";
-            chartLayout.RowCount = 2;
+            chartLayout.RowCount = 3;
             chartLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
-            chartLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 90F));
+            chartLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 67.5F));
+            chartLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 22.5F));
             chartLayout.Size = new Size(561, 432);
             chartLayout.TabIndex = 0;
             // 
@@ -277,14 +281,23 @@ namespace SimulatorWinForms
             chartControls.TabIndex = 0;
             // 
             // priceChart
-            // 
+            //
             priceChart.Dock = DockStyle.Fill;
             priceChart.Location = new Point(4, 46);
-            priceChart.Margin = new Padding(4, 3, 4, 3);
+            priceChart.Margin = new Padding(1, 1, 1, 1);
             priceChart.Name = "priceChart";
             priceChart.Size = new Size(553, 383);
             priceChart.TabIndex = 1;
-            // 
+            //
+            // secondaryChart
+            //
+            secondaryChart.Dock = DockStyle.Fill;
+            secondaryChart.Location = new Point(4, 46);
+            secondaryChart.Margin = new Padding(1, 1, 1, 1);
+            secondaryChart.Name = "secondaryChart";
+            secondaryChart.Size = new Size(553, 383);
+            secondaryChart.TabIndex = 2;
+            //
             // marketInfoContainer
             // 
             marketInfoContainer.BorderStyle = BorderStyle.FixedSingle;
@@ -2102,6 +2115,7 @@ namespace SimulatorWinForms
             chartContainer.PerformLayout();
             chartLayout.ResumeLayout(false);
             chartLayout.PerformLayout();
+            secondaryChart.ResumeLayout(false);
             marketInfoContainer.ResumeLayout(false);
             marketInfoContainer.PerformLayout();
             infoGrid.ResumeLayout(false);

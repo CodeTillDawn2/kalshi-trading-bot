@@ -534,6 +534,10 @@ namespace SimulatorWinForms
             // Set back action to switch back to main layout
             _snapshotViewer.BackAction = HideDashboard;
 
+            // DISABLE MainForm chart control to prevent interference with SnapshotViewer
+            formsPlot1.Enabled = false;
+            formsPlot1.Visible = false;
+
             // Replace entire form content with dashboard
             this.SuspendLayout();
             this.Controls.Remove(layout);
@@ -556,6 +560,10 @@ namespace SimulatorWinForms
             layout.Dock = DockStyle.Fill;
             this.Controls.Add(layout);
             this.ResumeLayout();
+
+            // RE-ENABLE MainForm chart control now that we're back to main view
+            formsPlot1.Enabled = true;
+            formsPlot1.Visible = true;
 
             formsPlot1.Plot.SetAxisLimits(_savedChartLimits.xMin, _savedChartLimits.xMax, _savedChartLimits.yMin, _savedChartLimits.yMax);
             formsPlot1.Refresh();

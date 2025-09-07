@@ -12,6 +12,7 @@ namespace SimulatorWinForms
         private int currentIndex;
         private List<string> memos;
         private string memoText = "";
+        private bool _isEvaluatingChartFilters = false; // Flag to prevent conflicts between UpdateChart and EvaluateChartFilters
 
         public Action BackAction { get; set; }
 
@@ -39,8 +40,215 @@ namespace SimulatorWinForms
             // Add resize handler for dynamic scaling
             this.Resize += SnapshotViewer_ResizeEnd;
 
+            // Add chart synchronization
+            SetupChartSynchronization();
+
+            // Add panning support for snapshot viewer charts
+            SetupChartPanning();
+
             // Add detailed tooltips for trading metrics
             SetupTooltips();
+
+            // Ensure secondary chart is properly initialized
+            secondaryChart.Visible = false; // Start hidden, will be shown when metrics are checked
+            secondaryChart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
+            secondaryChart.Plot.AxisAutoY();
+        }
+
+        private void SetupChartSynchronization()
+        {
+            // Use a timer to periodically check for axis changes and sync the secondary chart
+            var syncTimer = new System.Windows.Forms.Timer();
+            syncTimer.Interval = 100; // Check every 100ms
+            syncTimer.Tick += (sender, args) =>
+            {
+                if (secondaryChart.Visible)
+                {
+                    CheckAndSyncSecondaryChart();
+                }
+            };
+            syncTimer.Start();
+
+            // Also sync when mouse is released on the main chart (after zoom/pan operations)
+            priceChart.MouseUp += (sender, args) =>
+            {
+                if (secondaryChart.Visible)
+                {
+                    SyncSecondaryChartToMain();
+                }
+            };
+        }
+
+        private void SetupChartPanning()
+        {
+            // Add right-click panning support to both charts
+            // Make sure to remove any existing handlers first to avoid duplicates
+            priceChart.MouseDown -= PriceChart_MouseDown;
+            priceChart.MouseMove -= PriceChart_MouseMove;
+            priceChart.MouseUp -= PriceChart_MouseUp;
+
+            secondaryChart.MouseDown -= SecondaryChart_MouseDown;
+            secondaryChart.MouseMove -= SecondaryChart_MouseMove;
+            secondaryChart.MouseUp -= SecondaryChart_MouseUp;
+
+            // Add fresh handlers
+            priceChart.MouseDown += PriceChart_MouseDown;
+            priceChart.MouseMove += PriceChart_MouseMove;
+            priceChart.MouseUp += PriceChart_MouseUp;
+
+            secondaryChart.MouseDown += SecondaryChart_MouseDown;
+            secondaryChart.MouseMove += SecondaryChart_MouseMove;
+            secondaryChart.MouseUp += SecondaryChart_MouseUp;
+
+            // Ensure charts can receive mouse events
+            priceChart.Enabled = true;
+            secondaryChart.Enabled = true;
+        }
+
+        private (double xMin, double xMax, double yMin, double yMax)? _lastMainLimits;
+
+        private void CheckAndSyncSecondaryChart()
+        {
+            var currentLimits = priceChart.Plot.GetAxisLimits();
+
+            // Check if the X-axis limits have changed significantly
+            if (_lastMainLimits == null ||
+                Math.Abs(currentLimits.XMin - _lastMainLimits.Value.xMin) > 0.0001 ||
+                Math.Abs(currentLimits.XMax - _lastMainLimits.Value.xMax) > 0.0001)
+            {
+                _lastMainLimits = (currentLimits.XMin, currentLimits.XMax, currentLimits.YMin, currentLimits.YMax);
+                SyncSecondaryChartToMain();
+            }
+        }
+
+        private void SyncSecondaryChartToMain()
+        {
+            if (!secondaryChart.Visible) return;
+
+            // Get the current axis limits from the main chart
+            var mainLimits = priceChart.Plot.GetAxisLimits();
+
+            // Apply the same X-axis limits to the secondary chart
+            secondaryChart.Plot.SetAxisLimitsX(mainLimits.XMin, mainLimits.XMax);
+
+            // Auto-scale the Y-axis for the secondary chart to fit visible data
+            secondaryChart.Plot.AxisAutoY();
+
+            // Refresh the secondary chart
+            secondaryChart.Refresh();
+        }
+
+        // Panning support for snapshot viewer charts
+        private bool _isPriceChartPanning = false;
+        private bool _isSecondaryChartPanning = false;
+        private Point _priceChartPanStartPx;
+        private Point _secondaryChartPanStartPx;
+        private (double xMin, double xMax, double yMin, double yMax) _priceChartPanStartLimits;
+        private (double xMin, double xMax, double yMin, double yMax) _secondaryChartPanStartLimits;
+
+        private void PriceChart_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                // Start panning
+                _isPriceChartPanning = true;
+                _priceChartPanStartPx = e.Location;
+                var lim = priceChart.Plot.GetAxisLimits();
+                _priceChartPanStartLimits = (lim.XMin, lim.XMax, lim.YMin, lim.YMax);
+                priceChart.Cursor = Cursors.SizeAll;
+
+                // Note: Custom panning logic will override ScottPlot's default right-click behavior
+            }
+        }
+
+        private void PriceChart_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isPriceChartPanning && e.Button == MouseButtons.Right)
+            {
+                // Compute data-space deltas from pixel movement
+                double xNow = priceChart.Plot.GetCoordinateX(e.X);
+                double xStart = priceChart.Plot.GetCoordinateX(_priceChartPanStartPx.X);
+                double yNow = priceChart.Plot.GetCoordinateY(e.Y);
+                double yStart = priceChart.Plot.GetCoordinateY(_priceChartPanStartPx.Y);
+
+                double dx = xNow - xStart;
+                double dy = yNow - yStart;
+
+                priceChart.Plot.SetAxisLimits(
+                    _priceChartPanStartLimits.xMin - dx,
+                    _priceChartPanStartLimits.xMax - dx,
+                    _priceChartPanStartLimits.yMin - dy,
+                    _priceChartPanStartLimits.yMax - dy);
+
+                priceChart.Refresh();
+
+                // Sync secondary chart if visible
+                if (secondaryChart.Visible)
+                {
+                    SyncSecondaryChartToMain();
+                }
+            }
+        }
+
+        private void PriceChart_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (_isPriceChartPanning)
+            {
+                _isPriceChartPanning = false;
+                priceChart.Cursor = Cursors.Default;
+                _priceChartPanStartPx = Point.Empty;
+            }
+        }
+
+        private void SecondaryChart_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                // Start panning
+                _isSecondaryChartPanning = true;
+                _secondaryChartPanStartPx = e.Location;
+                var lim = secondaryChart.Plot.GetAxisLimits();
+                _secondaryChartPanStartLimits = (lim.XMin, lim.XMax, lim.YMin, lim.YMax);
+                secondaryChart.Cursor = Cursors.SizeAll;
+            }
+        }
+
+        private void SecondaryChart_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isSecondaryChartPanning && e.Button == MouseButtons.Right)
+            {
+                // Compute data-space deltas from pixel movement
+                double xNow = secondaryChart.Plot.GetCoordinateX(e.X);
+                double xStart = secondaryChart.Plot.GetCoordinateX(_secondaryChartPanStartPx.X);
+                double yNow = secondaryChart.Plot.GetCoordinateY(e.Y);
+                double yStart = secondaryChart.Plot.GetCoordinateY(_secondaryChartPanStartPx.Y);
+
+                double dx = xNow - xStart;
+                double dy = yNow - yStart;
+
+                secondaryChart.Plot.SetAxisLimits(
+                    _secondaryChartPanStartLimits.xMin - dx,
+                    _secondaryChartPanStartLimits.xMax - dx,
+                    _secondaryChartPanStartLimits.yMin - dy,
+                    _secondaryChartPanStartLimits.yMax - dy);
+
+                secondaryChart.Refresh();
+
+                // Sync main chart
+                var secLimits = secondaryChart.Plot.GetAxisLimits();
+                priceChart.Plot.SetAxisLimitsX(secLimits.XMin, secLimits.XMax);
+                priceChart.Refresh();
+            }
+        }
+
+        private void SecondaryChart_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (_isSecondaryChartPanning)
+            {
+                _isSecondaryChartPanning = false;
+                secondaryChart.Cursor = Cursors.Default;
+                _secondaryChartPanStartPx = Point.Empty;
+            }
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -69,7 +277,8 @@ namespace SimulatorWinForms
 
         private void Control_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
+            // Only handle right-click for back action if it's not on a chart control
+            if (e.Button == MouseButtons.Right && !(sender is ScottPlot.FormsPlot || sender is System.Windows.Forms.PictureBox))
             {
                 BackAction?.Invoke();
             }
@@ -166,10 +375,40 @@ namespace SimulatorWinForms
         {
             currentSnapshot = snapshot;
             historySnapshots = history.OrderBy(s => s.Timestamp).ToList();
-            currentIndex = historySnapshots.FindIndex(s => s.Timestamp == snapshot.Timestamp);
-            if (currentIndex < 0) currentIndex = 0; // Fallback to first if not found
+
+            // Debug: Check timestamp values
+            if (snapshot.Timestamp == DateTime.MinValue || snapshot.Timestamp.Year < 2000)
+            {
+                // If timestamp is invalid, try to use current time or first valid timestamp from history
+                if (historySnapshots.Any(h => h.Timestamp != DateTime.MinValue && h.Timestamp.Year >= 2000))
+                {
+                    var validSnapshot = historySnapshots.First(h => h.Timestamp != DateTime.MinValue && h.Timestamp.Year >= 2000);
+                    currentSnapshot = validSnapshot;
+                    currentIndex = historySnapshots.IndexOf(validSnapshot);
+                }
+                else
+                {
+                    // Last resort: use current time
+                    currentSnapshot = new MarketSnapshot { Timestamp = DateTime.Now };
+                    currentIndex = 0;
+                }
+            }
+            else
+            {
+                currentIndex = historySnapshots.FindIndex(s => s.Timestamp == snapshot.Timestamp);
+                if (currentIndex < 0) currentIndex = 0; // Fallback to first if not found
+            }
+
             memos = memosList;
-            memoText = memosList[currentIndex];
+            if (currentIndex < memosList.Count)
+            {
+                memoText = memosList[currentIndex];
+            }
+            else
+            {
+                memoText = memosList.FirstOrDefault() ?? "";
+            }
+
             UpdateUIFromSnapshot();  // Full UI update
         }
 
@@ -195,8 +434,11 @@ namespace SimulatorWinForms
                 }
             }
 
-            // Update chart (moves vertical line and zooms)
-            UpdateChart();
+            // Update chart (moves vertical line and zooms) - but only if not currently evaluating chart filters
+            if (!_isEvaluatingChartFilters)
+            {
+                UpdateChart();
+            }
 
             strategyOutputTextbox.Text = memoText;
 
@@ -295,47 +537,78 @@ namespace SimulatorWinForms
 
         private void UpdateChart()
         {
+            if (currentSnapshot == null) return;
+
+            // Get current zoom/pan state before clearing
+            var currentLimits = priceChart.Plot.GetAxisLimits();
+            bool hasExistingLimits = currentLimits.XMax > currentLimits.XMin;
+
+            // CRITICAL FIX: Only preserve zoom if it's NOT the default 2-hour span around current snapshot
+            // This prevents restoring the year 1900 zoom that might have been saved previously
+            bool isDefaultZoom = !hasExistingLimits ||
+                Math.Abs((currentLimits.XMax - currentLimits.XMin) - (2.0 / 24.0)) < 0.001; // Default is 2 hour span (2/24 days)
+
+            // Clear both charts
             priceChart.Plot.Clear();
+            secondaryChart.Plot.Clear();
 
-            if (historySnapshots == null || historySnapshots.Count == 0 || currentSnapshot == null) return;
+            // Always render base price data on main chart
+            RenderBasePriceData(priceChart);
 
-            if (string.IsNullOrWhiteSpace(CacheDir))
+            // Render Y1 metrics (main chart) - RSI, EMA, Bollinger, VWAP, PSAR, Support
+            RenderY1Metrics(priceChart);
+
+            // Check if any secondary chart metrics are enabled
+            bool hasSecondaryMetrics = HasSecondaryMetricsChecked();
+
+            // Show/hide secondary chart based on whether any secondary metrics are checked
+            secondaryChart.Visible = hasSecondaryMetrics;
+
+            if (hasSecondaryMetrics)
             {
-                // Fallback or error handling if cache dir not set
-                return;
+                // Render secondary chart metrics
+                RenderSecondaryMetrics(secondaryChart);
+
+                // Adjust main chart size to 3/4 when secondary chart is visible
+                chartLayout.RowStyles[1].Height = 67.5f; // Main chart takes 3/4
+                chartLayout.RowStyles[2].Height = 22.5f; // Secondary chart takes 1/4
+            }
+            else
+            {
+                // Secondary chart hidden, main chart takes full space
+                chartLayout.RowStyles[1].Height = 90f; // Main chart takes full height
+                chartLayout.RowStyles[2].Height = 0f; // Secondary chart hidden
             }
 
-            string market = currentSnapshot.MarketTicker;  // Use ticker from snapshot
-            DateTime snapshotTime = currentSnapshot.Timestamp;
+            // Update legends
+            UpdateChartLegends();
 
-            // Render the same chart as MainForm, but without collecting tooltips
-            Charting.MarketChartRenderer.Render(priceChart, CacheDir, market, null, collectTooltips: false);
-
-            // Add stationary vertical line at current snapshot timestamp (black)
-            double centerX = snapshotTime.ToOADate();
-            priceChart.Plot.AddVerticalLine(centerX, Color.Black, 2);
-
-            // Initially zoom in on the snapshot (e.g., +/- 30 minutes, total 1 hour span)
-            double spanDays = 1.0 / 24;  // 1 hour
-            priceChart.Plot.SetAxisLimitsX(centerX - spanDays / 2, centerX + spanDays / 2);
-            priceChart.Plot.AxisAutoY();  // Auto-scale Y-axis
-            priceChart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
-
-            // Now add indicators based on checkbox states
-            var legendItems = new List<string>();
-            PlotTradingMetricsIndicatorsOverTime(legendItems);
-            PlotFlowMomentumIndicatorsOverTime(legendItems);
-            PlotContextIndicatorsOverTime(legendItems);
-            PlotPositionIndicatorsOverTime(legendItems);
-            PlotSupportResistance(legendItems);
-
-            // Add legend if there are items
-            if (legendItems.Any())
+            // CRITICAL FIX: Only restore zoom/pan state if it's NOT the default zoom
+            // This prevents restoring corrupted zoom limits (like year 1900)
+            if (hasExistingLimits && !isDefaultZoom)
             {
-                priceChart.Plot.Legend(location: ScottPlot.Alignment.UpperRight);
+                // Additional validation: ensure the limits are reasonable (not year 1900)
+                if (currentLimits.XMin > 40000 && currentLimits.XMax > 40000) // OA dates start from ~1900
+                {
+                    priceChart.Plot.SetAxisLimits(currentLimits.XMin, currentLimits.XMax, currentLimits.YMin, currentLimits.YMax);
+
+                    // Sync secondary chart if visible
+                    if (hasSecondaryMetrics)
+                    {
+                        SyncSecondaryChartToMain();
+                    }
+                }
             }
 
-            priceChart.Refresh();  // Ensure the plot is refreshed after adding the line
+            // Refresh both charts
+            priceChart.Refresh();
+            if (hasSecondaryMetrics)
+            {
+                secondaryChart.Refresh();
+            }
+
+            // Force layout update
+            chartLayout.PerformLayout();
         }
 
         private void SnapshotViewer_ResizeEnd(object sender, EventArgs e)
@@ -363,8 +636,16 @@ namespace SimulatorWinForms
             plot.XAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
             plot.YAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
 
-            // Refresh the chart to apply changes
+            // Scale ScottPlot fonts (secondaryChart)
+            var secondaryPlot = secondaryChart.Plot;
+            secondaryPlot.XAxis.LabelStyle(fontSize: 12f * scaleFactor);
+            secondaryPlot.YAxis.LabelStyle(fontSize: 12f * scaleFactor);
+            secondaryPlot.XAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
+            secondaryPlot.YAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
+
+            // Refresh both charts to apply changes
             priceChart.Refresh();
+            secondaryChart.Refresh();
         }
 
         private void ScaleFonts(Control control, float scaleFactor)
@@ -388,23 +669,222 @@ namespace SimulatorWinForms
         {
             if (currentSnapshot == null) return;
 
-            // Save current axis limits to preserve zoom/pan
-            var currentLimits = priceChart.Plot.GetAxisLimits();
-            bool hasExistingLimits = currentLimits.XMax > currentLimits.XMin;
+            _isEvaluatingChartFilters = true; // Set flag to prevent UpdateChart conflicts
 
-            // Re-render the entire chart with indicators
-            UpdateChart();
-
-            // Only restore axis limits if we had valid ones (preserve user's zoom/pan)
-            if (hasExistingLimits)
+            try
             {
-                priceChart.Plot.SetAxisLimits(currentLimits.XMin, currentLimits.XMax, currentLimits.YMin, currentLimits.YMax);
+                // Get current zoom/pan state from main chart before clearing
+                var mainLimits = priceChart.Plot.GetAxisLimits();
+                bool hasExistingLimits = mainLimits.XMax > mainLimits.XMin;
+
+                // Clear both charts
+                priceChart.Plot.Clear();
+                secondaryChart.Plot.Clear();
+
+                // Always render base price data on main chart
+                RenderBasePriceData(priceChart);
+
+                // Render Y1 metrics (main chart) - RSI, EMA, Bollinger, VWAP, PSAR, Support
+                RenderY1Metrics(priceChart);
+
+                // Check if any secondary chart metrics are enabled
+                bool hasSecondaryMetrics = HasSecondaryMetricsChecked();
+
+                // Show/hide secondary chart based on whether any secondary metrics are checked
+                secondaryChart.Visible = hasSecondaryMetrics;
+
+                if (hasSecondaryMetrics)
+                {
+                    // Render secondary chart metrics
+                    RenderSecondaryMetrics(secondaryChart);
+
+                    // Adjust main chart size to 3/4 when secondary chart is visible
+                    chartLayout.RowStyles[1].Height = 67.5f; // Main chart takes 3/4
+                    chartLayout.RowStyles[2].Height = 22.5f; // Secondary chart takes 1/4
+                }
+                else
+                {
+                    // Secondary chart hidden, main chart takes full space
+                    chartLayout.RowStyles[1].Height = 90f; // Main chart takes full height
+                    chartLayout.RowStyles[2].Height = 0f; // Secondary chart hidden
+                }
+
+                // Update legends
+                UpdateChartLegends();
+
+                // CRITICAL FIX: Only restore zoom/pan if user has actually zoomed/panned away from default
+                // Don't restore if we're at the default zoom (which would show old timestamps)
+                bool isDefaultZoom = !hasExistingLimits ||
+                    Math.Abs((mainLimits.XMax - mainLimits.XMin) - (2.0 / 24.0)) < 0.001; // Default is 2 hour span (2/24 days)
+
+                if (hasExistingLimits && !isDefaultZoom)
+                {
+                    // User has manually zoomed/panned - restore their view
+                    priceChart.Plot.SetAxisLimits(mainLimits.XMin, mainLimits.XMax, mainLimits.YMin, mainLimits.YMax);
+
+                    // Sync secondary chart if visible
+                    if (hasSecondaryMetrics)
+                    {
+                        SyncSecondaryChartToMain();
+                    }
+                }
+                else
+                {
+                    // User hasn't zoomed - set a reasonable default around current snapshot
+                    DateTime snapshotTime = currentSnapshot.Timestamp;
+                    if (snapshotTime == DateTime.MinValue || snapshotTime.Year < 2000)
+                    {
+                        snapshotTime = DateTime.Now;
+                    }
+                    double snapshotTimeOADate = snapshotTime.ToOADate();
+                    double spanHours = 2.0; // 2 hour span for better visibility
+                    double spanDays = spanHours / 24.0;
+                    priceChart.Plot.SetAxisLimitsX(snapshotTimeOADate - spanDays / 2, snapshotTimeOADate + spanDays / 2);
+                    priceChart.Plot.AxisAutoY();
+
+                    // Sync secondary chart if visible
+                    if (hasSecondaryMetrics)
+                    {
+                        secondaryChart.Plot.SetAxisLimitsX(snapshotTimeOADate - spanDays / 2, snapshotTimeOADate + spanDays / 2);
+                        secondaryChart.Plot.AxisAutoY();
+                    }
+                }
+
+                // Force layout update - this is crucial for the chart to remain visible
+                chartLayout.PerformLayout();
+
+                // Ensure chart controls are properly sized after layout changes
+                priceChart.Size = new Size(chartLayout.ClientSize.Width, (int)(chartLayout.ClientSize.Height * (hasSecondaryMetrics ? 0.675f : 0.9f)));
+                if (hasSecondaryMetrics)
+                {
+                    secondaryChart.Size = new Size(chartLayout.ClientSize.Width, (int)(chartLayout.ClientSize.Height * 0.225f));
+                }
+
+                // Refresh both charts after layout is updated
                 priceChart.Refresh();
+                if (hasSecondaryMetrics)
+                {
+                    secondaryChart.Refresh();
+                }
+
+                // Additional refresh to ensure charts are properly displayed
+                this.Refresh();
+
+                // Force the chart container to refresh its layout
+                chartContainer.Refresh();
+
+                // Small delay to allow layout to settle
+                System.Threading.Thread.Sleep(100);
+
+                // Final refresh of the entire control
+                this.Invalidate();
+                this.Update();
+            }
+            finally
+            {
+                _isEvaluatingChartFilters = false; // Reset flag
             }
         }
 
-        private void PlotTradingMetricsIndicatorsOverTime(List<string> legendItems)
+
+        private void leftColumn_Paint(object sender, PaintEventArgs e)
         {
+
+        }
+
+        private void positionsLayout_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void RenderBasePriceData(ScottPlot.FormsPlot chart)
+        {
+            if (historySnapshots == null || historySnapshots.Count == 0 || currentSnapshot == null) return;
+
+            string market = currentSnapshot.MarketTicker;  // Use ticker from snapshot
+            DateTime snapshotTime = currentSnapshot.Timestamp;
+
+            // Ensure we have a valid timestamp
+            if (snapshotTime == DateTime.MinValue || snapshotTime.Year < 2000)
+            {
+                // Use current time as fallback
+                snapshotTime = DateTime.Now;
+            }
+
+            // Try to render using cached data first
+            if (!string.IsNullOrWhiteSpace(CacheDir) && Directory.Exists(CacheDir))
+            {
+                try
+                {
+                    // Render the same chart as MainForm, but without collecting tooltips
+                    Charting.MarketChartRenderer.Render(chart, CacheDir, market, null, collectTooltips: false);
+                }
+                catch (Exception ex)
+                {
+                    // If cached rendering fails, fall back to snapshot data rendering
+                    RenderFromSnapshotData(chart);
+                }
+            }
+            else
+            {
+                // No cache directory, render from snapshot data directly
+                RenderFromSnapshotData(chart);
+            }
+
+            // Add stationary vertical line at current snapshot timestamp (black)
+            double centerX = snapshotTime.ToOADate();
+            chart.Plot.AddVerticalLine(centerX, Color.Black, 2);
+
+            // Initially zoom in on the snapshot (e.g., +/- 1 hour, total 2 hour span)
+            double spanDays = 2.0 / 24;  // 2 hours
+            chart.Plot.SetAxisLimitsX(centerX - spanDays / 2, centerX + spanDays / 2);
+            chart.Plot.AxisAutoY();  // Auto-scale Y-axis
+            chart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
+        }
+
+        private void RenderFromSnapshotData(ScottPlot.FormsPlot chart)
+        {
+            if (historySnapshots == null || historySnapshots.Count == 0) return;
+
+            // Render basic price data from snapshots
+            var askPrices = new List<double>();
+            var bidPrices = new List<double>();
+            var buyPrices = new List<double>();
+            var sellPrices = new List<double>();
+            var exitPrices = new List<double>();
+            var timePoints = new List<double>();
+
+            foreach (var snapshot in historySnapshots)
+            {
+                timePoints.Add(snapshot.Timestamp.ToOADate());
+
+                // Use available price data from snapshots
+                askPrices.Add(snapshot.BestNoBid);
+                bidPrices.Add(snapshot.BestYesBid);
+
+                // Add buy/sell/exit points if available (these might be zero if not set)
+                buyPrices.Add(snapshot.BestYesBid); // Placeholder
+                sellPrices.Add(snapshot.BestNoBid); // Placeholder
+                exitPrices.Add((snapshot.BestYesBid + snapshot.BestNoBid) / 2); // Midpoint
+            }
+
+            if (timePoints.Count > 1)
+            {
+                // Plot ask and bid lines
+                chart.Plot.AddScatter(timePoints.ToArray(), askPrices.ToArray(), Color.OrangeRed, 2, label: "Ask");
+                chart.Plot.AddScatter(timePoints.ToArray(), bidPrices.ToArray(), Color.DodgerBlue, 2, label: "Bid");
+
+                // Plot buy/sell/exit points
+                chart.Plot.AddScatter(timePoints.ToArray(), buyPrices.ToArray(), Color.Green, 8, markerShape: ScottPlot.MarkerShape.filledCircle, label: "Buy");
+                chart.Plot.AddScatter(timePoints.ToArray(), sellPrices.ToArray(), Color.Red, 8, markerShape: ScottPlot.MarkerShape.filledCircle, label: "Sell");
+                chart.Plot.AddScatter(timePoints.ToArray(), exitPrices.ToArray(), Color.Black, 8, markerShape: ScottPlot.MarkerShape.filledCircle, label: "Exit");
+            }
+        }
+
+        private void RenderY1Metrics(ScottPlot.FormsPlot chart)
+        {
+            var legendItems = new List<string>();
+
             // RSI - Plot over time
             if (rsiLabel.Checked)
             {
@@ -422,11 +902,151 @@ namespace SimulatorWinForms
 
                 if (rsiPoints.Count > 1)
                 {
-                    var scatter = priceChart.Plot.AddScatter(timePoints.ToArray(), rsiPoints.ToArray(), Color.Blue, 2);
+                    var scatter = chart.Plot.AddScatter(timePoints.ToArray(), rsiPoints.ToArray(), Color.Blue, 2);
                     scatter.Label = "RSI";
                     legendItems.Add("RSI");
                 }
             }
+
+            // EMA - Plot over time
+            if (emaLabel.Checked)
+            {
+                var emaPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.EMA_Medium.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        emaPoints.Add(snapshot.EMA_Medium.Value);
+                    }
+                }
+
+                if (emaPoints.Count > 1)
+                {
+                    var emaScatter = chart.Plot.AddScatter(timePoints.ToArray(), emaPoints.ToArray(), Color.Purple, 2);
+                    emaScatter.Label = "EMA";
+                    legendItems.Add("EMA");
+                }
+            }
+
+            // Bollinger Bands - Plot over time
+            if (bollingerLabel.Checked)
+            {
+                var upperPoints = new List<double>();
+                var middlePoints = new List<double>();
+                var lowerPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.BollingerBands_Medium.Upper.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        upperPoints.Add(snapshot.BollingerBands_Medium.Upper.Value);
+                        middlePoints.Add(snapshot.BollingerBands_Medium.Middle.Value);
+                        lowerPoints.Add(snapshot.BollingerBands_Medium.Lower.Value);
+                    }
+                }
+
+                if (upperPoints.Count > 1)
+                {
+                    var upperScatter = chart.Plot.AddScatter(timePoints.ToArray(), upperPoints.ToArray(), Color.Red, 1);
+                    upperScatter.Label = "BB Upper";
+                    var middleScatter = chart.Plot.AddScatter(timePoints.ToArray(), middlePoints.ToArray(), Color.Yellow, 1);
+                    middleScatter.Label = "BB Middle";
+                    var lowerScatter = chart.Plot.AddScatter(timePoints.ToArray(), lowerPoints.ToArray(), Color.Green, 1);
+                    lowerScatter.Label = "BB Lower";
+                    legendItems.Add("Bollinger Bands");
+                }
+            }
+
+            // VWAP - Plot over time
+            if (vwapLabel.Checked)
+            {
+                var vwapPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.VWAP_Medium.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        vwapPoints.Add(snapshot.VWAP_Medium.Value);
+                    }
+                }
+
+                if (vwapPoints.Count > 1)
+                {
+                    var vwapScatter = chart.Plot.AddScatter(timePoints.ToArray(), vwapPoints.ToArray(), Color.Cyan, 2);
+                    vwapScatter.Label = "VWAP";
+                    legendItems.Add("VWAP");
+                }
+            }
+
+            // PSAR - Plot over time
+            if (psarLabel.Checked)
+            {
+                var psarPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.PSAR.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        psarPoints.Add(snapshot.PSAR.Value);
+                    }
+                }
+
+                if (psarPoints.Count > 1)
+                {
+                    var psarScatter = chart.Plot.AddScatter(timePoints.ToArray(), psarPoints.ToArray(), Color.Red, 3);
+                    psarScatter.Label = "PSAR";
+                    legendItems.Add("PSAR");
+                }
+            }
+
+            // Support/Resistance Levels
+            if (supportLabel.Checked && currentSnapshot.AllSupportResistanceLevels != null)
+            {
+                double centerX = currentSnapshot.Timestamp.ToOADate();
+                int count = 0;
+                foreach (var level in currentSnapshot.AllSupportResistanceLevels)
+                {
+                    double levelPrice = level.Price;
+                    var supportLine = chart.Plot.AddHorizontalLine(levelPrice, Color.DarkBlue, 1, ScottPlot.LineStyle.Dot);
+                    if (count < 3)
+                    {
+                        chart.Plot.AddText($"S/R: {levelPrice:F2}", centerX, levelPrice, 10, Color.DarkBlue);
+                    }
+                    count++;
+                }
+                legendItems.Add("Support/Resistance");
+            }
+
+            // Add legend if there are items
+            if (legendItems.Any())
+            {
+                chart.Plot.Legend(location: ScottPlot.Alignment.UpperRight);
+            }
+        }
+
+        private void RenderSecondaryMetrics(ScottPlot.FormsPlot chart)
+        {
+            var legendItems = new List<string>();
+
+            // Ensure we have a valid timestamp
+            DateTime snapshotTime = currentSnapshot.Timestamp;
+            if (snapshotTime == DateTime.MinValue || snapshotTime.Year < 2000)
+            {
+                snapshotTime = DateTime.Now;
+            }
+
+            // Add stationary vertical line at current snapshot timestamp (black) - same as main chart
+            double centerX = snapshotTime.ToOADate();
+            chart.Plot.AddVerticalLine(centerX, Color.Black, 2);
 
             // MACD - Plot over time
             if (macdLabel.Checked)
@@ -447,65 +1067,11 @@ namespace SimulatorWinForms
 
                 if (macdPoints.Count > 1)
                 {
-                    var macdScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), macdPoints.ToArray(), Color.Red, 2);
+                    var macdScatter = chart.Plot.AddScatter(timePoints.ToArray(), macdPoints.ToArray(), Color.Red, 2);
                     macdScatter.Label = "MACD";
-                    var signalScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), signalPoints.ToArray(), Color.Blue, 2);
+                    var signalScatter = chart.Plot.AddScatter(timePoints.ToArray(), signalPoints.ToArray(), Color.Blue, 2);
                     signalScatter.Label = "MACD Signal";
                     legendItems.Add("MACD");
-                }
-            }
-
-            // EMA - Plot over time
-            if (emaLabel.Checked)
-            {
-                var emaPoints = new List<double>();
-                var timePoints = new List<double>();
-
-                foreach (var snapshot in historySnapshots)
-                {
-                    if (snapshot.EMA_Medium.HasValue)
-                    {
-                        timePoints.Add(snapshot.Timestamp.ToOADate());
-                        emaPoints.Add(snapshot.EMA_Medium.Value); // Already in dollars
-                    }
-                }
-
-                if (emaPoints.Count > 1)
-                {
-                    var emaScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), emaPoints.ToArray(), Color.Purple, 2);
-                    emaScatter.Label = "EMA";
-                    legendItems.Add("EMA");
-                }
-            }
-
-            // Bollinger Bands - Plot over time
-            if (bollingerLabel.Checked)
-            {
-                var upperPoints = new List<double>();
-                var middlePoints = new List<double>();
-                var lowerPoints = new List<double>();
-                var timePoints = new List<double>();
-
-                foreach (var snapshot in historySnapshots)
-                {
-                    if (snapshot.BollingerBands_Medium.Upper.HasValue)
-                    {
-                        timePoints.Add(snapshot.Timestamp.ToOADate());
-                        upperPoints.Add(snapshot.BollingerBands_Medium.Upper.Value); // Already in dollars
-                        middlePoints.Add(snapshot.BollingerBands_Medium.Middle.Value); // Already in dollars
-                        lowerPoints.Add(snapshot.BollingerBands_Medium.Lower.Value); // Already in dollars
-                    }
-                }
-
-                if (upperPoints.Count > 1)
-                {
-                    var upperScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), upperPoints.ToArray(), Color.Red, 1);
-                    upperScatter.Label = "BB Upper";
-                    var middleScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), middlePoints.ToArray(), Color.Yellow, 1);
-                    middleScatter.Label = "BB Middle";
-                    var lowerScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), lowerPoints.ToArray(), Color.Green, 1);
-                    lowerScatter.Label = "BB Lower";
-                    legendItems.Add("Bollinger Bands");
                 }
             }
 
@@ -520,38 +1086,58 @@ namespace SimulatorWinForms
                     if (snapshot.ATR_Medium.HasValue)
                     {
                         timePoints.Add(snapshot.Timestamp.ToOADate());
-                        atrPoints.Add(snapshot.ATR_Medium.Value); // Already in dollars
+                        atrPoints.Add(snapshot.ATR_Medium.Value);
                     }
                 }
 
                 if (atrPoints.Count > 1)
                 {
-                    var atrScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), atrPoints.ToArray(), Color.Orange, 2);
+                    var atrScatter = chart.Plot.AddScatter(timePoints.ToArray(), atrPoints.ToArray(), Color.Orange, 2);
                     atrScatter.Label = "ATR";
                     legendItems.Add("ATR");
                 }
             }
 
-            // VWAP - Plot over time
-            if (vwapLabel.Checked)
+            // Slope
+            if (slopeCB.Checked)
             {
-                var vwapPoints = new List<double>();
+                var slopePoints = new List<double>();
                 var timePoints = new List<double>();
 
                 foreach (var snapshot in historySnapshots)
                 {
-                    if (snapshot.VWAP_Medium.HasValue)
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    slopePoints.Add(snapshot.YesBidSlopePerMinute_Short);
+                }
+
+                if (slopePoints.Count > 1)
+                {
+                    var slopeScatter = chart.Plot.AddScatter(timePoints.ToArray(), slopePoints.ToArray(), Color.Teal, 2);
+                    slopeScatter.Label = "Slope";
+                    legendItems.Add("Slope");
+                }
+            }
+
+            // ADX - Plot over time
+            if (adxLabel.Checked)
+            {
+                var adxPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.ADX.HasValue)
                     {
                         timePoints.Add(snapshot.Timestamp.ToOADate());
-                        vwapPoints.Add(snapshot.VWAP_Medium.Value); // Already in dollars
+                        adxPoints.Add(snapshot.ADX.Value);
                     }
                 }
 
-                if (vwapPoints.Count > 1)
+                if (adxPoints.Count > 1)
                 {
-                    var vwapScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), vwapPoints.ToArray(), Color.Cyan, 2);
-                    vwapScatter.Label = "VWAP";
-                    legendItems.Add("VWAP");
+                    var adxScatter = chart.Plot.AddScatter(timePoints.ToArray(), adxPoints.ToArray(), Color.Brown, 2);
+                    adxScatter.Label = "ADX";
+                    legendItems.Add("ADX");
                 }
             }
 
@@ -574,9 +1160,9 @@ namespace SimulatorWinForms
 
                 if (kPoints.Count > 1)
                 {
-                    var kScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), kPoints.ToArray(), Color.Black, 2);
+                    var kScatter = chart.Plot.AddScatter(timePoints.ToArray(), kPoints.ToArray(), Color.Black, 2);
                     kScatter.Label = "Stoch K";
-                    var dScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), dPoints.ToArray(), Color.Gray, 2);
+                    var dScatter = chart.Plot.AddScatter(timePoints.ToArray(), dPoints.ToArray(), Color.Gray, 2);
                     dScatter.Label = "Stoch D";
                     legendItems.Add("Stochastic");
                 }
@@ -596,61 +1182,12 @@ namespace SimulatorWinForms
 
                 if (obvPoints.Count > 1)
                 {
-                    var obvScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), obvPoints.ToArray(), Color.Magenta, 2);
+                    var obvScatter = chart.Plot.AddScatter(timePoints.ToArray(), obvPoints.ToArray(), Color.Magenta, 2);
                     obvScatter.Label = "OBV";
                     legendItems.Add("OBV");
                 }
             }
 
-            // PSAR - Plot over time
-            if (psarLabel.Checked)
-            {
-                var psarPoints = new List<double>();
-                var timePoints = new List<double>();
-
-                foreach (var snapshot in historySnapshots)
-                {
-                    if (snapshot.PSAR.HasValue)
-                    {
-                        timePoints.Add(snapshot.Timestamp.ToOADate());
-                        psarPoints.Add(snapshot.PSAR.Value); // Already in dollars
-                    }
-                }
-
-                if (psarPoints.Count > 1)
-                {
-                    var psarScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), psarPoints.ToArray(), Color.Red, 3);
-                    psarScatter.Label = "PSAR";
-                    legendItems.Add("PSAR");
-                }
-            }
-
-            // ADX - Plot over time
-            if (adxLabel.Checked)
-            {
-                var adxPoints = new List<double>();
-                var timePoints = new List<double>();
-
-                foreach (var snapshot in historySnapshots)
-                {
-                    if (snapshot.ADX.HasValue)
-                    {
-                        timePoints.Add(snapshot.Timestamp.ToOADate());
-                        adxPoints.Add(snapshot.ADX.Value);
-                    }
-                }
-
-                if (adxPoints.Count > 1)
-                {
-                    var adxScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), adxPoints.ToArray(), Color.Brown, 2);
-                    adxScatter.Label = "ADX";
-                    legendItems.Add("ADX");
-                }
-            }
-        }
-
-        private void PlotFlowMomentumIndicatorsOverTime(List<string> legendItems)
-        {
             // Top Velocity
             if (topVelocityCB.Checked)
             {
@@ -665,7 +1202,7 @@ namespace SimulatorWinForms
 
                 if (topVelPoints.Count > 1)
                 {
-                    var topVelScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), topVelPoints.ToArray(), Color.DarkGreen, 2);
+                    var topVelScatter = chart.Plot.AddScatter(timePoints.ToArray(), topVelPoints.ToArray(), Color.DarkGreen, 2);
                     topVelScatter.Label = "Top Velocity";
                     legendItems.Add("Top Velocity");
                 }
@@ -685,7 +1222,7 @@ namespace SimulatorWinForms
 
                 if (bottomVelPoints.Count > 1)
                 {
-                    var bottomVelScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), bottomVelPoints.ToArray(), Color.DarkRed, 2);
+                    var bottomVelScatter = chart.Plot.AddScatter(timePoints.ToArray(), bottomVelPoints.ToArray(), Color.DarkRed, 2);
                     bottomVelScatter.Label = "Bottom Velocity";
                     legendItems.Add("Bottom Velocity");
                 }
@@ -705,7 +1242,7 @@ namespace SimulatorWinForms
 
                 if (netOrderPoints.Count > 1)
                 {
-                    var netOrderScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), netOrderPoints.ToArray(), Color.Purple, 2);
+                    var netOrderScatter = chart.Plot.AddScatter(timePoints.ToArray(), netOrderPoints.ToArray(), Color.Purple, 2);
                     netOrderScatter.Label = "Net Order Rate";
                     legendItems.Add("Net Order Rate");
                 }
@@ -725,7 +1262,7 @@ namespace SimulatorWinForms
 
                 if (tradeVolPoints.Count > 1)
                 {
-                    var tradeVolScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), tradeVolPoints.ToArray(), Color.Orange, 2);
+                    var tradeVolScatter = chart.Plot.AddScatter(timePoints.ToArray(), tradeVolPoints.ToArray(), Color.Orange, 2);
                     tradeVolScatter.Label = "Trade Volume";
                     legendItems.Add("Trade Volume");
                 }
@@ -745,35 +1282,12 @@ namespace SimulatorWinForms
 
                 if (avgSizePoints.Count > 1)
                 {
-                    var avgSizeScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), avgSizePoints.ToArray(), Color.Pink, 2);
+                    var avgSizeScatter = chart.Plot.AddScatter(timePoints.ToArray(), avgSizePoints.ToArray(), Color.Pink, 2);
                     avgSizeScatter.Label = "Avg Trade Size";
                     legendItems.Add("Avg Trade Size");
                 }
             }
 
-            // Slope
-            if (slopeCB.Checked)
-            {
-                var slopePoints = new List<double>();
-                var timePoints = new List<double>();
-
-                foreach (var snapshot in historySnapshots)
-                {
-                    timePoints.Add(snapshot.Timestamp.ToOADate());
-                    slopePoints.Add(snapshot.YesBidSlopePerMinute_Short);
-                }
-
-                if (slopePoints.Count > 1)
-                {
-                    var slopeScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), slopePoints.ToArray(), Color.Teal, 2);
-                    slopeScatter.Label = "Slope";
-                    legendItems.Add("Slope");
-                }
-            }
-        }
-
-        private void PlotContextIndicatorsOverTime(List<string> legendItems)
-        {
             // Imbalance
             if (imbalCB.Checked)
             {
@@ -797,7 +1311,7 @@ namespace SimulatorWinForms
 
                 if (imbalPoints.Count > 1)
                 {
-                    var imbalScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), imbalPoints.ToArray(), Color.Navy, 2);
+                    var imbalScatter = chart.Plot.AddScatter(timePoints.ToArray(), imbalPoints.ToArray(), Color.Navy, 2);
                     imbalScatter.Label = "Imbalance";
                     legendItems.Add("Imbalance");
                 }
@@ -817,7 +1331,7 @@ namespace SimulatorWinForms
 
                 if (depthPoints.Count > 1)
                 {
-                    var depthScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), depthPoints.ToArray(), Color.Maroon, 2);
+                    var depthScatter = chart.Plot.AddScatter(timePoints.ToArray(), depthPoints.ToArray(), Color.Maroon, 2);
                     depthScatter.Label = "Depth Top 4";
                     legendItems.Add("Depth Top 4");
                 }
@@ -837,7 +1351,7 @@ namespace SimulatorWinForms
 
                 if (centerMassPoints.Count > 1)
                 {
-                    var centerMassScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), centerMassPoints.ToArray(), Color.Olive, 2);
+                    var centerMassScatter = chart.Plot.AddScatter(timePoints.ToArray(), centerMassPoints.ToArray(), Color.Olive, 2);
                     centerMassScatter.Label = "Center Mass";
                     legendItems.Add("Center Mass");
                 }
@@ -857,7 +1371,7 @@ namespace SimulatorWinForms
 
                 if (contractsPoints.Count > 1)
                 {
-                    var contractsScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), contractsPoints.ToArray(), Color.Silver, 2);
+                    var contractsScatter = chart.Plot.AddScatter(timePoints.ToArray(), contractsPoints.ToArray(), Color.Silver, 2);
                     contractsScatter.Label = "Total Contracts";
                     legendItems.Add("Total Contracts");
                 }
@@ -877,15 +1391,12 @@ namespace SimulatorWinForms
 
                 if (depthPoints.Count > 1)
                 {
-                    var depthScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), depthPoints.ToArray(), Color.Gold, 2);
+                    var depthScatter = chart.Plot.AddScatter(timePoints.ToArray(), depthPoints.ToArray(), Color.Gold, 2);
                     depthScatter.Label = "Total Depth";
                     legendItems.Add("Total Depth");
                 }
             }
-        }
 
-        private void PlotPositionIndicatorsOverTime(List<string> legendItems)
-        {
             // Position Size
             if (positionSizeLabel.Checked)
             {
@@ -900,7 +1411,7 @@ namespace SimulatorWinForms
 
                 if (positionSizePoints.Count > 1)
                 {
-                    var positionSizeScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), positionSizePoints.ToArray(), Color.Violet, 2);
+                    var positionSizeScatter = chart.Plot.AddScatter(timePoints.ToArray(), positionSizePoints.ToArray(), Color.Violet, 2);
                     positionSizeScatter.Label = "Position Size";
                     legendItems.Add("Position Size");
                 }
@@ -920,7 +1431,7 @@ namespace SimulatorWinForms
 
                 if (simulatedPosPoints.Count > 1)
                 {
-                    var simulatedPosScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), simulatedPosPoints.ToArray(), Color.Indigo, 2);
+                    var simulatedPosScatter = chart.Plot.AddScatter(timePoints.ToArray(), simulatedPosPoints.ToArray(), Color.Indigo, 2);
                     simulatedPosScatter.Label = "Simulated Position";
                     legendItems.Add("Simulated Position");
                 }
@@ -940,7 +1451,7 @@ namespace SimulatorWinForms
 
                 if (positionRoiPoints.Count > 1)
                 {
-                    var positionRoiScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), positionRoiPoints.ToArray(), Color.Crimson, 2);
+                    var positionRoiScatter = chart.Plot.AddScatter(timePoints.ToArray(), positionRoiPoints.ToArray(), Color.Crimson, 2);
                     positionRoiScatter.Label = "Position ROI";
                     legendItems.Add("Position ROI");
                 }
@@ -960,44 +1471,51 @@ namespace SimulatorWinForms
 
                 if (restingOrdersPoints.Count > 1)
                 {
-                    var restingOrdersScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), restingOrdersPoints.ToArray(), Color.Sienna, 2);
+                    var restingOrdersScatter = chart.Plot.AddScatter(timePoints.ToArray(), restingOrdersPoints.ToArray(), Color.Sienna, 2);
                     restingOrdersScatter.Label = "Resting Orders";
                     legendItems.Add("Resting Orders");
                 }
             }
-        }
 
-        private void PlotSupportResistance(List<string> legendItems)
-        {
-            double centerX = currentSnapshot.Timestamp.ToOADate();
-
-            // Support/Resistance Levels
-            if (supportLabel.Checked && currentSnapshot.AllSupportResistanceLevels != null)
+            // Add legend if there are items
+            if (legendItems.Any())
             {
-                int count = 0;
-                foreach (var level in currentSnapshot.AllSupportResistanceLevels)
-                {
-                    double levelPrice = level.Price; // Keep in pennies as-is
-                    var supportLine = priceChart.Plot.AddHorizontalLine(levelPrice, Color.DarkBlue, 1, ScottPlot.LineStyle.Dot);
-                    // Add text label for the first few levels to avoid clutter
-                    if (count < 3)
-                    {
-                        priceChart.Plot.AddText($"S/R: {levelPrice:F2}", centerX, levelPrice, 10, Color.DarkBlue);
-                    }
-                    count++;
-                }
-                legendItems.Add("Support/Resistance");
+                chart.Plot.Legend(location: ScottPlot.Alignment.UpperRight);
             }
+
+            // Set up secondary chart axes - only set Y-axis auto, preserve X-axis from sync
+            chart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
+            chart.Plot.AxisAutoY(); // Only auto-scale Y-axis
         }
 
-        private void leftColumn_Paint(object sender, PaintEventArgs e)
+        private bool HasSecondaryMetricsChecked()
         {
-
+            return macdLabel.Checked ||
+                   atrLabel.Checked ||
+                   slopeCB.Checked ||
+                   adxLabel.Checked ||
+                   stochasticLabel.Checked ||
+                   obvLabel.Checked ||
+                   topVelocityCB.Checked ||
+                   bottomVelocityCB.Checked ||
+                   netOrderRateCB.Checked ||
+                   tradeVolumeCB.Checked ||
+                   avgTradeSizeCB.Checked ||
+                   imbalCB.Checked ||
+                   depthTop4CB.Checked ||
+                   totalDepthCB.Checked ||
+                   centerMassCB.Checked ||
+                   totalContractsCB.Checked ||
+                   positionSizeLabel.Checked ||
+                   simulatedPositionLabel.Checked ||
+                   positionRoiLabel.Checked ||
+                   restingOrdersLabel.Checked;
         }
 
-        private void positionsLayout_Paint(object sender, PaintEventArgs e)
+        private void UpdateChartLegends()
         {
-
+            // This method is now handled within RenderY1Metrics and RenderSecondaryMetrics
+            // to avoid conflicts between the two charts
         }
 
         private void rsiLabel_CheckedChanged(object sender, EventArgs e)
