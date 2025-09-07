@@ -94,10 +94,16 @@ namespace SimulatorWinForms
             priceChart.MouseDown += PriceChart_MouseDown;
             priceChart.MouseMove += PriceChart_MouseMove;
             priceChart.MouseUp += PriceChart_MouseUp;
+            priceChart.MouseMove += PriceChart_MouseMove_Cursor;
+            priceChart.MouseLeave += PriceChart_MouseLeave;
+            priceChart.MouseDown += PriceChart_MouseDown_Cursor;
 
             secondaryChart.MouseDown += SecondaryChart_MouseDown;
             secondaryChart.MouseMove += SecondaryChart_MouseMove;
             secondaryChart.MouseUp += SecondaryChart_MouseUp;
+            secondaryChart.MouseMove += SecondaryChart_MouseMove_Cursor;
+            secondaryChart.MouseLeave += SecondaryChart_MouseLeave;
+            secondaryChart.MouseDown += SecondaryChart_MouseDown_Cursor;
 
             // Ensure charts can receive mouse events
             priceChart.Enabled = true;
@@ -113,6 +119,9 @@ namespace SimulatorWinForms
         private int _consecutiveNavigations = 0; // Track consecutive navigation steps
         private DateTime _lastNavigationTime = DateTime.MinValue; // Track timing for speed acceleration
         private int _navigationStepSize = 1; // Current step size (1, 2, 5, or 60)
+
+        // Cursor line fields
+        private ScottPlot.Plottable.IPlottable _cursorLine; // Light grey line following mouse cursor
 
         // Removed CheckAndSyncSecondaryChart method - secondary chart now independent
 
@@ -228,6 +237,108 @@ namespace SimulatorWinForms
                 _isSecondaryChartPanning = false;
                 secondaryChart.Cursor = Cursors.Default;
                 _secondaryChartPanStartPx = Point.Empty;
+            }
+        }
+
+        // Cursor line and click-to-jump functionality
+        private void PriceChart_MouseMove_Cursor(object sender, MouseEventArgs e)
+        {
+            UpdateCursorLine(priceChart, e);
+        }
+
+        private void PriceChart_MouseLeave(object sender, EventArgs e)
+        {
+            RemoveCursorLine(priceChart);
+        }
+
+        private void PriceChart_MouseDown_Cursor(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                JumpToClickedPosition(priceChart, e);
+            }
+        }
+
+        private void SecondaryChart_MouseMove_Cursor(object sender, MouseEventArgs e)
+        {
+            UpdateCursorLine(secondaryChart, e);
+        }
+
+        private void SecondaryChart_MouseLeave(object sender, EventArgs e)
+        {
+            RemoveCursorLine(secondaryChart);
+        }
+
+        private void SecondaryChart_MouseDown_Cursor(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                JumpToClickedPosition(secondaryChart, e);
+            }
+        }
+
+        private void UpdateCursorLine(ScottPlot.FormsPlot chart, MouseEventArgs e)
+        {
+            // Remove existing cursor line
+            RemoveCursorLine(chart);
+
+            // Get mouse position in data coordinates
+            double xPos = chart.Plot.GetCoordinateX(e.X);
+
+            // Add new cursor line
+            _cursorLine = chart.Plot.AddVerticalLine(xPos, Color.LightGray, 1, ScottPlot.LineStyle.Dash);
+            chart.Refresh();
+        }
+
+        private void RemoveCursorLine(ScottPlot.FormsPlot chart)
+        {
+            if (_cursorLine != null)
+            {
+                // Remove the cursor line
+                chart.Plot.Remove(_cursorLine);
+                _cursorLine = null;
+                chart.Refresh();
+            }
+        }
+
+        private void JumpToClickedPosition(ScottPlot.FormsPlot chart, MouseEventArgs e)
+        {
+            if (historySnapshots == null || historySnapshots.Count == 0) return;
+
+            // Get clicked position in data coordinates
+            double clickedX = chart.Plot.GetCoordinateX(e.X);
+
+            // Find the closest snapshot to the clicked position
+            MarketSnapshot closestSnapshot = null;
+            double minDistance = double.MaxValue;
+
+            foreach (var snapshot in historySnapshots)
+            {
+                double distance = Math.Abs(snapshot.Timestamp.ToOADate() - clickedX);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestSnapshot = snapshot;
+                }
+            }
+
+            if (closestSnapshot != null)
+            {
+                // Jump to the closest snapshot
+                int newIndex = historySnapshots.IndexOf(closestSnapshot);
+                if (newIndex >= 0 && newIndex < historySnapshots.Count)
+                {
+                    currentIndex = newIndex;
+                    currentSnapshot = closestSnapshot;
+                    memoText = memos != null && newIndex < memos.Count ? memos[newIndex] : "";
+
+                    // Update UI immediately
+                    UpdateUIFast();
+
+                    // Reset navigation speed counters
+                    _consecutiveNavigations = 0;
+                    _navigationStepSize = 1;
+                }
             }
         }
 
@@ -616,7 +727,7 @@ namespace SimulatorWinForms
             }
 
             // Add fresh vertical line
-            priceChart.Plot.AddVerticalLine(centerX, Color.Black, 2);
+            var verticalLine = priceChart.Plot.AddVerticalLine(centerX, Color.Black, 2);
 
             // Same for secondary chart
             if (secondaryChart.Visible)
@@ -632,7 +743,7 @@ namespace SimulatorWinForms
                         secondaryChart.Plot.Remove(plottable);
                     }
                 }
-                secondaryChart.Plot.AddVerticalLine(centerX, Color.Black, 2);
+                var secondaryVerticalLine = secondaryChart.Plot.AddVerticalLine(centerX, Color.Black, 2);
             }
 
             // Fast refresh
@@ -1012,7 +1123,7 @@ namespace SimulatorWinForms
 
             // Add stationary vertical line at current snapshot timestamp (black)
             double centerX = snapshotTime.ToOADate();
-            chart.Plot.AddVerticalLine(centerX, Color.Black, 2);
+            var snapshotLine = chart.Plot.AddVerticalLine(centerX, Color.Black, 2);
 
             // Initially zoom in on the snapshot (e.g., +/- 1 hour, total 2 hour span)
             double spanDays = 2.0 / 24;  // 2 hours
@@ -1225,7 +1336,7 @@ namespace SimulatorWinForms
 
             // Add stationary vertical line at current snapshot timestamp (black) - same as main chart
             double centerX = snapshotTime.ToOADate();
-            chart.Plot.AddVerticalLine(centerX, Color.Black, 2);
+            var secondarySnapshotLine = chart.Plot.AddVerticalLine(centerX, Color.Black, 2);
 
             // MACD - Plot over time
             if (macdLabel.Checked)
