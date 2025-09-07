@@ -38,6 +38,9 @@ namespace SimulatorWinForms
 
             // Add resize handler for dynamic scaling
             this.Resize += SnapshotViewer_ResizeEnd;
+
+            // Add detailed tooltips for trading metrics
+            SetupTooltips();
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -70,6 +73,65 @@ namespace SimulatorWinForms
             {
                 BackAction?.Invoke();
             }
+        }
+
+        private void SetupTooltips()
+        {
+            // Trading Metrics Tooltips
+            toolTip1.SetToolTip(rsiLabel, "Relative Strength Index (RSI): Momentum oscillator measuring price changes to evaluate overbought/oversold conditions. Values above 70 indicate overbought (potential sell), below 30 indicate oversold (potential buy).");
+
+            toolTip1.SetToolTip(macdLabel, "Moving Average Convergence Divergence (MACD): Trend-following momentum indicator showing relationship between two moving averages. Bullish when MACD crosses above signal line, bearish when below.");
+
+            toolTip1.SetToolTip(emaLabel, "Exponential Moving Average (EMA): Weighted moving average giving more importance to recent prices. Used for trend identification and support/resistance levels.");
+
+            toolTip1.SetToolTip(bollingerLabel, "Bollinger Bands: Volatility bands placed above and below a moving average. Price touching upper band suggests overbought, lower band suggests oversold. Band contraction indicates low volatility.");
+
+            toolTip1.SetToolTip(atrLabel, "Average True Range (ATR): Volatility indicator measuring price movement range. Higher values indicate higher volatility, useful for stop-loss placement and position sizing.");
+
+            toolTip1.SetToolTip(vwapLabel, "Volume Weighted Average Price (VWAP): Average price weighted by trading volume. Institutional benchmark - price above VWAP suggests bullish, below suggests bearish.");
+
+            toolTip1.SetToolTip(stochasticLabel, "Stochastic Oscillator: Momentum indicator comparing closing price to price range over period. %K above 80 suggests overbought, below 20 suggests oversold.");
+
+            toolTip1.SetToolTip(obvLabel, "On-Balance Volume (OBV): Cumulative volume indicator adding volume on up days, subtracting on down days. Rising OBV confirms uptrend, falling OBV confirms downtrend.");
+
+            toolTip1.SetToolTip(psarLabel, "Parabolic SAR: Trend-following indicator plotting points below/above price during uptrends/downtrends. Used for trailing stop-losses and trend confirmation.");
+
+            toolTip1.SetToolTip(adxLabel, "Average Directional Index (ADX): Strength of trend indicator. Values above 25 indicate strong trend, below 20 indicate weak/no trend. Used with +DI/-DI for trend direction.");
+
+            toolTip1.SetToolTip(supportLabel, "Support/Resistance Levels: Historical price levels where buying/selling pressure caused reversals. Support levels catch falling prices, resistance levels cap rising prices.");
+
+            // Flow/Momentum Tooltips
+            toolTip1.SetToolTip(topVelocityCB, "Top Velocity: Rate of price change at the best bid/ask levels. High values indicate strong momentum in that direction.");
+
+            toolTip1.SetToolTip(bottomVelocityCB, "Bottom Velocity: Rate of price change at lower levels in the order book. Indicates broader market participation.");
+
+            toolTip1.SetToolTip(netOrderRateCB, "Net Order Rate: Difference between buy and sell order flow. Positive values indicate more buying pressure, negative indicates selling pressure.");
+
+            toolTip1.SetToolTip(tradeVolumeCB, "Trade Volume: Total number of contracts traded in a given period. Higher volume often confirms trend strength.");
+
+            toolTip1.SetToolTip(avgTradeSizeCB, "Average Trade Size: Mean size of individual trades. Large average sizes may indicate institutional activity.");
+
+            toolTip1.SetToolTip(slopeCB, "5-Minute Slope: Rate of price change over 5-minute periods. Positive slope indicates upward momentum, negative indicates downward.");
+
+            // Context Tooltips
+            toolTip1.SetToolTip(imbalCB, "Order Book Imbalance: Ratio of buy orders to sell orders at current price levels. Values >1 indicate buying pressure, <1 indicate selling pressure.");
+
+            toolTip1.SetToolTip(depthTop4CB, "Depth at Top 4 Levels: Total order size in the first 4 bid/ask levels. Indicates liquidity and potential price impact of large orders.");
+
+            toolTip1.SetToolTip(centerMassCB, "Center of Mass: Weighted average price of all orders in the order book. Indicates where the majority of liquidity is concentrated.");
+
+            toolTip1.SetToolTip(totalContractsCB, "Total Contracts: Sum of all contract sizes in the order book. Higher totals indicate deeper liquidity.");
+
+            toolTip1.SetToolTip(totalDepthCB, "Total Depth: Combined value of all orders in the order book. Important for assessing market liquidity and slippage potential.");
+
+            // Position Tooltips
+            toolTip1.SetToolTip(positionSizeLabel, "Position Size: Current number of contracts held in the position. Larger positions have higher risk/reward ratios.");
+
+            toolTip1.SetToolTip(simulatedPositionLabel, "Simulated Position: Hypothetical position size based on strategy parameters. Used for backtesting and risk assessment.");
+
+            toolTip1.SetToolTip(positionRoiLabel, "Position ROI: Return on investment for the current position. Calculated as profit/loss divided by initial investment.");
+
+            toolTip1.SetToolTip(restingOrdersLabel, "Resting Orders: Unfilled limit orders waiting in the order book. Indicates planned entry/exit points.");
         }
 
         // Removed SnapshotViewer_KeyDown (handled by parent form)

@@ -8,6 +8,7 @@ namespace SimulatorWinForms
     partial class SnapshotViewer
     {
         private System.ComponentModel.IContainer components = null;
+        private System.Windows.Forms.ToolTip toolTip1;
 
         protected override void Dispose(bool disposing)
         {
@@ -20,6 +21,8 @@ namespace SimulatorWinForms
 
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
+            toolTip1 = new System.Windows.Forms.ToolTip(components);
             mainLayout = new TableLayoutPanel();
             dashboardGrid = new TableLayoutPanel();
             chartContainer = new Panel();
@@ -163,6 +166,13 @@ namespace SimulatorWinForms
             valueCol = new DataGridViewTextBoxColumn();
             backButton = new Button();
             chartHeader = new Label();
+
+            // Configure tooltip
+            toolTip1.AutoPopDelay = 5000;
+            toolTip1.InitialDelay = 1000;
+            toolTip1.ReshowDelay = 500;
+            toolTip1.ShowAlways = true;
+
             mainLayout.SuspendLayout();
             dashboardGrid.SuspendLayout();
             chartContainer.SuspendLayout();
