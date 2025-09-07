@@ -145,7 +145,8 @@ namespace TradingStrategies.Strategies.Strats
             CandleMids[] mids = snapshot.RecentCandlesticks.ToCandleMids(snapshot.MarketTicker);
 
             var patterns = PatternSearch.DetectPatterns(mids, 10);
-            var currentPatterns = patterns[patterns.Count - 1];
+            List<PatternDefinition> currentPatterns = new List<PatternDefinition>();
+            if (patterns.Keys.Count > 0) currentPatterns = patterns[patterns.Keys.Last()];
 
             if (snapshot.BestYesAsk >= 100 - minDist || snapshot.BestYesBid <= minDist)
                 return AD(ActionType.None, 0, 0,

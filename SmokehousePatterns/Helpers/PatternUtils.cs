@@ -82,6 +82,7 @@ namespace SmokehousePatterns.Helpers
                     LookbackMeanTrend = meanTrend,
                     LookbackAvgRange = lookbackAvgRange,
                     LookbackTrendConsistency = trendConsistency,
+                    AvgVoumeVsLookback = avgVoumeVsLookback,
                     BullishRatio = bullishRatio,
                     BearishRatio = bearishRatio,
                     IntervalType = intervalType,

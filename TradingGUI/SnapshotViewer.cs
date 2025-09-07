@@ -256,10 +256,24 @@ namespace SimulatorWinForms
             // Initially zoom in on the snapshot (e.g., +/- 30 minutes, total 1 hour span)
             double spanDays = 1.0 / 24;  // 1 hour
             priceChart.Plot.SetAxisLimitsX(centerX - spanDays / 2, centerX + spanDays / 2);
-
             priceChart.Plot.AxisAutoY();  // Auto-scale Y-axis
             priceChart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
-            priceChart.Refresh();
+
+            // Now add indicators based on checkbox states
+            var legendItems = new List<string>();
+            PlotTradingMetricsIndicatorsOverTime(legendItems);
+            PlotFlowMomentumIndicatorsOverTime(legendItems);
+            PlotContextIndicatorsOverTime(legendItems);
+            PlotPositionIndicatorsOverTime(legendItems);
+            PlotSupportResistance(legendItems);
+
+            // Add legend if there are items
+            if (legendItems.Any())
+            {
+                priceChart.Plot.Legend(location: ScottPlot.Alignment.UpperRight);
+            }
+
+            priceChart.Refresh();  // Ensure the plot is refreshed after adding the line
         }
 
         private void SnapshotViewer_ResizeEnd(object sender, EventArgs e)
@@ -310,7 +324,608 @@ namespace SimulatorWinForms
 
         private void EvaluateChartFilters()
         {
+            if (currentSnapshot == null) return;
 
+            // Save current axis limits to preserve zoom/pan
+            var currentLimits = priceChart.Plot.GetAxisLimits();
+            bool hasExistingLimits = currentLimits.XMax > currentLimits.XMin;
+
+            // Re-render the entire chart with indicators
+            UpdateChart();
+
+            // Only restore axis limits if we had valid ones (preserve user's zoom/pan)
+            if (hasExistingLimits)
+            {
+                priceChart.Plot.SetAxisLimits(currentLimits.XMin, currentLimits.XMax, currentLimits.YMin, currentLimits.YMax);
+                priceChart.Refresh();
+            }
+        }
+
+        private void PlotTradingMetricsIndicatorsOverTime(List<string> legendItems)
+        {
+            // RSI - Plot over time
+            if (rsiLabel.Checked)
+            {
+                var rsiPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.RSI_Medium.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        rsiPoints.Add(snapshot.RSI_Medium.Value);
+                    }
+                }
+
+                if (rsiPoints.Count > 1)
+                {
+                    var scatter = priceChart.Plot.AddScatter(timePoints.ToArray(), rsiPoints.ToArray(), Color.Blue, 2);
+                    scatter.Label = "RSI";
+                    legendItems.Add("RSI");
+                }
+            }
+
+            // MACD - Plot over time
+            if (macdLabel.Checked)
+            {
+                var macdPoints = new List<double>();
+                var signalPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.MACD_Medium.MACD.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        macdPoints.Add(snapshot.MACD_Medium.MACD.Value);
+                        signalPoints.Add(snapshot.MACD_Medium.Signal.GetValueOrDefault());
+                    }
+                }
+
+                if (macdPoints.Count > 1)
+                {
+                    var macdScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), macdPoints.ToArray(), Color.Red, 2);
+                    macdScatter.Label = "MACD";
+                    var signalScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), signalPoints.ToArray(), Color.Blue, 2);
+                    signalScatter.Label = "MACD Signal";
+                    legendItems.Add("MACD");
+                }
+            }
+
+            // EMA - Plot over time
+            if (emaLabel.Checked)
+            {
+                var emaPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.EMA_Medium.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        emaPoints.Add(snapshot.EMA_Medium.Value); // Already in dollars
+                    }
+                }
+
+                if (emaPoints.Count > 1)
+                {
+                    var emaScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), emaPoints.ToArray(), Color.Purple, 2);
+                    emaScatter.Label = "EMA";
+                    legendItems.Add("EMA");
+                }
+            }
+
+            // Bollinger Bands - Plot over time
+            if (bollingerLabel.Checked)
+            {
+                var upperPoints = new List<double>();
+                var middlePoints = new List<double>();
+                var lowerPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.BollingerBands_Medium.Upper.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        upperPoints.Add(snapshot.BollingerBands_Medium.Upper.Value); // Already in dollars
+                        middlePoints.Add(snapshot.BollingerBands_Medium.Middle.Value); // Already in dollars
+                        lowerPoints.Add(snapshot.BollingerBands_Medium.Lower.Value); // Already in dollars
+                    }
+                }
+
+                if (upperPoints.Count > 1)
+                {
+                    var upperScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), upperPoints.ToArray(), Color.Red, 1);
+                    upperScatter.Label = "BB Upper";
+                    var middleScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), middlePoints.ToArray(), Color.Yellow, 1);
+                    middleScatter.Label = "BB Middle";
+                    var lowerScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), lowerPoints.ToArray(), Color.Green, 1);
+                    lowerScatter.Label = "BB Lower";
+                    legendItems.Add("Bollinger Bands");
+                }
+            }
+
+            // ATR - Plot over time
+            if (atrLabel.Checked)
+            {
+                var atrPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.ATR_Medium.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        atrPoints.Add(snapshot.ATR_Medium.Value); // Already in dollars
+                    }
+                }
+
+                if (atrPoints.Count > 1)
+                {
+                    var atrScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), atrPoints.ToArray(), Color.Orange, 2);
+                    atrScatter.Label = "ATR";
+                    legendItems.Add("ATR");
+                }
+            }
+
+            // VWAP - Plot over time
+            if (vwapLabel.Checked)
+            {
+                var vwapPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.VWAP_Medium.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        vwapPoints.Add(snapshot.VWAP_Medium.Value); // Already in dollars
+                    }
+                }
+
+                if (vwapPoints.Count > 1)
+                {
+                    var vwapScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), vwapPoints.ToArray(), Color.Cyan, 2);
+                    vwapScatter.Label = "VWAP";
+                    legendItems.Add("VWAP");
+                }
+            }
+
+            // Stochastic - Plot over time
+            if (stochasticLabel.Checked)
+            {
+                var kPoints = new List<double>();
+                var dPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.StochasticOscillator_Medium.K.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        kPoints.Add(snapshot.StochasticOscillator_Medium.K.Value);
+                        dPoints.Add(snapshot.StochasticOscillator_Medium.D.Value);
+                    }
+                }
+
+                if (kPoints.Count > 1)
+                {
+                    var kScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), kPoints.ToArray(), Color.Black, 2);
+                    kScatter.Label = "Stoch K";
+                    var dScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), dPoints.ToArray(), Color.Gray, 2);
+                    dScatter.Label = "Stoch D";
+                    legendItems.Add("Stochastic");
+                }
+            }
+
+            // OBV - Plot over time
+            if (obvLabel.Checked)
+            {
+                var obvPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    obvPoints.Add(snapshot.OBV_Medium / 1000000.0); // Scale for visibility
+                }
+
+                if (obvPoints.Count > 1)
+                {
+                    var obvScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), obvPoints.ToArray(), Color.Magenta, 2);
+                    obvScatter.Label = "OBV";
+                    legendItems.Add("OBV");
+                }
+            }
+
+            // PSAR - Plot over time
+            if (psarLabel.Checked)
+            {
+                var psarPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.PSAR.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        psarPoints.Add(snapshot.PSAR.Value); // Already in dollars
+                    }
+                }
+
+                if (psarPoints.Count > 1)
+                {
+                    var psarScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), psarPoints.ToArray(), Color.Red, 3);
+                    psarScatter.Label = "PSAR";
+                    legendItems.Add("PSAR");
+                }
+            }
+
+            // ADX - Plot over time
+            if (adxLabel.Checked)
+            {
+                var adxPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.ADX.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        adxPoints.Add(snapshot.ADX.Value);
+                    }
+                }
+
+                if (adxPoints.Count > 1)
+                {
+                    var adxScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), adxPoints.ToArray(), Color.Brown, 2);
+                    adxScatter.Label = "ADX";
+                    legendItems.Add("ADX");
+                }
+            }
+        }
+
+        private void PlotFlowMomentumIndicatorsOverTime(List<string> legendItems)
+        {
+            // Top Velocity
+            if (topVelocityCB.Checked)
+            {
+                var topVelPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    topVelPoints.Add(snapshot.VelocityPerMinute_Top_Yes_Bid);
+                }
+
+                if (topVelPoints.Count > 1)
+                {
+                    var topVelScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), topVelPoints.ToArray(), Color.DarkGreen, 2);
+                    topVelScatter.Label = "Top Velocity";
+                    legendItems.Add("Top Velocity");
+                }
+            }
+
+            // Bottom Velocity
+            if (bottomVelocityCB.Checked)
+            {
+                var bottomVelPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    bottomVelPoints.Add(snapshot.VelocityPerMinute_Bottom_Yes_Bid);
+                }
+
+                if (bottomVelPoints.Count > 1)
+                {
+                    var bottomVelScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), bottomVelPoints.ToArray(), Color.DarkRed, 2);
+                    bottomVelScatter.Label = "Bottom Velocity";
+                    legendItems.Add("Bottom Velocity");
+                }
+            }
+
+            // Net Order Rate
+            if (netOrderRateCB.Checked)
+            {
+                var netOrderPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    netOrderPoints.Add(snapshot.TradeRatePerMinute_Yes);
+                }
+
+                if (netOrderPoints.Count > 1)
+                {
+                    var netOrderScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), netOrderPoints.ToArray(), Color.Purple, 2);
+                    netOrderScatter.Label = "Net Order Rate";
+                    legendItems.Add("Net Order Rate");
+                }
+            }
+
+            // Trade Volume
+            if (tradeVolumeCB.Checked)
+            {
+                var tradeVolPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    tradeVolPoints.Add(snapshot.TradeVolumePerMinute_Yes);
+                }
+
+                if (tradeVolPoints.Count > 1)
+                {
+                    var tradeVolScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), tradeVolPoints.ToArray(), Color.Orange, 2);
+                    tradeVolScatter.Label = "Trade Volume";
+                    legendItems.Add("Trade Volume");
+                }
+            }
+
+            // Average Trade Size
+            if (avgTradeSizeCB.Checked)
+            {
+                var avgSizePoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    avgSizePoints.Add(snapshot.AverageTradeSize_Yes);
+                }
+
+                if (avgSizePoints.Count > 1)
+                {
+                    var avgSizeScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), avgSizePoints.ToArray(), Color.Pink, 2);
+                    avgSizeScatter.Label = "Avg Trade Size";
+                    legendItems.Add("Avg Trade Size");
+                }
+            }
+
+            // Slope
+            if (slopeCB.Checked)
+            {
+                var slopePoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    slopePoints.Add(snapshot.YesBidSlopePerMinute_Short);
+                }
+
+                if (slopePoints.Count > 1)
+                {
+                    var slopeScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), slopePoints.ToArray(), Color.Teal, 2);
+                    slopeScatter.Label = "Slope";
+                    legendItems.Add("Slope");
+                }
+            }
+        }
+
+        private void PlotContextIndicatorsOverTime(List<string> legendItems)
+        {
+            // Imbalance
+            if (imbalCB.Checked)
+            {
+                var imbalPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    double imbalance = 1;
+                    if (snapshot.TotalOrderbookDepth_Yes == 0 || snapshot.TotalOrderbookDepth_No == 0)
+                    {
+                        imbalance = 0;
+                    }
+                    else
+                    {
+                        imbalance = Math.Round((double)snapshot.TotalOrderbookDepth_Yes / snapshot.TotalOrderbookDepth_No, 2);
+                    }
+                    imbalPoints.Add(imbalance);
+                }
+
+                if (imbalPoints.Count > 1)
+                {
+                    var imbalScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), imbalPoints.ToArray(), Color.Navy, 2);
+                    imbalScatter.Label = "Imbalance";
+                    legendItems.Add("Imbalance");
+                }
+            }
+
+            // Depth Top 4
+            if (depthTop4CB.Checked)
+            {
+                var depthPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    depthPoints.Add(snapshot.DepthAtTop4YesBids);
+                }
+
+                if (depthPoints.Count > 1)
+                {
+                    var depthScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), depthPoints.ToArray(), Color.Maroon, 2);
+                    depthScatter.Label = "Depth Top 4";
+                    legendItems.Add("Depth Top 4");
+                }
+            }
+
+            // Center Mass
+            if (centerMassCB.Checked)
+            {
+                var centerMassPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    centerMassPoints.Add(snapshot.YesBidCenterOfMass);
+                }
+
+                if (centerMassPoints.Count > 1)
+                {
+                    var centerMassScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), centerMassPoints.ToArray(), Color.Olive, 2);
+                    centerMassScatter.Label = "Center Mass";
+                    legendItems.Add("Center Mass");
+                }
+            }
+
+            // Total Contracts
+            if (totalContractsCB.Checked)
+            {
+                var contractsPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    contractsPoints.Add(snapshot.TotalBidContracts_Yes);
+                }
+
+                if (contractsPoints.Count > 1)
+                {
+                    var contractsScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), contractsPoints.ToArray(), Color.Silver, 2);
+                    contractsScatter.Label = "Total Contracts";
+                    legendItems.Add("Total Contracts");
+                }
+            }
+
+            // Total Depth
+            if (totalDepthCB.Checked)
+            {
+                var depthPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    depthPoints.Add(snapshot.TotalOrderbookDepth_Yes);
+                }
+
+                if (depthPoints.Count > 1)
+                {
+                    var depthScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), depthPoints.ToArray(), Color.Gold, 2);
+                    depthScatter.Label = "Total Depth";
+                    legendItems.Add("Total Depth");
+                }
+            }
+        }
+
+        private void PlotPositionIndicatorsOverTime(List<string> legendItems)
+        {
+            // Position Size
+            if (positionSizeLabel.Checked)
+            {
+                var positionSizePoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    positionSizePoints.Add(snapshot.PositionSize);
+                }
+
+                if (positionSizePoints.Count > 1)
+                {
+                    var positionSizeScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), positionSizePoints.ToArray(), Color.Violet, 2);
+                    positionSizeScatter.Label = "Position Size";
+                    legendItems.Add("Position Size");
+                }
+            }
+
+            // Simulated Position
+            if (simulatedPositionLabel.Checked)
+            {
+                var simulatedPosPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    simulatedPosPoints.Add(snapshot.PositionSize); // Using position size as proxy
+                }
+
+                if (simulatedPosPoints.Count > 1)
+                {
+                    var simulatedPosScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), simulatedPosPoints.ToArray(), Color.Indigo, 2);
+                    simulatedPosScatter.Label = "Simulated Position";
+                    legendItems.Add("Simulated Position");
+                }
+            }
+
+            // Position ROI
+            if (positionRoiLabel.Checked)
+            {
+                var positionRoiPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    positionRoiPoints.Add(snapshot.PositionROI);
+                }
+
+                if (positionRoiPoints.Count > 1)
+                {
+                    var positionRoiScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), positionRoiPoints.ToArray(), Color.Crimson, 2);
+                    positionRoiScatter.Label = "Position ROI";
+                    legendItems.Add("Position ROI");
+                }
+            }
+
+            // Resting Orders
+            if (restingOrdersLabel.Checked)
+            {
+                var restingOrdersPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    timePoints.Add(snapshot.Timestamp.ToOADate());
+                    restingOrdersPoints.Add(snapshot.RestingOrders?.Count ?? 0);
+                }
+
+                if (restingOrdersPoints.Count > 1)
+                {
+                    var restingOrdersScatter = priceChart.Plot.AddScatter(timePoints.ToArray(), restingOrdersPoints.ToArray(), Color.Sienna, 2);
+                    restingOrdersScatter.Label = "Resting Orders";
+                    legendItems.Add("Resting Orders");
+                }
+            }
+        }
+
+        private void PlotSupportResistance(List<string> legendItems)
+        {
+            double centerX = currentSnapshot.Timestamp.ToOADate();
+
+            // Support/Resistance Levels
+            if (supportLabel.Checked && currentSnapshot.AllSupportResistanceLevels != null)
+            {
+                int count = 0;
+                foreach (var level in currentSnapshot.AllSupportResistanceLevels)
+                {
+                    double levelPrice = level.Price; // Keep in pennies as-is
+                    var supportLine = priceChart.Plot.AddHorizontalLine(levelPrice, Color.DarkBlue, 1, ScottPlot.LineStyle.Dot);
+                    // Add text label for the first few levels to avoid clutter
+                    if (count < 3)
+                    {
+                        priceChart.Plot.AddText($"S/R: {levelPrice:F2}", centerX, levelPrice, 10, Color.DarkBlue);
+                    }
+                    count++;
+                }
+                legendItems.Add("Support/Resistance");
+            }
         }
 
         private void leftColumn_Paint(object sender, PaintEventArgs e)
