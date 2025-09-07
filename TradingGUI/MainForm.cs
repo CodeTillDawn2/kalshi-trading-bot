@@ -45,6 +45,11 @@ namespace SimulatorWinForms
             _simulator.OnTestProgress += msg => AppendLog(msg);
             _simulator.OnProfitLossUpdate += (m, pnl) => UpdatePnL(m, pnl);
             _simulator.OnMarketProcessed += m => AppendLog($"✔ Processed {m}");
+            // DISABLE ScottPlot's built-in pan/zoom to prevent conflicts
+            formsPlot1.Configuration.Pan = false;
+            formsPlot1.Configuration.Zoom = false;
+            formsPlot1.Configuration.ScrollWheelZoom = false;
+
             formsPlot1.MouseMove += FormsPlot1_MouseMove;
             formsPlot1.MouseLeave += FormsPlot1_MouseLeave;
 
@@ -87,6 +92,9 @@ namespace SimulatorWinForms
 
             // Add resize handler for dynamic scaling
             this.ResizeEnd += MainForm_ResizeEnd;
+
+            // Add activation handler to reset panning state
+            this.Activated += MainForm_Activated;
         }
 
         private void ResetPnLForMarkets(IEnumerable<string> markets)
@@ -241,8 +249,8 @@ namespace SimulatorWinForms
 
         private void FormsPlot1_MouseMove(object sender, MouseEventArgs e)
         {
-            // Right-drag panning
-            if (_isRightPanning && e.Button == MouseButtons.Right)
+            // Right-drag panning - only if both flag is set AND button is actually pressed
+            if (_isRightPanning && e.Button == MouseButtons.Right && Control.MouseButtons == MouseButtons.Right)
             {
                 // compute data-space deltas from pixel movement
                 double xNow = formsPlot1.Plot.GetCoordinateX(e.X);
@@ -261,6 +269,11 @@ namespace SimulatorWinForms
 
                 formsPlot1.Refresh();
                 return; // skip tooltip/hover while panning
+            }
+            else if (_isRightPanning && e.Button != MouseButtons.Right)
+            {
+                // If we were panning but right button is no longer pressed, reset state
+                ResetPanningState();
             }
 
             // if the right button is no longer held, end pan
@@ -308,8 +321,8 @@ namespace SimulatorWinForms
 
         private void FormsPlot1_MouseLeave(object sender, EventArgs e)
         {
-            _isRightPanning = false;
-            formsPlot1.Cursor = Cursors.Default;
+            // Reset panning state when mouse leaves the chart
+            ResetPanningState();
 
             _tooltipOverlay.Visible = false;
             _lastTooltipMemo = null;
@@ -605,6 +618,32 @@ namespace SimulatorWinForms
 
             // Refresh tooltip overlay font if needed
             _tooltipOverlay.Font = new Font(_tooltipOverlay.Font.FontFamily, 9f * scaleFactor);
+        }
+
+        private void ResetPanningState()
+        {
+            _isRightPanning = false;
+            formsPlot1.Cursor = Cursors.Default;
+            _panStartPx = Point.Empty;
+        }
+
+        private void MainForm_Activated(object sender, EventArgs e)
+        {
+            // Reset panning state when the form becomes active again
+            // This handles the case where user returns from snapshot viewer while still holding mouse button
+            ResetPanningState();
+
+            // Additional safeguard: use a timer to reset panning state after a short delay
+            // This handles edge cases where the mouse button state might not be properly detected
+            var timer = new System.Windows.Forms.Timer();
+            timer.Interval = 100; // 100ms delay
+            timer.Tick += (s, args) =>
+            {
+                ResetPanningState();
+                timer.Stop();
+                timer.Dispose();
+            };
+            timer.Start();
         }
 
         private async void btnRunML_Click(object sender, EventArgs e)

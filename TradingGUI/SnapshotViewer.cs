@@ -40,6 +40,15 @@ namespace SimulatorWinForms
             // Add resize handler for dynamic scaling
             this.Resize += SnapshotViewer_ResizeEnd;
 
+            // DISABLE ScottPlot's built-in pan/zoom to prevent conflicts with custom panning
+            priceChart.Configuration.Pan = false;
+            priceChart.Configuration.Zoom = false;
+            priceChart.Configuration.ScrollWheelZoom = false;
+
+            secondaryChart.Configuration.Pan = false;
+            secondaryChart.Configuration.Zoom = false;
+            secondaryChart.Configuration.ScrollWheelZoom = false;
+
             // Add chart synchronization
             SetupChartSynchronization();
 
@@ -174,18 +183,33 @@ namespace SimulatorWinForms
                 double dx = xNow - xStart;
                 double dy = yNow - yStart;
 
-                priceChart.Plot.SetAxisLimits(
-                    _priceChartPanStartLimits.xMin - dx,
-                    _priceChartPanStartLimits.xMax - dx,
-                    _priceChartPanStartLimits.yMin - dy,
-                    _priceChartPanStartLimits.yMax - dy);
-
-                priceChart.Refresh();
-
-                // Sync secondary chart if visible
-                if (secondaryChart.Visible)
+                // Use larger movement threshold to prevent micro-movements from causing updates
+                if (Math.Abs(dx) > 0.01 || Math.Abs(dy) > 0.01)
                 {
-                    SyncSecondaryChartToMain();
+                    // Temporarily disable secondary chart updates to prevent interference
+                    bool wasSecondaryVisible = secondaryChart.Visible;
+                    if (wasSecondaryVisible)
+                    {
+                        secondaryChart.Visible = false;
+                    }
+
+                    priceChart.Plot.SetAxisLimits(
+                        _priceChartPanStartLimits.xMin - dx,
+                        _priceChartPanStartLimits.xMax - dx,
+                        _priceChartPanStartLimits.yMin - dy,
+                        _priceChartPanStartLimits.yMax - dy);
+
+                    // Single refresh to minimize flicker
+                    priceChart.Refresh();
+
+                    // Re-enable and sync secondary chart if it was visible
+                    if (wasSecondaryVisible)
+                    {
+                        secondaryChart.Visible = true;
+                        var mainLimits = priceChart.Plot.GetAxisLimits();
+                        secondaryChart.Plot.SetAxisLimitsX(mainLimits.XMin, mainLimits.XMax);
+                        secondaryChart.Refresh();
+                    }
                 }
             }
         }
@@ -226,18 +250,34 @@ namespace SimulatorWinForms
                 double dx = xNow - xStart;
                 double dy = yNow - yStart;
 
-                secondaryChart.Plot.SetAxisLimits(
-                    _secondaryChartPanStartLimits.xMin - dx,
-                    _secondaryChartPanStartLimits.xMax - dx,
-                    _secondaryChartPanStartLimits.yMin - dy,
-                    _secondaryChartPanStartLimits.yMax - dy);
+                // Use larger movement threshold to prevent micro-movements from causing updates
+                if (Math.Abs(dx) > 0.01 || Math.Abs(dy) > 0.01)
+                {
+                    // Temporarily disable main chart updates to prevent interference
+                    bool wasMainVisible = priceChart.Visible;
+                    if (wasMainVisible)
+                    {
+                        priceChart.Visible = false;
+                    }
 
-                secondaryChart.Refresh();
+                    secondaryChart.Plot.SetAxisLimits(
+                        _secondaryChartPanStartLimits.xMin - dx,
+                        _secondaryChartPanStartLimits.xMax - dx,
+                        _secondaryChartPanStartLimits.yMin - dy,
+                        _secondaryChartPanStartLimits.yMax - dy);
 
-                // Sync main chart
-                var secLimits = secondaryChart.Plot.GetAxisLimits();
-                priceChart.Plot.SetAxisLimitsX(secLimits.XMin, secLimits.XMax);
-                priceChart.Refresh();
+                    // Single refresh to minimize flicker
+                    secondaryChart.Refresh();
+
+                    // Re-enable and sync main chart if it was visible
+                    if (wasMainVisible)
+                    {
+                        priceChart.Visible = true;
+                        var secLimits = secondaryChart.Plot.GetAxisLimits();
+                        priceChart.Plot.SetAxisLimitsX(secLimits.XMin, secLimits.XMax);
+                        priceChart.Refresh();
+                    }
+                }
             }
         }
 
@@ -695,7 +735,7 @@ namespace SimulatorWinForms
 
                 if (hasSecondaryMetrics)
                 {
-                    // Render secondary chart metrics
+                    // Render secondary chart metrics with full context
                     RenderSecondaryMetrics(secondaryChart);
 
                     // Adjust main chart size to 3/4 when secondary chart is visible
@@ -742,10 +782,10 @@ namespace SimulatorWinForms
                     priceChart.Plot.SetAxisLimitsX(snapshotTimeOADate - spanDays / 2, snapshotTimeOADate + spanDays / 2);
                     priceChart.Plot.AxisAutoY();
 
-                    // Sync secondary chart if visible
+                    // Sync secondary chart if visible - show full context, don't zoom
                     if (hasSecondaryMetrics)
                     {
-                        secondaryChart.Plot.SetAxisLimitsX(snapshotTimeOADate - spanDays / 2, snapshotTimeOADate + spanDays / 2);
+                        secondaryChart.Plot.AxisAutoX(); // Show full context
                         secondaryChart.Plot.AxisAutoY();
                     }
                 }
@@ -1483,9 +1523,10 @@ namespace SimulatorWinForms
                 chart.Plot.Legend(location: ScottPlot.Alignment.UpperRight);
             }
 
-            // Set up secondary chart axes - only set Y-axis auto, preserve X-axis from sync
+            // Set up secondary chart axes - show full context, don't zoom to current snapshot
             chart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
-            chart.Plot.AxisAutoY(); // Only auto-scale Y-axis
+            chart.Plot.AxisAutoX(); // Auto-scale X-axis to show full context
+            chart.Plot.AxisAutoY(); // Auto-scale Y-axis
         }
 
         private bool HasSecondaryMetricsChecked()
