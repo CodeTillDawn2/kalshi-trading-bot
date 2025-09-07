@@ -501,11 +501,11 @@ namespace TradingStrategies
                     {
                         remainingRisk -= fill * levelPrice;
                         remainingCash -= fill * levelPrice;
-                        // For accounting: Long positions pay money, Short positions receive money
-                        if (longSide)
-                            path.TotalPaid += fill * levelPrice;
-                        else
+                        // For shorts: we receive money (opposite of longs)
+                        if (shortSide)
                             path.TotalReceived += fill * levelPrice;
+                        else
+                            path.TotalPaid += fill * levelPrice;
                     }
                     else
                     {

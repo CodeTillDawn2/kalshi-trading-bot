@@ -56,7 +56,8 @@ namespace SimulatorWinForms
             secondaryChart.Configuration.Zoom = false;
             secondaryChart.Configuration.ScrollWheelZoom = false;
 
-            // Add mouse wheel zoom for secondary chart
+            // Add mouse wheel zoom for both charts
+            priceChart.MouseWheel += PriceChart_MouseWheel;
             secondaryChart.MouseWheel += SecondaryChart_MouseWheel;
 
             // Initialize navigation timer for deferred updates
@@ -351,6 +352,60 @@ namespace SimulatorWinForms
                     _navigationStepSize = 1;
                 }
             }
+        }
+
+        private void PriceChart_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (currentSnapshot == null || !_fullDataRange.HasValue) return;
+
+            // Get current limits
+            var currentLimits = priceChart.Plot.GetAxisLimits();
+
+            // Calculate zoom factor (smaller steps for finer control)
+            double zoomFactor = e.Delta > 0 ? 0.9 : 1.1; // Zoom in on scroll up, out on scroll down
+
+            // Calculate new X range
+            double currentSpan = currentLimits.XMax - currentLimits.XMin;
+            double newSpan = currentSpan * zoomFactor;
+
+            // Don't allow zooming out past full data range
+            double fullDataSpan = _fullDataRange.Value.xMax - _fullDataRange.Value.xMin;
+            if (newSpan > fullDataSpan)
+            {
+                newSpan = fullDataSpan;
+            }
+
+            // Try to center on the snapshot time (black line)
+            double snapshotTime = currentSnapshot.Timestamp.ToOADate();
+            double desiredXMin = snapshotTime - newSpan / 2;
+            double desiredXMax = snapshotTime + newSpan / 2;
+
+            // If centering on snapshot would go outside data bounds, adjust the center
+            double newXMin, newXMax;
+
+            if (desiredXMin < _fullDataRange.Value.xMin)
+            {
+                // Would go too far left, so center as far left as possible
+                newXMin = _fullDataRange.Value.xMin;
+                newXMax = newXMin + newSpan;
+            }
+            else if (desiredXMax > _fullDataRange.Value.xMax)
+            {
+                // Would go too far right, so center as far right as possible
+                newXMax = _fullDataRange.Value.xMax;
+                newXMin = newXMax - newSpan;
+            }
+            else
+            {
+                // Can center on snapshot perfectly
+                newXMin = desiredXMin;
+                newXMax = desiredXMax;
+            }
+
+            // Apply new limits
+            priceChart.Plot.SetAxisLimitsX(newXMin, newXMax);
+            priceChart.Plot.AxisAutoY(); // Keep Y-axis auto-scaled
+            priceChart.Refresh();
         }
 
         private void SecondaryChart_MouseWheel(object sender, MouseEventArgs e)
@@ -1385,6 +1440,14 @@ namespace SimulatorWinForms
             chart.Plot.SetAxisLimitsX(centerX - spanDays / 2, centerX + spanDays / 2);
             chart.Plot.AxisAutoY();  // Auto-scale Y-axis
             chart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
+
+            // Store full data range for zoom bounds
+            if (!_fullDataRange.HasValue && historySnapshots != null && historySnapshots.Count > 0)
+            {
+                double minTime = historySnapshots.Min(s => s.Timestamp.ToOADate());
+                double maxTime = historySnapshots.Max(s => s.Timestamp.ToOADate());
+                _fullDataRange = (minTime, maxTime);
+            }
         }
 
         private void RenderFromSnapshotData(ScottPlot.FormsPlot chart)
