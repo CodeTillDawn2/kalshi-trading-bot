@@ -49,6 +49,14 @@ namespace SimulatorWinForms
             secondaryChart.Configuration.Zoom = false;
             secondaryChart.Configuration.ScrollWheelZoom = false;
 
+            // Add mouse wheel zoom for secondary chart
+            secondaryChart.MouseWheel += SecondaryChart_MouseWheel;
+
+            // Initialize navigation timer for deferred updates
+            _navigationTimer = new System.Windows.Forms.Timer();
+            _navigationTimer.Interval = 300; // 300ms delay after user stops pressing keys
+            _navigationTimer.Tick += NavigationTimer_Tick;
+
             // Add chart synchronization
             SetupChartSynchronization();
 
@@ -66,16 +74,8 @@ namespace SimulatorWinForms
 
         private void SetupChartSynchronization()
         {
-            // Only sync when mouse is released on the main chart (after zoom/pan operations)
-            // Removed the timer to improve arrow key navigation responsiveness
-            priceChart.MouseUp += (sender, args) =>
-            {
-                if (secondaryChart.Visible)
-                {
-                    // Only sync X-axis for secondary chart to maintain full context
-                    SyncSecondaryChartXAxisOnly();
-                }
-            };
+            // Removed synchronization with secondary chart on mouse up
+            // Secondary chart now maintains its own independent view
         }
 
         private void SetupChartPanning()
@@ -105,54 +105,18 @@ namespace SimulatorWinForms
         }
 
         private (double xMin, double xMax, double yMin, double yMax)? _lastMainLimits;
+        private (double xMin, double xMax)? _fullDataRange; // Store full data range for zoom bounds
+        private System.Windows.Forms.Timer _navigationTimer; // Timer for deferred chart updates during navigation
+        private bool _isNavigating = false; // Flag to track if user is actively navigating
 
-        private void CheckAndSyncSecondaryChart()
-        {
-            var currentLimits = priceChart.Plot.GetAxisLimits();
+        // Progressive speed navigation fields
+        private int _consecutiveNavigations = 0; // Track consecutive navigation steps
+        private DateTime _lastNavigationTime = DateTime.MinValue; // Track timing for speed acceleration
+        private int _navigationStepSize = 1; // Current step size (1, 2, 5, or 60)
 
-            // Check if the X-axis limits have changed significantly
-            if (_lastMainLimits == null ||
-                Math.Abs(currentLimits.XMin - _lastMainLimits.Value.xMin) > 0.0001 ||
-                Math.Abs(currentLimits.XMax - _lastMainLimits.Value.xMax) > 0.0001)
-            {
-                _lastMainLimits = (currentLimits.XMin, currentLimits.XMax, currentLimits.YMin, currentLimits.YMax);
-                SyncSecondaryChartToMain();
-            }
-        }
+        // Removed CheckAndSyncSecondaryChart method - secondary chart now independent
 
-        private void SyncSecondaryChartToMain()
-        {
-            if (!secondaryChart.Visible) return;
-
-            // Get the current axis limits from the main chart
-            var mainLimits = priceChart.Plot.GetAxisLimits();
-
-            // Apply the same X-axis limits to the secondary chart
-            secondaryChart.Plot.SetAxisLimitsX(mainLimits.XMin, mainLimits.XMax);
-
-            // Auto-scale the Y-axis for the secondary chart to fit visible data
-            secondaryChart.Plot.AxisAutoY();
-
-            // Refresh the secondary chart
-            secondaryChart.Refresh();
-        }
-
-        private void SyncSecondaryChartXAxisOnly()
-        {
-            if (!secondaryChart.Visible) return;
-
-            // Get the current X-axis limits from the main chart
-            var mainLimits = priceChart.Plot.GetAxisLimits();
-
-            // Apply only the X-axis limits to the secondary chart (keep full Y context)
-            secondaryChart.Plot.SetAxisLimitsX(mainLimits.XMin, mainLimits.XMax);
-
-            // Keep the full Y-axis context for secondary chart
-            secondaryChart.Plot.AxisAutoY();
-
-            // Refresh the secondary chart
-            secondaryChart.Refresh();
-        }
+        // Removed SyncSecondaryChart methods - secondary chart now independent
 
         // Panning support for snapshot viewer charts
         private bool _isPriceChartPanning = false;
@@ -193,13 +157,6 @@ namespace SimulatorWinForms
                 // Use smaller movement threshold for more responsive panning
                 if (Math.Abs(dx) > 0.001 || Math.Abs(dy) > 0.001)
                 {
-                    // Temporarily disable secondary chart updates to prevent interference
-                    bool wasSecondaryVisible = secondaryChart.Visible;
-                    if (wasSecondaryVisible)
-                    {
-                        secondaryChart.Visible = false;
-                    }
-
                     priceChart.Plot.SetAxisLimits(
                         _priceChartPanStartLimits.xMin - dx,
                         _priceChartPanStartLimits.xMax - dx,
@@ -208,15 +165,6 @@ namespace SimulatorWinForms
 
                     // Single refresh to minimize flicker
                     priceChart.Refresh();
-
-                    // Re-enable and sync secondary chart if it was visible
-                    if (wasSecondaryVisible)
-                    {
-                        secondaryChart.Visible = true;
-                        var mainLimits = priceChart.Plot.GetAxisLimits();
-                        secondaryChart.Plot.SetAxisLimitsX(mainLimits.XMin, mainLimits.XMax);
-                        secondaryChart.Refresh();
-                    }
                 }
             }
         }
@@ -283,16 +231,112 @@ namespace SimulatorWinForms
             }
         }
 
+        private void SecondaryChart_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (currentSnapshot == null || !_fullDataRange.HasValue) return;
+
+            // Get current limits
+            var currentLimits = secondaryChart.Plot.GetAxisLimits();
+
+            // Calculate zoom factor (smaller steps for finer control)
+            double zoomFactor = e.Delta > 0 ? 0.9 : 1.1; // Zoom in on scroll up, out on scroll down
+
+            // Calculate new X range
+            double currentSpan = currentLimits.XMax - currentLimits.XMin;
+            double newSpan = currentSpan * zoomFactor;
+
+            // Don't allow zooming out past full data range
+            double fullDataSpan = _fullDataRange.Value.xMax - _fullDataRange.Value.xMin;
+            if (newSpan > fullDataSpan)
+            {
+                newSpan = fullDataSpan;
+            }
+
+            // Try to center on the snapshot time (black line)
+            double snapshotTime = currentSnapshot.Timestamp.ToOADate();
+            double desiredXMin = snapshotTime - newSpan / 2;
+            double desiredXMax = snapshotTime + newSpan / 2;
+
+            // If centering on snapshot would go outside data bounds, adjust the center
+            double newXMin, newXMax;
+
+            if (desiredXMin < _fullDataRange.Value.xMin)
+            {
+                // Would go too far left, so center as far left as possible
+                newXMin = _fullDataRange.Value.xMin;
+                newXMax = newXMin + newSpan;
+            }
+            else if (desiredXMax > _fullDataRange.Value.xMax)
+            {
+                // Would go too far right, so center as far right as possible
+                newXMax = _fullDataRange.Value.xMax;
+                newXMin = newXMax - newSpan;
+            }
+            else
+            {
+                // Can center on snapshot perfectly
+                newXMin = desiredXMin;
+                newXMax = desiredXMax;
+            }
+
+            // Apply new limits
+            secondaryChart.Plot.SetAxisLimitsX(newXMin, newXMax);
+            secondaryChart.Plot.AxisAutoY(); // Keep Y-axis auto-scaled
+            secondaryChart.Refresh();
+        }
+
+        private void NavigationTimer_Tick(object sender, EventArgs e)
+        {
+            // Stop the timer and reset navigation flag
+            _navigationTimer.Stop();
+            _isNavigating = false;
+
+            // Reset navigation speed counters when user stops
+            _consecutiveNavigations = 0;
+            _navigationStepSize = 1;
+
+            // Perform only the expensive chart operations (metrics, secondary chart rendering)
+            UpdateChartsExpensive();
+        }
+
+        private void UpdateChartsExpensive()
+        {
+            if (currentSnapshot == null) return;
+
+            // Only update the expensive chart rendering parts
+            // Clear and re-render metrics and secondary chart data
+            priceChart.Plot.Clear();
+            RenderBasePriceData(priceChart);
+            RenderY1Metrics(priceChart);
+            UpdateChartLegends();
+
+            if (secondaryChart.Visible)
+            {
+                secondaryChart.Plot.Clear();
+                RenderSecondaryMetrics(secondaryChart);
+            }
+
+            // Refresh both charts
+            priceChart.Refresh();
+            if (secondaryChart.Visible)
+            {
+                secondaryChart.Refresh();
+            }
+
+            // Force layout update
+            chartLayout.PerformLayout();
+        }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Left)
             {
-                Navigate(-1);
+                NavigateFast(-1);
                 return true;  // Mark as handled to prevent further propagation
             }
             else if (keyData == Keys.Right)
             {
-                Navigate(1);
+                NavigateFast(1);
                 return true;  // Mark as handled
             }
             return base.ProcessCmdKey(ref msg, keyData);  // Allow other keys to pass through
@@ -377,30 +421,232 @@ namespace SimulatorWinForms
 
         // Removed SnapshotViewer_KeyDown (handled by parent form)
 
+
         private void Navigate(int delta)
+        {
+            // Use the fast navigation approach for better performance
+            NavigateFast(delta);
+        }
+
+        private void NavigateFast(int delta)
         {
             if (historySnapshots == null || historySnapshots.Count == 0) return;
 
-            int newIndex = currentIndex + delta;
-            if (newIndex < 0 || newIndex >= historySnapshots.Count) return;
+            // Calculate progressive step size based on consecutive navigations
+            int stepSize = CalculateNavigationStepSize();
 
+            // Apply the step size to the delta
+            int actualDelta = delta * stepSize;
+
+            int newIndex = currentIndex + actualDelta;
+            if (newIndex < 0) newIndex = 0;
+            if (newIndex >= historySnapshots.Count) newIndex = historySnapshots.Count - 1;
+
+            // If we're at the boundary, don't count this as a consecutive navigation
+            if (newIndex == currentIndex) return;
+
+            // Update the data immediately
             currentIndex = newIndex;
             currentSnapshot = historySnapshots[currentIndex];
             memoText = memos[newIndex];
-            UpdateUIFromSnapshot();  // Full UI update
+
+            // Immediately update all UI elements (fast operations)
+            UpdateUIFast();
+
+            // Start navigation mode and reset timer for expensive operations
+            _isNavigating = true;
+            _navigationTimer.Stop();
+            _navigationTimer.Start();
+        }
+
+        private int CalculateNavigationStepSize()
+        {
+            DateTime now = DateTime.Now;
+
+            // Reset consecutive count if too much time has passed
+            if ((now - _lastNavigationTime).TotalMilliseconds > 500)
+            {
+                _consecutiveNavigations = 0;
+                _navigationStepSize = 1;
+            }
+
+            _consecutiveNavigations++;
+            _lastNavigationTime = now;
+
+            // Progressive speed based on consecutive navigations
+            if (_consecutiveNavigations >= 60)
+            {
+                _navigationStepSize = 60; // Jump 60 bars at a time
+            }
+            else if (_consecutiveNavigations >= 15)
+            {
+                _navigationStepSize = 5; // Jump 5 bars at a time
+            }
+            else if (_consecutiveNavigations >= 5)
+            {
+                _navigationStepSize = 2; // Jump 2 bars at a time
+            }
+            else
+            {
+                _navigationStepSize = 1; // Normal speed
+            }
+
+            return _navigationStepSize;
+        }
+
+        private void UpdateUIFast()
+        {
+            if (currentSnapshot == null) return;
+
+            // Update strategy output immediately
+            strategyOutputTextbox.Text = memoText;
+
+            // Update price display elements
+            allTimeHighAskPrice.Text = currentSnapshot.AllTimeHighNo_Bid.Bid.ToString();
+            allTimeHighAskTime.Text = currentSnapshot.AllTimeHighNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            allTimeHighBidPrice.Text = currentSnapshot.AllTimeHighYes_Bid.Bid.ToString();
+            allTimeHighBidTime.Text = currentSnapshot.AllTimeHighYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
+
+            recentHighAskPrice.Text = currentSnapshot.RecentHighNo_Bid.Bid.ToString();
+            recentHighAskTime.Text = currentSnapshot.RecentHighNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            recentHighBidPrice.Text = currentSnapshot.RecentHighYes_Bid.Bid.ToString();
+            recentHighBidTime.Text = currentSnapshot.RecentHighYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
+
+            currentPriceAsk.Text = currentSnapshot.BestNoBid.ToString();
+            currentPriceBid.Text = currentSnapshot.BestYesBid.ToString();
+
+            recentLowAskPrice.Text = currentSnapshot.RecentLowNo_Bid.Bid.ToString();
+            recentLowAskTime.Text = currentSnapshot.RecentLowNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            recentLowBidPrice.Text = currentSnapshot.RecentLowYes_Bid.Bid.ToString();
+            recentLowBidTime.Text = currentSnapshot.RecentLowYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
+
+            allTimeLowAskPrice.Text = currentSnapshot.AllTimeLowNo_Bid.Bid.ToString();
+            allTimeLowAskTime.Text = currentSnapshot.AllTimeLowNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
+            allTimeLowBidPrice.Text = currentSnapshot.AllTimeLowYes_Bid.Bid.ToString();
+            allTimeLowBidTime.Text = currentSnapshot.AllTimeLowYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
+
+            // Update trading metrics
+            rsiValue.Text = currentSnapshot.RSI_Medium?.ToString("F2") ?? "--";
+            macdValue.Text = currentSnapshot.MACD_Medium.MACD.HasValue ? $"MACD: {currentSnapshot.MACD_Medium.MACD:F2}, Sig: {currentSnapshot.MACD_Medium.Signal:F2}, Hist: {currentSnapshot.MACD_Medium.Histogram:F2}" : "--";
+            emaValue.Text = currentSnapshot.EMA_Medium?.ToString("F2") ?? "--";
+            bollingerValue.Text = currentSnapshot.BollingerBands_Medium.Lower.HasValue ? $"L: {currentSnapshot.BollingerBands_Medium.Lower:F2}, M: {currentSnapshot.BollingerBands_Medium.Middle:F2}, U: {currentSnapshot.BollingerBands_Medium.Upper:F2}" : "--";
+            atrValue.Text = currentSnapshot.ATR_Medium?.ToString("F2") ?? "--";
+            vwapValue.Text = currentSnapshot.VWAP_Medium?.ToString("F2") ?? "--";
+            stochasticValue.Text = currentSnapshot.StochasticOscillator_Medium.K.HasValue ? $"K: {currentSnapshot.StochasticOscillator_Medium.K:F2}, D: {currentSnapshot.StochasticOscillator_Medium.D:F2}" : "--";
+            obvValue.Text = currentSnapshot.OBV_Medium.ToString();
+            psarValue.Text = currentSnapshot.PSAR.ToString() ?? "--";
+            adxValue.Text = currentSnapshot.ADX.ToString() ?? "--";
+            supportValue.Text = currentSnapshot.AllSupportResistanceLevels.Count != 1 ? currentSnapshot.AllSupportResistanceLevels.Count.ToString()
+                : $"{currentSnapshot.AllSupportResistanceLevels.First().Price}";
+
+            // Update other info
+            chartHeader.Text = currentSnapshot.MarketTicker ?? "--";
+            categoryValue.Text = currentSnapshot.MarketCategory ?? "--";
+            timeLeftValue.Text = FormatTimeSpan(currentSnapshot.TimeLeft);
+            marketAgeValue.Text = FormatTimeSpan(currentSnapshot.MarketAge);
+
+            // Update flow/momentum values
+            topVelocityYesValue.Text = currentSnapshot.VelocityPerMinute_Top_Yes_Bid.ToString("F2");
+            topVelocityNoValue.Text = currentSnapshot.VelocityPerMinute_Top_No_Bid.ToString("F2");
+            bottomVelocityYesValue.Text = currentSnapshot.VelocityPerMinute_Bottom_Yes_Bid.ToString("F2");
+            bottomVelocityNoValue.Text = currentSnapshot.VelocityPerMinute_Bottom_No_Bid.ToString("F2");
+            netOrderRateYesValue.Text = currentSnapshot.TradeRatePerMinute_Yes.ToString("F2");
+            netOrderRateNoValue.Text = currentSnapshot.TradeRatePerMinute_No.ToString("F2");
+            tradeVolumeYesValue.Text = currentSnapshot.TradeVolumePerMinute_Yes.ToString("F2");
+            tradeVolumeNoValue.Text = currentSnapshot.TradeVolumePerMinute_No.ToString("F2");
+            avgTradeSizeYesValue.Text = currentSnapshot.AverageTradeSize_Yes.ToString("F2");
+            avgTradeSizeNoValue.Text = currentSnapshot.AverageTradeSize_No.ToString("F2");
+            slopeYesValue.Text = currentSnapshot.YesBidSlopePerMinute_Short.ToString("F2") ?? "--";
+            slopeNoValue.Text = currentSnapshot.NoBidSlopePerMinute_Short.ToString("F2") ?? "--";
+
+            // Update context values
+            spreadValue.Text = currentSnapshot.YesSpread.ToString();
+
+            double imbalance = 1;
+            if (currentSnapshot.TotalOrderbookDepth_Yes == 0 || currentSnapshot.TotalOrderbookDepth_No == 0)
+            {
+                imbalance = 0;
+            }
+            else
+            {
+                imbalance = Math.Round((double)currentSnapshot.TotalOrderbookDepth_Yes / currentSnapshot.TotalOrderbookDepth_No, 2);
+            }
+            imbalValue.Text = imbalance.ToString();
+            depthTop4YesValue.Text = currentSnapshot.DepthAtTop4YesBids.ToString();
+            depthTop4NoValue.Text = currentSnapshot.DepthAtTop4NoBids.ToString();
+            totalDepthYesValue.Text = currentSnapshot.TotalOrderbookDepth_Yes.ToString();
+            totalDepthNoValue.Text = currentSnapshot.TotalOrderbookDepth_No.ToString();
+            centerMassYesValue.Text = currentSnapshot.YesBidCenterOfMass.ToString("F2");
+            centerMassNoValue.Text = currentSnapshot.NoBidCenterOfMass.ToString("F2");
+            totalContractsYesValue.Text = currentSnapshot.TotalBidContracts_Yes.ToString();
+            totalContractsNoValue.Text = currentSnapshot.TotalBidContracts_No.ToString();
+
+            // Update positions
+            positionSizeValue.Text = currentSnapshot.PositionSize.ToString();
+            lastTradeValue.Text = currentSnapshot.TotalTraded.ToString();
+            positionRoiValue.Text = currentSnapshot.PositionROI.ToString("F2");
+            buyinPriceValue.Text = currentSnapshot.BuyinPrice.ToString("F2");
+            positionUpsideValue.Text = currentSnapshot.PositionUpside.ToString("F2");
+            positionDownsideValue.Text = currentSnapshot.PositionDownside.ToString("F2");
+            restingOrdersValue.Text = currentSnapshot.RestingOrders?.Count.ToString() ?? "0";
+            simulatedPositionValue.Text = "??";
+
+            // Immediately move the vertical line (fast operation)
+            MoveVerticalLineImmediately();
+        }
+
+        private void MoveVerticalLineImmediately()
+        {
+            if (currentSnapshot == null) return;
+
+            double centerX = currentSnapshot.Timestamp.ToOADate();
+
+            // Remove existing vertical lines immediately
+            var mainPlottables = priceChart.Plot.GetPlottables().ToList();
+            for (int i = mainPlottables.Count - 1; i >= 0; i--)
+            {
+                var plottable = mainPlottables[i];
+                // Check for ScottPlot vertical line types
+                if (plottable.GetType().Name.Contains("VerticalLine") ||
+                    plottable.GetType().FullName.Contains("VerticalLine") ||
+                    plottable.ToString().Contains("Vertical"))
+                {
+                    priceChart.Plot.Remove(plottable);
+                }
+            }
+
+            // Add fresh vertical line
+            priceChart.Plot.AddVerticalLine(centerX, Color.Black, 2);
+
+            // Same for secondary chart
+            if (secondaryChart.Visible)
+            {
+                var secondaryPlottables = secondaryChart.Plot.GetPlottables().ToList();
+                for (int i = secondaryPlottables.Count - 1; i >= 0; i--)
+                {
+                    var plottable = secondaryPlottables[i];
+                    if (plottable.GetType().Name.Contains("VerticalLine") ||
+                        plottable.GetType().FullName.Contains("VerticalLine") ||
+                        plottable.ToString().Contains("Vertical"))
+                    {
+                        secondaryChart.Plot.Remove(plottable);
+                    }
+                }
+                secondaryChart.Plot.AddVerticalLine(centerX, Color.Black, 2);
+            }
+
+            // Fast refresh
+            priceChart.Refresh();
+            if (secondaryChart.Visible)
+            {
+                secondaryChart.Refresh();
+            }
         }
 
         public void NavigateSnapshot(int delta)
         {
-            // Updated to use currentIndex for consistency and reliability
-            if (historySnapshots == null || historySnapshots.Count == 0) return;
-
-            int newIndex = currentIndex + delta;
-            if (newIndex < 0 || newIndex >= historySnapshots.Count) return;
-
-            currentIndex = newIndex;
-            currentSnapshot = historySnapshots[newIndex];
-            UpdateUIFromSnapshot();  // Full UI update
+            // Use fast navigation for better performance
+            NavigateFast(delta);
         }
 
         public void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history, List<string> memosList)
@@ -472,99 +718,8 @@ namespace SimulatorWinForms
                 UpdateChart();
             }
 
-            strategyOutputTextbox.Text = memoText;
-
-            // Populate other UI elements based on actual MarketSnapshot properties
-            // Prices section (mapping "Ask" to No_Bid properties, "Bid" to Yes_Bid properties)
-            allTimeHighAskPrice.Text = currentSnapshot.AllTimeHighNo_Bid.Bid.ToString();
-            allTimeHighAskTime.Text = currentSnapshot.AllTimeHighNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
-            allTimeHighBidPrice.Text = currentSnapshot.AllTimeHighYes_Bid.Bid.ToString();
-            allTimeHighBidTime.Text = currentSnapshot.AllTimeHighYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
-
-            recentHighAskPrice.Text = currentSnapshot.RecentHighNo_Bid.Bid.ToString();
-            recentHighAskTime.Text = currentSnapshot.RecentHighNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
-            recentHighBidPrice.Text = currentSnapshot.RecentHighYes_Bid.Bid.ToString();
-            recentHighBidTime.Text = currentSnapshot.RecentHighYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
-
-            currentPriceAsk.Text = currentSnapshot.BestNoBid.ToString();
-            currentPriceBid.Text = currentSnapshot.BestYesBid.ToString();
-
-            recentLowAskPrice.Text = currentSnapshot.RecentLowNo_Bid.Bid.ToString();
-            recentLowAskTime.Text = currentSnapshot.RecentLowNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
-            recentLowBidPrice.Text = currentSnapshot.RecentLowYes_Bid.Bid.ToString();
-            recentLowBidTime.Text = currentSnapshot.RecentLowYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
-
-            allTimeLowAskPrice.Text = currentSnapshot.AllTimeLowNo_Bid.Bid.ToString();
-            allTimeLowAskTime.Text = currentSnapshot.AllTimeLowNo_Bid.When.ToString("yyyy-MM-dd HH:mm");
-            allTimeLowBidPrice.Text = currentSnapshot.AllTimeLowYes_Bid.Bid.ToString();
-            allTimeLowBidTime.Text = currentSnapshot.AllTimeLowYes_Bid.When.ToString("yyyy-MM-dd HH:mm");
-
-            // Trading metrics (using medium timeframe where applicable)
-            rsiValue.Text = currentSnapshot.RSI_Medium?.ToString("F2") ?? "--";
-            macdValue.Text = currentSnapshot.MACD_Medium.MACD.HasValue ? $"MACD: {currentSnapshot.MACD_Medium.MACD:F2}, Sig: {currentSnapshot.MACD_Medium.Signal:F2}, Hist: {currentSnapshot.MACD_Medium.Histogram:F2}" : "--";
-            emaValue.Text = currentSnapshot.EMA_Medium?.ToString("F2") ?? "--";
-            bollingerValue.Text = currentSnapshot.BollingerBands_Medium.Lower.HasValue ? $"L: {currentSnapshot.BollingerBands_Medium.Lower:F2}, M: {currentSnapshot.BollingerBands_Medium.Middle:F2}, U: {currentSnapshot.BollingerBands_Medium.Upper:F2}" : "--";
-            atrValue.Text = currentSnapshot.ATR_Medium?.ToString("F2") ?? "--";
-            vwapValue.Text = currentSnapshot.VWAP_Medium?.ToString("F2") ?? "--";
-            stochasticValue.Text = currentSnapshot.StochasticOscillator_Medium.K.HasValue ? $"K: {currentSnapshot.StochasticOscillator_Medium.K:F2}, D: {currentSnapshot.StochasticOscillator_Medium.D:F2}" : "--";
-            obvValue.Text = currentSnapshot.OBV_Medium.ToString();
-            psarValue.Text = currentSnapshot.PSAR.ToString() ?? "--";
-            adxValue.Text = currentSnapshot.ADX.ToString() ?? "--";
-            supportValue.Text = currentSnapshot.AllSupportResistanceLevels.Count != 1 ? currentSnapshot.AllSupportResistanceLevels.Count.ToString()
-                : $"{currentSnapshot.AllSupportResistanceLevels.First().Price}";
-
-            // Other info
-            chartHeader.Text = currentSnapshot.MarketTicker ?? "--";
-            categoryValue.Text = currentSnapshot.MarketCategory ?? "--";
-            timeLeftValue.Text = FormatTimeSpan(currentSnapshot.TimeLeft);
-            marketAgeValue.Text = FormatTimeSpan(currentSnapshot.MarketAge);
-
-            // Flow/Momentum (displaying Yes and No separately to match index.html)
-            topVelocityYesValue.Text = currentSnapshot.VelocityPerMinute_Top_Yes_Bid.ToString("F2");
-            topVelocityNoValue.Text = currentSnapshot.VelocityPerMinute_Top_No_Bid.ToString("F2");
-            bottomVelocityYesValue.Text = currentSnapshot.VelocityPerMinute_Bottom_Yes_Bid.ToString("F2");
-            bottomVelocityNoValue.Text = currentSnapshot.VelocityPerMinute_Bottom_No_Bid.ToString("F2");
-            netOrderRateYesValue.Text = currentSnapshot.TradeRatePerMinute_Yes.ToString("F2");
-            netOrderRateNoValue.Text = currentSnapshot.TradeRatePerMinute_No.ToString("F2");
-            tradeVolumeYesValue.Text = currentSnapshot.TradeVolumePerMinute_Yes.ToString("F2");
-            tradeVolumeNoValue.Text = currentSnapshot.TradeVolumePerMinute_No.ToString("F2");
-            avgTradeSizeYesValue.Text = currentSnapshot.AverageTradeSize_Yes.ToString("F2");
-            avgTradeSizeNoValue.Text = currentSnapshot.AverageTradeSize_No.ToString("F2");
-            slopeYesValue.Text = currentSnapshot.YesBidSlopePerMinute_Short.ToString("F2") ?? "--";
-            slopeNoValue.Text = currentSnapshot.NoBidSlopePerMinute_Short.ToString("F2") ?? "--";
-
-            // Context (displaying Yes and No separately where applicable to match index.html)
-            spreadValue.Text = currentSnapshot.YesSpread.ToString();
-
-            double imbalance = 1;
-            if (currentSnapshot.TotalOrderbookDepth_Yes == 0 || currentSnapshot.TotalOrderbookDepth_No == 0)
-            {
-                imbalance = 0;
-            }
-            else
-            {
-                imbalance = Math.Round((double)currentSnapshot.TotalOrderbookDepth_Yes / currentSnapshot.TotalOrderbookDepth_No, 2);
-            }
-            imbalValue.Text = imbalance.ToString();
-            depthTop4YesValue.Text = currentSnapshot.DepthAtTop4YesBids.ToString();
-            depthTop4NoValue.Text = currentSnapshot.DepthAtTop4NoBids.ToString();
-            totalDepthYesValue.Text = currentSnapshot.TotalOrderbookDepth_Yes.ToString();
-            totalDepthNoValue.Text = currentSnapshot.TotalOrderbookDepth_No.ToString();
-            centerMassYesValue.Text = currentSnapshot.YesBidCenterOfMass.ToString("F2");
-            centerMassNoValue.Text = currentSnapshot.NoBidCenterOfMass.ToString("F2");
-            totalContractsYesValue.Text = currentSnapshot.TotalBidContracts_Yes.ToString();
-            totalContractsNoValue.Text = currentSnapshot.TotalBidContracts_No.ToString();
-
-            // Positions
-            positionSizeValue.Text = currentSnapshot.PositionSize.ToString();
-            lastTradeValue.Text = currentSnapshot.TotalTraded.ToString();  // Using TotalTraded as proxy for last trade value
-            positionRoiValue.Text = currentSnapshot.PositionROI.ToString("F2");
-            buyinPriceValue.Text = currentSnapshot.BuyinPrice.ToString("F2");
-            positionUpsideValue.Text = currentSnapshot.PositionUpside.ToString("F2");
-            positionDownsideValue.Text = currentSnapshot.PositionDownside.ToString("F2");
-            restingOrdersValue.Text = currentSnapshot.RestingOrders?.Count.ToString() ?? "0";
-            simulatedPositionValue.Text = "??";
-
+            // Update all UI elements (fast operations)
+            UpdateUIFast();
         }
 
         private void UpdateChart()
@@ -624,11 +779,7 @@ namespace SimulatorWinForms
                 {
                     priceChart.Plot.SetAxisLimits(currentLimits.XMin, currentLimits.XMax, currentLimits.YMin, currentLimits.YMax);
 
-                    // Sync secondary chart if visible
-                    if (hasSecondaryMetrics)
-                    {
-                        SyncSecondaryChartToMain();
-                    }
+                    // Secondary chart maintains independent view
                 }
             }
 
@@ -754,11 +905,7 @@ namespace SimulatorWinForms
                     // User has manually zoomed/panned - restore their view
                     priceChart.Plot.SetAxisLimits(mainLimits.XMin, mainLimits.XMax, mainLimits.YMin, mainLimits.YMax);
 
-                    // Sync secondary chart if visible
-                    if (hasSecondaryMetrics)
-                    {
-                        SyncSecondaryChartToMain();
-                    }
+                    // Secondary chart maintains independent view
                 }
                 else
                 {
@@ -1061,7 +1208,7 @@ namespace SimulatorWinForms
             // Add legend if there are items
             if (legendItems.Any())
             {
-                chart.Plot.Legend(location: ScottPlot.Alignment.UpperRight);
+                chart.Plot.Legend(location: ScottPlot.Alignment.UpperLeft);
             }
         }
 
@@ -1544,13 +1691,21 @@ namespace SimulatorWinForms
             // Add legend if there are items
             if (legendItems.Any())
             {
-                chart.Plot.Legend(location: ScottPlot.Alignment.UpperRight);
+                chart.Plot.Legend(location: ScottPlot.Alignment.UpperLeft);
             }
 
             // Set up secondary chart axes - show full context, don't zoom to current snapshot
             chart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
             chart.Plot.AxisAutoX(); // Auto-scale X-axis to show full context
             chart.Plot.AxisAutoY(); // Auto-scale Y-axis
+
+            // Store full data range for zoom constraints (only if not already set)
+            if (!_fullDataRange.HasValue && historySnapshots != null && historySnapshots.Count > 0)
+            {
+                double minTime = historySnapshots.Min(s => s.Timestamp.ToOADate());
+                double maxTime = historySnapshots.Max(s => s.Timestamp.ToOADate());
+                _fullDataRange = (minTime, maxTime);
+            }
         }
 
         private bool HasSecondaryMetricsChecked()

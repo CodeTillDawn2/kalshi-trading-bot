@@ -17,6 +17,15 @@ namespace SimulatorWinForms
             {
                 components.Dispose();
             }
+
+            // Clean up navigation timer
+            if (_navigationTimer != null)
+            {
+                _navigationTimer.Stop();
+                _navigationTimer.Dispose();
+                _navigationTimer = null;
+            }
+
             base.Dispose(disposing);
         }
 
