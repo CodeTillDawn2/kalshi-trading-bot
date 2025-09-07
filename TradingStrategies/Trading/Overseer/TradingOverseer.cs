@@ -250,7 +250,8 @@ namespace TradingStrategies
                 AverageTradeSize_No = effectiveSnapshot.AverageTradeSize_No,
                 RestingYesBids = restingYes,
                 RestingNoBids = restingNo,
-                Memo = ""
+                Memo = "",
+                AverageCost = path.AverageCost
             };
 
             actionEvents.Add(eventLog);
@@ -370,7 +371,8 @@ namespace TradingStrategies
                 BidImbalance = effectiveSnapshot.BidCountImbalance,
                 RestingYesBids = restingYes,
                 RestingNoBids = restingNo,
-                Memo = decision.Memo
+                Memo = decision.Memo,
+                AverageCost = path.AverageCost
             };
 
             actionEvents.Add(eventLog);
@@ -499,6 +501,15 @@ namespace TradingStrategies
                     {
                         remainingRisk -= fill * levelPrice;
                         remainingCash -= fill * levelPrice;
+                        // For accounting: Long positions pay money, Short positions receive money
+                        if (longSide)
+                            path.TotalPaid += fill * levelPrice;
+                        else
+                            path.TotalReceived += fill * levelPrice;
+                    }
+                    else
+                    {
+                        path.TotalReceived += fill * levelPrice;
                     }
 
                     int effectiveTradePrice = isPaying ? (100 - p) : p;
@@ -720,7 +731,9 @@ namespace TradingStrategies
                     StartNoBid = firstSnapshot.BestNoBid,
                     EndYesBid = finalSnapshot.BestYesBid,
                     EndNoBid = finalSnapshot.BestNoBid,
-                    EndType = endType
+                    EndType = endType,
+                    SimulatedPosition = path.Position,
+                    AverageCost = path.AverageCost
                 };
 
                 pathData.Add((performance, eventLogs));

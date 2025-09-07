@@ -19,6 +19,8 @@ namespace TradingSimulator.TestObjects
     {
         public string Market { get; set; }
         public double PnL { get; set; }
+        public int SimulatedPosition { get; set; }
+        public double AverageCost { get; set; }
         public List<PricePoint> BidPoints { get; set; }
         public List<PricePoint> AskPoints { get; set; }
         public List<PricePoint> BuyPoints { get; set; }
@@ -27,6 +29,9 @@ namespace TradingSimulator.TestObjects
         public List<PricePoint> EventPoints { get; set; }
         public List<PricePoint> IntendedLongPoints { get; set; }
         public List<PricePoint> IntendedShortPoints { get; set; }
+        public List<PricePoint> PositionPoints { get; set; }
+        public List<PricePoint> AverageCostPoints { get; set; }
+        public List<PricePoint> RestingOrdersPoints { get; set; }
         public List<PricePoint> DiscrepancyPoints { get; set; } = new List<PricePoint>();  // NEW
     }
 

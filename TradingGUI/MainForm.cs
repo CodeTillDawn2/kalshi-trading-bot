@@ -127,7 +127,7 @@ namespace SimulatorWinForms
             dgvMarkets.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
             var checkCol = new DataGridViewCheckBoxColumn { Name = "CheckedCol", HeaderText = "✓", AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells };
-            var marketCol = new DataGridViewTextBoxColumn { Name = "Market", HeaderText = "Market", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 75 };
+            var marketCol = new DataGridViewTextBoxColumn { Name = "Market", HeaderText = "Market", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 50 };
             var pnlCol = new DataGridViewTextBoxColumn { Name = "PnL", HeaderText = "PnL", AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells };
             dgvMarkets.Columns.Add(checkCol);
             dgvMarkets.Columns.Add(marketCol);
@@ -175,7 +175,10 @@ namespace SimulatorWinForms
                             {
                                 var json = File.ReadAllText(canonical);
                                 var cd = JsonSerializer.Deserialize<CachedMarketData>(json);
-                                if (cd != null) pnlByBase[b] = cd.PnL;
+                                if (cd != null)
+                                {
+                                    pnlByBase[b] = cd.PnL;
+                                }
                                 continue;
                             }
 
@@ -187,21 +190,25 @@ namespace SimulatorWinForms
                                 {
                                     var pj = File.ReadAllText(p);
                                     var d = JsonSerializer.Deserialize<CachedMarketData>(pj);
-                                    if (d != null) sum += d.PnL;
+                                    if (d != null)
+                                    {
+                                        sum += d.PnL;
+                                    }
                                 }
                                 pnlByBase[b] = sum;
                             }
                         }
                         catch (Exception ex)
                         {
-                            AppendLog($"PnL enrich failed for {b}: {ex.Message}");
+                            AppendLog($"Cache enrich failed for {b}: {ex.Message}");
                         }
                     }
                 }
 
                 foreach (var b in bases.OrderBy(b => b))
                 {
-                    var row = dgvMarkets.Rows.Add(false, b, pnlByBase.TryGetValue(b, out var pnl) ? pnl.ToString("F2") : "");
+                    var pnlStr = pnlByBase.TryGetValue(b, out var pnl) ? pnl.ToString("F2") : "";
+                    var row = dgvMarkets.Rows.Add(false, b, pnlStr);
                     dgvMarkets.Rows[row].Cells["CheckedCol"].Value = _checkedMarketNames.Contains(b);
                 }
             }
@@ -542,7 +549,82 @@ namespace SimulatorWinForms
                 memosPerSnapshot.Add(joined);
             }
 
-            _snapshotViewer.Populate(closest, history, memosPerSnapshot);
+            // Load position, average cost, and resting orders data from cache
+            int simulatedPosition = 0;
+            double averageCost = 0.0;
+            int simulatedRestingOrders = 0;
+            List<PricePoint> positionPoints = new List<PricePoint>();
+            List<PricePoint> averageCostPoints = new List<PricePoint>();
+            List<PricePoint> restingOrdersPoints = new List<PricePoint>();
+            string marketName = closest.MarketTicker ?? "Unknown";
+            try
+            {
+                // Look for files with suffixes and use the most recent one
+                var pattern = $"{marketName}_*.json";
+                var matchingFiles = Directory.GetFiles(_cacheDir, pattern)
+                    .OrderByDescending(f => File.GetLastWriteTime(f))
+                    .ToList();
+
+                if (matchingFiles.Any())
+                {
+                    var json = File.ReadAllText(matchingFiles.First());
+                    var cd = JsonSerializer.Deserialize<CachedMarketData>(json);
+                    if (cd != null)
+                    {
+                        simulatedPosition = cd.SimulatedPosition;
+                        averageCost = cd.AverageCost;
+                        positionPoints = cd.PositionPoints ?? new List<PricePoint>();
+                        averageCostPoints = cd.AverageCostPoints ?? new List<PricePoint>();
+                        restingOrdersPoints = cd.RestingOrdersPoints ?? new List<PricePoint>();
+
+                        // Calculate simulated resting orders count for current snapshot
+                        if (restingOrdersPoints != null && restingOrdersPoints.Count > 0)
+                        {
+                            var matchingPoint = restingOrdersPoints.FirstOrDefault(p =>
+                                Math.Abs((p.Date - closest.Timestamp).TotalSeconds) < 1);
+                            if (matchingPoint != null)
+                            {
+                                simulatedRestingOrders = (int)matchingPoint.Price;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Fallback: try the canonical filename
+                    var canonical = Path.Combine(_cacheDir, $"{marketName}.json");
+                    if (File.Exists(canonical))
+                    {
+                        var json = File.ReadAllText(canonical);
+                        var cd = JsonSerializer.Deserialize<CachedMarketData>(json);
+                        if (cd != null)
+                        {
+                            simulatedPosition = cd.SimulatedPosition;
+                            averageCost = cd.AverageCost;
+                            positionPoints = cd.PositionPoints ?? new List<PricePoint>();
+                            averageCostPoints = cd.AverageCostPoints ?? new List<PricePoint>();
+                            restingOrdersPoints = cd.RestingOrdersPoints ?? new List<PricePoint>();
+
+                            // Calculate simulated resting orders count for current snapshot
+                            if (restingOrdersPoints != null && restingOrdersPoints.Count > 0)
+                            {
+                                var matchingPoint = restingOrdersPoints.FirstOrDefault(p =>
+                                    Math.Abs((p.Date - closest.Timestamp).TotalSeconds) < 1);
+                                if (matchingPoint != null)
+                                {
+                                    simulatedRestingOrders = (int)matchingPoint.Price;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendLog($"Failed to load position data for {marketName}: {ex.Message}");
+            }
+
+            _snapshotViewer.Populate(closest, history, memosPerSnapshot, simulatedPosition, averageCost, simulatedRestingOrders, positionPoints, averageCostPoints, restingOrdersPoints);
 
             // Set back action to switch back to main layout
             _snapshotViewer.BackAction = HideDashboard;

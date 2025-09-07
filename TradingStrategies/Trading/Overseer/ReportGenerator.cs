@@ -42,6 +42,7 @@ namespace TradingStrategies.Trading.Overseer
             public string RestingYesBids { get; set; } = "";  // Summary of resting bids on yes side, e.g., "price:qty, price:qty"
             public string RestingNoBids { get; set; } = "";   // Summary of resting bids on no side, e.g., "price:qty, price:qty"
             public string Memo { get; set; } = "";
+            public double AverageCost { get; set; } = 0.0;  // Average cost of the position
         }
 
         public class EventGroup
@@ -90,6 +91,8 @@ namespace TradingStrategies.Trading.Overseer
             public int EndYesBid { get; set; }
             public int EndNoBid { get; set; }
             public string EndType { get; set; }
+            public int SimulatedPosition { get; set; }
+            public double AverageCost { get; set; }
         }
 
         public string GenerateDetailedPerformanceReport(string marketId, List<EventLog> events, double initialCash, Dictionary<string, PathInfo> paths, bool writeToFile, string outputDir = @"C:\Users\Peter\Documents\GitHub\TestingOutput")

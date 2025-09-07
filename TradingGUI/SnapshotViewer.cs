@@ -2,6 +2,7 @@
 
 // SnapshotViewer.cs (replace the entire class with this updated version)
 using SmokehouseDTOs;
+using TradingSimulator.TestObjects;
 
 namespace SimulatorWinForms
 {
@@ -13,6 +14,12 @@ namespace SimulatorWinForms
         private List<string> memos;
         private string memoText = "";
         private bool _isEvaluatingChartFilters = false; // Flag to prevent conflicts between UpdateChart and EvaluateChartFilters
+        private int _simulatedPosition = 0;
+        private double _averageCost = 0.0;
+        private int _simulatedRestingOrders = 0;
+        private List<PricePoint> _positionPoints = new List<PricePoint>();
+        private List<PricePoint> _averageCostPoints = new List<PricePoint>();
+        private List<PricePoint> _restingOrdersPoints = new List<PricePoint>();
 
         public Action BackAction { get; set; }
 
@@ -332,6 +339,10 @@ namespace SimulatorWinForms
                     currentSnapshot = closestSnapshot;
                     memoText = memos != null && newIndex < memos.Count ? memos[newIndex] : "";
 
+                    // Update position and average cost for current snapshot
+                    _simulatedPosition = currentSnapshot.PositionSize;
+                    _averageCost = currentSnapshot.BuyinPrice;
+
                     // Update UI immediately
                     UpdateUIFast();
 
@@ -414,28 +425,66 @@ namespace SimulatorWinForms
         {
             if (currentSnapshot == null) return;
 
-            // Only update the expensive chart rendering parts
-            // Clear and re-render metrics and secondary chart data
-            priceChart.Plot.Clear();
-            RenderBasePriceData(priceChart);
-            RenderY1Metrics(priceChart);
-            UpdateChartLegends();
+            // PRESERVE ZOOM STATE BEFORE CLEARING
+            var mainLimits = priceChart.Plot.GetAxisLimits();
+            bool hasExistingLimits = mainLimits.XMax > mainLimits.XMin;
 
+            // HIDE CHARTS DURING UPDATE TO PREVENT ANY VISUAL FLICKERING
+            bool wasMainVisible = priceChart.Visible;
+            bool wasSecondaryVisible = secondaryChart.Visible;
+            priceChart.Visible = false;
             if (secondaryChart.Visible)
             {
-                secondaryChart.Plot.Clear();
-                RenderSecondaryMetrics(secondaryChart);
+                secondaryChart.Visible = false;
             }
 
-            // Refresh both charts
-            priceChart.Refresh();
-            if (secondaryChart.Visible)
+            try
             {
-                secondaryChart.Refresh();
-            }
+                // Only update the expensive chart rendering parts
+                // Clear and re-render metrics and secondary chart data
+                priceChart.Plot.Clear();
+                RenderBasePriceData(priceChart);
+                RenderY1Metrics(priceChart);
+                UpdateChartLegends();
 
-            // Force layout update
-            chartLayout.PerformLayout();
+                if (wasSecondaryVisible)
+                {
+                    secondaryChart.Plot.Clear();
+                    RenderSecondaryMetrics(secondaryChart);
+                }
+
+                // RESTORE ZOOM STATE AFTER RENDERING
+                // CRITICAL FIX: Only restore zoom/pan if user has actually zoomed/panned away from default
+                // Don't restore if we're at the default zoom (which would show old timestamps)
+                bool isDefaultZoom = !hasExistingLimits ||
+                    Math.Abs((mainLimits.XMax - mainLimits.XMin) - (2.0 / 24.0)) < 0.001; // Default is 2 hour span (2/24 days)
+
+                if (hasExistingLimits && !isDefaultZoom)
+                {
+                    // User has manually zoomed/panned - restore their view
+                    // Additional validation: ensure the limits are reasonable (not year 1900)
+                    if (mainLimits.XMin > 40000 && mainLimits.XMax > 40000) // OA dates start from ~1900
+                    {
+                        priceChart.Plot.SetAxisLimits(mainLimits.XMin, mainLimits.XMax, mainLimits.YMin, mainLimits.YMax);
+                    }
+                }
+
+                // Force layout update
+                chartLayout.PerformLayout();
+            }
+            finally
+            {
+                // SHOW CHARTS AGAIN - THIS SHOULD BE INSTANT WITH NO FLICKERING
+                priceChart.Visible = wasMainVisible;
+                secondaryChart.Visible = wasSecondaryVisible;
+
+                // Single refresh after making visible
+                priceChart.Refresh();
+                if (wasSecondaryVisible)
+                {
+                    secondaryChart.Refresh();
+                }
+            }
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -560,6 +609,58 @@ namespace SimulatorWinForms
             currentIndex = newIndex;
             currentSnapshot = historySnapshots[currentIndex];
             memoText = memos[newIndex];
+
+            // Update position and average cost for current snapshot
+            _simulatedPosition = currentSnapshot.PositionSize;
+            _averageCost = currentSnapshot.BuyinPrice;
+
+            // Update resting orders count for current snapshot
+            if (_restingOrdersPoints != null && _restingOrdersPoints.Count > 0)
+            {
+                var matchingPoint = _restingOrdersPoints.FirstOrDefault(p =>
+                    Math.Abs((p.Date - currentSnapshot.Timestamp).TotalSeconds) < 1);
+                if (matchingPoint != null)
+                {
+                    // Update the resting orders count in the snapshot
+                    if (currentSnapshot.RestingOrders == null)
+                    {
+                        currentSnapshot.RestingOrders = new List<(string, string, string, int, int, DateTime?)>();
+                    }
+                    int targetCount = (int)matchingPoint.Price;
+                    while (currentSnapshot.RestingOrders.Count < targetCount)
+                    {
+                        currentSnapshot.RestingOrders.Add(("buy", "yes", "limit", 1, 50, null));
+                    }
+                    while (currentSnapshot.RestingOrders.Count > targetCount)
+                    {
+                        currentSnapshot.RestingOrders.RemoveAt(currentSnapshot.RestingOrders.Count - 1);
+                    }
+                }
+            }
+
+            // Update resting orders count for current snapshot
+            if (_restingOrdersPoints != null && _restingOrdersPoints.Count > 0)
+            {
+                var matchingPoint = _restingOrdersPoints.FirstOrDefault(p =>
+                    Math.Abs((p.Date - currentSnapshot.Timestamp).TotalSeconds) < 1);
+                if (matchingPoint != null)
+                {
+                    // Update the resting orders count in the snapshot
+                    if (currentSnapshot.RestingOrders == null)
+                    {
+                        currentSnapshot.RestingOrders = new List<(string, string, string, int, int, DateTime?)>();
+                    }
+                    int targetCount = (int)matchingPoint.Price;
+                    while (currentSnapshot.RestingOrders.Count < targetCount)
+                    {
+                        currentSnapshot.RestingOrders.Add(("buy", "yes", "limit", 1, 50, null));
+                    }
+                    while (currentSnapshot.RestingOrders.Count > targetCount)
+                    {
+                        currentSnapshot.RestingOrders.RemoveAt(currentSnapshot.RestingOrders.Count - 1);
+                    }
+                }
+            }
 
             // Immediately update all UI elements (fast operations)
             UpdateUIFast();
@@ -709,11 +810,12 @@ namespace SimulatorWinForms
             positionSizeValue.Text = currentSnapshot.PositionSize.ToString();
             lastTradeValue.Text = currentSnapshot.TotalTraded.ToString();
             positionRoiValue.Text = currentSnapshot.PositionROI.ToString("F2");
-            buyinPriceValue.Text = currentSnapshot.BuyinPrice.ToString("F2");
+            buyinPriceValue.Text = currentSnapshot.BuyinPrice.ToString("F2");  // Use snapshot data for consistency
             positionUpsideValue.Text = currentSnapshot.PositionUpside.ToString("F2");
             positionDownsideValue.Text = currentSnapshot.PositionDownside.ToString("F2");
-            restingOrdersValue.Text = currentSnapshot.RestingOrders?.Count.ToString() ?? "0";
-            simulatedPositionValue.Text = "??";
+            // Use simulated resting orders count passed as parameter
+            restingOrdersValue.Text = _simulatedRestingOrders.ToString();
+            simulatedPositionValue.Text = currentSnapshot.PositionSize.ToString();  // Use snapshot data for consistency
 
             // Immediately move the vertical line (fast operation)
             MoveVerticalLineImmediately();
@@ -773,7 +875,7 @@ namespace SimulatorWinForms
             NavigateFast(delta);
         }
 
-        public void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history, List<string> memosList)
+        public void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history, List<string> memosList, int simulatedPosition = 0, double averageCost = 0.0, int simulatedRestingOrders = 0, List<PricePoint> positionPoints = null, List<PricePoint> averageCostPoints = null, List<PricePoint> restingOrdersPoints = null)
         {
             currentSnapshot = snapshot;
             historySnapshots = history.OrderBy(s => s.Timestamp).ToList();
@@ -809,6 +911,68 @@ namespace SimulatorWinForms
             else
             {
                 memoText = memosList.FirstOrDefault() ?? "";
+            }
+
+            // Store simulated position and average cost
+            _simulatedPosition = simulatedPosition;
+            _averageCost = averageCost;
+            _simulatedRestingOrders = simulatedRestingOrders;
+            _positionPoints = positionPoints ?? new List<PricePoint>();
+            _averageCostPoints = averageCostPoints ?? new List<PricePoint>();
+            _restingOrdersPoints = restingOrdersPoints ?? new List<PricePoint>();
+            simulatedPositionValue.Text = simulatedPosition.ToString();
+
+            // Map position data to individual snapshots
+            if (_positionPoints != null && _positionPoints.Count > 0)
+            {
+                foreach (var histSnapshot in historySnapshots)
+                {
+                    var matchingPoint = _positionPoints.FirstOrDefault(p =>
+                        Math.Abs((p.Date - histSnapshot.Timestamp).TotalSeconds) < 1); // Match within 1 second
+                    if (matchingPoint != null)
+                    {
+                        histSnapshot.PositionSize = (int)matchingPoint.Price;
+                    }
+                }
+            }
+
+            // Map average cost data to individual snapshots
+            if (_averageCostPoints != null && _averageCostPoints.Count > 0)
+            {
+                foreach (var histSnapshot in historySnapshots)
+                {
+                    var matchingPoint = _averageCostPoints.FirstOrDefault(p =>
+                        Math.Abs((p.Date - histSnapshot.Timestamp).TotalSeconds) < 1); // Match within 1 second
+                    if (matchingPoint != null)
+                    {
+                        histSnapshot.BuyinPrice = matchingPoint.Price;
+                    }
+                }
+            }
+
+            // Map resting orders data to individual snapshots
+            if (_restingOrdersPoints != null && _restingOrdersPoints.Count > 0)
+            {
+                foreach (var histSnapshot in historySnapshots)
+                {
+                    var matchingPoint = _restingOrdersPoints.FirstOrDefault(p =>
+                        Math.Abs((p.Date - histSnapshot.Timestamp).TotalSeconds) < 1); // Match within 1 second
+                    if (matchingPoint != null)
+                    {
+                        // Store resting orders count in a way that can be accessed by the UI
+                        // We'll use the existing RestingOrders property or create a simulated count
+                        if (histSnapshot.RestingOrders == null)
+                        {
+                            histSnapshot.RestingOrders = new List<(string, string, string, int, int, DateTime?)>();
+                        }
+                        // Add dummy resting orders to match the count from simulation
+                        int targetCount = (int)matchingPoint.Price;
+                        while (histSnapshot.RestingOrders.Count < targetCount)
+                        {
+                            histSnapshot.RestingOrders.Add(("buy", "yes", "limit", 1, 50, null));
+                        }
+                    }
+                }
             }
 
             UpdateUIFromSnapshot();  // Full UI update
@@ -1836,10 +2000,22 @@ namespace SimulatorWinForms
                 var simulatedPosPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                // Use cached position data if available, otherwise fall back to snapshot data
+                if (_positionPoints != null && _positionPoints.Count > 0)
                 {
-                    timePoints.Add(snapshot.Timestamp.ToOADate());
-                    simulatedPosPoints.Add(snapshot.PositionSize); // Using position size as proxy
+                    foreach (var point in _positionPoints)
+                    {
+                        timePoints.Add(point.Date.ToOADate());
+                        simulatedPosPoints.Add(point.Price);
+                    }
+                }
+                else
+                {
+                    foreach (var snapshot in historySnapshots)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        simulatedPosPoints.Add(snapshot.PositionSize); // Using position size as proxy
+                    }
                 }
 
                 if (simulatedPosPoints.Count > 1)
@@ -1847,6 +2023,26 @@ namespace SimulatorWinForms
                     var simulatedPosScatter = chart.Plot.AddScatter(timePoints.ToArray(), simulatedPosPoints.ToArray(), Color.Indigo, 2);
                     simulatedPosScatter.Label = "Simulated Position";
                     legendItems.Add("Simulated Position");
+                }
+            }
+
+            // Average Cost
+            if (_averageCostPoints != null && _averageCostPoints.Count > 0)
+            {
+                var avgCostPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var point in _averageCostPoints)
+                {
+                    timePoints.Add(point.Date.ToOADate());
+                    avgCostPoints.Add(point.Price);
+                }
+
+                if (avgCostPoints.Count > 1)
+                {
+                    var avgCostScatter = chart.Plot.AddScatter(timePoints.ToArray(), avgCostPoints.ToArray(), Color.DarkCyan, 2);
+                    avgCostScatter.Label = "Average Cost";
+                    legendItems.Add("Average Cost");
                 }
             }
 

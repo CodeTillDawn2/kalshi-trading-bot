@@ -140,11 +140,11 @@ namespace TradingSimulator.Simulator
         }
 
 
-        private async Task<(double finalPnL, List<PricePoint> bidPoints, List<PricePoint> askPoints,
-         List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
-         List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
-         List<PricePoint> discrepancyPoints)>
-     ProcessMarketAsync(
+        private async Task<(double finalPnL, int finalPosition, double finalAverageCost, List<PricePoint> bidPoints, List<PricePoint> askPoints,
+          List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
+          List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
+          List<PricePoint> positionPoints, List<PricePoint> averageCostPoints, List<PricePoint> restingOrdersPoints, List<PricePoint> discrepancyPoints)>
+      ProcessMarketAsync(
          string marketTicker,
          List<MarketSnapshot> marketSnapshots,
          Dictionary<MarketType, List<Strategy>> strategiesDict,
@@ -158,7 +158,7 @@ namespace TradingSimulator.Simulator
             if (!ignoreProcessedCache && _processedMarkets.Contains(marketTicker))
             {
                 OnTestProgress?.Invoke($"{progressPrefix}Skipping cached market: {marketTicker}");
-                return (0, null, null, null, null, null, null, null, null, null);
+                return (0, 0, 0.0, null, null, null, null, null, null, null, null, null, null, null, null);
             }
             OnTestProgress?.Invoke($"{progressPrefix}Processing market: {marketTicker}");
 
@@ -182,6 +182,8 @@ namespace TradingSimulator.Simulator
                     var bestPath = pathData.OrderByDescending(p => p.performance.Equity).First();
                     var eventLogs = bestPath.events;
                     var finalPnL = bestPath.performance.PnL;
+                    var finalPosition = bestPath.performance.SimulatedPosition;
+                    var finalAverageCost = bestPath.performance.AverageCost;
 
                     var bidPoints = marketSnapshots.Select(s => new PricePoint(s.Timestamp, s.BestYesBid, " Best Bid")).ToList();
                     var askPoints = marketSnapshots.Select(s => new PricePoint(s.Timestamp, s.BestYesAsk, " Best Ask")).ToList();
@@ -231,30 +233,76 @@ namespace TradingSimulator.Simulator
                         .Select(ev => new PricePoint(ev.Timestamp, (ev.BestYesBid + ev.BestYesAsk) / 2.0, " " + ev.Memo))
                         .ToList();
 
-                    return (finalPnL, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, discrepancyPoints);
+                    // Create position and average cost points from event logs
+                    var positionPoints = eventLogs
+                        .Select(ev => new PricePoint(ev.Timestamp, ev.Position, $"Position: {ev.Position}"))
+                        .ToList();
+
+                    var averageCostPoints = eventLogs
+                        .Select(ev => new PricePoint(ev.Timestamp, ev.AverageCost, $"Avg Cost: {ev.AverageCost:F2}"))
+                        .ToList();
+
+                    // Create resting orders points from event logs
+                    var restingOrdersPoints = eventLogs
+                        .Select(ev =>
+                        {
+                            int totalResting = 0;
+                            // Parse RestingYesBids
+                            if (!string.IsNullOrEmpty(ev.RestingYesBids) && ev.RestingYesBids != "N/A")
+                            {
+                                var yesOrders = ev.RestingYesBids.Split(',');
+                                foreach (var order in yesOrders)
+                                {
+                                    var parts = order.Trim().Split(':');
+                                    if (parts.Length == 2 && int.TryParse(parts[1], out int qty))
+                                    {
+                                        totalResting += qty;
+                                    }
+                                }
+                            }
+                            // Parse RestingNoBids
+                            if (!string.IsNullOrEmpty(ev.RestingNoBids) && ev.RestingNoBids != "N/A")
+                            {
+                                var noOrders = ev.RestingNoBids.Split(',');
+                                foreach (var order in noOrders)
+                                {
+                                    var parts = order.Trim().Split(':');
+                                    if (parts.Length == 2 && int.TryParse(parts[1], out int qty))
+                                    {
+                                        totalResting += qty;
+                                    }
+                                }
+                            }
+                            return new PricePoint(ev.Timestamp, totalResting, $"Resting Orders: {totalResting}");
+                        })
+                        .ToList();
+
+                    return (finalPnL, finalPosition, finalAverageCost, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, positionPoints, averageCostPoints, restingOrdersPoints, discrepancyPoints);
                 }
             }
             finally
             {
 
             }
-            return (0, null, null, null, null, null, null, null, null, null);
+            return (0, 0, 0.0, null, null, null, null, null, null, null, null, null, null, null, null);
         }
 
 
 
         private void SaveMarketDataToFile(
-            string marketTicker, double finalPnL,
+            string marketTicker, double finalPnL, int finalPosition, double finalAverageCost,
             List<PricePoint> bidPoints, List<PricePoint> askPoints,
             List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
             List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
-            List<PricePoint> discrepancyPoints,
+            List<PricePoint> positionPoints, List<PricePoint> averageCostPoints, List<PricePoint> restingOrdersPoints, List<PricePoint> discrepancyPoints,
             string fileNameSuffix = "")
         {
             var cachedData = new CachedMarketData
             {
                 Market = marketTicker,
                 PnL = finalPnL,
+                SimulatedPosition = finalPosition,
+                AverageCost = finalAverageCost,
                 BidPoints = bidPoints,
                 AskPoints = askPoints,
                 BuyPoints = buyPoints,
@@ -263,6 +311,9 @@ namespace TradingSimulator.Simulator
                 EventPoints = eventPoints,
                 IntendedLongPoints = intendedLongPoints,
                 IntendedShortPoints = intendedShortPoints,
+                PositionPoints = positionPoints,
+                AverageCostPoints = averageCostPoints,
+                RestingOrdersPoints = restingOrdersPoints,
                 DiscrepancyPoints = discrepancyPoints
             };
 
@@ -387,7 +438,7 @@ namespace TradingSimulator.Simulator
                 var strategies = strategiesList[idx]; // only the selected set
                 OnTestProgress?.Invoke($"[{label}/{dto.StrategyName}] market {market} ({mIdx + 1}/{uniqueMarkets.Count})");
 
-                var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort, disc) =
+                var (finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort, pos, avgCost, rest, disc) =
                     await ProcessMarketAsync(
                         market, marketSnapshots, strategies, _scopeFactory,
                         progressPrefix: $"[{label}/{dto.StrategyName}] ",
@@ -396,10 +447,10 @@ namespace TradingSimulator.Simulator
 
                 totalDiscrepancies += disc?.Count ?? 0;
 
-              
+
                 if (writeToFile)
-                    SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
-                        disc, fileNameSuffix: $"_{label}_{dto.StrategyName}");
+                    SaveMarketDataToFile(market, finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort,
+                        pos, avgCost, rest, disc, fileNameSuffix: $"_{label}_{dto.StrategyName}");
 
                 dto.WeightSetMarkets.Add(new WeightSetMarketDTO
                 {
@@ -696,7 +747,7 @@ ResolveFamily(StrategyFamily family)
                 {
                     var strategies = strategiesList[setIdx];
                     var dto = weightSetDtos[setIdx];
-                    var (finalPnL, _, _, _, _, _, _, _, _, _) = await ProcessMarketAsync(
+                    var (finalPnL, _, _, _, _, _, _, _, _, _, _, _, _, _, _) = await ProcessMarketAsync(
                         market, marketSnapshots, strategies, _scopeFactory,
                         progressPrefix: "",
                         writeToFile: false,
@@ -856,7 +907,7 @@ ResolveFamily(StrategyFamily family)
 
                     OnTestProgress?.Invoke($"[{label}/{dto.StrategyName}] market {market} ({mIdx + 1}/{uniqueMarkets.Count}) set {setIdx + 1}/{strategiesList.Count}");
 
-                    var (finalPnL, bid, ask, buy, sell, exit, ev, il, ishort, disc) =
+                    var (finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort, pos, avgCost, rest, disc) =
                         await ProcessMarketAsync(
                             market, marketSnapshots, strategies, _scopeFactory,
                             progressPrefix: $"[{label}/{dto.StrategyName}] ",
@@ -867,8 +918,8 @@ ResolveFamily(StrategyFamily family)
 
 
                     if (writeToFile)
-                        SaveMarketDataToFile(market, finalPnL, bid, ask, buy, sell, exit, ev, il, ishort,
-                            disc, fileNameSuffix: $"_{label}_{dto.StrategyName}");
+                        SaveMarketDataToFile(market, finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort,
+                            pos, avgCost, rest, disc, fileNameSuffix: $"_{label}_{dto.StrategyName}");
 
                     dto.WeightSetMarkets.Add(new WeightSetMarketDTO
                     {
