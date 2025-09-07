@@ -38,9 +38,34 @@ namespace SimulatorWinForms
 
             // Add AutoScroll to containers to handle overflow
             marketInfoContainer.AutoScroll = true;
+            marketInfoContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             positionsContainer.AutoScroll = true;
+            positionsContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             orderbookContainer.AutoScroll = true;
+            orderbookContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             chartContainer.AutoScroll = true;
+            chartContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+
+            // Add borders around individual metric groups
+            tradingMetricsGrid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            tradingMetricsGrid.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+            flowMomentumGrid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            flowMomentumGrid.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+            contextGrid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            contextGrid.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+            positionsGrid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            positionsGrid.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+            otherInfoGrid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            otherInfoGrid.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+            pricesGrid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            pricesGrid.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+
+            // Add more opaque borders to internal grids
+            orderbookGrid.GridColor = System.Drawing.Color.Black;
+            orderbookGrid.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            orderbookGrid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Single;
+            orderbookGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            orderbookGrid.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
 
             AddMouseDownHandlers(this);
 
