@@ -17,7 +17,6 @@ namespace KalshiBotOverseer
 
         private bool _exchangeStatus;
         private bool _tradingStatus;
-        private DateTime _lastWebSocketTimestamp;
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
@@ -40,6 +39,8 @@ namespace KalshiBotOverseer
             _logger.LogDebug("WebSocketMonitorServiceLite starting...");
             try
             {
+                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                CancellationToken = _cancellationTokenSource.Token;
                 _logger.LogDebug("Starting exchange status monitoring...");
                 _monitorTask = Task.Run(async () =>
                 {
@@ -59,6 +60,7 @@ namespace KalshiBotOverseer
         {
             _logger.LogInformation("WebSocketMonitorServiceLite.StopAsync called at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow,
                 CancellationToken.IsCancellationRequested);
+            _cancellationTokenSource.Cancel();
             try
             {
                 if (_isConnected)
@@ -146,7 +148,6 @@ namespace KalshiBotOverseer
                             else if (!status.exchange_active && _isConnected)
                             {
                                 _logger.LogWarning("Exchange is inactive, resetting WebSocket connection");
-                                _lastWebSocketTimestamp = DateTime.UtcNow;
                                 await _webSocketClient.ResetConnectionAsync();
                                 _isConnected = false;
                                 _logger.LogWarning("WebSocket connection reset due to inactive exchange, will try again in one minute");

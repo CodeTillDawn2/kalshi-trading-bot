@@ -1,14 +1,15 @@
-﻿// New class: EventSubscriber.cs (place in appropriate namespace, e.g., SmokehouseBot.Services)
+﻿// Overseer.cs
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
-using SmokehouseDTOs; // Assuming logging is used
+using SmokehouseDTOs;
 
 namespace SmokehouseBot.Services
 {
-    public class Overseer
+    public class Overseer : IDisposable
     {
         private readonly IKalshiWebSocketClient _webSocketClient;
-        private readonly ILogger<Overseer> _logger; // Optional, for logging events
+        private readonly ILogger<Overseer> _logger;
+        private bool _disposed = false;
 
         public Overseer(IKalshiWebSocketClient webSocketClient, ILogger<Overseer> logger)
         {
@@ -26,10 +27,24 @@ namespace SmokehouseBot.Services
             _logger?.LogInformation("Subscribed to Fill, MarketLifecycle, and EventLifecycle events.");
         }
 
+        public void Stop()
+        {
+            Unsubscribe();
+            _logger?.LogInformation("Unsubscribed from events.");
+        }
+
+        private void Unsubscribe()
+        {
+            if (_disposed) return;
+            _webSocketClient.FillReceived -= OnFillReceived;
+            _webSocketClient.MarketLifecycleReceived -= OnMarketLifecycleReceived;
+            _webSocketClient.EventLifecycleReceived -= OnEventLifecycleReceived;
+        }
+
         private void OnFillReceived(object sender, FillEventArgs e)
         {
             // Handle the fill event (e.g., log or process)
-            _logger?.LogInformation("Received Fill event: {EventData}", e); // Placeholder handling
+            _logger?.LogInformation("Received Fill event: {EventData}", e);
         }
 
         private void OnMarketLifecycleReceived(object sender, MarketLifecycleEventArgs e)
@@ -42,6 +57,13 @@ namespace SmokehouseBot.Services
         {
             // Handle the event lifecycle event
             _logger?.LogInformation("Received EventLifecycle event: {EventData}", e);
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            Unsubscribe();
+            _disposed = true;
         }
     }
 }

@@ -50,16 +50,25 @@ class Program
         // Get the monitor service and start it
         var monitorService = serviceProvider.GetRequiredService<IWebSocketMonitorService>();
         var cancellationTokenSource = new CancellationTokenSource();
-        monitorService.StartServices(cancellationTokenSource.Token);
 
-        // Get the overseer and start it (subscribes to events)
-        var eventSubscriber = serviceProvider.GetRequiredService<Overseer>();
-        eventSubscriber.Start();
+        try
+        {
+            monitorService.StartServices(cancellationTokenSource.Token);
 
-        Console.WriteLine("Services started. Press any key to stop...");
-        Console.ReadKey();
+            // Get the overseer and start it (subscribes to events)
+            var eventSubscriber = serviceProvider.GetRequiredService<Overseer>();
+            eventSubscriber.Start();
 
-        // Stop services on shutdown
-        await monitorService.StopServicesAsync(cancellationTokenSource.Token);
+            Console.WriteLine("Services started. Press any key to stop...");
+            Console.ReadKey();
+
+            // Stop overseer
+            eventSubscriber.Stop();
+        }
+        finally
+        {
+            // Stop services on shutdown
+            await monitorService.StopServicesAsync(cancellationTokenSource.Token);
+        }
     }
 }
