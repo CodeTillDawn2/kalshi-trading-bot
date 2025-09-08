@@ -555,6 +555,7 @@ namespace SmokehouseBot.State
             _obv_Long = (long)_tradingCalculator.CalculateOBV(dayCopy);
 
             ADX = _tradingCalculator.CalculateADX(minuteCopy, _calculationConfig.ADX_Periods);
+            if (ADX != null) ADX = Math.Round((double)ADX, 2);
 
             CalculateSlope();
 
