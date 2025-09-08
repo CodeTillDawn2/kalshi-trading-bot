@@ -24,7 +24,7 @@ using TradingStrategies.Helpers.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Console.WriteLine("Application starting at {0}", DateTime.UtcNow);
+Console.WriteLine($"Application starting at {DateTime.UtcNow}");
 
 // ## Logging Configuration
 builder.Logging.ClearProviders();
@@ -180,9 +180,9 @@ else
     builder.Logging.SetMinimumLevel(LogLevel.Information);
 }
 
-Console.WriteLine("Building application at {0}", DateTime.UtcNow);
+Console.WriteLine($"Building application at {DateTime.UtcNow}");
 var app = builder.Build();
-Console.WriteLine("Application built at {0}", DateTime.UtcNow);
+Console.WriteLine($"Application built at {DateTime.UtcNow}");
 
 // Validate DI container
 try
@@ -190,7 +190,7 @@ try
     using (var scope = app.Services.CreateScope())
     {
         scope.ServiceProvider.GetRequiredService<IServiceProvider>();
-        Console.WriteLine("DI container validated successfully at {0}", DateTime.UtcNow);
+        Console.WriteLine($"DI container validated successfully at {DateTime.UtcNow}");
     }
 }
 catch (Exception ex)
@@ -202,9 +202,8 @@ catch (Exception ex)
 // Configure LoggerExtensions
 using (var scope = app.Services.CreateScope())
 {
-    var loggingConfigOptions = scope.ServiceProvider.GetRequiredService<IOptions<LoggingConfig>>();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-    Console.WriteLine("LoggerExtensions configured at {0}", DateTime.UtcNow);
+    Console.WriteLine($"LoggerExtensions configured at {DateTime.UtcNow}");
 }
 
 // Register shutdown hook

@@ -4,7 +4,7 @@
     public class WeightSetMarketDTO
     {
         public int WeightSetID { get; set; }
-        public string MarketTicker { get; set; }
+        public required string MarketTicker { get; set; }
         public decimal PnL { get; set; }
         public DateTime? LastRun { get; set; }
     }

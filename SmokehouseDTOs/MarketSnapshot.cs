@@ -267,10 +267,10 @@ namespace SmokehouseDTOs
 
         public DateTime Timestamp { get; set; }
 
-        public string MarketTicker { get; set; }
-        public string MarketCategory { get; set; }
+        public string? MarketTicker { get; set; }
+        public string? MarketCategory { get; set; }
 
-        public string MarketStatus { get; set; }
+        public string? MarketStatus { get; set; }
         public int SnapshotSchemaVersion { get; set; }
 
         #region Order Book Data
@@ -392,7 +392,7 @@ namespace SmokehouseDTOs
         /// Sourced from <see cref="MarketData.AllSupportResistanceLevels"/>, calculated by <see cref="TradingCalculator.CalculateHistoricalSupportResistance"/> using minute candlesticks.
         /// Levels are filtered for statistical significance, excluding data from 07:00:00 to 11:59:00 UTC.
         /// </remarks>
-        public List<SupportResistanceLevel> AllSupportResistanceLevels { get; set; }
+        public List<SupportResistanceLevel>? AllSupportResistanceLevels { get; set; }
         #endregion
 
         #region Position Metrics
@@ -464,7 +464,7 @@ namespace SmokehouseDTOs
         /// Sourced from <see cref="MarketData.RestingOrders"/>, retrieved by <see cref="MarketData.RefreshPositionMetadata"/> from <see cref="MarketPosition.RestingOrdersCount"/>.
         /// 0 if no orders or position. Non-negative integer.
         /// </remarks>
-        public List<(string action, string side, string type, int count, int price, DateTime? expiration)> RestingOrders { get; set; }
+        public List<(string action, string side, string type, int count, int price, DateTime? expiration)>? RestingOrders { get; set; }
 
         /// <summary>
         /// Gets or sets the realized profit and loss (PnL) for the position in dollars.
@@ -1236,24 +1236,24 @@ namespace SmokehouseDTOs
         /// <summary>
         /// Gets or sets the "Yes" side market behavior classification.
         /// </summary>
-        public string MarketBehaviorYes { get; set; }
+        public string? MarketBehaviorYes { get; set; }
 
         /// <summary>
         /// Gets or sets the "No" side market behavior classification.
         /// </summary>
-        public string MarketBehaviorNo { get; set; }
+        public string? MarketBehaviorNo { get; set; }
 
         /// <summary>
         /// Gets or sets the "Yes" side price quality assessment.
         /// </summary>
-        public string GoodBadPriceYes { get; set; }
+        public string? GoodBadPriceYes { get; set; }
 
         /// <summary>
         /// Gets or sets the "No" side price quality assessment.
         /// </summary>
-        public string GoodBadPriceNo { get; set; }
+        public string? GoodBadPriceNo { get; set; }
 
-        public string MarketType { get; set; }
+        public string? MarketType { get; set; }
 
 
         #endregion
@@ -1415,7 +1415,13 @@ namespace SmokehouseDTOs
 
         internal class DescendingComparer<T> : IComparer<T> where T : IComparable<T>
         {
-            public int Compare(T x, T y) => y.CompareTo(x);
+            public int Compare(T? x, T? y)
+            {
+                if (x == null && y == null) return 0;
+                if (x == null) return 1;
+                if (y == null) return -1;
+                return y.CompareTo(x);
+            }
         }
 
         public void UpgradeSnapshot(int CurrentVersion)
@@ -1424,40 +1430,15 @@ namespace SmokehouseDTOs
             {
                 switch (SnapshotSchemaVersion)
                 {
-                    case 23:
+                    case 31:
                         throw new NotImplementedException();
-                    case 22:
-                        long totalYesDepth = 0;
-                        long totalNoDepth = 0;
-
-                        foreach (var level in GetYesBids())
-                        {
-                            totalYesDepth += level.Value * level.Key;
-                        }
-                        foreach (var level in GetNoBids())
-                        {
-                            totalNoDepth += level.Value * level.Key;
-                        }
-                        TotalOrderbookDepth_Yes = totalYesDepth;
-                        TotalOrderbookDepth_No = totalNoDepth;
-                        SnapshotSchemaVersion = 23;
-                        break;
-                    case 21:
-                        BollingerBands_Medium = (
-                            BollingerBands_Medium.Upper,   // Correct Lower (was calculated lower)
-                            BollingerBands_Medium.Lower,   // Correct Middle (was calculated middle)
-                            BollingerBands_Medium.Middle   // Correct Upper (was calculated upper)
-                        );
-
-                        BollingerBands_Long = (
-                            BollingerBands_Long.Upper,     // Correct Lower
-                            BollingerBands_Long.Lower,     // Correct Middle
-                            BollingerBands_Long.Middle     // Correct Upper
-                        );
-                        SnapshotSchemaVersion = 22;
+                    case 30:
+                        // No explicit transformations needed for nullable types, as they map automatically in most serializers.
+                        // Update schema version to 31.
+                        SnapshotSchemaVersion = 31;
                         break;
                     default:
-                        SnapshotSchemaVersion = 21;
+                        SnapshotSchemaVersion = 30;
                         break;
                 }
             }
@@ -1466,10 +1447,10 @@ namespace SmokehouseDTOs
         public Dictionary<int, int> GetYesBids()
         {
             var dict = new Dictionary<int, int>();
-            foreach (var entry in OrderbookData.Where(e => (e["side"].ToString()) == "yes"))
+            foreach (var entry in OrderbookData.Where(e => (e["side"]?.ToString()) == "yes"))
             {
-                int price = Int32.Parse(entry["price"].ToString());
-                int rc = Int32.Parse(entry["resting_contracts"].ToString());
+                int price = Int32.Parse(entry["price"]?.ToString() ?? "0");
+                int rc = Int32.Parse(entry["resting_contracts"]?.ToString() ?? "0");
                 dict[price] = rc;
             }
             return dict;
@@ -1478,10 +1459,10 @@ namespace SmokehouseDTOs
         public Dictionary<int, int> GetNoBids()
         {
             var dict = new Dictionary<int, int>();
-            foreach (var entry in OrderbookData.Where(e => (e["side"].ToString()) == "no"))
+            foreach (var entry in OrderbookData.Where(e => (e["side"]?.ToString()) == "no"))
             {
-                int price = Int32.Parse(entry["price"].ToString());
-                int rc = Int32.Parse(entry["resting_contracts"].ToString());
+                int price = Int32.Parse(entry["price"]?.ToString() ?? "0");
+                int rc = Int32.Parse(entry["resting_contracts"]?.ToString() ?? "0");
                 dict[price] = rc;
             }
             return dict;
@@ -1572,9 +1553,9 @@ namespace SmokehouseDTOs
             set => _currentAverageTradeSize_No = value;
         }
 
-        public List<PseudoCandlestick> RecentCandlesticks { get { return _lastTenCandlesticks; } set { _lastTenCandlesticks = value; } }
+        public List<PseudoCandlestick>? RecentCandlesticks { get { return _recentCandlesticks; } set { _recentCandlesticks = value; } }
 
-        private List<PseudoCandlestick> _lastTenCandlesticks;
+        private List<PseudoCandlestick>? _recentCandlesticks;
 
         public MarketSnapshot Clone()
         {
