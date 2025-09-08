@@ -493,15 +493,8 @@ namespace SmokehouseBot.Services
                 if (totalTouches < minTouches)
                     continue;
 
-                // Calculate strength with volume blending
+                // Calculate strength as smoothed frequency
                 double strength = smoothedFrequency[peakIndex];
-                long totalVolume = 0;
-                for (int p = Math.Max(minPrice, price - 1); p <= Math.Min(maxPrice, price + 1); p++)
-                {
-                    int idx = p - minPrice;
-                    totalVolume += (long)volumeArray[idx];
-                }
-                strength *= totalVolume;
 
                 var level = new SupportResistanceLevel
                 {
@@ -518,6 +511,9 @@ namespace SmokehouseBot.Services
                 if (selectedLevels.Count >= maxLevels)
                     break;
             }
+
+            // Filter out levels too close to 0 or 100
+            selectedLevels = selectedLevels.Where(l => l.Price > 5 && l.Price < 95).ToList();
 
             // Sort by strength
             selectedLevels = selectedLevels.OrderByDescending(l => l.Strength).ToList();

@@ -764,7 +764,7 @@ namespace SmokehouseBot.Services
 
             try
             {
-                OrderbookData orderData;
+                OrderbookData? orderData;
 
                 var lockObj = _orderbookLocks.GetOrAdd(marketTicker, _ => new object());
                 lock (lockObj)

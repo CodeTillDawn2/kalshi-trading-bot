@@ -187,7 +187,7 @@ namespace SmokehouseBot.Management
                 {
                     if (!brain.ManagedWatchList)
                     {
-                        BrainInstanceDTO dto = await context.GetBrainInstance(_executionConfig.BrainInstance);
+                        BrainInstanceDTO? dto = await context.GetBrainInstance(_executionConfig.BrainInstance);
                         int removed = await RemoveUninterestingMarkets(context, apiService, brain, dto.MinimumInterest);
                         if (removed > 0)
                         {

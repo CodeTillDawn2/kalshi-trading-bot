@@ -372,7 +372,7 @@ namespace SmokehouseBot.Services
                 }
 
                 // Fallback to canceled changes (unchanged logic)
-                OrderbookChange bestCanceledMatch = null;
+                OrderbookChange? bestCanceledMatch = null;
                 foreach (var change in _orderbookChanges)
                 {
                     if (change.IsTradeRelated || change.DeltaContracts >= 0 || change.Side != expectedOrderBookSide || !change.IsCanceled || change.MatchedTradeId != null)

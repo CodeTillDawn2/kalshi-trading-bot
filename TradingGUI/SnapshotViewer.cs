@@ -341,7 +341,7 @@ namespace SimulatorWinForms
             double clickedX = chart.Plot.GetCoordinateX(e.X);
 
             // Find the closest snapshot to the clicked position
-            MarketSnapshot closestSnapshot = null;
+            MarketSnapshot? closestSnapshot = null;
             double minDistance = double.MaxValue;
 
             foreach (var snapshot in historySnapshots)
@@ -367,6 +367,16 @@ namespace SimulatorWinForms
                     // Update position and average cost for current snapshot
                     _simulatedPosition = currentSnapshot.PositionSize;
                     _averageCost = currentSnapshot.BuyinPrice;
+
+                    // If clicking on secondary chart, reset main chart zoom to show the new position
+                    if (chart == secondaryChart)
+                    {
+                        double centerX = currentSnapshot.Timestamp.ToOADate();
+                        double spanDays = 2.0 / 24;  // 2 hours
+                        priceChart.Plot.SetAxisLimitsX(centerX - spanDays / 2, centerX + spanDays / 2);
+                        priceChart.Plot.AxisAutoY();
+                        priceChart.Refresh();
+                    }
 
                     // Update UI immediately
                     UpdateUIFast();

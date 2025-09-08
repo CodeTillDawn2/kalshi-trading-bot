@@ -122,8 +122,8 @@ namespace TradingStrategies
 
         private (Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas) ComputeDeltasIfApplicable(MarketSnapshot prevSnapshot, MarketSnapshot snapshot)
         {
-            Dictionary<int, int> yesDeltas = null;
-            Dictionary<int, int> noDeltas = null;
+            Dictionary<int, int> yesDeltas = new Dictionary<int, int>();
+            Dictionary<int, int> noDeltas = new Dictionary<int, int>();
             if (prevSnapshot != null)
             {
                 yesDeltas = ComputeDeltas(prevSnapshot.GetYesBids(), snapshot.GetYesBids());

@@ -214,7 +214,7 @@ namespace TradingSimulator.Tests
             {
                 var webSocketField = typeof(KalshiWebSocketClient)
                     .GetField("_webSocket", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                ClientWebSocket? webSocket = (ClientWebSocket)webSocketField.GetValue(_client);
+                ClientWebSocket? webSocket = (ClientWebSocket?)webSocketField.GetValue(_client);
                 if (webSocket == null || webSocket.State != WebSocketState.Open)
                 {
                     _loggerMock.Object.Log(LogLevel.Error, "WebSocket is not connected");

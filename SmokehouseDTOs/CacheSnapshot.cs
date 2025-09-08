@@ -105,7 +105,7 @@ namespace SmokehouseDTOs
                 {
                     if (reader.TokenType == JsonTokenType.EndObject) return (ask, bid);
                     if (reader.TokenType != JsonTokenType.PropertyName) continue;
-                    string prop = reader.GetString();
+                    string? prop = reader.GetString();
                     reader.Read();
                     switch (prop)
                     {

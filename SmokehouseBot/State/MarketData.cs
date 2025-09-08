@@ -559,6 +559,8 @@ namespace SmokehouseBot.State
 
             CalculateSlope();
 
+            RecentCandlesticks = minuteCopy.TakeLast(15).ToList();
+
             _logger.LogDebug("**Ended updating trading metrics for {marketTicker}**", _marketTicker);
         }
 
@@ -935,7 +937,8 @@ namespace SmokehouseBot.State
             return result.OrderBy(pc => pc.Timestamp).ToList();
         }
 
-        public List<PseudoCandlestick> RecentCandlesticks { get { return _minutePseudoCandlesticks.TakeLast(15).ToList(); } }
+        public List<PseudoCandlestick> RecentCandlesticks { get { return _recentCandlesticks; } set { _recentCandlesticks = value; } }
+        private List<PseudoCandlestick> _recentCandlesticks;
 
         private List<PseudoCandlestick> _minutePseudoCandlesticks = new List<PseudoCandlestick>();
         private List<PseudoCandlestick> _hourPseudoCandlesticks = new List<PseudoCandlestick>();

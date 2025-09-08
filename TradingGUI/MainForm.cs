@@ -527,7 +527,7 @@ namespace SimulatorWinForms
 
             // Find the closest snapshot to the clicked xOADate
             DateTime clickedTime = DateTime.FromOADate(xOADate);
-            MarketSnapshot closest = _snapshots.OrderBy(s => Math.Abs((s.Timestamp - clickedTime).TotalSeconds)).FirstOrDefault();
+            MarketSnapshot? closest = _snapshots.OrderBy(s => Math.Abs((s.Timestamp - clickedTime).TotalSeconds)).FirstOrDefault();
             if (closest == null) return;
 
             List<MarketSnapshot> history = _snapshots;  // Already ordered by timestamp

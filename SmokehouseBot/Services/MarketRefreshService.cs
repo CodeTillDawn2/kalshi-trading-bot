@@ -174,6 +174,7 @@ namespace SmokehouseBot.Services
             foreach (var marketTicker in watchedMarkets)
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+                if (marketTicker == null) continue;
 
                 var marketData = _serviceFactory.GetMarketDataService().GetMarketDetails(marketTicker);
                 if (marketData == null)
@@ -217,7 +218,8 @@ namespace SmokehouseBot.Services
                 }
                 else
                 {
-                    _logger.LogInformation("Refresh - No market refresh needed for {Market}. Last ticker: {Last}, Last Sync {Sync}",
+                    marketData.UpdateTradingMetrics();
+                    _logger.LogInformation("Refresh - No market refresh needed for {Market}. Still refreshing trading metrics. Last ticker: {Last}, Last Sync {Sync}",
                         marketTicker, lastTicker?.LoggedDate, marketData.LastSuccessfulSync);
                 }
             }

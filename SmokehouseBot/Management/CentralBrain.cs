@@ -1059,7 +1059,7 @@ namespace SmokehouseBot.Management
                 _logger.LogDebug("BRAIN: Analyzing market {MarketTicker} with snapshot from {Timestamp}", marketTicker, marketSnapshot.Timestamp);
 
                 var marketDataService = _serviceFactory.GetMarketDataService();
-                var marketData = marketDataService.GetMarketDetails(marketTicker);
+                var marketData = marketDataService?.GetMarketDetails(marketTicker);
                 if (marketData == null || marketData.MarketInfo == null ||
                     marketData.MarketInfo.status != KalshiConstants.Status_Active)
                 {
@@ -1069,7 +1069,7 @@ namespace SmokehouseBot.Management
 
                 if (marketSnapshot == null)
                 {
-                    _logger.LogWarning("BRAIN: No snapshot data found for {MarketTicker} at {Timestamp}.", marketTicker, marketSnapshot.Timestamp);
+                    _logger.LogWarning("BRAIN: No snapshot data found for {MarketTicker} at {Timestamp}.", marketTicker, marketSnapshot?.Timestamp);
                     return;
                 }
             }

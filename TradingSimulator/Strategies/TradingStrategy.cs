@@ -102,7 +102,7 @@ namespace TradingSimulator.Strategies
                 }
 
                 var sortedSnapshots = cacheSnapshots.OrderBy(s => s.Timestamp).ToList();
-                T previousData = default;
+                T? previousData = default;
 
                 for (int i = 0; i < sortedSnapshots.Count(); i++)
                 {

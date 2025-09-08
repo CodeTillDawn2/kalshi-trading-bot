@@ -267,7 +267,7 @@ namespace SmokehouseDTOs
 
         public DateTime Timestamp { get; set; }
 
-        public string? MarketTicker { get; set; }
+        public string MarketTicker { get; set; }
         public string? MarketCategory { get; set; }
 
         public string? MarketStatus { get; set; }
@@ -1430,15 +1430,19 @@ namespace SmokehouseDTOs
             {
                 switch (SnapshotSchemaVersion)
                 {
-                    case 31:
+                    case 42:
                         throw new NotImplementedException();
-                    case 30:
+                    case 41:
+                        //No changes, no snapshots actually generated in schema version 41
+                        SnapshotSchemaVersion = 42;
+                        break;
+                    case 40:
                         // No explicit transformations needed for nullable types, as they map automatically in most serializers.
                         // Update schema version to 31.
-                        SnapshotSchemaVersion = 31;
+                        SnapshotSchemaVersion = 41;
                         break;
                     default:
-                        SnapshotSchemaVersion = 30;
+                        SnapshotSchemaVersion = 40;
                         break;
                 }
             }
@@ -1851,7 +1855,7 @@ namespace SmokehouseDTOs
             {
                 if (reader.TokenType == JsonTokenType.EndObject) return (lower, middle, upper);
                 if (reader.TokenType != JsonTokenType.PropertyName) continue;
-                string prop = reader.GetString();
+                string? prop = reader.GetString();
                 reader.Read();
                 switch (prop)
                 {

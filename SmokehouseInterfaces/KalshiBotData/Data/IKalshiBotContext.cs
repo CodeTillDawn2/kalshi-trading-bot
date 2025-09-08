@@ -108,7 +108,7 @@ namespace KalshiBotData.Data.Interfaces
         #endregion
 
         #region Brain Instances
-        Task<BrainInstanceDTO?> GetBrainInstance(string instanceName);
+        Task<BrainInstanceDTO?> GetBrainInstance(string? instanceName);
         Task<List<BrainInstanceDTO>> GetBrainInstances(string? instanceName = null, bool? hasBrainLock = null);
         Task<List<BrainInstanceDTO>> GetBrainInstances_cached(string? instanceName = null, bool? hasBrainLock = null);
         Task<List<BrainInstanceDTO>> GetStaleBrains(Guid brainLock);

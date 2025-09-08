@@ -134,6 +134,7 @@ namespace SmokehouseBot.State.Interfaces
         void RecalculateOrderbookChangeMetrics();
         List<PseudoCandlestick> BuildPseudoCandlesticks(string period, int lookbackPeriods = 34);
         List<SupportResistanceLevel> GetFilteredSupportResistanceLevels();
+        void UpdateTradingMetrics();
 
         double YesBidSlopePerMinute_Short { get; set; }
         double NoBidSlopePerMinute_Short { get; set; }

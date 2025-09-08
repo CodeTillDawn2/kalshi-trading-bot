@@ -876,7 +876,7 @@ namespace KalshiBotData.Data
         #endregion
 
         #region Brain Instances
-        public async Task<BrainInstanceDTO?> GetBrainInstance(string instanceName)
+        public async Task<BrainInstanceDTO?> GetBrainInstance(string? instanceName)
         {
             BrainInstance? instance = await BrainInstances.AsNoTracking().FirstOrDefaultAsync(x => x.BrainInstanceName == instanceName);
             return instance?.ToBrainInstanceDTO();
