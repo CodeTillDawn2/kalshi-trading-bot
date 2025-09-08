@@ -739,6 +739,17 @@ namespace SmokehouseBot.Services
                 }
                 marketData.OrderbookData = orderbook;
 
+                if (marketData != null)
+                {
+                    marketData.AllSupportResistanceLevels = _serviceFactory.GetTradingCalculator().CalculateHistoricalSupportResistance(
+                        marketTicker,
+                        marketData.Candlesticks["minute"],
+                        minCandlestickPercentage: _calculationConfig.ResistanceLevels_MinCandlestickPercentage,
+                        maxLevels: _calculationConfig.ResistanceLevels_MaxLevels,
+                        sigma: _calculationConfig.ResistanceLevels_Sigma,
+                        minDistance: _calculationConfig.ResistanceLevels_MinDistance);
+                }
+
                 NotifyMarketDataUpdated(marketTicker);
                 marketData.LastSuccessfulSync = DateTime.UtcNow;
 

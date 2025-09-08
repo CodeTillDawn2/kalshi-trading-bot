@@ -568,19 +568,8 @@ namespace SmokehouseBot.State
 
             CalculateSlope();
 
-
-            AllSupportResistanceLevels = _tradingCalculator.CalculateHistoricalSupportResistance(
-                MarketTicker,
-                Candlesticks["minute"],
-                minCandlestickPercentage: _calculationConfig.ResistanceLevels_MinCandlestickPercentage,
-                maxLevels: _calculationConfig.ResistanceLevels_MaxLevels,
-                sigma: _calculationConfig.ResistanceLevels_Sigma,
-                minDistance: _calculationConfig.ResistanceLevels_MinDistance);
-            PSAR = Math.Round((double)_tradingCalculator.CalculatePSAR(Candlesticks["minute"]), 2);
-            
-
             RecentCandlesticks = minuteCopy.TakeLast(15).ToList();
-
+            PSAR = Math.Round((double)_tradingCalculator.CalculatePSAR(Candlesticks["minute"]), 2);
             _logger.LogDebug("**Ended updating trading metrics for {marketTicker}**", _marketTicker);
         }
 
