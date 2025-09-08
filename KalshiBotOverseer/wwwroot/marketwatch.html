@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketWatch Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .market-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #fafafa;
+        }
+        .market-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .market-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+        .value {
+            color: #333;
+        }
+        .status-active {
+            color: #27ae60;
+        }
+        .status-closed {
+            color: #e74c3c;
+        }
+        .refresh-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .refresh-btn:hover {
+            background-color: #2980b9;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MarketWatch Dashboard</h1>
+        <button class="refresh-btn" onclick="loadMarketWatchData()">Refresh Data</button>
+        <div id="marketWatchContainer">
+            <div class="loading">Loading market watch data...</div>
+        </div>
+    </div>
+
+    <script>
+        async function loadMarketWatchData() {
+            const container = document.getElementById('marketWatchContainer');
+            container.innerHTML = '<div class="loading">Loading market watch data...</div>';
+
+            try {
+                const response = await fetch('/marketwatch/data');
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="loading">No market watch data available.</div>';
+                    return;
+                }
+
+                container.innerHTML = data.map(item => createMarketCard(item)).join('');
+            } catch (error) {
+                console.error('Error loading data:', error);
+                container.innerHTML = '<div class="loading">Error loading data. Please try again.</div>';
+            }
+        }
+
+        function createMarketCard(item) {
+            const market = item.market;
+            const statusClass = market && market.status === 'active' ? 'status-active' : 'status-closed';
+
+            return `
+                <div class="market-card">
+                    <div class="market-header">${item.market_ticker}</div>
+                    <div class="market-info">
+                        <div>
+                            <div class="info-item">
+                                <span class="label">Brain Lock:</span>
+                                <span class="value">${item.brainLock || 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Interest Score:</span>
+                                <span class="value">${item.interestScore ? item.interestScore.toFixed(2) : 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Interest Score Date:</span>
+                                <span class="value">${item.interestScoreDate ? new Date(item.interestScoreDate).toLocaleString() : 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Last Watched:</span>
+                                <span class="value">${item.lastWatched ? new Date(item.lastWatched).toLocaleString() : 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Avg WebSocket Events/Min:</span>
+                                <span class="value">${item.averageWebsocketEventsPerMinute ? item.averageWebsocketEventsPerMinute.toFixed(2) : 'N/A'}</span>
+                            </div>
+                        </div>
+                        ${market ? `
+                        <div>
+                            <div class="info-item">
+                                <span class="label">Title:</span>
+                                <span class="value">${market.title || 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Subtitle:</span>
+                                <span class="value">${market.subtitle || 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Market Type:</span>
+                                <span class="value">${market.market_type || 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Status:</span>
+                                <span class="value ${statusClass}">${market.status || 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Open Time:</span>
+                                <span class="value">${market.open_time ? new Date(market.open_time).toLocaleString() : 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Close Time:</span>
+                                <span class="value">${market.close_time ? new Date(market.close_time).toLocaleString() : 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Yes Bid/Ask:</span>
+                                <span class="value">${market.yes_bid || 0} / ${market.yes_ask || 0}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">No Bid/Ask:</span>
+                                <span class="value">${market.no_bid || 0} / ${market.no_ask || 0}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Last Price:</span>
+                                <span class="value">${market.last_price || 0}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Volume:</span>
+                                <span class="value">${market.volume ? market.volume.toLocaleString() : 0}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Liquidity:</span>
+                                <span class="value">${market.liquidity ? market.liquidity.toLocaleString() : 0}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Open Interest:</span>
+                                <span class="value">${market.open_interest || 0}</span>
+                            </div>
+                        </div>
+                        ` : '<div>No market data available</div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load data on page load
+        window.onload = loadMarketWatchData;
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadMarketWatchData, 30000);
+    </script>
+</body>
+</html>

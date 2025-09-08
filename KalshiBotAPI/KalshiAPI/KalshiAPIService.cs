@@ -31,6 +31,7 @@ namespace KalshiBotAPI.KalshiAPI
         private readonly HttpClient _httpClient;
         private readonly RSA _privateKey;
         private readonly string _keyId;
+        private readonly string _connectionString;
         private Dictionary<string, string> AuthHeaders = new Dictionary<string, string>();
         private IStatusTrackerService _statusTrackerService;
 
@@ -53,6 +54,9 @@ namespace KalshiBotAPI.KalshiAPI
             _logger = logger;
             _statusTrackerService = statusTrackerService;
             _kalshiConfig = kalshiConfig.Value;
+
+            // Initialize connection string from configuration
+            _connectionString = config.GetConnectionString("DefaultConnection") ?? throw new ArgumentNullException("DefaultConnection connection string not configured");
 
             _httpClient = new HttpClient
             {

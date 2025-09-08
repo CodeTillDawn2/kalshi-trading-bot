@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 
 namespace KalshiBotOverseer
 {
+    /// <summary>
+    /// Optional SignalR service for real-time communication.
+    /// If the hub is not available, the service will log warnings but continue to function.
+    /// </summary>
     public class SignalRService
     {
         private readonly HubConnection _connection;
@@ -39,7 +43,7 @@ namespace KalshiBotOverseer
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error starting SignalR connection.");
+                _logger.LogWarning(ex, "SignalR connection failed. This is optional and the application will continue without real-time messaging. Error: {Message}", ex.Message);
             }
         }
 
@@ -47,12 +51,15 @@ namespace KalshiBotOverseer
         {
             try
             {
-                await _connection.StopAsync();
-                _logger.LogInformation("SignalR connection stopped.");
+                if (_connection.State != HubConnectionState.Disconnected)
+                {
+                    await _connection.StopAsync();
+                    _logger.LogInformation("SignalR connection stopped.");
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error stopping SignalR connection.");
+                _logger.LogWarning(ex, "Error stopping SignalR connection: {Message}", ex.Message);
             }
         }
 
@@ -60,12 +67,19 @@ namespace KalshiBotOverseer
         {
             if (_connection.State == HubConnectionState.Connected)
             {
-                await _connection.InvokeAsync(method, message);
-                _logger.LogInformation("Sent message: {Message}", message);
+                try
+                {
+                    await _connection.InvokeAsync(method, message);
+                    _logger.LogInformation("Sent message: {Message}", message);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to send SignalR message: {Message}", ex.Message);
+                }
             }
             else
             {
-                _logger.LogWarning("Cannot send message: SignalR connection not established.");
+                _logger.LogDebug("SignalR not connected. Message not sent: {Message}", message);
             }
         }
 

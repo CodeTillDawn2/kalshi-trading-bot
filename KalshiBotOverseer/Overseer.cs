@@ -7,7 +7,7 @@ using SmokehouseDTOs;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SmokehouseBot.Services
+namespace KalshiBotOverseer
 {
     public class Overseer : IDisposable
     {
@@ -96,7 +96,7 @@ namespace SmokehouseBot.Services
             }
 
             _apiFetchCancellationTokenSource = new CancellationTokenSource();
-            _apiFetchTimer = new Timer(async _ => await FetchApiDataAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+            _apiFetchTimer = new Timer(async _ => await FetchApiDataAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(10));
 
             _logger?.LogInformation("Started periodic API fetching every minute");
         }
