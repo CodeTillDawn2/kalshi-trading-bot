@@ -35,6 +35,11 @@ namespace KalshiBotData.Data
         private DbSet<SnapshotGroup> SnapshotGroups { get; set; }
         private DbSet<WeightSet> WeightSets { get; set; }
         private DbSet<WeightSetMarket> WeightSetMarkets { get; set; }
+        private DbSet<Announcement> Announcements { get; set; }
+        private DbSet<ExchangeSchedule> ExchangeSchedules { get; set; }
+        private DbSet<MaintenanceWindow> MaintenanceWindows { get; set; }
+        private DbSet<StandardHours> StandardHours { get; set; }
+        private DbSet<StandardHoursSession> StandardHoursSessions { get; set; }
 
         private readonly string _connectionString;
         private readonly IConfiguration _config;
@@ -1144,6 +1149,24 @@ namespace KalshiBotData.Data
         }
         #endregion
 
+        #region Announcements
+        public async Task AddAnnouncements(List<AnnouncementDTO> announcements)
+        {
+            var announcementModels = announcements.Select(a => a.ToAnnouncement()).ToList();
+            await Announcements.AddRangeAsync(announcementModels);
+            await SaveChangesAsync();
+        }
+        #endregion
+
+        #region Exchange Schedule
+        public async Task AddExchangeSchedule(ExchangeScheduleDTO exchangeSchedule)
+        {
+            var exchangeScheduleModel = exchangeSchedule.ToExchangeSchedule();
+            await ExchangeSchedules.AddAsync(exchangeScheduleModel);
+            await SaveChangesAsync();
+        }
+        #endregion
+
         #region Other
         public async Task<List<MarketLiquidityStatsDTO>> GetMarketLiquidityStates()
         {
@@ -1658,6 +1681,81 @@ namespace KalshiBotData.Data
                 .WithMany(ws => ws.WeightSetMarkets)
                 .HasForeignKey(wsm => wsm.WeightSetID)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Announcement>()
+                .ToTable("t_Announcements")
+                .HasKey(a => a.AnnouncementID);
+
+            modelBuilder.Entity<Announcement>()
+                .Property(a => a.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<Announcement>()
+                .Property(a => a.LastModifiedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<ExchangeSchedule>()
+                .ToTable("t_ExchangeSchedule")
+                .HasKey(es => es.ExchangeScheduleID);
+
+            modelBuilder.Entity<ExchangeSchedule>()
+                .Property(es => es.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<ExchangeSchedule>()
+                .Property(es => es.LastModifiedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<ExchangeSchedule>()
+                .HasMany(es => es.MaintenanceWindows)
+                .WithOne(mw => mw.ExchangeSchedule)
+                .HasForeignKey(mw => mw.ExchangeScheduleID);
+
+            modelBuilder.Entity<ExchangeSchedule>()
+                .HasMany(es => es.StandardHours)
+                .WithOne(sh => sh.ExchangeSchedule)
+                .HasForeignKey(sh => sh.ExchangeScheduleID);
+
+            modelBuilder.Entity<MaintenanceWindow>()
+                .ToTable("t_MaintenanceWindows")
+                .HasKey(mw => mw.MaintenanceWindowID);
+
+            modelBuilder.Entity<MaintenanceWindow>()
+                .Property(mw => mw.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<MaintenanceWindow>()
+                .Property(mw => mw.LastModifiedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<StandardHours>()
+                .ToTable("t_StandardHours")
+                .HasKey(sh => sh.StandardHoursID);
+
+            modelBuilder.Entity<StandardHours>()
+                .Property(sh => sh.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<StandardHours>()
+                .Property(sh => sh.LastModifiedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<StandardHours>()
+                .HasMany(sh => sh.Sessions)
+                .WithOne(s => s.StandardHours)
+                .HasForeignKey(s => s.StandardHoursID);
+
+            modelBuilder.Entity<StandardHoursSession>()
+                .ToTable("t_StandardHoursSessions")
+                .HasKey(s => s.SessionID);
+
+            modelBuilder.Entity<StandardHoursSession>()
+                .Property(s => s.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<StandardHoursSession>()
+                .Property(s => s.LastModifiedDate)
+                .HasDefaultValueSql("GETDATE()");
         }
     }
 }

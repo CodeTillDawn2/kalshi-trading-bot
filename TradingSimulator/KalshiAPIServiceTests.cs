@@ -23,7 +23,6 @@ namespace TradingSimulator.Tests
         private Mock<ILogger<IKalshiAPIService>> _loggerMock;
         private IConfiguration _configuration;
         private Mock<IServiceScopeFactory> _scopeFactoryMock;
-        private Mock<IScopeManagerService> _scopeManagerMock;
         private Mock<IStatusTrackerService> _statusTrackerMock;
         private IOptions<KalshiConfig> _kalshiConfigOptions;
         private KalshiAPIService _apiService;
@@ -91,7 +90,6 @@ namespace TradingSimulator.Tests
 
             _loggerMock = new Mock<ILogger<IKalshiAPIService>>();
             _scopeFactoryMock = new Mock<IServiceScopeFactory>();
-            _scopeManagerMock = new Mock<IScopeManagerService>();
             _statusTrackerMock = new Mock<IStatusTrackerService>();
             _statusTrackerMock.Setup(s => s.GetCancellationToken()).Returns(CancellationToken.None);
 
@@ -123,7 +121,6 @@ namespace TradingSimulator.Tests
                 _loggerMock.Object,
                 _configuration,
                 _scopeFactoryMock.Object,
-                _scopeManagerMock.Object,
                 _statusTrackerMock.Object,
                 _kalshiConfigOptions
             );

@@ -27,5 +27,9 @@ namespace SmokehouseBot.KalshiAPI.Interfaces
         Task<(int ProcessedCount, int ErrorCount)> FetchOrdersAsync(
             string? ticker = null, string? eventTicker = null, long? minTs = null, long? maxTs = null,
             string? status = null, string? cursor = null, int? limit = null);
+
+        Task<(int ProcessedCount, int ErrorCount)> FetchAnnouncementsAsync();
+
+        Task<(int ProcessedCount, int ErrorCount)> FetchExchangeScheduleAsync();
     }
 }

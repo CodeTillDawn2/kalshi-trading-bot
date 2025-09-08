@@ -12,7 +12,7 @@ using TradingStrategies.Helpers.Interfaces;
 
 namespace SmokehouseBot.Services
 {
-    public class ScopeManagerService : IScopeManagerService
+    public class KaslhiBotScopeManagerService : IScopeManagerService
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<IScopeManagerService> _logger;
@@ -20,7 +20,7 @@ namespace SmokehouseBot.Services
         public IServiceScope? Scope => _scope;
 
 
-        public ScopeManagerService(IServiceProvider serviceProvider, ILogger<IScopeManagerService> logger)
+        public KaslhiBotScopeManagerService(IServiceProvider serviceProvider, ILogger<IScopeManagerService> logger)
         {
             _serviceProvider = serviceProvider;
 

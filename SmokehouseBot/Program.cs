@@ -64,7 +64,7 @@ builder.Services.Configure<HostOptions>(options =>
 builder.Services.AddSingleton<IServiceFactory, ServiceFactory>();
 builder.Services.AddSingleton<ICentralBrain, CentralBrain>();
 builder.Services.AddSingleton<ICentralErrorHandler, CentralErrorHandler>();
-builder.Services.AddSingleton<IScopeManagerService, ScopeManagerService>();
+builder.Services.AddSingleton<IScopeManagerService, KaslhiBotScopeManagerService>();
 builder.Services.AddSingleton<ICentralPerformanceMonitor, CentralPerformanceMonitor>();
 builder.Services.AddSingleton<IMarketManagerService, MarketManagerService>();
 builder.Services.AddSingleton<IStatusTrackerService, KalshiBotStatusTracker>();

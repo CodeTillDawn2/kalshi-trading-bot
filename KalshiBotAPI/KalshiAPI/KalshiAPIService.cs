@@ -32,7 +32,6 @@ namespace KalshiBotAPI.KalshiAPI
         private readonly RSA _privateKey;
         private readonly string _keyId;
         private Dictionary<string, string> AuthHeaders = new Dictionary<string, string>();
-        private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
 
         private readonly ConcurrentDictionary<string, ConcurrentBag<long>> _executionTimes = new();
@@ -48,14 +47,19 @@ namespace KalshiBotAPI.KalshiAPI
             ILogger<IKalshiAPIService> logger,
             IConfiguration config,
             IServiceScopeFactory scopeFactory,
-            IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IOptions<KalshiConfig> kalshiConfig)
         {
             _logger = logger;
-            _scopeManagerService = scopeManagerService;
             _statusTrackerService = statusTrackerService;
             _kalshiConfig = kalshiConfig.Value;
+
+            // Debug: Log configuration values
+            _logger.LogInformation("KalshiAPIService initialized with:");
+            _logger.LogInformation("  Environment: '{Environment}'", _kalshiConfig.Environment);
+            _logger.LogInformation("  KeyId: '{KeyId}'", _kalshiConfig.KeyId);
+            _logger.LogInformation("  KeyFile: '{KeyFile}'", _kalshiConfig.KeyFile);
+
             _httpClient = new HttpClient
             {
                 BaseAddress = new Uri("https://api.elections.kalshi.com/trade-api/v2/"),
@@ -1253,6 +1257,245 @@ namespace KalshiBotAPI.KalshiAPI
             {
                 _logger.LogWarning("Unexpected error in FetchOrdersAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
                 return (0, 0);
+            }
+        }
+
+        public async Task<(int ProcessedCount, int ErrorCount)> FetchAnnouncementsAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                int processedCount = 0;
+                int errorCount = 0;
+
+                string url = "exchange/announcements";
+                var headers = GenerateAuthHeaders("GET", "/trade-api/v2/exchange/announcements");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var responseData = JsonSerializer.Deserialize<List<AnnouncementApi>>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                if (responseData == null || responseData.Count == 0)
+                {
+                    _logger.LogWarning("No announcements found in API response.");
+                    return (0, 0);
+                }
+
+                using var scope = _scopeFactory.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+
+                var announcementsToAdd = new List<AnnouncementDTO>();
+                foreach (var apiAnnouncement in responseData)
+                {
+                    var announcement = new AnnouncementDTO
+                    {
+                        DeliveryTime = apiAnnouncement.DeliveryTime,
+                        Message = apiAnnouncement.Message,
+                        Status = apiAnnouncement.Status,
+                        Type = apiAnnouncement.Type,
+                        CreatedDate = DateTime.Now,
+                        LastModifiedDate = DateTime.Now
+                    };
+                    announcementsToAdd.Add(announcement);
+                }
+
+                await context.AddAnnouncements(announcementsToAdd);
+                processedCount = announcementsToAdd.Count;
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(FetchAnnouncementsAsync), stopwatch.ElapsedMilliseconds);
+                return (processedCount, errorCount);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("FetchAnnouncementsAsync was cancelled");
+                return (0, 0);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in FetchAnnouncementsAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
+                return (0, 1);
+            }
+        }
+
+        public async Task<(int ProcessedCount, int ErrorCount)> FetchExchangeScheduleAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                int processedCount = 0;
+                int errorCount = 0;
+
+                string url = "exchange/schedule";
+                var headers = GenerateAuthHeaders("GET", "/trade-api/v2/exchange/schedule");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var responseData = JsonSerializer.Deserialize<ExchangeScheduleResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                if (responseData == null || responseData.Schedule == null)
+                {
+                    _logger.LogWarning("No exchange schedule data found in API response.");
+                    return (0, 0);
+                }
+
+                using var scope = _scopeFactory.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+
+                // Create ExchangeSchedule DTO
+                var exchangeScheduleDTO = new ExchangeScheduleDTO
+                {
+                    LastUpdated = DateTime.Now,
+                    CreatedDate = DateTime.Now,
+                    LastModifiedDate = DateTime.Now,
+                    MaintenanceWindows = responseData.Schedule.MaintenanceWindows.Select(mw => new MaintenanceWindowDTO
+                    {
+                        StartDateTime = mw.StartDateTime,
+                        EndDateTime = mw.EndDateTime,
+                        CreatedDate = DateTime.Now,
+                        LastModifiedDate = DateTime.Now
+                    }).ToList(),
+                    StandardHours = responseData.Schedule.StandardHours.Select(sh => new StandardHoursDTO
+                    {
+                        StartTime = sh.StartTime,
+                        EndTime = sh.EndTime,
+                        CreatedDate = DateTime.Now,
+                        LastModifiedDate = DateTime.Now,
+                        Sessions = new List<StandardHoursSessionDTO>()
+                    }).ToList()
+                };
+
+                // Process sessions for each standard hours entry
+                foreach (var (apiStandardHours, dtoStandardHours) in responseData.Schedule.StandardHours.Zip(exchangeScheduleDTO.StandardHours, (api, dto) => (api, dto)))
+                {
+                    // Monday
+                    foreach (var session in apiStandardHours.Monday)
+                    {
+                        dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
+                        {
+                            DayOfWeek = "Monday",
+                            StartTime = TimeSpan.Parse(session.OpenTime),
+                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            CreatedDate = DateTime.Now,
+                            LastModifiedDate = DateTime.Now
+                        });
+                    }
+
+                    // Tuesday
+                    foreach (var session in apiStandardHours.Tuesday)
+                    {
+                        dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
+                        {
+                            DayOfWeek = "Tuesday",
+                            StartTime = TimeSpan.Parse(session.OpenTime),
+                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            CreatedDate = DateTime.Now,
+                            LastModifiedDate = DateTime.Now
+                        });
+                    }
+
+                    // Wednesday
+                    foreach (var session in apiStandardHours.Wednesday)
+                    {
+                        dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
+                        {
+                            DayOfWeek = "Wednesday",
+                            StartTime = TimeSpan.Parse(session.OpenTime),
+                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            CreatedDate = DateTime.Now,
+                            LastModifiedDate = DateTime.Now
+                        });
+                    }
+
+                    // Thursday
+                    foreach (var session in apiStandardHours.Thursday)
+                    {
+                        dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
+                        {
+                            DayOfWeek = "Thursday",
+                            StartTime = TimeSpan.Parse(session.OpenTime),
+                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            CreatedDate = DateTime.Now,
+                            LastModifiedDate = DateTime.Now
+                        });
+                    }
+
+                    // Friday
+                    foreach (var session in apiStandardHours.Friday)
+                    {
+                        dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
+                        {
+                            DayOfWeek = "Friday",
+                            StartTime = TimeSpan.Parse(session.OpenTime),
+                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            CreatedDate = DateTime.Now,
+                            LastModifiedDate = DateTime.Now
+                        });
+                    }
+
+                    // Saturday
+                    foreach (var session in apiStandardHours.Saturday)
+                    {
+                        dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
+                        {
+                            DayOfWeek = "Saturday",
+                            StartTime = TimeSpan.Parse(session.OpenTime),
+                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            CreatedDate = DateTime.Now,
+                            LastModifiedDate = DateTime.Now
+                        });
+                    }
+
+                    // Sunday
+                    foreach (var session in apiStandardHours.Sunday)
+                    {
+                        dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
+                        {
+                            DayOfWeek = "Sunday",
+                            StartTime = TimeSpan.Parse(session.OpenTime),
+                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            CreatedDate = DateTime.Now,
+                            LastModifiedDate = DateTime.Now
+                        });
+                    }
+                }
+
+                await context.AddExchangeSchedule(exchangeScheduleDTO);
+                processedCount = 1; // One schedule processed
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(FetchExchangeScheduleAsync), stopwatch.ElapsedMilliseconds);
+                return (processedCount, errorCount);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("FetchExchangeScheduleAsync was cancelled");
+                return (0, 0);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in FetchExchangeScheduleAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
+                return (0, 1);
             }
         }
 

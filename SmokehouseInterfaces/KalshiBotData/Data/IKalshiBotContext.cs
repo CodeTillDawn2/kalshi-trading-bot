@@ -139,6 +139,14 @@ namespace KalshiBotData.Data.Interfaces
         Task DeleteWeightSet(string strategyName);
         #endregion
 
+        #region Announcements
+        Task AddAnnouncements(List<AnnouncementDTO> announcements);
+        #endregion
+
+        #region Exchange Schedule
+        Task AddExchangeSchedule(ExchangeScheduleDTO exchangeSchedule);
+        #endregion
+
         #region Other
         Task<List<MarketLiquidityStatsDTO>> GetMarketLiquidityStates();
         Task<List<MarketLiquidityStatsDTO>> GetMarketLiquidityStates_cached();
