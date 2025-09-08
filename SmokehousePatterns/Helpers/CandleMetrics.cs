@@ -52,18 +52,6 @@
                 return LookbackAvgRange[patternLength - 1];
             return 0;
         }
-        public double GetTrendDirectionRatio(int patternLength, bool isBullish)
-        {
-
-            if (isBullish)
-            {
-                return BullishRatio[patternLength - 1];
-            }
-            else
-            {
-                return BearishRatio[patternLength - 1];
-            }
-
-        }
+      
     }
 }
