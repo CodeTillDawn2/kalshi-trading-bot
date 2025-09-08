@@ -218,8 +218,7 @@ namespace SmokehouseBot.Services
                 }
                 else
                 {
-                    marketData.UpdateTradingMetrics();
-                    _logger.LogInformation("Refresh - No market refresh needed for {Market}. Still refreshing trading metrics. Last ticker: {Last}, Last Sync {Sync}",
+                    _logger.LogDebug("Refresh - No market refresh needed for {Market}. Last ticker: {Last}, Last Sync {Sync}",
                         marketTicker, lastTicker?.LoggedDate, marketData.LastSuccessfulSync);
                 }
             }

@@ -3,6 +3,7 @@ using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotOverseer;
+using KalshiBotOverseer.State;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -39,7 +40,8 @@ class Program
         // Register required services
         services.AddScoped<IKalshiAPIService, KalshiAPIService>();
         services.AddScoped<IKalshiWebSocketClient, KalshiWebSocketClient>();
-        services.AddSingleton<IBotReadyStatus, IBotReadyStatus>();
+        services.AddSingleton<IStatusTrackerService, OverseerStatusTracker>();
+        services.AddSingleton<IBotReadyStatus, OverseerReadyStatus>();
 
         // Register the new WebSocketMonitorServiceLite as singleton
         services.AddSingleton<IWebSocketMonitorService, WebSocketMonitorServiceLite>();

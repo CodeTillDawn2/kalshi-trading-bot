@@ -1,13 +1,13 @@
 ﻿using SmokehouseBot.State.Interfaces;
 
-namespace SmokehouseBot.State
+namespace KalshiBotOverseer.State
 {
-    public class BotReadyStatus : IBotReadyStatus
+    public class OverseerReadyStatus : IBotReadyStatus
     {
         public TaskCompletionSource<bool> InitializationCompleted { get; set; } = new TaskCompletionSource<bool>();
         public TaskCompletionSource<bool> BrowserReady { get; set; } = new TaskCompletionSource<bool>();
 
-        public BotReadyStatus()
+        public OverseerReadyStatus()
         {
             ResetAll();
         }

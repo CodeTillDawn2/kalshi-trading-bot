@@ -1,17 +1,13 @@
-﻿
+﻿using SmokehouseBot.State.Interfaces;
 
-using SmokehouseBot.State.Interfaces;
-
-namespace KalshiBotOverseer
+namespace KalshiBotOverseer.State
 {
-    public class StatusTrackerService : IStatusTrackerService
+    public class OverseerStatusTracker : IStatusTrackerService
     {
-        public TaskCompletionSource<bool> InitializationCompleted { get; set; } = new TaskCompletionSource<bool>();
-        public TaskCompletionSource<bool> BrowserReady { get; set; } = new TaskCompletionSource<bool>();
         private CancellationTokenSource _globalCancellationTokenSource;
         private readonly object _lock = new();
 
-        public StatusTrackerService()
+        public OverseerStatusTracker()
         {
             ResetAll();
         }
@@ -35,8 +31,6 @@ namespace KalshiBotOverseer
         public void ResetAll()
         {
 
-            InitializationCompleted = new TaskCompletionSource<bool>();
-            InitializationCompleted.SetResult(false);
             lock (_lock)
             {
                 if (_globalCancellationTokenSource != null)

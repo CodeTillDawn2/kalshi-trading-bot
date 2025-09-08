@@ -2,12 +2,12 @@
 
 namespace SmokehouseBot.State
 {
-    public class StatusTrackerService : IStatusTrackerService
+    public class KalshiBotStatusTracker : IStatusTrackerService
     {
         private CancellationTokenSource _globalCancellationTokenSource;
         private readonly object _lock = new();
 
-        public StatusTrackerService()
+        public KalshiBotStatusTracker()
         {
             ResetAll();
         }

@@ -67,8 +67,8 @@ builder.Services.AddSingleton<ICentralErrorHandler, CentralErrorHandler>();
 builder.Services.AddSingleton<IScopeManagerService, ScopeManagerService>();
 builder.Services.AddSingleton<ICentralPerformanceMonitor, CentralPerformanceMonitor>();
 builder.Services.AddSingleton<IMarketManagerService, MarketManagerService>();
-builder.Services.AddSingleton<IStatusTrackerService, StatusTrackerService>();
-builder.Services.AddSingleton<IBotReadyStatus, BotReadyStatus>();
+builder.Services.AddSingleton<IStatusTrackerService, KalshiBotStatusTracker>();
+builder.Services.AddSingleton<IBotReadyStatus, KalshiBotReadyStatus>();
 builder.Services.AddSingleton<IBrainStatusService, BrainStatusService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<ICentralBrain>());
 
