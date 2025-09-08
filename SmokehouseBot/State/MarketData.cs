@@ -1,6 +1,7 @@
 ﻿// TradingStrategies.Models/MarketData.cs
 using Microsoft.Extensions.Options;
 using SmokehouseBot.Helpers;
+using SmokehouseBot.Services;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseBot.State.Interfaces;
 using SmokehouseDTOs;
@@ -558,6 +559,17 @@ namespace SmokehouseBot.State
             if (ADX != null) ADX = Math.Round((double)ADX, 2);
 
             CalculateSlope();
+
+
+            AllSupportResistanceLevels = _tradingCalculator.CalculateHistoricalSupportResistance(
+                MarketTicker,
+                Candlesticks["minute"],
+                minCandlestickPercentage: _calculationConfig.ResistanceLevels_MinCandlestickPercentage,
+                maxLevels: _calculationConfig.ResistanceLevels_MaxLevels,
+                sigma: _calculationConfig.ResistanceLevels_Sigma,
+                minDistance: _calculationConfig.ResistanceLevels_MinDistance);
+            PSAR = Math.Round((double)_tradingCalculator.CalculatePSAR(Candlesticks["minute"]), 2);
+            
 
             RecentCandlesticks = minuteCopy.TakeLast(15).ToList();
 
