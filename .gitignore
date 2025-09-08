@@ -85,3 +85,5 @@ KalshiUI/bin/Debug/net8.0-windows/appsettings.local.json
 /KalshiBotAPI/obj
 /KalshiBotOverseer/obj
 /KalshiBotAPI/bin
+KalshiBotOverseer/appsettings.local.json
+/KalshiBotOverseer/bin
