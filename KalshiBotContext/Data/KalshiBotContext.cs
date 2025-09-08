@@ -310,7 +310,7 @@ namespace KalshiBotData.Data
                     await SaveChangesAsync();
                     Thread.Sleep(50);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     await SaveChangesAsync();
                     Thread.Sleep(50);
@@ -1107,7 +1107,7 @@ namespace KalshiBotData.Data
                 await SaveChangesAsync();
                 await transaction.CommitAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await transaction.RollbackAsync();
                 throw;

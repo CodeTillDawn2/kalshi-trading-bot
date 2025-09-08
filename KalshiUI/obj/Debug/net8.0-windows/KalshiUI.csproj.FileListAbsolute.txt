@@ -1,0 +1,9 @@
+c:\Users\Peter\Documents\GitHub\kalshi-trading-bot\KalshiUI\obj\Debug\net8.0-windows\KalshiUI.csproj.AssemblyReference.cache
+c:\Users\Peter\Documents\GitHub\kalshi-trading-bot\KalshiUI\obj\Debug\net8.0-windows\KalshiUI.KalshiUI.resources
+c:\Users\Peter\Documents\GitHub\kalshi-trading-bot\KalshiUI\obj\Debug\net8.0-windows\KalshiUI.ModalPopup.resources
+c:\Users\Peter\Documents\GitHub\kalshi-trading-bot\KalshiUI\obj\Debug\net8.0-windows\KalshiUI.csproj.GenerateResource.cache
+c:\Users\Peter\Documents\GitHub\kalshi-trading-bot\KalshiUI\obj\Debug\net8.0-windows\KalshiUI.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\Peter\Documents\GitHub\kalshi-trading-bot\KalshiUI\obj\Debug\net8.0-windows\KalshiUI.AssemblyInfoInputs.cache
+c:\Users\Peter\Documents\GitHub\kalshi-trading-bot\KalshiUI\obj\Debug\net8.0-windows\KalshiUI.AssemblyInfo.cs
+c:\Users\Peter\Documents\GitHub\kalshi-trading-bot\KalshiUI\obj\Debug\net8.0-windows\KalshiUI.csproj.CoreCompileInputs.cache
+c:\Users\Peter\Documents\GitHub\kalshi-trading-bot\KalshiUI\obj\Debug\net8.0-windows\KalshiUI.sourcelink.json
