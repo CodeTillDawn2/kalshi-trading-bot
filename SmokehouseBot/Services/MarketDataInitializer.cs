@@ -1,5 +1,7 @@
 ﻿using SmokehouseBot.Services.Interfaces;
 using SmokehouseBot.State.Interfaces;
+using System.Threading;
+
 namespace SmokehouseBot.Services
 {
     public class MarketDataInitializer : IMarketDataInitializer
@@ -39,33 +41,52 @@ namespace SmokehouseBot.Services
                     _logger.LogDebug("After forced refresh, found {Count} watched markets: {Markets}", watchedMarkets.Count, string.Join(", ", watchedMarkets));
                 }
 
-                // Process markets sequentially with 250ms delay between each to prevent rate limiting
-                foreach (var ticker in watchedMarkets)
+                // Run market initialization sequentially on a single background thread with lower priority
+                await Task.Run(async () =>
                 {
-                    _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-
-                    _logger.LogDebug("Initializing market {MarketTicker}", ticker);
-                    if (!_serviceFactory.GetDataCache().Markets.ContainsKey(ticker))
+                    try
                     {
-                        _logger.LogDebug("Adding market subscription for {MarketTicker}", ticker);
-                        await _serviceFactory.GetMarketDataService().SubscribeToMarketAsync(ticker);
-                        _logger.LogDebug("Subscribed to market {MarketTicker}", ticker);
-                        _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                        _logger.LogDebug("Waiting for initial WebSocket data for {MarketTicker}", ticker);
-                        await WaitForInitialDataAsync(ticker);
-                        _logger.LogDebug("Received initial WebSocket data for {MarketTicker}", ticker);
-                    }
-                    else
-                    {
-                        _logger.LogDebug("Syncing all market data for {MarketTicker}", ticker);
-                        await _serviceFactory.GetMarketDataService().SyncMarketDataAsync(ticker);
-                        _logger.LogDebug("Synced market data for {MarketTicker}", ticker);
-                    }
-                    _logger.LogDebug("Completed initialization for {MarketTicker}", ticker);
+                        // Set thread priority to BelowNormal to reduce resource competition with snapshots
+                        Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
 
-                    // Add 100ms delay between market initializations to prevent rate limiting
-                    await Task.Delay(100, _statusTracker.GetCancellationToken());
-                }
+                        _logger.LogDebug("Starting market initialization on low-priority thread");
+
+                        // Process markets sequentially to avoid rate limiting
+                        foreach (var ticker in watchedMarkets)
+                        {
+                            _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+
+                            _logger.LogDebug("Initializing market {MarketTicker} on low-priority thread", ticker);
+                            if (!_serviceFactory.GetDataCache().Markets.ContainsKey(ticker))
+                            {
+                                _logger.LogDebug("Adding market subscription for {MarketTicker}", ticker);
+                                await _serviceFactory.GetMarketDataService().SubscribeToMarketAsync(ticker);
+                                _logger.LogDebug("Subscribed to market {MarketTicker}", ticker);
+                                _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+                                _logger.LogDebug("Waiting for initial WebSocket data for {MarketTicker}", ticker);
+                                await WaitForInitialDataAsync(ticker);
+                                _logger.LogDebug("Received initial WebSocket data for {MarketTicker}", ticker);
+                            }
+                            else
+                            {
+                                _logger.LogDebug("Syncing all market data for {MarketTicker}", ticker);
+                                await _serviceFactory.GetMarketDataService().SyncMarketDataAsync(ticker);
+                                _logger.LogDebug("Synced market data for {MarketTicker}", ticker);
+                            }
+                            _logger.LogDebug("Completed initialization for {MarketTicker}", ticker);
+
+                            // Add 100ms delay between market initializations to prevent rate limiting
+                            await Task.Delay(100, _statusTracker.GetCancellationToken());
+                        }
+
+                        _logger.LogDebug("Market initialization completed on low-priority thread");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error during market initialization on low-priority thread");
+                        throw;
+                    }
+                }, _statusTracker.GetCancellationToken());
                 _logger.LogInformation("All market initializations completed");
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
 

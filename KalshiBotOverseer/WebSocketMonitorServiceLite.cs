@@ -139,8 +139,7 @@ namespace KalshiBotOverseer
 
                                 // Subscribe only to Fill, MarketLifecycle, and EventLifecycle (global, no market tickers)
                                 await client.SubscribeToChannelAsync("fill", new string[0]);
-                                await client.SubscribeToChannelAsync("market_lifecycle", new string[0]);
-                                await client.SubscribeToChannelAsync("event_lifecycle", new string[0]);
+                                await client.SubscribeToChannelAsync("lifecycle", new string[0]);
 
                                 _isConnected = true;
                                 _logger.LogDebug("WebSocket connected and subscribed to Fill, MarketLifecycle, and EventLifecycle successfully");

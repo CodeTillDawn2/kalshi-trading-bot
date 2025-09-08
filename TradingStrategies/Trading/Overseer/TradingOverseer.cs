@@ -10,10 +10,6 @@ using TradingStrategies.Trading.Helpers;
 using TradingStrategies.Trading.Overseer;
 using static SmokehouseInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Trading.Overseer.ReportGenerator;
-using Microsoft.Extensions.Logging;
-using SmokehouseBot.KalshiAPI.Interfaces;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace TradingStrategies
 {
@@ -26,17 +22,12 @@ namespace TradingStrategies
         private readonly Dictionary<(string Ticker, DateTime Timestamp), MarketType> _marketTypeCache;
         private readonly string _cacheDirectory = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
 
-        // Periodic API fetching
-        private Timer? _apiFetchTimer;
-        private CancellationTokenSource? _apiFetchCancellationTokenSource;
-        private readonly ILogger<TradingOverseer>? _logger;
-        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, ILogger<TradingOverseer>? logger = null)
+        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService)
         {
             _scopeFactory = scopeFactory;
             _snapshotService = snapshotService;
             _strategySelectionHelper = new StrategySelectionHelper();
             _marketTypeCache = new Dictionary<(string, DateTime), MarketType>();
-            _logger = logger;
         }
 
         private record SnapshotGroupTemp(string MarketTicker, DateTime StartTime, DateTime EndTime);
@@ -893,84 +884,5 @@ namespace TradingStrategies
             return result;
         }
 
-        /// <summary>
-        /// Starts periodic fetching of announcements and exchange schedule data every minute
-        /// </summary>
-        public void StartPeriodicApiFetching()
-        {
-            if (_apiFetchTimer != null)
-            {
-                _logger?.LogWarning("Periodic API fetching is already running");
-                return;
-            }
-
-            _apiFetchCancellationTokenSource = new CancellationTokenSource();
-            _apiFetchTimer = new Timer(async _ => await FetchApiDataAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-
-            _logger?.LogInformation("Started periodic API fetching every minute");
-        }
-
-        /// <summary>
-        /// Stops periodic fetching of API data
-        /// </summary>
-        public void StopPeriodicApiFetching()
-        {
-            if (_apiFetchTimer != null)
-            {
-                _apiFetchTimer.Dispose();
-                _apiFetchTimer = null;
-            }
-
-            if (_apiFetchCancellationTokenSource != null)
-            {
-                _apiFetchCancellationTokenSource.Cancel();
-                _apiFetchCancellationTokenSource.Dispose();
-                _apiFetchCancellationTokenSource = null;
-            }
-
-            _logger?.LogInformation("Stopped periodic API fetching");
-        }
-
-        /// <summary>
-        /// Fetches announcements and exchange schedule data from Kalshi API
-        /// </summary>
-        private async Task FetchApiDataAsync()
-        {
-            try
-            {
-                if (_apiFetchCancellationTokenSource?.IsCancellationRequested == true)
-                    return;
-
-                using var scope = _scopeFactory.CreateScope();
-                var kalshiApiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
-
-                _logger?.LogInformation("Starting periodic API data fetch at {Timestamp}", DateTime.UtcNow);
-
-                // Fetch announcements
-                var announcementsResult = await kalshiApiService.FetchAnnouncementsAsync();
-                _logger?.LogInformation("Announcements fetch completed: {ProcessedCount} processed, {ErrorCount} errors",
-                    announcementsResult.ProcessedCount, announcementsResult.ErrorCount);
-
-                // Fetch exchange schedule
-                var exchangeScheduleResult = await kalshiApiService.FetchExchangeScheduleAsync();
-                _logger?.LogInformation("Exchange schedule fetch completed: {ProcessedCount} processed, {ErrorCount} errors",
-                    exchangeScheduleResult.ProcessedCount, exchangeScheduleResult.ErrorCount);
-
-                _logger?.LogInformation("Periodic API data fetch completed successfully at {Timestamp}", DateTime.UtcNow);
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Error during periodic API data fetch: {Message}", ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Manually triggers a single API data fetch (useful for testing)
-        /// </summary>
-        public async Task TriggerManualApiFetchAsync()
-        {
-            _logger?.LogInformation("Manual API fetch triggered");
-            await FetchApiDataAsync();
-        }
     }
 }

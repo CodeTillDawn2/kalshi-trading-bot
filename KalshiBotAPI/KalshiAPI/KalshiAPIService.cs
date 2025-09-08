@@ -54,12 +54,6 @@ namespace KalshiBotAPI.KalshiAPI
             _statusTrackerService = statusTrackerService;
             _kalshiConfig = kalshiConfig.Value;
 
-            // Debug: Log configuration values
-            _logger.LogInformation("KalshiAPIService initialized with:");
-            _logger.LogInformation("  Environment: '{Environment}'", _kalshiConfig.Environment);
-            _logger.LogInformation("  KeyId: '{KeyId}'", _kalshiConfig.KeyId);
-            _logger.LogInformation("  KeyFile: '{KeyFile}'", _kalshiConfig.KeyFile);
-
             _httpClient = new HttpClient
             {
                 BaseAddress = new Uri("https://api.elections.kalshi.com/trade-api/v2/"),
