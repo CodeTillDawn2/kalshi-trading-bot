@@ -143,6 +143,8 @@ namespace SmokehouseBot.State.Interfaces
 
         public double? PSAR { get; set; }
         public double? ADX { get; set; }
+        public double? PlusDI { get; set; }
+        public double? MinusDI { get; set; }
         double CurrentTradeRatePerMinute_Yes { get; set; }
         double CurrentTradeRatePerMinute_No { get; set; }
         double CurrentTradeVolumePerMinute_No { get; set; }

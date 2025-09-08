@@ -123,6 +123,8 @@ namespace SmokehouseDTOs
             double noBidSlopePerMinute_Medium,
             double? psar,
             double? adx,
+            double? plusDI,
+            double? minusDI,
             double currentTradeRatePerMinuteYes,
             double currentTradeRatePerMinuteNo,
             double currentTradeVolumePerMinuteYes,
@@ -520,6 +522,8 @@ namespace SmokehouseDTOs
         #region Trade Metrics
 
         public double? ADX { get; set; }
+        public double? PlusDI { get; set; }
+        public double? MinusDI { get; set; }
         public double? PSAR { get; set; }
 
 
@@ -1681,6 +1685,8 @@ namespace SmokehouseDTOs
                 NoBidSlopePerMinute_Medium = this.NoBidSlopePerMinute_Medium,
                 PSAR = this.PSAR,
                 ADX = this.ADX,
+                PlusDI = this.PlusDI,
+                MinusDI = this.MinusDI,
 
                 CurrentTradeRatePerMinute_Yes = this.CurrentTradeRatePerMinute_Yes,
                 CurrentTradeRatePerMinute_No = this.CurrentTradeRatePerMinute_No,

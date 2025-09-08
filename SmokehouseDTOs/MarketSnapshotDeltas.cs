@@ -63,6 +63,8 @@ namespace SmokehouseDTOs
         public double? ExpectedFees() => Changed("ExpectedFees") ? _current.ExpectedFees : (double?)null;
 
         public double? ADX() => Changed("ADX") ? _current.ADX : (double?)null;
+        public double? PlusDI() => Changed("PlusDI") ? _current.PlusDI : (double?)null;
+        public double? MinusDI() => Changed("MinusDI") ? _current.MinusDI : (double?)null;
         public double? PSAR() => Changed("PSAR") ? _current.PSAR : (double?)null;
 
         public double? TradeRatePerMinute_Yes() => Changed("TradeRatePerMinute_Yes") ? _current.TradeRatePerMinute_Yes : (double?)null;

@@ -256,6 +256,8 @@ namespace SmokehouseBot.State
 
         public double? PSAR { get; set; }
         public double? ADX { get; set; }
+        public double? PlusDI { get; set; }
+        public double? MinusDI { get; set; }
 
         private double _highestVolume_Day = 0;
         private double _highestVolume_Hour = 0;
@@ -555,8 +557,14 @@ namespace SmokehouseBot.State
 
             _obv_Long = (long)_tradingCalculator.CalculateOBV(dayCopy);
 
-            ADX = _tradingCalculator.CalculateADX(minuteCopy, _calculationConfig.ADX_Periods);
+            var adxResult = _tradingCalculator.CalculateADX(minuteCopy, _calculationConfig.ADX_Periods);
+            ADX = adxResult.ADX;
+            PlusDI = adxResult.PlusDI;
+            MinusDI = adxResult.MinusDI;
+
             if (ADX != null) ADX = Math.Round((double)ADX, 2);
+            if (PlusDI != null) PlusDI = Math.Round((double)PlusDI, 2);
+            if (MinusDI != null) MinusDI = Math.Round((double)MinusDI, 2);
 
             CalculateSlope();
 

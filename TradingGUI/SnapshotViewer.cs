@@ -850,6 +850,7 @@ namespace SimulatorWinForms
             obvValue.Text = currentSnapshot.OBV_Medium.ToString();
             psarValue.Text = currentSnapshot.PSAR.ToString() ?? "--";
             adxValue.Text = currentSnapshot.ADX.ToString() ?? "--";
+            // Note: +DI and -DI values are not displayed in UI labels, only plotted on secondary chart
             supportValue.Text = currentSnapshot.AllSupportResistanceLevels.Count != 1 ? currentSnapshot.AllSupportResistanceLevels.Count.ToString()
                 : $"{currentSnapshot.AllSupportResistanceLevels.First().Price}";
 
@@ -1847,6 +1848,8 @@ namespace SimulatorWinForms
             if (adxLabel.Checked)
             {
                 var adxPoints = new List<double>();
+                var plusDIPoints = new List<double>();
+                var minusDIPoints = new List<double>();
                 var timePoints = new List<double>();
 
                 foreach (var snapshot in historySnapshots)
@@ -1855,6 +1858,8 @@ namespace SimulatorWinForms
                     {
                         timePoints.Add(snapshot.Timestamp.ToOADate());
                         adxPoints.Add(snapshot.ADX.Value);
+                        plusDIPoints.Add(snapshot.PlusDI.GetValueOrDefault());
+                        minusDIPoints.Add(snapshot.MinusDI.GetValueOrDefault());
                     }
                 }
 
@@ -1862,6 +1867,10 @@ namespace SimulatorWinForms
                 {
                     var adxScatter = chart.Plot.AddScatter(timePoints.ToArray(), adxPoints.ToArray(), Color.Brown, 2);
                     adxScatter.Label = "ADX";
+                    var plusDIScatter = chart.Plot.AddScatter(timePoints.ToArray(), plusDIPoints.ToArray(), Color.DarkGreen, 2);
+                    plusDIScatter.Label = "+DI";
+                    var minusDIScatter = chart.Plot.AddScatter(timePoints.ToArray(), minusDIPoints.ToArray(), Color.DarkRed, 2);
+                    minusDIScatter.Label = "-DI";
                     legendItems.Add("ADX");
                 }
             }

@@ -107,6 +107,8 @@ namespace SmokehouseDTOs.Converters
             ("OBV_Medium","obvM"),
             ("OBV_Long","obvL"),
             ("ADX","adx"),
+            ("PlusDI","pdi"),
+            ("MinusDI","mdi"),
             ("PSAR","psar"),
 
             // --- Price extremes (Yes/No) ---

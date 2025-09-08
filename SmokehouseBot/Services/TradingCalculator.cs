@@ -650,25 +650,31 @@ namespace SmokehouseBot.Services
         }
 
         /// <summary>
-        /// Calculates the Average Directional Index (ADX) value for a series of pseudo-candlesticks in the Kalshi marketplace.
+        /// Calculates the Average Directional Index (ADX) value along with +DI and -DI for a series of pseudo-candlesticks in the Kalshi marketplace.
         /// This indicator serves as a robust complementary metric, particularly when integrated with tools like the Parabolic Stop and Reverse (PSAR) to validate trend strength.
         /// It provides an objective measure of trend intensity, irrespective of direction, which aids in distinguishing genuine trends from periods of consolidation or volatility without momentum.
         /// This is especially pertinent in Kalshi's event-driven environment, where contract prices may exhibit pronounced trends due to evolving probabilities influenced by economic announcements or other developments.
         /// By confirming the presence of a strong trend (typically ADX values exceeding 25), it enhances the efficacy of PSAR signals, reducing the likelihood of whipsaws in non-trending conditions.
-        /// Nonetheless, ADX functions as a lagging indicator and does not inherently specify trend direction; it necessitates pairing with directional components like the Positive Directional Indicator (+DI) and Negative Directional Indicator (-DI), or external tools such as PSAR.
+        /// The +DI and -DI components provide directional information: +DI > -DI suggests uptrend, -DI > +DI suggests downtrend.
         /// Its utility diminishes in highly volatile, range-bound markets common to certain Kalshi contracts awaiting resolution.
         /// </summary>
         /// <param name="pseudoCandles">The list of pseudo-candlesticks containing mid-high, mid-low, and mid-close prices.</param>
         /// <param name="period">The period for ADX calculation (default: 14).</param>
-        /// <returns>The current ADX value, or null if insufficient data or invalid computation.</returns>
+        /// <returns>A tuple containing ADX, +DI, and -DI values, or null values if insufficient data or invalid computation.</returns>
         /// <remarks>
         /// Interpretations of ADX values are as follows in Kalshi's context:
         /// - Below 20: Indicates a weak or absent trend, suggesting consolidation or choppy conditions; traders should exercise caution with trend-following strategies like PSAR, as signals may prove unreliable.
         /// - Between 20 and 25: Signals the potential emergence of a trend; this transitional range warrants monitoring for confirmation, such as a PSAR crossover aligned with rising ADX.
         /// - Between 25 and 40: Reflects a strong trend, validating PSAR positions and encouraging trend continuation trades, with higher values denoting increased momentum.
         /// - Above 40: Denotes an exceptionally strong trend, often nearing potential exhaustion; while supportive of PSAR trailing stops, it may foreshadow reversals, prompting consideration of profit-taking.
+        ///
+        /// +DI and -DI interpretations:
+        /// - +DI > -DI: Suggests upward trend strength
+        /// - -DI > +DI: Suggests downward trend strength
+        /// - +DI crossing above -DI: Potential bullish signal
+        /// - -DI crossing above +DI: Potential bearish signal
         /// </remarks>
-        public double? CalculateADX(List<PseudoCandlestick> pseudoCandles, int period = 14)
+        public (double? ADX, double? PlusDI, double? MinusDI) CalculateADX(List<PseudoCandlestick> pseudoCandles, int period = 14)
         {
             var log = new StringBuilder();
             log.AppendLine($"Calculating ADX for {period} periods.");
@@ -684,7 +690,7 @@ namespace SmokehouseBot.Services
             {
                 log.AppendLine($"Insufficient data. Candles: {pseudoCandles?.Count ?? 0}, Required: {period * 2}.");
                 _logger.LogDebug("{Log}", log.ToString());
-                return null;
+                return (null,null,null);
             }
 
             var highs = pseudoCandles.Select(pc => pc.MidHigh).ToList();
@@ -710,6 +716,9 @@ namespace SmokehouseBot.Services
 
             // Calculate subsequent values iteratively
             var dxValues = new List<double>();
+            double? latestPlusDI = null;
+            double? latestMinusDI = null;
+
             for (int i = period + 1; i < pseudoCandles.Count; i++)
             {
                 double upMove = highs[i] - highs[i - 1];
@@ -729,6 +738,10 @@ namespace SmokehouseBot.Services
                 double dx = Math.Abs(plusDI - minusDI) / (plusDI + minusDI) * 100;
                 dxValues.Add(dx);
 
+                // Store the latest +DI and -DI values
+                latestPlusDI = plusDI;
+                latestMinusDI = minusDI;
+
                 log.AppendLine($"Index {i}: +DM={plusDM:F4}, -DM={minusDM:F4}, TR={tr:F4}, +DI={plusDI:F2}, -DI={minusDI:F2}, DX={dx:F2}");
             }
 
@@ -736,7 +749,7 @@ namespace SmokehouseBot.Services
             {
                 log.AppendLine($"Insufficient DX values for ADX: {dxValues.Count}, Required: {period}.");
                 _logger.LogDebug("{Log}", log.ToString());
-                return null;
+                return (null, null, null);
             }
 
             // Calculate ADX as SMA of last 'period' DX values
@@ -745,12 +758,12 @@ namespace SmokehouseBot.Services
             {
                 log.AppendLine($"Invalid ADX: {adx}.");
                 _logger.LogDebug("{Log}", log.ToString());
-                return null;
+                return (null, null, null);
             }
 
-            log.AppendLine($"ADX: {adx:F2}");
+            log.AppendLine($"ADX: {adx:F2}, +DI: {latestPlusDI:F2}, -DI: {latestMinusDI:F2}");
             _logger.LogDebug("{Log}", log.ToString());
-            return adx;
+            return (adx, latestPlusDI, latestMinusDI);
         }
     }
 }

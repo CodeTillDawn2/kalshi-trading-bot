@@ -989,6 +989,8 @@ namespace SmokehouseBot.Management
                kvp.Value.NoBidSlopePerMinute_Medium,
                kvp.Value.PSAR,
                kvp.Value.ADX,
+               kvp.Value.PlusDI,
+               kvp.Value.MinusDI,
                kvp.Value.CurrentTradeRatePerMinute_Yes,
                kvp.Value.CurrentTradeRatePerMinute_No,
                kvp.Value.CurrentTradeVolumePerMinute_Yes,
