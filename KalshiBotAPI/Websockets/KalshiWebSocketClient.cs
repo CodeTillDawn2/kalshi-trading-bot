@@ -503,7 +503,7 @@ namespace KalshiBotAPI.Websockets
 
         public async Task ConnectAsync(int retryCount = 0)
         {
-            if (!_allowReconnect && !_isConnected || !_readyStatus.InitializationCompleted.Task.IsCompleted)
+            if (!_allowReconnect && !_isConnected)
             {
                 _logger.LogDebug("Reconnection disabled, skipping connect attempt");
                 return;
@@ -645,12 +645,6 @@ namespace KalshiBotAPI.Websockets
                 if (!_isConnected)
                 {
                     _logger.LogWarning("WebSocket not connected, cannot subscribe to watched markets");
-                    return;
-                }
-
-                if (!_readyStatus.InitializationCompleted.Task.IsCompleted)
-                {
-                    _logger.LogWarning("Initialization not complete, delaying watched markets subscription");
                     return;
                 }
 
@@ -820,8 +814,9 @@ namespace KalshiBotAPI.Websockets
         {
             lock (_webSocketLock)
             {
-                bool connected = _webSocket != null && _webSocket.State == WebSocketState.Open;
-                _logger.LogDebug("WebSocket connection status: {Connected}", connected);
+                bool connected = _isConnected && _webSocket != null && _webSocket.State == WebSocketState.Open;
+                _logger.LogDebug("WebSocket connection status: {Connected} (isConnected={IsConnectedFlag}, webSocket={WebSocketState})",
+                    connected, _isConnected, _webSocket?.State.ToString() ?? "null");
                 return connected;
             }
         }

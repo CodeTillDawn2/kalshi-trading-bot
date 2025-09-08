@@ -16,6 +16,7 @@ using SmokehouseInterfaces.Constants;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -894,6 +895,16 @@ namespace KalshiBotAPI.KalshiAPI
                     try
                     {
                         var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+
+                        // Handle rate limiting (429 Too Many Requests)
+                        if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                        {
+                            _logger.LogWarning("Rate limit exceeded for candlesticks API. Delaying 30 seconds before retrying. Market: {MarketTicker}, URL: {Url}",
+                                marketTicker, url);
+                            await Task.Delay(TimeSpan.FromSeconds(30), _statusTrackerService.GetCancellationToken());
+                            continue; // Retry the same request after delay
+                        }
+
                         response.EnsureSuccessStatusCode();
                         var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
 

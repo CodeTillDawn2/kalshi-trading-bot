@@ -3,6 +3,7 @@ using KalshiBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmokehouseBot.Configuration;
+using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseBot.State.Interfaces;
@@ -219,8 +220,13 @@ namespace SmokehouseBot.Management
                     await marketDataService.FetchPositionsAsync();
                 }
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-                HashSet<MarketWatchDTO> MarketsWatched = await context.GetMarketWatches_cached(
+                // Load existing watched markets for this brain lock, sorted by interest score descending
+                var watchedMarketsList = await context.GetMarketWatches_cached(
                     brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock });
+                var sortedWatchedMarkets = watchedMarketsList
+                    .OrderByDescending(w => w.InterestScore ?? double.MinValue)
+                    .ToList();
+                HashSet<MarketWatchDTO> MarketsWatched = new HashSet<MarketWatchDTO>(sortedWatchedMarkets);
 
                 HashSet<MarketWatchDTO> watchedList;
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
@@ -330,6 +336,48 @@ namespace SmokehouseBot.Management
 
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
+                _logger.LogDebug("BRAIN: Starting OrderBookService...");
+                await orderBookService.StartServicesAsync();
+                _logger.LogInformation("BRAIN: OrderBookService started");
+
+                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
+
+                await webSocketService.TriggerConnectionCheckAsync();
+
+                // Start WebSocket services BEFORE snapshot timer to ensure markets receive data
+                _logger.LogDebug("BRAIN: Starting WebSocketHostedService...");
+                webSocketService.StartServices(_statusTrackerService.GetCancellationToken());
+                _logger.LogInformation("BRAIN: WebSocketHostedService started");
+
+                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
+
+                var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                webSocketClient.EnableReconnect();
+                _logger.LogInformation("Enabled WebSocket reconnection");
+
+                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
+
+                _logger.LogInformation("BRAIN: Triggering WebSocket connection check...");
+                await webSocketService.TriggerConnectionCheckAsync();
+                _logger.LogInformation("BRAIN: Triggered WebSocket connection check");
+
+                // Initialize snapshot timer early to start generating snapshots before market initialization completes
+                _logger.LogInformation("BRAIN: Initializing snapshot timer early with 1-minute delay...");
+                if (_snapshotTimer == null)
+                {
+                    _snapshotTimer = new Timer(
+                        async state => await CreateSnapshotAndTriggerAnalysis(state),
+                        null,
+                        TimeSpan.FromMinutes(1),
+                        _decisionInterval
+                    );
+                    _logger.LogInformation("BRAIN: Snapshot timer initialized early with 1-minute delay.");
+                }
+                else
+                {
+                    _logger.LogInformation("BRAIN: Snapshot timer already exists, skipping early initialization.");
+                }
+
                 var marketInitializer = _serviceFactory.GetMarketDataInitializer();
                 _logger.LogDebug("BRAIN: Starting MarketDataInitializer.SetupAsync...");
                 await marketInitializer.SetupAsync();
@@ -337,17 +385,10 @@ namespace SmokehouseBot.Management
 
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
-                _logger.LogDebug("BRAIN: Starting WebSocketHostedService...");
-                webSocketService.StartServices(_statusTrackerService.GetCancellationToken());
-                _logger.LogInformation("BRAIN: WebSocketHostedService started");
-
-                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-
-                _logger.LogDebug("BRAIN: Starting OrderBookService...");
-                await orderBookService.StartServicesAsync();
-                _logger.LogInformation("BRAIN: OrderBookService started");
-
-                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
+                // Now that initialization is complete, connect the WebSocket directly
+                _logger.LogInformation("BRAIN: Connecting WebSocket now that initialization is complete...");
+                await webSocketClient.ConnectAsync();
+                _logger.LogInformation("BRAIN: WebSocket connected successfully");
 
                 _logger.LogDebug("Starting MarketRefreshService...");
                 _serviceFactory.GetMarketRefreshService().ExecuteServicesAsync(_statusTrackerService.GetCancellationToken());
@@ -362,18 +403,6 @@ namespace SmokehouseBot.Management
 
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
-                var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
-                webSocketClient.EnableReconnect();
-                _logger.LogInformation("Enabled WebSocket reconnection");
-
-                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-
-                _logger.LogInformation("BRAIN: Triggering WebSocket connection check...");
-                await webSocketService.TriggerConnectionCheckAsync();
-                _logger.LogInformation("BRAIN: Triggered WebSocket connection check");
-
-                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-
                 if (!_readyStatus.BrowserReady.Task.IsCompleted)
                 {
                     _readyStatus.BrowserReady.SetResult(true);
@@ -384,23 +413,6 @@ namespace SmokehouseBot.Management
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
                 _errorHandler.CatastrophicErrorAlreadyDetected = false;
-
-                _logger.LogInformation("BRAIN: Initializing snapshot timer with 1-minute delay...");
-
-                if (_snapshotTimer == null)
-                {
-                    _snapshotTimer = new Timer(
-                        async state => await CreateSnapshotAndTriggerAnalysis(state),
-                        null,
-                        TimeSpan.FromMinutes(1),
-                        _decisionInterval
-                    );
-                    _logger.LogInformation("BRAIN: Snapshot timer initialized with 1-minute delay.");
-                }
-                else
-                {
-                    _logger.LogInformation("BRAIN: Snapshot timer already exists, skipping initialization.");
-                }
 
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
@@ -676,14 +688,12 @@ namespace SmokehouseBot.Management
         {
             var cancellationToken = _statusTrackerService.GetCancellationToken();
             if (IsServicesStopped
-                || IsStartingUp
                 || IsShuttingDown
                 || cancellationToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Data is not ready because one of the following conditions is met: " +
-                    "IsServicesStopped={IsServicesStopped}, IsStartingUp={IsStartingUp}, " +
-                    "IsShuttingDown={IsShuttingDown}, CancellationToken.IsCancellationRequested={IsCancellationRequested}",
-                    IsServicesStopped, IsStartingUp, IsShuttingDown, cancellationToken.IsCancellationRequested);
+                    "IsServicesStopped={IsServicesStopped}, IsShuttingDown={IsShuttingDown}, CancellationToken.IsCancellationRequested={IsCancellationRequested}",
+                    IsServicesStopped, IsShuttingDown, cancellationToken.IsCancellationRequested);
                 return false;
             }
             if (_serviceFactory.GetDataCache().TradingStatus == false) return false;
@@ -707,6 +717,15 @@ namespace SmokehouseBot.Management
                     _snapshotTimer = null;
                     return;
                 }
+
+                // Check if WebSocket is connected before proceeding with snapshots
+                if (!IsWebSocketServiceRunning())
+                {
+                    _logger.LogDebug("BRAIN: Skipping snapshot creation - WebSocket not connected yet.");
+                    ResetPerformanceMetrics();
+                    return;
+                }
+
                 ManageBrain();
                 if (IsDataReady())
                 {

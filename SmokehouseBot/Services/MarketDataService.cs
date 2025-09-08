@@ -894,7 +894,7 @@ namespace SmokehouseBot.Services
                     ).Select(m => m.market_ticker);
 
 
-                _logger.LogDebug("Fetched {Count} market watches from database: {Markets}", markets.Count(), string.Join(", ", markets));
+                _logger.LogDebug("Fetched {Count} market watches from database: {Markets}", markets.Count(), string.Join(", "));
 
                 HashSet<string> allWatchedMarkets = markets.ToHashSet();
 
@@ -969,8 +969,8 @@ namespace SmokehouseBot.Services
                 _logger.LogDebug("Cache.WatchedMarkets is empty, re-fetching from database");
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                var markets = (await context
-                    .GetMarketWatches(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock })
+                var markets = ((await context
+                    .GetMarketWatches(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock }))
                     );
 
                 var marketTickers = markets.Select(m => m.market_ticker).ToHashSet();
@@ -986,7 +986,7 @@ namespace SmokehouseBot.Services
                     _lastWatchedMarkets = _serviceFactory.GetDataCache().WatchedMarkets;
                 }
 
-                _logger.LogInformation("Stats: Re-fetched {Count} market watches from database: {Markets}", markets.Count(), string.Join(", ", markets));
+                _logger.LogInformation("Stats: Re-fetched {Count} market watches from database: {Markets}", markets.Count(), string.Join(", ", marketTickers));
 
                 var watchedMarkets = _serviceFactory.GetDataCache().WatchedMarkets.ToList();
                 _logger.LogDebug("Returning {Count} watched markets: {Markets}", watchedMarkets.Count, string.Join(", ", watchedMarkets));

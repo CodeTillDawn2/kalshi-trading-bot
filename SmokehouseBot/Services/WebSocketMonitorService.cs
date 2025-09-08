@@ -128,7 +128,7 @@ namespace SmokehouseBot.Services
                             _serviceFactory.GetDataCache().TradingStatus = status.trading_active;
                             _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _serviceFactory.GetDataCache().ExchangeStatus, _serviceFactory.GetDataCache().TradingStatus);
 
-                            if (status.exchange_active && !_isConnected && _readyStatus.InitializationCompleted.Task.IsCompleted)
+                            if (status.exchange_active && !_isConnected)
                             {
                                 _logger.LogInformation("Exchange is active, connecting WebSocket");
                                 await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync();
@@ -173,7 +173,7 @@ namespace SmokehouseBot.Services
                         _serviceFactory.GetDataCache().TradingStatus = status.trading_active;
                         _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _serviceFactory.GetDataCache().ExchangeStatus, _serviceFactory.GetDataCache().TradingStatus);
 
-                        if (status.exchange_active && !_isConnected && _readyStatus.InitializationCompleted.Task.IsCompleted)
+                        if (status.exchange_active && !_isConnected)
                         {
                             _logger.LogInformation("Exchange is active, connecting WebSocket2");
                             await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync(0);

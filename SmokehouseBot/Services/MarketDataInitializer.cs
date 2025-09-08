@@ -39,6 +39,7 @@ namespace SmokehouseBot.Services
                     _logger.LogDebug("After forced refresh, found {Count} watched markets: {Markets}", watchedMarkets.Count, string.Join(", ", watchedMarkets));
                 }
 
+                // Process markets sequentially with 250ms delay between each to prevent rate limiting
                 foreach (var ticker in watchedMarkets)
                 {
                     _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -61,8 +62,11 @@ namespace SmokehouseBot.Services
                         _logger.LogDebug("Synced market data for {MarketTicker}", ticker);
                     }
                     _logger.LogDebug("Completed initialization for {MarketTicker}", ticker);
-                    _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+
+                    // Add 100ms delay between market initializations to prevent rate limiting
+                    await Task.Delay(100, _statusTracker.GetCancellationToken());
                 }
+                _logger.LogInformation("All market initializations completed");
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
 
                 _logger.LogDebug("Fetching positions...");
