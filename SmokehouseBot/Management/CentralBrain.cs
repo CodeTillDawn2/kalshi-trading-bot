@@ -114,7 +114,7 @@ namespace SmokehouseBot.Management
                 }
                 _errorCheckTimer = new Timer(CheckForErrors, null, TimeSpan.FromSeconds(.5), TimeSpan.FromSeconds(.5));
 
-                Task.Run(() => DoFinalInitialization());
+                _=Task.Run(() => DoFinalInitialization(), cancellationToken);
 
                 _logger.LogInformation("BRAIN: SmokehouseBrain running...");
             }

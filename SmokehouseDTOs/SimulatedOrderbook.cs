@@ -1,13 +1,12 @@
 ﻿using SmokehouseDTOs;
-using System.Text.Json;
 
-namespace TradingStrategies.Trading.Overseer
+namespace SmokehouseDTOs
 {
     public class SimulatedOrderbook
     {
         // Array of lists for prices 1-99; index 0 unused
-        private readonly List<(int count, DateTime timestamp)>[] YesBids = new List<(int count, DateTime timestamp)>[100];
-        private readonly List<(int count, DateTime timestamp)>[] NoBids = new List<(int count, DateTime timestamp)>[100];
+        public readonly List<(int count, DateTime timestamp)>[] YesBids = new List<(int count, DateTime timestamp)>[100];
+        public readonly List<(int count, DateTime timestamp)>[] NoBids = new List<(int count, DateTime timestamp)>[100];
 
         public SimulatedOrderbook()
         {
@@ -76,14 +75,9 @@ namespace TradingStrategies.Trading.Overseer
             DateTime initTime = snapshot.Timestamp; // Assume all initial orders at snapshot time
             foreach (var entry in snapshot.OrderbookData)
             {
-                // Properly extract from Dictionary<string, object> where object is JsonElement
-                var priceElement = (JsonElement)entry["price"];
-                var contractsElement = (JsonElement)entry["resting_contracts"];
-                var sideElement = (JsonElement)entry["side"];
-
-                int price = priceElement.GetInt32();
-                int contracts = contractsElement.GetInt32();
-                string side = sideElement.GetString();
+                int price = Int32.Parse(entry["price"].ToString());
+                int contracts = Int32.Parse(entry["resting_contracts"].ToString());
+                string side = entry["side"].ToString();
 
                 if (price < 1 || price > 99) continue;
 
@@ -132,13 +126,12 @@ namespace TradingStrategies.Trading.Overseer
             book[price].Add((qty, timestamp)); // Add to end (newest)
         }
 
-        public void ApplyDeltas(Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas, DateTime snapshotTime)
+        public void ApplyDeltas(Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas)
         {
-            // Use the snapshot's timestamp so newly-added volume sits behind any prior snapshot volume.
-            ApplyDeltasInternal(YesBids, yesDeltas, snapshotTime);
-            ApplyDeltasInternal(NoBids, noDeltas, snapshotTime);
+            DateTime currentTime = DateTime.UtcNow; // Or pass snapshot.Timestamp for sim consistency
+            ApplyDeltasInternal(YesBids, yesDeltas, currentTime);
+            ApplyDeltasInternal(NoBids, noDeltas, currentTime);
         }
-
 
         private void ApplyDeltasInternal(List<(int count, DateTime timestamp)>[] book, Dictionary<int, int> deltas, DateTime currentTime)
         {

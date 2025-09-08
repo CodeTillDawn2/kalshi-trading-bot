@@ -26,8 +26,8 @@ namespace TradingStrategies.Trading.Overseer
         public void ProcessSnapshot(MarketSnapshot snapshot, MarketSnapshot? prevSnapshot)
         {
             // Apply deltas if previous snapshot provided
-            Dictionary<int, int> yesDeltas = null;
-            Dictionary<int, int> noDeltas = null;
+            Dictionary<int, int> yesDeltas = new Dictionary<int, int>();
+            Dictionary<int, int> noDeltas = new Dictionary<int, int>();
             if (prevSnapshot != null && SimulatedBook != null)
             {
                 yesDeltas = ComputeDeltas(prevSnapshot.GetYesBids(), snapshot.GetYesBids());
