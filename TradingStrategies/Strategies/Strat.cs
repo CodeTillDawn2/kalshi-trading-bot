@@ -1,6 +1,4 @@
 ﻿using SmokehouseDTOs;
-using System.Text.Json;
-using TradingStrategies.Strategies.Strats;
 
 namespace TradingStrategies.Strategies
 {

@@ -366,7 +366,7 @@ namespace TradingStrategies.Strategies.Strats
         public static readonly List<(string Name, Dictionary<SlopeMomentumStrat.ParamKey, double> Parameters)>
 SlopeMomentumParameterSets = new List<(string, Dictionary<SlopeMomentumStrat.ParamKey, double>)>
 {
-    
+
     (    "FloMo_Testing",
     new Dictionary<SlopeMomentumStrat.ParamKey, double>
     {

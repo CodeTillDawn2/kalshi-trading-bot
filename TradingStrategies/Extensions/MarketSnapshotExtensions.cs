@@ -1,5 +1,4 @@
 ﻿using SmokehouseDTOs;
-using TradingStrategies.Trading.Overseer;
 
 namespace TradingStrategies.Extensions
 {

@@ -1,6 +1,5 @@
 ﻿// CentralBrain.cs
 using KalshiBotData.Data.Interfaces;
-using KalshiBotData.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmokehouseBot.Configuration;

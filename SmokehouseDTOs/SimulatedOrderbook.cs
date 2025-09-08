@@ -1,6 +1,4 @@
-﻿using SmokehouseDTOs;
-
-namespace SmokehouseDTOs
+﻿namespace SmokehouseDTOs
 {
     public class SimulatedOrderbook
     {

@@ -8,9 +8,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Timers;
 using TradingStrategies.Configuration;
-using System.Linq;
-using System.Collections.Generic;
-using System;
 
 namespace SmokehouseBot.Services
 {
@@ -1532,28 +1529,28 @@ namespace SmokehouseBot.Services
 
             // Separate trade‑related vs non‑trade‑related changes by side.
             var yesTrades = recent.Where(c => c.IsTradeRelated && c.Side == "yes").ToList();
-            var noTrades  = recent.Where(c => c.IsTradeRelated && c.Side == "no").ToList();
+            var noTrades = recent.Where(c => c.IsTradeRelated && c.Side == "no").ToList();
 
             var yesOrders = recent.Where(c => !c.IsTradeRelated && c.Side == "yes").ToList();
-            var noOrders  = recent.Where(c => !c.IsTradeRelated && c.Side == "no").ToList();
+            var noOrders = recent.Where(c => !c.IsTradeRelated && c.Side == "no").ToList();
 
             // Raw counts
             int tradeCountYesRaw = yesTrades.Count;
-            int tradeCountNoRaw  = noTrades.Count;
-            int nonTradeYesRaw   = yesOrders.Count;
-            int nonTradeNoRaw    = noOrders.Count;
+            int tradeCountNoRaw = noTrades.Count;
+            int nonTradeYesRaw = yesOrders.Count;
+            int nonTradeNoRaw = noOrders.Count;
 
             // Normalize counts per minute (counts per minute)
             double tradeCountPerMinYes = tradeCountYesRaw / minutes;
-            double tradeCountPerMinNo  = tradeCountNoRaw  / minutes;
-            double nonTradePerMinYes   = nonTradeYesRaw   / minutes;
-            double nonTradePerMinNo    = nonTradeNoRaw    / minutes;
+            double tradeCountPerMinNo = tradeCountNoRaw  / minutes;
+            double nonTradePerMinYes = nonTradeYesRaw   / minutes;
+            double nonTradePerMinNo = nonTradeNoRaw    / minutes;
 
             // Per-minute volumes (dollarized). Use absolute delta for trade-related volumes and signed delta for orders
             double tradeVolPerMinYes = yesTrades.Sum(c => (c.Price / 100.0) * Math.Abs(c.DeltaContracts)) / minutes;
-            double tradeVolPerMinNo  = noTrades.Sum (c => (c.Price / 100.0) * Math.Abs(c.DeltaContracts)) / minutes;
+            double tradeVolPerMinNo = noTrades.Sum(c => (c.Price / 100.0) * Math.Abs(c.DeltaContracts)) / minutes;
             double orderVolPerMinYes = yesOrders.Sum(c => (c.Price / 100.0) * c.DeltaContracts) / minutes;
-            double orderVolPerMinNo  = noOrders.Sum (c => (c.Price / 100.0) * c.DeltaContracts) / minutes;
+            double orderVolPerMinNo = noOrders.Sum(c => (c.Price / 100.0) * c.DeltaContracts) / minutes;
 
             // Average trade size (dollarized per trade) remains raw (not normalized per minute)
             double avgTradeSizeYes = 0;
@@ -1572,15 +1569,15 @@ namespace SmokehouseBot.Services
 
             // Round values for consistent precision
             tradeCountPerMinYes = Math.Round(tradeCountPerMinYes, 2);
-            tradeCountPerMinNo  = Math.Round(tradeCountPerMinNo,  2);
-            tradeVolPerMinYes   = Math.Round(tradeVolPerMinYes,   2);
-            tradeVolPerMinNo    = Math.Round(tradeVolPerMinNo,    2);
-            orderVolPerMinYes   = Math.Round(orderVolPerMinYes,   2);
-            orderVolPerMinNo    = Math.Round(orderVolPerMinNo,    2);
-            nonTradePerMinYes   = Math.Round(nonTradePerMinYes,   2);
-            nonTradePerMinNo    = Math.Round(nonTradePerMinNo,    2);
-            avgTradeSizeYes     = Math.Round(avgTradeSizeYes,     2);
-            avgTradeSizeNo      = Math.Round(avgTradeSizeNo,      2);
+            tradeCountPerMinNo  = Math.Round(tradeCountPerMinNo, 2);
+            tradeVolPerMinYes   = Math.Round(tradeVolPerMinYes, 2);
+            tradeVolPerMinNo    = Math.Round(tradeVolPerMinNo, 2);
+            orderVolPerMinYes   = Math.Round(orderVolPerMinYes, 2);
+            orderVolPerMinNo    = Math.Round(orderVolPerMinNo, 2);
+            nonTradePerMinYes   = Math.Round(nonTradePerMinYes, 2);
+            nonTradePerMinNo    = Math.Round(nonTradePerMinNo, 2);
+            avgTradeSizeYes     = Math.Round(avgTradeSizeYes, 2);
+            avgTradeSizeNo      = Math.Round(avgTradeSizeNo, 2);
 
             // Assign normalized metrics directly to Market fields.  Counts are stored as per-minute values.
             market.CurrentTradeRatePerMinute_Yes        = tradeCountPerMinYes;

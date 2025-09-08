@@ -190,6 +190,6 @@ namespace TradingStrategies.Strategies.Strats
             return JsonSerializer.Serialize(data);
         }
 
-     
+
     }
 }

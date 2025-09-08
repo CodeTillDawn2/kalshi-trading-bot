@@ -460,7 +460,7 @@ namespace TradingSimulator.Simulator
                 });
 
                 OnProfitLossUpdate?.Invoke(market, finalPnL);
-                
+
 
                 OnMarketProcessed?.Invoke(market);
                 marketSnapshots.Clear();
@@ -954,7 +954,7 @@ ResolveFamily(StrategyFamily family)
             OnTestProgress?.Invoke($"{label}: all strategy sets completed");
         }
 
-        
+
 
         [TearDown]
         public void TearDown()

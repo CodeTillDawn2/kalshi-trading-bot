@@ -1,10 +1,7 @@
 ﻿using SmokehouseDTOs;
 using SmokehousePatterns;
 using SmokehousePatterns.PatternDefinitions;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.Json;
 using TradingStrategies.Extensions;
 using static SmokehouseInterfaces.Enums.StrategyEnums;
@@ -628,7 +625,7 @@ namespace TradingStrategies.Strategies.Strats
     ("TryAgain_S089",new(){ {TryAgainStrat.ParamKey.MinDistanceFromBounds,4},{TryAgainStrat.ParamKey.VelocityToDepthRatio,0.78},{TryAgainStrat.ParamKey.MinConsecutiveBars,2},{TryAgainStrat.ParamKey.MaxSpreadTicks,3},{TryAgainStrat.ParamKey.TradeRateShareMin,0.04},{TryAgainStrat.ParamKey.TradeEventShareMin,0.06},{TryAgainStrat.ParamKey.ExitOppositeSignalStrength,0.36},{TryAgainStrat.ParamKey.MinSlope,1.0},{TryAgainStrat.ParamKey.MinSlope_Medium,1.4},{TryAgainStrat.ParamKey.ExitMinSlopeRequirement_Medium,0.38},{TryAgainStrat.ParamKey.ExitMinSlopeRequirement,2.8},{TryAgainStrat.ParamKey.Top10VelocityWeight,6} }),
     ("TryAgain_S090",new(){ {TryAgainStrat.ParamKey.MinDistanceFromBounds,4},{TryAgainStrat.ParamKey.VelocityToDepthRatio,0.88},{TryAgainStrat.ParamKey.MinConsecutiveBars,1},{TryAgainStrat.ParamKey.MaxSpreadTicks,4},{TryAgainStrat.ParamKey.TradeRateShareMin,0.04},{TryAgainStrat.ParamKey.TradeEventShareMin,0.06},{TryAgainStrat.ParamKey.ExitOppositeSignalStrength,0.38},{TryAgainStrat.ParamKey.MinSlope,1.1},{TryAgainStrat.ParamKey.MinSlope_Medium,1.5},{TryAgainStrat.ParamKey.ExitMinSlopeRequirement_Medium,0.40},{TryAgainStrat.ParamKey.ExitMinSlopeRequirement,3.0},{TryAgainStrat.ParamKey.Top10VelocityWeight,6} }),
 
-    
+
     ("TryAgain_S092",new(){ {TryAgainStrat.ParamKey.MinDistanceFromBounds,12},{TryAgainStrat.ParamKey.VelocityToDepthRatio,0.32},{TryAgainStrat.ParamKey.MinConsecutiveBars,1},{TryAgainStrat.ParamKey.MaxSpreadTicks,2},{TryAgainStrat.ParamKey.TradeRateShareMin,0.06},{TryAgainStrat.ParamKey.TradeEventShareMin,0.04},{TryAgainStrat.ParamKey.ExitOppositeSignalStrength,0.20},{TryAgainStrat.ParamKey.MinSlope,0.8},{TryAgainStrat.ParamKey.MinSlope_Medium,0.9},{TryAgainStrat.ParamKey.ExitMinSlopeRequirement_Medium,0.28},{TryAgainStrat.ParamKey.ExitMinSlopeRequirement,1.8},{TryAgainStrat.ParamKey.Top10VelocityWeight,1} }),
     ("TryAgain_S093",new(){ {TryAgainStrat.ParamKey.MinDistanceFromBounds,12},{TryAgainStrat.ParamKey.VelocityToDepthRatio,0.38},{TryAgainStrat.ParamKey.MinConsecutiveBars,2},{TryAgainStrat.ParamKey.MaxSpreadTicks,2},{TryAgainStrat.ParamKey.TradeRateShareMin,0.06},{TryAgainStrat.ParamKey.TradeEventShareMin,0.04},{TryAgainStrat.ParamKey.ExitOppositeSignalStrength,0.22},{TryAgainStrat.ParamKey.MinSlope,0.9},{TryAgainStrat.ParamKey.MinSlope_Medium,1.0},{TryAgainStrat.ParamKey.ExitMinSlopeRequirement_Medium,0.30},{TryAgainStrat.ParamKey.ExitMinSlopeRequirement,2.0},{TryAgainStrat.ParamKey.Top10VelocityWeight,1} }),
     ("TryAgain_S094",new(){ {TryAgainStrat.ParamKey.MinDistanceFromBounds,12},{TryAgainStrat.ParamKey.VelocityToDepthRatio,0.44},{TryAgainStrat.ParamKey.MinConsecutiveBars,1},{TryAgainStrat.ParamKey.MaxSpreadTicks,3},{TryAgainStrat.ParamKey.TradeRateShareMin,0.06},{TryAgainStrat.ParamKey.TradeEventShareMin,0.04},{TryAgainStrat.ParamKey.ExitOppositeSignalStrength,0.24},{TryAgainStrat.ParamKey.MinSlope,1.0},{TryAgainStrat.ParamKey.MinSlope_Medium,1.1},{TryAgainStrat.ParamKey.ExitMinSlopeRequirement_Medium,0.32},{TryAgainStrat.ParamKey.ExitMinSlopeRequirement,2.2},{TryAgainStrat.ParamKey.Top10VelocityWeight,1} }),

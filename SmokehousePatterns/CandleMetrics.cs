@@ -52,6 +52,6 @@
                 return LookbackAvgRange[patternLength - 1];
             return 0;
         }
-      
+
     }
 }
