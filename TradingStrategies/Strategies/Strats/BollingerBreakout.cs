@@ -25,7 +25,7 @@ namespace TradingStrategies.Strategies.Strats
             MaxBidImbalance
         }
 
-        public BollingerBreakout(string name = nameof(BollingerBreakout), double weight = 1.0, Dictionary<ParamKey, double> mlParams = null)
+        public BollingerBreakout(string name = nameof(BollingerBreakout), double weight = 1.0, Dictionary<ParamKey, double>? mlParams = null)
         {
             Name = name;
             Weight = weight;

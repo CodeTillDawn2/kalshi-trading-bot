@@ -11,8 +11,8 @@ namespace SmokehouseBot.Management.Interfaces
         DateTime LastSuccessfulSnapshot { get; set; }
         Task<bool> HandleErrors();
         Task<bool> CheckInternetConnection();
-        void AddWarning(Exception ex, string identifier, string message = null);
-        void AddError(Exception ex, string identifier, string message = null);
+        void AddWarning(Exception ex, string identifier, string? message = null);
+        void AddError(Exception ex, string identifier, string? message = null);
         long WarningCount { get; set; }
         long ErrorCount { get; set; }
     }

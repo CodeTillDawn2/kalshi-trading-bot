@@ -45,7 +45,7 @@ namespace TradingSimulator.ML
     // ===== PUBLIC ENTRYPOINTS (call these from button handlers) =====
     public static class FlattenPriceQuickstart
     {
-        public static RegressionSummary TrainFromCsv(string csvPath, string modelPath, FlattenPriceConfig cfg = null)
+        public static RegressionSummary TrainFromCsv(string csvPath, string modelPath, FlattenPriceConfig? cfg = null)
         {
             cfg ??= new FlattenPriceConfig();
             var ml = new MLContext(seed: cfg.Seed);
@@ -90,7 +90,7 @@ namespace TradingSimulator.ML
             };
         }
 
-        public static RegressionSummary EvaluateFromCsv(string csvPath, string modelPath, FlattenPriceConfig cfg = null)
+        public static RegressionSummary EvaluateFromCsv(string csvPath, string modelPath, FlattenPriceConfig? cfg = null)
         {
             cfg ??= new FlattenPriceConfig();
             var ml = new MLContext(seed: cfg.Seed);
@@ -108,7 +108,7 @@ namespace TradingSimulator.ML
             return new RegressionSummary { TrainRows = examples.Count, MAE = m.MeanAbsoluteError, RMSE = m.RootMeanSquaredError, R2 = m.RSquared };
         }
 
-        public static FlattenPrediction PredictLatestFromCsv(string csvPath, string modelPath, FlattenPriceConfig cfg = null)
+        public static FlattenPrediction PredictLatestFromCsv(string csvPath, string modelPath, FlattenPriceConfig? cfg = null)
         {
             cfg ??= new FlattenPriceConfig();
             var ml = new MLContext(seed: cfg.Seed);

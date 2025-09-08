@@ -47,7 +47,7 @@ namespace TradingStrategies.Strategies.Strats
         public TryAgainStrat(
     string name = nameof(TryAgainStrat),
     double weight = 1.0,
-    Dictionary<ParamKey, double> mlParams = null)
+    Dictionary<ParamKey, double>? mlParams = null)
         {
             Name = name;
             Weight = weight;

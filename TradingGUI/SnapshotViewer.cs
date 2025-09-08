@@ -152,7 +152,7 @@ namespace SimulatorWinForms
         private int _navigationStepSize = 1; // Current step size (1, 2, 5, or 60)
 
         // Cursor line fields
-        private ScottPlot.Plottable.IPlottable _cursorLine; // Light grey line following mouse cursor
+        private ScottPlot.Plottable.IPlottable? _cursorLine; // Light grey line following mouse cursor
 
         // Removed CheckAndSyncSecondaryChart method - secondary chart now independent
 
@@ -951,7 +951,7 @@ namespace SimulatorWinForms
             NavigateFast(delta);
         }
 
-        public void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history, List<string> memosList, int simulatedPosition = 0, double averageCost = 0.0, int simulatedRestingOrders = 0, List<PricePoint> positionPoints = null, List<PricePoint> averageCostPoints = null, List<PricePoint> restingOrdersPoints = null)
+        public void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history, List<string> memosList, int simulatedPosition = 0, double averageCost = 0.0, int simulatedRestingOrders = 0, List<PricePoint>? positionPoints = null, List<PricePoint>? averageCostPoints = null, List<PricePoint>? restingOrdersPoints = null)
         {
             currentSnapshot = snapshot;
             historySnapshots = history.OrderBy(s => s.Timestamp).ToList();

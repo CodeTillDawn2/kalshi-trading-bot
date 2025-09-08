@@ -40,7 +40,7 @@ namespace TradingStrategies.Strategies.Strats
         public FlowMomentumStrat(
             string name = nameof(FlowMomentumStrat),
             double weight = 1.0,
-            Dictionary<ParamKey, double> mlParams = null)
+            Dictionary<ParamKey, double>? mlParams = null)
         {
             Name = name;
             Weight = weight;

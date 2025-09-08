@@ -54,7 +54,7 @@ namespace TradingStrategies.Strategies.Strats
         }
 
         public Breakout2(string name = nameof(Breakout2), double weight = 1.0,
-                  Dictionary<ParamKey, double> mlParams = null)
+                  Dictionary<ParamKey, double>? mlParams = null)
         {
             Name = name;
             Weight = weight;

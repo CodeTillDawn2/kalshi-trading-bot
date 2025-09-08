@@ -12,8 +12,8 @@ namespace SmokehouseDTOs
         {
             for (int i = 0; i < 100; i++)
             {
-                YesBids[i] = null; // Lazy init
-                NoBids[i] = null;
+                YesBids[i] = new(); // Lazy init
+                NoBids[i] = new();
             }
         }
 
@@ -68,8 +68,8 @@ namespace SmokehouseDTOs
         {
             for (int i = 1; i <= 99; i++)
             {
-                YesBids[i] = null;
-                NoBids[i] = null;
+                YesBids[i] = new();
+                NoBids[i] = new();
             }
 
             DateTime initTime = snapshot.Timestamp; // Assume all initial orders at snapshot time
@@ -112,7 +112,7 @@ namespace SmokehouseDTOs
             orders.RemoveAll(o => o.count <= 0);
             if (orders.Count == 0)
             {
-                book[price] = null;
+                book[price] = new();
             }
         }
 

@@ -27,7 +27,7 @@ namespace TradingStrategies.Strategies.Strats
             MaxBidImbalance
         }
 
-        public NothingEverHappensStrat(string name = nameof(NothingEverHappensStrat), double weight = 1.0, Dictionary<ParamKey, double> mlParams = null)
+        public NothingEverHappensStrat(string name = nameof(NothingEverHappensStrat), double weight = 1.0, Dictionary<ParamKey, double>? mlParams = null)
         {
             Name = name;
             Weight = weight;

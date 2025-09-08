@@ -22,7 +22,7 @@ namespace TradingStrategies.Strategies.Strats
             MinRatioDifference
         }
 
-        public Breakout(string name = nameof(Breakout), double weight = 1.0, Dictionary<ParamKey, double> mlParams = null)
+        public Breakout(string name = nameof(Breakout), double weight = 1.0, Dictionary<ParamKey, double>? mlParams = null)
         {
             Name = name;
             Weight = weight;

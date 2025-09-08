@@ -12,7 +12,7 @@ namespace SimulatorWinForms
         private readonly SimulatorTests _simulator;
         private readonly string _cacheDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "TestingOutput");
         private List<(double x, double y, string memo)> _tooltipPoints = new();
-        private string _lastTooltipMemo = null;
+        private string? _lastTooltipMemo = null;
         private HashSet<string> _checkedMarketNames = new();
         private bool _simSetup;
         private Label _tooltipOverlay;
@@ -118,7 +118,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private async Task LoadCache(List<string> includeBases = null)
+        private async Task LoadCache(List<string>? includeBases = null)
         {
             dgvMarkets.Columns.Clear();
             dgvMarkets.Rows.Clear();

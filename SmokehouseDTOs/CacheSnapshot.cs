@@ -66,7 +66,7 @@ namespace SmokehouseDTOs
                 {
                     if (reader.TokenType == JsonTokenType.EndObject) return (ask, bid, when);
                     if (reader.TokenType != JsonTokenType.PropertyName) continue;
-                    string prop = reader.GetString();
+                    string? prop = reader.GetString();
                     reader.Read();
                     switch (prop)
                     {
@@ -76,7 +76,7 @@ namespace SmokehouseDTOs
                         case "Item2": bid = reader.GetInt32(); break;
                         case "when":
                         case "Item3":
-                            string s = reader.GetString();
+                            string? s = reader.GetString();
                             if (DateTime.TryParse(s, null, System.Globalization.DateTimeStyles.RoundtripKind, out var dt)) when = dt;
                             break;
                     }
@@ -138,7 +138,7 @@ namespace SmokehouseDTOs
                 {
                     if (reader.TokenType == JsonTokenType.EndObject) return (ask, when);
                     if (reader.TokenType != JsonTokenType.PropertyName) continue;
-                    string prop = reader.GetString();
+                    string? prop = reader.GetString();
                     reader.Read();
                     switch (prop)
                     {
@@ -146,7 +146,7 @@ namespace SmokehouseDTOs
                         case "Bid": ask = reader.GetInt32(); break;
                         case "w":
                         case "When":
-                            string s = reader.GetString();
+                            string? s = reader.GetString();
                             if (DateTime.TryParse(s, null, System.Globalization.DateTimeStyles.RoundtripKind, out var dt)) when = dt;
                             break;
                     }

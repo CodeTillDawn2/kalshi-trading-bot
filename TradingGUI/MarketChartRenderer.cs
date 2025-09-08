@@ -11,7 +11,7 @@ namespace SimulatorWinForms.Charting
             ScottPlot.FormsPlot plot,
             string cacheDir,
             string market,
-            Action<string> log,
+            Action<string>? log,
             bool collectTooltips = true)  // Optional, but we'll override per series to match old
         {
             plot.Plot.Clear();
@@ -20,7 +20,7 @@ namespace SimulatorWinForms.Charting
             var baseMarket = Regex.Replace(market ?? "", @"_(\d+)$", "");
             var canonical = Path.Combine(cacheDir, $"{baseMarket}.json");
 
-            CachedMarketData merged = null;
+            CachedMarketData? merged = null;
 
             if (File.Exists(canonical))
             {

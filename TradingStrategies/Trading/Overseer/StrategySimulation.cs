@@ -11,7 +11,7 @@ namespace TradingStrategies.Trading.Overseer
         public int Position { get; private set; }
         public double Cash { get; private set; }
         public double InitialCash { get; private set; }
-        public SimulatedOrderbook SimulatedBook { get; private set; }
+        public SimulatedOrderbook? SimulatedBook { get; private set; }
         public List<(string action, string side, string type, int count, int price, DateTime? expiration)> SimulatedRestingOrders { get; private set; } = new List<(string, string, string, int, int, DateTime?)>();
 
         public StrategySimulation(Strategy strategy, double initialCash = 100.0)
@@ -219,7 +219,7 @@ namespace TradingStrategies.Trading.Overseer
                             toCancel -= take;
                             if (e.count <= 0) lst.RemoveAt(j); else lst[j] = e;
                         }
-                        if (lst.Count == 0) book[bookPrice] = null;
+                        if (lst.Count == 0) book[bookPrice] = new List<(int count, DateTime timestamp)>();
                     }
                 }
                 SimulatedRestingOrders.Clear();
@@ -305,7 +305,7 @@ namespace TradingStrategies.Trading.Overseer
                             toCancel -= take;
                             if (e.count <= 0) lst.RemoveAt(j); else lst[j] = e;
                         }
-                        if (lst.Count == 0) book[bookPrice] = null;
+                        if (lst.Count == 0) book[bookPrice] = new List<(int count, DateTime timestamp)>();
                     }
                     SimulatedRestingOrders.RemoveAt(i);
                     continue;

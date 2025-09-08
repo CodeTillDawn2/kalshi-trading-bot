@@ -35,7 +35,7 @@ namespace TradingStrategies.Strategies.Strats
         public SlopeMomentumStrat(
             string name = nameof(SlopeMomentumStrat),
             double weight = 1.0,
-            Dictionary<ParamKey, double> mlParams = null)
+            Dictionary<ParamKey, double>? mlParams = null)
         {
             Name = name;
             Weight = weight;

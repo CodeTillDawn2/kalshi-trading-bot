@@ -818,7 +818,7 @@ namespace SmokehouseBot.Services
             }
         }
 
-        private async Task BroadcastBalanceAsync(string connectionId = null)
+        private async Task BroadcastBalanceAsync(string? connectionId = null)
         {
             var stopwatch = Stopwatch.StartNew();
             IncrementBroadcastCount(nameof(BroadcastBalanceAsync));
