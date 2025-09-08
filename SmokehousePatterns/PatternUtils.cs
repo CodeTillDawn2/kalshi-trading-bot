@@ -1,6 +1,6 @@
 ﻿using SmokehouseDTOs;
-using static SmokehousePatterns.Helpers.TrendCalcs;
-namespace SmokehousePatterns.Helpers
+using static SmokehousePatterns.TrendCalcs;
+namespace SmokehousePatterns
 {
     public static class PatternUtils
     {

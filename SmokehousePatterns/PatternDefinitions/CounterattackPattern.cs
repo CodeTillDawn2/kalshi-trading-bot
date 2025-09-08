@@ -1,7 +1,6 @@
 ﻿using SmokehouseDTOs;
-using SmokehousePatterns.Helpers;
 using System.Diagnostics;
-using static SmokehousePatterns.Helpers.PatternUtils;
+using static SmokehousePatterns.PatternUtils;
 
 namespace SmokehousePatterns.PatternDefinitions
 {

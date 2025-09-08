@@ -1,8 +1,7 @@
 ﻿using SmokehouseDTOs;
 using SmokehousePatterns;
-using SmokehousePatterns.Helpers;
 using SmokehousePatterns.PatternDefinitions;
-using static SmokehousePatterns.Helpers.PatternUtils;
+using static SmokehousePatterns.PatternUtils;
 /// <summary>
 /// Represents a Dark Cloud Cover candlestick pattern, a 2-candle bearish reversal pattern.
 /// Indicates a potential reversal from an uptrend to a downtrend.

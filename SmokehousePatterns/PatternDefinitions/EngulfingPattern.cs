@@ -1,8 +1,7 @@
 ﻿using SmokehouseDTOs;
 using SmokehousePatterns;
-using SmokehousePatterns.Helpers;
 using SmokehousePatterns.PatternDefinitions;
-using static SmokehousePatterns.Helpers.PatternUtils;
+using static SmokehousePatterns.PatternUtils;
 
 public class EngulfingPattern : PatternDefinition
 {

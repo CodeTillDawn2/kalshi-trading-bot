@@ -1,8 +1,7 @@
 ﻿using SmokehouseDTOs;
-using SmokehousePatterns.Helpers;
 using System.Diagnostics;
-using static SmokehousePatterns.Helpers.PatternUtils;
-using static SmokehousePatterns.Helpers.TrendCalcs;
+using static SmokehousePatterns.PatternUtils;
+using static SmokehousePatterns.TrendCalcs;
 
 namespace SmokehousePatterns.PatternDefinitions
 {

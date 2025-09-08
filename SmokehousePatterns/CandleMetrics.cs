@@ -1,4 +1,4 @@
-﻿namespace SmokehousePatterns.Helpers
+﻿namespace SmokehousePatterns
 {
     public struct CandleMetrics
     {

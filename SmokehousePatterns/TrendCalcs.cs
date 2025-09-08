@@ -1,6 +1,6 @@
 ﻿using SmokehouseDTOs;
 
-namespace SmokehousePatterns.Helpers
+namespace SmokehousePatterns
 {
     public static class TrendCalcs
     {
@@ -80,12 +80,12 @@ namespace SmokehousePatterns.Helpers
             for (int i = lookbackStart; i <= lookbackEnd; i++)
             {
                 double change = prices[i].Close - prices[i].Open;
-                consistentTrendCount += change > 0 ? 1 : (change < 0 ? -1 : 0);
+                consistentTrendCount += change > 0 ? 1 : change < 0 ? -1 : 0;
             }
 
             double unweightedRatio = (double)Math.Abs(consistentTrendCount) / lookbackCount;
             double stepSize = 1.0 / lookbackCount;
-            double smoothedRatio = unweightedRatio + (stepSize / 2.0);
+            double smoothedRatio = unweightedRatio + stepSize / 2.0;
             return Math.Min(smoothedRatio, 1.0);
         }
 
@@ -163,7 +163,7 @@ namespace SmokehousePatterns.Helpers
             }
             double unweightedRatio = totalCount > 0 ? (double)bullishCount / totalCount : 0;
             double stepSize = totalCount > 0 ? 1.0 / totalCount : 0;
-            double smoothedRatio = unweightedRatio + (stepSize / 2.0);
+            double smoothedRatio = unweightedRatio + stepSize / 2.0;
             return Math.Min(smoothedRatio, 1.0);
         }
 
@@ -206,7 +206,7 @@ namespace SmokehousePatterns.Helpers
 
             double unweightedRatio = (double)directionCount / lookbackCount;
             double stepSize = 1.0 / lookbackCount;
-            double smoothedRatio = unweightedRatio + (stepSize / 2.0); // Midpoint smoothing
+            double smoothedRatio = unweightedRatio + stepSize / 2.0; // Midpoint smoothing
             return Math.Min(smoothedRatio, 1.0);
         }
 
