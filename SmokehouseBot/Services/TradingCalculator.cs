@@ -415,12 +415,8 @@ namespace SmokehouseBot.Services
             }
 
             // Filter candlesticks outside 07:00:00 to 11:59:00 UTC
-            var validCandlesticks = candlesticks.Where(c =>
-            {
-                var truncatedTime = TradingCalculations.TruncateToMinute(c.Date.ToUniversalTime());
-                var timeOfDay = truncatedTime.TimeOfDay;
-                return timeOfDay < new TimeSpan(7, 0, 0) || timeOfDay > new TimeSpan(11, 59, 0);
-            }).ToList();
+            // Temporarily disable filter to include all data for level calculation
+            var validCandlesticks = candlesticks.ToList();
 
             log.AppendLine($"Filtered out {candlesticks.Count - validCandlesticks.Count} candlesticks between 07:00:00 and 11:59:00 UTC. Valid candlesticks: {validCandlesticks.Count}");
 

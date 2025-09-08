@@ -143,10 +143,8 @@ namespace SimulatorWinForms
             secondaryChart.Enabled = true;
         }
 
-        private (double xMin, double xMax, double yMin, double yMax)? _lastMainLimits;
         private (double xMin, double xMax)? _fullDataRange; // Store full data range for zoom bounds
         private System.Windows.Forms.Timer _navigationTimer; // Timer for deferred chart updates during navigation
-        private bool _isNavigating = false; // Flag to track if user is actively navigating
 
         // Progressive speed navigation fields
         private int _consecutiveNavigations = 0; // Track consecutive navigation steps
@@ -491,7 +489,6 @@ namespace SimulatorWinForms
         {
             // Stop the timer and reset navigation flag
             _navigationTimer.Stop();
-            _isNavigating = false;
 
             // Reset navigation speed counters when user stops
             _consecutiveNavigations = 0;
@@ -749,7 +746,6 @@ namespace SimulatorWinForms
             UpdateUIFromSnapshot();
 
             // Start navigation mode and reset timer for expensive operations
-            _isNavigating = true;
             _navigationTimer.Stop();
             _navigationTimer.Start();
         }
@@ -1444,7 +1440,7 @@ namespace SimulatorWinForms
                     // Render the same chart as MainForm, but without collecting tooltips
                     Charting.MarketChartRenderer.Render(chart, CacheDir, market, null, collectTooltips: false);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // If cached rendering fails, fall back to snapshot data rendering
                     RenderFromSnapshotData(chart);
@@ -1517,29 +1513,6 @@ namespace SimulatorWinForms
         private void RenderY1Metrics(ScottPlot.FormsPlot chart)
         {
             var legendItems = new List<string>();
-
-            // RSI - Plot over time
-            if (rsiLabel.Checked)
-            {
-                var rsiPoints = new List<double>();
-                var timePoints = new List<double>();
-
-                foreach (var snapshot in historySnapshots)
-                {
-                    if (snapshot.RSI_Medium.HasValue)
-                    {
-                        timePoints.Add(snapshot.Timestamp.ToOADate());
-                        rsiPoints.Add(snapshot.RSI_Medium.Value);
-                    }
-                }
-
-                if (rsiPoints.Count > 1)
-                {
-                    var scatter = chart.Plot.AddScatter(timePoints.ToArray(), rsiPoints.ToArray(), Color.Blue, 2);
-                    scatter.Label = "RSI";
-                    legendItems.Add("RSI");
-                }
-            }
 
             // EMA - Plot over time
             if (emaLabel.Checked)
@@ -1731,22 +1704,49 @@ namespace SimulatorWinForms
                 }
             }
 
-            // Slope
+            // RSI - Plot over time
+            if (rsiLabel.Checked)
+            {
+                var rsiPoints = new List<double>();
+                var timePoints = new List<double>();
+
+                foreach (var snapshot in historySnapshots)
+                {
+                    if (snapshot.RSI_Medium.HasValue)
+                    {
+                        timePoints.Add(snapshot.Timestamp.ToOADate());
+                        rsiPoints.Add(snapshot.RSI_Medium.Value);
+                    }
+                }
+
+                if (rsiPoints.Count > 1)
+                {
+                    var scatter = chart.Plot.AddScatter(timePoints.ToArray(), rsiPoints.ToArray(), Color.Blue, 2);
+                    scatter.Label = "RSI";
+                    legendItems.Add("RSI");
+                }
+            }
+
+            // Slope - Plot both Yes and No
             if (slopeCB.Checked)
             {
-                var slopePoints = new List<double>();
+                var slopeYesPoints = new List<double>();
+                var slopeNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
                 foreach (var snapshot in historySnapshots)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
-                    slopePoints.Add(snapshot.YesBidSlopePerMinute_Short);
+                    slopeYesPoints.Add(snapshot.YesBidSlopePerMinute_Short);
+                    slopeNoPoints.Add(snapshot.NoBidSlopePerMinute_Short);
                 }
 
-                if (slopePoints.Count > 1)
+                if (slopeYesPoints.Count > 1)
                 {
-                    var slopeScatter = chart.Plot.AddScatter(timePoints.ToArray(), slopePoints.ToArray(), Color.Teal, 2);
-                    slopeScatter.Label = "Slope";
+                    var slopeYesScatter = chart.Plot.AddScatter(timePoints.ToArray(), slopeYesPoints.ToArray(), Color.Teal, 2);
+                    slopeYesScatter.Label = "Slope Yes";
+                    var slopeNoScatter = chart.Plot.AddScatter(timePoints.ToArray(), slopeNoPoints.ToArray(), Color.DarkCyan, 2);
+                    slopeNoScatter.Label = "Slope No";
                     legendItems.Add("Slope");
                 }
             }
@@ -2114,25 +2114,6 @@ namespace SimulatorWinForms
                 }
             }
 
-            // Average Cost
-            if (_averageCostPoints != null && _averageCostPoints.Count > 0)
-            {
-                var avgCostPoints = new List<double>();
-                var timePoints = new List<double>();
-
-                foreach (var point in _averageCostPoints)
-                {
-                    timePoints.Add(point.Date.ToOADate());
-                    avgCostPoints.Add(point.Price);
-                }
-
-                if (avgCostPoints.Count > 1)
-                {
-                    var avgCostScatter = chart.Plot.AddScatter(timePoints.ToArray(), avgCostPoints.ToArray(), Color.DarkCyan, 2);
-                    avgCostScatter.Label = "Average Cost";
-                    legendItems.Add("Average Cost");
-                }
-            }
 
             // Position ROI
             if (positionRoiLabel.Checked)
@@ -2215,7 +2196,8 @@ namespace SimulatorWinForms
                    positionSizeLabel.Checked ||
                    simulatedPositionLabel.Checked ||
                    positionRoiLabel.Checked ||
-                   restingOrdersLabel.Checked;
+                   restingOrdersLabel.Checked ||
+                   rsiLabel.Checked;
         }
 
         private void UpdateChartLegends()
