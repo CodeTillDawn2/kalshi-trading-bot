@@ -104,6 +104,15 @@ class Program
             }
         });
 
+        // Register SignalRService
+        services.AddSingleton<SignalRService>(sp =>
+        {
+            var logger = sp.GetRequiredService<ILogger<SignalRService>>();
+            // TODO: Get hub URL from configuration
+            var hubUrl = "http://localhost:5000/chartHub"; // Adjust as needed
+            return new SignalRService(hubUrl, logger);
+        });
+
         // Register the new EventSubscriber as singleton
         services.AddSingleton<Overseer>();
 

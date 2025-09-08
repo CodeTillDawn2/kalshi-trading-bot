@@ -14,18 +14,20 @@ namespace SmokehouseBot.Services
         private readonly IKalshiWebSocketClient _webSocketClient;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<Overseer> _logger;
+        private readonly SignalRService _signalRService;
         private Timer? _apiFetchTimer;
         private CancellationTokenSource? _apiFetchCancellationTokenSource;
         private bool _disposed = false;
 
-        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger)
+        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, SignalRService signalRService)
         {
             _webSocketClient = webSocketClient;
             _scopeFactory = scopeFactory;
             _logger = logger;
+            _signalRService = signalRService;
         }
 
-        public void Start()
+        public async void Start()
         {
             // Subscribe to the specific events
             _webSocketClient.FillReceived += OnFillReceived;
@@ -34,13 +36,17 @@ namespace SmokehouseBot.Services
 
             _logger?.LogInformation("Subscribed to Fill, MarketLifecycle, and EventLifecycle events.");
 
+            await _signalRService.StartAsync();
+
             StartPeriodicApiFetching();
         }
 
-        public void Stop()
+        public async void Stop()
         {
             Unsubscribe();
             _logger?.LogInformation("Unsubscribed from events.");
+
+            await _signalRService.StopAsync();
         }
 
         private void Unsubscribe()
@@ -51,22 +57,31 @@ namespace SmokehouseBot.Services
             _webSocketClient.EventLifecycleReceived -= OnEventLifecycleReceived;
         }
 
-        private void OnFillReceived(object sender, FillEventArgs e)
+        private async void OnFillReceived(object sender, FillEventArgs e)
         {
             // Handle the fill event (e.g., log or process)
             _logger?.LogInformation("Received Fill event: {EventData}", e);
+
+            // Transmit the fill event via SignalR
+            await _signalRService.SendMessageAsync("ReceiveFill", $"Fill event: {e}");
         }
 
-        private void OnMarketLifecycleReceived(object sender, MarketLifecycleEventArgs e)
+        private async void OnMarketLifecycleReceived(object sender, MarketLifecycleEventArgs e)
         {
             // Handle the market lifecycle event
             _logger?.LogInformation("Received MarketLifecycle event: {EventData}", e);
+
+            // Transmit the market lifecycle event via SignalR
+            await _signalRService.SendMessageAsync("ReceiveMarketLifecycle", $"MarketLifecycle event: {e}");
         }
 
-        private void OnEventLifecycleReceived(object sender, EventLifecycleEventArgs e)
+        private async void OnEventLifecycleReceived(object sender, EventLifecycleEventArgs e)
         {
             // Handle the event lifecycle event
             _logger?.LogInformation("Received EventLifecycle event: {EventData}", e);
+
+            // Transmit the event lifecycle event via SignalR
+            await _signalRService.SendMessageAsync("ReceiveEventLifecycle", $"EventLifecycle event: {e}");
         }
 
         /// <summary>
