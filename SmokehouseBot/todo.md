@@ -23,12 +23,10 @@
 - [ ] What are "Milestones" in the Kalshi API? Seems like it could be things that need to happen for events to trigger? Could be used for analysis
 - [ ] Evaluate whether we can trust ticker feed to indicate when we should get candlesticks
 - [ ] Batch subscription updates
-- [ ] Dump snapshots to file system to reduce sql usage in the moment since snapshots aren't needed except in retrospect
 - [ ] Expand Web socket testing to include: adding and removing markets quickly, conflicting commands, etc
 - [ ] Detect upcoming downtimes and react to them, schedule maintenance
 - [ ] ticker_v2
 - [ ] Need some kind of "traffic cop" intermediary to handle graceful handoffs, potentially handle some of the maintenance duties
-- [ ] Is no slope flipped the wrong direction from what would be expected?
 - [ ] userdatatimestamp endpoint (https://docs.kalshi.com/api-reference/get-user-data-timestamp). Make system that monitors this and, beyond a defined threshold, cancels all resting orders and shuts down until it improves. 
 
 
@@ -54,6 +52,7 @@ Notes: Major issue which was causing snapshots after the first to not translate 
 - [x] Clean new repo on github
 - [x] Tests now runnable on other machines
 - [x] So many strat and trading GUI changes
+- [x] Dump snapshots to file system to reduce sql usage in the moment since snapshots aren't needed except in retrospect
 
 # v0.2.4
 Note: Discovered bug which was causing the orderbook to be static in the snapshot due to dual storage in memory and only one copy being updated. All snapshots have been invalidated with no
