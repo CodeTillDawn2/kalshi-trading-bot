@@ -3,6 +3,7 @@ using SmokehouseBot.Services.Interfaces;
 using SmokehouseBot.State.Interfaces;
 using SmokehouseDTOs.Exceptions;
 using System.Diagnostics;
+using System.Threading;
 using TradingStrategies.Configuration;
 
 namespace SmokehouseBot.Services
@@ -49,8 +50,12 @@ namespace SmokehouseBot.Services
             try
             {
                 _logger.LogDebug("MarketRefreshService ExecuteAsync started...");
-                _executeTask = Task.Run(async () =>
+                _executeTask = Task.Factory.StartNew(async () =>
                 {
+                    // Set thread priority to BelowNormal for market refresh operations
+                    Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
+                    _logger.LogDebug("MarketRefreshService running on low priority thread (BelowNormal)");
+
                     //bool isFirstExecution = true;
                     while (!_statusTracker.GetCancellationToken().IsCancellationRequested)
                     {
@@ -101,11 +106,11 @@ namespace SmokehouseBot.Services
                         }
                     }
                     _logger.LogDebug("MarketRefreshService ExecuteAsync stopped.");
-                }, _statusTracker.GetCancellationToken());
+                }, _statusTracker.GetCancellationToken(), TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
             }
             catch (OperationCanceledException)
             {
-                _logger.LogDebug("PopulateMarketDataAsync was cancelled");
+                _logger.LogDebug("MarketRefreshService ExecuteAsync was cancelled");
             }
         }
 

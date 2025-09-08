@@ -41,6 +41,7 @@
 - [ ] Investigate: Exchange is inactive or reconnection disabled, skipping reconnection attempt (id 458076146,followed by no reconnection attempt for 2 hours, then skipping "late" snapshots, only restarting because of no snapshots in 10 minutes)
 - [ ] Start periodically sampling exchange status and find out if they are warning about sudden outages
 - [x] Start with no markets watched then build list so there isn't so much of a downtime, start with most active markets to minimize impact of restart
+- [ ] Need to let market refresh service run before init finishes if long running
 
 # v0.2.5
 Notes: Major issue which was causing snapshots after the first to not translate to change over time... all snapshots invalidated.

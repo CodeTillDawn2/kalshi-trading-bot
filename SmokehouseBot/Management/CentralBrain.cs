@@ -195,7 +195,7 @@ namespace SmokehouseBot.Management
             _isReset = false;
 
             _serviceFactory.InitializeServices(_brainStatus.BrainLock);
-            _logger.LogInformation("BRAIN: Starting process of opening data dashboard...");
+            _logger.LogInformation("BRAIN: Starting Kalshi Bot Initialization...");
             try
             {
                 var dataCache = _serviceFactory.GetDataCache();
@@ -765,7 +765,6 @@ namespace SmokehouseBot.Management
             {
                 var cancellationToken = _statusTrackerService.GetCancellationToken();
                 cancellationToken.ThrowIfCancellationRequested();
-                _logger.LogDebug("BRAIN: Creating snapshot for all markets. {0}", string.Join(",", _serviceFactory.GetDataCache().Markets.Keys));
                 DateTime snapshotDate = DateTime.Now;
 
                 // Step 1: Filter watched markets explicitly
@@ -781,18 +780,51 @@ namespace SmokehouseBot.Management
                     }
                 }
 
-                // Step 2: Create snapshots for each watched market
+                // Step 2: Create snapshots for each watched market in parallel for better performance
                 var marketSnapshots = new List<MarketSnapshot>();
+                var snapshotTasks = new List<Task<MarketSnapshot?>>();
+
                 foreach (var kvp in watchedMarketsData)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
                     if (!kvp.Value.ReceivedFirstSnapshot) continue;
-                    kvp.Value.RefreshTickerMetadata();
-                    kvp.Value.RecalculateOrderbookChangeMetrics();
-                    var marketSnapshot = CreateMarketSnapshot(snapshotDate, kvp);
-                    kvp.Value.LastSnapshotTaken = DateTime.UtcNow;
-                    marketSnapshots.Add(marketSnapshot);
+
+                    // Create snapshot task for parallel processing
+                    var snapshotTask = Task.Run(() =>
+                    {
+                        try
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            kvp.Value.RefreshTickerMetadata();
+                            kvp.Value.RecalculateOrderbookChangeMetrics();
+                            var marketSnapshot = CreateMarketSnapshot(snapshotDate, kvp);
+                            kvp.Value.LastSnapshotTaken = DateTime.UtcNow;
+                            return marketSnapshot;
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error creating snapshot for market {MarketTicker}", kvp.Key);
+                            return null;
+                        }
+                    }, cancellationToken);
+
+                    snapshotTasks.Add(snapshotTask);
                 }
+
+                _logger.LogDebug("BRAIN: Starting parallel snapshot creation for {Count} markets", watchedMarketsData.Count);
+
+                // Wait for all snapshot tasks to complete
+                var completedSnapshots = await Task.WhenAll(snapshotTasks);
+
+                // Filter out null results and add to the list
+                foreach (var snapshot in completedSnapshots)
+                {
+                    if (snapshot != null)
+                    {
+                        marketSnapshots.Add(snapshot);
+                    }
+                }
+
+                _logger.LogDebug("BRAIN: Completed parallel snapshot creation, processed {Count} markets successfully", marketSnapshots.Count);
 
                 cancellationToken.ThrowIfCancellationRequested();
                 allSnapshots = new CacheSnapshot(snapshotDate, _serviceFactory.GetDataCache().SoftwareVersion, _snapshotConfig.SnapshotSchemaVersion,
