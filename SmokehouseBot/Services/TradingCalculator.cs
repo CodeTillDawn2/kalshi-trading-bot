@@ -418,6 +418,9 @@ namespace SmokehouseBot.Services
             // Temporarily disable filter to include all data for level calculation
             var validCandlesticks = candlesticks.ToList();
 
+            // Use all historical candlesticks for comprehensive analysis
+            // validCandlesticks = validCandlesticks.OrderByDescending(c => c.Date).Take(1000).ToList();
+
             log.AppendLine($"Filtered out {candlesticks.Count - validCandlesticks.Count} candlesticks between 07:00:00 and 11:59:00 UTC. Valid candlesticks: {validCandlesticks.Count}");
 
             if (validCandlesticks.Count < 3)
@@ -430,23 +433,34 @@ namespace SmokehouseBot.Services
             int minTouches = Math.Max(1, (int)Math.Round(validCandlesticks.Count * minCandlestickPercentage));
             log.AppendLine($"Minimum touches required: {minTouches} ({minCandlestickPercentage:P0} of {validCandlesticks.Count} valid candlesticks)");
 
-            // Collect frequency and volume for each normalized price (1 to 99 cents)
-            var priceFrequency = new Dictionary<int, int>();
+            // Collect frequency and volume for each normalized price (1 to 99 cents) with time-based weighting
+            var priceFrequency = new Dictionary<int, double>();
             var priceVolume = new Dictionary<int, long>();
-            foreach (var candle in validCandlesticks)
+
+            // Sort candlesticks by date to apply time-based weighting
+            var sortedCandlesticks = validCandlesticks.OrderBy(c => c.Date).ToList();
+            var earliestDate = sortedCandlesticks.First().Date;
+            var latestDate = sortedCandlesticks.Last().Date;
+            var totalTimeSpan = (latestDate - earliestDate).TotalHours;
+
+            foreach (var candle in sortedCandlesticks)
             {
                 int normalizedPrice = (int)Math.Round((candle.AskClose + candle.BidClose) / 2.0);
                 if (normalizedPrice < 1 || normalizedPrice > 99)
                     continue;
 
+                // Calculate time-based weight (exponential decay favoring recent data)
+                var hoursSinceStart = (candle.Date - earliestDate).TotalHours;
+                var timeWeight = Math.Exp(hoursSinceStart / Math.Max(totalTimeSpan, 1.0) * 2.0); // Exponential weighting
+
                 if (priceFrequency.ContainsKey(normalizedPrice))
                 {
-                    priceFrequency[normalizedPrice]++;
+                    priceFrequency[normalizedPrice] += timeWeight;
                     priceVolume[normalizedPrice] += candle.Volume;
                 }
                 else
                 {
-                    priceFrequency[normalizedPrice] = 1;
+                    priceFrequency[normalizedPrice] = timeWeight;
                     priceVolume[normalizedPrice] = candle.Volume;
                 }
             }
@@ -495,6 +509,14 @@ namespace SmokehouseBot.Services
 
                 // Calculate strength as smoothed frequency
                 double strength = smoothedFrequency[peakIndex];
+
+                // Calculate total volume within ±1 cent of the peak price
+                long totalVolume = 0;
+                for (int p = Math.Max(minPrice, price - 1); p <= Math.Min(maxPrice, price + 1); p++)
+                {
+                    int idx = p - minPrice;
+                    totalVolume += (long)volumeArray[idx];
+                }
 
                 var level = new SupportResistanceLevel
                 {
