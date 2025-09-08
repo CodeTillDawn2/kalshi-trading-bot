@@ -1,5 +1,4 @@
-﻿using SmokehouseBot.Management.Interfaces;
-using SmokehouseBot.Services.Interfaces;
+﻿using SmokehouseBot.Services.Interfaces;
 using SmokehouseBot.State.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;

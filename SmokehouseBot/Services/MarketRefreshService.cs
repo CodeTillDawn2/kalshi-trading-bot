@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
-using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
+using SmokehouseBot.State.Interfaces;
 using SmokehouseDTOs.Exceptions;
 using System.Diagnostics;
 using TradingStrategies.Configuration;

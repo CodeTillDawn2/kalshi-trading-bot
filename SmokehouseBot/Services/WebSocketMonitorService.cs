@@ -1,6 +1,6 @@
 ﻿using SmokehouseBot.KalshiAPI.Interfaces;
-using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
+using SmokehouseBot.State.Interfaces;
 using SmokehouseDTOs.KalshiAPI;
 
 namespace SmokehouseBot.Services
@@ -14,18 +14,21 @@ namespace SmokehouseBot.Services
         private Task _monitorTask;
         private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
+        private IBotReadyStatus _readyStatus;
 
         public WebSocketMonitorService(
             IServiceScopeFactory scopeFactory,
             IServiceFactory serviceFactory,
             ILogger<IWebSocketMonitorService> logger,
             IScopeManagerService scopeManagerService,
+            IBotReadyStatus readyStatus,
             IStatusTrackerService statusTrackerService)
         {
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _statusTrackerService = statusTrackerService;
             _scopeFactory = scopeFactory;
+            _readyStatus = readyStatus;
             _logger = logger;
             _logger.LogDebug("WebSocketHostedService instance created");
         }
@@ -35,7 +38,7 @@ namespace SmokehouseBot.Services
             _logger.LogDebug("WebSocketHostedService starting...");
             try
             {
-                _logger.LogDebug("Initial cache state: InitializationCompleted.IsCompleted={IsCompleted}", _statusTrackerService.InitializationCompleted.Task.IsCompleted);
+                _logger.LogDebug("Initial cache state: InitializationCompleted.IsCompleted={IsCompleted}", _readyStatus.InitializationCompleted.Task.IsCompleted);
 
                 _logger.LogDebug("Starting exchange status monitoring...");
                 _monitorTask = Task.Run(async () =>
@@ -125,7 +128,7 @@ namespace SmokehouseBot.Services
                             _serviceFactory.GetDataCache().TradingStatus = status.trading_active;
                             _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _serviceFactory.GetDataCache().ExchangeStatus, _serviceFactory.GetDataCache().TradingStatus);
 
-                            if (status.exchange_active && !_isConnected && _statusTrackerService.InitializationCompleted.Task.IsCompleted)
+                            if (status.exchange_active && !_isConnected && _readyStatus.InitializationCompleted.Task.IsCompleted)
                             {
                                 _logger.LogInformation("Exchange is active, connecting WebSocket");
                                 await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync();
@@ -170,7 +173,7 @@ namespace SmokehouseBot.Services
                         _serviceFactory.GetDataCache().TradingStatus = status.trading_active;
                         _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _serviceFactory.GetDataCache().ExchangeStatus, _serviceFactory.GetDataCache().TradingStatus);
 
-                        if (status.exchange_active && !_isConnected && _statusTrackerService.InitializationCompleted.Task.IsCompleted)
+                        if (status.exchange_active && !_isConnected && _readyStatus.InitializationCompleted.Task.IsCompleted)
                         {
                             _logger.LogInformation("Exchange is active, connecting WebSocket2");
                             await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync(0);

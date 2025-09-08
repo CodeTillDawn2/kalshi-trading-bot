@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using SmokehouseBot.Configuration;
-using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
+using SmokehouseBot.State.Interfaces;
 using System.Net.WebSockets;
 using System.Text;
 
@@ -23,6 +23,7 @@ namespace TradingSimulator.Tests
         private Mock<ISqlDataService> _sqlDataService;
         private Mock<IServiceScopeFactory> _scopeFactoryMock;
         private Mock<IStatusTrackerService> _statusTracker;
+        private Mock<IBotReadyStatus> _readyStatus;
         private Mock<IServiceFactory> _serviceFactoryMock;
         private SqlDataService _sqlService;
         private KalshiWebSocketClient _client;
@@ -36,11 +37,12 @@ namespace TradingSimulator.Tests
             _loggerMock = new Mock<ILogger<KalshiWebSocketClient>>();
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
             _statusTracker = new Mock<IStatusTrackerService>();
+            _readyStatus = new Mock<IBotReadyStatus>();
             _sqlDataService = new Mock<ISqlDataService>();
 
             var initializationCompleted = new TaskCompletionSource<bool>();
             initializationCompleted.SetResult(true); // Simulate initialization completed
-            _statusTracker.SetupGet(st => st.InitializationCompleted).Returns(initializationCompleted);
+            _readyStatus.SetupGet(st => st.InitializationCompleted).Returns(initializationCompleted);
 
             var cts = new CancellationTokenSource();
             _statusTracker.Setup(st => st.GetCancellationToken()).Returns(cts.Token);
@@ -72,7 +74,7 @@ namespace TradingSimulator.Tests
             Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.local.json");
             _sqlService = new SqlDataService(_configuration, _sqlLoggerMock.Object);
 
-            _client = new KalshiWebSocketClient(_kalshiConfigOptions, _loggerMock.Object, _statusTracker.Object, _sqlDataService.Object, false);
+            _client = new KalshiWebSocketClient(_kalshiConfigOptions, _loggerMock.Object, _statusTracker.Object, _readyStatus.Object, _sqlDataService.Object, false);
         }
 
         [TearDown]

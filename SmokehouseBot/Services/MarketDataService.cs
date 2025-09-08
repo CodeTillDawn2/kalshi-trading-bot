@@ -25,6 +25,7 @@ namespace SmokehouseBot.Services
         private readonly IServiceFactory _serviceFactory;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IStatusTrackerService _statusTracker;
+        private readonly IBotReadyStatus _readyStatus;
         private readonly IBrainStatusService _brainStatus;
         private readonly ILogger<IMarketDataService> _logger;
         private readonly Func<MarketDTO, MarketData> _marketDataFactory;
@@ -59,6 +60,7 @@ namespace SmokehouseBot.Services
             IOptions<CalculationConfig> calculationConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTracker,
+            IBotReadyStatus readyStatus,
             IBrainStatusService brainStatus)
         {
             _logger = logger;
@@ -71,6 +73,7 @@ namespace SmokehouseBot.Services
             _calculationConfig = calculationConfig.Value;
             _marketDataFactory = marketDataFactory;
             _statusTracker = statusTracker;
+            _readyStatus = readyStatus;
 
             _tickerUpdateTimer = new System.Timers.Timer(5000); // 5 seconds
             _tickerUpdateTimer.Elapsed += async (sender, e) => await MassUpdateTickers();
@@ -374,7 +377,7 @@ namespace SmokehouseBot.Services
                 _logger.LogInformation("Initialized market cache for {MarketTicker}", marketTicker);
 
                 await _serviceFactory.GetWebSocketHostedService().TriggerConnectionCheckAsync();
-                if (!_statusTracker.InitializationCompleted.Task.IsCompleted)
+                if (!_readyStatus.InitializationCompleted.Task.IsCompleted)
                 {
                     _logger.LogInformation("Skipping connection attempt as initialization is not complete.");
                 }
@@ -859,7 +862,7 @@ namespace SmokehouseBot.Services
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                if (!_statusTracker.InitializationCompleted.Task.IsCompleted)
+                if (!_readyStatus.InitializationCompleted.Task.IsCompleted)
                 {
                     _logger.LogDebug("MarketDataService is stopped or not initialized, skipping watched markets update");
                     return;
@@ -920,7 +923,7 @@ namespace SmokehouseBot.Services
                     _watchedMarketsSemaphore.Release();
                     _logger.LogDebug("Released watched markets semaphore");
                 }
-                else if (!_statusTracker.InitializationCompleted.Task.IsCompleted)
+                else if (!_readyStatus.InitializationCompleted.Task.IsCompleted)
                 {
                     _logger.LogDebug("Not yet ready");
                 }
@@ -937,7 +940,7 @@ namespace SmokehouseBot.Services
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                if (!_statusTracker.InitializationCompleted.Task.IsCompleted)
+                if (!_readyStatus.InitializationCompleted.Task.IsCompleted)
                 {
                     _logger.LogDebug("MarketDataService is not initialized, skipping UpdateWatchedMarketsAsync");
                 }

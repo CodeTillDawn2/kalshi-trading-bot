@@ -2,8 +2,8 @@
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
+using SmokehouseBot.State.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Exceptions;
 using SmokehouseInterfaces.Constants;
@@ -21,6 +21,7 @@ namespace KalshiBotAPI.Websockets
     {
         private readonly ISqlDataService _sqlDataService;
         private readonly IStatusTrackerService _statusTrackerService;
+        private readonly IBotReadyStatus _readyStatus;
         private readonly ILogger<IKalshiWebSocketClient> _logger;
         private readonly KalshiConfig _kalshiConfig;
         private readonly RSA _privateKey;
@@ -96,12 +97,14 @@ namespace KalshiBotAPI.Websockets
             IOptions<KalshiConfig> kalshiConfig,
             ILogger<IKalshiWebSocketClient> logger,
             IStatusTrackerService statusTrackerService,
+            IBotReadyStatus readyStatus,
             ISqlDataService sqlDataService,
             bool writeToSql)
         {
             _kalshiConfig = kalshiConfig.Value;
             _logger = logger;
             _statusTrackerService = statusTrackerService;
+            _readyStatus = readyStatus;
             _sqlDataService = sqlDataService;
             _privateKey = RSA.Create();
             _privateKey.ImportFromPem(File.ReadAllText(_kalshiConfig.KeyFile));
@@ -500,7 +503,7 @@ namespace KalshiBotAPI.Websockets
 
         public async Task ConnectAsync(int retryCount = 0)
         {
-            if (!_allowReconnect && !_isConnected || !_statusTrackerService.InitializationCompleted.Task.IsCompleted)
+            if (!_allowReconnect && !_isConnected || !_readyStatus.InitializationCompleted.Task.IsCompleted)
             {
                 _logger.LogDebug("Reconnection disabled, skipping connect attempt");
                 return;
@@ -645,7 +648,7 @@ namespace KalshiBotAPI.Websockets
                     return;
                 }
 
-                if (!_statusTrackerService.InitializationCompleted.Task.IsCompleted)
+                if (!_readyStatus.InitializationCompleted.Task.IsCompleted)
                 {
                     _logger.LogWarning("Initialization not complete, delaying watched markets subscription");
                     return;

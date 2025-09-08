@@ -7,6 +7,7 @@ using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
 using SmokehouseInterfaces.Constants;
+using SmokehouseBot.State.Interfaces;
 using TradingStrategies.Configuration;
 
 namespace SmokehouseBot.Management

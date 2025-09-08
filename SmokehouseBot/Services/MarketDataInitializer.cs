@@ -1,5 +1,5 @@
-﻿using SmokehouseBot.Management.Interfaces;
-using SmokehouseBot.Services.Interfaces;
+﻿using SmokehouseBot.Services.Interfaces;
+using SmokehouseBot.State.Interfaces;
 namespace SmokehouseBot.Services
 {
     public class MarketDataInitializer : IMarketDataInitializer
@@ -7,12 +7,14 @@ namespace SmokehouseBot.Services
         private readonly ILogger<IMarketDataInitializer> _logger;
         private readonly IServiceFactory _serviceFactory;
         private readonly IStatusTrackerService _statusTracker;
+        private readonly IBotReadyStatus _readyStatus;
         private readonly IScopeManagerService _scopeManagerService;
-        public MarketDataInitializer(ILogger<IMarketDataInitializer> logger, IServiceFactory serviceFactory, IScopeManagerService scopeManagerService,
+        public MarketDataInitializer(ILogger<IMarketDataInitializer> logger, IServiceFactory serviceFactory, IScopeManagerService scopeManagerService, IBotReadyStatus readyStatus,
             IStatusTrackerService statusTracker)
         {
             _logger = logger;
             _statusTracker = statusTracker;
+            _readyStatus = readyStatus;
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
         }
@@ -72,21 +74,21 @@ namespace SmokehouseBot.Services
                 await _serviceFactory.GetMarketDataService().UpdateAccountBalanceAsync();
                 _logger.LogDebug("Account balance updated");
 
-                _statusTracker.InitializationCompleted.SetResult(true);
+                _readyStatus.InitializationCompleted.SetResult(true);
                 _logger.LogInformation("Initialization set to completed");
             }
             catch (OperationCanceledException)
             {
                 _logger.LogDebug("MarketDataInitializer.SetupAsync cancelled at {0}", DateTime.UtcNow);
-                _statusTracker.InitializationCompleted.TrySetResult(false);
-                _statusTracker.BrowserReady.TrySetResult(false);
+                _readyStatus.InitializationCompleted.TrySetResult(false);
+                _readyStatus.BrowserReady.TrySetResult(false);
                 _logger.LogDebug("Market Data initialization canceled.");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during MarketDataInitializer.SetupAsync");
-                _statusTracker.InitializationCompleted.TrySetResult(false);
-                _statusTracker.BrowserReady.TrySetResult(false);
+                _readyStatus.InitializationCompleted.TrySetResult(false);
+                _readyStatus.BrowserReady.TrySetResult(false);
                 _logger.LogDebug("Set InitializationCompleted and BrowserReady tasks to false due to error");
                 throw;
             }

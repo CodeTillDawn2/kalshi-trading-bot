@@ -5,6 +5,7 @@ using SmokehouseBot.Configuration;
 using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs.Data;
+using SmokehouseBot.State.Interfaces;
 using System.Collections.Concurrent;
 using TradingStrategies.Configuration;
 namespace SmokehouseBot.Management

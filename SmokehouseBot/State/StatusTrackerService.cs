@@ -1,11 +1,9 @@
-﻿using SmokehouseBot.Management.Interfaces;
+﻿using SmokehouseBot.State.Interfaces;
 
-namespace SmokehouseBot.Management
+namespace SmokehouseBot.State
 {
     public class StatusTrackerService : IStatusTrackerService
     {
-        public TaskCompletionSource<bool> InitializationCompleted { get; set; } = new TaskCompletionSource<bool>();
-        public TaskCompletionSource<bool> BrowserReady { get; set; } = new TaskCompletionSource<bool>();
         private CancellationTokenSource _globalCancellationTokenSource;
         private readonly object _lock = new();
 
@@ -33,8 +31,6 @@ namespace SmokehouseBot.Management
         public void ResetAll()
         {
 
-            InitializationCompleted = new TaskCompletionSource<bool>();
-            InitializationCompleted.SetResult(false);
             lock (_lock)
             {
                 if (_globalCancellationTokenSource != null)

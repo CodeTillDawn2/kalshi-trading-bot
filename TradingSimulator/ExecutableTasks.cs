@@ -14,6 +14,7 @@ using SmokehouseBot.Management.Interfaces;
 using SmokehouseBot.Services;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
+using SmokehouseBot.State.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TradingSimulator.Strategies;

@@ -30,6 +30,7 @@ namespace SmokehouseBot.Management
         private readonly CalculationConfig _calculationConfig;
         private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
+        private IBotReadyStatus _readyStatus;
         private Timer? _snapshotTimer;
         private readonly SemaphoreSlim _snapshotLock = new SemaphoreSlim(1, 1);
         private readonly TimeSpan _decisionInterval;
@@ -72,6 +73,7 @@ namespace SmokehouseBot.Management
             IHostApplicationLifetime appLifetime,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
+            IBotReadyStatus readyStatus,
             IBrainStatusService brainStatusService)
         {
             _logger = logger;
@@ -87,6 +89,7 @@ namespace SmokehouseBot.Management
             _executionConfig = executionConfig.Value;
             _calculationConfig = calculationConfig.Value;
             _statusTrackerService = statusTrackerService;
+            _readyStatus = readyStatus;
             _brainInstance = _executionConfig.BrainInstance;
             _decisionInterval = TimeSpan.FromSeconds(_tradingConfig.DecisionFrequencySeconds);
 
@@ -196,6 +199,7 @@ namespace SmokehouseBot.Management
             {
                 var dataCache = _serviceFactory.GetDataCache();
                 _statusTrackerService.ResetAll();
+                _readyStatus.ResetAll();
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
                 var snapshotService = _serviceFactory.GetTradingSnapshotService();
                 var marketDataService = _serviceFactory.GetMarketDataService();
@@ -290,16 +294,16 @@ namespace SmokehouseBot.Management
                 }
 
                 _logger.LogDebug("BRAIN: Initial cache state: InitializationCompleted={IsCompleted}, BrowserReady={IsBrowserReady}",
-                    _statusTrackerService.InitializationCompleted.Task.IsCompleted, _statusTrackerService.BrowserReady.Task.IsCompleted);
+                    _readyStatus.InitializationCompleted.Task.IsCompleted, _readyStatus.BrowserReady.Task.IsCompleted);
 
-                if (_servicesStopped || (_statusTrackerService.InitializationCompleted.Task.IsCompleted && !_statusTrackerService.InitializationCompleted.Task.Result))
+                if (_servicesStopped || (_readyStatus.InitializationCompleted.Task.IsCompleted && !_readyStatus.InitializationCompleted.Task.Result))
                 {
-                    _statusTrackerService.InitializationCompleted = new TaskCompletionSource<bool>();
+                    _readyStatus.InitializationCompleted = new TaskCompletionSource<bool>();
                     _logger.LogDebug("BRAIN: Reset InitializationCompleted task");
                 }
-                if (_servicesStopped || !_statusTrackerService.BrowserReady.Task.IsCompleted || (_statusTrackerService.BrowserReady.Task.IsCompleted && !_statusTrackerService.BrowserReady.Task.Result))
+                if (_servicesStopped || !_readyStatus.BrowserReady.Task.IsCompleted || (_readyStatus.BrowserReady.Task.IsCompleted && !_readyStatus.BrowserReady.Task.Result))
                 {
-                    _statusTrackerService.BrowserReady = new TaskCompletionSource<bool>();
+                    _readyStatus.BrowserReady = new TaskCompletionSource<bool>();
                     _logger.LogDebug("BRAIN: Reset BrowserReady task");
                 }
 
@@ -370,9 +374,9 @@ namespace SmokehouseBot.Management
 
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
-                if (!_statusTrackerService.BrowserReady.Task.IsCompleted)
+                if (!_readyStatus.BrowserReady.Task.IsCompleted)
                 {
-                    _statusTrackerService.BrowserReady.SetResult(true);
+                    _readyStatus.BrowserReady.SetResult(true);
                     _logger.LogInformation("BRAIN: Set BrowserReady task to true");
                 }
                 _servicesStopped = false;
@@ -407,16 +411,16 @@ namespace SmokehouseBot.Management
             catch (OperationCanceledException)
             {
                 _logger.LogDebug("StartDashboard was cancelled");
-                _statusTrackerService.InitializationCompleted.TrySetResult(false);
+                _readyStatus.InitializationCompleted.TrySetResult(false);
                 await ShutdownDashboardAsync();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error starting dashboard");
                 var dataCache = _serviceFactory.GetDataCache();
-                if (!_statusTrackerService.BrowserReady.Task.IsCompleted)
+                if (!_readyStatus.BrowserReady.Task.IsCompleted)
                 {
-                    _statusTrackerService.BrowserReady.SetResult(false);
+                    _readyStatus.BrowserReady.SetResult(false);
                     _logger.LogWarning("Set BrowserReady task to false due to error");
                 }
                 throw;
@@ -494,27 +498,27 @@ namespace SmokehouseBot.Management
                 dataCache.WatchedMarkets.Clear();
                 _logger.LogDebug("Cleared DataCache");
 
-                if (!_statusTrackerService.InitializationCompleted.Task.IsCompleted)
+                if (!_readyStatus.InitializationCompleted.Task.IsCompleted)
                 {
-                    _statusTrackerService.InitializationCompleted.SetResult(false);
+                    _readyStatus.InitializationCompleted.SetResult(false);
                     _logger.LogDebug("Set InitializationCompleted task to false");
                 }
                 else
                 {
-                    _statusTrackerService.InitializationCompleted = new TaskCompletionSource<bool>();
-                    _statusTrackerService.InitializationCompleted.SetResult(false);
+                    _readyStatus.InitializationCompleted = new TaskCompletionSource<bool>();
+                    _readyStatus.InitializationCompleted.SetResult(false);
                     _logger.LogDebug("Reset and set InitializationCompleted task to false");
                 }
 
-                if (!_statusTrackerService.BrowserReady.Task.IsCompleted)
+                if (!_readyStatus.BrowserReady.Task.IsCompleted)
                 {
-                    _statusTrackerService.BrowserReady.SetResult(false);
+                    _readyStatus.BrowserReady.SetResult(false);
                     _logger.LogDebug("Set BrowserReady task to false");
                 }
                 else
                 {
-                    _statusTrackerService.BrowserReady = new TaskCompletionSource<bool>();
-                    _statusTrackerService.BrowserReady.SetResult(false);
+                    _readyStatus.BrowserReady = new TaskCompletionSource<bool>();
+                    _readyStatus.BrowserReady.SetResult(false);
                     _logger.LogDebug("Reset and set BrowserReady task to false");
                 }
 

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using SmokehouseBot.KalshiAPI.Interfaces;
 using SmokehouseBot.Services;
 using SmokehouseBot.Services.Interfaces;
+using SmokehouseBot.State.Interfaces;
 
 class Program
 {
@@ -35,9 +36,10 @@ class Program
             builder.SetMinimumLevel(LogLevel.Debug);
         });
 
-        // Register required services 
+        // Register required services
         services.AddScoped<IKalshiAPIService, KalshiAPIService>();
         services.AddScoped<IKalshiWebSocketClient, KalshiWebSocketClient>();
+        services.AddSingleton<IBotReadyStatus, IBotReadyStatus>();
 
         // Register the new WebSocketMonitorServiceLite as singleton
         services.AddSingleton<IWebSocketMonitorService, WebSocketMonitorServiceLite>();

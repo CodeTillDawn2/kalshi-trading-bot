@@ -68,6 +68,7 @@ builder.Services.AddSingleton<IScopeManagerService, ScopeManagerService>();
 builder.Services.AddSingleton<ICentralPerformanceMonitor, CentralPerformanceMonitor>();
 builder.Services.AddSingleton<IMarketManagerService, MarketManagerService>();
 builder.Services.AddSingleton<IStatusTrackerService, StatusTrackerService>();
+builder.Services.AddSingleton<IBotReadyStatus, BotReadyStatus>();
 builder.Services.AddSingleton<IBrainStatusService, BrainStatusService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<ICentralBrain>());
 
@@ -141,6 +142,7 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClie
     sp.GetRequiredService<IOptions<KalshiConfig>>(),
     sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
     sp.GetRequiredService<IStatusTrackerService>(),
+    sp.GetRequiredService<IBotReadyStatus>(),
     sp.GetRequiredService<ISqlDataService>(),
     sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents
 ));

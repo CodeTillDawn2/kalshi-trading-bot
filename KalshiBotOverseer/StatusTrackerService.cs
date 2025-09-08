@@ -1,4 +1,6 @@
-﻿using SmokehouseBot.Management.Interfaces;
+﻿
+
+using SmokehouseBot.State.Interfaces;
 
 namespace KalshiBotOverseer
 {

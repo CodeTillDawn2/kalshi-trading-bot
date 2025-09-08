@@ -11,16 +11,14 @@ namespace SmokehouseBot.Services
 {
     public class ServiceFactory : IServiceFactory
     {
-        private readonly IServiceProvider _serviceProvider;
-        private IStatusTrackerService _statusTrackerService;
+
         private readonly object _lock = new();
         private readonly ILogger<IServiceFactory> _logger;
         private IScopeManagerService _scopeManager;
         private Guid _brainLock;
 
-        public ServiceFactory(IServiceProvider serviceProvider, ILogger<IServiceFactory> logger, IScopeManagerService scopeManagerService)
+        public ServiceFactory(ILogger<IServiceFactory> logger, IScopeManagerService scopeManagerService)
         {
-            _serviceProvider = serviceProvider;
             _scopeManager = scopeManagerService;
             _logger = logger;
         }
