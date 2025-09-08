@@ -4,8 +4,10 @@ using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
+using KalshiBotData.Data.Interfaces;
 using KalshiBotOverseer;
 using KalshiBotOverseer.State;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -61,6 +63,8 @@ class Program
             false
             ));
         services.AddScoped<ISqlDataService, SqlDataService>();
+        services.AddDbContext<KalshiBotContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        services.AddScoped<IKalshiBotContext>(provider => provider.GetService<KalshiBotContext>());
         services.AddSingleton<IStatusTrackerService, OverseerStatusTracker>();
         services.AddSingleton<IBotReadyStatus, OverseerReadyStatus>();
 

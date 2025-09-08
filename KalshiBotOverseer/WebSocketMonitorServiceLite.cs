@@ -137,12 +137,8 @@ namespace KalshiBotOverseer
                                 var client = _webSocketClient;
                                 await client.ConnectAsync();
 
-                                // Subscribe only to Fill, MarketLifecycle, and EventLifecycle (global, no market tickers)
-                                await client.SubscribeToChannelAsync("fill", new string[0]);
-                                await client.SubscribeToChannelAsync("lifecycle", new string[0]);
-
                                 _isConnected = true;
-                                _logger.LogDebug("WebSocket connected and subscribed to Fill, MarketLifecycle, and EventLifecycle successfully");
+                                _logger.LogDebug("WebSocket connected successfully");
                             }
                             else if (!status.exchange_active && _isConnected)
                             {
@@ -187,13 +183,8 @@ namespace KalshiBotOverseer
                             var client = _webSocketClient;
                             await client.ConnectAsync(0);
 
-                            // Subscribe only to Fill, MarketLifecycle, and EventLifecycle (global, no market tickers)
-                            await client.SubscribeToChannelAsync("fill", new string[0]);
-                            await client.SubscribeToChannelAsync("market_lifecycle", new string[0]);
-                            await client.SubscribeToChannelAsync("event_lifecycle", new string[0]);
-
                             _isConnected = true;
-                            _logger.LogInformation("WebSocket connected and subscribed to Fill, MarketLifecycle, and EventLifecycle successfully");
+                            _logger.LogInformation("WebSocket connected successfully");
                         }
                         else if (!status.exchange_active && _isConnected)
                         {
