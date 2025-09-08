@@ -190,20 +190,6 @@ namespace TradingStrategies.Strategies.Strats
             return JsonSerializer.Serialize(data);
         }
 
-        public static BollingerBreakout FromJson(string json)
-        {
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-            if ((string)data["type"] != "BollingerBreakout")
-            {
-                throw new ArgumentException("Invalid strategy type");
-            }
-            var name = (string)data["name"];
-            var weight = Convert.ToDouble(data["weight"]);
-            var defaultAction = Enum.Parse<ActionType>((string)data["defaultAction"]);
-            var mlParamsJson = (JsonElement)data["mlParams"];
-            var mlParams = mlParamsJson.Deserialize<Dictionary<string, double>>()
-                .ToDictionary(kv => Enum.Parse<ParamKey>(kv.Key), kv => kv.Value);
-            return new BollingerBreakout(name, weight, mlParams);
-        }
+     
     }
 }

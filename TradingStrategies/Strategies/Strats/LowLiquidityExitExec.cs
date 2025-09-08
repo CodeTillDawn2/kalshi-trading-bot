@@ -160,16 +160,5 @@ namespace TradingStrategies.Strategies.Strats
             public int Compare(T x, T y) => y.CompareTo(x);
         }
 
-        public static LowLiquidityExitExec FromJson(string json)
-        {
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-            if ((string)data["type"] != "LowLiquidityExitExec")
-            {
-                throw new ArgumentException("Invalid strategy type");
-            }
-            var name = (string)data["name"];
-            var weight = Convert.ToDouble(data["weight"]);
-            return new LowLiquidityExitExec(name, weight);
-        }
     }
 }

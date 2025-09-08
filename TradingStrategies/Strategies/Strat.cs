@@ -12,15 +12,6 @@ namespace TradingStrategies.Strategies
 
         public abstract string ToJson();
 
-        public static Strat FromJson(string json)
-        {
-            var jsonDoc = JsonDocument.Parse(json);
-            string type = jsonDoc.RootElement.GetProperty("type").GetString();
-            return type switch
-            {
-                "BollingerBreakout" => BollingerBreakout.FromJson(json),
-                _ => throw new ArgumentException("Unknown strategy type")
-            };
-        }
+
     }
 }

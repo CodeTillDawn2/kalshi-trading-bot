@@ -178,11 +178,25 @@ namespace SmokehouseBot.Management
                 }
                 else if (brain.ManagedWatchList)
                 {
-                    BrainInstanceDTO? dto = await context.GetBrainInstance(_executionConfig.BrainInstance);
+                    BrainInstanceDTO dto = await context.GetBrainInstance(_executionConfig.BrainInstance);
                     _logger.LogInformation("BRAIN: Usage within acceptable range: {Percentage:F2}%. Checking for uninteresting markets.", metrics.CurrentUsage);
-                    await RemoveUninterestingMarkets(context, apiService, brain, dto.MinimumInterest);
+                    int removed = await RemoveUninterestingMarkets(context, apiService, brain, dto.MinimumInterest);
+                    _logger.LogInformation("BRAIN: Removed {Removed} uninteresting markets.", removed);
                 }
 
+                else
+                {
+                    if (!brain.ManagedWatchList)
+                    {
+                        BrainInstanceDTO dto = await context.GetBrainInstance(_executionConfig.BrainInstance);
+                        int removed = await RemoveUninterestingMarkets(context, apiService, brain, dto.MinimumInterest);
+                        if (removed > 0)
+                        {
+                            List<string> addedMarkets = await AddHighInterestMarkets(context, apiService, removed, dto.MinimumInterest);
+                            _logger.LogInformation("BRAIN: In unmanaged mode, replaced {Removed} uninteresting markets with {Added} high interest markets.", removed, addedMarkets.Count);
+                        }
+                    }
+                }
                 _firstWatchUpdate = false;
             }
             catch (OperationCanceledException)
@@ -557,31 +571,32 @@ namespace SmokehouseBot.Management
             return marketsAddedList;
         }
 
-        private async Task RemoveUninterestingMarkets(IKalshiBotContext context, IKalshiAPIService apiService, BrainInstanceDTO brain, double minimumInterest)
+        private async Task<int> RemoveUninterestingMarkets(IKalshiBotContext context, IKalshiAPIService apiService, BrainInstanceDTO brain, double minimumInterest)
         {
+            int removed = 0;
             try
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
                 var token = cts.Token;
-
+        
                 var candidates = await context.GetMarketWatches_cached(
                     brainLocksIncluded: new HashSet<Guid> { _brainStatus.BrainLock },
                     maxInterestScore: minimumInterest
                 );
-
+        
                 var interestScoreCutoff = DateTime.Now.AddHours(-3);
                 var tickersToScore = candidates
                     .Where(x => x.InterestScore == null || x.InterestScoreDate <= interestScoreCutoff)
                     .Select(x => x.market_ticker)
                     .Distinct()
                     .ToList();
-
+        
                 if (tickersToScore.Any())
                 {
                     _logger.LogDebug("API: Getting market interest score for {@Tickers} in {Context}", tickersToScore, "RemoveUninterestingMarkets");
                     var scores = await _serviceFactory.GetMarketInterestScoreHelper()
                         .GetMarketInterestScores(_scopeFactory, tickersToScore);
-
+        
                     foreach (var w in candidates)
                     {
                         var s = scores.FirstOrDefault(x => x.Ticker == w.market_ticker);
@@ -592,12 +607,12 @@ namespace SmokehouseBot.Management
                         }
                     }
                 }
-
+        
                 if (brain.WatchPositions || brain.WatchOrders)
                 {
                     var marketPositions = await context.GetMarketPositions_cached(
                         marketTickers: candidates.Select(x => x.market_ticker).ToHashSet());
-
+        
                     if (brain.WatchPositions)
                     {
                         var protectedByPosition = marketPositions
@@ -606,7 +621,7 @@ namespace SmokehouseBot.Management
                             .ToHashSet();
                         candidates = candidates.Where(x => !protectedByPosition.Contains(x.market_ticker)).ToHashSet();
                     }
-
+        
                     if (brain.WatchOrders)
                     {
                         var protectedByOrders = marketPositions
@@ -616,7 +631,7 @@ namespace SmokehouseBot.Management
                         candidates = candidates.Where(x => !protectedByOrders.Contains(x.market_ticker)).ToHashSet();
                     }
                 }
-
+        
                 foreach (var watch in candidates)
                 {
                     if ((watch.InterestScore ?? double.MinValue) <= minimumInterest)
@@ -624,6 +639,7 @@ namespace SmokehouseBot.Management
                         _logger.LogInformation("Stats: Removing market {MarketTicker} due to low interest. Interest={InterestScore}",
                             watch.market_ticker, watch.InterestScore);
                         await _serviceFactory.GetMarketDataService().UnwatchMarket(watch.market_ticker);
+                        removed++;
                     }
                 }
             }
@@ -635,6 +651,7 @@ namespace SmokehouseBot.Management
             {
                 _logger.LogError(ex, "Failed to remove uninteresting markets");
             }
+            return removed;
         }
 
 

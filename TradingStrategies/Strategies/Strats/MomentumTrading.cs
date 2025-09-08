@@ -393,19 +393,5 @@ namespace TradingStrategies.Strategies.Strats
         }
 
 
-        public static MomentumTrading FromJson(string json)
-        {
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-            if ((string)data["type"] != "Momentum")
-                throw new ArgumentException("Invalid strategy type");
-
-            var name = (string)data["name"];
-            var weight = Convert.ToDouble(data["weight"]);
-            var mlParamsJson = (JsonElement)data["mlParams"];
-            var mlParams = mlParamsJson.Deserialize<Dictionary<string, double>>()
-                .ToDictionary(kv => Enum.Parse<ParamKey>(kv.Key), kv => kv.Value);
-
-            return new MomentumTrading(name, weight, ActionType.None, mlParams);
-        }
     }
 }

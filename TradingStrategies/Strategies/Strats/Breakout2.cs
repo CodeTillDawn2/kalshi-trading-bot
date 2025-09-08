@@ -433,19 +433,5 @@ namespace TradingStrategies.Strategies.Strats
             return json;
         }
 
-        public static Breakout2 FromJson(string json)
-        {
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-            if ((string)data["type"] != "Breakout2")
-                throw new ArgumentException("Invalid strategy type");
-
-            var name = (string)data["name"];
-            var weight = Convert.ToDouble(data["weight"]);
-            var mlParamsJson = (JsonElement)data["mlParams"];
-            var mlParams = mlParamsJson.Deserialize<Dictionary<string, double>>()
-                .ToDictionary(kv => Enum.Parse<ParamKey>(kv.Key), kv => kv.Value);
-
-            return new Breakout2(name, weight, mlParams);
-        }
     }
 }
