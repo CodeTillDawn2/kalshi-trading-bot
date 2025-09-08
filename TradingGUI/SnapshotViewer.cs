@@ -1,6 +1,9 @@
 ﻿// Updated SnapshotViewer.cs with intelligent isotropic font scaling
 
 // SnapshotViewer.cs (replace the entire class with this updated version)
+using KalshiBotData.Data;
+using KalshiBotData.Models;
+using Microsoft.Extensions.Configuration;
 using SmokehouseDTOs;
 using TradingSimulator.TestObjects;
 
@@ -21,6 +24,7 @@ namespace SimulatorWinForms
         private List<PricePoint> _averageCostPoints = new List<PricePoint>();
         private List<PricePoint> _restingOrdersPoints = new List<PricePoint>();
         private List<PricePoint> _patternPoints = new List<PricePoint>();
+        private readonly KalshiBotContext _context;
 
         public Action BackAction { get; set; }
 
@@ -36,6 +40,15 @@ namespace SimulatorWinForms
         {
             InitializeComponent();
             backButton.Click += (s, e) => BackAction?.Invoke();
+
+            // Initialize database context
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    ["ConnectionStrings:DefaultConnection"] = "Server=localhost;Database=KalshiBot;Trusted_Connection=True;"
+                })
+                .Build();
+            _context = new KalshiBotContext(config);
 
             // Add AutoScroll to containers to handle overflow
             marketInfoContainer.AutoScroll = true;
@@ -333,7 +346,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void JumpToClickedPosition(ScottPlot.FormsPlot chart, MouseEventArgs e)
+        private async void JumpToClickedPosition(ScottPlot.FormsPlot chart, MouseEventArgs e)
         {
             if (historySnapshots == null || historySnapshots.Count == 0) return;
 
@@ -379,7 +392,7 @@ namespace SimulatorWinForms
                     }
 
                     // Update UI immediately
-                    UpdateUIFast();
+                    _ = UpdateUIFast();
 
                     // Reset navigation speed counters
                     _consecutiveNavigations = 0;
@@ -672,13 +685,13 @@ namespace SimulatorWinForms
         // Removed SnapshotViewer_KeyDown (handled by parent form)
 
 
-        private void Navigate(int delta)
+        private async void Navigate(int delta)
         {
             // Use the fast navigation approach for better performance
             NavigateFast(delta);
         }
 
-        private void NavigateFast(int delta)
+        private async void NavigateFast(int delta)
         {
             if (historySnapshots == null || historySnapshots.Count == 0) return;
 
@@ -753,7 +766,7 @@ namespace SimulatorWinForms
             }
 
             // Immediately update all UI elements (fast operations)
-            UpdateUIFast();
+            _ = UpdateUIFast();
 
             // Update orderbook from the new snapshot
             UpdateUIFromSnapshot();
@@ -798,14 +811,30 @@ namespace SimulatorWinForms
             return _navigationStepSize;
         }
 
-        private void UpdateUIFast()
+        private async Task UpdateUIFast()
         {
             if (currentSnapshot == null) return;
 
             // Update strategy output immediately
             strategyOutputTextbox.Text = memoText;
 
-            marketTickerLabel.Text = currentSnapshot.MarketTicker;
+            // Query market title from database
+            string marketTitle = currentSnapshot.MarketTicker ?? "--";
+            try
+            {
+                var market = await _context.GetMarketByTicker(currentSnapshot.MarketTicker);
+                if (market != null && !string.IsNullOrEmpty(market.title))
+                {
+                    marketTitle = market.title;
+                }
+            }
+            catch (Exception ex)
+            {
+                // If database query fails, fall back to ticker
+                // Could add logging here if needed
+            }
+
+            marketTickerLabel.Text = marketTitle;
 
             // Update price display elements
             allTimeHighAskPrice.Text = (100 - currentSnapshot.AllTimeHighNo_Bid.Bid).ToString();
@@ -855,7 +884,7 @@ namespace SimulatorWinForms
                 : $"{currentSnapshot.AllSupportResistanceLevels.First().Price}";
 
             // Update other info
-            chartHeader.Text = currentSnapshot.MarketTicker ?? "--";
+            chartHeader.Text = marketTitle;
             categoryValue.Text = currentSnapshot.MarketCategory ?? "--";
             timeLeftValue.Text = FormatTimeSpan(currentSnapshot.TimeLeft);
             marketAgeValue.Text = FormatTimeSpan(currentSnapshot.MarketAge);
@@ -995,7 +1024,7 @@ namespace SimulatorWinForms
             }
         }
 
-        public void NavigateSnapshot(int delta)
+        public async void NavigateSnapshot(int delta)
         {
             // Use fast navigation for better performance
             NavigateFast(delta);
@@ -1110,7 +1139,7 @@ namespace SimulatorWinForms
             return ts.HasValue ? $"{ts.Value.Days} days, {ts.Value.Hours} hours" : "--";
         }
 
-        private void UpdateUIFromSnapshot()
+        private async void UpdateUIFromSnapshot()
         {
             // Clear and repopulate order book with bids and asks
             orderbookGrid.Rows.Clear();
@@ -1212,7 +1241,7 @@ namespace SimulatorWinForms
             }
 
             // Update all UI elements (fast operations)
-            UpdateUIFast();
+            _ = UpdateUIFast();
         }
 
         private void UpdateChart()

@@ -1,4 +1,7 @@
 ﻿// MainForm.cs: Full class with restored tooltip/hover (black line), back button fix via BackAction, and axis restore on back
+using KalshiBotData.Data;
+using KalshiBotData.Models;
+using Microsoft.Extensions.Configuration;
 using SmokehouseDTOs;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -10,6 +13,7 @@ namespace SimulatorWinForms
     public partial class MainForm : Form
     {
         private readonly SimulatorTests _simulator;
+        private readonly KalshiBotContext _context;
         private readonly string _cacheDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "TestingOutput");
         private List<(double x, double y, string memo)> _tooltipPoints = new();
         private string? _lastTooltipMemo = null;
@@ -39,6 +43,15 @@ namespace SimulatorWinForms
             InitializeComponent();
 
             toolTip1.ShowAlways = true;
+
+            // Initialize database context
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    ["ConnectionStrings:DefaultConnection"] = "Server=localhost;Database=KalshiBot;Trusted_Connection=True;"
+                })
+                .Build();
+            _context = new KalshiBotContext(config);
 
             _simulator = new SimulatorTests();
             _simulator.EnsureInitialized();
@@ -127,10 +140,12 @@ namespace SimulatorWinForms
             dgvMarkets.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
             var checkCol = new DataGridViewCheckBoxColumn { Name = "CheckedCol", HeaderText = "✓", AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells };
-            var marketCol = new DataGridViewTextBoxColumn { Name = "Market", HeaderText = "Market", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 50 };
+            var marketCol = new DataGridViewTextBoxColumn { Name = "Market", HeaderText = "Market", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 30 };
+            var titleCol = new DataGridViewTextBoxColumn { Name = "Title", HeaderText = "Title", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 40 };
             var pnlCol = new DataGridViewTextBoxColumn { Name = "PnL", HeaderText = "PnL", AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells };
             dgvMarkets.Columns.Add(checkCol);
             dgvMarkets.Columns.Add(marketCol);
+            dgvMarkets.Columns.Add(titleCol);
             dgvMarkets.Columns.Add(pnlCol);
 
             dgvMarkets.HandleCreated += (_, __) =>
@@ -205,11 +220,13 @@ namespace SimulatorWinForms
                     }
                 }
 
-                foreach (var b in bases.OrderBy(b => b))
+                // Query markets from database
+                var markets = await _context.GetMarkets();
+                foreach (var market in markets.OrderBy(m => m.market_ticker))
                 {
-                    var pnlStr = pnlByBase.TryGetValue(b, out var pnl) ? pnl.ToString("F2") : "";
-                    var row = dgvMarkets.Rows.Add(false, b, pnlStr);
-                    dgvMarkets.Rows[row].Cells["CheckedCol"].Value = _checkedMarketNames.Contains(b);
+                    var pnlStr = pnlByBase.TryGetValue(market.market_ticker, out var pnl) ? pnl.ToString("F2") : "";
+                    var row = dgvMarkets.Rows.Add(false, market.market_ticker, market.title, pnlStr);
+                    dgvMarkets.Rows[row].Cells["CheckedCol"].Value = _checkedMarketNames.Contains(market.market_ticker);
                 }
             }
             catch (Exception ex)
