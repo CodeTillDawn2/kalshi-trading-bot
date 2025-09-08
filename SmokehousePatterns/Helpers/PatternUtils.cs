@@ -96,68 +96,6 @@ namespace SmokehousePatterns.Helpers
         }
 
 
-        //// Lazy load current candle metrics
-        //double meanTrend = i >= 1 ? CalculateMeanTrend(marketStates, i, trendLookback) : 0.0;
-        //double lookbackAvgRange = CalculateLookbackAvgRange(marketStates, i, trendLookback, prices);
-        //double trendConsistency = CalculateTrendConsistency(marketStates,i,trendLookback,metricsCache,prices);
-
-        //double lookbackAvgVolume = CalculateAverageVolume(prices, i, trendLookback);
-
-        public static bool IsDoji(
-            CandleMetrics metrics)
-        {
-
-            return metrics.TotalRange > 0 && metrics.BodySize <= 1.5;
-        }
-
-        public static bool IsStrictDoji(CandleMetrics metrics)
-        {
-            return metrics.BodySize == 0 &&           // Strict: Open must equal Close
-                   metrics.UpperWick >= 1 &&          // Minimum upper wick
-                   metrics.LowerWick >= 1 &&          // Minimum lower wick
-                   metrics.TotalRange >= 2;           // Ensure some movement
-        }
-
-        public static bool HasSignificantWick(CandleMetrics metrics, bool isUpper, double minWickToBodyRatio = 2.0)
-        {
-            double wick = isUpper ? metrics.UpperWick : metrics.LowerWick;
-            return wick >= minWickToBodyRatio * metrics.BodySize && wick >= 0.5 * metrics.TotalRange;
-            // Used in IsHammer, IsShootingStar, IsTakuri
-        }
-
-        public static bool IsLargeBody(CandleMetrics metrics, double minBodyToRangeRatio = 0.7)
-        {
-            return metrics.TotalRange >= 3 && metrics.BodyToRangeRatio >= minBodyToRangeRatio;
-            // Used in IsMarubozu, IsLongLineCandle
-        }
-
-        public static bool IsSmallBody(CandleMetrics metrics, double maxBodyToRangeRatio = 0.2)
-        {
-            return metrics.BodySize <= 1.5 && metrics.BodyToRangeRatio <= maxBodyToRangeRatio;
-            // Used in IsSpinningTop, IsShortLineCandle
-        }
-
-        // Helper methods requiring raw candle data
-        public static bool HasGap(CandleMids prevCandle, CandleMids currentCandle, bool isBullish)
-        {
-            return isBullish ? currentCandle.Open > prevCandle.Close : currentCandle.Open < prevCandle.Close;
-
-        }
-
-        public static bool IsInsideBody(CandleMids prevCandle, CandleMids currentCandle)
-        {
-            return currentCandle.Open >= Math.Min(prevCandle.Open, prevCandle.Close) &&
-                   currentCandle.Close <= Math.Max(prevCandle.Open, prevCandle.Close);
-            // Used in IsHarami, IsThreeInside
-        }
-
-        public static bool AreClosesSimilar(double close1, double close2, double tolerance = 1.5)
-        {
-            return Math.Abs(close1 - close2) <= tolerance;
-            // Used in IsOnNeckPattern, IsStickSandwich
-        }
-
-
         public static bool IsPatternSignificant(CandleMids current, CandleMids? previous)
         {
             if (previous == null) return true; // Always process the first candle
@@ -169,16 +107,6 @@ namespace SmokehousePatterns.Helpers
                current.High - current.Low >= 1.0 || // Significant volatility
                Math.Abs(currentMidpoint - current.Open) >= 0.5; // Notable body size
         }
-
-        public static string AndrogenizePattern(string name)
-        {
-            name = name.Replace("_Bearish", "").Replace("_Bullish", "").Replace("_Continuation", "").Replace("_Reversal", "");
-            if (name.EndsWith("Up")) name = name.Substring(0, name.Length - 2);
-            if (name.EndsWith("Down")) name = name.Substring(0, name.Length - 4);
-            return name;
-        }
-
-
 
 
 
