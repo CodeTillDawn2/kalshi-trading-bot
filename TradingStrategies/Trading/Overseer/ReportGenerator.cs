@@ -43,6 +43,7 @@ namespace TradingStrategies.Trading.Overseer
             public string RestingNoBids { get; set; } = "";   // Summary of resting bids on no side, e.g., "price:qty, price:qty"
             public string Memo { get; set; } = "";
             public double AverageCost { get; set; } = 0.0;  // Average cost of the position
+            public List<SmokehousePatterns.PatternDefinitions.PatternDefinition> Patterns { get; set; } = new List<SmokehousePatterns.PatternDefinitions.PatternDefinition>();  // Detected patterns for this snapshot
         }
 
         public class EventGroup

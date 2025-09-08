@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SmokehouseBot.Services.Interfaces;
 using SmokehouseDTOs;
 using SmokehouseDTOs.Data;
+using SmokehousePatterns;
 using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
 using TradingStrategies.Trading.Helpers;
@@ -55,6 +56,7 @@ namespace TradingStrategies
             foreach (var snapshot in snapshots)
             {
                 SetMarketType(snapshot, helper);
+
                 var (yesDeltas, noDeltas) = ComputeDeltasIfApplicable(prevSnapshot, snapshot);
 
                 ApplyDeltasAndSimulateFills(activePaths, yesDeltas, noDeltas, snapshot.Timestamp);
@@ -220,6 +222,9 @@ namespace TradingStrategies
 
             var (restingYes, restingNo) = SummarizeRestingOrders(actionResting);
 
+            // Detect patterns for this snapshot
+            var patterns = DetectPatterns(effectiveSnapshot);
+
             var eventLog = new ReportGenerator.EventLog
             {
                 Timestamp = effectiveSnapshot.Timestamp,
@@ -251,7 +256,8 @@ namespace TradingStrategies
                 RestingYesBids = restingYes,
                 RestingNoBids = restingNo,
                 Memo = "",
-                AverageCost = path.AverageCost
+                AverageCost = path.AverageCost,
+                Patterns = patterns
             };
 
             actionEvents.Add(eventLog);
@@ -348,6 +354,9 @@ namespace TradingStrategies
 
             var (restingYes, restingNo) = SummarizeRestingOrders(actionResting);
 
+            // Detect patterns for this snapshot
+            var patterns = DetectPatterns(effectiveSnapshot);
+
             var eventLog = new ReportGenerator.EventLog
             {
                 Timestamp = effectiveSnapshot.Timestamp,
@@ -372,7 +381,8 @@ namespace TradingStrategies
                 RestingYesBids = restingYes,
                 RestingNoBids = restingNo,
                 Memo = decision.Memo,
-                AverageCost = path.AverageCost
+                AverageCost = path.AverageCost,
+                Patterns = patterns
             };
 
             actionEvents.Add(eventLog);
@@ -799,6 +809,31 @@ namespace TradingStrategies
                 }
             }
             return deltas;
+        }
+
+        private List<SmokehousePatterns.PatternDefinitions.PatternDefinition> DetectPatterns(MarketSnapshot snapshot)
+        {
+            if (snapshot.RecentCandlesticks == null || snapshot.RecentCandlesticks.Count == 0)
+            {
+                return new List<SmokehousePatterns.PatternDefinitions.PatternDefinition>();
+            }
+
+            try
+            {
+                var mids = snapshot.RecentCandlesticks.ToCandleMids(snapshot.MarketTicker);
+                var patterns = PatternSearch.DetectPatterns(mids, 10);
+                if (patterns.Keys.Count > 0)
+                {
+                    return patterns[patterns.Keys.Last()];
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't crash the simulation
+                Console.WriteLine($"Error detecting patterns: {ex.Message}");
+            }
+
+            return new List<SmokehousePatterns.PatternDefinitions.PatternDefinition>();
         }
 
         private double GetEquity(SimulationPath path, MarketSnapshot lastSnapshot)

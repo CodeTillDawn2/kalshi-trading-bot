@@ -20,6 +20,7 @@ namespace SimulatorWinForms
         private List<PricePoint> _positionPoints = new List<PricePoint>();
         private List<PricePoint> _averageCostPoints = new List<PricePoint>();
         private List<PricePoint> _restingOrdersPoints = new List<PricePoint>();
+        private List<PricePoint> _patternPoints = new List<PricePoint>();
 
         public Action BackAction { get; set; }
 
@@ -622,6 +623,8 @@ namespace SimulatorWinForms
 
             toolTip1.SetToolTip(supportLabel, "Support/Resistance Levels: Historical price levels where buying/selling pressure caused reversals. Support levels catch falling prices, resistance levels cap rising prices.");
 
+            // Patterns tooltip is now handled in UpdateUIFast() to ensure currentSnapshot is available
+
             // Flow/Momentum Tooltips
             toolTip1.SetToolTip(topVelocityCB, "Top Velocity: Rate of price change at the best bid/ask levels. High values indicate strong momentum in that direction.");
 
@@ -893,6 +896,42 @@ namespace SimulatorWinForms
             restingOrdersValue.Text = _simulatedRestingOrders.ToString();
             simulatedPositionValue.Text = currentSnapshot.PositionSize.ToString();  // Use snapshot data for consistency
 
+            // Update patterns count for CURRENT snapshot only
+            int currentSnapshotPatterns = 0;
+            if (_patternPoints != null && currentSnapshot != null)
+            {
+                // Count patterns that match the current snapshot timestamp (within 1 second)
+                currentSnapshotPatterns = _patternPoints.Count(p =>
+                    Math.Abs((p.Date - currentSnapshot.Timestamp).TotalSeconds) < 1);
+            }
+            patternsValue.Text = currentSnapshotPatterns.ToString();
+
+            // Update tooltip to show patterns at CURRENT snapshot only
+            string patternsTooltip = "Patterns: Detected technical analysis patterns in price data.";
+            if (_patternPoints != null && _patternPoints.Count > 0 && currentSnapshot != null)
+            {
+                // Find patterns that match the current snapshot timestamp (within 1 second)
+                var currentSnapshotPatternsList = _patternPoints
+                    .Where(p => Math.Abs((p.Date - currentSnapshot.Timestamp).TotalSeconds) < 1)
+                    .Select(p => p.Memo?.Replace("Pattern: ", "") ?? "Unknown")
+                    .Distinct()
+                    .ToList();
+
+                if (currentSnapshotPatternsList.Any())
+                {
+                    patternsTooltip += $" Current snapshot has {currentSnapshotPatternsList.Count} pattern(s): {string.Join(", ", currentSnapshotPatternsList)}";
+                }
+                else
+                {
+                    patternsTooltip += " No patterns detected at current snapshot.";
+                }
+            }
+            else
+            {
+                patternsTooltip += " No patterns detected yet.";
+            }
+            toolTip1.SetToolTip(patternsLabel, patternsTooltip);
+
             // Immediately move the vertical line (fast operation)
             MoveVerticalLineImmediately();
         }
@@ -951,7 +990,7 @@ namespace SimulatorWinForms
             NavigateFast(delta);
         }
 
-        public void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history, List<string> memosList, int simulatedPosition = 0, double averageCost = 0.0, int simulatedRestingOrders = 0, List<PricePoint>? positionPoints = null, List<PricePoint>? averageCostPoints = null, List<PricePoint>? restingOrdersPoints = null)
+        public void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history, List<string> memosList, int simulatedPosition = 0, double averageCost = 0.0, int simulatedRestingOrders = 0, List<PricePoint>? positionPoints = null, List<PricePoint>? averageCostPoints = null, List<PricePoint>? restingOrdersPoints = null, List<PricePoint>? patternPoints = null)
         {
             currentSnapshot = snapshot;
             historySnapshots = history.OrderBy(s => s.Timestamp).ToList();
@@ -996,6 +1035,7 @@ namespace SimulatorWinForms
             _positionPoints = positionPoints ?? new List<PricePoint>();
             _averageCostPoints = averageCostPoints ?? new List<PricePoint>();
             _restingOrdersPoints = restingOrdersPoints ?? new List<PricePoint>();
+            _patternPoints = patternPoints ?? new List<PricePoint>();
             simulatedPositionValue.Text = simulatedPosition.ToString();
 
             // Map position data to individual snapshots
@@ -1632,6 +1672,48 @@ namespace SimulatorWinForms
                 legendItems.Add("Support/Resistance");
             }
 
+            // Patterns - Plot pattern occurrences as markers with tooltips on PRIMARY chart
+            if (patternsLabel.Checked && _patternPoints != null && _patternPoints.Count > 0)
+            {
+                var patternTimePoints = new List<double>();
+                var patternValuePoints = new List<double>();
+                var patternTooltips = new List<string>();
+
+                foreach (var patternPoint in _patternPoints)
+                {
+                    patternTimePoints.Add(patternPoint.Date.ToOADate());
+                    patternValuePoints.Add(patternPoint.Price);
+
+                    // Create tooltip with pattern details from Memo field
+                    string tooltip = patternPoint.Memo ?? "Pattern";
+                    if (tooltip.Contains("Pattern: "))
+                    {
+                        // Extract pattern name from the memo
+                        string patternName = tooltip.Replace("Pattern: ", "");
+                        tooltip = $"Pattern: {patternName}";
+                    }
+                    patternTooltips.Add(tooltip);
+                }
+
+                if (patternTimePoints.Count > 0)
+                {
+                    // Plot patterns as diamond markers on the PRIMARY chart
+                    var patternScatter = chart.Plot.AddScatter(patternTimePoints.ToArray(), patternValuePoints.ToArray(),
+                        Color.Red, 8, markerShape: ScottPlot.MarkerShape.filledDiamond);
+                    patternScatter.Label = "Patterns";
+                    legendItems.Add("Patterns");
+
+                    // Add text labels above pattern markers for better visibility
+                    for (int i = 0; i < patternTimePoints.Count; i++)
+                    {
+                        // Add a small text label above each pattern marker
+                        var text = chart.Plot.AddText(patternTooltips[i], patternTimePoints[i], patternValuePoints[i] + 0.3,
+                            8, Color.Red);
+                        text.IsVisible = true; // Always visible for better pattern identification
+                    }
+                }
+            }
+
             // Add legend if there are items
             if (legendItems.Any())
             {
@@ -2155,6 +2237,7 @@ namespace SimulatorWinForms
                 }
             }
 
+
             // Add legend if there are items
             if (legendItems.Any())
             {
@@ -2197,7 +2280,8 @@ namespace SimulatorWinForms
                    simulatedPositionLabel.Checked ||
                    positionRoiLabel.Checked ||
                    restingOrdersLabel.Checked ||
-                   rsiLabel.Checked;
+                   rsiLabel.Checked ||
+                   patternsLabel.Checked;
         }
 
         private void UpdateChartLegends()
@@ -2257,6 +2341,11 @@ namespace SimulatorWinForms
         }
 
         private void supportLabel_CheckedChanged(object sender, EventArgs e)
+        {
+            EvaluateChartFilters();
+        }
+
+        private void patternsLabel_CheckedChanged(object sender, EventArgs e)
         {
             EvaluateChartFilters();
         }

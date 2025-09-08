@@ -556,6 +556,7 @@ namespace SimulatorWinForms
             List<PricePoint> positionPoints = new List<PricePoint>();
             List<PricePoint> averageCostPoints = new List<PricePoint>();
             List<PricePoint> restingOrdersPoints = new List<PricePoint>();
+            List<PricePoint> patternPoints = new List<PricePoint>();
             string marketName = closest.MarketTicker ?? "Unknown";
             try
             {
@@ -576,6 +577,8 @@ namespace SimulatorWinForms
                         positionPoints = cd.PositionPoints ?? new List<PricePoint>();
                         averageCostPoints = cd.AverageCostPoints ?? new List<PricePoint>();
                         restingOrdersPoints = cd.RestingOrdersPoints ?? new List<PricePoint>();
+                        patternPoints = cd.PatternPoints ?? new List<PricePoint>();
+                        patternPoints = cd.PatternPoints ?? new List<PricePoint>();
 
                         // Calculate simulated resting orders count for current snapshot
                         if (restingOrdersPoints != null && restingOrdersPoints.Count > 0)
@@ -624,7 +627,7 @@ namespace SimulatorWinForms
                 AppendLog($"Failed to load position data for {marketName}: {ex.Message}");
             }
 
-            _snapshotViewer.Populate(closest, history, memosPerSnapshot, simulatedPosition, averageCost, simulatedRestingOrders, positionPoints, averageCostPoints, restingOrdersPoints);
+            _snapshotViewer.Populate(closest, history, memosPerSnapshot, simulatedPosition, averageCost, simulatedRestingOrders, positionPoints, averageCostPoints, restingOrdersPoints, patternPoints);
 
             // Set back action to switch back to main layout
             _snapshotViewer.BackAction = HideDashboard;

@@ -33,6 +33,7 @@ namespace TradingSimulator.TestObjects
         public List<PricePoint> AverageCostPoints { get; set; }
         public List<PricePoint> RestingOrdersPoints { get; set; }
         public List<PricePoint> DiscrepancyPoints { get; set; } = new List<PricePoint>();  // NEW
+        public List<PricePoint> PatternPoints { get; set; } = new List<PricePoint>();  // Detected patterns
     }
 
 }

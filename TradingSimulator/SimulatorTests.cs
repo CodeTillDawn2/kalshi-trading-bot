@@ -143,7 +143,7 @@ namespace TradingSimulator.Simulator
         private async Task<(double finalPnL, int finalPosition, double finalAverageCost, List<PricePoint> bidPoints, List<PricePoint> askPoints,
           List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
           List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
-          List<PricePoint> positionPoints, List<PricePoint> averageCostPoints, List<PricePoint> restingOrdersPoints, List<PricePoint> discrepancyPoints)>
+          List<PricePoint> positionPoints, List<PricePoint> averageCostPoints, List<PricePoint> restingOrdersPoints, List<PricePoint> discrepancyPoints, List<PricePoint> patternPoints)>
       ProcessMarketAsync(
          string marketTicker,
          List<MarketSnapshot> marketSnapshots,
@@ -158,7 +158,7 @@ namespace TradingSimulator.Simulator
             if (!ignoreProcessedCache && _processedMarkets.Contains(marketTicker))
             {
                 OnTestProgress?.Invoke($"{progressPrefix}Skipping cached market: {marketTicker}");
-                return (0, 0, 0.0, null, null, null, null, null, null, null, null, null, null, null, null);
+                return (0, 0, 0.0, null, null, null, null, null, null, null, null, null, null, null, null, null);
             }
             OnTestProgress?.Invoke($"{progressPrefix}Processing market: {marketTicker}");
 
@@ -242,6 +242,19 @@ namespace TradingSimulator.Simulator
                         .Select(ev => new PricePoint(ev.Timestamp, ev.AverageCost, $"Avg Cost: {ev.AverageCost:F2}"))
                         .ToList();
 
+                    // Create pattern points from event logs
+                    var patternPoints = new List<PricePoint>();
+                    foreach (var ev in eventLogs)
+                    {
+                        if (ev.Patterns != null && ev.Patterns.Any())
+                        {
+                            foreach (var pattern in ev.Patterns)
+                            {
+                                patternPoints.Add(new PricePoint(ev.Timestamp, 0, $"Pattern: {pattern.Name}"));
+                            }
+                        }
+                    }
+
                     // Create resting orders points from event logs
                     var restingOrdersPoints = eventLogs
                         .Select(ev =>
@@ -277,14 +290,14 @@ namespace TradingSimulator.Simulator
                         })
                         .ToList();
 
-                    return (finalPnL, finalPosition, finalAverageCost, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, positionPoints, averageCostPoints, restingOrdersPoints, discrepancyPoints);
+                    return (finalPnL, finalPosition, finalAverageCost, bidPoints, askPoints, buyPoints, sellPoints, exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, positionPoints, averageCostPoints, restingOrdersPoints, discrepancyPoints, patternPoints);
                 }
             }
             finally
             {
 
             }
-            return (0, 0, 0.0, null, null, null, null, null, null, null, null, null, null, null, null);
+            return (0, 0, 0.0, null, null, null, null, null, null, null, null, null, null, null, null, null);
         }
 
 
@@ -294,7 +307,7 @@ namespace TradingSimulator.Simulator
             List<PricePoint> bidPoints, List<PricePoint> askPoints,
             List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
             List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
-            List<PricePoint> positionPoints, List<PricePoint> averageCostPoints, List<PricePoint> restingOrdersPoints, List<PricePoint> discrepancyPoints,
+            List<PricePoint> positionPoints, List<PricePoint> averageCostPoints, List<PricePoint> restingOrdersPoints, List<PricePoint> discrepancyPoints, List<PricePoint> patternPoints,
             string fileNameSuffix = "")
         {
             var cachedData = new CachedMarketData
@@ -314,7 +327,8 @@ namespace TradingSimulator.Simulator
                 PositionPoints = positionPoints,
                 AverageCostPoints = averageCostPoints,
                 RestingOrdersPoints = restingOrdersPoints,
-                DiscrepancyPoints = discrepancyPoints
+                DiscrepancyPoints = discrepancyPoints,
+                PatternPoints = patternPoints
             };
 
             var json = JsonSerializer.Serialize(cachedData);
@@ -438,7 +452,7 @@ namespace TradingSimulator.Simulator
                 var strategies = strategiesList[idx]; // only the selected set
                 OnTestProgress?.Invoke($"[{label}/{dto.StrategyName}] market {market} ({mIdx + 1}/{uniqueMarkets.Count})");
 
-                var (finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort, pos, avgCost, rest, disc) =
+                var (finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort, pos, avgCost, rest, disc, patterns) =
                     await ProcessMarketAsync(
                         market, marketSnapshots, strategies, _scopeFactory,
                         progressPrefix: $"[{label}/{dto.StrategyName}] ",
@@ -450,7 +464,7 @@ namespace TradingSimulator.Simulator
 
                 if (writeToFile)
                     SaveMarketDataToFile(market, finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort,
-                        pos, avgCost, rest, disc, fileNameSuffix: $"_{label}_{dto.StrategyName}");
+                        pos, avgCost, rest, disc, patterns, fileNameSuffix: $"_{label}_{dto.StrategyName}");
 
                 dto.WeightSetMarkets.Add(new WeightSetMarketDTO
                 {
@@ -747,7 +761,7 @@ ResolveFamily(StrategyFamily family)
                 {
                     var strategies = strategiesList[setIdx];
                     var dto = weightSetDtos[setIdx];
-                    var (finalPnL, _, _, _, _, _, _, _, _, _, _, _, _, _, _) = await ProcessMarketAsync(
+                    var (finalPnL, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _) = await ProcessMarketAsync(
                         market, marketSnapshots, strategies, _scopeFactory,
                         progressPrefix: "",
                         writeToFile: false,
@@ -907,7 +921,7 @@ ResolveFamily(StrategyFamily family)
 
                     OnTestProgress?.Invoke($"[{label}/{dto.StrategyName}] market {market} ({mIdx + 1}/{uniqueMarkets.Count}) set {setIdx + 1}/{strategiesList.Count}");
 
-                    var (finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort, pos, avgCost, rest, disc) =
+                    var (finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort, pos, avgCost, rest, disc, patterns) =
                         await ProcessMarketAsync(
                             market, marketSnapshots, strategies, _scopeFactory,
                             progressPrefix: $"[{label}/{dto.StrategyName}] ",
@@ -919,7 +933,7 @@ ResolveFamily(StrategyFamily family)
 
                     if (writeToFile)
                         SaveMarketDataToFile(market, finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort,
-                            pos, avgCost, rest, disc, fileNameSuffix: $"_{label}_{dto.StrategyName}");
+                            pos, avgCost, rest, disc, patterns, fileNameSuffix: $"_{label}_{dto.StrategyName}");
 
                     dto.WeightSetMarkets.Add(new WeightSetMarketDTO
                     {

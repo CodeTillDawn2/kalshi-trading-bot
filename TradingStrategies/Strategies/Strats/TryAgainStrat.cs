@@ -139,11 +139,7 @@ namespace TradingStrategies.Strategies.Strats
                          false, false, new List<PatternDefinition>()));
 
 
-            CandleMids[] mids = snapshot.RecentCandlesticks.ToCandleMids(snapshot.MarketTicker);
-
-            var patterns = PatternSearch.DetectPatterns(mids, 10);
             List<PatternDefinition> currentPatterns = new List<PatternDefinition>();
-            if (patterns.Keys.Count > 0) currentPatterns = patterns[patterns.Keys.Last()];
 
             if (snapshot.BestYesAsk >= 100 - minDist || snapshot.BestYesBid <= minDist)
                 return AD(ActionType.None, 0, 0,
@@ -469,12 +465,6 @@ namespace TradingStrategies.Strategies.Strats
             lines.Add($"Exit mins: Short {F(exitMinShort)}, Medium {F(exitMinMed)}");
             lines.Add($"Current Position: {position}");
             lines.Add($"Flip Blocked: {(flipBlocked ? "Yes" : "No")} (opp |net| thr: {F(exitOpp)})");
-            if (patterns != null && patterns.Count > 0)
-            {
-                lines.Add($"Patterns:");
-            }
-            foreach (var pattern in patterns)
-                lines.Add(pattern == null ? $"Name: {pattern?.Name}, Strength: {pattern?.Strength}, Certainty: {pattern?.Certainty}, Uncertainty: {pattern?.Uncertainty}" : "");
 
             return string.Join("\r\n", lines);
         }

@@ -37,13 +37,8 @@ namespace TradingSimulator.Executable
         private IKalshiBotContext _dbContext;
         private ServiceProvider? _serviceProvider;
         private IOptions<SnapshotConfig> _snapshotOptions;
-        private const int BatchSize = 1000;
-        private int _validCount;
-        private int _priceOffCount_minor;
         private int _priceOffCount_major;
-        private int _errorCount;
         private int _orderbookMissingCount;
-        private int _lastWebSocketTooOldCount;
         private int _overlappingPriceCount;
         private int _rateDiscrepancyCount; // New counter
         private readonly Dictionary<string, List<DiscrepancyMetadata>> _majorDiscrepancies = new();
@@ -146,11 +141,7 @@ namespace TradingSimulator.Executable
             _snapshotPeriodAnalyzer = new SnapshotPeriodHelper();
 
             _dbContext = new KalshiBotContext(config);
-            _validCount = 0;
-            _priceOffCount_minor = 0;
             _priceOffCount_major = 0;
-            _lastWebSocketTooOldCount = 0;
-            _errorCount = 0;
             _orderbookMissingCount = 0;
             _overlappingPriceCount = 0;
             _rateDiscrepancyCount = 0; // Initialize new counter

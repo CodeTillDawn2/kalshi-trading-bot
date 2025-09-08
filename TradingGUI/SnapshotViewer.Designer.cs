@@ -80,6 +80,8 @@ namespace SimulatorWinForms
             allTimeLowBidPrice = new Label();
             allTimeLowBidTime = new Label();
             tradingMetricsGrid = new TableLayoutPanel();
+            patternsLabel = new CheckBox();
+            patternsValue = new Label();
             supportValue = new Label();
             supportLabel = new CheckBox();
             tradingMetricsHeader = new Label();
@@ -836,6 +838,8 @@ namespace SimulatorWinForms
             tradingMetricsGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 48.61111F));
             tradingMetricsGrid.Controls.Add(supportValue, 1, 11);
             tradingMetricsGrid.Controls.Add(supportLabel, 0, 11);
+            tradingMetricsGrid.Controls.Add(patternsLabel, 0, 12);
+            tradingMetricsGrid.Controls.Add(patternsValue, 1, 12);
             tradingMetricsGrid.Controls.Add(tradingMetricsHeader, 0, 0);
             tradingMetricsGrid.Controls.Add(rsiLabel, 0, 1);
             tradingMetricsGrid.Controls.Add(rsiValue, 1, 1);
@@ -860,7 +864,8 @@ namespace SimulatorWinForms
             tradingMetricsGrid.Dock = DockStyle.Fill;
             tradingMetricsGrid.Location = new Point(3, 203);
             tradingMetricsGrid.Name = "tradingMetricsGrid";
-            tradingMetricsGrid.RowCount = 12;
+            tradingMetricsGrid.RowCount = 13;
+            tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
             tradingMetricsGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 9.09F));
@@ -898,7 +903,30 @@ namespace SimulatorWinForms
             supportLabel.TabIndex = 21;
             supportLabel.Text = "Supports:";
             supportLabel.CheckedChanged += supportLabel_CheckedChanged;
-            // 
+            //
+            // patternsLabel
+            //
+            patternsLabel.AutoSize = true;
+            patternsLabel.Dock = DockStyle.Fill;
+            patternsLabel.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            patternsLabel.Location = new Point(3, 201);
+            patternsLabel.Name = "patternsLabel";
+            patternsLabel.Size = new Size(68, 16);
+            patternsLabel.TabIndex = 23;
+            patternsLabel.Text = "Patterns:";
+            patternsLabel.CheckedChanged += patternsLabel_CheckedChanged;
+            //
+            // patternsValue
+            //
+            patternsValue.AutoSize = true;
+            patternsValue.Dock = DockStyle.Fill;
+            patternsValue.Font = new Font("Segoe UI", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            patternsValue.Location = new Point(77, 198);
+            patternsValue.Name = "patternsValue";
+            patternsValue.Size = new Size(64, 22);
+            patternsValue.TabIndex = 24;
+            patternsValue.Text = "--";
+            //
             // tradingMetricsHeader
             // 
             tradingMetricsHeader.AutoSize = true;
@@ -2334,6 +2362,8 @@ namespace SimulatorWinForms
         private CheckBox totalDepthCB;
         private Label supportValue;
         private CheckBox supportLabel;
+        private CheckBox patternsLabel;
+        private Label patternsValue;
         private Label tradingMetricsHeader;
         private Label marketTickerLabel;
     }
