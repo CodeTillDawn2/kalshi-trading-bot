@@ -2,9 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace SmokehouseDTOs.KalshiAPI
 {
-    // The API returns a direct array, not wrapped in an object
     public class AnnouncementResponse
     {
+        [JsonPropertyName("announcements")]
         public List<AnnouncementApi> Announcements { get; set; } = new List<AnnouncementApi>();
     }
 }

@@ -1278,12 +1278,12 @@ namespace KalshiBotAPI.KalshiAPI
                 response.EnsureSuccessStatusCode();
                 var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
 
-                var responseData = JsonSerializer.Deserialize<List<AnnouncementApi>>(
+                var responseData = JsonSerializer.Deserialize<AnnouncementResponse>(
                     jsonString,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                 );
 
-                if (responseData == null || responseData.Count == 0)
+                if (responseData == null || responseData.Announcements == null || responseData.Announcements.Count == 0)
                 {
                     _logger.LogWarning("No announcements found in API response.");
                     return (0, 0);
@@ -1293,7 +1293,7 @@ namespace KalshiBotAPI.KalshiAPI
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
                 var announcementsToAdd = new List<AnnouncementDTO>();
-                foreach (var apiAnnouncement in responseData)
+                foreach (var apiAnnouncement in responseData.Announcements)
                 {
                     var announcement = new AnnouncementDTO
                     {

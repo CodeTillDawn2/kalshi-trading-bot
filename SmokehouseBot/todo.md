@@ -13,7 +13,6 @@
 - [ ] Test on phone
 - [ ] Add information about your resting orders to the front end
 - [ ] Change position label to be more clear
-- [ ] https://kalshi.com/eventpreview/KXTOPALBUMBYTAYLORSWIFT-25DEC/preview_card
 
 # Soon
 - [ ] Alerts?

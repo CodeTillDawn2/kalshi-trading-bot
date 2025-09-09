@@ -106,6 +106,9 @@ namespace KalshiBotOverseer
             // Register the new EventSubscriber as singleton
             services.AddSingleton<Overseer>();
 
+            // Add memory cache for data caching
+            services.AddMemoryCache();
+
             // Add MVC for controllers
             services.AddControllers();
         }
@@ -117,7 +120,9 @@ namespace KalshiBotOverseer
                 app.UseDeveloperExceptionPage();
             }
 
+            // Set up static files serving from the wwwroot directory
             app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

@@ -4,202 +4,1052 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MarketWatch Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             color: #333;
-            text-align: center;
         }
-        .market-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-            background-color: #fafafa;
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        .market-header {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        .market-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .info-item {
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            align-items: center;
         }
-        .label {
-            font-weight: bold;
-            color: #555;
+
+        .header h1 {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 700;
         }
-        .value {
-            color: #333;
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
-        .status-active {
-            color: #27ae60;
-        }
-        .status-closed {
-            color: #e74c3c;
-        }
+
         .refresh-btn {
-            background-color: #3498db;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .refresh-btn i {
+            font-size: 16px;
+        }
+
+        .tab-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .tab-buttons {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 20px 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .tab-btn i {
+            font-size: 18px;
+        }
+
+        .tab-content {
+            padding: 30px;
+        }
+
+        .filters-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .filter-input, .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .sort-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .sort-btn:hover {
+            background: #5a6268;
+        }
+
+        .sort-btn.active {
+            background: #667eea;
+        }
+
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+        }
+
+        .market-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+        }
+
+        .market-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .market-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .market-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .market-ticker {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .brain-lock-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .market-metrics {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        .metric-item {
+            background: #f8f9fa;
+            padding: 6px 8px;
+            border-radius: 6px;
+            border-left: 2px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .metric-label {
+            font-size: 9px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+            line-height: 1.2;
+            flex: 1;
+        }
+
+        .metric-value {
+            font-size: 12px;
+            font-weight: 700;
+            color: #2c3e50;
+            line-height: 1.2;
+            text-align: right;
+        }
+
+        .metric-value.positive {
+            color: #28a745;
+        }
+
+        .metric-value.negative {
+            color: #dc3545;
+        }
+
+        .market-details {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .market-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 2px;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .market-subtitle {
+            font-size: 10px;
+            color: #6c757d;
+            margin-bottom: 4px;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .market-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-closed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .brain-lock-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+
+        .brain-lock-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .brain-lock-dates {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .date-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .date-item i {
+            width: 14px;
+            color: #007bff;
+        }
+
+        .brain-lock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .brain-lock-id {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .brain-lock-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+            font-size: 18px;
+        }
+
+        .loading i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .error {
+            text-align: center;
+            padding: 60px;
+            color: #dc3545;
+            font-size: 18px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+
+        .pagination-controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .pagination-info {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .pagination-buttons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .pagination-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        .refresh-btn:hover {
-            background-color: #2980b9;
+
+        .pagination-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-        .loading {
+
+        .pagination-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #currentPageInfo {
+            font-weight: 600;
+            color: #495057;
+            min-width: 80px;
             text-align: center;
-            padding: 20px;
-            color: #666;
+        }
+
+        .metric-value {
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .market-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 10px;
+            }
+
+            .market-card {
+                padding: 10px;
+            }
+
+            .market-metrics {
+                gap: 5px;
+            }
+
+            .filters-section {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            .market-ticker {
+                font-size: 13px;
+            }
+
+            .metric-value {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .market-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .market-card {
+                padding: 8px;
+            }
+
+            .market-ticker {
+                font-size: 12px;
+            }
+
+            .brain-lock-badge {
+                font-size: 8px;
+                padding: 2px 5px;
+            }
+
+            .metric-label {
+                font-size: 8px;
+            }
+
+            .metric-value {
+                font-size: 11px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>MarketWatch Dashboard</h1>
-        <button class="refresh-btn" onclick="loadMarketWatchData()">Refresh Data</button>
-        <div id="marketWatchContainer">
-            <div class="loading">Loading market watch data...</div>
+    <div class="dashboard">
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> MarketWatch Dashboard</h1>
+            <div class="header-controls">
+                <button class="refresh-btn" onclick="refreshAllData()">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh All
+                </button>
+                <div class="last-updated">
+                    <small id="lastUpdated">Last updated: --</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('markets')">
+                    <i class="fas fa-store"></i>
+                    Markets
+                </button>
+                <button class="tab-btn" onclick="switchTab('brainlocks')">
+                    <i class="fas fa-brain"></i>
+                    Brain Locks
+                </button>
+            </div>
+
+            <div id="markets-tab" class="tab-content">
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <label class="filter-label">Search Markets</label>
+                        <input type="text" id="searchInput" class="filter-input" placeholder="Search by ticker, title..." onkeyup="filterMarkets()">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Brain Lock Filter</label>
+                        <select id="brainLockFilter" class="filter-select" onchange="filterMarkets()">
+                            <option value="">All Brain Locks</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort By</label>
+                        <select id="sortSelect" class="filter-select" onchange="sortMarkets()">
+                            <option value="ticker">Market Ticker</option>
+                            <option value="title">Market Title</option>
+                            <option value="interestScore" selected>Interest Score</option>
+                            <option value="websocketEvents">WebSocket Events</option>
+                            <option value="lastWatched">Last Watched</option>
+                            <option value="brainLock">Brain Lock</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Page Size</label>
+                        <select id="pageSizeSelect" class="filter-select" onchange="changePageSize()">
+                            <option value="25">25 per page</option>
+                            <option value="50" selected>50 per page</option>
+                            <option value="100">100 per page</option>
+                            <option value="200">200 per page</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort Order</label>
+                        <button id="sortOrderBtn" class="sort-btn active" onclick="toggleSortOrder()">
+                            <i class="fas fa-sort-amount-down"></i>
+                            Descending
+                        </button>
+                    </div>
+                </div>
+
+                <div id="marketsContainer">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <div>Loading market data...</div>
+                    </div>
+                </div>
+
+                <div id="paginationControls" class="pagination-controls" style="display: none;">
+                    <div class="pagination-info">
+                        <span id="paginationInfo">Showing 1-50 of 100 markets</span>
+                    </div>
+                    <div class="pagination-buttons">
+                        <button id="prevPageBtn" class="pagination-btn" onclick="changePage(-1)" disabled>
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <span id="currentPageInfo">Page 1</span>
+                        <button id="nextPageBtn" class="pagination-btn" onclick="changePage(1)">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="brainlocks-tab" class="tab-content" style="display: none;">
+                <div id="brainLocksContainer">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <div>Loading brain lock data...</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        let marketData = [];
+        let brainLockData = [];
+        let currentTab = 'markets';
+        let sortOrder = 'desc';
+        let currentPage = 1;
+        let pageSize = 50;
+        let filteredData = [];
+
+        async function refreshAllData() {
+            await Promise.all([
+                loadMarketWatchData(),
+                loadBrainLocksData()
+            ]);
+            updateLastUpdated();
+        }
+
         async function loadMarketWatchData() {
-            const container = document.getElementById('marketWatchContainer');
-            container.innerHTML = '<div class="loading">Loading market watch data...</div>';
-
             try {
-                const response = await fetch('/marketwatch/data');
-                const data = await response.json();
+                const response = await fetch('/MarketWatch/data');
+                marketData = await response.json();
+                updateBrainLockFilter();
+                currentPage = 1; // Reset to first page when loading new data
+                renderMarkets();
+            } catch (error) {
+                console.error('Error loading market data:', error);
+                document.getElementById('marketsContainer').innerHTML =
+                    '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Failed to load market data</div></div>';
+            }
+        }
 
-                if (data.length === 0) {
-                    container.innerHTML = '<div class="loading">No market watch data available.</div>';
-                    return;
+        async function loadBrainLocksData() {
+            try {
+                const response = await fetch('/MarketWatch/brainlocks');
+                brainLockData = await response.json();
+                renderBrainLocks();
+            } catch (error) {
+                console.error('Error loading brain lock data:', error);
+                document.getElementById('brainLocksContainer').innerHTML =
+                    '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Failed to load brain lock data</div></div>';
+            }
+        }
+
+        function updateBrainLockFilter() {
+            const brainLockFilter = document.getElementById('brainLockFilter');
+            const brainLocks = [...new Set(marketData.map(item => item.brainInstanceName).filter(bl => bl))];
+
+            brainLockFilter.innerHTML = '<option value="">All Brain Instances</option>';
+            brainLocks.sort().forEach(bl => {
+                brainLockFilter.innerHTML += `<option value="${bl}">${bl}</option>`;
+            });
+        }
+
+        function renderMarkets() {
+            const container = document.getElementById('marketsContainer');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const brainLockFilter = document.getElementById('brainLockFilter').value;
+            const sortBy = document.getElementById('sortSelect').value;
+
+            filteredData = marketData.filter(item => {
+                const matchesSearch = !searchTerm ||
+                    item.market_ticker.toLowerCase().includes(searchTerm) ||
+                    (item.market?.title || '').toLowerCase().includes(searchTerm) ||
+                    (item.market?.subtitle || '').toLowerCase().includes(searchTerm);
+
+                const matchesBrainLock = !brainLockFilter || item.brainInstanceName == brainLockFilter;
+
+                return matchesSearch && matchesBrainLock;
+            });
+
+            // Sort data
+            filteredData.sort((a, b) => {
+                let aVal, bVal;
+
+                switch (sortBy) {
+                    case 'interestScore':
+                        aVal = a.interestScore || 0;
+                        bVal = b.interestScore || 0;
+                        break;
+                    case 'websocketEvents':
+                        aVal = a.averageWebsocketEventsPerMinute || 0;
+                        bVal = b.averageWebsocketEventsPerMinute || 0;
+                        break;
+                    case 'lastWatched':
+                        aVal = new Date(a.lastWatched || 0);
+                        bVal = new Date(b.lastWatched || 0);
+                        break;
+                    case 'brainLock':
+                        aVal = a.brainInstanceName || '';
+                        bVal = b.brainInstanceName || '';
+                        break;
+                    case 'title':
+                        aVal = a.market?.title || '';
+                        bVal = b.market?.title || '';
+                        break;
+                    default: // ticker
+                        aVal = a.market_ticker;
+                        bVal = b.market_ticker;
                 }
 
-                container.innerHTML = data.map(item => createMarketCard(item)).join('');
-            } catch (error) {
-                console.error('Error loading data:', error);
-                container.innerHTML = '<div class="loading">Error loading data. Please try again.</div>';
+                if (sortOrder === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            if (filteredData.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><div>No markets match your filters</div></div>';
+                document.getElementById('paginationControls').style.display = 'none';
+                return;
             }
+
+            // Calculate pagination
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, filteredData.length);
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            container.innerHTML = `
+                <div class="market-grid">
+                    ${pageData.map(item => createMarketCard(item)).join('')}
+                </div>
+            `;
+
+            // Update pagination controls
+            updatePaginationControls(totalPages, startIndex + 1, endIndex, filteredData.length);
+        }
+
+        function updatePaginationControls(totalPages, startItem, endItem, totalItems) {
+            const controls = document.getElementById('paginationControls');
+            const info = document.getElementById('paginationInfo');
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            const pageInfo = document.getElementById('currentPageInfo');
+
+            if (totalPages <= 1) {
+                controls.style.display = 'none';
+                return;
+            }
+
+            controls.style.display = 'flex';
+            info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} markets`;
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+            prevBtn.disabled = currentPage <= 1;
+            nextBtn.disabled = currentPage >= totalPages;
+        }
+
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSizeSelect').value);
+            currentPage = 1;
+            renderMarkets();
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            renderMarkets();
         }
 
         function createMarketCard(item) {
             const market = item.market;
-            const statusClass = market && market.status === 'active' ? 'status-active' : 'status-closed';
+            const statusClass = market?.status === 'active' ? 'status-active' : 'status-closed';
+            const categoryInfo = market?.category ? getCategoryIcon(market.category) : getCategoryIcon(null);
+
+            // Use yes_sub_title if subtitle is blank
+            const displaySubtitle = (market?.subtitle && market.subtitle.trim()) ? market.subtitle : (market?.yes_sub_title || 'No Subtitle');
 
             return `
                 <div class="market-card">
-                    <div class="market-header">${item.market_ticker}</div>
-                    <div class="market-info">
-                        <div>
-                            <div class="info-item">
-                                <span class="label">Brain Lock:</span>
-                                <span class="value">${item.brainLock || 'N/A'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Interest Score:</span>
-                                <span class="value">${item.interestScore ? item.interestScore.toFixed(2) : 'N/A'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Interest Score Date:</span>
-                                <span class="value">${item.interestScoreDate ? new Date(item.interestScoreDate).toLocaleString() : 'N/A'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Last Watched:</span>
-                                <span class="value">${item.lastWatched ? new Date(item.lastWatched).toLocaleString() : 'N/A'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Avg WebSocket Events/Min:</span>
-                                <span class="value">${item.averageWebsocketEventsPerMinute ? item.averageWebsocketEventsPerMinute.toFixed(2) : 'N/A'}</span>
+                    <div class="market-header">
+                        <div class="market-ticker">
+                            <i class="${categoryInfo.icon}" style="color: ${categoryInfo.color}; font-size: 14px;" title="${market?.category || 'Unknown Category'}"></i>
+                            <span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${market?.title || 'No Title'}</span>
+                        </div>
+                        ${item.brainInstanceName ? `<span class="brain-lock-badge">${item.brainInstanceName}</span>` : ''}
+                    </div>
+
+                    <div class="market-metrics">
+                        <div class="metric-item">
+                            <div class="metric-label">Ticker</div>
+                            <div class="metric-value" style="font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                ${item.market_ticker}
                             </div>
                         </div>
-                        ${market ? `
-                        <div>
-                            <div class="info-item">
-                                <span class="label">Title:</span>
-                                <span class="value">${market.title || 'N/A'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Subtitle:</span>
-                                <span class="value">${market.subtitle || 'N/A'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Market Type:</span>
-                                <span class="value">${market.market_type || 'N/A'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Status:</span>
-                                <span class="value ${statusClass}">${market.status || 'N/A'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Open Time:</span>
-                                <span class="value">${market.open_time ? new Date(market.open_time).toLocaleString() : 'N/A'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Close Time:</span>
-                                <span class="value">${market.close_time ? new Date(market.close_time).toLocaleString() : 'N/A'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Yes Bid/Ask:</span>
-                                <span class="value">${market.yes_bid || 0} / ${market.yes_ask || 0}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">No Bid/Ask:</span>
-                                <span class="value">${market.no_bid || 0} / ${market.no_ask || 0}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Last Price:</span>
-                                <span class="value">${market.last_price || 0}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Volume:</span>
-                                <span class="value">${market.volume ? market.volume.toLocaleString() : 0}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Liquidity:</span>
-                                <span class="value">${market.liquidity ? market.liquidity.toLocaleString() : 0}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Open Interest:</span>
-                                <span class="value">${market.open_interest || 0}</span>
+                        <div class="metric-item">
+                            <div class="metric-label">Interest</div>
+                            <div class="metric-value ${item.interestScore > 0 ? 'positive' : ''}">
+                                ${item.interestScore ? item.interestScore.toFixed(1) : 'N/A'}
                             </div>
                         </div>
-                        ` : '<div>No market data available</div>'}
+                        <div class="metric-item">
+                            <div class="metric-label">Events</div>
+                            <div class="metric-value">
+                                ${item.averageWebsocketEventsPerMinute ? item.averageWebsocketEventsPerMinute.toFixed(0) : 'N/A'}
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Last Seen</div>
+                            <div class="metric-value" style="font-size: 10px;">
+                                ${item.lastWatched ? formatDateTime(item.lastWatched).split(',')[0] : 'Never'}
+                            </div>
+                        </div>
+                    </div>
+
+                    ${market ? `
+                    <div class="market-details">
+                        <div class="market-title">${market.title || 'No Title'}</div>
+                        <div class="market-subtitle">${displaySubtitle}</div>
+                        <span class="market-status ${statusClass}">${market.status || 'Unknown'}</span>
+                        <div style="margin-top: 4px; font-size: 9px; color: #6c757d; line-height: 1.2;">
+                            Vol: ${market.volume ? market.volume.toLocaleString() : 0} |
+                            Liq: ${market.liquidity ? market.liquidity.toLocaleString() : 0} |
+                            Price: ${market.last_price || 0}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderBrainLocks() {
+            const container = document.getElementById('brainLocksContainer');
+
+            if (brainLockData.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-brain"></i><div>No brain locks found</div></div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="market-grid">
+                    ${brainLockData.map(item => createBrainLockCard(item)).join('')}
+                </div>
+            `;
+        }
+
+        function createBrainLockCard(item) {
+            const lastSnapshotFormatted = item.lastSnapshotSaved ? formatDateTime(item.lastSnapshotSaved) : 'Never';
+            const lastWatchedFormatted = item.lastWatched ? formatDateTime(item.lastWatched) : 'Never';
+            const lastErrorFormatted = item.lastErrorEncountered ? formatDateTime(item.lastErrorEncountered) : 'Never';
+
+            return `
+                <div class="brain-lock-card" onclick="drillIntoBrainLock('${item.brainInstanceName}')">
+                    <div class="brain-lock-header">
+                        <div class="brain-lock-id">
+                            <i class="fas fa-brain"></i>
+                            ${item.brainInstanceName}
+                        </div>
+                        <div style="font-size: 14px; color: #6c757d;">
+                            ${item.marketCount} markets
+                        </div>
+                    </div>
+
+                    <div class="brain-lock-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">${item.averageInterestScore.toFixed(1)}</span>
+                            <div class="stat-label">Avg Interest</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">${item.minInterestScore.toFixed(1)}</span>
+                            <div class="stat-label">Min Interest</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">${item.maxInterestScore.toFixed(1)}</span>
+                            <div class="stat-label">Max Interest</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">${item.averageWebsocketEvents.toFixed(1)}</span>
+                            <div class="stat-label">Avg Events</div>
+                        </div>
+                    </div>
+
+                    <div class="brain-lock-dates">
+                        <div class="date-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Last Watched: ${lastWatchedFormatted}</span>
+                        </div>
+                        <div class="date-item">
+                            <i class="fas fa-save"></i>
+                            <span>Last Snapshot: ${lastSnapshotFormatted}</span>
+                        </div>
+                        <div class="date-item">
+                            <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                            <span>Last Error: ${lastErrorFormatted}</span>
+                        </div>
                     </div>
                 </div>
             `;
         }
 
-        // Load data on page load
-        window.onload = loadMarketWatchData;
+        function drillIntoBrainLock(brainInstanceName) {
+            // Filter markets by brain instance name
+            document.getElementById('brainLockFilter').value = brainInstanceName;
+            switchTab('markets');
+            filterMarkets();
+        }
 
-        // Auto-refresh every 30 seconds
-        setInterval(loadMarketWatchData, 30000);
+        function filterMarkets() {
+            currentPage = 1; // Reset to first page when filtering
+            renderMarkets();
+        }
+
+        function sortMarkets() {
+            currentPage = 1; // Reset to first page when sorting
+            renderMarkets();
+        }
+
+        function toggleSortOrder() {
+            const btn = document.getElementById('sortOrderBtn');
+            sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
+
+            btn.innerHTML = sortOrder === 'desc'
+                ? '<i class="fas fa-sort-amount-down"></i> Descending'
+                : '<i class="fas fa-sort-amount-up"></i> Ascending';
+
+            btn.classList.toggle('active', sortOrder === 'desc');
+            currentPage = 1; // Reset to first page when changing sort order
+            renderMarkets();
+        }
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+            // Update tab content
+            document.getElementById('markets-tab').style.display = tabName === 'markets' ? 'block' : 'none';
+            document.getElementById('brainlocks-tab').style.display = tabName === 'brainlocks' ? 'block' : 'none';
+        }
+
+        function updateLastUpdated() {
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = `Last updated: ${now.toLocaleTimeString()}`;
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '--';
+            const date = new Date(dateStr);
+            return date.toLocaleString();
+        }
+
+        function getCategoryIcon(category) {
+            if (!category) return { icon: 'fas fa-question-circle', color: '#6c757d' };
+
+            const categoryMap = {
+                'Climate and Weather': { icon: 'fas fa-cloud-sun', color: '#17a2b8' },
+                'Mentions': { icon: 'fas fa-at', color: '#6f42c1' },
+                'Crypto': { icon: 'fab fa-bitcoin', color: '#f39c12' },
+                'Entertainment': { icon: 'fas fa-film', color: '#e83e8c' },
+                'Science and Technology': { icon: 'fas fa-microscope', color: '#28a745' },
+                'Social': { icon: 'fas fa-users', color: '#007bff' },
+                'Financials': { icon: 'fas fa-chart-line', color: '#28a745' },
+                'Elections': { icon: 'fas fa-vote-yea', color: '#dc3545' },
+                'Sports': { icon: 'fas fa-futbol', color: '#fd7e14' },
+                'Health': { icon: 'fas fa-heartbeat', color: '#dc3545' },
+                'World': { icon: 'fas fa-globe', color: '#6c757d' },
+                'Transportation': { icon: 'fas fa-plane', color: '#17a2b8' },
+                'Politics': { icon: 'fas fa-landmark', color: '#6c757d' },
+                'Education': { icon: 'fas fa-graduation-cap', color: '#ffc107' },
+                'Companies': { icon: 'fas fa-building', color: '#007bff' },
+                'Economics': { icon: 'fas fa-chart-bar', color: '#28a745' }
+            };
+
+            return categoryMap[category] || { icon: 'fas fa-question-circle', color: '#6c757d' };
+        }
+
+        // Initialize
+        window.onload = async () => {
+            await refreshAllData();
+            // Auto-refresh every 60 seconds
+            setInterval(refreshAllData, 60000);
+        };
     </script>
 </body>
 </html>

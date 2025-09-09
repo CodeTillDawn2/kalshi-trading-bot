@@ -127,6 +127,8 @@ namespace KalshiBotData.Data.Interfaces
 
         #region Log Entries
         Task AddLogEntry(LogEntryDTO dto);
+        Task<List<LogEntryDTO>> GetLogEntries(string? brainInstance = null, string? level = null,
+            DateTime? startDate = null, DateTime? endDate = null, int? maxRecords = null);
         #endregion
 
         #region WeightSets

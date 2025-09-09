@@ -72,7 +72,7 @@ namespace SmokehouseBot.Management
                 {
                     throw new Exception($"Brain instance with ID {_executionConfig.BrainInstance} not found.");
                 }
-                _brainLock = brainInstance.BrainLock ?? new Guid();
+                _brainLock = brainInstance.BrainLock ?? Guid.NewGuid();
                 _sessionIdentifier = GenerateRandomString(5);
                 _initialized = true;
             }

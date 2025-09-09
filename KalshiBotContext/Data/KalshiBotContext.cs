@@ -1147,6 +1147,34 @@ namespace KalshiBotData.Data
             LogEntries.Add(dto.ToLogEntry());
             await SaveChangesAsync();
         }
+
+        public async Task<List<LogEntryDTO>> GetLogEntries(string? brainInstance = null, string? level = null,
+            DateTime? startDate = null, DateTime? endDate = null, int? maxRecords = null)
+        {
+            IQueryable<LogEntry> query = LogEntries.AsNoTracking();
+
+            if (!string.IsNullOrEmpty(brainInstance))
+                query = query.Where(le => le.BrainInstance == brainInstance);
+
+            if (!string.IsNullOrEmpty(level))
+                query = query.Where(le => le.Level == level);
+
+            if (startDate.HasValue)
+                query = query.Where(le => le.Timestamp >= startDate.Value);
+
+            if (endDate.HasValue)
+                query = query.Where(le => le.Timestamp <= endDate.Value);
+
+            if (maxRecords.HasValue)
+                query = query.Take(maxRecords.Value);
+
+            var logEntries = await query
+                .OrderByDescending(le => le.Timestamp)
+                .ToListAsync();
+
+            return logEntries.Select(le => le.ToLogEntryDTO()).ToList();
+        }
+
         #endregion
 
         #region Announcements
