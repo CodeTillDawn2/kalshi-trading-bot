@@ -41,6 +41,7 @@
 - [ ] Start periodically sampling exchange status and find out if they are warning about sudden outages
 - [x] Start with no markets watched then build list so there isn't so much of a downtime, start with most active markets to minimize impact of restart
 - [ ] Need to let market refresh service run before init finishes if long running
+- [ ] Add warnings to overseer if SingalRService is not using web sockets or payload gets too big (>1MB), plus any others we can think of
 
 # v0.2.5
 Notes: Major issue which was causing snapshots after the first to not translate to change over time... all snapshots invalidated.
