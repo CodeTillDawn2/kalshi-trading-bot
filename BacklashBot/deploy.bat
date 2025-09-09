@@ -1,5 +1,5 @@
 @echo off
-echo Publishing SmokehouseBot project (appsettings.local.json will NOT be copied)...
+echo Publishing BacklashBot project (appsettings.local.json will NOT be copied)...
 setlocal
 
 :: Determine PowerShell executable
@@ -11,10 +11,10 @@ if %ERRORLEVEL% == 0 (
 echo INFO: Using PowerShell: %POWERSHELL_EXE%
 
 :: Configuration
-set "PROJECT_PATH=C:\Users\Peter\Documents\GitHub\kalshi-trading-bot\SmokehouseBot\SmokehouseBot.csproj"
-set "OUTPUT_PATH=C:\Deploy\SmokehouseBot"
+set "PROJECT_PATH=C:\Users\Peter\Documents\GitHub\kalshi-trading-bot\BacklashBot\BacklashBot.csproj"
+set "OUTPUT_PATH=C:\Deploy\BacklashBot"
 set "TARGET_FRAMEWORK=net8.0"
-set "ZIP_BASENAME=SmokehouseBot"
+set "ZIP_BASENAME=BacklashBot"
 set "THIS_SCRIPT_NAME=%~nx0"
 
 :: Clean build artifacts only

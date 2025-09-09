@@ -27,6 +27,7 @@ namespace KalshiBotData.Data
         private DbSet<MarketPosition> MarketPositions { get; set; }
         private DbSet<Order> Orders { get; set; }
         private DbSet<LogEntry> LogEntries { get; set; }
+        private DbSet<OverseerLogEntry> OverseerLogEntries { get; set; }
         private DbSet<Snapshot> Snapshots { get; set; }
         private DbSet<SnapshotSchema> SnapshotSchemas { get; set; }
         private DbSet<BrainInstance> BrainInstances { get; set; }
@@ -1150,6 +1151,12 @@ namespace KalshiBotData.Data
             await SaveChangesAsync();
         }
 
+        public async Task AddOverseerLogEntry(LogEntryDTO dto)
+        {
+            OverseerLogEntries.Add(dto.ToOverseerLogEntry());
+            await SaveChangesAsync();
+        }
+
         public async Task<List<LogEntryDTO>> GetLogEntries(string? brainInstance = null, string? level = null,
             DateTime? startDate = null, DateTime? endDate = null, int? maxRecords = null)
         {
@@ -1704,6 +1711,35 @@ namespace KalshiBotData.Data
             {
                 entity
                     .ToTable("t_LogEntries")
+                    .HasKey(e => e.Id);
+
+                entity.Property(e => e.Timestamp)
+                      .IsRequired()
+                      .HasColumnType("datetime");
+
+                entity.Property(e => e.Level)
+                      .IsRequired()
+                      .HasMaxLength(50);
+
+                entity.Property(e => e.SessionIdentifier)
+                      .IsRequired()
+                      .HasMaxLength(5);
+
+                entity.Property(e => e.Message)
+                      .IsRequired()
+                      .HasMaxLength(4000);
+
+                entity.Property(e => e.Exception)
+                      .HasMaxLength(4000);
+
+                entity.Property(e => e.Source)
+                      .IsRequired()
+                      .HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<OverseerLogEntry>(entity =>
+            {
+                entity
                     .HasKey(e => e.Id);
 
                 entity.Property(e => e.Timestamp)

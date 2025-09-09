@@ -53,5 +53,37 @@ namespace KalshiBotData.Extensions
             logEntry.Source = logEntryDTO.Source;
             return logEntry;
         }
+
+        public static OverseerLogEntry ToOverseerLogEntry(this LogEntryDTO logEntryDTO)
+        {
+            return new OverseerLogEntry
+            {
+                Id = logEntryDTO.Id,
+                Timestamp = logEntryDTO.Timestamp,
+                Level = logEntryDTO.Level,
+                Message = logEntryDTO.Message,
+                Exception = logEntryDTO.Exception,
+                Environment = logEntryDTO.Environment,
+                BrainInstance = logEntryDTO.BrainInstance,
+                SessionIdentifier = logEntryDTO.SessionIdentifier,
+                Source = logEntryDTO.Source
+            };
+        }
+
+        public static LogEntryDTO ToOverseerLogEntryDTO(this OverseerLogEntry overseerLogEntry)
+        {
+            return new LogEntryDTO
+            {
+                Id = overseerLogEntry.Id,
+                Timestamp = overseerLogEntry.Timestamp,
+                Level = overseerLogEntry.Level,
+                Message = overseerLogEntry.Message,
+                Exception = overseerLogEntry.Exception,
+                Environment = overseerLogEntry.Environment,
+                BrainInstance = overseerLogEntry.BrainInstance,
+                SessionIdentifier = overseerLogEntry.SessionIdentifier,
+                Source = overseerLogEntry.Source
+            };
+        }
     }
 }

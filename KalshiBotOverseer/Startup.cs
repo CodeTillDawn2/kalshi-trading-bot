@@ -5,6 +5,7 @@ using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
 using KalshiBotOverseer;
+using KalshiBotOverseer.Logging;
 using KalshiBotOverseer.Services;
 using KalshiBotOverseer.State;
 using Microsoft.AspNetCore.Builder;
@@ -44,6 +45,11 @@ namespace KalshiBotOverseer
                 builder.AddConsole();
                 builder.SetMinimumLevel(LogLevel.Debug);
             });
+
+            // Add database logging services
+            services.AddSingleton<DatabaseLoggingQueue>();
+            services.AddSingleton<ILoggerProvider, DatabaseLoggerProvider>();
+            services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
 
             // Register required services
             services.AddScoped<IKalshiAPIService, KalshiAPIService>();
