@@ -328,7 +328,7 @@ namespace BacklashBot.Services
             try
             {
                 var marketDataService = _serviceFactory.GetMarketDataService();
-                var errorHandler = _serviceFactory.GetSmokehouseErrorHandler();
+                var errorHandler = _serviceFactory.GetBacklashErrorHandler();
                 var dataCache = _serviceFactory.GetDataCache();
                 var marketData = marketDataService.GetMarketDetails(marketTicker);
                 if (marketData == null)

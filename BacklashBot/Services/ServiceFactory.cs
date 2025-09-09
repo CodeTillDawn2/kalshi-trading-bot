@@ -64,7 +64,7 @@ namespace BacklashBot.Services
         public IBroadcastService? GetBroadcastService() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<IBroadcastService>() ?? null;
         public IMarketRefreshService? GetMarketRefreshService() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<IMarketRefreshService>() ?? null;
         public IWebSocketMonitorService? GetWebSocketHostedService() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<IWebSocketMonitorService>() ?? null;
-        public ICentralErrorHandler? GetSmokehouseErrorHandler() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<ICentralErrorHandler>() ?? null;
+        public ICentralErrorHandler? GetBacklashErrorHandler() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<ICentralErrorHandler>() ?? null;
 
 
 

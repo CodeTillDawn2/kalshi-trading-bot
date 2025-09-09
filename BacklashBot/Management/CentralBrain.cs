@@ -67,8 +67,8 @@ namespace BacklashBot.Management
             IOptions<SnapshotConfig> snapshotConfig,
             IOptions<TradingConfig> tradingConfig,
             IOptions<ExecutionConfig> executionConfig,
-            ICentralErrorHandler smokehouseErrorHandler,
-            ICentralPerformanceMonitor smokehousePerformanceTracker,
+            ICentralErrorHandler backlashErrorHandler,
+            ICentralPerformanceMonitor backlashPerformanceTracker,
             IOptions<CalculationConfig> calculationConfig,
             IMarketManagerService marketManager,
             IHostApplicationLifetime appLifetime,
@@ -84,8 +84,8 @@ namespace BacklashBot.Management
             _snapshotConfig = snapshotConfig.Value;
             _marketManager = marketManager;
             _brainStatus = brainStatusService;
-            _errorHandler = smokehouseErrorHandler;
-            _performanceTracker = smokehousePerformanceTracker;
+            _errorHandler = backlashErrorHandler;
+            _performanceTracker = backlashPerformanceTracker;
             _tradingConfig = tradingConfig.Value;
             _executionConfig = executionConfig.Value;
             _calculationConfig = calculationConfig.Value;

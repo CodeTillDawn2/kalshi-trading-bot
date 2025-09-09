@@ -20,7 +20,7 @@ namespace BacklashBot.Services.Interfaces
         IBroadcastService? GetBroadcastService();
         IMarketRefreshService? GetMarketRefreshService();
         IWebSocketMonitorService? GetWebSocketHostedService();
-        ICentralErrorHandler? GetSmokehouseErrorHandler();
+        ICentralErrorHandler? GetBacklashErrorHandler();
         void ResetAll();
         void InitializeServices(Guid _brainLock);
     }

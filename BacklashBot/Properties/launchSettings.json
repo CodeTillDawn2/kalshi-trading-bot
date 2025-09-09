@@ -1,8 +1,16 @@
 {
   "profiles": {
-    "SmokehouseBot": {
+    "WSL": {
+      "commandName": "WSL2",
+      "launchUrl": "https://localhost:60208",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://localhost:60208;http://localhost:60209"
+      },
+      "distributionName": ""
+    },
+    "BacklashBotBot": {
       "commandName": "Project",
-      "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
