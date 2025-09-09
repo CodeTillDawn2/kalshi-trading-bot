@@ -755,6 +755,73 @@
             background: linear-gradient(135deg, rgba(28, 51, 39, 0.1), transparent);
             pointer-events: none;
         }
+
+        /* Context Menu Styles */
+        .context-menu {
+            position: absolute;
+            background: rgba(16, 16, 13, 0.95);
+            border: 2px solid rgb(28, 51, 39);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(28, 51, 39, 0.6);
+            z-index: 1000;
+            min-width: 200px;
+            padding: 8px 0;
+        }
+
+        .context-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .context-menu li {
+            padding: 10px 20px;
+            color: rgb(225, 221, 206);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .context-menu li:hover {
+            background: rgba(28, 51, 39, 0.4);
+        }
+
+        .context-menu li.checked::after {
+            content: '✓';
+            position: absolute;
+            right: 10px;
+            color: rgb(28, 51, 39);
+            font-weight: bold;
+        }
+
+        .submenu {
+            position: relative;
+        }
+
+        .submenu-items {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background: rgba(16, 16, 13, 0.95);
+            border: 2px solid rgb(28, 51, 39);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(28, 51, 39, 0.6);
+            min-width: 150px;
+            padding: 8px 0;
+            z-index: 1001;
+        }
+
+        .submenu:hover .submenu-items {
+            display: block;
+        }
+
+        .submenu-items li {
+            padding: 8px 15px;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -799,6 +866,10 @@
                 <button class="tab-btn" onclick="switchTab('orders')">
                     <i class="fas fa-list"></i>
                     Orders
+                </button>
+                <button class="tab-btn" onclick="switchTab('snapshots')">
+                    <i class="fas fa-camera"></i>
+                    Snapshots
                 </button>
             </div>
 
@@ -914,6 +985,39 @@
                 </div>
             </div>
 
+            <div id="snapshots-tab" class="tab-content" style="display: none;">
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <label class="filter-label">Search Markets</label>
+                        <input type="text" id="snapshotsSearchInput" class="filter-input" placeholder="Search by ticker, title..." onkeyup="filterSnapshots()">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort By</label>
+                        <select id="snapshotsSortSelect" class="filter-select" onchange="sortSnapshots()">
+                                <option value="marketTicker">Market Ticker</option>
+                                <option value="title">Market Title</option>
+                                <option value="recordedHoursPercentage" selected>Recorded Hours %</option>
+                                <option value="groupCount">Group Count</option>
+                                <option value="recordedEnd">Recorded End</option>
+                            </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort Order</label>
+                        <button id="snapshotsSortOrderBtn" class="sort-btn active" onclick="toggleSnapshotsSortOrder()">
+                            <i class="fas fa-sort-amount-down"></i>
+                            Descending
+                        </button>
+                    </div>
+                </div>
+
+                <div id="snapshotsContainer">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <div>Loading snapshot data...</div>
+                    </div>
+                </div>
+            </div>
+
             <div id="orders-tab" class="tab-content" style="display: none;">
                 <div class="filters-section">
                     <div class="filter-group">
@@ -974,15 +1078,76 @@
         </div>
     </div>
 
+    <!-- Context Menu for Brain Cards -->
+    <div id="brainContextMenu" class="context-menu" style="display: none;">
+        <ul>
+            <li onclick="handleWatchedMarkets()">Watched Markets</li>
+            <li onclick="handleChangeWatchSettings()">Change Watch Settings</li>
+            <li onclick="handleLogs()">Logs</li>
+            <li class="submenu">
+                <span>Change Mode</span>
+                <ul class="submenu-items">
+                    <li onclick="handleMode('Autonomous')" class="checked">Autonomous</li>
+                    <li onclick="handleMode('Servant')">Servant</li>
+                </ul>
+            </li>
+            <li class="submenu">
+                <span>Reset</span>
+                <ul class="submenu-items">
+                    <li onclick="handleReset('Graceful')">Graceful</li>
+                    <li onclick="handleReset('Force')">Force</li>
+                </ul>
+            </li>
+            <li onclick="handleStartUp()">Start Up</li>
+            <li class="submenu">
+                <span>Shutdown</span>
+                <ul class="submenu-items">
+                    <li onclick="handleShutdown('Graceful')">Graceful</li>
+                    <li onclick="handleShutdown('Force')">Force</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Context Menu for Market Cards -->
+    <div id="marketContextMenu" class="context-menu" style="display: none;">
+        <ul id="marketMenuItems">
+            <!-- Items will be populated dynamically -->
+        </ul>
+    </div>
+
+    <!-- Context Menu for Positions -->
+    <div id="positionsContextMenu" class="context-menu" style="display: none;">
+        <ul>
+            <li>No options available</li>
+        </ul>
+    </div>
+
+    <!-- Context Menu for Orders -->
+    <div id="ordersContextMenu" class="context-menu" style="display: none;">
+        <ul>
+            <li>No options available</li>
+        </ul>
+    </div>
+
+    <!-- Context Menu for Snapshots -->
+    <div id="snapshotsContextMenu" class="context-menu" style="display: none;">
+        <ul>
+            <li onclick="handleSnapshotGroups()">Groups</li>
+        </ul>
+    </div>
+
     <script>
         let marketData = [];
         let brainLockData = [];
         let positionsData = [];
         let ordersData = [];
+        let snapshotsData = [];
         let currentTab = 'brainlocks';
         let sortOrder = 'desc';
         let positionsSortOrder = 'desc';
         let ordersSortOrder = 'desc';
+        let snapshotsSortOrder = 'desc';
         let currentPage = 1;
         let pageSize = 50;
         let filteredData = [];
@@ -993,6 +1158,7 @@
                 loadBrainLocksData(),
                 loadPositionsData(),
                 loadOrdersData(),
+                loadSnapshotsData(),
                 loadAccountData()
             ]);
             updateLastUpdated();
@@ -1173,7 +1339,7 @@
             const displaySubtitle = (market.subtitle && market.subtitle.trim()) ? market.subtitle : (market.yes_sub_title || 'No Subtitle');
 
             return `
-                <div class="market-card">
+                <div class="market-card" onclick="showMarketContextMenu(event, '${item.market_ticker}', ${item.brainInstanceName ? `'${item.brainInstanceName}'` : 'null'})" oncontextmenu="showMarketContextMenu(event, '${item.market_ticker}', ${item.brainInstanceName ? `'${item.brainInstanceName}'` : 'null'})">
                     <!-- Title Group at Top -->
                     <div class="title-group">
                         <div class="market-ticker" title="${market.title}">
@@ -1250,7 +1416,7 @@
             const lastErrorFormatted = item.lastErrorEncountered ? formatDateTime(item.lastErrorEncountered) : 'Never';
 
             return `
-                <div class="brain-lock-card" onclick="drillIntoBrainLock('${item.brainInstanceName}')">
+                <div class="brain-lock-card" onclick="showBrainContextMenu(event, '${item.brainInstanceName}')" oncontextmenu="showBrainContextMenu(event, '${item.brainInstanceName}')">
                     <div class="brain-lock-header">
                         <div class="brain-lock-id">
                             <i class="fas fa-brain"></i>
@@ -1335,13 +1501,32 @@
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            const activeBtn = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            } else {
+                console.error('Could not find tab button for:', tabName);
+            }
 
-            // Update tab content
-            document.getElementById('brainlocks-tab').style.display = tabName === 'brainlocks' ? 'block' : 'none';
-            document.getElementById('markets-tab').style.display = tabName === 'markets' ? 'block' : 'none';
-            document.getElementById('positions-tab').style.display = tabName === 'positions' ? 'block' : 'none';
-            document.getElementById('orders-tab').style.display = tabName === 'orders' ? 'block' : 'none';
+            // Update tab content - hide all first, then show the selected one
+            const allTabs = document.querySelectorAll('.tab-content');
+            allTabs.forEach(tab => {
+                tab.style.display = 'none';
+                tab.style.visibility = 'hidden';
+            });
+
+            const targetTab = document.getElementById(tabName + '-tab');
+            if (targetTab) {
+                targetTab.style.display = 'block';
+                targetTab.style.visibility = 'visible';
+            } else {
+                console.error('Could not find tab content for:', tabName + '-tab');
+            }
+
+            // If switching to snapshots tab and data is already loaded, render it
+            if (tabName === 'snapshots' && snapshotsData && snapshotsData.length > 0) {
+                renderSnapshots();
+            }
         }
 
         function updateLastUpdated() {
@@ -1379,6 +1564,224 @@
 
             return categoryMap[category] || { icon: 'fas fa-question-circle', color: '#6c757d' };
         }
+
+        // Logging function
+        async function logToBackend(message) {
+            try {
+                await fetch('/MarketWatch/log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, level: 'info' })
+                });
+            } catch (error) {
+                console.error('Failed to log to backend:', error);
+            }
+        }
+
+        // Brain Context Menu Functions
+        let currentBrainInstance = '';
+        let currentMode = 'Autonomous';
+
+        function showBrainContextMenu(event, brainInstanceName) {
+            event.stopPropagation(); // Prevent click from bubbling to document
+            if (event.button === 2) event.preventDefault(); // Only prevent for right-click
+            currentBrainInstance = brainInstanceName;
+            const menu = document.getElementById('brainContextMenu');
+            menu.style.left = event.pageX + 'px';
+            menu.style.top = event.pageY + 'px';
+            menu.style.display = 'block';
+
+            // Update check marks for mode
+            updateModeCheckMarks();
+        }
+
+        function hideBrainContextMenu() {
+            document.getElementById('brainContextMenu').style.display = 'none';
+        }
+
+        function updateModeCheckMarks() {
+            const menu = document.getElementById('brainContextMenu');
+            const items = menu.querySelectorAll('.submenu-items li');
+            items.forEach(item => {
+                item.classList.remove('checked');
+                if (item.textContent === currentMode) {
+                    item.classList.add('checked');
+                }
+            });
+        }
+
+        function handleWatchedMarkets() {
+            logToBackend(`Watched Markets clicked for brain: ${currentBrainInstance}`);
+            hideBrainContextMenu();
+        }
+
+        function handleChangeWatchSettings() {
+            logToBackend(`Change Watch Settings clicked for brain: ${currentBrainInstance}`);
+            hideBrainContextMenu();
+        }
+
+        function handleLogs() {
+            logToBackend(`Logs clicked for brain: ${currentBrainInstance}`);
+            hideBrainContextMenu();
+        }
+
+        function handleMode(mode) {
+            logToBackend(`Change Mode to ${mode} clicked for brain: ${currentBrainInstance}`);
+            currentMode = mode;
+            updateModeCheckMarks();
+            hideBrainContextMenu();
+        }
+
+        function handleReset(type) {
+            logToBackend(`${type} Reset clicked for brain: ${currentBrainInstance}`);
+            hideBrainContextMenu();
+        }
+
+        function handleStartUp() {
+            logToBackend(`Start Up clicked for brain: ${currentBrainInstance}`);
+            hideBrainContextMenu();
+        }
+
+        function handleShutdown(type) {
+            logToBackend(`${type} Shutdown clicked for brain: ${currentBrainInstance}`);
+            hideBrainContextMenu();
+        }
+
+        // Market Context Menu Functions
+        let currentMarketTicker = '';
+        let currentMarketBrainLock = null;
+
+        // Positions Context Menu Functions
+        function showPositionsContextMenu(event) {
+            event.stopPropagation();
+            if (event.button === 2) event.preventDefault();
+            const menu = document.getElementById('positionsContextMenu');
+            menu.style.left = event.pageX + 'px';
+            menu.style.top = event.pageY + 'px';
+            menu.style.display = 'block';
+        }
+
+        function hidePositionsContextMenu() {
+            document.getElementById('positionsContextMenu').style.display = 'none';
+        }
+
+        // Orders Context Menu Functions
+        function showOrdersContextMenu(event) {
+            event.stopPropagation();
+            if (event.button === 2) event.preventDefault();
+            const menu = document.getElementById('ordersContextMenu');
+            menu.style.left = event.pageX + 'px';
+            menu.style.top = event.pageY + 'px';
+            menu.style.display = 'block';
+        }
+
+        function hideOrdersContextMenu() {
+            document.getElementById('ordersContextMenu').style.display = 'none';
+        }
+
+        // Snapshots Context Menu Functions
+        let currentSnapshotTicker = '';
+
+        function showSnapshotContextMenu(event, marketTicker) {
+            event.stopPropagation();
+            if (event.button === 2) event.preventDefault();
+            currentSnapshotTicker = marketTicker;
+            const menu = document.getElementById('snapshotsContextMenu');
+            menu.style.left = event.pageX + 'px';
+            menu.style.top = event.pageY + 'px';
+            menu.style.display = 'block';
+        }
+
+        function hideSnapshotsContextMenu() {
+            document.getElementById('snapshotsContextMenu').style.display = 'none';
+        }
+
+        function handleSnapshotGroups() {
+            logToBackend(`Groups clicked for snapshot: ${currentSnapshotTicker}`);
+            hideSnapshotsContextMenu();
+        }
+
+        function showMarketContextMenu(event, marketTicker, brainInstanceName) {
+            event.stopPropagation(); // Prevent click from bubbling to document
+            if (event.button === 2) event.preventDefault(); // Only prevent for right-click
+            currentMarketTicker = marketTicker;
+            currentMarketBrainLock = brainInstanceName;
+            const menu = document.getElementById('marketContextMenu');
+            const menuItems = document.getElementById('marketMenuItems');
+
+            // Build menu items based on brain lock status
+            let items = `
+                <li onclick="handleChart()">Chart</li>
+                <li onclick="handleForceRefresh()">Force Refresh</li>
+                <li onclick="handleMoveToQuarantine()">Move to Quarantine</li>
+            `;
+
+            if (!brainInstanceName) {
+                items += `<li onclick="handleForceWatch()">Force Watch</li>`;
+            } else {
+                items += `<li onclick="handleTransferTo()">Transfer to...</li>`;
+            }
+
+            menuItems.innerHTML = items;
+
+            menu.style.left = event.pageX + 'px';
+            menu.style.top = event.pageY + 'px';
+            menu.style.display = 'block';
+        }
+
+        function hideMarketContextMenu() {
+            document.getElementById('marketContextMenu').style.display = 'none';
+        }
+
+        function handleChart() {
+            logToBackend(`Chart clicked for market: ${currentMarketTicker}`);
+            hideMarketContextMenu();
+        }
+
+        function handleForceRefresh() {
+            logToBackend(`Force Refresh clicked for market: ${currentMarketTicker}`);
+            hideMarketContextMenu();
+        }
+
+        function handleMoveToQuarantine() {
+            logToBackend(`Move to Quarantine clicked for market: ${currentMarketTicker}`);
+            hideMarketContextMenu();
+        }
+
+        function handleForceWatch() {
+            logToBackend(`Force Watch clicked for market: ${currentMarketTicker}`);
+            hideMarketContextMenu();
+        }
+
+        function handleTransferTo() {
+            logToBackend(`Transfer to... clicked for market: ${currentMarketTicker} (brain: ${currentMarketBrainLock})`);
+            hideMarketContextMenu();
+        }
+
+        // Hide context menus on click outside
+        document.addEventListener('click', function(event) {
+            const brainMenu = document.getElementById('brainContextMenu');
+            const marketMenu = document.getElementById('marketContextMenu');
+            const positionsMenu = document.getElementById('positionsContextMenu');
+            const ordersMenu = document.getElementById('ordersContextMenu');
+            const snapshotsMenu = document.getElementById('snapshotsContextMenu');
+
+            if (!brainMenu.contains(event.target)) {
+                hideBrainContextMenu();
+            }
+            if (!marketMenu.contains(event.target)) {
+                hideMarketContextMenu();
+            }
+            if (!positionsMenu.contains(event.target)) {
+                hidePositionsContextMenu();
+            }
+            if (!ordersMenu.contains(event.target)) {
+                hideOrdersContextMenu();
+            }
+            if (!snapshotsMenu.contains(event.target)) {
+                hideSnapshotsContextMenu();
+            }
+        });
 
         // Initialize
         window.onload = async () => {
@@ -1505,7 +1908,7 @@
             const feesPaidDollars = ((item.feesPaid || 0) / 100).toFixed(2);
 
             return `
-                <tr style="border-bottom: 1px solid rgba(28, 51, 39, 0.3);">
+                <tr style="border-bottom: 1px solid rgba(28, 51, 39, 0.3);" onclick="showPositionsContextMenu(event)" oncontextmenu="showPositionsContextMenu(event)">
                     <td style="padding: 12px; color: rgb(225, 221, 206); font-weight: 600;">${item.ticker}</td>
                     <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${item.position || 0}</td>
                     <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${totalTradedDollars}</td>
@@ -1548,6 +1951,20 @@
                 console.error('Error loading orders data:', error);
                 document.getElementById('ordersContainer').innerHTML =
                     '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Failed to load orders data</div></div>';
+            }
+        }
+
+        async function loadSnapshotsData() {
+            try {
+                const response = await fetch('/MarketWatch/snapshots');
+                const rawText = await response.text();
+
+                snapshotsData = JSON.parse(rawText);
+                renderSnapshots();
+            } catch (error) {
+                console.error('Error loading snapshots data:', error);
+                document.getElementById('snapshotsContainer').innerHTML =
+                    '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Failed to load snapshots data: ' + error.message + '</div></div>';
             }
         }
 
@@ -1652,7 +2069,7 @@
             const priceDollars = ((item.price || 0) / 100).toFixed(2);
 
             return `
-                <tr style="border-bottom: 1px solid rgba(28, 51, 39, 0.3);">
+                <tr style="border-bottom: 1px solid rgba(28, 51, 39, 0.3);" onclick="showOrdersContextMenu(event)" oncontextmenu="showOrdersContextMenu(event)">
                     <td style="padding: 12px; color: rgb(225, 221, 206); font-weight: 600;">${item.marketTicker}</td>
                     <td style="padding: 12px; text-align: center; color: rgb(225, 221, 206); ${sideClass === 'positive' ? 'color: #28a745;' : 'color: #dc3545;'} font-weight: 600;">${item.side?.toUpperCase() || 'N/A'}</td>
                     <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${item.quantity || 0}</td>
@@ -1704,6 +2121,187 @@
 
             btn.classList.toggle('active', ordersSortOrder === 'desc');
             renderOrders();
+        }
+
+        function renderSnapshots() {
+            const container = document.getElementById('snapshotsContainer');
+            const searchTerm = document.getElementById('snapshotsSearchInput').value.toLowerCase();
+            const sortBy = document.getElementById('snapshotsSortSelect').value;
+
+            // Check if snapshotsData is loaded and is an array
+            if (!snapshotsData || !Array.isArray(snapshotsData)) {
+                container.innerHTML = '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Snapshots data not loaded or invalid.</div></div>';
+                return;
+            }
+
+            let filteredSnapshots;
+            try {
+                filteredSnapshots = snapshotsData.filter(item => {
+                    return !searchTerm ||
+                        (item.marketTicker && item.marketTicker.toLowerCase().includes(searchTerm)) ||
+                        (item.title && item.title.toLowerCase().includes(searchTerm));
+                });
+            } catch (error) {
+                console.error('Error filtering snapshots data:', error);
+                container.innerHTML = '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Error filtering snapshots data: ' + error.message + '</div></div>';
+                return;
+            }
+
+            // Sort data
+            filteredSnapshots.sort((a, b) => {
+                let aVal, bVal;
+
+                switch (sortBy) {
+                    case 'marketTicker':
+                        aVal = a.marketTicker;
+                        bVal = b.marketTicker;
+                        break;
+                    case 'title':
+                        aVal = a.title;
+                        bVal = b.title;
+                        break;
+                    case 'recordedHoursPercentage':
+                        aVal = a.recordedHoursPercentage || 0;
+                        bVal = b.recordedHoursPercentage || 0;
+                        break;
+                    case 'groupCount':
+                        aVal = a.groupCount;
+                        bVal = b.groupCount;
+                        break;
+                    case 'recordedEnd':
+                        aVal = a.recordedEnd ? 1 : 0;
+                        bVal = b.recordedEnd ? 1 : 0;
+                        break;
+                    default:
+                        aVal = a.marketTicker;
+                        bVal = b.marketTicker;
+                }
+
+                if (snapshotsSortOrder === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            if (filteredSnapshots.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-camera"></i><div>No snapshots match your filters</div></div>';
+                return;
+            }
+
+            try {
+                // Generate rows outside template literal
+                let rowsHtml = '';
+                for (let i = 0; i < filteredSnapshots.length; i++) {
+                    const item = filteredSnapshots[i];
+                    try {
+                        const rowHtml = createSnapshotRow(item);
+                        rowsHtml += rowHtml;
+                    } catch (error) {
+                        console.error('Error creating row for item', i, ':', error);
+                        rowsHtml += `<tr><td colspan="8" style="color: red;">Error rendering row ${i}: ${error.message}</td></tr>`;
+                    }
+                }
+
+                const tableHtml = `
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; background: rgba(16, 16, 13, 0.9); border-radius: 10px; overflow: hidden;">
+                            <thead>
+                                <tr style="background: rgba(28, 51, 39, 0.8);">
+                                    <th style="padding: 12px; text-align: left; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Market Ticker</th>
+                                    <th style="padding: 12px; text-align: left; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Title</th>
+                                    <th style="padding: 12px; text-align: left; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Subtitle</th>
+                                    <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Recorded Hours</th>
+                                    <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Market Hours</th>
+                                    <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Recorded %</th>
+                                    <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Groups</th>
+                                    <th style="padding: 12px; text-align: center; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Recorded End</th>
+                                    <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Avg Liquidity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                if (!container) {
+                    console.error('Container element not found!');
+                    return;
+                }
+
+                try {
+                    container.innerHTML = tableHtml;
+                } catch (error) {
+                    console.error('Error setting container HTML:', error);
+                }
+            } catch (error) {
+                console.error('Error rendering table:', error);
+                // Fallback: show simple list
+                container.innerHTML = `
+                    <div style="padding: 20px; background: rgba(16, 16, 13, 0.9); border-radius: 10px;">
+                        <h3 style="color: rgb(225, 221, 206); margin-bottom: 15px;">Snapshots Data (${filteredSnapshots.length} items)</h3>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            ${filteredSnapshots.map((item, index) => `
+                                <div style="padding: 10px; margin-bottom: 5px; background: rgba(28, 51, 39, 0.3); border-radius: 5px; color: rgb(225, 221, 206);">
+                                    <strong>${index + 1}. ${item.MarketTicker || 'N/A'}</strong> - ${item.Title || 'N/A'}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="margin-top: 15px; color: #dc3545;">Table rendering failed: ${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function createSnapshotRow(item) {
+            try {
+                const recordedEndIcon = item.recordedEnd ? '<i class="fas fa-check" style="color: #28a745;"></i>' : '<i class="fas fa-times" style="color: #dc3545;"></i>';
+
+                const rowHtml = `
+                    <tr style="border-bottom: 1px solid rgba(28, 51, 39, 0.3);" onclick="showSnapshotContextMenu(event, '${item.marketTicker}')" oncontextmenu="showSnapshotContextMenu(event, '${item.marketTicker}')">
+                        <td style="padding: 12px; color: rgb(225, 221, 206); font-weight: 600;">${item.marketTicker || 'N/A'}</td>
+                        <td style="padding: 12px; color: rgb(225, 221, 206);">${item.title || 'N/A'}</td>
+                        <td style="padding: 12px; color: rgb(225, 221, 206);">${item.subtitle || item.yes_sub_title || 'N/A'}</td>
+                        <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${typeof item.recordedHours === 'number' ? item.recordedHours.toFixed(2) : 'N/A'}</td>
+                        <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${typeof item.marketHours === 'number' ? item.marketHours.toFixed(2) : 'N/A'}</td>
+                        <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${typeof item.recordedHoursPercentage === 'number' ? item.recordedHoursPercentage.toFixed(2) + '%' : 'N/A'}</td>
+                        <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${item.groupCount || 'N/A'}</td>
+                        <td style="padding: 12px; text-align: center; color: rgb(225, 221, 206);">${recordedEndIcon}</td>
+                        <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${typeof item.averageLiquidity === 'number' ? item.averageLiquidity.toFixed(2) : 'N/A'}</td>
+                    </tr>
+                `;
+
+                return rowHtml;
+            } catch (error) {
+                console.error('Error in createSnapshotRow:', error);
+                return `
+                    <tr style="border-bottom: 1px solid rgba(28, 51, 39, 0.3);">
+                        <td colspan="8" style="padding: 12px; color: #dc3545;">Error rendering row: ${error.message}</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function filterSnapshots() {
+            renderSnapshots();
+        }
+
+        function sortSnapshots() {
+            renderSnapshots();
+        }
+
+        function toggleSnapshotsSortOrder() {
+            const btn = document.getElementById('snapshotsSortOrderBtn');
+            snapshotsSortOrder = snapshotsSortOrder === 'desc' ? 'asc' : 'desc';
+
+            btn.innerHTML = snapshotsSortOrder === 'desc'
+                ? '<i class="fas fa-sort-amount-down"></i> Descending'
+                : '<i class="fas fa-sort-amount-up"></i> Ascending';
+
+            btn.classList.toggle('active', snapshotsSortOrder === 'desc');
+            renderSnapshots();
         }
 
         // Account data functions - no SignalR needed

@@ -7,6 +7,7 @@ using SmokehouseInterfaces.Constants;
 using SmokehouseBot.KalshiAPI.Interfaces;
 using System.Linq;
 using System.Threading.Tasks;
+using KalshiBotOverseer.Services;
 
 namespace KalshiBotOverseer.Controllers
 {
@@ -17,17 +18,19 @@ namespace KalshiBotOverseer.Controllers
         private readonly IKalshiBotContext _context;
         private readonly IMemoryCache _cache;
         private readonly IKalshiAPIService _apiService;
+        private readonly SnapshotService _snapshotService;
         private const string MarketsCacheKey = "ActiveMarkets";
         private const string BrainInstancesCacheKey = "BrainInstances";
         private const string LogDataCacheKey = "LogData";
         private readonly TimeSpan MarketsCacheDuration = TimeSpan.FromMinutes(15);
         private readonly TimeSpan LogDataCacheDuration = TimeSpan.FromMinutes(5); // Shorter cache for log data
 
-        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService)
+        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotService snapshotService)
         {
             _context = context;
             _cache = cache;
             _apiService = apiService;
+            _snapshotService = snapshotService;
         }
 
         [HttpGet]
@@ -356,6 +359,42 @@ namespace KalshiBotOverseer.Controllers
                 Console.WriteLine($"Error in GetAccountData: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return StatusCode(500, new { error = "Failed to retrieve account data", details = ex.Message });
+            }
+        }
+
+        [HttpPost("log")]
+        public async Task<IActionResult> LogEvent([FromBody] object request)
+        {
+            try
+            {
+                // Log the event to console
+                Console.WriteLine($"Log event: {request}");
+
+                // Optionally, you could also insert into the LogEntry table if needed
+                // await _context.InsertLogEntry(new LogEntry { ... });
+
+                return Ok(new { status = "logged" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error logging event: {ex.Message}");
+                return StatusCode(500, new { error = "Failed to log event", details = ex.Message });
+            }
+        }
+
+        [HttpGet("snapshots")]
+        public async Task<IActionResult> GetSnapshotsData()
+        {
+            try
+            {
+                var snapshotsData = await _snapshotService.GetSnapshotGroupsDataAsync();
+                return Ok(snapshotsData);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetSnapshotsData: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return StatusCode(500, new { error = "Failed to retrieve snapshots data", details = ex.Message });
             }
         }
 

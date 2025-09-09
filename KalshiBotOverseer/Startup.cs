@@ -5,6 +5,7 @@ using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
 using KalshiBotOverseer;
+using KalshiBotOverseer.Services;
 using KalshiBotOverseer.State;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -108,6 +109,9 @@ namespace KalshiBotOverseer
 
             // Add memory cache for data caching
             services.AddMemoryCache();
+
+            // Register SnapshotService
+            services.AddScoped<SnapshotService>();
 
             // Add MVC for controllers
             services.AddControllers();
