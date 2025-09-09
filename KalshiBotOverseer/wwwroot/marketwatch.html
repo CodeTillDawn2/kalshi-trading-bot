@@ -53,6 +53,39 @@
             align-items: center;
         }
 
+        .account-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-left: auto;
+            margin-right: 20px;
+        }
+
+        .account-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(16, 16, 13, 0.9);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgb(28, 51, 39);
+            min-width: 100px;
+        }
+
+        .account-label {
+            font-size: 10px;
+            color: rgb(225, 221, 206);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .account-value {
+            font-size: 14px;
+            color: rgb(225, 221, 206);
+            font-weight: 700;
+        }
+
         .refresh-btn {
             background: linear-gradient(135deg, rgb(28, 51, 39), rgba(28, 51, 39, 0.8));
             color: rgb(225, 221, 206);
@@ -200,6 +233,12 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 12px;
+        }
+
+        .brain-lock-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
         }
 
         .market-card {
@@ -439,8 +478,10 @@
 
         .brain-lock-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
         .stat-item {
@@ -573,9 +614,24 @@
                 justify-content: center;
             }
 
+            .account-info {
+                margin: 10px 0;
+                gap: 15px;
+            }
+
+            .account-item {
+                min-width: 80px;
+                padding: 6px 10px;
+            }
+
             .market-grid {
                 grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
                 gap: 10px;
+            }
+
+            .brain-lock-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
             }
 
             .market-card {
@@ -623,6 +679,11 @@
         @media (max-width: 480px) {
             .market-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .brain-lock-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
             }
 
             .market-card {
@@ -700,6 +761,16 @@
     <div class="dashboard">
         <div class="header">
             <h1><img src="Images/backlashstudios.png" alt="Backlash Studios Logo" style="height: 100px;"> Backlash Bot Dashboard</h1>
+            <div class="account-info">
+                <div class="account-item">
+                    <div class="account-label">Balance</div>
+                    <div class="account-value" id="accountBalance">$--</div>
+                </div>
+                <div class="account-item">
+                    <div class="account-label">Portfolio</div>
+                    <div class="account-value" id="portfolioValue">$--</div>
+                </div>
+            </div>
             <div class="header-controls">
                 <button class="refresh-btn" onclick="refreshAllData()">
                     <i class="fas fa-sync-alt"></i>
@@ -713,13 +784,21 @@
 
         <div class="tab-container">
             <div class="tab-buttons">
-                <button class="tab-btn active" onclick="switchTab('markets')">
+                <button class="tab-btn active" onclick="switchTab('brainlocks')">
+                    <i class="fas fa-brain"></i>
+                    Brains
+                </button>
+                <button class="tab-btn" onclick="switchTab('markets')">
                     <i class="fas fa-store"></i>
                     Markets
                 </button>
-                <button class="tab-btn" onclick="switchTab('brainlocks')">
-                    <i class="fas fa-brain"></i>
-                    Brain Locks
+                <button class="tab-btn" onclick="switchTab('positions')">
+                    <i class="fas fa-chart-line"></i>
+                    Positions
+                </button>
+                <button class="tab-btn" onclick="switchTab('orders')">
+                    <i class="fas fa-list"></i>
+                    Orders
                 </button>
             </div>
 
@@ -787,11 +866,108 @@
                 </div>
             </div>
 
-            <div id="brainlocks-tab" class="tab-content" style="display: none;">
+            <div id="brainlocks-tab" class="tab-content">
                 <div id="brainLocksContainer">
                     <div class="loading">
                         <i class="fas fa-spinner fa-spin"></i>
                         <div>Loading brain lock data...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="positions-tab" class="tab-content" style="display: none;">
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <input type="checkbox" id="currentPositionsOnly" checked onchange="loadPositionsData()">
+                            Current Positions Only
+                        </label>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Search Positions</label>
+                        <input type="text" id="positionsSearchInput" class="filter-input" placeholder="Search by ticker..." onkeyup="filterPositions()">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort By</label>
+                        <select id="positionsSortSelect" class="filter-select" onchange="sortPositions()">
+                            <option value="ticker">Ticker</option>
+                            <option value="position">Position</option>
+                            <option value="totalTraded">Total Traded</option>
+                            <option value="realizedPnl">Realized P&L</option>
+                            <option value="lastUpdatedUTC">Last Updated</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort Order</label>
+                        <button id="positionsSortOrderBtn" class="sort-btn active" onclick="togglePositionsSortOrder()">
+                            <i class="fas fa-sort-amount-down"></i>
+                            Descending
+                        </button>
+                    </div>
+                </div>
+
+                <div id="positionsContainer">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <div>Loading positions data...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="orders-tab" class="tab-content" style="display: none;">
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <label class="filter-label">Search Orders</label>
+                        <input type="text" id="ordersSearchInput" class="filter-input" placeholder="Search by ticker..." onkeyup="filterOrders()">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Status Filter</label>
+                        <select id="ordersStatusFilter" class="filter-select" onchange="filterOrders()">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="filled">Filled</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Side Filter</label>
+                        <select id="ordersSideFilter" class="filter-select" onchange="filterOrders()">
+                            <option value="">All Sides</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort By</label>
+                        <select id="ordersSortSelect" class="filter-select" onchange="sortOrders()">
+                            <option value="marketTicker">Market Ticker</option>
+                            <option value="side">Side</option>
+                            <option value="quantity">Quantity</option>
+                            <option value="price">Price</option>
+                            <option value="status">Status</option>
+                            <option value="createdAt">Created At</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort Order</label>
+                        <button id="ordersSortOrderBtn" class="sort-btn active" onclick="toggleOrdersSortOrder()">
+                            <i class="fas fa-sort-amount-down"></i>
+                            Descending
+                        </button>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <input type="checkbox" id="showCompleteOrders" onchange="filterOrders()">
+                            Show Complete
+                        </label>
+                    </div>
+                </div>
+
+                <div id="ordersContainer">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <div>Loading orders data...</div>
                     </div>
                 </div>
             </div>
@@ -801,8 +977,12 @@
     <script>
         let marketData = [];
         let brainLockData = [];
-        let currentTab = 'markets';
+        let positionsData = [];
+        let ordersData = [];
+        let currentTab = 'brainlocks';
         let sortOrder = 'desc';
+        let positionsSortOrder = 'desc';
+        let ordersSortOrder = 'desc';
         let currentPage = 1;
         let pageSize = 50;
         let filteredData = [];
@@ -810,9 +990,26 @@
         async function refreshAllData() {
             await Promise.all([
                 loadMarketWatchData(),
-                loadBrainLocksData()
+                loadBrainLocksData(),
+                loadPositionsData(),
+                loadOrdersData(),
+                loadAccountData()
             ]);
             updateLastUpdated();
+        }
+
+        async function loadAccountData() {
+            try {
+                // Fetch balance and portfolio value from API
+                const response = await fetch('/MarketWatch/account');
+                const data = await response.json();
+
+                // Update the UI with the fetched data
+                updateBalance(data.balance);
+                updatePortfolioValue(data.portfolioValue);
+            } catch (error) {
+                console.error('Error loading account data:', error);
+            }
         }
 
         async function loadMarketWatchData() {
@@ -920,9 +1117,10 @@
             const endIndex = Math.min(startIndex + pageSize, filteredData.length);
             const pageData = filteredData.slice(startIndex, endIndex);
 
+            const marketCards = pageData.map(item => createMarketCard(item)).filter(card => card !== '');
             container.innerHTML = `
                 <div class="market-grid">
-                    ${pageData.map(item => createMarketCard(item)).join('')}
+                    ${marketCards.join('')}
                 </div>
             `;
 
@@ -962,27 +1160,32 @@
         }
 
         function createMarketCard(item) {
+            // Skip rendering if market data is missing or incomplete
+            if (!item.market || !item.market.title || item.market.title.trim() === '') {
+                return ''; // Don't render cards with missing market data
+            }
+
             const market = item.market;
-            const statusClass = market?.status === 'active' ? 'status-active' : 'status-closed';
-            const categoryInfo = market?.category ? getCategoryIcon(market.category) : getCategoryIcon(null);
+            const statusClass = market.status === 'active' ? 'status-active' : 'status-closed';
+            const categoryInfo = market.category ? getCategoryIcon(market.category) : getCategoryIcon(null);
 
             // Use yes_sub_title if subtitle is blank
-            const displaySubtitle = (market?.subtitle && market.subtitle.trim()) ? market.subtitle : (market?.yes_sub_title || 'No Subtitle');
+            const displaySubtitle = (market.subtitle && market.subtitle.trim()) ? market.subtitle : (market.yes_sub_title || 'No Subtitle');
 
             return `
                 <div class="market-card">
                     <!-- Title Group at Top -->
                     <div class="title-group">
-                        <div class="market-ticker" title="${market?.title || 'No Title'}">
-                            <i class="${categoryInfo.icon}" style="color: ${categoryInfo.color}; font-size: 14px;" title="${market?.category || 'Unknown Category'}"></i>
-                            <span class="title-text">${market?.title || 'No Title'}</span>
+                        <div class="market-ticker" title="${market.title}">
+                            <i class="${categoryInfo.icon}" style="color: ${categoryInfo.color}; font-size: 14px;" title="${market.category || 'Unknown Category'}"></i>
+                            <span class="title-text">${market.title}</span>
                         </div>
                         <div class="market-subtitle" title="${displaySubtitle}">${displaySubtitle}</div>
                     </div>
 
                     <!-- Status and Brain Lock -->
                     <div class="status-section">
-                        <span class="market-status ${statusClass}">${market?.status || 'Unknown'}</span>
+                        <span class="market-status ${statusClass}">${market.status || 'Unknown'}</span>
                         ${item.brainInstanceName ? `<div class="brain-lock-instance">${item.brainInstanceName}</div>` : '<div class="brain-lock-instance no-brain-lock">No Brain Lock</div>'}
                     </div>
 
@@ -1015,7 +1218,6 @@
                     </div>
 
                     <!-- Market Details -->
-                    ${market ? `
                     <div class="market-details">
                         <div style="margin-top: 4px; font-size: 9px; color: #cccccc; line-height: 1.2;">
                             Vol: ${market.volume ? market.volume.toLocaleString() : 0} |
@@ -1023,7 +1225,6 @@
                             Price: ${market.last_price || 0}
                         </div>
                     </div>
-                    ` : ''}
                 </div>
             `;
         }
@@ -1037,7 +1238,7 @@
             }
 
             container.innerHTML = `
-                <div class="market-grid">
+                <div class="brain-lock-grid">
                     ${brainLockData.map(item => createBrainLockCard(item)).join('')}
                 </div>
             `;
@@ -1137,8 +1338,10 @@
             document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
 
             // Update tab content
-            document.getElementById('markets-tab').style.display = tabName === 'markets' ? 'block' : 'none';
             document.getElementById('brainlocks-tab').style.display = tabName === 'brainlocks' ? 'block' : 'none';
+            document.getElementById('markets-tab').style.display = tabName === 'markets' ? 'block' : 'none';
+            document.getElementById('positions-tab').style.display = tabName === 'positions' ? 'block' : 'none';
+            document.getElementById('orders-tab').style.display = tabName === 'orders' ? 'block' : 'none';
         }
 
         function updateLastUpdated() {
@@ -1179,10 +1382,331 @@
 
         // Initialize
         window.onload = async () => {
+            // Ensure Brain Locks tab is active on load
+            switchTab('brainlocks');
             await refreshAllData();
             // Auto-refresh every 60 seconds
             setInterval(refreshAllData, 60000);
         };
+
+        // Handle account balance updates
+        function updateBalance(balance) {
+            const balanceElement = document.getElementById('accountBalance');
+            if (balanceElement) {
+                balanceElement.textContent = `$${balance.toFixed(2)}`;
+            }
+        }
+
+        // Handle portfolio value updates
+        function updatePortfolioValue(value) {
+            const valueElement = document.getElementById('portfolioValue');
+            if (valueElement) {
+                // Show placeholder until portfolio calculation is implemented
+                if (value === 0.0) {
+                    valueElement.textContent = '--';
+                } else {
+                    valueElement.textContent = `$${value.toFixed(2)}`;
+                }
+            }
+        }
+
+        // Positions functions
+        async function loadPositionsData() {
+            try {
+                const currentOnly = document.getElementById('currentPositionsOnly').checked;
+                const response = await fetch(`/MarketWatch/positions?currentOnly=${currentOnly}`);
+                positionsData = await response.json();
+                renderPositions();
+            } catch (error) {
+                console.error('Error loading positions data:', error);
+                document.getElementById('positionsContainer').innerHTML =
+                    '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Failed to load positions data</div></div>';
+            }
+        }
+
+        function renderPositions() {
+            const container = document.getElementById('positionsContainer');
+            const searchTerm = document.getElementById('positionsSearchInput').value.toLowerCase();
+            const sortBy = document.getElementById('positionsSortSelect').value;
+
+            let filteredPositions = positionsData.filter(item => {
+                return !searchTerm || item.ticker.toLowerCase().includes(searchTerm);
+            });
+
+            // Sort data
+            filteredPositions.sort((a, b) => {
+                let aVal, bVal;
+
+                switch (sortBy) {
+                    case 'position':
+                        aVal = a.position || 0;
+                        bVal = b.position || 0;
+                        break;
+                    case 'totalTraded':
+                        aVal = a.totalTraded || 0;
+                        bVal = b.totalTraded || 0;
+                        break;
+                    case 'realizedPnl':
+                        aVal = a.realizedPnl || 0;
+                        bVal = b.realizedPnl || 0;
+                        break;
+                    case 'lastUpdatedUTC':
+                        aVal = new Date(a.lastUpdatedUTC || 0);
+                        bVal = new Date(b.lastUpdatedUTC || 0);
+                        break;
+                    default: // ticker
+                        aVal = a.ticker;
+                        bVal = b.ticker;
+                }
+
+                if (positionsSortOrder === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            if (filteredPositions.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><div>No positions match your filters</div></div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; background: rgba(16, 16, 13, 0.9); border-radius: 10px; overflow: hidden;">
+                        <thead>
+                            <tr style="background: rgba(28, 51, 39, 0.8);">
+                                <th style="padding: 12px; text-align: left; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Ticker</th>
+                                <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Position</th>
+                                <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Total Traded</th>
+                                <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Market Exposure</th>
+                                <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Realized P&L</th>
+                                <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Resting Orders</th>
+                                <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Fees Paid</th>
+                                <th style="padding: 12px; text-align: left; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredPositions.map(item => createPositionRow(item)).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function createPositionRow(item) {
+            const pnlClass = (item.realizedPnl || 0) >= 0 ? 'positive' : 'negative';
+            const lastUpdated = item.lastUpdatedUTC ? formatDateTime(item.lastUpdatedUTC) : 'Never';
+
+            // Convert cents to dollars for monetary values
+            const totalTradedDollars = ((item.totalTraded || 0) / 100).toFixed(2);
+            const marketExposureDollars = ((item.marketExposure || 0) / 100).toFixed(2);
+            const realizedPnlDollars = ((item.realizedPnl || 0) / 100).toFixed(2);
+            const feesPaidDollars = ((item.feesPaid || 0) / 100).toFixed(2);
+
+            return `
+                <tr style="border-bottom: 1px solid rgba(28, 51, 39, 0.3);">
+                    <td style="padding: 12px; color: rgb(225, 221, 206); font-weight: 600;">${item.ticker}</td>
+                    <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${item.position || 0}</td>
+                    <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${totalTradedDollars}</td>
+                    <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${marketExposureDollars}</td>
+                    <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206); ${pnlClass === 'positive' ? 'color: #28a745;' : 'color: #dc3545;'}">${realizedPnlDollars}</td>
+                    <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${item.restingOrdersCount || 0}</td>
+                    <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${feesPaidDollars}</td>
+                    <td style="padding: 12px; color: rgb(225, 221, 206); font-size: 12px;">${lastUpdated}</td>
+                </tr>
+            `;
+        }
+
+        function filterPositions() {
+            renderPositions();
+        }
+
+        function sortPositions() {
+            renderPositions();
+        }
+
+        function togglePositionsSortOrder() {
+            const btn = document.getElementById('positionsSortOrderBtn');
+            positionsSortOrder = positionsSortOrder === 'desc' ? 'asc' : 'desc';
+
+            btn.innerHTML = positionsSortOrder === 'desc'
+                ? '<i class="fas fa-sort-amount-down"></i> Descending'
+                : '<i class="fas fa-sort-amount-up"></i> Ascending';
+
+            btn.classList.toggle('active', positionsSortOrder === 'desc');
+            renderPositions();
+        }
+
+        // Orders functions
+        async function loadOrdersData() {
+            try {
+                const response = await fetch('/MarketWatch/orders');
+                ordersData = await response.json();
+                renderOrders();
+            } catch (error) {
+                console.error('Error loading orders data:', error);
+                document.getElementById('ordersContainer').innerHTML =
+                    '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Failed to load orders data</div></div>';
+            }
+        }
+
+        function renderOrders() {
+            const container = document.getElementById('ordersContainer');
+            const searchTerm = document.getElementById('ordersSearchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('ordersStatusFilter').value;
+            const sideFilter = document.getElementById('ordersSideFilter').value;
+            const sortBy = document.getElementById('ordersSortSelect').value;
+            const showComplete = document.getElementById('showCompleteOrders').checked;
+
+            let filteredOrders = ordersData.filter(item => {
+                // Show Complete checkbox logic - when unchecked, hide completed orders
+                if (!showComplete) {
+                    const statusLower = item.status?.toLowerCase();
+                    if (statusLower === 'filled' || statusLower === 'cancelled' || statusLower === 'expired') {
+                        return false;
+                    }
+                }
+
+                const matchesSearch = !searchTerm ||
+                    item.marketTicker.toLowerCase().includes(searchTerm);
+
+                const matchesStatus = !statusFilter || item.status?.toLowerCase() === statusFilter;
+                const matchesSide = !sideFilter || item.side?.toLowerCase() === sideFilter;
+
+                return matchesSearch && matchesStatus && matchesSide;
+            });
+
+            // Sort data
+            filteredOrders.sort((a, b) => {
+                let aVal, bVal;
+
+                switch (sortBy) {
+                    case 'orderId':
+                        aVal = a.orderId || 0;
+                        bVal = b.orderId || 0;
+                        break;
+                    case 'side':
+                        aVal = a.side || '';
+                        bVal = b.side || '';
+                        break;
+                    case 'quantity':
+                        aVal = a.quantity || 0;
+                        bVal = b.quantity || 0;
+                        break;
+                    case 'price':
+                        aVal = a.price || 0;
+                        bVal = b.price || 0;
+                        break;
+                    case 'status':
+                        aVal = a.status || '';
+                        bVal = b.status || '';
+                        break;
+                    case 'createdAt':
+                        aVal = new Date(a.createdAt || 0);
+                        bVal = new Date(b.createdAt || 0);
+                        break;
+                    default: // marketTicker
+                        aVal = a.marketTicker;
+                        bVal = b.marketTicker;
+                }
+
+                if (ordersSortOrder === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-list"></i><div>No orders match your filters</div></div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; background: rgba(16, 16, 13, 0.9); border-radius: 10px; overflow: hidden;">
+                        <thead>
+                            <tr style="background: rgba(28, 51, 39, 0.8);">
+                                <th style="padding: 12px; text-align: left; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Market Ticker</th>
+                                <th style="padding: 12px; text-align: center; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Side</th>
+                                <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Quantity</th>
+                                <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Filled</th>
+                                <th style="padding: 12px; text-align: right; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Price</th>
+                                <th style="padding: 12px; text-align: center; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Status</th>
+                                <th style="padding: 12px; text-align: left; color: rgb(225, 221, 206); font-weight: 600; border-bottom: 2px solid rgb(28, 51, 39);">Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredOrders.map(item => createOrderRow(item)).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function createOrderRow(item) {
+            const sideClass = item.side?.toLowerCase() === 'yes' ? 'positive' : 'negative';
+            const statusClass = getStatusClass(item.status);
+            const createdAt = item.createdAt ? formatDateTime(item.createdAt) : 'Never';
+            const priceDollars = ((item.price || 0) / 100).toFixed(2);
+
+            return `
+                <tr style="border-bottom: 1px solid rgba(28, 51, 39, 0.3);">
+                    <td style="padding: 12px; color: rgb(225, 221, 206); font-weight: 600;">${item.marketTicker}</td>
+                    <td style="padding: 12px; text-align: center; color: rgb(225, 221, 206); ${sideClass === 'positive' ? 'color: #28a745;' : 'color: #dc3545;'} font-weight: 600;">${item.side?.toUpperCase() || 'N/A'}</td>
+                    <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${item.quantity || 0}</td>
+                    <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${item.quantityFilled || 0}</td>
+                    <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${priceDollars}</td>
+                    <td style="padding: 12px; text-align: center; color: rgb(225, 221, 206);">
+                        <span style="background: ${getStatusColor(item.status)}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                            ${item.status?.toUpperCase() || 'UNKNOWN'}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; color: rgb(225, 221, 206); font-size: 12px;">${createdAt}</td>
+                </tr>
+            `;
+        }
+
+        function getStatusClass(status) {
+            if (!status) return '';
+            const statusLower = status.toLowerCase();
+            if (statusLower === 'filled') return 'positive';
+            if (statusLower === 'cancelled' || statusLower === 'expired') return 'negative';
+            return '';
+        }
+
+        function getStatusColor(status) {
+            if (!status) return 'rgba(16, 16, 13, 0.8)';
+            const statusLower = status.toLowerCase();
+            if (statusLower === 'pending') return 'rgba(255, 193, 7, 0.8)'; // Yellow/Orange
+            if (statusLower === 'filled') return 'rgba(40, 167, 69, 0.8)'; // Green
+            if (statusLower === 'cancelled') return 'rgba(220, 53, 69, 0.8)'; // Red
+            if (statusLower === 'expired') return 'rgba(108, 117, 125, 0.8)'; // Gray
+            return 'rgba(16, 16, 13, 0.8)'; // Default
+        }
+
+        function filterOrders() {
+            renderOrders();
+        }
+
+        function sortOrders() {
+            renderOrders();
+        }
+
+        function toggleOrdersSortOrder() {
+            const btn = document.getElementById('ordersSortOrderBtn');
+            ordersSortOrder = ordersSortOrder === 'desc' ? 'asc' : 'desc';
+
+            btn.innerHTML = ordersSortOrder === 'desc'
+                ? '<i class="fas fa-sort-amount-down"></i> Descending'
+                : '<i class="fas fa-sort-amount-up"></i> Ascending';
+
+            btn.classList.toggle('active', ordersSortOrder === 'desc');
+            renderOrders();
+        }
+
+        // Account data functions - no SignalR needed
     </script>
 </body>
 </html>

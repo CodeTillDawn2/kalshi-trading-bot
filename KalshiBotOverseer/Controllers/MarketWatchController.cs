@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using SmokehouseDTOs.Data;
 using SmokehouseInterfaces.Constants;
+using SmokehouseBot.KalshiAPI.Interfaces;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,16 +16,18 @@ namespace KalshiBotOverseer.Controllers
     {
         private readonly IKalshiBotContext _context;
         private readonly IMemoryCache _cache;
+        private readonly IKalshiAPIService _apiService;
         private const string MarketsCacheKey = "ActiveMarkets";
         private const string BrainInstancesCacheKey = "BrainInstances";
         private const string LogDataCacheKey = "LogData";
         private readonly TimeSpan MarketsCacheDuration = TimeSpan.FromMinutes(15);
         private readonly TimeSpan LogDataCacheDuration = TimeSpan.FromMinutes(5); // Shorter cache for log data
 
-        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache)
+        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService)
         {
             _context = context;
             _cache = cache;
+            _apiService = apiService;
         }
 
         [HttpGet]
@@ -251,5 +254,111 @@ namespace KalshiBotOverseer.Controllers
                 return StatusCode(500, new { error = "Failed to retrieve brain locks data", details = ex.Message });
             }
         }
+
+        [HttpGet("positions")]
+        public async Task<IActionResult> GetPositionsData(bool currentOnly = true)
+        {
+            try
+            {
+                // Get market positions with optional filtering
+                var positions = await _cache.GetOrCreateAsync($"Positions_{currentOnly}", async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
+
+                    // If currentOnly is true, only get positions where Position != 0
+                    // If false, get all positions (historical + current)
+                    bool? hasPosition = currentOnly ? true : null;
+
+                    return (await _context.GetMarketPositions(hasPosition: hasPosition)).ToList();
+                });
+
+                var positionsData = positions.Select(p => new
+                {
+                    p.Ticker,
+                    p.TotalTraded,
+                    p.Position,
+                    p.MarketExposure,
+                    p.RealizedPnl,
+                    p.RestingOrdersCount,
+                    p.FeesPaid,
+                    LastUpdatedUTC = p.LastUpdatedUTC,
+                    LastModified = p.LastModified
+                }).ToList();
+
+                return Ok(positionsData);
+            }
+            catch (Exception ex)
+            {
+                // Log the error and return a proper error response
+                Console.WriteLine($"Error in GetPositionsData: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return StatusCode(500, new { error = "Failed to retrieve positions data", details = ex.Message });
+            }
+        }
+
+        [HttpGet("orders")]
+        public async Task<IActionResult> GetOrdersData()
+        {
+            try
+            {
+                // Get orders data
+                var orders = await _cache.GetOrCreateAsync("Orders", async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
+                    return (await _context.GetOrders()).ToList();
+                });
+
+                var ordersData = orders.Select(o => new
+                {
+                    MarketTicker = o.Ticker,
+                    o.OrderId,
+                    o.Side,
+                    Quantity = o.RemainingCount,
+                    QuantityFilled = o.MakerFillCount + o.TakerFillCount,
+                    Price = o.Side?.ToLower() == "yes" ? o.YesPrice : o.NoPrice,
+                    o.Status,
+                    OrderType = o.Type,
+                    CreatedAt = o.CreatedTimeUTC,
+                    UpdatedAt = o.LastUpdateTimeUTC
+                }).ToList();
+
+                return Ok(ordersData);
+            }
+            catch (Exception ex)
+            {
+                // Log the error and return a proper error response
+                Console.WriteLine($"Error in GetOrdersData: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return StatusCode(500, new { error = "Failed to retrieve orders data", details = ex.Message });
+            }
+        }
+
+        [HttpGet("account")]
+        public async Task<IActionResult> GetAccountData()
+        {
+            try
+            {
+                // Get balance from Kalshi API
+                var balance = await _apiService.GetBalanceAsync();
+                var balanceInDollars = (double)balance / 100.0;
+
+                // Portfolio value calculation will be implemented later
+                // For now, return balance only
+                return Ok(new
+                {
+                    balance = balanceInDollars,
+                    portfolioValue = 0.0 // Placeholder - will be implemented later
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the error and return a proper error response
+                Console.WriteLine($"Error in GetAccountData: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return StatusCode(500, new { error = "Failed to retrieve account data", details = ex.Message });
+            }
+        }
+
+
     }
 }
