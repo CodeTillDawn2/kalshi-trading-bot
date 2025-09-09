@@ -5,6 +5,7 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs.Exceptions;
+using BacklashInterfaces.SmokehouseBot.Services;
 using TradingStrategies.Helpers.Interfaces;
 
 namespace BacklashBot.Services
@@ -65,6 +66,8 @@ namespace BacklashBot.Services
         public IMarketRefreshService? GetMarketRefreshService() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<IMarketRefreshService>() ?? null;
         public IWebSocketMonitorService? GetWebSocketHostedService() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<IWebSocketMonitorService>() ?? null;
         public ICentralErrorHandler? GetBacklashErrorHandler() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<ICentralErrorHandler>() ?? null;
+        public IOverseerClientService? GetOverseerClientService() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<IOverseerClientService>() ?? null;
+        public IScopeManagerService GetScopeManager() => _scopeManager;
 
 
 

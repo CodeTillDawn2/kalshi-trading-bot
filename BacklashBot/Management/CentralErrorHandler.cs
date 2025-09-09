@@ -27,6 +27,7 @@ namespace BacklashBot.Management
         public ConcurrentQueue<ErrorHandlerTaskInfo> Errors { get; } = new ConcurrentQueue<ErrorHandlerTaskInfo>();
 
         public DateTime LastSuccessfulSnapshot { get; set; } = DateTime.MinValue;
+        public DateTime LastErrorDate { get; set; } = DateTime.MinValue;
 
         public CentralErrorHandler(
             IMarketManagerService marketManagerService,
@@ -78,6 +79,7 @@ namespace BacklashBot.Management
                                 LogSourceCategory = warningTaskInfo.LogSourceCategory
                             });
                         ErrorCount++;
+                        LastErrorDate = warningTaskInfo.Timestamp;
                     }
                     else
                     {
@@ -103,6 +105,7 @@ namespace BacklashBot.Management
                     {
                         _logger.LogWarning("CATASTROPHIC ERROR: OriginalException was null in ErrorHandlerTaskInfo but was logged as an error. Message: '{FormattedMessage}', Source: '{LogSourceCategory}'", message, identifier);
                         ErrorCount++;
+                        LastErrorDate = errorTaskInfo.Timestamp;
                         isCatastrophicLocal = true;
                     }
                     else
@@ -121,6 +124,7 @@ namespace BacklashBot.Management
                             {
                                 _logger.LogCritical("BRAIN: Internet connection is down. Cannot reset connection. Please check your internet connection.");
                                 ErrorCount++;
+                                LastErrorDate = errorTaskInfo.Timestamp;
                                 isCatastrophicLocal = true;
                             }
                             else
@@ -180,6 +184,7 @@ namespace BacklashBot.Management
                         {
                             _logger.LogError("CATASTROPHIC ERROR: (WebSocketRetryFailedException): Connecting to web socket failed after retries. Restarting services. Message: {ErrorMessage}", wsrEx.Message);
                             ErrorCount++;
+                            LastErrorDate = errorTaskInfo.Timestamp;
                             isCatastrophicLocal = true;
                         }
                         else if (exception is TradeMissedException tmEx)
@@ -187,6 +192,7 @@ namespace BacklashBot.Management
                             _marketManagerService.TriggerMarketReset(tmEx.MarketId);
                             _logger.LogInformation("HANDLED ERROR: (TradeMissedException): Missed trade for market {MarketId}. Resetting. Message: {ErrorMessage}", tmEx.MarketId, tmEx.Message);
                             ErrorCount++;
+                            LastErrorDate = errorTaskInfo.Timestamp;
                             _nonCatastrophicErrors.Enqueue((DateTime.Now, errorTaskInfo));
                         }
                         else if (exception is DeadLockException dlex)
@@ -198,12 +204,14 @@ namespace BacklashBot.Management
                         {
                             _logger.LogInformation("HANDLED ERROR: (ProcessingThresholdExceededException): {ErrorMessage}", pteEx.Message);
                             ErrorCount++;
+                            LastErrorDate = errorTaskInfo.Timestamp;
                             _nonCatastrophicErrors.Enqueue((DateTime.Now, errorTaskInfo));
                         }
                         else if (exception is KalshiKeyFileNotFoundException keyex)
                         {
                             _logger.LogCritical(keyex, "CATASTROPHIC ERROR: Kalshi Key File is missing or there are permissions issues.");
                             ErrorCount++;
+                            LastErrorDate = errorTaskInfo.Timestamp;
                             isCatastrophicLocal = true;
                         }
                         else if ((exception is HttpRequestException
@@ -213,13 +221,22 @@ namespace BacklashBot.Management
                         {
                             _logger.LogCritical(exception, "CATASTROPHIC ERROR: The internet may be down...");
                             ErrorCount++;
+                            LastErrorDate = errorTaskInfo.Timestamp;
                             isCatastrophicLocal = true;
+                        }
+                        else if (identifier.Contains("OverseerClientService") &&
+                                (exception is HttpRequestException && exception.Message.Contains("actively refused")))
+                        {
+                            // Overseer connection failure - this is expected when overseer is not running
+                            _logger.LogInformation("Overseer connection failed: {Message}. This is optional and not catastrophic.", exception.Message);
+                            // Don't increment error count or mark as catastrophic
                         }
                         else
                         {
                             _logger.LogCritical(exception, "UNHANDLED ERROR: from {Identifier}. Original Message: '{OriginalMessage}', Type: {ExceptionType}, Inner exception: {InnerExceptionMessage}",
                                 identifier, message, exception.GetType().FullName, exception.InnerException?.Message ?? "N/A");
                             ErrorCount++;
+                            LastErrorDate = errorTaskInfo.Timestamp;
                             isCatastrophicLocal = true;
                         }
                     }
@@ -275,15 +292,17 @@ namespace BacklashBot.Management
         public void AddError(Exception ex, string identifier, string? message = null)
         {
             var cts = new CancellationTokenSource();
+            var timestamp = DateTime.Now;
             Errors.Enqueue(new ErrorHandlerTaskInfo
             {
                 OriginalException = ex ?? new UnhandledSmokehouseException(message ?? "Error added directly with no original exception."),
                 FormattedMessage = message ?? ex?.Message ?? "Error added directly.",
                 LogSourceCategory = identifier,
                 Severity = LogLevel.Error,
-                Timestamp = DateTime.Now
+                Timestamp = timestamp
             });
             ErrorCount++;
+            LastErrorDate = timestamp;
         }
 
         private string ExtractValue(string logMessage, string variableName)

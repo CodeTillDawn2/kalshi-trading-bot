@@ -70,6 +70,11 @@ namespace BacklashBot.Services
             _scope = null;
         }
 
+        public IServiceScope CreateScope()
+        {
+            return _serviceProvider.CreateScope();
+        }
+
         public void Dispose()
         {
             _scope?.Dispose();

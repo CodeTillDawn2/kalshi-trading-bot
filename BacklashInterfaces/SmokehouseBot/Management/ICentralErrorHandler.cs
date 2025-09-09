@@ -9,6 +9,7 @@ namespace BacklashBot.Management.Interfaces
         ConcurrentQueue<ErrorHandlerTaskInfo> Errors { get; }
         public bool CatastrophicErrorAlreadyDetected { get; set; }
         DateTime LastSuccessfulSnapshot { get; set; }
+        DateTime LastErrorDate { get; set; }
         Task<bool> HandleErrors();
         Task<bool> CheckInternetConnection();
         void AddWarning(Exception ex, string identifier, string? message = null);

@@ -1137,6 +1137,7 @@
         </ul>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
     <script>
         let marketData = [];
         let brainLockData = [];
@@ -1151,6 +1152,30 @@
         let currentPage = 1;
         let pageSize = 50;
         let filteredData = [];
+        let checkInData = {};
+        let connection = null;
+
+        // Initialize SignalR connection
+        async function initializeSignalR() {
+            try {
+                connection = new signalR.HubConnectionBuilder()
+                    .withUrl('/chartHub')
+                    .withAutomaticReconnect()
+                    .build();
+
+                // Set up event handlers
+                connection.on('CheckInUpdate', handleCheckInUpdate);
+
+                // Start the connection
+                await connection.start();
+                console.log('SignalR connection established');
+
+                // Perform handshake
+                await connection.invoke('Handshake', 'web-ui', 'Web Dashboard', 'WebClient');
+            } catch (error) {
+                console.error('SignalR connection failed:', error);
+            }
+        }
 
         async function refreshAllData() {
             await Promise.all([
@@ -1443,6 +1468,22 @@
                         <div class="stat-item">
                             <span class="stat-value">${item.averageWebsocketEvents.toFixed(1)}</span>
                             <div class="stat-label">Avg Events</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="last-checkin-${item.brainInstanceName}">Never</span>
+                            <div class="stat-label">Last Check In</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="last-snapshot-${item.brainInstanceName}">Never</span>
+                            <div class="stat-label">Last Snapshot</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="error-count-${item.brainInstanceName}">0</span>
+                            <div class="stat-label">Error Count</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="market-count-${item.brainInstanceName}">${item.marketCount}</span>
+                            <div class="stat-label">Markets</div>
                         </div>
                     </div>
 
@@ -1787,6 +1828,7 @@
         window.onload = async () => {
             // Ensure Brain Locks tab is active on load
             switchTab('brainlocks');
+            await initializeSignalR();
             await refreshAllData();
             // Auto-refresh every 60 seconds
             setInterval(refreshAllData, 60000);
@@ -2302,6 +2344,60 @@
 
             btn.classList.toggle('active', snapshotsSortOrder === 'desc');
             renderSnapshots();
+        }
+
+        // Handle CheckIn messages from bots
+        function handleCheckInUpdate(checkInData) {
+            const brainInstanceName = checkInData.BrainInstanceName;
+            const marketCount = checkInData.MarketCount || 0;
+            const errorCount = checkInData.ErrorCount || 0;
+            const lastSnapshot = checkInData.LastSnapshot;
+            const lastCheckIn = checkInData.LastCheckIn;
+
+            // Update checkInData object
+            checkInData[brainInstanceName] = {
+                brainInstanceName: brainInstanceName,
+                marketCount: marketCount,
+                errorCount: errorCount,
+                lastSnapshot: lastSnapshot,
+                lastCheckIn: lastCheckIn
+            };
+
+            // Update UI elements
+            updateCheckInUI(brainInstanceName, marketCount, errorCount, lastSnapshot, lastCheckIn);
+
+            console.log(`CheckIn received from ${brainInstanceName}: Markets=${marketCount}, ErrorCount=${errorCount}, LastSnapshot=${lastSnapshot}`);
+        }
+
+        function updateCheckInUI(brainInstanceName, marketCount, errorCount, lastSnapshot, lastCheckIn) {
+            // Update Last Check In
+            const lastCheckInElement = document.getElementById(`last-checkin-${brainInstanceName}`);
+            if (lastCheckInElement) {
+                const checkInTime = lastCheckIn ? formatDateTime(lastCheckIn) : 'Never';
+                lastCheckInElement.textContent = checkInTime;
+                lastCheckInElement.style.color = lastCheckIn ? '#28a745' : '#6c757d'; // Green if recent, gray if never
+            }
+
+            // Update Last Snapshot
+            const lastSnapshotElement = document.getElementById(`last-snapshot-${brainInstanceName}`);
+            if (lastSnapshotElement) {
+                const snapshotTime = lastSnapshot ? formatDateTime(lastSnapshot) : 'Never';
+                lastSnapshotElement.textContent = snapshotTime;
+                lastSnapshotElement.style.color = lastSnapshot ? '#28a745' : '#6c757d'; // Green if recent, gray if never
+            }
+
+            // Update Error Count
+            const errorCountElement = document.getElementById(`error-count-${brainInstanceName}`);
+            if (errorCountElement) {
+                errorCountElement.textContent = errorCount;
+                errorCountElement.style.color = errorCount > 0 ? '#dc3545' : '#28a745'; // Red if errors, green if no errors
+            }
+
+            // Update Market Count
+            const marketCountElement = document.getElementById(`market-count-${brainInstanceName}`);
+            if (marketCountElement) {
+                marketCountElement.textContent = marketCount;
+            }
         }
 
         // Account data functions - no SignalR needed

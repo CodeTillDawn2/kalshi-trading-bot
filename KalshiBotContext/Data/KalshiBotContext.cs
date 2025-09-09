@@ -40,6 +40,8 @@ namespace KalshiBotData.Data
         private DbSet<MaintenanceWindow> MaintenanceWindows { get; set; }
         private DbSet<StandardHours> StandardHours { get; set; }
         private DbSet<StandardHoursSession> StandardHoursSessions { get; set; }
+        private DbSet<BacklashDTOs.SignalRClient> SignalRClients { get; set; }
+        private DbSet<BacklashDTOs.Data.OverseerInfo> OverseerInfos { get; set; }
 
         private readonly string _connectionString;
         private readonly IConfiguration _config;
@@ -1217,6 +1219,111 @@ namespace KalshiBotData.Data
         }
         #endregion
 
+        #region SignalR Clients
+        public async Task<List<BacklashDTOs.SignalRClient>> GetSignalRClients(string? clientId = null, string? ipAddress = null, bool? isActive = null)
+        {
+            IQueryable<BacklashDTOs.SignalRClient> query = SignalRClients.AsNoTracking();
+            if (!string.IsNullOrEmpty(clientId))
+                query = query.Where(c => c.ClientId == clientId);
+            if (!string.IsNullOrEmpty(ipAddress))
+                query = query.Where(c => c.IPAddress == ipAddress);
+            if (isActive.HasValue)
+                query = query.Where(c => c.IsActive == isActive.Value);
+            return await query.ToListAsync();
+        }
+
+        public async Task<BacklashDTOs.SignalRClient?> GetSignalRClient(string clientId)
+        {
+            return await SignalRClients.AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId);
+        }
+
+        public async Task AddOrUpdateSignalRClient(BacklashDTOs.SignalRClient client)
+        {
+            var existing = await SignalRClients.FirstOrDefaultAsync(c => c.ClientId == client.ClientId);
+            if (existing == null)
+            {
+                SignalRClients.Add(client);
+            }
+            else
+            {
+                existing.ClientName = client.ClientName;
+                existing.IPAddress = client.IPAddress;
+                existing.AuthToken = client.AuthToken;
+                existing.ClientType = client.ClientType;
+                existing.IsActive = client.IsActive;
+                existing.LastSeen = client.LastSeen;
+                existing.ConnectionId = client.ConnectionId;
+                this.Entry(existing).State = EntityState.Modified;
+            }
+            await SaveChangesAsync();
+        }
+
+        public async Task UpdateSignalRClientConnection(string clientId, string connectionId)
+        {
+            var client = await SignalRClients.FirstOrDefaultAsync(c => c.ClientId == clientId);
+            if (client != null)
+            {
+                client.ConnectionId = connectionId;
+                client.LastSeen = DateTime.UtcNow;
+                await SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateSignalRClientLastSeen(string clientId)
+        {
+            var client = await SignalRClients.FirstOrDefaultAsync(c => c.ClientId == clientId);
+            if (client != null)
+            {
+                client.LastSeen = DateTime.UtcNow;
+                await SaveChangesAsync();
+            }
+        }
+
+        public async Task DeactivateSignalRClient(string clientId)
+        {
+            var client = await SignalRClients.FirstOrDefaultAsync(c => c.ClientId == clientId);
+            if (client != null)
+            {
+                client.IsActive = false;
+                client.LastSeen = DateTime.UtcNow;
+                await SaveChangesAsync();
+            }
+        }
+        #endregion
+
+        #region Overseer Info
+        public async Task AddOrUpdateOverseerInfo(BacklashDTOs.Data.OverseerInfo overseerInfo)
+        {
+            var existing = await OverseerInfos.FirstOrDefaultAsync(oi => oi.HostName == overseerInfo.HostName && oi.IPAddress == overseerInfo.IPAddress);
+            if (existing == null)
+            {
+                OverseerInfos.Add(overseerInfo);
+            }
+            else
+            {
+                existing.LastHeartbeat = overseerInfo.LastHeartbeat ?? DateTime.UtcNow;
+                existing.IsActive = overseerInfo.IsActive;
+                existing.ServiceName = overseerInfo.ServiceName;
+                existing.Version = overseerInfo.Version;
+                this.Entry(existing).State = EntityState.Modified;
+            }
+            await SaveChangesAsync();
+        }
+
+        public async Task<List<BacklashDTOs.Data.OverseerInfo>> GetActiveOverseers()
+        {
+            return await OverseerInfos
+                .Where(oi => oi.IsActive)
+                .OrderByDescending(oi => oi.LastHeartbeat ?? oi.StartTime)
+                .ToListAsync();
+        }
+
+        public async Task<BacklashDTOs.Data.OverseerInfo?> GetOverseerByHostName(string hostName)
+        {
+            return await OverseerInfos.FirstOrDefaultAsync(oi => oi.HostName == hostName && oi.IsActive);
+        }
+        #endregion
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(_connectionString);
@@ -1784,6 +1891,89 @@ namespace KalshiBotData.Data
             modelBuilder.Entity<StandardHoursSession>()
                 .Property(s => s.LastModifiedDate)
                 .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<BacklashDTOs.SignalRClient>()
+                .ToTable("t_SignalRClients")
+                .HasKey(c => c.ClientId);
+
+            modelBuilder.Entity<BacklashDTOs.SignalRClient>()
+                .Property(c => c.ClientId)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<BacklashDTOs.SignalRClient>()
+                .Property(c => c.ClientName)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<BacklashDTOs.SignalRClient>()
+                .Property(c => c.IPAddress)
+                .HasMaxLength(45)
+                .IsRequired();
+
+            modelBuilder.Entity<BacklashDTOs.SignalRClient>()
+                .Property(c => c.AuthToken)
+                .HasMaxLength(256)
+                .IsRequired();
+
+            modelBuilder.Entity<BacklashDTOs.SignalRClient>()
+                .Property(c => c.ClientType)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            modelBuilder.Entity<BacklashDTOs.SignalRClient>()
+                .Property(c => c.RegisteredAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            modelBuilder.Entity<BacklashDTOs.SignalRClient>()
+                .HasIndex(c => c.IPAddress)
+                .HasDatabaseName("IX_t_SignalRClients_IPAddress");
+
+            modelBuilder.Entity<BacklashDTOs.SignalRClient>()
+                .HasIndex(c => new { c.IsActive, c.LastSeen })
+                .HasDatabaseName("IX_t_SignalRClients_IsActive_LastSeen");
+
+            modelBuilder.Entity<OverseerInfo>()
+                .ToTable("t_OverseerInfo")
+                .HasKey(oi => oi.Id);
+
+            modelBuilder.Entity<OverseerInfo>()
+                .Property(oi => oi.HostName)
+                .HasMaxLength(255)
+                .IsRequired();
+
+            modelBuilder.Entity<OverseerInfo>()
+                .Property(oi => oi.IPAddress)
+                .HasMaxLength(45)
+                .IsRequired();
+
+            modelBuilder.Entity<OverseerInfo>()
+                .Property(oi => oi.Port)
+                .IsRequired();
+
+            modelBuilder.Entity<OverseerInfo>()
+                .Property(oi => oi.StartTime)
+                .IsRequired();
+
+            modelBuilder.Entity<OverseerInfo>()
+                .Property(oi => oi.IsActive)
+                .IsRequired();
+
+            modelBuilder.Entity<OverseerInfo>()
+                .Property(oi => oi.ServiceName)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<OverseerInfo>()
+                .Property(oi => oi.Version)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<OverseerInfo>()
+                .HasIndex(oi => oi.IsActive)
+                .HasDatabaseName("IX_t_OverseerInfo_IsActive");
+
+            modelBuilder.Entity<OverseerInfo>()
+                .HasIndex(oi => oi.LastHeartbeat)
+                .HasDatabaseName("IX_t_OverseerInfo_LastHeartbeat");
         }
     }
 }

@@ -1,5 +1,6 @@
 using BacklashDTOs;
 using BacklashDTOs.Data;
+using KalshiBotData.Data;
 
 namespace KalshiBotData.Data.Interfaces
 {
@@ -152,6 +153,21 @@ namespace KalshiBotData.Data.Interfaces
         #region Other
         Task<List<MarketLiquidityStatsDTO>> GetMarketLiquidityStates();
         Task<List<MarketLiquidityStatsDTO>> GetMarketLiquidityStates_cached();
+        #endregion
+
+        #region SignalR Clients
+        Task<List<SignalRClient>> GetSignalRClients(string? clientId = null, string? ipAddress = null, bool? isActive = null);
+        Task<SignalRClient?> GetSignalRClient(string clientId);
+        Task AddOrUpdateSignalRClient(SignalRClient client);
+        Task UpdateSignalRClientConnection(string clientId, string connectionId);
+        Task UpdateSignalRClientLastSeen(string clientId);
+        Task DeactivateSignalRClient(string clientId);
+        #endregion
+
+        #region Overseer Info
+        Task AddOrUpdateOverseerInfo(BacklashDTOs.Data.OverseerInfo overseerInfo);
+        Task<List<BacklashDTOs.Data.OverseerInfo>> GetActiveOverseers();
+        Task<BacklashDTOs.Data.OverseerInfo?> GetOverseerByHostName(string hostName);
         #endregion
     }
 }

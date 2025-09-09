@@ -7,6 +7,7 @@ using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using BacklashInterfaces.SmokehouseBot.Services;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
@@ -401,6 +402,11 @@ namespace BacklashBot.Management
                 await broadcastService.StartServicesAsync();
                 _logger.LogInformation("BRAIN: BroadcastService started");
 
+                var overseerClientService = _serviceFactory.GetOverseerClientService();
+                _logger.LogDebug("BRAIN: Starting OverseerClientService...");
+                await overseerClientService.StartAsync();
+                _logger.LogInformation("BRAIN: OverseerClientService started");
+
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
                 if (!_readyStatus.BrowserReady.Task.IsCompleted)
@@ -492,6 +498,11 @@ namespace BacklashBot.Management
                 _logger.LogDebug("Stopping BroadcastService...");
                 await broadcastService.StopServicesAsync();
                 _logger.LogDebug("BroadcastService stopped");
+
+                var overseerClientService = _serviceFactory.GetOverseerClientService();
+                _logger.LogDebug("Stopping OverseerClientService...");
+                await overseerClientService.StopAsync();
+                _logger.LogDebug("OverseerClientService stopped");
 
                 var orderBookService = _serviceFactory.GetOrderBookService();
                 _logger.LogDebug("Stopping OrderBookService...");

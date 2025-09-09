@@ -2,6 +2,7 @@ using KalshiBotAPI.WebSockets.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.State.Interfaces;
 using TradingStrategies.Helpers.Interfaces;
+using BacklashInterfaces.SmokehouseBot.Services;
 
 namespace BacklashBot.Services.Interfaces
 {
@@ -21,6 +22,8 @@ namespace BacklashBot.Services.Interfaces
         IMarketRefreshService? GetMarketRefreshService();
         IWebSocketMonitorService? GetWebSocketHostedService();
         ICentralErrorHandler? GetBacklashErrorHandler();
+        IOverseerClientService? GetOverseerClientService();
+        IScopeManagerService GetScopeManager();
         void ResetAll();
         void InitializeServices(Guid _brainLock);
     }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashDTOs;
+using KalshiBotData.Data;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,29 +15,28 @@ namespace KalshiBotOverseer
         private readonly IKalshiWebSocketClient _webSocketClient;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<Overseer> _logger;
-        private readonly SignalRService _signalRService;
         private Timer? _apiFetchTimer;
         private CancellationTokenSource? _apiFetchCancellationTokenSource;
         private bool _disposed = false;
 
-        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, SignalRService signalRService)
+        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger)
         {
             _webSocketClient = webSocketClient;
             _scopeFactory = scopeFactory;
             _logger = logger;
-            _signalRService = signalRService;
         }
 
         public async void Start()
         {
+            // Log overseer IP to database
+            await LogOverseerInfoAsync();
+
             // Subscribe to the specific events
             _webSocketClient.FillReceived += OnFillReceived;
             _webSocketClient.MarketLifecycleReceived += OnMarketLifecycleReceived;
             _webSocketClient.EventLifecycleReceived += OnEventLifecycleReceived;
 
             _logger?.LogInformation("Subscribed to Fill, MarketLifecycle, and EventLifecycle events.");
-
-            await _signalRService.StartAsync();
 
             StartPeriodicApiFetching();
         }
@@ -45,8 +45,6 @@ namespace KalshiBotOverseer
         {
             Unsubscribe();
             _logger?.LogInformation("Unsubscribed from events.");
-
-            await _signalRService.StopAsync();
         }
 
         private void Unsubscribe()
@@ -62,8 +60,7 @@ namespace KalshiBotOverseer
             // Handle the fill event (e.g., log or process)
             _logger?.LogInformation("Received Fill event: {EventData}", e);
 
-            // Transmit the fill event via SignalR
-            await _signalRService.SendMessageAsync("ReceiveFill", $"Fill event: {e}");
+            // Fill event processed
         }
 
         private async void OnMarketLifecycleReceived(object sender, MarketLifecycleEventArgs e)
@@ -71,8 +68,7 @@ namespace KalshiBotOverseer
             // Handle the market lifecycle event
             _logger?.LogInformation("Received MarketLifecycle event: {EventData}", e);
 
-            // Transmit the market lifecycle event via SignalR
-            await _signalRService.SendMessageAsync("ReceiveMarketLifecycle", $"MarketLifecycle event: {e}");
+            // Market lifecycle event processed
         }
 
         private async void OnEventLifecycleReceived(object sender, EventLifecycleEventArgs e)
@@ -80,8 +76,7 @@ namespace KalshiBotOverseer
             // Handle the event lifecycle event
             _logger?.LogInformation("Received EventLifecycle event: {EventData}", e);
 
-            // Transmit the event lifecycle event via SignalR
-            await _signalRService.SendMessageAsync("ReceiveEventLifecycle", $"EventLifecycle event: {e}");
+            // Event lifecycle event processed
         }
 
         /// <summary>
@@ -152,6 +147,42 @@ namespace KalshiBotOverseer
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Error during periodic API data fetch: {Message}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Logs overseer information including IP address to database
+        /// </summary>
+        private async Task LogOverseerInfoAsync()
+        {
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<KalshiBotData.Data.Interfaces.IKalshiBotContext>();
+
+                // Get local IP address
+                var hostName = System.Net.Dns.GetHostName();
+                var localIP = System.Net.Dns.GetHostEntry(hostName).AddressList
+                    .FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?
+                    .ToString() ?? "127.0.0.1";
+
+                var overseerInfo = new BacklashDTOs.Data.OverseerInfo
+                {
+                    HostName = hostName,
+                    IPAddress = localIP,
+                    Port = 5000, // Default port
+                    StartTime = DateTime.UtcNow,
+                    IsActive = true,
+                    ServiceName = "KalshiBotOverseer",
+                    LastHeartbeat = DateTime.UtcNow
+                };
+
+                await context.AddOrUpdateOverseerInfo(overseerInfo);
+                _logger?.LogInformation("Overseer info: {HostName} at {IPAddress}:{Port}", hostName, localIP, 5000);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning(ex, "Failed to log overseer info to database");
             }
         }
 

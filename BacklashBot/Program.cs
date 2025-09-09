@@ -12,10 +12,12 @@ using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Logging;
 using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
+using BacklashBot.Middleware;
 using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State;
 using BacklashBot.State.Interfaces;
+using BacklashInterfaces.SmokehouseBot.Services;
 using BacklashDTOs.Data;
 using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
@@ -138,6 +140,7 @@ builder.Services.AddScoped<ICandlestickService, CandlestickService>();
 builder.Services.AddScoped<IBroadcastService, BroadcastService>();
 builder.Services.AddScoped<IMarketRefreshService, MarketRefreshService>();
 builder.Services.AddScoped<IWebSocketMonitorService, WebSocketMonitorService>();
+builder.Services.AddSingleton<IOverseerClientService, OverseerClientService>();
 builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
     sp.GetRequiredService<IOptions<KalshiConfig>>(),
     sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),

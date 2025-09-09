@@ -19,6 +19,8 @@ using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Http;
 
 namespace KalshiBotOverseer
 {
@@ -95,14 +97,6 @@ namespace KalshiBotOverseer
                 }
             });
 
-            // Register SignalRService (optional - for real-time messaging)
-            services.AddSingleton<SignalRService>(sp =>
-            {
-                var logger = sp.GetRequiredService<ILogger<SignalRService>>();
-                // TODO: Get hub URL from configuration
-                var hubUrl = "http://localhost:5000/chartHub"; // Adjust as needed for your SignalR hub
-                return new SignalRService(hubUrl, logger);
-            });
 
             // Register the new EventSubscriber as singleton
             services.AddSingleton<Overseer>();
@@ -115,6 +109,13 @@ namespace KalshiBotOverseer
 
             // Add MVC for controllers
             services.AddControllers();
+
+            // Add SignalR
+            services.AddSignalR(options =>
+            {
+                options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+                options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -132,7 +133,16 @@ namespace KalshiBotOverseer
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChartHub>("/chartHub");
+
+                // Add health check endpoint for overseer discovery
+                endpoints.MapGet("/health", async context =>
+                {
+                    context.Response.ContentType = "application/json";
+                    await context.Response.WriteAsync("{\"status\":\"healthy\",\"service\":\"KalshiBotOverseer\"}");
+                });
             });
         }
+
     }
 }

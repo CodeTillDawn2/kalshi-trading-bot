@@ -7,6 +7,7 @@ namespace BacklashBot.Services.Interfaces
         void InitializeScope();
         void ResetAll();
         IServiceScope Scope { get; }
+        IServiceScope CreateScope();
 
     }
 }
