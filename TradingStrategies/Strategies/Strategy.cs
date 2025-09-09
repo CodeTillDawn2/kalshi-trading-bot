@@ -1,6 +1,6 @@
-﻿// Updated Strategy.cs for merged Strat
-using SmokehouseDTOs;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+// Updated Strategy.cs for merged Strat
+using BacklashDTOs;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Strategies
 {

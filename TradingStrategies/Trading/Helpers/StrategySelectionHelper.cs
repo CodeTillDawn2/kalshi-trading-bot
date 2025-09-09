@@ -1,6 +1,6 @@
-﻿using TradingStrategies.Strategies;
+using TradingStrategies.Strategies;
 using TradingStrategies.Strategies.Strats;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Strategies.Strats.BollingerBreakout;
 
 namespace TradingStrategies.Trading.Helpers
@@ -1168,7 +1168,7 @@ namespace TradingStrategies.Trading.Helpers
         { FlowMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.2 },
     }),
 
-    // High-edge (participation ↓)
+    // High-edge (participation ?)
     ("FM_HighEdge_01", new()
     {
         { FlowMomentumStrat.ParamKey.MinDistanceFromBounds, 9 },
@@ -1328,7 +1328,7 @@ namespace TradingStrategies.Trading.Helpers
         { FlowMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.0 },
     }),
 
-    // Spike gate variants (to ensure “unusual” not noise)
+    // Spike gate variants (to ensure �unusual� not noise)
     ("FM_SpikeGate_01", new()
     {
         { FlowMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },

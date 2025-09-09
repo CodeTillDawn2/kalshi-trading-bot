@@ -1,6 +1,6 @@
-﻿// Full class: TradingStrategies/Trading/Helpers/MarketTypeHelper.cs (ensure it's instantiated)
-using SmokehouseDTOs;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+// Full class: TradingStrategies/Trading/Helpers/MarketTypeHelper.cs (ensure it's instantiated)
+using BacklashDTOs;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Trading.Helpers
 {

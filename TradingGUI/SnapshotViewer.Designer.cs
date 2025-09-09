@@ -1,4 +1,4 @@
-﻿// Full updated SnapshotViewer.Designer.cs
+// Full updated SnapshotViewer.Designer.cs
 
 // MarketDashboardControl2.Designer.cs
 using ScottPlot;

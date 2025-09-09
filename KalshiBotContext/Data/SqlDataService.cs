@@ -1,8 +1,8 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using SmokehouseBot.Services.Interfaces;
-using SmokehouseDTOs.Exceptions;
+using BacklashBot.Services.Interfaces;
+using BacklashDTOs.Exceptions;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Text.Json;

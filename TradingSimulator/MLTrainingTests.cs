@@ -1,4 +1,4 @@
-﻿// MLTrainingTests.cs
+// MLTrainingTests.cs
 using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -6,10 +6,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using SmokehouseBot.Services;
-using SmokehouseBot.Services.Interfaces;
-using SmokehouseDTOs;
-using SmokehouseDTOs.Data;
+using BacklashBot.Services;
+using BacklashBot.Services.Interfaces;
+using BacklashDTOs;
+using BacklashDTOs.Data;
 using System.Text;
 using TradingStrategies.Configuration;
 
@@ -29,9 +29,9 @@ namespace TradingSimulator.ML
         [SetUp]
         public void Setup()
         {
-            // Locate SmokehouseBot/appsettings.local.json exactly like your other tests
+            // Locate BacklashBot/appsettings.local.json exactly like your other tests
             var basePath = Path.GetFullPath(
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "SmokehouseBot"));
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
             var config = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
@@ -188,7 +188,7 @@ namespace TradingSimulator.ML
 
             // 5) Optional: Predict for the latest row
             var latest = FlattenPriceQuickstart.PredictLatestFromCsv(csvPath, modelPath, cfg);
-            TestContext.Out.WriteLine($"Latest: cur={latest.CurrentYes:F2}, Δ={latest.PredictedDelta:F2}, flat={latest.PredictedFlatten:F2}");
+            TestContext.Out.WriteLine($"Latest: cur={latest.CurrentYes:F2}, ?={latest.PredictedDelta:F2}, flat={latest.PredictedFlatten:F2}");
         }
     }
 }

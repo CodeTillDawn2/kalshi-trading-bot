@@ -1,9 +1,9 @@
-﻿using KalshiBotData.Data.Interfaces;
+using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SmokehouseBot.Services.Interfaces;
-using SmokehouseDTOs;
+using BacklashBot.Services.Interfaces;
+using BacklashDTOs;
 using TradingSimulator.Simulator;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;

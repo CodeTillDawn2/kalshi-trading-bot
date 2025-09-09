@@ -1,4 +1,4 @@
-﻿namespace TradingStrategies.Strategies
+namespace TradingStrategies.Strategies
 {
     public enum Signal
     {

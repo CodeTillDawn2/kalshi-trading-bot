@@ -14,9 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmokehouseDTOs\SmokehouseDTOs.csproj" />
-    <ProjectReference Include="..\SmokehouseInterfaces\SmokehouseInterfaces.csproj" />
-    <ProjectReference Include="..\SmokehousePatterns\SmokehousePatterns.csproj" />
+    <ProjectReference Include="..\BacklashDTOs\BacklashDTOs.csproj" />
+    <ProjectReference Include="..\BacklashInterfaces\BacklashInterfaces.csproj" />
+    <ProjectReference Include="..\BacklashPatterns\BacklashPatterns.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
-﻿
-using SmokehouseDTOs.Converters;
+
+using BacklashDTOs.Converters;
 using System.Text.Json.Serialization;
 
 namespace KalshiBotData.Models

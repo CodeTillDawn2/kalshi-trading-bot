@@ -1,4 +1,4 @@
-﻿using KalshiBotAPI.Configuration;
+using KalshiBotAPI.Configuration;
 using KalshiBotAPI.Websockets;
 using KalshiBotData.Data;
 using Microsoft.Extensions.Configuration;
@@ -6,9 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using SmokehouseBot.Configuration;
-using SmokehouseBot.Services.Interfaces;
-using SmokehouseBot.State.Interfaces;
+using BacklashBot.Configuration;
+using BacklashBot.Services.Interfaces;
+using BacklashBot.State.Interfaces;
 using System.Net.WebSockets;
 using System.Text;
 
@@ -48,7 +48,7 @@ namespace TradingSimulator.Tests
             _statusTracker.Setup(st => st.GetCancellationToken()).Returns(cts.Token);
 
             // Load configuration from appsettings.local.json
-            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "SmokehouseBot"));
+            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
             _configuration = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)

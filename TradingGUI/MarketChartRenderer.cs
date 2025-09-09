@@ -1,4 +1,4 @@
-﻿// MarketChartRenderer.cs (full file with modifications: adjusted per-series collectTooltips to match old behavior)
+// MarketChartRenderer.cs (full file with modifications: adjusted per-series collectTooltips to match old behavior)
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TradingSimulator.TestObjects;

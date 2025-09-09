@@ -1,5 +1,5 @@
-﻿using KalshiBotData.Models;
-using SmokehouseDTOs.Data;
+using KalshiBotData.Models;
+using BacklashDTOs.Data;
 
 namespace KalshiBotData.Extensions
 {

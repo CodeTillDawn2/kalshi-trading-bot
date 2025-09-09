@@ -1,4 +1,4 @@
-﻿namespace KalshiBotData.Models
+namespace KalshiBotData.Models
 {
     public class Fill
     {

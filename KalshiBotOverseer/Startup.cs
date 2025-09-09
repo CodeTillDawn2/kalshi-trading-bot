@@ -15,10 +15,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SmokehouseBot.KalshiAPI.Interfaces;
-using SmokehouseBot.Services;
-using SmokehouseBot.Services.Interfaces;
-using SmokehouseBot.State.Interfaces;
+using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBot.Services;
+using BacklashBot.Services.Interfaces;
+using BacklashBot.State.Interfaces;
 
 namespace KalshiBotOverseer
 {

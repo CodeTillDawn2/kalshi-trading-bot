@@ -87,3 +87,17 @@ KalshiUI/bin/Debug/net8.0-windows/appsettings.local.json
 /KalshiBotAPI/bin
 KalshiBotOverseer/appsettings.local.json
 /KalshiBotOverseer/bin
+/BacklashBot/.vs
+BacklashBot/appsettings.local.json
+BacklashBot/Benchmarks_05-07-25.xlsx
+/BacklashBot/bin
+/BacklashBot/obj
+BacklashBot/publish.log
+BacklashBot/UiMockup.psd
+/BacklashDTOs/bin
+/BacklashDTOs/obj
+/BacklashInterfaces/bin
+/BacklashInterfaces/obj
+/BacklashPatterns/obj
+/BacklashPatterns/bin
+/KalshiBotOverseer/bin

@@ -1,8 +1,8 @@
-﻿// MainForm.cs: Full class with restored tooltip/hover (black line), back button fix via BackAction, and axis restore on back
+// MainForm.cs: Full class with restored tooltip/hover (black line), back button fix via BackAction, and axis restore on back
 using KalshiBotData.Data;
 using KalshiBotData.Models;
 using Microsoft.Extensions.Configuration;
-using SmokehouseDTOs;
+using BacklashDTOs;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TradingSimulator.Simulator;
@@ -57,7 +57,7 @@ namespace SimulatorWinForms
             _simulator.EnsureInitialized();
             _simulator.OnTestProgress += msg => AppendLog(msg);
             _simulator.OnProfitLossUpdate += (m, pnl) => UpdatePnL(m, pnl);
-            _simulator.OnMarketProcessed += m => AppendLog($"✔ Processed {m}");
+            _simulator.OnMarketProcessed += m => AppendLog($"? Processed {m}");
             // DISABLE ScottPlot's built-in pan/zoom to prevent conflicts
             formsPlot1.Configuration.Pan = false;
             formsPlot1.Configuration.Zoom = false;
@@ -139,7 +139,7 @@ namespace SimulatorWinForms
             dgvMarkets.RowHeadersVisible = false;
             dgvMarkets.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            var checkCol = new DataGridViewCheckBoxColumn { Name = "CheckedCol", HeaderText = "✓", AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells };
+            var checkCol = new DataGridViewCheckBoxColumn { Name = "CheckedCol", HeaderText = "?", AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells };
             var marketCol = new DataGridViewTextBoxColumn { Name = "Market", HeaderText = "Market", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 30 };
             var titleCol = new DataGridViewTextBoxColumn { Name = "Title", HeaderText = "Title", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 40 };
             var pnlCol = new DataGridViewTextBoxColumn { Name = "PnL", HeaderText = "PnL", AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells };
@@ -512,7 +512,7 @@ namespace SimulatorWinForms
 
             if (e.Button == MouseButtons.Right)
             {
-                // prevent ScottPlot’s default right-drag zoom from fighting our pan (if available)
+                // prevent ScottPlot�s default right-drag zoom from fighting our pan (if available)
                 try { formsPlot1.Configuration.RightClickDragZoom = false; } catch { /* ignore if not supported */ }
 
                 var lim = formsPlot1.Plot.GetAxisLimits();

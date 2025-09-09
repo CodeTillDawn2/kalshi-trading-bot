@@ -5,8 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NJsonSchema;
-using SmokehouseDTOs;
-using SmokehouseDTOs.Data;
+using BacklashDTOs;
+using BacklashDTOs.Data;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TradingStrategies.Configuration;
@@ -18,7 +18,7 @@ namespace TradingSimulator.Executable
         private KalshiBotContext _context;
         private SchemaDeploymentObj _schemaDeployment;
         private IConfigurationRoot _configuration;
-        private string basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "SmokehouseBot"));
+        private string basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
 
         [SetUp]
         public void Setup()
@@ -142,7 +142,7 @@ namespace TradingSimulator.Executable
             {
                 try
                 {
-                    string basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "SmokehouseBot"));
+                    string basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
                     string fullAppSettingsPath = Path.Combine(basePath, "appsettings.local.json");
 
                     var filePath = fullAppSettingsPath;

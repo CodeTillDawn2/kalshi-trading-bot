@@ -1,4 +1,4 @@
-ï»¿// SimulatorTests.cs
+// SimulatorTests.cs
 // Updated to avoid redundant data loads for markets, remove parallel operations, and maintain separate strategy set methods
 
 using KalshiBotData.Data;
@@ -9,13 +9,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using SmokehouseBot.Configuration;
-using SmokehouseBot.Management;
-using SmokehouseBot.Management.Interfaces;
-using SmokehouseBot.Services;
-using SmokehouseBot.Services.Interfaces;
-using SmokehouseDTOs;
-using SmokehouseDTOs.Data;
+using BacklashBot.Configuration;
+using BacklashBot.Management;
+using BacklashBot.Management.Interfaces;
+using BacklashBot.Services;
+using BacklashBot.Services.Interfaces;
+using BacklashDTOs;
+using BacklashDTOs.Data;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TradingSimulator.Strategies;
@@ -28,7 +28,7 @@ using TradingStrategies.ML;
 using TradingStrategies.Strategies;
 using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Trading.Helpers;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingSimulator.Simulator
 {
@@ -70,7 +70,7 @@ namespace TradingSimulator.Simulator
         [SetUp]
         public void Setup()
         {
-            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "SmokehouseBot"));
+            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
             var config = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
@@ -95,7 +95,7 @@ namespace TradingSimulator.Simulator
 
             _scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
-            // FIX: init order â€” construct helpers AFTER these are ready
+            // FIX: init order — construct helpers AFTER these are ready
             _snapshotPeriodHelper = new SnapshotPeriodHelper();
             _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, _snapshotOptions, _tradingOptions, _scopeFactory);
             _overseer = new TradingOverseer(_scopeFactory, _snapshotService);
@@ -405,7 +405,7 @@ namespace TradingSimulator.Simulator
             var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, marketsToRun).ConfigureAwait(false);
             var uniqueMarkets = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
 
-            OnTestProgress?.Invoke($"{label}/{dto.StrategyName}: 1 strategy set Ã— {uniqueMarkets.Count} markets");
+            OnTestProgress?.Invoke($"{label}/{dto.StrategyName}: 1 strategy set × {uniqueMarkets.Count} markets");
 
             // NEW: Running counter for discrepancies
             int totalDiscrepancies = 0;
@@ -884,7 +884,7 @@ ResolveFamily(StrategyFamily family)
             var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, marketsToRun).ConfigureAwait(false);
             var uniqueMarkets = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();
 
-            OnTestProgress?.Invoke($"{label}: {strategiesList.Count} strategy sets Ã— {uniqueMarkets.Count} markets");
+            OnTestProgress?.Invoke($"{label}: {strategiesList.Count} strategy sets × {uniqueMarkets.Count} markets");
 
             // Running counter for discrepancies
             int totalDiscrepancies = 0;

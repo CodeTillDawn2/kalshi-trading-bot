@@ -1,4 +1,4 @@
-﻿namespace TradingStrategies.Configuration
+namespace TradingStrategies.Configuration
 {
     public class CalculationConfig
     {

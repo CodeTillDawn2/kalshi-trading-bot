@@ -1,6 +1,6 @@
-﻿// WeightSetMarketExtensions.cs
+// WeightSetMarketExtensions.cs
 using KalshiBotData.Models;
-using SmokehouseDTOs.Data;
+using BacklashDTOs.Data;
 
 namespace KalshiBotData.Extensions
 {

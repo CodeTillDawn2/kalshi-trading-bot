@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -43,7 +43,7 @@ namespace TradingStrategies.Trading.Overseer
             public string RestingNoBids { get; set; } = "";   // Summary of resting bids on no side, e.g., "price:qty, price:qty"
             public string Memo { get; set; } = "";
             public double AverageCost { get; set; } = 0.0;  // Average cost of the position
-            public List<SmokehousePatterns.PatternDefinitions.PatternDefinition> Patterns { get; set; } = new List<SmokehousePatterns.PatternDefinitions.PatternDefinition>();  // Detected patterns for this snapshot
+            public List<BacklashPatterns.PatternDefinitions.PatternDefinition> Patterns { get; set; } = new List<BacklashPatterns.PatternDefinitions.PatternDefinition>();  // Detected patterns for this snapshot
         }
 
         public class EventGroup
@@ -279,7 +279,7 @@ namespace TradingStrategies.Trading.Overseer
             // Path Definitions
             sb.AppendLine();
             sb.AppendLine("Path Definitions");
-            var actualPath = string.Join(" → ", events.Select(e => e.MarketType).Distinct().ToArray());
+            var actualPath = string.Join(" ? ", events.Select(e => e.MarketType).Distinct().ToArray());
             sb.AppendLine($"Actual Path Taken: {actualPath}");
             sb.AppendLine("Path,Strategies");
             foreach (var kv in paths)

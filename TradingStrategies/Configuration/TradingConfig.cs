@@ -1,4 +1,4 @@
-﻿namespace TradingStrategies.Configuration;
+namespace TradingStrategies.Configuration;
 
 /// <summary>
 /// Configuration settings for trading

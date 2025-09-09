@@ -1,14 +1,14 @@
-﻿// Updated TradingOverseer.cs with Memo added to EventLog
+// Updated TradingOverseer.cs with Memo added to EventLog
 using Microsoft.Extensions.DependencyInjection;
-using SmokehouseBot.Services.Interfaces;
-using SmokehouseDTOs;
-using SmokehouseDTOs.Data;
-using SmokehousePatterns;
+using BacklashBot.Services.Interfaces;
+using BacklashDTOs;
+using BacklashDTOs.Data;
+using BacklashPatterns;
 using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
 using TradingStrategies.Trading.Helpers;
 using TradingStrategies.Trading.Overseer;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Trading.Overseer.ReportGenerator;
 
 namespace TradingStrategies
@@ -716,7 +716,7 @@ namespace TradingStrategies
 
                 var snapshotsPerType = eventLogs.GroupBy(e => e.MarketType).ToDictionary(g => g.Key, g => g.Count());
 
-                var pathTaken = string.Join(" → ", eventLogs.Select(e => e.MarketType).Distinct());
+                var pathTaken = string.Join(" ? ", eventLogs.Select(e => e.MarketType).Distinct());
                 var finalEquity = GetEquity(path, finalSnapshot);
                 var pnl = finalEquity - initialCash;
                 int trades = 0;
@@ -812,11 +812,11 @@ namespace TradingStrategies
             return deltas;
         }
 
-        private List<SmokehousePatterns.PatternDefinitions.PatternDefinition> DetectPatterns(MarketSnapshot snapshot)
+        private List<BacklashPatterns.PatternDefinitions.PatternDefinition> DetectPatterns(MarketSnapshot snapshot)
         {
             if (snapshot.RecentCandlesticks == null || snapshot.RecentCandlesticks.Count == 0)
             {
-                return new List<SmokehousePatterns.PatternDefinitions.PatternDefinition>();
+                return new List<BacklashPatterns.PatternDefinitions.PatternDefinition>();
             }
 
             try
@@ -834,7 +834,7 @@ namespace TradingStrategies
                 Console.WriteLine($"Error detecting patterns: {ex.Message}");
             }
 
-            return new List<SmokehousePatterns.PatternDefinitions.PatternDefinition>();
+            return new List<BacklashPatterns.PatternDefinitions.PatternDefinition>();
         }
 
         private double GetEquity(SimulationPath path, MarketSnapshot lastSnapshot)

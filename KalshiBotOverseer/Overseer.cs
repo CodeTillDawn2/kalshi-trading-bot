@@ -1,9 +1,9 @@
-﻿// Overseer.cs
+// Overseer.cs
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SmokehouseBot.KalshiAPI.Interfaces;
-using SmokehouseDTOs;
+using BacklashBot.KalshiAPI.Interfaces;
+using BacklashDTOs;
 using System.Threading;
 using System.Threading.Tasks;
 

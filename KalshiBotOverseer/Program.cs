@@ -1,4 +1,4 @@
-﻿// Updated Program.cs with web hosting
+// Updated Program.cs with web hosting
 using KalshiBotOverseer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

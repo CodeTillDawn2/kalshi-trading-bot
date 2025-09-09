@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\KalshiBotContext\KalshiBotData.csproj" />
-    <ProjectReference Include="..\SmokehouseBot\SmokehouseBot.csproj" />
+    <ProjectReference Include="..\BacklashBot\BacklashBot.csproj" />
     <ProjectReference Include="..\TradingStrategies\TradingStrategies.csproj" />
   </ItemGroup>
 

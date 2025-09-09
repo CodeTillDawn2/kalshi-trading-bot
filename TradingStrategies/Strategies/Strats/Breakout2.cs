@@ -1,7 +1,7 @@
-﻿using SmokehouseDTOs;
+using BacklashDTOs;
 using System.Globalization;
 using System.Text.Json;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Strategies.Strats
 {
@@ -38,7 +38,7 @@ namespace TradingStrategies.Strategies.Strats
             SpikeWeightCap,
             SpikeVolumeWeightScale,
 
-            // Confirmations (share of total) — single thresholds for both sides
+            // Confirmations (share of total) � single thresholds for both sides
             TradeRateShareMin,
             TradeEventShareMin,
 

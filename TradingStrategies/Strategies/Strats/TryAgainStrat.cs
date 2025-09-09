@@ -1,10 +1,10 @@
-﻿using SmokehouseDTOs;
-using SmokehousePatterns;
-using SmokehousePatterns.PatternDefinitions;
+using BacklashDTOs;
+using BacklashPatterns;
+using BacklashPatterns.PatternDefinitions;
 using System.Globalization;
 using System.Text.Json;
 using TradingStrategies.Extensions;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Strategies.Strats
 {
@@ -170,7 +170,7 @@ namespace TradingStrategies.Strategies.Strats
             int yesPrev = prev.BestYesBid, yesNow = snapshot.BestYesBid;
             int noPrev = prev.BestNoBid, noNow = snapshot.BestNoBid;
 
-            // RELAXED consecutive rule: only direction (≥ / ≤). Full requirements apply to *current* bar via strict entry checks.
+            // RELAXED consecutive rule: only direction (= / =). Full requirements apply to *current* bar via strict entry checks.
             bool counterYesPass = (yesNow >= yesPrev);
             bool counterNoPass = (yesNow <= yesPrev);
 
@@ -198,7 +198,7 @@ namespace TradingStrategies.Strategies.Strats
                 shortSlopeOK &&
                 spreadEntryOK;
 
-            // Strict entry (WITHOUT spread) — used only to memo “blocked by spread”
+            // Strict entry (WITHOUT spread) � used only to memo �blocked by spread�
             bool entryYesStrict_NoSpread =
                 (yesNow > yesPrev) &&
                 (absNetFlow >= baseVD) &&
@@ -331,8 +331,8 @@ namespace TradingStrategies.Strategies.Strats
             // price moves
             bool longPriceUpStrict = yesBidNow >  yesBidPrev;   // entry uses strict >
             bool shortPriceDownStrict = yesBidNow <  yesBidPrev; // entry uses strict <
-            bool longPriceUpOrEq = yesBidNow >= yesBidPrev;     // streak uses ≥
-            bool shortPriceDownOrEq = yesBidNow <= yesBidPrev;  // streak uses ≤
+            bool longPriceUpOrEq = yesBidNow >= yesBidPrev;     // streak uses =
+            bool shortPriceDownOrEq = yesBidNow <= yesBidPrev;  // streak uses =
             bool longPriceDown = yesBidNow <  yesBidPrev;       // adverse for long exit
             bool shortPriceUp = yesBidNow >  yesBidPrev;        // adverse for short exit
 
@@ -371,11 +371,11 @@ namespace TradingStrategies.Strategies.Strats
                 if (consecN > 0) rs.Add($"opp counter > 0 (consecN={consecN})");
                 if (consecY >= minBars && consecN == 0 && !entryYesStrict)
                 {
-                    if (!longPriceUpStrict) rs.Add($"entry price not strictly > (streak uses ≥): YesBid {yesBidPrev}->{yesBidNow}");
+                    if (!longPriceUpStrict) rs.Add($"entry price not strictly > (streak uses =): YesBid {yesBidPrev}->{yesBidNow}");
                     else if (Math.Abs(netFlow) < baseVD) rs.Add($"|net| {F(Math.Abs(netFlow))} < {F(baseVD)}");
-                    else if (trShareYes < shareTRMin) rs.Add($"TRᵧ {F(trShareYes)} < {F(shareTRMin)}");
-                    else if (teShareYes < shareTEMin) rs.Add($"TEᵧ {F(teShareYes)} < {F(shareTEMin)}");
-                    else if (!LongSlopeOK()) rs.Add($"slope rule fail: need S ≥ {F(minSlope)} OR (M ≥ {F(minSlopeMed)} AND S ≥ {F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}");
+                    else if (trShareYes < shareTRMin) rs.Add($"TR? {F(trShareYes)} < {F(shareTRMin)}");
+                    else if (teShareYes < shareTEMin) rs.Add($"TE? {F(teShareYes)} < {F(shareTEMin)}");
+                    else if (!LongSlopeOK()) rs.Add($"slope rule fail: need S = {F(minSlope)} OR (M = {F(minSlopeMed)} AND S = {F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}");
                 }
                 if (candidateBeforeFlip == ActionType.Long && flipBlocked)
                     rs.Add($"flip blocked: |net| {F(Math.Abs(netFlow))} < opp thr {F(exitOpp)}");
@@ -389,11 +389,11 @@ namespace TradingStrategies.Strategies.Strats
                 if (consecY > 0) rs.Add($"opp counter > 0 (consecY={consecY})");
                 if (consecN >= minBars && consecY == 0 && !entryNoStrict)
                 {
-                    if (!shortPriceDownStrict) rs.Add($"entry price not strictly < (streak uses ≤): YesBid {yesBidPrev}->{yesBidNow}");
+                    if (!shortPriceDownStrict) rs.Add($"entry price not strictly < (streak uses =): YesBid {yesBidPrev}->{yesBidNow}");
                     else if (Math.Abs(netFlow) < baseVD) rs.Add($"|net| {F(Math.Abs(netFlow))} < {F(baseVD)}");
-                    else if (trShareNo < shareTRMin) rs.Add($"TRₙ {F(trShareNo)} < {F(shareTRMin)}");
-                    else if (teShareNo < shareTEMin) rs.Add($"TEₙ {F(teShareNo)} < {F(shareTEMin)}");
-                    else if (!ShortSlopeOK()) rs.Add($"slope rule fail: need S ≤ -{F(minSlope)} OR (M ≤ -{F(minSlopeMed)} AND S ≤ -{F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}");
+                    else if (trShareNo < shareTRMin) rs.Add($"TR? {F(trShareNo)} < {F(shareTRMin)}");
+                    else if (teShareNo < shareTEMin) rs.Add($"TE? {F(teShareNo)} < {F(shareTEMin)}");
+                    else if (!ShortSlopeOK()) rs.Add($"slope rule fail: need S = -{F(minSlope)} OR (M = -{F(minSlopeMed)} AND S = -{F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}");
                 }
                 if (candidateBeforeFlip == ActionType.Short && flipBlocked)
                     rs.Add($"flip blocked: |net| {F(Math.Abs(netFlow))} < opp thr {F(exitOpp)}");
@@ -401,41 +401,41 @@ namespace TradingStrategies.Strategies.Strats
             }
 
             string CounterSummaryLong() =>
-                LongCounterOK() ? $"Counter LONG: OK (streak uses ≥; consecY={consecY})"
-                                : $"Counter LONG: No — price not ≥ (YesBid {yesBidPrev}->{yesBidNow}) (consecY={consecY})";
+                LongCounterOK() ? $"Counter LONG: OK (streak uses =; consecY={consecY})"
+                                : $"Counter LONG: No � price not = (YesBid {yesBidPrev}->{yesBidNow}) (consecY={consecY})";
 
             string CounterSummaryShort() =>
-                ShortCounterOK() ? $"Counter SHORT: OK (streak uses ≤; consecN={consecN})"
-                                 : $"Counter SHORT: No — price not ≤ (YesBid {yesBidPrev}->{yesBidNow}) (consecN={consecN})";
+                ShortCounterOK() ? $"Counter SHORT: OK (streak uses =; consecN={consecN})"
+                                 : $"Counter SHORT: No � price not = (YesBid {yesBidPrev}->{yesBidNow}) (consecN={consecN})";
 
             string EntrySummaryLong() =>
-                entryYesStrict ? "EntryCheck LONG: OK (strict: price >, |net| ≥ base, shares OK, slope OK: S≥min or (M≥med & S≥med))"
-                               : $"EntryCheck LONG: No — {(longPriceUpStrict ? (Math.Abs(netFlow) >= baseVD ? (trShareYes >= shareTRMin ? (teShareYes >= shareTEMin ? (LongSlopeOK() ? "unexpected" : $"slope rule fail: need S ≥ {F(minSlope)} OR (M ≥ {F(minSlopeMed)} AND S ≥ {F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}") : $"TEᵧ {F(teShareYes)} < {F(shareTEMin)}") : $"TRᵧ {F(trShareYes)} < {F(shareTRMin)}") : $"|net| {F(Math.Abs(netFlow))} < {F(baseVD)}") : $"entry needs strictly > (streak uses ≥): YesBid {yesBidPrev}->{yesBidNow}")}";
+                entryYesStrict ? "EntryCheck LONG: OK (strict: price >, |net| = base, shares OK, slope OK: S=min or (M=med & S=med))"
+                               : $"EntryCheck LONG: No � {(longPriceUpStrict ? (Math.Abs(netFlow) >= baseVD ? (trShareYes >= shareTRMin ? (teShareYes >= shareTEMin ? (LongSlopeOK() ? "unexpected" : $"slope rule fail: need S = {F(minSlope)} OR (M = {F(minSlopeMed)} AND S = {F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}") : $"TE? {F(teShareYes)} < {F(shareTEMin)}") : $"TR? {F(trShareYes)} < {F(shareTRMin)}") : $"|net| {F(Math.Abs(netFlow))} < {F(baseVD)}") : $"entry needs strictly > (streak uses =): YesBid {yesBidPrev}->{yesBidNow}")}";
 
             string EntrySummaryShort() =>
-                entryNoStrict ? "EntryCheck SHORT: OK (strict: price <, |net| ≥ base, shares OK, slope OK: S≤-min or (M≤-med & S≤-med))"
-                              : $"EntryCheck SHORT: No — {(shortPriceDownStrict ? (Math.Abs(netFlow) >= baseVD ? (trShareNo >= shareTRMin ? (teShareNo >= shareTEMin ? (ShortSlopeOK() ? "unexpected" : $"slope rule fail: need S ≤ -{F(minSlope)} OR (M ≤ -{F(minSlopeMed)} AND S ≤ -{F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}") : $"TEₙ {F(teShareNo)} < {F(shareTEMin)}") : $"TRₙ {F(trShareNo)} < {F(shareTRMin)}") : $"|net| {F(Math.Abs(netFlow))} < {F(baseVD)}") : $"entry needs strictly < (streak uses ≤): YesBid {yesBidPrev}->{yesBidNow}")}";
+                entryNoStrict ? "EntryCheck SHORT: OK (strict: price <, |net| = base, shares OK, slope OK: S=-min or (M=-med & S=-med))"
+                              : $"EntryCheck SHORT: No � {(shortPriceDownStrict ? (Math.Abs(netFlow) >= baseVD ? (trShareNo >= shareTRMin ? (teShareNo >= shareTEMin ? (ShortSlopeOK() ? "unexpected" : $"slope rule fail: need S = -{F(minSlope)} OR (M = -{F(minSlopeMed)} AND S = -{F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}") : $"TE? {F(teShareNo)} < {F(shareTEMin)}") : $"TR? {F(trShareNo)} < {F(shareTRMin)}") : $"|net| {F(Math.Abs(netFlow))} < {F(baseVD)}") : $"entry needs strictly < (streak uses =): YesBid {yesBidPrev}->{yesBidNow}")}";
 
             string longBlock = BlockerLong();
             string shortBlock = BlockerShort();
 
             string wouldLong = wouldEnterLong
-                ? $"Would Enter LONG: Yes — {CounterSummaryLong()} | {EntrySummaryLong()}"
-                : $"Would Enter LONG: No — {CounterSummaryLong()} | {EntrySummaryLong()} | Blocker: {longBlock ?? "n/a"}";
+                ? $"Would Enter LONG: Yes � {CounterSummaryLong()} | {EntrySummaryLong()}"
+                : $"Would Enter LONG: No � {CounterSummaryLong()} | {EntrySummaryLong()} | Blocker: {longBlock ?? "n/a"}";
 
             string wouldShort = wouldEnterShort
-                ? $"Would Enter SHORT: Yes — {CounterSummaryShort()} | {EntrySummaryShort()}"
-                : $"Would Enter SHORT: No — {CounterSummaryShort()} | {EntrySummaryShort()} | Blocker: {shortBlock ?? "n/a"}";
+                ? $"Would Enter SHORT: Yes � {CounterSummaryShort()} | {EntrySummaryShort()}"
+                : $"Would Enter SHORT: No � {CounterSummaryShort()} | {EntrySummaryShort()} | Blocker: {shortBlock ?? "n/a"}";
 
             string wouldExit = null;
             if (position > 0)
                 wouldExit = wouldExitLong
-                    ? $"Would EXIT LONG: Yes — (S ≤ -{F(exitMinShort)} OR M ≤ -{F(exitMinMed)}), price ↓ (YesBid {yesBidPrev}->{yesBidNow})"
-                    : $"Would EXIT LONG: No — need (S ≤ -{F(exitMinShort)} OR M ≤ -{F(exitMinMed)}) and price ↓; got S {F(netSlopeShort)}, M {F(netSlopeMed)}, price {(longPriceDown ? "↓" : "↑/=")}";
+                    ? $"Would EXIT LONG: Yes � (S = -{F(exitMinShort)} OR M = -{F(exitMinMed)}), price ? (YesBid {yesBidPrev}->{yesBidNow})"
+                    : $"Would EXIT LONG: No � need (S = -{F(exitMinShort)} OR M = -{F(exitMinMed)}) and price ?; got S {F(netSlopeShort)}, M {F(netSlopeMed)}, price {(longPriceDown ? "?" : "?/=")}";
             else if (position < 0)
                 wouldExit = wouldExitShort
-                    ? $"Would EXIT SHORT: Yes — (S ≥ {F(exitMinShort)} OR M ≥ {F(exitMinMed)}), price ↑ (YesBid {yesBidPrev}->{yesBidNow})"
-                    : $"Would EXIT SHORT: No — need (S ≥ {F(exitMinShort)} OR M ≥ {F(exitMinMed)}) and price ↑; got S {F(netSlopeShort)}, M {F(netSlopeMed)}, price {(shortPriceUp ? "↑" : "↓/=")}";
+                    ? $"Would EXIT SHORT: Yes � (S = {F(exitMinShort)} OR M = {F(exitMinMed)}), price ? (YesBid {yesBidPrev}->{yesBidNow})"
+                    : $"Would EXIT SHORT: No � need (S = {F(exitMinShort)} OR M = {F(exitMinMed)}) and price ?; got S {F(netSlopeShort)}, M {F(netSlopeMed)}, price {(shortPriceUp ? "?" : "?/=")}";
 
             var lines = new List<string> { ActionLine() };
             if (flipBlocked) lines.Add("Flip blocked: |net flow| below opposite threshold.");
@@ -449,11 +449,11 @@ namespace TradingStrategies.Strategies.Strats
             double deltaNo = (wTop - 1.0) * vTopNo;
             lines.Add($"Weight w={F(wTop)} applied to Top10% buckets only.");
             lines.Add($"Raw Velocities (Y/N): top10 {F(vTopYes)}/{F(vTopNo)} + bot90 {F(vBotYes)}/{F(vBotNo)} = {F(vYesRaw)}/{F(vNoRaw)}");
-            lines.Add($"Weighted Velocities (Y/N): {F(vYesWeighted)}/{F(vNoWeighted)} (Δ from weight: +{F(deltaYes)} / +{F(deltaNo)})");
+            lines.Add($"Weighted Velocities (Y/N): {F(vYesWeighted)}/{F(vNoWeighted)} (? from weight: +{F(deltaYes)} / +{F(deltaNo)})");
 
             lines.Add("");
             lines.Add("Key Calculations:");
-            lines.Add($"YesBid prev→now: {yesBidPrev}→{yesBidNow} | NoBid prev→now: {noBidPrev}→{noBidNow}");
+            lines.Add($"YesBid prev?now: {yesBidPrev}?{yesBidNow} | NoBid prev?now: {noBidPrev}?{noBidNow}");
             lines.Add($"Depth (Yes/No): {F(depthYesTrue)} / {F(depthNoTrue)}");
             lines.Add($"Normalized Flow (Yes/No): {F(flowYes)} / {F(flowNo)}");
             lines.Add($"Net Normalized Flow (Yes-No): {F(netFlow)} (|net| thr: {F(baseVD)})");

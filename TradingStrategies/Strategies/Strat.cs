@@ -1,4 +1,4 @@
-﻿using SmokehouseDTOs;
+using BacklashDTOs;
 
 namespace TradingStrategies.Strategies
 {

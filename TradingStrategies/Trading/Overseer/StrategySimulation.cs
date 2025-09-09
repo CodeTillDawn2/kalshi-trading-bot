@@ -1,7 +1,7 @@
-ï»¿using SmokehouseDTOs;
+using BacklashDTOs;
 using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -154,7 +154,7 @@ namespace TradingStrategies.Trading.Overseer
                 SimulatedRestingOrders.Clear();
             }
 
-            // Combo â€œtake then restâ€ sized to 100% of current position
+            // Combo “take then rest” sized to 100% of current position
             if (isComboLongPostAsk && Position > 0)
             {
                 int sellYesPrice = decision.Price;   // 1..99 (YES ask)

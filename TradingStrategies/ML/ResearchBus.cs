@@ -1,6 +1,6 @@
-﻿// ResearchBus.cs
+// ResearchBus.cs
 using System.Collections.Concurrent;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.ML
 {

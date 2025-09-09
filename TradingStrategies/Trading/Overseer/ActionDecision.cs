@@ -1,4 +1,4 @@
-﻿using static SmokehouseInterfaces.Enums.StrategyEnums;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies
 {

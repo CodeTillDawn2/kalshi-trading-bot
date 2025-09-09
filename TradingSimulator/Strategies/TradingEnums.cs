@@ -1,4 +1,4 @@
-﻿namespace TradingSimulator.Strategies
+namespace TradingSimulator.Strategies
 {
     // Enum for trading decisions
     public enum TradingDecisionEnum

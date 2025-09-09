@@ -1,4 +1,4 @@
-﻿using SmokehouseBot.State.Interfaces;
+using BacklashBot.State.Interfaces;
 
 namespace KalshiBotOverseer.State
 {

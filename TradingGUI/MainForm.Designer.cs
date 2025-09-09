@@ -1,4 +1,4 @@
-﻿namespace SimulatorWinForms
+namespace SimulatorWinForms
 {
     partial class MainForm
     {

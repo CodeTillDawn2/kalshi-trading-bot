@@ -1,7 +1,7 @@
-﻿// MLEntrySeekerShared.cs
-using SmokehouseDTOs;
+// MLEntrySeekerShared.cs
+using BacklashDTOs;
 using TradingStrategies.ML;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Strategies.Strats
 {

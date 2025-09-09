@@ -1,10 +1,10 @@
-﻿// Updated SnapshotViewer.cs with intelligent isotropic font scaling
+// Updated SnapshotViewer.cs with intelligent isotropic font scaling
 
 // SnapshotViewer.cs (replace the entire class with this updated version)
 using KalshiBotData.Data;
 using KalshiBotData.Models;
 using Microsoft.Extensions.Configuration;
-using SmokehouseDTOs;
+using BacklashDTOs;
 using TradingSimulator.TestObjects;
 
 namespace SimulatorWinForms

@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SmokehouseDTOs;
-using SmokehouseDTOs.Data;
+using BacklashDTOs;
+using BacklashDTOs.Data;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Trading.Helpers;
 

@@ -1,4 +1,4 @@
-﻿using KalshiBotAPI.Configuration;
+using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
 using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
@@ -7,14 +7,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using SmokehouseBot.Configuration;
-using SmokehouseBot.KalshiAPI.Interfaces;
-using SmokehouseBot.Management;
-using SmokehouseBot.Management.Interfaces;
-using SmokehouseBot.Services;
-using SmokehouseBot.Services.Interfaces;
-using SmokehouseDTOs;
-using SmokehouseBot.State.Interfaces;
+using BacklashBot.Configuration;
+using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBot.Management;
+using BacklashBot.Management.Interfaces;
+using BacklashBot.Services;
+using BacklashBot.Services.Interfaces;
+using BacklashDTOs;
+using BacklashBot.State.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TradingSimulator.Strategies;
@@ -86,7 +86,7 @@ namespace TradingSimulator.Executable
         [SetUp]
         public void Setup()
         {
-            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "SmokehouseBot"));
+            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
             var config = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)

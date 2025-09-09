@@ -1,4 +1,4 @@
-﻿namespace TradingSimulator.Strategies
+namespace TradingSimulator.Strategies
 {
     public class TradingDecision
     {

@@ -2,8 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using SmokehouseBot.Helpers;
-using SmokehouseBot.Services;
+using BacklashBot.Helpers;
+using BacklashBot.Services;
 using TradingStrategies.Configuration;
 
 namespace TradingSimulator.Tests

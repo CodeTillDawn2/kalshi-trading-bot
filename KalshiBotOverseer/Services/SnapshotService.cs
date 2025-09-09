@@ -1,5 +1,5 @@
 using KalshiBotData.Data.Interfaces;
-using SmokehouseDTOs.Data;
+using BacklashDTOs.Data;
 
 namespace KalshiBotOverseer.Services
 {

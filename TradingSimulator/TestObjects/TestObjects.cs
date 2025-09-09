@@ -1,4 +1,4 @@
-﻿// Updated TradingSimulator.TestObjects with EventPoints in CachedMarketData
+// Updated TradingSimulator.TestObjects with EventPoints in CachedMarketData
 using TradingSimulator.Strategies;
 
 namespace TradingSimulator.TestObjects

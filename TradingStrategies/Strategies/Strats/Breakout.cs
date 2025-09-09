@@ -1,6 +1,6 @@
-﻿using SmokehouseDTOs;
+using BacklashDTOs;
 using System.Text.Json;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Strategies.Strats
 {

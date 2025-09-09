@@ -1,4 +1,4 @@
-﻿namespace KalshiBotAPI.Configuration;
+namespace KalshiBotAPI.Configuration;
 
 /// <summary>
 /// Configuration settings for the Kalshi API integration.

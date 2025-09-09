@@ -1,9 +1,9 @@
-﻿using KalshiBotAPI.WebSockets.Interfaces;
+using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SmokehouseBot.KalshiAPI.Interfaces;
-using SmokehouseBot.Services.Interfaces;
-using SmokehouseDTOs.KalshiAPI;
+using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBot.Services.Interfaces;
+using BacklashDTOs.KalshiAPI;
 
 namespace KalshiBotOverseer
 {

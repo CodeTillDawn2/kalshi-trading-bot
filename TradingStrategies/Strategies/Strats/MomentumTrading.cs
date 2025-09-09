@@ -1,11 +1,11 @@
-ï»¿using SmokehouseDTOs;
+using BacklashDTOs;
 using System.Globalization;
 using System.Text.Json;
-using static SmokehouseInterfaces.Enums.StrategyEnums;
+using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Strategies.Strats
 {
-    // MomentumTrading â€” breakout-style momentum with optional top-decile overweighting.
+    // MomentumTrading — breakout-style momentum with optional top-decile overweighting.
     public class MomentumTrading : Strat
     {
         public string Name { get; private set; }
@@ -32,7 +32,7 @@ namespace TradingStrategies.Strategies.Strats
             SpikeWeightCap,
             SpikeVolumeWeightScale,
 
-            // Confirmations (share of total) â€” single thresholds for both sides
+            // Confirmations (share of total) — single thresholds for both sides
             TradeRateShareMin,
             TradeEventShareMin,
 
