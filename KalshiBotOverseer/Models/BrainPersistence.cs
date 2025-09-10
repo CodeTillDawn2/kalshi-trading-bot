@@ -6,7 +6,7 @@ namespace KalshiBotOverseer.Models
     public class BrainPersistence
     {
         public string BrainInstanceName { get; set; }
-        public Guid? BrainLock { get; set; }
+        public Guid? Brain { get; set; }
         public bool WatchPositions { get; set; }
         public bool WatchOrders { get; set; }
         public bool ManagedWatchList { get; set; }
@@ -18,6 +18,7 @@ namespace KalshiBotOverseer.Models
         public DateTime? LastSeen { get; set; }
         public HashSet<string> CurrentMarketTickers { get; set; } = new HashSet<string>();
         public HashSet<string> TargetMarketTickers { get; set; } = new HashSet<string>();
+        public string Mode { get; set; } = "Autonomous";
 
         // Historical performance metrics
         public List<MetricHistory> CpuUsageHistory { get; set; } = new List<MetricHistory>();
@@ -26,13 +27,14 @@ namespace KalshiBotOverseer.Models
         public List<MetricHistory> NotificationQueueHistory { get; set; } = new List<MetricHistory>();
         public List<MetricHistory> OrderbookQueueHistory { get; set; } = new List<MetricHistory>();
         public List<MetricHistory> MarketCountHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> ErrorHistory { get; set; } = new List<MetricHistory>();
     }
 
     public class BrainStatusData
     {
         // Basic brain info
         public string BrainInstanceName { get; set; } = "";
-        public Guid? BrainLock { get; set; }
+        public Guid? Brain { get; set; }
 
         // Configuration flags
         public bool WatchPositions { get; set; }
@@ -51,6 +53,7 @@ namespace KalshiBotOverseer.Models
         public bool IsStartingUp { get; set; }
         public bool IsShuttingDown { get; set; }
         public bool IsWebSocketConnected { get; set; }
+        public string Mode { get; set; } = "Autonomous";
 
         // Performance metrics
         public double CurrentCpuUsage { get; set; }
@@ -66,6 +69,7 @@ namespace KalshiBotOverseer.Models
         public List<MetricHistory> NotificationQueueHistory { get; set; } = new List<MetricHistory>();
         public List<MetricHistory> OrderbookQueueHistory { get; set; } = new List<MetricHistory>();
         public List<MetricHistory> MarketCountHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> ErrorHistory { get; set; } = new List<MetricHistory>();
 
         // Market data
         public int MarketCount { get; set; }
@@ -90,7 +94,7 @@ namespace KalshiBotOverseer.Models
     public class MarketWatchData
     {
         public string MarketTicker { get; set; } = "";
-        public Guid? BrainLock { get; set; }
+        public Guid? Brain { get; set; }
         public double? InterestScore { get; set; }
         public DateTime? InterestScoreDate { get; set; }
         public DateTime? LastWatched { get; set; }

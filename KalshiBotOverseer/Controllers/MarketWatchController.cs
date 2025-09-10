@@ -403,6 +403,74 @@ namespace KalshiBotOverseer.Controllers
             }
         }
 
+        [HttpGet("brains")]
+        public async Task<IActionResult> GetBrainsData()
+        {
+            try
+            {
+                // Get all brain instances from database
+                var brainInstances = await _cache.GetOrCreateAsync(AllBrainInstancesCacheKey, async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
+                    return (await _context.GetBrainInstances_cached()).ToList();
+                });
+
+                // Get all market watches
+                var marketWatches = await _cache.GetOrCreateAsync("AllMarketWatches", async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
+                    return (await _context.GetMarketWatches()).ToList();
+                });
+
+                // Filter and enrich brain instances with WatchedMarkets data
+                var cutoff = DateTime.Now.AddHours(-48); // 48 hours ago
+                var filteredBrainInstances = brainInstances
+                    .Select(brainInstance =>
+                    {
+                        var brainName = brainInstance.BrainInstanceName;
+
+                        // Find markets watched by this brain instance
+                        var watchedMarkets = marketWatches.Where(mw =>
+                            mw.BrainLock.HasValue &&
+                            mw.BrainLock.Value == brainInstance.BrainLock).ToList();
+
+                        // Check if brain has been watched in last 48 hours
+                        var hasRecentWatch = watchedMarkets.Any(mw => mw.LastWatched > cutoff);
+
+                        // Only include if watched in last 48 hours
+                        if (!hasRecentWatch)
+                            return null;
+
+                        return new
+                        {
+                            brainInstanceName = brainName,
+                            BrainInstanceName = brainName,
+                            brainInstance.BrainLock,
+                            brainInstance.LastSeen,
+                            Mode = "Autonomous",
+                            WatchedMarkets = watchedMarkets.Select(mw => new
+                            {
+                                mw.market_ticker,
+                                mw.LastWatched,
+                                mw.InterestScore,
+                                mw.InterestScoreDate,
+                                mw.AverageWebsocketEventsPerMinute
+                            }).ToList()
+                        };
+                    })
+                    .Where(b => b != null)
+                    .ToList();
+
+                return Ok(filteredBrainInstances);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetBrainsData: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return StatusCode(500, new { error = "Failed to retrieve brains data", details = ex.Message });
+            }
+        }
+
 
     }
 }

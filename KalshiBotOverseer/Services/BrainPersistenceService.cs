@@ -55,6 +55,7 @@ namespace KalshiBotOverseer.Services
                 "NotificationQueue" => brain.NotificationQueueHistory,
                 "OrderbookQueue" => brain.OrderbookQueueHistory,
                 "MarketCount" => brain.MarketCountHistory,
+                "Error" => brain.ErrorHistory,
                 _ => throw new ArgumentException($"Unknown metric: {metricName}")
             };
         }

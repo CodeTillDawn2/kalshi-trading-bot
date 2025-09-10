@@ -230,7 +230,6 @@ namespace KalshiBotOverseer
                 var brainStatus = new BrainStatusData
                 {
                     BrainInstanceName = clientInfo.ClientName ?? "",
-                    BrainLock = null, // Will be populated from database if needed
 
                     // Configuration from CheckInData
                     WatchPositions = checkInData.WatchPositions,

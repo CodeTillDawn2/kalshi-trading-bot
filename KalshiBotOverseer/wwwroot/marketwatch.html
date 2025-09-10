@@ -238,7 +238,7 @@
             gap: 12px;
         }
 
-        .brain-lock-grid {
+        .brain-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
@@ -308,7 +308,7 @@
             margin-bottom: 10px;
         }
 
-        .brain-lock-instance {
+        .brain-instance {
             font-size: 10px;
             font-weight: 600;
             color: rgb(225, 221, 206);
@@ -317,13 +317,13 @@
             border-radius: 8px;
         }
 
-        .brain-lock-instance.no-brain-lock {
+        .brain-instance.no-brain {
             color: rgb(225, 221, 206);
             background: rgba(16, 16, 13, 0.3);
             font-style: italic;
         }
 
-        .brain-lock-badge {
+        .brain-badge {
             background: rgb(28, 51, 39);
             color: rgb(225, 221, 206);
             padding: 2px 6px;
@@ -423,7 +423,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .brain-lock-card {
+        .brain-card {
             background: rgba(16, 16, 13, 0.95);
             border-radius: 20px;
             padding: 25px;
@@ -431,16 +431,39 @@
             transition: all 0.3s ease;
             border: 2px solid rgb(28, 51, 39);
             cursor: pointer;
+            position: relative;
         }
 
-        .brain-lock-card:hover {
+        .brain-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 35px rgba(28, 51, 39, 0.6);
             border-color: rgb(28, 51, 39);
             background: rgba(16, 16, 13, 0.98);
         }
 
-        .brain-lock-dates {
+        .brain-card.inactive {
+            background: rgba(139, 0, 0, 0.9);
+            border: 2px solid rgb(139, 0, 0);
+        }
+
+        .brain-card.inactive:hover {
+            background: rgba(139, 0, 0, 0.95);
+            box-shadow: 0 15px 35px rgba(139, 0, 0, 0.6);
+            border-color: rgb(139, 0, 0);
+        }
+
+        .brain-card.warning {
+            background: rgba(139, 0, 0, 0.7);
+            border: 2px solid rgb(139, 0, 0);
+        }
+
+        .brain-card.warning:hover {
+            background: rgba(139, 0, 0, 0.8);
+            box-shadow: 0 15px 35px rgba(139, 0, 0, 0.6);
+            border-color: rgb(139, 0, 0);
+        }
+
+        .brain-dates {
             margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid rgba(28, 51, 39, 0.3);
@@ -461,25 +484,25 @@
             opacity: 0.8;
         }
 
-        .brain-lock-header {
+        .brain-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
 
-        .brain-lock-header div:last-child {
+        .brain-header div:last-child {
             font-size: 14px;
             color: rgb(225, 221, 206);
         }
 
-        .brain-lock-id {
+        .brain-id {
             font-size: 24px;
             font-weight: 700;
             color: rgb(225, 221, 206);
         }
 
-        .brain-lock-stats {
+        .brain-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
@@ -632,7 +655,7 @@
                 gap: 10px;
             }
 
-            .brain-lock-grid {
+            .brain-grid {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
@@ -664,14 +687,19 @@
             }
 
             .status-section {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 4px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
             }
 
-            .brain-lock-instance {
-                font-size: 9px;
-                align-self: flex-start;
+            .brain-instance {
+                font-size: 10px;
+                font-weight: 600;
+                color: rgb(225, 221, 206);
+                background: rgba(16, 16, 13, 0.5);
+                padding: 2px 6px;
+                border-radius: 8px;
             }
 
             .metric-value {
@@ -684,7 +712,7 @@
                 grid-template-columns: 1fr;
             }
 
-            .brain-lock-grid {
+            .brain-grid {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
@@ -711,13 +739,13 @@
                 gap: 3px;
             }
 
-            .brain-lock-instance {
+            .brain-instance {
                 font-size: 8px;
                 padding: 1px 4px;
                 align-self: flex-start;
             }
 
-            .brain-lock-badge {
+            .brain-badge {
                 font-size: 8px;
                 padding: 2px 5px;
             }
@@ -747,7 +775,7 @@
             box-shadow: 0 0 20px rgba(28, 51, 39, 0.6);
         }
 
-        .brain-lock-card:hover::before {
+        .brain-card:hover::before {
             content: '';
             position: absolute;
             top: 0;
@@ -1000,10 +1028,10 @@
             </div>
 
             <div id="brainlocks-tab" class="tab-content">
-                <div id="brainLocksContainer">
+                <div id="brainsContainer">
                     <div class="loading">
                         <i class="fas fa-spinner fa-spin"></i>
-                        <div>Loading brain lock data...</div>
+                        <div>Loading brain data...</div>
                     </div>
                 </div>
             </div>
@@ -1460,7 +1488,6 @@
         async function refreshAllData() {
             await Promise.all([
                 loadMarketWatchData(),
-                loadBrainLocksData(),
                 loadPositionsData(),
                 loadOrdersData(),
                 loadSnapshotsData(),
@@ -1497,22 +1524,44 @@
             }
         }
 
-        async function loadBrainLocksData() {
+        async function loadBrainsData() {
             try {
-                const response = await fetch('/MarketWatch/brainlocks');
-                brainLockData = await response.json();
-                renderBrainLocks();
+                const response = await fetch('/MarketWatch/brains');
+                if (!response.ok) {
+                    console.warn('Brains endpoint not available, falling back to SignalR data only');
+                    return;
+                }
+                const brainInstances = await response.json();
+
+                // Convert to brainData format expected by the rest of the code
+                brainData = {};
+                brainInstances.forEach(brain => {
+                    const brainName = brain.brainInstanceName || brain.BrainInstanceName;
+                    if (brainName) {
+                        brainData[brainName] = {
+                            ...brain,
+                            brainInstanceName: brainName,
+                            marketCount: brain.WatchedMarkets ? brain.WatchedMarkets.length : 0
+                        };
+                    }
+                });
+
+                console.log('Loaded brain data from backend:', Object.keys(brainData).length, 'brains');
+                renderBrains();
             } catch (error) {
-                console.error('Error loading brain lock data:', error);
-                document.getElementById('brainLocksContainer').innerHTML =
-                    '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Failed to load brain lock data</div></div>';
+                console.error('Error loading brain data:', error);
+                // Don't show error for 404, just skip
+                if (!error.message.includes('404')) {
+                    document.getElementById('brainsContainer').innerHTML =
+                        '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Failed to load brain data</div></div>';
+                }
             }
         }
 
-        // Function to refresh brain locks display
-        function refreshBrainLocksDisplay() {
-            if (brainLockData && brainLockData.length > 0) {
-                renderBrainLocks();
+        // Function to refresh brains display
+        function refreshBrainsDisplay() {
+            if (brainData && brainData.length > 0) {
+                renderBrains();
             }
         }
 
@@ -1668,7 +1717,7 @@
                     <!-- Status and Brain Lock -->
                     <div class="status-section">
                         <span class="market-status ${statusClass}">${market.status || 'Unknown'}</span>
-                        ${item.brainInstanceName ? `<div class="brain-lock-instance">${item.brainInstanceName.replace(/</g, '<').replace(/>/g, '>')}</div>` : '<div class="brain-lock-instance no-brain-lock">No Brain Lock</div>'}
+                        ${item.brainInstanceName ? `<div class="brain-instance">${item.brainInstanceName.replace(/</g, '<').replace(/>/g, '>')}</div>` : '<div class="brain-instance no-brain">No Brain</div>'}
                     </div>
 
                     <!-- Metrics Section -->
@@ -1708,26 +1757,32 @@
             return cardHtml;
         }
 
-        function renderBrainLocks() {
-            const container = document.getElementById('brainLocksContainer');
+        function renderBrains() {
+            const container = document.getElementById('brainsContainer');
 
-            if (!brainLockData || !Array.isArray(brainLockData)) {
-                container.innerHTML = '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Invalid brain lock data received</div></div>';
+            if (!brainData || typeof brainData !== 'object') {
+                container.innerHTML = '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Invalid brain data received</div></div>';
                 return;
             }
 
-            if (brainLockData.length === 0) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-brain"></i><div>No brain locks found</div></div>';
+            // Convert brainData object to array of brain objects
+            const brainArray = Object.values(brainData);
+            if (brainArray.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-brain"></i><div>No brains found</div></div>';
                 return;
             }
 
             try {
-                mwLog('debug', 'renderBrainLocks: keys present in checkInData',
+                mwLog('debug', 'renderBrains: keys present in checkInData',
                     { keys: Object.keys(checkInData || {}) });
 
+                // Backend has already filtered the data, just use what's provided
+                const filteredBrainData = brainArray;
+                console.log('DEBUG: Brain data from backend:', filteredBrainData.length, 'brains');
+
                 container.innerHTML = `
-            <div class="brain-lock-grid">
-                ${brainLockData.map(item => createBrainLockCard(item)).join('')}
+            <div class="brain-grid">
+                ${filteredBrainData.map(item => createBrainCard(item)).join('')}
             </div>
         `;
                 // ensure the tab is actually visible if user is on Brains
@@ -1738,15 +1793,15 @@
                         tab.style.visibility = 'visible';
                     }
                 }
-                console.log('DEBUG: Brain locks rendered successfully');
+                console.log('DEBUG: Brains rendered successfully');
             } catch (error) {
-                console.error('DEBUG: Error rendering brain locks:', error);
-                container.innerHTML = '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Error rendering brain locks: ' + error.message + '</div></div>';
+                console.error('DEBUG: Error rendering brains:', error);
+                container.innerHTML = '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Error rendering brains: ' + error.message + '</div></div>';
             }
         }
 
-        function createBrainLockCard(item) {
-            console.log('DEBUG: createBrainLockCard called for:', item.brainInstanceName, 'with checkInData:', checkInData[item.brainInstanceName]);
+        function createBrainCard(item) {
+            console.log('DEBUG: createBrainCard called for:', item.brainInstanceName, 'with checkInData:', checkInData[item.brainInstanceName]);
 
             if (!item || !item.brainInstanceName) {
                 console.error('DEBUG: Invalid item or missing brainInstanceName:', item);
@@ -1754,9 +1809,10 @@
             }
 
             const brainCheckInData = checkInData[item.brainInstanceName];
-            let statusText = 'Connecting...';
-            let statusColor = '#ffc107';
+            let statusText = 'Inactive';
+            let statusColor = '#dc3545';
             let hasRecentCheckIn = false;
+            let cardClass = 'brain-card inactive';
 
             if (brainCheckInData && brainCheckInData.lastCheckIn) {
                 const timeSinceCheckIn = new Date() - new Date(brainCheckInData.lastCheckIn);
@@ -1764,21 +1820,42 @@
                     statusText = 'Active';
                     statusColor = '#28a745';
                     hasRecentCheckIn = true;
+                    cardClass = 'brain-card'; // Remove inactive
                 } else {
                     statusText = 'Offline';
                     statusColor = '#6c757d';
                 }
             } else if (brainCheckInData) {
+                // No lastCheckIn but data exists
                 statusText = 'Unknown';
                 statusColor = '#6c757d';
+            }
+
+            // Apply color logic based on check-in and snapshot status
+            if (!hasRecentCheckIn) {
+                cardClass = 'brain-card inactive';
+                statusText = 'Inactive';
+                statusColor = '#dc3545';
+            } else {
+                // Check if snapshot is stale (>3 minutes before last check-in)
+                if (brainCheckInData.lastSnapshot && brainCheckInData.lastCheckIn) {
+                    const checkInTime = new Date(brainCheckInData.lastCheckIn);
+                    const snapshotTime = new Date(brainCheckInData.lastSnapshot);
+                    const diff = checkInTime - snapshotTime;
+                    if (diff > 180000) { // 3 minutes in milliseconds
+                        cardClass = 'brain-card warning';
+                        statusText = 'Stale Snapshot';
+                        statusColor = '#dc3545';
+                    }
+                }
             }
 
             const escapedBrainName = item.brainInstanceName.replace(/'/g, "\\'").replace(/"/g, '\\"');
 
             const cardHtml = `
-                    <div class="brain-lock-card" onclick="showBrainContextMenu(event, '${escapedBrainName}')" oncontextmenu="showBrainContextMenu(event, '${escapedBrainName}')">
-                        <div class="brain-lock-header">
-                            <div class="brain-lock-id">
+                    <div class="${cardClass}" onclick="showBrainContextMenu(event, '${escapedBrainName}')" oncontextmenu="showBrainContextMenu(event, '${escapedBrainName}')">
+                        <div class="brain-header">
+                            <div class="brain-id">
                                 <i class="fas fa-brain"></i>
                                 ${item.brainInstanceName}
                             </div>
@@ -1790,7 +1867,7 @@
                             </div>
                         </div>
 
-                        <div class="brain-lock-stats">
+                        <div class="brain-stats">
                             <div class="stat-item">
                                 <span class="stat-value">${hasRecentCheckIn ? checkInData[item.brainInstanceName].marketCount : item.marketCount || '--'}</span>
                                 <div class="stat-label">Current Markets</div>
@@ -1798,14 +1875,6 @@
                             <div class="stat-item">
                                 <span class="stat-value">${item.marketCount || '--'}</span>
                                 <div class="stat-label">Target Watches</div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-value">${item.minInterestScore ? item.minInterestScore.toFixed(1) : '--'}</span>
-                                <div class="stat-label">Min Interest</div>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-value">--</span>
-                                <div class="stat-label">Usage Min</div>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-value" id="last-checkin-${item.brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}">${hasRecentCheckIn ? formatDateTime(checkInData[item.brainInstanceName].lastCheckIn) : 'Never'}</span>
@@ -1816,17 +1885,13 @@
                                 <div class="stat-label">Last Snapshot</div>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value" id="error-count-${item.brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}">${hasRecentCheckIn ? checkInData[item.brainInstanceName].errorCount : '0'}</span>
-                                <div class="stat-label">Error Count</div>
+                                <canvas id="error-chart-${item.brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}" width="60" height="30" style="background: rgba(28, 51, 39, 0.1); border-radius: 4px;"></canvas>
+                                <div class="stat-label" style="font-size: 10px;">Error Graph</div>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">${item.lastSeen ? formatDateTime(item.lastSeen) : 'Never'}</span>
-                                <div class="stat-label">Last Seen</div>
+                                <span class="stat-value">${item.mode || 'Autonomous'}</span>
+                                <div class="stat-label">Mode</div>
                             </div>
-                        </div>
-
-                        <!-- Performance Graphs -->
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(28, 51, 39, 0.3);">
                             <div class="stat-item">
                                 <canvas id="cpu-chart-${item.brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}" width="60" height="30" style="background: rgba(28, 51, 39, 0.1); border-radius: 4px;"></canvas>
                                 <div class="stat-label" style="font-size: 10px;">CPU Usage</div>
@@ -3034,7 +3099,7 @@
             return { name, casing };
         }
 
-        // Store and reflect comprehensive status; also refresh the card’s check-in snapshot
+        // Store and reflect comprehensive status; also refresh the card's check-in snapshot
         function handleBrainStatusUpdate(msg) {
             // Accept either BrainInstanceName or brainInstanceName
             const pas = msg && msg.BrainInstanceName;
@@ -3048,9 +3113,19 @@
                 return;
             }
 
-            // Store the full status for charts/other UI
-            brainData[name] = msg;
-            mwLog('debug', '[BrainCards] handleBrainStatusUpdate: brainData set', { name, storedKeys: Object.keys(brainData[name] || {}) });
+            // Update existing brain data with real-time SignalR information
+            if (brainData[name]) {
+                // Preserve database data and enrich with SignalR real-time data
+                brainData[name] = {
+                    ...brainData[name], // Keep database data (WatchedMarkets, etc.)
+                    ...msg, // Override with SignalR real-time data
+                    brainInstanceName: name // Ensure consistent naming
+                };
+            } else {
+                // If brain not in database data, add it (shouldn't happen with backend filtering)
+                brainData[name] = msg;
+            }
+            mwLog('debug', '[BrainCards] handleBrainStatusUpdate: brainData merged', { name, storedKeys: Object.keys(brainData[name] || {}) });
 
             // Derive check-in badge fields for the brain lock card
             const lastCheckIn = msg.LastCheckIn ?? msg.lastCheckIn ?? null;
@@ -3077,10 +3152,10 @@
 
             // Re-render brain cards so badges/timestamps change immediately
             try {
-                renderBrainLocks();
-                mwLog('debug', '[BrainCards] handleBrainStatusUpdate: renderBrainLocks done', { name, hasCheckIn: !!checkInData[name] });
+                renderBrains();
+                mwLog('debug', '[BrainCards] handleBrainStatusUpdate: renderBrains done', { name, hasCheckIn: !!checkInData[name] });
             } catch (e) {
-                mwLog('error', '[BrainCards] renderBrainLocks failed', e);
+                mwLog('error', '[BrainCards] renderBrains failed', e);
             }
         }
 
@@ -3102,6 +3177,11 @@
             // Orderbook Queue Chart
             if (brainStatusMessage.OrderbookQueueHistory && brainStatusMessage.OrderbookQueueHistory.length > 0) {
                 renderMiniChart(`orderbook-chart-${safeName}`, brainStatusMessage.OrderbookQueueHistory, 'Orders', '#dc3545');
+            }
+
+            // Error Chart
+            if (brainStatusMessage.ErrorHistory && brainStatusMessage.ErrorHistory.length > 0) {
+                renderMiniChart(`error-chart-${safeName}`, brainStatusMessage.ErrorHistory, 'Errors', '#ff6b6b');
             }
         }
 
@@ -3204,7 +3284,7 @@
                 console.log('DEBUG: Updated checkInData for', brainInstanceName, ':', checkInData[brainInstanceName]);
 
                 // Re-render cards so stats/status text reflect the new check-in
-                renderBrainLocks();
+                renderBrains();
 
                 console.log(
                     `CheckIn received from ${brainInstanceName}: Markets=${marketCount}, ` +

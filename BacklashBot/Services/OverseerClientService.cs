@@ -317,7 +317,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "OVERSEER- Failed to discover overseer via network. Error: {Error}", ex.Message);
+                _logger.LogWarning("OVERSEER- Failed to discover overseer via network. Error: {Error}", ex.Message);
                 return null;
             }
         }
@@ -696,7 +696,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "OVERSEER- Overseer discovery failed - this is normal and will be retried on next cycle. Error: {Error}", ex.Message);
+                _logger.LogWarning("OVERSEER- Overseer discovery failed - this is normal and will be retried on next cycle. Error: {Error}", ex.Message);
             }
         }
 
@@ -738,7 +738,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "OVERSEER- Failed during overseer discovery process. Will retry on next cycle. Error: {Error}", ex.Message);
+                _logger.LogWarning("OVERSEER- Failed during overseer discovery process. Will retry on next cycle. Error: {Error}", ex.Message);
             }
         }
 
@@ -836,7 +836,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "OVERSEER- Failed to send CheckIn to overseer. Connection may have been lost - will retry. Error: {Error}", ex.Message);
+                _logger.LogWarning("OVERSEER- Failed to send CheckIn to overseer. Connection may have been lost - will retry. Error: {Error}", ex.Message);
                 _isConnected = false; // Mark as disconnected so discovery can try to reconnect
             }
         }
@@ -861,7 +861,7 @@ namespace BacklashBot.Services
             _isConnected = false;
             if (exception != null)
             {
-                _logger.LogWarning(exception, "OVERSEER- Connection to overseer closed unexpectedly. Automatic reconnection will be attempted. Error: {Error}", exception.Message);
+                _logger.LogWarning("OVERSEER- Connection to overseer closed unexpectedly. Automatic reconnection will be attempted. Error: {Error}", exception.Message);
             }
             else
             {
@@ -886,7 +886,7 @@ namespace BacklashBot.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "OVERSEER- Failed to perform handshake after reconnection. Error: {Error}", ex.Message);
+                    _logger.LogWarning("OVERSEER- Failed to perform handshake after reconnection. Error: {Error}", ex.Message);
                 }
             });
 
