@@ -264,18 +264,9 @@ namespace BacklashBot.Hubs
         // Connection status
         public bool IsWebSocketConnected { get; set; }
 
-        // Market watch data
-        public List<MarketWatchData>? WatchedMarkets { get; set; }
+        // Market watch data removed - not needed for SignalR
     }
 
-    public class MarketWatchData
-    {
-        public string MarketTicker { get; set; } = "";
-        public double InterestScore { get; set; }
-        public DateTime? InterestScoreDate { get; set; }
-        public DateTime? LastWatched { get; set; }
-        public double? AverageWebsocketEventsPerMinute { get; set; }
-    }
 
     public class CheckInResponse
     {

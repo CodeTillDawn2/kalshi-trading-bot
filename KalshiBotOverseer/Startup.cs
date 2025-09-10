@@ -1,3 +1,7 @@
+using BacklashBot.KalshiAPI.Interfaces;
+using BacklashBot.Services;
+using BacklashBot.Services.Interfaces;
+using BacklashBot.State.Interfaces;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
@@ -10,18 +14,15 @@ using KalshiBotOverseer.Services;
 using KalshiBotOverseer.State;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.Services;
-using BacklashBot.Services.Interfaces;
-using BacklashBot.State.Interfaces;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 namespace KalshiBotOverseer
 {
@@ -117,7 +118,12 @@ namespace KalshiBotOverseer
             services.AddSingleton<BrainPersistenceService>();
 
             // Add MVC for controllers
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(o =>
+                {
+                    o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    o.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                });
 
             // Add SignalR
             services.AddSignalR(options =>

@@ -21,6 +21,7 @@ namespace KalshiBotOverseer.Controllers
         private readonly SnapshotService _snapshotService;
         private const string MarketsCacheKey = "ActiveMarkets";
         private const string BrainInstancesCacheKey = "BrainInstances";
+        private const string AllBrainInstancesCacheKey = "AllBrainInstances";
         private const string LogDataCacheKey = "LogData";
         private readonly TimeSpan MarketsCacheDuration = TimeSpan.FromMinutes(15);
         private readonly TimeSpan LogDataCacheDuration = TimeSpan.FromMinutes(5); // Shorter cache for log data
@@ -58,6 +59,13 @@ namespace KalshiBotOverseer.Controllers
                     return (await _context.GetBrainInstances_cached())
                         .Where(bi => bi.BrainLock.HasValue)
                         .ToDictionary(bi => bi.BrainLock.Value, bi => bi.BrainInstanceName);
+                });
+
+                // Get all brain instances for comprehensive lookup
+                var allBrainInstances = await _cache.GetOrCreateAsync(AllBrainInstancesCacheKey, async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
+                    return (await _context.GetBrainInstances_cached()).ToList();
                 });
 
                 // Get market watches for active markets only
@@ -126,8 +134,15 @@ namespace KalshiBotOverseer.Controllers
                     return (await _context.GetMarkets(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active })).ToList();
                 });
 
-                // Get cached brain instances for lookup
-                var brainInstances = await _cache.GetOrCreateAsync(BrainInstancesCacheKey, async entry =>
+                // Get all brain instances from database (not just those with BrainLock)
+                var allBrainInstances = await _cache.GetOrCreateAsync(AllBrainInstancesCacheKey, async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
+                    return (await _context.GetBrainInstances_cached()).ToList();
+                });
+
+                // Get cached brain instances with BrainLock for lookup
+                var brainInstancesWithLock = await _cache.GetOrCreateAsync(BrainInstancesCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
                     return (await _context.GetBrainInstances_cached())
@@ -139,22 +154,15 @@ namespace KalshiBotOverseer.Controllers
                 var activeMarketTickers = markets.Select(m => m.market_ticker).ToHashSet();
                 var marketWatches = (await _context.GetMarketWatches(marketTickers: activeMarketTickers)).ToList();
 
-                // Get snapshot and error data from LogEntry table for brain locks (optimized with caching)
-                var brainLockIds = marketWatches.Where(mw => mw.BrainLock.HasValue).Select(mw => mw.BrainLock.Value).Distinct().ToList();
+                // Get snapshot and error data from LogEntry table for brain instances (optimized with caching)
+                var brainInstanceNames = allBrainInstances.Select(bi => bi.BrainInstanceName).Distinct().ToList();
 
                 var logData = await _cache.GetOrCreateAsync(LogDataCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = LogDataCacheDuration;
 
-                    var snapshotData = new Dictionary<Guid, DateTime?>();
-                    var errorData = new Dictionary<Guid, DateTime?>();
-
-                    // Get all brain instance names for the brain locks
-                    var brainInstanceNames = brainLockIds
-                        .Where(id => brainInstances.ContainsKey(id))
-                        .Select(id => brainInstances[id])
-                        .Distinct()
-                        .ToList();
+                    var snapshotData = new Dictionary<string, DateTime?>();
+                    var errorData = new Dictionary<string, DateTime?>();
 
                     if (brainInstanceNames.Any())
                     {
@@ -170,14 +178,10 @@ namespace KalshiBotOverseer.Controllers
                                         brainInstance: brainInstanceName,
                                         maxRecords: 1);
 
-                                    if (snapshotLogs.Any() && snapshotLogs.First().Message.Contains("snapshot", StringComparison.OrdinalIgnoreCase))
+                                    if (snapshotLogs != null && snapshotLogs.Any() && snapshotLogs.First().Message != null &&
+                                        snapshotLogs.First().Message.Contains("snapshot", StringComparison.OrdinalIgnoreCase))
                                     {
-                                        // Find the brain lock ID for this brain instance
-                                        var brainLockId = brainInstances.FirstOrDefault(kvp => kvp.Value == brainInstanceName).Key;
-                                        if (brainLockId != Guid.Empty)
-                                        {
-                                            snapshotData[brainLockId] = snapshotLogs.First().Timestamp;
-                                        }
+                                        snapshotData[brainInstanceName] = snapshotLogs.First().Timestamp;
                                     }
 
                                     // Query for error messages
@@ -186,14 +190,9 @@ namespace KalshiBotOverseer.Controllers
                                         level: "ERROR",
                                         maxRecords: 1);
 
-                                    if (errorLogs.Any())
+                                    if (errorLogs != null && errorLogs.Any())
                                     {
-                                        // Find the brain lock ID for this brain instance
-                                        var brainLockId = brainInstances.FirstOrDefault(kvp => kvp.Value == brainInstanceName).Key;
-                                        if (brainLockId != Guid.Empty)
-                                        {
-                                            errorData[brainLockId] = errorLogs.First().Timestamp;
-                                        }
+                                        errorData[brainInstanceName] = errorLogs.First().Timestamp;
                                     }
                                 }
                                 catch (Exception ex)
@@ -214,38 +213,44 @@ namespace KalshiBotOverseer.Controllers
                 var snapshotData = logData.SnapshotData;
                 var errorData = logData.ErrorData;
 
-                // Group by brain lock and calculate rollup stats
-                var brainLockGroups = marketWatches
-                    .Where(mw => mw.BrainLock.HasValue)
-                    .GroupBy(mw => mw.BrainLock.Value)
-                    .Select(group => {
-                        brainInstances.TryGetValue(group.Key, out var brainInstanceName);
-                        snapshotData.TryGetValue(group.Key, out var lastSnapshotDate);
-                        errorData.TryGetValue(group.Key, out var lastErrorDate);
-                        return new
+                // Create brain lock data for all brain instances
+                var brainLockGroups = allBrainInstances.Select(brainInstance =>
+                {
+                    // Find market watches for this brain instance
+                    var brainMarketWatches = marketWatches.Where(mw =>
+                        mw.BrainLock.HasValue &&
+                        brainInstancesWithLock.TryGetValue(mw.BrainLock.Value, out var name) &&
+                        name == brainInstance.BrainInstanceName).ToList();
+
+                    snapshotData.TryGetValue(brainInstance.BrainInstanceName, out var lastSnapshotDate);
+                    errorData.TryGetValue(brainInstance.BrainInstanceName, out var lastErrorDate);
+
+                    return new
+                    {
+                        BrainLockId = brainInstance.BrainLock ?? Guid.NewGuid(), // Use existing BrainLock or generate temp ID
+                        BrainInstanceName = brainInstance.BrainInstanceName,
+                        MarketCount = brainMarketWatches.Count,
+                        AverageInterestScore = brainMarketWatches.Any() ? brainMarketWatches.Average(mw => mw.InterestScore ?? 0) : 0,
+                        MaxInterestScore = brainMarketWatches.Any() ? brainMarketWatches.Max(mw => mw.InterestScore ?? 0) : 0,
+                        MinInterestScore = brainMarketWatches.Any() ? brainMarketWatches.Min(mw => mw.InterestScore ?? 0) : 0,
+                        AverageWebsocketEvents = brainMarketWatches.Any() ? brainMarketWatches.Average(mw => mw.AverageWebsocketEventsPerMinute ?? 0) : 0,
+                        LastWatched = brainMarketWatches.Any() ? brainMarketWatches.Max(mw => mw.LastWatched) : null,
+                        LastSnapshotSaved = lastSnapshotDate,
+                        LastErrorEncountered = lastErrorDate,
+                        LastSeen = brainInstance.LastSeen,
+                        Markets = brainMarketWatches.Select(mw => new
                         {
-                            BrainLockId = group.Key,
-                            BrainInstanceName = brainInstanceName ?? "Unknown",
-                            MarketCount = group.Count(),
-                            AverageInterestScore = group.Average(mw => mw.InterestScore ?? 0),
-                            MaxInterestScore = group.Max(mw => mw.InterestScore ?? 0),
-                            MinInterestScore = group.Min(mw => mw.InterestScore ?? 0),
-                            AverageWebsocketEvents = group.Average(mw => mw.AverageWebsocketEventsPerMinute ?? 0),
-                            LastWatched = group.Max(mw => mw.LastWatched),
-                            LastSnapshotSaved = lastSnapshotDate,
-                            LastErrorEncountered = lastErrorDate,
-                            Markets = group.Select(mw => new
-                            {
-                                mw.market_ticker,
-                                mw.InterestScore,
-                                mw.InterestScoreDate,
-                                mw.LastWatched,
-                                mw.AverageWebsocketEventsPerMinute
-                            }).ToList()
-                        };
-                    })
-                    .OrderByDescending(bl => bl.AverageInterestScore)
-                    .ToList();
+                            mw.market_ticker,
+                            mw.InterestScore,
+                            mw.InterestScoreDate,
+                            mw.LastWatched,
+                            mw.AverageWebsocketEventsPerMinute
+                        }).ToList()
+                    };
+                })
+                .OrderByDescending(bl => bl.MarketCount) // Order by market count, then by name
+                .ThenBy(bl => bl.BrainInstanceName)
+                .ToList();
 
                 return Ok(brainLockGroups);
             }

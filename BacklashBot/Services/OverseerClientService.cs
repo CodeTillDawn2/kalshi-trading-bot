@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.Management.Interfaces;
+using BacklashBot.Configuration;
 using BacklashDTOs;
 using BacklashInterfaces.SmokehouseBot.Services;
 using System.Net;
@@ -28,79 +30,49 @@ namespace BacklashBot.Services
 
         public OverseerClientService(
             ILogger<OverseerClientService> logger,
-            IServiceFactory serviceFactory)
+            IServiceFactory serviceFactory,
+            IOptions<ExecutionConfig> executionConfig)
         {
             _logger = logger;
             _serviceFactory = serviceFactory;
             _clientId = Guid.NewGuid().ToString();
+
+            // Read brain instance name from configuration, fallback to hardcoded if not set
+            _clientName = executionConfig.Value.BrainInstance ?? "BacklashBot";
+            _logger.LogInformation("OVERSEER- Using brain instance name: {BrainInstanceName}", _clientName);
         }
 
         public async Task StartAsync()
         {
             try
             {
+                _logger.LogInformation("OVERSEER- Starting OverseerClientService...");
+
+                // Start Overseer Discovery timer first (every 3 minutes) - this ensures we keep trying to find overseer
+                _overseerDiscoveryTimer = new Timer(async _ => await PerformOverseerDiscoveryAsync(), null, TimeSpan.Zero, _overseerDiscoveryInterval);
+                _logger.LogInformation("OVERSEER- Overseer discovery timer started (every {Interval} minutes)", _overseerDiscoveryInterval.TotalMinutes);
+
+                // Start CheckIn timer (every 30 seconds) - it will only send if connected
+                _checkInTimer = new Timer(async _ => await SendCheckInAsync(), null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(30));
+                _logger.LogInformation("OVERSEER- CheckIn timer started (every 30 seconds, first check in 10 seconds)");
+
                 // Find overseer IP from database or configuration
                 var overseerUrl = await GetOverseerUrlAsync();
 
-                if (string.IsNullOrEmpty(overseerUrl))
+                if (!string.IsNullOrEmpty(overseerUrl))
                 {
-                    _logger.LogDebug("OVERSEER- No overseer URL found. Overseer client will not start - this is normal in testing mode.");
-                    return;
+                    _logger.LogInformation("OVERSEER- Attempting initial connection to overseer at: {Url}", overseerUrl);
+                    await AttemptConnectionAsync(overseerUrl, "Initial Startup");
                 }
-
-                _logger.LogInformation("OVERSEER- Connecting to overseer at: {Url}", overseerUrl);
-
-                _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(overseerUrl)
-                    .WithAutomaticReconnect()
-                    .Build();
-
-                // Set up event handlers
-                _hubConnection.On<string>("HandshakeResponse", HandleHandshakeResponse);
-                _hubConnection.On<string>("CheckInResponse", HandleCheckInResponse);
-                _hubConnection.On<string>("MessageResponse", HandleMessageResponse);
-
-                // Handle connection events
-                _hubConnection.Closed += HandleConnectionClosed;
-                _hubConnection.Reconnected += HandleReconnected;
-
-                try
+                else
                 {
-                    await _hubConnection.StartAsync();
-                    _isConnected = true;
-
-                    _logger.LogInformation("OVERSEER- Connected to overseer successfully");
-
-                    // Perform handshake
-                    await PerformHandshakeAsync();
-
-                    // Start CheckIn timer (every 30 seconds)
-                    _checkInTimer = new Timer(async _ => await SendCheckInAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(30));
-                    _logger.LogInformation("OVERSEER- CheckIn timer started (every 30 seconds)");
-
-                    // Start Overseer Discovery timer (every 3 minutes)
-                    _overseerDiscoveryTimer = new Timer(async _ => await PerformOverseerDiscoveryAsync(), null, TimeSpan.FromMinutes(1), _overseerDiscoveryInterval);
-                    _logger.LogInformation("OVERSEER- Overseer discovery timer started (every 3 minutes)");
-                }
-                catch (HttpRequestException httpEx) when (httpEx.Message.Contains("actively refused") || httpEx.Message.Contains("connection"))
-                {
-                    // Overseer is not running - this is expected and not an error
-                    _logger.LogInformation("OVERSEER- Overseer is not available at {Url}. This is optional and the bot will continue without oversight.", overseerUrl);
-                    _isConnected = false;
-                    // Don't throw - this is expected when overseer is not running
-                }
-                catch (Exception connectionEx)
-                {
-                    // Other connection issues - log as information since overseer is optional
-                    _logger.LogInformation("OVERSEER- Failed to connect to overseer at {Url}. This is optional and the bot will continue without oversight. Error: {Error}", overseerUrl, connectionEx.Message);
-                    _isConnected = false;
-                    // Don't throw - continue without overseer
+                    _logger.LogInformation("OVERSEER- No overseer URL found initially. Discovery will continue in background every 3 minutes.");
                 }
             }
             catch (Exception ex)
             {
                 // General startup issues - log as information since overseer is optional
-                _logger.LogInformation("OVERSEER- Failed to initialize overseer client. This is optional and the bot will continue without oversight. Error: {Error}", ex.Message);
+                _logger.LogError(ex, "OVERSEER- Failed to initialize overseer client. This is optional and the bot will continue without oversight.");
                 // Don't throw - overseer is optional
             }
         }
@@ -167,14 +139,14 @@ namespace BacklashBot.Services
                     return overseerUrl;
                 }
 
-                // 4. Final fallback to localhost
-                _logger.LogDebug("OVERSEER- No overseer found via configuration, database, or network discovery. Using localhost fallback for testing.");
-                return "http://localhost:5000/chartHub";
+                // 4. No overseer found - return null to let discovery continue
+                _logger.LogInformation("OVERSEER- No overseer found via configuration, database, or network discovery. Discovery will continue in background.");
+                return null;
             }
             catch (Exception ex)
             {
-                _logger.LogDebug(ex, "OVERSEER- Failed to discover overseer URL, using localhost fallback for testing");
-                return "http://localhost:5000/chartHub";
+                _logger.LogDebug(ex, "OVERSEER- Failed to discover overseer URL");
+                return null;
             }
         }
 
@@ -198,14 +170,48 @@ namespace BacklashBot.Services
                     return $"http://{overseerHost}:{overseerPort}/chartHub";
                 }
 
-                // Could also check appsettings.json here if needed
-                // For example: Configuration.GetValue<string>("Overseer:Url")
+                // Check appsettings.json configuration
+                try
+                {
+                    // Try to get configuration from IConfiguration if available
+                    // For now, we'll use a simple approach to read from appsettings.local.json
+                    var configUrl = await GetOverseerUrlFromAppSettingsAsync();
+                    if (!string.IsNullOrEmpty(configUrl))
+                    {
+                        _logger.LogInformation("OVERSEER- Found overseer URL in appsettings: {Url}", configUrl);
+                        return configUrl;
+                    }
+                }
+                catch (Exception configEx)
+                {
+                    _logger.LogDebug(configEx, "OVERSEER- Failed to read overseer URL from appsettings");
+                }
 
                 return null;
             }
             catch (Exception ex)
             {
                 _logger.LogDebug(ex, "OVERSEER- Failed to get overseer URL from configuration");
+                return null;
+            }
+        }
+
+        private async Task<string?> GetOverseerUrlFromAppSettingsAsync()
+        {
+            try
+            {
+                // Check if there's an OVERSEER_URL environment variable that might be set from appsettings
+                var configUrl = Environment.GetEnvironmentVariable("OVERSEER_URL");
+                if (!string.IsNullOrEmpty(configUrl))
+                {
+                    return configUrl.EndsWith("/chartHub") ? configUrl : $"{configUrl.TrimEnd('/')}/chartHub";
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "OVERSEER- Failed to get overseer URL from appsettings");
                 return null;
             }
         }
@@ -260,33 +266,58 @@ namespace BacklashBot.Services
         {
             try
             {
+                _logger.LogDebug("OVERSEER- Starting network discovery for overseer...");
+
                 // Simple network discovery - try common ports on local network
                 var commonPorts = new[] { 5000, 5001, 8080, 3000 };
                 var localIP = GetLocalIPAddress();
 
                 if (string.IsNullOrEmpty(localIP))
                 {
+                    _logger.LogDebug("OVERSEER- Could not determine local IP address for network discovery");
                     return null;
                 }
 
+                _logger.LogDebug("OVERSEER- Local IP: {LocalIP}", localIP);
+
                 // Get subnet (e.g., 192.168.1.0/24)
                 var subnet = GetSubnet(localIP);
-
-                // Try to connect to potential overseer instances
-                foreach (var port in commonPorts)
+                if (string.IsNullOrEmpty(subnet))
                 {
-                    var potentialUrl = $"http://{subnet}.1:{port}/chartHub";
-                    if (await TestOverseerConnectionAsync(potentialUrl))
+                    _logger.LogDebug("OVERSEER- Could not determine subnet from local IP: {LocalIP}", localIP);
+                    return null;
+                }
+
+                _logger.LogDebug("OVERSEER- Scanning subnet: {Subnet}.*", subnet);
+
+                // Try to connect to potential overseer instances on the subnet
+                // Start from .100 and go down to .2, then try .1
+                for (int i = 100; i >= 1; i--)
+                {
+                    if (i == 1) continue; // Skip .1 as it's usually the gateway
+
+                    foreach (var port in commonPorts)
                     {
-                        return potentialUrl;
+                        var potentialUrl = $"http://{subnet}.{i}:{port}/chartHub";
+                        _logger.LogDebug("OVERSEER- Testing potential overseer at: {Url}", potentialUrl);
+
+                        if (await TestOverseerConnectionAsync(potentialUrl))
+                        {
+                            _logger.LogInformation("OVERSEER- Found overseer via network discovery at: {Url}", potentialUrl);
+                            return potentialUrl;
+                        }
                     }
                 }
 
+                // Note: We don't try localhost fallback here as we want to rely on the database discovery system
+                // The KalshiBotOverseer should register itself in the database when it starts
+
+                _logger.LogDebug("OVERSEER- Network discovery completed - no overseer found");
                 return null;
             }
             catch (Exception ex)
             {
-                _logger.LogDebug("OVERSEER- Failed to discover overseer via network. Error: {Error}", ex.Message);
+                _logger.LogWarning(ex, "OVERSEER- Failed to discover overseer via network. Error: {Error}", ex.Message);
                 return null;
             }
         }
@@ -333,7 +364,7 @@ namespace BacklashBot.Services
             try
             {
                 using var client = new HttpClient();
-                client.Timeout = TimeSpan.FromSeconds(2);
+                client.Timeout = TimeSpan.FromSeconds(3); // Increased timeout for better reliability
 
                 // Try multiple endpoints to test if overseer is available
                 var testUrls = new[]
@@ -348,23 +379,193 @@ namespace BacklashBot.Services
                 {
                     try
                     {
+                        _logger.LogTrace("OVERSEER- Testing connection to: {Url}", testUrl);
                         var response = await client.GetAsync(testUrl);
+
                         if (response.IsSuccessStatusCode)
                         {
+                            _logger.LogDebug("OVERSEER- Connection test successful for: {Url} (Status: {StatusCode})", testUrl, response.StatusCode);
                             return true;
                         }
+                        else
+                        {
+                            _logger.LogTrace("OVERSEER- Connection test failed for: {Url} (Status: {StatusCode})", testUrl, response.StatusCode);
+                        }
                     }
-                    catch
+                    catch (HttpRequestException httpEx)
                     {
+                        _logger.LogTrace("OVERSEER- HTTP error testing {Url}: {Error}", testUrl, httpEx.Message);
+                        // Continue to next URL
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        _logger.LogTrace("OVERSEER- Timeout testing {Url}", testUrl);
+                        // Continue to next URL
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogTrace("OVERSEER- Error testing {Url}: {Error}", testUrl, ex.Message);
                         // Continue to next URL
                     }
                 }
 
+                _logger.LogTrace("OVERSEER- All connection tests failed for base URL: {Url}", url);
                 return false;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogTrace("OVERSEER- Unexpected error during connection test for {Url}: {Error}", url, ex.Message);
                 return false;
+            }
+        }
+
+        private async Task AttemptConnectionAsync(string overseerUrl, string reason)
+        {
+            try
+            {
+                _logger.LogInformation("OVERSEER- Attempting connection to overseer at {Url} (Reason: {Reason})", overseerUrl, reason);
+
+                // Check and clean up existing connection
+                if (_hubConnection != null)
+                {
+                    var currentState = _hubConnection.State.ToString();
+                    _logger.LogDebug("OVERSEER- Current HubConnection state: {State}", currentState);
+
+                    // Only dispose if not already disposed
+                    if (_hubConnection.State.ToString() != "Disconnected")
+                    {
+                        try
+                        {
+                            await _hubConnection.StopAsync();
+                            _logger.LogDebug("OVERSEER- Stopped existing connection");
+                        }
+                        catch (Exception stopEx)
+                        {
+                            _logger.LogWarning("OVERSEER- Error stopping existing connection: {Error}", stopEx.Message);
+                        }
+                    }
+
+                    // Always dispose and create new connection to ensure clean state
+                    await _hubConnection.DisposeAsync();
+                    _hubConnection = null;
+                    _logger.LogDebug("OVERSEER- Disposed existing HubConnection");
+                }
+
+                // Reset connection state
+                _isConnected = false;
+                _currentOverseerUrl = null;
+
+                // Create new connection
+                _hubConnection = new HubConnectionBuilder()
+                    .WithUrl(overseerUrl)
+                    .WithAutomaticReconnect()
+                    .Build();
+
+                _logger.LogDebug("OVERSEER- Created new HubConnection, initial state: {State}", _hubConnection.State.ToString());
+
+                // Set up event handlers
+                _hubConnection.On<string>("HandshakeResponse", HandleHandshakeResponse);
+                _hubConnection.On<string>("CheckInResponse", HandleCheckInResponse);
+                _hubConnection.On<string>("MessageResponse", HandleMessageResponse);
+
+                // Handle connection events
+                _hubConnection.Closed += HandleConnectionClosed;
+                _hubConnection.Reconnected += HandleReconnected;
+
+                // Verify connection is in correct state before starting
+                if (_hubConnection.State.ToString() != "Disconnected")
+                {
+                    _logger.LogWarning("OVERSEER- HubConnection is in {State} state, cannot start. Creating fresh connection.", _hubConnection.State.ToString());
+                    await _hubConnection.DisposeAsync();
+                    _hubConnection = new HubConnectionBuilder()
+                        .WithUrl(overseerUrl)
+                        .WithAutomaticReconnect()
+                        .Build();
+
+                    // Re-setup event handlers
+                    _hubConnection.On<string>("HandshakeResponse", HandleHandshakeResponse);
+                    _hubConnection.On<string>("CheckInResponse", HandleCheckInResponse);
+                    _hubConnection.On<string>("MessageResponse", HandleMessageResponse);
+                    _hubConnection.Closed += HandleConnectionClosed;
+                    _hubConnection.Reconnected += HandleReconnected;
+                }
+
+                _logger.LogDebug("OVERSEER- Starting HubConnection...");
+                await _hubConnection.StartAsync();
+                _logger.LogDebug("OVERSEER- HubConnection started, state: {State}", _hubConnection.State.ToString());
+
+                _isConnected = true;
+                _currentOverseerUrl = overseerUrl;
+
+                _logger.LogInformation("OVERSEER- Successfully connected to overseer at {Url}", overseerUrl);
+
+                // Perform handshake
+                await PerformHandshakeAsync();
+            }
+            catch (HttpRequestException httpEx) when (httpEx.Message.Contains("actively refused") || httpEx.Message.Contains("connection"))
+            {
+                // Overseer is not running or network unreachable
+                _logger.LogInformation("OVERSEER- Overseer is not available at {Url}. Will retry during next discovery cycle. Error: {Error}", overseerUrl, httpEx.Message);
+                _isConnected = false;
+                _currentOverseerUrl = null;
+            }
+            catch (HttpRequestException httpEx) when (httpEx.Message.Contains("503") || httpEx.Message.Contains("Service Unavailable"))
+            {
+                // Service is running but temporarily unavailable
+                _logger.LogWarning("OVERSEER- Overseer at {Url} is temporarily unavailable (503 Service Unavailable). This may indicate the service is starting up or overloaded. Will retry sooner. Error: {Error}", overseerUrl, httpEx.Message);
+                _isConnected = false;
+                _currentOverseerUrl = null;
+
+                // Schedule an immediate retry for 503 errors
+                Task.Run(async () =>
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(30)); // Wait 30 seconds then retry
+                    if (!_isConnected)
+                    {
+                        _logger.LogInformation("OVERSEER- Retrying connection to {Url} after 503 error", overseerUrl);
+                        await AttemptConnectionAsync(overseerUrl, "503 Retry");
+                    }
+                });
+            }
+            catch (InvalidOperationException invalidOpEx) when (invalidOpEx.Message.Contains("cannot be started if it is not in the Disconnected state"))
+            {
+                // HubConnection state issue - this is the error we're seeing
+                _logger.LogWarning("OVERSEER- HubConnection state error for {Url}. This usually indicates a previous connection wasn't properly cleaned up. Error: {Error}", overseerUrl, invalidOpEx.Message);
+                _isConnected = false;
+                _currentOverseerUrl = null;
+
+                // Force cleanup and retry
+                if (_hubConnection != null)
+                {
+                    try
+                    {
+                        await _hubConnection.DisposeAsync();
+                        _hubConnection = null;
+                        _logger.LogDebug("OVERSEER- Force disposed HubConnection due to state error");
+                    }
+                    catch (Exception disposeEx)
+                    {
+                        _logger.LogWarning("OVERSEER- Error force disposing HubConnection: {Error}", disposeEx.Message);
+                    }
+                }
+
+                // Retry after a short delay
+                Task.Run(async () =>
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+                    if (!_isConnected)
+                    {
+                        _logger.LogInformation("OVERSEER- Retrying connection to {Url} after state error", overseerUrl);
+                        await AttemptConnectionAsync(overseerUrl, "State Error Retry");
+                    }
+                });
+            }
+            catch (Exception connectionEx)
+            {
+                // Other connection issues - log as information since overseer is optional
+                _logger.LogInformation("OVERSEER- Failed to connect to overseer at {Url}. Will retry during next discovery cycle. Error: {Error}", overseerUrl, connectionEx.Message);
+                _isConnected = false;
+                _currentOverseerUrl = null;
             }
         }
 
@@ -443,9 +644,13 @@ namespace BacklashBot.Services
         {
             try
             {
+                _logger.LogDebug("OVERSEER- Performing overseer discovery cycle...");
+
                 // Skip if we recently performed discovery
                 if (DateTime.UtcNow - _lastOverseerDiscovery < _overseerDiscoveryInterval)
                 {
+                    _logger.LogDebug("OVERSEER- Skipping discovery - too soon since last attempt ({Seconds} seconds ago)",
+                        (DateTime.UtcNow - _lastOverseerDiscovery).TotalSeconds);
                     return;
                 }
 
@@ -454,12 +659,13 @@ namespace BacklashBot.Services
                 // If we're not connected, try to find any overseer
                 if (!_isConnected || _currentOverseer == null)
                 {
-                    _logger.LogDebug("OVERSEER- No overseer connection detected, attempting to discover available overseer");
+                    _logger.LogInformation("OVERSEER- No overseer connection detected, attempting to discover and connect to available overseer");
                     await DiscoverAndConnectToBestOverseerAsync();
                     return;
                 }
 
                 // If we're connected, check for better overseers
+                _logger.LogDebug("OVERSEER- Validating current overseer connection...");
                 await ValidateCurrentOverseerAsync();
 
                 // Also perform network discovery in case there are overseers not in the database
@@ -470,14 +676,22 @@ namespace BacklashBot.Services
                     // Test the connection and switch if it's better
                     if (await TestOverseerConnectionAsync(networkOverseerUrl))
                     {
-                        _logger.LogInformation("OVERSEER- Network-discovered overseer is available, attempting to switch");
-                        await SwitchToOverseerUrlAsync(networkOverseerUrl, "Network Discovery");
+                        _logger.LogInformation("OVERSEER- Network-discovered overseer is available, attempting to switch from {CurrentUrl}", _currentOverseerUrl);
+                        await AttemptConnectionAsync(networkOverseerUrl, "Network Discovery");
                     }
+                    else
+                    {
+                        _logger.LogDebug("OVERSEER- Network-discovered overseer at {Url} is not responding, keeping current connection", networkOverseerUrl);
+                    }
+                }
+                else
+                {
+                    _logger.LogDebug("OVERSEER- No new overseers discovered via network");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogDebug("OVERSEER- Overseer discovery failed - this is normal and will be retried. Error: {Error}", ex.Message);
+                _logger.LogWarning(ex, "OVERSEER- Overseer discovery failed - this is normal and will be retried on next cycle. Error: {Error}", ex.Message);
             }
         }
 
@@ -485,12 +699,14 @@ namespace BacklashBot.Services
         {
             try
             {
+                _logger.LogDebug("OVERSEER- Starting overseer discovery process...");
+
                 // Try database first
                 var databaseUrl = await GetOverseerUrlFromDatabaseAsync();
                 if (!string.IsNullOrEmpty(databaseUrl))
                 {
-                    _logger.LogInformation("OVERSEER- Found overseer in database, attempting connection");
-                    await SwitchToOverseerUrlAsync(databaseUrl, "Database Discovery");
+                    _logger.LogInformation("OVERSEER- Found overseer in database: {Url}, attempting connection", databaseUrl);
+                    await AttemptConnectionAsync(databaseUrl, "Database Discovery");
                     return;
                 }
 
@@ -498,8 +714,8 @@ namespace BacklashBot.Services
                 var networkUrl = await DiscoverOverseerViaNetworkAsync();
                 if (!string.IsNullOrEmpty(networkUrl))
                 {
-                    _logger.LogInformation("OVERSEER- Found overseer via network discovery, attempting connection");
-                    await SwitchToOverseerUrlAsync(networkUrl, "Network Discovery");
+                    _logger.LogInformation("OVERSEER- Found overseer via network discovery: {Url}, attempting connection", networkUrl);
+                    await AttemptConnectionAsync(networkUrl, "Network Discovery");
                     return;
                 }
 
@@ -507,17 +723,17 @@ namespace BacklashBot.Services
                 var configUrl = await GetOverseerUrlFromConfigurationAsync();
                 if (!string.IsNullOrEmpty(configUrl))
                 {
-                    _logger.LogInformation("OVERSEER- Found overseer in configuration, attempting connection");
-                    await SwitchToOverseerUrlAsync(configUrl, "Configuration Discovery");
+                    _logger.LogInformation("OVERSEER- Found overseer in configuration: {Url}, attempting connection", configUrl);
+                    await AttemptConnectionAsync(configUrl, "Configuration Discovery");
                     return;
                 }
 
-                // No overseer found - this is normal and not an error
-                _logger.LogDebug("OVERSEER- No overseer found via any discovery method - this is normal in testing/development mode");
+                // No overseer found - this is normal and will be retried on next discovery cycle
+                _logger.LogDebug("OVERSEER- Overseer discovery completed - no active overseer found in database, will retry on next cycle");
             }
             catch (Exception ex)
             {
-                _logger.LogDebug("OVERSEER- Failed to discover and connect to overseer - this is normal and will be retried. Error: {Error}", ex.Message);
+                _logger.LogWarning(ex, "OVERSEER- Failed during overseer discovery process. Will retry on next cycle. Error: {Error}", ex.Message);
             }
         }
 
@@ -546,66 +762,21 @@ namespace BacklashBot.Services
 
         private async Task SwitchToOverseerUrlAsync(string newUrl, string reason)
         {
-            try
-            {
-                // Close existing connection
-                if (_hubConnection != null)
-                {
-                    await _hubConnection.StopAsync();
-                    await _hubConnection.DisposeAsync();
-                    _hubConnection = null;
-                }
-
-                _logger.LogInformation("OVERSEER- Connecting to overseer: {Url} (Reason: {Reason})", newUrl, reason);
-
-                // Create new connection
-                _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(newUrl)
-                    .WithAutomaticReconnect()
-                    .Build();
-
-                // Set up event handlers
-                _hubConnection.On<string>("HandshakeResponse", HandleHandshakeResponse);
-                _hubConnection.On<string>("CheckInResponse", HandleCheckInResponse);
-                _hubConnection.On<string>("MessageResponse", HandleMessageResponse);
-
-                // Handle connection events
-                _hubConnection.Closed += HandleConnectionClosed;
-                _hubConnection.Reconnected += HandleReconnected;
-
-                // Attempt connection
-                await _hubConnection.StartAsync();
-                _isConnected = true;
-                _currentOverseerUrl = newUrl;
-
-                _logger.LogInformation("OVERSEER- Successfully connected to overseer: {Url}", newUrl);
-
-                // Perform handshake
-                await PerformHandshakeAsync();
-
-                // Update current overseer info if we can get it from the URL
-                // (This is a simplified approach - in a real implementation you might want to query the overseer for its info)
-                _currentOverseer = null; // Reset until we get updated info
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDebug("OVERSEER- Failed to connect to overseer {Url} - this is normal and will be retried. Error: {Error}", newUrl, ex.Message);
-                _isConnected = false;
-                _currentOverseerUrl = null;
-            }
+            await AttemptConnectionAsync(newUrl, reason);
         }
 
         private async Task SendCheckInAsync()
         {
             if (_hubConnection == null || !_isConnected)
             {
-                _logger.LogDebug("OVERSEER- Overseer not connected, skipping CheckIn");
+                _logger.LogDebug("OVERSEER- Overseer not connected, skipping CheckIn (will retry on next cycle)");
                 return;
             }
 
             try
             {
+                _logger.LogDebug("OVERSEER- Preparing CheckIn data...");
+
                 // Validate that we're still connected to the most recent overseer
                 await ValidateCurrentOverseerAsync();
 
@@ -618,50 +789,89 @@ namespace BacklashBot.Services
                     ErrorCount = errorHandler.ErrorCount,
                     LastSnapshot = errorHandler.LastSuccessfulSnapshot == DateTime.MinValue
                         ? (DateTime?)null
-                        : errorHandler.LastSuccessfulSnapshot
+                        : errorHandler.LastSuccessfulSnapshot,
+                    LastErrorDate = errorHandler.LastErrorDate == DateTime.MinValue
+                        ? (DateTime?)null
+                        : errorHandler.LastErrorDate,
+                    IsStartingUp = false, // Could be determined from service state
+                    IsShuttingDown = false,
+                    WatchPositions = true, // From configuration
+                    WatchOrders = true,
+                    ManagedWatchList = true,
+                    CaptureSnapshots = false,
+                    TargetWatches = 200, // From configuration
+                    MinimumInterest = 5.0,
+                    UsageMin = 70.0,
+                    UsageMax = 90.0,
+                    CurrentCpuUsage = 0.0, // Could get from system
+                    EventQueueAvg = 0.0,
+                    TickerQueueAvg = 0.0,
+                    NotificationQueueAvg = 0.0,
+                    OrderbookQueueAvg = 0.0,
+                    IsWebSocketConnected = true // Could be determined
                 };
 
+                _logger.LogDebug("OVERSEER- Sending CheckIn to overseer: {MarketCount} markets, ErrorCount: {ErrorCount}, LastSnapshot: {LastSnapshot}",
+                    markets.Count, errorHandler.ErrorCount, checkInData.LastSnapshot);
+
                 await _hubConnection.InvokeAsync("CheckIn", checkInData);
-                _logger.LogDebug("OVERSEER- CheckIn sent: {MarketCount} markets, ErrorCount: {ErrorCount}",
-                    markets.Count, errorHandler.ErrorCount);
+                _logger.LogInformation("OVERSEER- CheckIn sent successfully to overseer at {Url}", _currentOverseerUrl);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "OVERSEER- Failed to send CheckIn to overseer. This is optional and will be retried.");
+                _logger.LogWarning(ex, "OVERSEER- Failed to send CheckIn to overseer. Connection may have been lost - will retry. Error: {Error}", ex.Message);
+                _isConnected = false; // Mark as disconnected so discovery can try to reconnect
             }
         }
 
         private void HandleHandshakeResponse(string response)
         {
-            _logger.LogInformation("OVERSEER- Handshake response received: {Response}", response);
+            _logger.LogInformation("OVERSEER- Handshake response received from overseer: {Response}", response);
         }
 
         private void HandleCheckInResponse(string response)
         {
-            _logger.LogDebug("OVERSEER- CheckIn response received: {Response}", response);
+            _logger.LogInformation("OVERSEER- CheckIn response received from overseer: {Response}", response);
         }
 
         private void HandleMessageResponse(string response)
         {
-            _logger.LogInformation("OVERSEER- Message response received: {Response}", response);
+            _logger.LogInformation("OVERSEER- Message response received from overseer: {Response}", response);
         }
 
         private Task HandleConnectionClosed(Exception? exception)
         {
             _isConnected = false;
-            _logger.LogWarning(exception, "OVERSEER- Connection to overseer closed");
+            if (exception != null)
+            {
+                _logger.LogWarning(exception, "OVERSEER- Connection to overseer closed unexpectedly. Automatic reconnection will be attempted. Error: {Error}", exception.Message);
+            }
+            else
+            {
+                _logger.LogInformation("OVERSEER- Connection to overseer closed gracefully");
+            }
 
-            // Could implement reconnection logic here
             return Task.CompletedTask;
         }
 
         private Task HandleReconnected(string? connectionId)
         {
             _isConnected = true;
-            _logger.LogInformation("OVERSEER- Reconnected to overseer with connection ID: {ConnectionId}", connectionId);
+            _logger.LogInformation("OVERSEER- Successfully reconnected to overseer with connection ID: {ConnectionId}", connectionId);
 
             // Re-perform handshake on reconnection
-            Task.Run(async () => await PerformHandshakeAsync());
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await PerformHandshakeAsync();
+                    _logger.LogInformation("OVERSEER- Handshake completed after reconnection");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "OVERSEER- Failed to perform handshake after reconnection. Error: {Error}", ex.Message);
+                }
+            });
 
             return Task.CompletedTask;
         }

@@ -23,6 +23,8 @@ using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -220,8 +222,6 @@ app.Lifetime.ApplicationStopping.Register(() =>
 
 // ## HTTP Pipeline Configuration
 app.UseRouting();
-app.UseDefaultFiles();
-app.UseStaticFiles();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {

@@ -18,6 +18,14 @@ namespace KalshiBotOverseer.Models
         public DateTime? LastSeen { get; set; }
         public HashSet<string> CurrentMarketTickers { get; set; } = new HashSet<string>();
         public HashSet<string> TargetMarketTickers { get; set; } = new HashSet<string>();
+
+        // Historical performance metrics
+        public List<MetricHistory> CpuUsageHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> EventQueueHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> TickerQueueHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> NotificationQueueHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> OrderbookQueueHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> MarketCountHistory { get; set; } = new List<MetricHistory>();
     }
 
     public class BrainStatusData
@@ -51,6 +59,14 @@ namespace KalshiBotOverseer.Models
         public double NotificationQueueAvg { get; set; }
         public double OrderbookQueueAvg { get; set; }
 
+        // Historical performance metrics
+        public List<MetricHistory> CpuUsageHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> EventQueueHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> TickerQueueHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> NotificationQueueHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> OrderbookQueueHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> MarketCountHistory { get; set; } = new List<MetricHistory>();
+
         // Market data
         public int MarketCount { get; set; }
         public long ErrorCount { get; set; }
@@ -63,6 +79,12 @@ namespace KalshiBotOverseer.Models
         // Current and target tickers
         public List<string> CurrentMarketTickers { get; set; } = new List<string>();
         public List<string> TargetMarketTickers { get; set; } = new List<string>();
+    }
+
+    public class MetricHistory
+    {
+        public DateTime Timestamp { get; set; }
+        public double Value { get; set; }
     }
 
     public class MarketWatchData

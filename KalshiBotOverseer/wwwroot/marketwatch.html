@@ -1416,10 +1416,13 @@
 
                 // Set up event handlers
                 connection.on('BrainStatusUpdate', handleBrainStatusUpdate);
+                connection.on('CheckInUpdate', handleCheckInUpdate);
                 connection.on('CheckInResponse', handleCheckInResponse);
                 connection.on('TargetTickersResponse', handleTargetTickersResponse);
                 connection.on('CurrentTickersResponse', handleCurrentTickersResponse);
                 connection.on('TargetTickersConfirmationResponse', handleTargetTickersConfirmationResponse);
+
+                console.log('DEBUG: SignalR event handlers registered');
 
                 // Start the connection
                 await connection.start();
@@ -1481,6 +1484,13 @@
                 console.error('Error loading brain lock data:', error);
                 document.getElementById('brainLocksContainer').innerHTML =
                     '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Failed to load brain lock data</div></div>';
+            }
+        }
+
+        // Function to refresh brain locks display
+        function refreshBrainLocksDisplay() {
+            if (brainLockData && brainLockData.length > 0) {
+                renderBrainLocks();
             }
         }
 
@@ -1618,21 +1628,25 @@
             // Use yes_sub_title if subtitle is blank
             const displaySubtitle = (market.subtitle && market.subtitle.trim()) ? market.subtitle : (market.yes_sub_title || 'No Subtitle');
 
-            return `
-                <div class="market-card" onclick="showMarketContextMenu(event, '${item.market_ticker}', ${item.brainInstanceName ? `'${item.brainInstanceName}'` : 'null'})" oncontextmenu="showMarketContextMenu(event, '${item.market_ticker}', ${item.brainInstanceName ? `'${item.brainInstanceName}'` : 'null'})">
+            // Escape strings for safe use in HTML attributes
+            const escapedMarketTicker = item.market_ticker.replace(/'/g, "\\'").replace(/"/g, '\\"');
+            const escapedBrainName = item.brainInstanceName ? item.brainInstanceName.replace(/'/g, "\\'").replace(/"/g, '\\"') : null;
+
+            const cardHtml = `
+                <div class="market-card" onclick="showMarketContextMenu(event, '${escapedMarketTicker}', ${escapedBrainName ? `'${escapedBrainName}'` : 'null'})" oncontextmenu="showMarketContextMenu(event, '${escapedMarketTicker}', ${escapedBrainName ? `'${escapedBrainName}'` : 'null'})">
                     <!-- Title Group at Top -->
                     <div class="title-group">
-                        <div class="market-ticker" title="${market.title}">
-                            <i class="${categoryInfo.icon}" style="color: ${categoryInfo.color}; font-size: 14px;" title="${market.category || 'Unknown Category'}"></i>
-                            <span class="title-text">${market.title}</span>
+                        <div class="market-ticker" title="${market.title.replace(/"/g, '"')}">
+                            <i class="${categoryInfo.icon}" style="color: ${categoryInfo.color}; font-size: 14px;" title="${(market.category || 'Unknown Category').replace(/"/g, '"')}"></i>
+                            <span class="title-text">${market.title.replace(/</g, '<').replace(/>/g, '>')}</span>
                         </div>
-                        <div class="market-subtitle" title="${displaySubtitle}">${displaySubtitle}</div>
+                        <div class="market-subtitle" title="${displaySubtitle.replace(/"/g, '"')}">${displaySubtitle.replace(/</g, '<').replace(/>/g, '>')}</div>
                     </div>
 
                     <!-- Status and Brain Lock -->
                     <div class="status-section">
                         <span class="market-status ${statusClass}">${market.status || 'Unknown'}</span>
-                        ${item.brainInstanceName ? `<div class="brain-lock-instance">${item.brainInstanceName}</div>` : '<div class="brain-lock-instance no-brain-lock">No Brain Lock</div>'}
+                        ${item.brainInstanceName ? `<div class="brain-lock-instance">${item.brainInstanceName.replace(/</g, '<').replace(/>/g, '>')}</div>` : '<div class="brain-lock-instance no-brain-lock">No Brain Lock</div>'}
                     </div>
 
                     <!-- Metrics Section -->
@@ -1667,83 +1681,144 @@
                     </div>
                 </div>
             `;
+
+            console.log('DEBUG: Generated card HTML for', item.brainInstanceName, ':', cardHtml.substring(0, 200) + '...');
+            return cardHtml;
         }
 
         function renderBrainLocks() {
             const container = document.getElementById('brainLocksContainer');
+
+            if (!brainLockData || !Array.isArray(brainLockData)) {
+                container.innerHTML = '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Invalid brain lock data received</div></div>';
+                return;
+            }
 
             if (brainLockData.length === 0) {
                 container.innerHTML = '<div class="empty-state"><i class="fas fa-brain"></i><div>No brain locks found</div></div>';
                 return;
             }
 
-            container.innerHTML = `
-                <div class="brain-lock-grid">
-                    ${brainLockData.map(item => createBrainLockCard(item)).join('')}
-                </div>
-            `;
+            try {
+                container.innerHTML = `
+            <div class="brain-lock-grid">
+                ${brainLockData.map(item => createBrainLockCard(item)).join('')}
+            </div>
+        `;
+                // ensure the tab is actually visible if user is on Brains
+                if (window.currentTab === 'brainlocks') {
+                    const tab = document.getElementById('brainlocks-tab');
+                    if (tab) {
+                        tab.style.display = 'block';
+                        tab.style.visibility = 'visible';
+                    }
+                }
+                console.log('DEBUG: Brain locks rendered successfully');
+            } catch (error) {
+                console.error('DEBUG: Error rendering brain locks:', error);
+                container.innerHTML = '<div class="error"><i class="fas fa-exclamation-triangle"></i><div>Error rendering brain locks: ' + error.message + '</div></div>';
+            }
         }
 
         function createBrainLockCard(item) {
-            const lastSnapshotFormatted = item.lastSnapshotSaved ? formatDateTime(item.lastSnapshotSaved) : 'Never';
-            const lastWatchedFormatted = item.lastWatched ? formatDateTime(item.lastWatched) : 'Never';
-            const lastErrorFormatted = item.lastErrorEncountered ? formatDateTime(item.lastErrorEncountered) : 'Never';
+            console.log('DEBUG: createBrainLockCard called for:', item.brainInstanceName, 'with checkInData:', checkInData[item.brainInstanceName]);
 
-            return `
-                <div class="brain-lock-card" onclick="showBrainContextMenu(event, '${item.brainInstanceName}')" oncontextmenu="showBrainContextMenu(event, '${item.brainInstanceName}')">
-                    <div class="brain-lock-header">
-                        <div class="brain-lock-id">
-                            <i class="fas fa-brain"></i>
-                            ${item.brainInstanceName}
+            if (!item || !item.brainInstanceName) {
+                console.error('DEBUG: Invalid item or missing brainInstanceName:', item);
+                return '<div class="error">Invalid brain data</div>';
+            }
+
+            const brainCheckInData = checkInData[item.brainInstanceName];
+            let statusText = 'Connecting...';
+            let statusColor = '#ffc107';
+            let hasRecentCheckIn = false;
+
+            if (brainCheckInData && brainCheckInData.lastCheckIn) {
+                const timeSinceCheckIn = new Date() - new Date(brainCheckInData.lastCheckIn);
+                if (timeSinceCheckIn < 300000) {
+                    statusText = 'Active';
+                    statusColor = '#28a745';
+                    hasRecentCheckIn = true;
+                } else {
+                    statusText = 'Offline';
+                    statusColor = '#6c757d';
+                }
+            } else if (brainCheckInData) {
+                statusText = 'Unknown';
+                statusColor = '#6c757d';
+            }
+
+            const escapedBrainName = item.brainInstanceName.replace(/'/g, "\\'").replace(/"/g, '\\"');
+
+            const cardHtml = `
+                    <div class="brain-lock-card" onclick="showBrainContextMenu(event, '${escapedBrainName}')" oncontextmenu="showBrainContextMenu(event, '${escapedBrainName}')">
+                        <div class="brain-lock-header">
+                            <div class="brain-lock-id">
+                                <i class="fas fa-brain"></i>
+                                ${item.brainInstanceName}
+                            </div>
+                            <div style="font-size: 14px; color: #cccccc;">
+                                ${hasRecentCheckIn ? checkInData[item.brainInstanceName].marketCount + ' markets' : 'Not Connected'}
+                            </div>
+                            <div id="status-indicator-${item.brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}" style="font-size: 12px; font-weight: 600; color: ${statusColor};">
+                                ${statusText}
+                            </div>
                         </div>
-                        <div style="font-size: 14px; color: #cccccc;">
-                            ${item.marketCount} markets
+
+                        <div class="brain-lock-stats">
+                            <div class="stat-item">
+                                <span class="stat-value">${hasRecentCheckIn ? checkInData[item.brainInstanceName].marketCount : item.marketCount || '--'}</span>
+                                <div class="stat-label">Current Markets</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">${item.marketCount || '--'}</span>
+                                <div class="stat-label">Target Watches</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">${item.minInterestScore ? item.minInterestScore.toFixed(1) : '--'}</span>
+                                <div class="stat-label">Min Interest</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">--</span>
+                                <div class="stat-label">Usage Min</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="last-checkin-${item.brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}">${hasRecentCheckIn ? formatDateTime(checkInData[item.brainInstanceName].lastCheckIn) : 'Never'}</span>
+                                <div class="stat-label">Last Check In</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="last-snapshot-${item.brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}">${hasRecentCheckIn ? formatDateTime(checkInData[item.brainInstanceName].lastSnapshot) : 'Never'}</span>
+                                <div class="stat-label">Last Snapshot</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="error-count-${item.brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}">${hasRecentCheckIn ? checkInData[item.brainInstanceName].errorCount : '0'}</span>
+                                <div class="stat-label">Error Count</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">${item.lastSeen ? formatDateTime(item.lastSeen) : 'Never'}</span>
+                                <div class="stat-label">Last Seen</div>
+                            </div>
                         </div>
-                        <div id="status-indicator-${item.brainInstanceName}" style="font-size: 12px; font-weight: 600; color: #28a745;">
-                            Active
+
+                        <!-- Performance Graphs -->
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(28, 51, 39, 0.3);">
+                            <div class="stat-item">
+                                <canvas id="cpu-chart-${item.brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}" width="60" height="30" style="background: rgba(28, 51, 39, 0.1); border-radius: 4px;"></canvas>
+                                <div class="stat-label" style="font-size: 10px;">CPU Usage</div>
+                            </div>
+                            <div class="stat-item">
+                                <canvas id="event-chart-${item.brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}" width="60" height="30" style="background: rgba(28, 51, 39, 0.1); border-radius: 4px;"></canvas>
+                                <div class="stat-label" style="font-size: 10px;">Event Queue</div>
+                            </div>
+                            <div class="stat-item">
+                                <canvas id="orderbook-chart-${item.brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}" width="60" height="30" style="background: rgba(28, 51, 39, 0.1); border-radius: 4px;"></canvas>
+                                <div class="stat-label" style="font-size: 10px;">Orderbook Queue</div>
+                            </div>
                         </div>
                     </div>
+                `;
 
-                    <div class="brain-lock-stats">
-                        <div class="stat-item">
-                            <span class="stat-value">${item.averageInterestScore.toFixed(1)}</span>
-                            <div class="stat-label">Avg Interest</div>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value">${item.minInterestScore.toFixed(1)}</span>
-                            <div class="stat-label">Min Interest</div>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value">${item.maxInterestScore.toFixed(1)}</span>
-                            <div class="stat-label">Max Interest</div>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value">${item.averageWebsocketEvents.toFixed(1)}</span>
-                            <div class="stat-label">Avg Events</div>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value" id="last-checkin-${item.brainInstanceName}">Never</span>
-                            <div class="stat-label">Last Check In</div>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value" id="last-snapshot-${item.brainInstanceName}">Never</span>
-                            <div class="stat-label">Last Snapshot</div>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value" id="error-count-${item.brainInstanceName}">0</span>
-                            <div class="stat-label">Error Count</div>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value" id="market-count-${item.brainInstanceName}">${item.marketCount}</span>
-                            <div class="stat-label">Markets</div>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value">${lastErrorFormatted}</span>
-                            <div class="stat-label">Last Error</div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            return cardHtml;
         }
 
         function drillIntoBrainLock(brainInstanceName) {
@@ -2404,8 +2479,8 @@
             switchTab('brainlocks');
             await initializeSignalR();
             await refreshAllData();
-            // Auto-refresh every 60 seconds
-            setInterval(refreshAllData, 60000);
+            // Auto-refresh all data every 30 seconds
+            setInterval(refreshAllData, 30000);
         };
 
         // Handle account balance updates
@@ -2875,11 +2950,14 @@
             try {
                 const recordedEndIcon = item.recordedEnd ? '<i class="fas fa-check" style="color: #28a745;"></i>' : '<i class="fas fa-times" style="color: #dc3545;"></i>';
 
+                // Escape the market ticker for safe use in HTML attributes
+                const escapedMarketTicker = (item.marketTicker || 'N/A').replace(/'/g, "\\'").replace(/"/g, '\\"');
+
                 const rowHtml = `
-                    <tr style="border-bottom: 1px solid rgba(28, 51, 39, 0.3);" onclick="showSnapshotContextMenu(event, '${item.marketTicker}')" oncontextmenu="showSnapshotContextMenu(event, '${item.marketTicker}')">
-                        <td style="padding: 12px; color: rgb(225, 221, 206); font-weight: 600;">${item.marketTicker || 'N/A'}</td>
-                        <td style="padding: 12px; color: rgb(225, 221, 206);">${item.title || 'N/A'}</td>
-                        <td style="padding: 12px; color: rgb(225, 221, 206);">${item.subtitle || item.yes_sub_title || 'N/A'}</td>
+                    <tr style="border-bottom: 1px solid rgba(28, 51, 39, 0.3);" onclick="showSnapshotContextMenu(event, '${escapedMarketTicker}')" oncontextmenu="showSnapshotContextMenu(event, '${escapedMarketTicker}')">
+                        <td style="padding: 12px; color: rgb(225, 221, 206); font-weight: 600;">${(item.marketTicker || 'N/A').replace(/</g, '<').replace(/>/g, '>')}</td>
+                        <td style="padding: 12px; color: rgb(225, 221, 206);">${(item.title || 'N/A').replace(/</g, '<').replace(/>/g, '>')}</td>
+                        <td style="padding: 12px; color: rgb(225, 221, 206);">${(item.subtitle || item.yes_sub_title || 'N/A').replace(/</g, '<').replace(/>/g, '>')}</td>
                         <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${typeof item.recordedHours === 'number' ? item.recordedHours.toFixed(2) : 'N/A'}</td>
                         <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${typeof item.marketHours === 'number' ? item.marketHours.toFixed(2) : 'N/A'}</td>
                         <td style="padding: 12px; text-align: right; color: rgb(225, 221, 206);">${typeof item.recordedHoursPercentage === 'number' ? item.recordedHoursPercentage.toFixed(2) + '%' : 'N/A'}</td>
@@ -2921,16 +2999,90 @@
         }
 
         // Handle comprehensive BrainStatus messages from bots
-        function handleBrainStatusUpdate(brainStatus) {
-            const brainInstanceName = brainStatus.BrainInstanceName;
+        function handleBrainStatusUpdate(brainStatusMessage) {
+            const brainInstanceName = brainStatusMessage.BrainInstanceName;
 
             // Store comprehensive brain data
-            brainData[brainInstanceName] = brainStatus;
+            brainData[brainInstanceName] = brainStatusMessage;
 
             // Update UI elements with comprehensive data
-            updateBrainStatusUI(brainStatus);
+            updateBrainStatusUI(brainStatusMessage);
 
-            console.log(`BrainStatus received from ${brainInstanceName}: Markets=${brainStatus.MarketCount}, CPU=${brainStatus.CurrentCpuUsage}%, Errors=${brainStatus.ErrorCount}, StartingUp=${brainStatus.IsStartingUp}, ShuttingDown=${brainStatus.IsShuttingDown}`);
+            // Render performance charts
+            renderBrainCharts(brainStatusMessage);
+
+            console.log(`BrainStatus received from ${brainInstanceName}: Markets=${brainStatusMessage.MarketCount}, CPU=${brainStatusMessage.CurrentCpuUsage}%, Errors=${brainStatusMessage.ErrorCount}, StartingUp=${brainStatusMessage.IsStartingUp}, ShuttingDown=${brainStatusMessage.IsShuttingDown}`);
+        }
+
+        // Render performance charts for brain cards
+        function renderBrainCharts(brainStatusMessage) {
+            const brainInstanceName = brainStatusMessage.BrainInstanceName;
+            const safeName = brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_');
+
+            // CPU Usage Chart
+            if (brainStatusMessage.CpuUsageHistory && brainStatusMessage.CpuUsageHistory.length > 0) {
+                renderMiniChart(`cpu-chart-${safeName}`, brainStatusMessage.CpuUsageHistory, 'CPU %', '#28a745');
+            }
+
+            // Event Queue Chart
+            if (brainStatusMessage.EventQueueHistory && brainStatusMessage.EventQueueHistory.length > 0) {
+                renderMiniChart(`event-chart-${safeName}`, brainStatusMessage.EventQueueHistory, 'Events', '#ffc107');
+            }
+
+            // Orderbook Queue Chart
+            if (brainStatusMessage.OrderbookQueueHistory && brainStatusMessage.OrderbookQueueHistory.length > 0) {
+                renderMiniChart(`orderbook-chart-${safeName}`, brainStatusMessage.OrderbookQueueHistory, 'Orders', '#dc3545');
+            }
+        }
+
+        // Render mini chart for brain metrics
+        function renderMiniChart(canvasId, historyData, label, color) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+
+            // Prepare data
+            const data = historyData.slice(-10); // Last 10 points for mini chart
+            const labels = data.map(item => new Date(item.Timestamp));
+            const values = data.map(item => item.Value);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: values,
+                        borderColor: color,
+                        backgroundColor: color.replace('rgb', 'rgba').replace(')', ', 0.1)'),
+                        borderWidth: 1,
+                        pointRadius: 0,
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            display: false
+                        },
+                        y: {
+                            display: false
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    animation: {
+                        duration: 0 // Disable animation for performance
+                    }
+                }
+            });
         }
 
         // Handle CheckIn response from server
@@ -2943,41 +3095,74 @@
                     // Confirm receipt of target tickers
                     confirmTargetTickersReceived(response.BrainInstanceName || 'unknown');
                 }
+                // Refresh brain locks display after CheckIn response
+                setTimeout(refreshBrainLocksDisplay, 500);
             } else {
                 console.error('CheckIn failed:', response.Message);
             }
         }
 
-        function updateBrainStatusUI(brainStatus) {
-            const brainInstanceName = brainStatus.BrainInstanceName;
+        // Handle CheckIn messages from bots and update brain cards
+        function handleCheckInUpdate(checkInMessage) {
+            console.log('DEBUG: handleCheckInUpdate called with:', checkInMessage);
+
+            const brainInstanceName = checkInMessage.BrainInstanceName;
+            const marketCount = checkInMessage.MarketCount || 0;
+            const errorCount = checkInMessage.ErrorCount || 0;
+            const lastSnapshot = checkInMessage.LastSnapshot;
+            const lastCheckIn = checkInMessage.LastCheckIn;
+            const isStartingUp = checkInMessage.IsStartingUp || false;
+            const isShuttingDown = checkInMessage.IsShuttingDown || false;
+
+            // Update global checkInData object
+            checkInData[brainInstanceName] = {
+                brainInstanceName: brainInstanceName,
+                marketCount: marketCount,
+                errorCount: errorCount,
+                lastSnapshot: lastSnapshot,
+                lastCheckIn: lastCheckIn,
+                isStartingUp: isStartingUp,
+                isShuttingDown: isShuttingDown
+            };
+
+            console.log('DEBUG: Updated checkInData for', brainInstanceName, ':', checkInData[brainInstanceName]);
+
+            // Re-render brain locks to show updated information
+            renderBrainLocks();
+
+            console.log(`CheckIn received from ${brainInstanceName}: Markets=${marketCount}, ErrorCount=${errorCount}, LastSnapshot=${lastSnapshot}, StartingUp=${isStartingUp}, ShuttingDown=${isShuttingDown}`);
+        }
+
+        function updateBrainStatusUI(brainStatusMessage) {
+            const brainInstanceName = brainStatusMessage.BrainInstanceName;
 
             // Update Last Check In
             const lastCheckInElement = document.getElementById(`last-checkin-${brainInstanceName}`);
             if (lastCheckInElement) {
-                const checkInTime = brainStatus.LastCheckIn ? formatDateTime(brainStatus.LastCheckIn) : 'Never';
+                const checkInTime = brainStatusMessage.LastCheckIn ? formatDateTime(brainStatusMessage.LastCheckIn) : 'Never';
                 lastCheckInElement.textContent = checkInTime;
-                lastCheckInElement.style.color = brainStatus.LastCheckIn ? '#28a745' : '#6c757d';
+                lastCheckInElement.style.color = brainStatusMessage.LastCheckIn ? '#28a745' : '#6c757d';
             }
 
             // Update Last Snapshot
             const lastSnapshotElement = document.getElementById(`last-snapshot-${brainInstanceName}`);
             if (lastSnapshotElement) {
-                const snapshotTime = brainStatus.LastSnapshot ? formatDateTime(brainStatus.LastSnapshot) : 'Never';
+                const snapshotTime = brainStatusMessage.LastSnapshot ? formatDateTime(brainStatusMessage.LastSnapshot) : 'Never';
                 lastSnapshotElement.textContent = snapshotTime;
-                lastSnapshotElement.style.color = brainStatus.LastSnapshot ? '#28a745' : '#6c757d';
+                lastSnapshotElement.style.color = brainStatusMessage.LastSnapshot ? '#28a745' : '#6c757d';
             }
 
             // Update Error Count
             const errorCountElement = document.getElementById(`error-count-${brainInstanceName}`);
             if (errorCountElement) {
-                errorCountElement.textContent = brainStatus.ErrorCount;
-                errorCountElement.style.color = brainStatus.ErrorCount > 0 ? '#dc3545' : '#28a745';
+                errorCountElement.textContent = brainStatusMessage.ErrorCount;
+                errorCountElement.style.color = brainStatusMessage.ErrorCount > 0 ? '#dc3545' : '#28a745';
             }
 
             // Update Market Count
             const marketCountElement = document.getElementById(`market-count-${brainInstanceName}`);
             if (marketCountElement) {
-                marketCountElement.textContent = brainStatus.MarketCount;
+                marketCountElement.textContent = brainStatusMessage.MarketCount;
             }
 
             // Update Status Indicator
@@ -2986,10 +3171,10 @@
                 let statusText = 'Active';
                 let statusColor = '#28a745';
 
-                if (brainStatus.IsStartingUp) {
+                if (brainStatusMessage.IsStartingUp) {
                     statusText = 'Starting Up';
                     statusColor = '#ffc107';
-                } else if (brainStatus.IsShuttingDown) {
+                } else if (brainStatusMessage.IsShuttingDown) {
                     statusText = 'Shutting Down';
                     statusColor = '#dc3545';
                 }
@@ -3060,6 +3245,8 @@
         function handleTargetTickersConfirmationResponse(response) {
             if (response.Success) {
                 console.log(`Target tickers confirmation acknowledged for ${response.BrainInstanceName}`);
+                // Refresh brain locks display after confirmation
+                setTimeout(refreshBrainLocksDisplay, 500);
             } else {
                 console.error(`Target tickers confirmation failed for ${response.BrainInstanceName}:`, response.Message);
             }

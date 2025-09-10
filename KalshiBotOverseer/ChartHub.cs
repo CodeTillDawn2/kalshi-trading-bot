@@ -182,6 +182,14 @@ namespace KalshiBotOverseer
                 if (!string.IsNullOrEmpty(clientInfo.ClientName))
                 {
                     _brainService.UpdateCurrentMarketTickers(clientInfo.ClientName, checkInData.Markets ?? new List<string>());
+
+                    // Update historical metrics
+                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "CpuUsage", checkInData.CurrentCpuUsage);
+                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "EventQueue", checkInData.EventQueueAvg);
+                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "TickerQueue", checkInData.TickerQueueAvg);
+                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "NotificationQueue", checkInData.NotificationQueueAvg);
+                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "OrderbookQueue", checkInData.OrderbookQueueAvg);
+                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "MarketCount", checkInData.Markets?.Count ?? 0);
                 }
 
                 // Update client last seen
@@ -215,6 +223,9 @@ namespace KalshiBotOverseer
                     _logger.LogWarning(dbEx, "Failed to log CheckIn to database for client: {ClientId}", clientInfo.ClientId);
                 }
 
+                // Get existing brain data for historical metrics
+                var existingBrain = _brainService.GetBrain(clientInfo.ClientName ?? "");
+
                 // Create comprehensive brain status data
                 var brainStatus = new BrainStatusData
                 {
@@ -227,8 +238,6 @@ namespace KalshiBotOverseer
                     ManagedWatchList = checkInData.ManagedWatchList,
                     CaptureSnapshots = checkInData.CaptureSnapshots,
                     TargetWatches = checkInData.TargetWatches,
-                    MinimumInterest = checkInData.MinimumInterest,
-                    UsageMin = checkInData.UsageMin,
                     UsageMax = checkInData.UsageMax,
 
                     // Status information
@@ -255,7 +264,15 @@ namespace KalshiBotOverseer
 
                     // Current and target tickers
                     CurrentMarketTickers = checkInData.Markets ?? new List<string>(),
-                    TargetMarketTickers = targetTickers.ToList()
+                    TargetMarketTickers = targetTickers.ToList(),
+
+                    // Historical data from persistence
+                    CpuUsageHistory = existingBrain.CpuUsageHistory,
+                    EventQueueHistory = existingBrain.EventQueueHistory,
+                    TickerQueueHistory = existingBrain.TickerQueueHistory,
+                    NotificationQueueHistory = existingBrain.NotificationQueueHistory,
+                    OrderbookQueueHistory = existingBrain.OrderbookQueueHistory,
+                    MarketCountHistory = existingBrain.MarketCountHistory
                 };
 
                 // Broadcast comprehensive brain status to all connected clients (including web UI)

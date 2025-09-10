@@ -29,5 +29,34 @@ namespace KalshiBotOverseer.Services
             brain.CurrentMarketTickers = new HashSet<string>(tickers);
             SaveBrain(brain);
         }
+
+        public void UpdateMetricHistory(string brainInstanceName, string metricName, double value)
+        {
+            var brain = GetBrain(brainInstanceName);
+            var history = GetHistoryList(brain, metricName);
+            history.Add(new Models.MetricHistory { Timestamp = DateTime.UtcNow, Value = value });
+
+            // Keep only last 50 entries to prevent memory issues
+            if (history.Count > 50)
+            {
+                history.RemoveRange(0, history.Count - 50);
+            }
+
+            SaveBrain(brain);
+        }
+
+        private List<Models.MetricHistory> GetHistoryList(BrainPersistence brain, string metricName)
+        {
+            return metricName switch
+            {
+                "CpuUsage" => brain.CpuUsageHistory,
+                "EventQueue" => brain.EventQueueHistory,
+                "TickerQueue" => brain.TickerQueueHistory,
+                "NotificationQueue" => brain.NotificationQueueHistory,
+                "OrderbookQueue" => brain.OrderbookQueueHistory,
+                "MarketCount" => brain.MarketCountHistory,
+                _ => throw new ArgumentException($"Unknown metric: {metricName}")
+            };
+        }
     }
 }
