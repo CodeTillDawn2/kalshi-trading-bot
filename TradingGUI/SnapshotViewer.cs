@@ -86,6 +86,9 @@ namespace SimulatorWinForms
             // Add resize handler for dynamic scaling
             this.Resize += SnapshotViewer_ResizeEnd;
 
+            // Initialize typography system
+            ApplyInitialTypography();
+
             // DISABLE ScottPlot's built-in pan/zoom to prevent conflicts with custom panning
             priceChart.Configuration.Pan = false;
             priceChart.Configuration.Zoom = false;
@@ -1318,39 +1321,38 @@ namespace SimulatorWinForms
 
         private void SnapshotViewer_ResizeEnd(object sender, EventArgs e)
         {
-            // Calculate isotropic scale factor: min of width and height ratios (clamp between min and max)
+            // Calculate isotropic scale factor with DPI awareness (more conservative)
             float widthScale = (float)this.Width / OriginalWidth;
             float heightScale = (float)this.Height / OriginalHeight;
-            float scaleFactor = Math.Clamp(Math.Min(widthScale, heightScale), MinScale, MaxScale);
+            float baseScale = Math.Clamp(Math.Min(widthScale, heightScale), MinScale, MaxScale);
+            float dpiScale = TypographyManager.Instance.GetTypographyScale();
 
-            // Scale fonts for labels, checkboxes, and values recursively
-            ScaleFonts(this, scaleFactor);
+            // Use more conservative scaling to prevent layout issues
+            float scaleFactor = Math.Min(baseScale, dpiScale);
 
-            // Scale DataGridView (orderbookGrid)
-            orderbookGrid.Font = new Font(orderbookGrid.Font.FontFamily, 8.25f * scaleFactor);
-            orderbookGrid.ColumnHeadersDefaultCellStyle.Font = new Font(orderbookGrid.Font.FontFamily, 8.25f * scaleFactor, FontStyle.Bold);
-            orderbookGrid.AutoResizeColumns();
+            // Only apply typography scaling if it's significantly different from 1.0
+            if (Math.Abs(scaleFactor - 1.0f) > 0.1f)
+            {
+                // Apply enhanced typography with scaling
+                TypographyManager.Instance.ApplyTypography(this, scaleFactor);
 
-            // Scale Button (backButton)
-            backButton.Font = new Font(backButton.Font.FontFamily, 8.25f * scaleFactor);
+                // Special handling for ScottPlot charts (typography manager skips them)
+                var plot = priceChart.Plot;
+                plot.XAxis.LabelStyle(fontSize: 12f * scaleFactor);
+                plot.YAxis.LabelStyle(fontSize: 12f * scaleFactor);
+                plot.XAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
+                plot.YAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
 
-            // Scale ScottPlot fonts (priceChart)
-            var plot = priceChart.Plot;
-            plot.XAxis.LabelStyle(fontSize: 12f * scaleFactor);
-            plot.YAxis.LabelStyle(fontSize: 12f * scaleFactor);
-            plot.XAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
-            plot.YAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
+                var secondaryPlot = secondaryChart.Plot;
+                secondaryPlot.XAxis.LabelStyle(fontSize: 12f * scaleFactor);
+                secondaryPlot.YAxis.LabelStyle(fontSize: 12f * scaleFactor);
+                secondaryPlot.XAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
+                secondaryPlot.YAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
 
-            // Scale ScottPlot fonts (secondaryChart)
-            var secondaryPlot = secondaryChart.Plot;
-            secondaryPlot.XAxis.LabelStyle(fontSize: 12f * scaleFactor);
-            secondaryPlot.YAxis.LabelStyle(fontSize: 12f * scaleFactor);
-            secondaryPlot.XAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
-            secondaryPlot.YAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
-
-            // Refresh both charts to apply changes
-            priceChart.Refresh();
-            secondaryChart.Refresh();
+                // Refresh both charts to apply changes
+                priceChart.Refresh();
+                secondaryChart.Refresh();
+            }
         }
 
         private void ScaleFonts(Control control, float scaleFactor)
@@ -1367,6 +1369,20 @@ namespace SimulatorWinForms
             foreach (Control child in control.Controls)
             {
                 ScaleFonts(child, scaleFactor);
+            }
+        }
+
+        private void ApplyInitialTypography()
+        {
+            // Apply typography on initial load with conservative DPI scaling
+            float dpiScale = TypographyManager.Instance.GetTypographyScale();
+
+            // Use more conservative scaling for initial load to prevent layout issues
+            float scaleFactor = Math.Min(dpiScale, 1.2f);
+
+            if (Math.Abs(scaleFactor - 1.0f) > 0.1f)
+            {
+                TypographyManager.Instance.ApplyTypography(this, scaleFactor);
             }
         }
 

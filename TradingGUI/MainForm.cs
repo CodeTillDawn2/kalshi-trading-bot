@@ -107,6 +107,9 @@ namespace SimulatorWinForms
 
             // Add activation handler to reset panning state
             this.Activated += MainForm_Activated;
+
+            // Initialize typography system
+            ApplyInitialTypography();
         }
 
         private void ResetPnLForMarkets(IEnumerable<string> markets)
@@ -688,38 +691,31 @@ namespace SimulatorWinForms
 
         private void MainForm_ResizeEnd(object sender, EventArgs e)
         {
-            // Calculate scale factor based on width (clamp between min and max)
-            float scaleFactor = Math.Clamp((float)this.Width / OriginalWidth, MinScale, MaxScale);
+            // Calculate scale factor based on width and DPI (more conservative scaling)
+            float widthScale = Math.Clamp((float)this.Width / OriginalWidth, MinScale, MaxScale);
+            float dpiScale = TypographyManager.Instance.GetTypographyScale();
 
-            // Scale fonts for DataGridView (including headers)
-            dgvMarkets.Font = new Font(dgvMarkets.Font.FontFamily, 8.25f * scaleFactor);  // Default WinForms font size is ~8.25
-            dgvMarkets.ColumnHeadersDefaultCellStyle.Font = new Font(dgvMarkets.Font.FontFamily, 8.25f * scaleFactor, FontStyle.Bold);
-            dgvMarkets.AutoResizeColumns();  // Ensure columns adjust
+            // Use more conservative scaling to prevent layout issues
+            float scaleFactor = Math.Min(widthScale, dpiScale);
 
-            // Scale RichTextBox font
-            rtbLog.Font = new Font("Consolas", 9f * scaleFactor);
-
-            // Scale button fonts
-            foreach (Control control in buttonPanel.Controls)
+            // Only apply typography scaling if it's significantly different from 1.0
+            if (Math.Abs(scaleFactor - 1.0f) > 0.1f)
             {
-                if (control is Button button)
-                {
-                    button.Font = new Font(button.Font.FontFamily, 8.25f * scaleFactor);
-                }
+                TypographyManager.Instance.ApplyTypography(this, scaleFactor);
+
+                // Special handling for ScottPlot (typography manager skips it)
+                var plot = formsPlot1.Plot;
+                plot.XAxis.LabelStyle(fontSize: 12f * scaleFactor);
+                plot.YAxis.LabelStyle(fontSize: 12f * scaleFactor);
+                plot.XAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
+                plot.YAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
+
+                // Refresh the plot to apply changes
+                formsPlot1.Refresh();
+
+                // Ensure tooltip overlay uses proper typography
+                _tooltipOverlay.Font = TypographyManager.Instance.GetScaledFont(FontSize.Medium, scaleFactor);
             }
-
-            // Scale ScottPlot fonts (adjust labels, ticks, etc.)
-            var plot = formsPlot1.Plot;
-            plot.XAxis.LabelStyle(fontSize: 12f * scaleFactor);
-            plot.YAxis.LabelStyle(fontSize: 12f * scaleFactor);
-            plot.XAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
-            plot.YAxis.TickLabelStyle(fontSize: 10f * scaleFactor);
-
-            // Refresh the plot to apply changes
-            formsPlot1.Refresh();
-
-            // Refresh tooltip overlay font if needed
-            _tooltipOverlay.Font = new Font(_tooltipOverlay.Font.FontFamily, 9f * scaleFactor);
         }
 
         private void ResetPanningState()
@@ -746,6 +742,20 @@ namespace SimulatorWinForms
                 timer.Dispose();
             };
             timer.Start();
+        }
+
+        private void ApplyInitialTypography()
+        {
+            // Apply typography on initial load with conservative DPI scaling
+            float dpiScale = TypographyManager.Instance.GetTypographyScale();
+
+            // Use more conservative scaling for initial load to prevent layout issues
+            float scaleFactor = Math.Min(dpiScale, 1.2f);
+
+            if (Math.Abs(scaleFactor - 1.0f) > 0.1f)
+            {
+                TypographyManager.Instance.ApplyTypography(this, scaleFactor);
+            }
         }
 
         private async void btnRunML_Click(object sender, EventArgs e)
