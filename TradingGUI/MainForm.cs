@@ -5,14 +5,14 @@ using Microsoft.Extensions.Configuration;
 using BacklashDTOs;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using TradingSimulator.Simulator;
+using TradingSimulator;
 using TradingSimulator.TestObjects;
 
 namespace SimulatorWinForms
 {
     public partial class MainForm : Form
     {
-        private readonly SimulatorTests _simulator;
+        private readonly TradingSimulatorService _simulator;
         private readonly KalshiBotContext _context;
         private readonly string _cacheDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "TestingOutput");
         private List<(double x, double y, string memo)> _tooltipPoints = new();
@@ -44,16 +44,15 @@ namespace SimulatorWinForms
 
             toolTip1.ShowAlways = true;
 
-            // Initialize database context
+            // Initialize database context with same config as SimulatorTests
+            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
             var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>
-                {
-                    ["ConnectionStrings:DefaultConnection"] = "Server=localhost;Database=KalshiBot;Trusted_Connection=True;"
-                })
+                .SetBasePath(basePath)
+                .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
                 .Build();
             _context = new KalshiBotContext(config);
 
-            _simulator = new SimulatorTests();
+            _simulator = new TradingSimulatorService();
             _simulator.EnsureInitialized();
             _simulator.OnTestProgress += msg => AppendLog(msg);
             _simulator.OnProfitLossUpdate += (m, pnl) => UpdatePnL(m, pnl);
@@ -221,7 +220,8 @@ namespace SimulatorWinForms
                 }
 
                 // Query markets from database
-                var markets = await _context.GetMarkets();
+                var markets = await _context.GetMarkets(includedMarkets: bases.ToHashSet());
+                
                 foreach (var market in markets.OrderBy(m => m.market_ticker))
                 {
                     var pnlStr = pnlByBase.TryGetValue(market.market_ticker, out var pnl) ? pnl.ToString("F2") : "";
@@ -512,7 +512,7 @@ namespace SimulatorWinForms
 
             if (e.Button == MouseButtons.Right)
             {
-                // prevent ScottPlot’s default right-drag zoom from fighting our pan (if available)
+                // prevent ScottPlotï¿½s default right-drag zoom from fighting our pan (if available)
                 try { formsPlot1.Configuration.RightClickDragZoom = false; } catch { /* ignore if not supported */ }
 
                 var lim = formsPlot1.Plot.GetAxisLimits();
