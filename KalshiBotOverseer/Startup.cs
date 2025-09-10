@@ -130,7 +130,8 @@ namespace KalshiBotOverseer
             {
                 options.KeepAliveInterval = TimeSpan.FromSeconds(15);
                 options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
-            });
+                
+            }).AddJsonProtocol(o => { o.PayloadSerializerOptions.PropertyNamingPolicy = null; });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

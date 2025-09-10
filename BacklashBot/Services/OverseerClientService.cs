@@ -571,12 +571,17 @@ namespace BacklashBot.Services
 
         private async Task PerformHandshakeAsync()
         {
-            if (_hubConnection == null || !_isConnected) return;
+            if (!IsConnectionActive()) return;
 
             try
             {
                 await _hubConnection.InvokeAsync("Handshake", _clientId, _clientName, _clientType);
                 _logger.LogInformation("OVERSEER- Handshake sent to overseer");
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
+            {
+                _logger.LogWarning("OVERSEER- Connection became inactive during handshake attempt. Will mark as disconnected. Error: {Error}", ex.Message);
+                _isConnected = false;
             }
             catch (Exception ex)
             {
@@ -765,11 +770,18 @@ namespace BacklashBot.Services
             await AttemptConnectionAsync(newUrl, reason);
         }
 
+        private bool IsConnectionActive()
+        {
+            return _hubConnection != null &&
+                   _isConnected &&
+                   _hubConnection.State == HubConnectionState.Connected;
+        }
+
         private async Task SendCheckInAsync()
         {
-            if (_hubConnection == null || !_isConnected)
+            if (!IsConnectionActive())
             {
-                _logger.LogDebug("OVERSEER- Overseer not connected, skipping CheckIn (will retry on next cycle)");
+                _logger.LogDebug("OVERSEER- Overseer not connected or connection not active, skipping CheckIn (will retry on next cycle)");
                 return;
             }
 
@@ -816,6 +828,11 @@ namespace BacklashBot.Services
 
                 await _hubConnection.InvokeAsync("CheckIn", checkInData);
                 _logger.LogInformation("OVERSEER- CheckIn sent successfully to overseer at {Url}", _currentOverseerUrl);
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
+            {
+                _logger.LogWarning("OVERSEER- Connection became inactive during CheckIn attempt. Will mark as disconnected and retry. Error: {Error}", ex.Message);
+                _isConnected = false; // Mark as disconnected so discovery can try to reconnect
             }
             catch (Exception ex)
             {

@@ -276,15 +276,21 @@ namespace KalshiBotOverseer
                 };
 
                 // Broadcast comprehensive brain status to all connected clients (including web UI)
+                // (A) log how many clients are connected on this hub instance
+                var connections = _connectedClients.Count;
+                _logger.LogInformation("[ChartHub] Broadcasting BrainStatusUpdate for {Brain} to {Count} connections",
+                    brainStatus.BrainInstanceName, connections);
+
+                // (B) send the real payload
                 await Clients.All.SendAsync("BrainStatusUpdate", brainStatus);
 
-                // Send acknowledgment with target tickers
-                await Clients.Caller.SendAsync("CheckInResponse", new
+                // (C) send a tiny trace ping so the browser can prove it received *something* even if deserialization ever failed
+                await Clients.All.SendAsync("BroadcastTrace", new
                 {
-                    Success = true,
-                    Message = "CheckIn received successfully",
-                    TargetTickers = targetTickers,
-                    Timestamp = DateTime.UtcNow
+                    Kind = "BrainStatusUpdate",
+                    Brain = brainStatus.BrainInstanceName,
+                    MarketCount = brainStatus.MarketCount,
+                    ServerUtc = DateTime.UtcNow
                 });
 
             }

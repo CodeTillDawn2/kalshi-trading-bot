@@ -1403,35 +1403,57 @@
         let currentPage = 1;
         let pageSize = 50;
         let filteredData = [];
+        let brainData = {};
         let checkInData = {};
         let connection = null;
 
+        window.onerror = (m, s, l, c, e) => console.error('[GLOBAL ERROR]', m, 'at', s + ':' + l + ':' + c, e);
+        window.onunhandledrejection = (ev) => console.error('[UNHANDLED REJECTION]', ev?.reason || ev);
+
         // Initialize SignalR connection
         async function initializeSignalR() {
+            const hubUrl = '/chartHub';
+            console.log('[BrainCards] building hub connection to', hubUrl);
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl(hubUrl)
+                .withAutomaticReconnect()
+                .configureLogging(signalR.LogLevel.Information)
+                .build();
+
+            // Expose for other functions already in the page
+            window.connection = connection;
+
+            connection.on('BrainStatusUpdate', (m) => {
+                mwLog('debug', '[BrainCards] BrainStatusUpdate received', { keys: Object.keys(m || {}), sample: m });
+                handleBrainStatusUpdate(m);
+            });
+
+            connection.on('CheckInUpdate', (msg) => {
+                console.log('[BrainCards] CheckInUpdate received:', msg);
+                try {
+                    handleCheckInUpdate(msg);
+                } catch (e) {
+                    console.error('[BrainCards] CheckInUpdate handler error:', e);
+                }
+            });
+
+            // Optional server-side ping (added below) shows here if broadcast reaches browser
+            connection.on('BroadcastTrace', (info) => {
+                console.log('[BrainCards] BroadcastTrace:', info);
+            });
+
+            // Lifecycle logs
+            connection.onreconnecting(err => console.warn('[BrainCards] reconnecting…', err));
+            connection.onreconnected(id => console.log('[BrainCards] reconnected, connId=', id));
+            connection.onclose(err => console.warn('[BrainCards] closed', err));
+
+            // Start
             try {
-                connection = new signalR.HubConnectionBuilder()
-                    .withUrl('/chartHub')
-                    .withAutomaticReconnect()
-                    .build();
-
-                // Set up event handlers
-                connection.on('BrainStatusUpdate', handleBrainStatusUpdate);
-                connection.on('CheckInUpdate', handleCheckInUpdate);
-                connection.on('CheckInResponse', handleCheckInResponse);
-                connection.on('TargetTickersResponse', handleTargetTickersResponse);
-                connection.on('CurrentTickersResponse', handleCurrentTickersResponse);
-                connection.on('TargetTickersConfirmationResponse', handleTargetTickersConfirmationResponse);
-
-                console.log('DEBUG: SignalR event handlers registered');
-
-                // Start the connection
                 await connection.start();
-                console.log('SignalR connection established');
-
-                // Perform handshake
-                await connection.invoke('Handshake', 'web-ui', 'Web Dashboard', 'WebClient');
-            } catch (error) {
-                console.error('SignalR connection failed:', error);
+                console.log('[BrainCards] connection established, state=', connection.state);
+            } catch (err) {
+                console.error('[BrainCards] connection start failed:', err);
             }
         }
 
@@ -1496,13 +1518,13 @@
 
         function updateBrainLockFilter() {
             const brainLockFilter = document.getElementById('brainLockFilter');
-            const brainLocks = [...new Set(marketData.map(item => item.brainInstanceName).filter(bl => bl))];
-
-            brainLockFilter.innerHTML = '<option value="">All Brain Instances</option>';
-            brainLockFilter.innerHTML += '<option value="none">No Brain Lock</option>';
-            brainLocks.sort().forEach(bl => {
-                brainLockFilter.innerHTML += `<option value="${bl}">${bl}</option>`;
-            });
+            const uniqueNames = Array.from(
+                new Set((marketData || []).map(item => item.brainInstanceName).filter(Boolean))
+            ).sort((a, b) => a.localeCompare(b));
+            brainLockFilter.innerHTML = `
+        <option value="">All</option>
+        ${uniqueNames.map(name => `<option value="${name}">${name}</option>`).join('')}
+    `;
         }
 
         function renderMarkets() {
@@ -1700,6 +1722,9 @@
             }
 
             try {
+                mwLog('debug', 'renderBrainLocks: keys present in checkInData',
+                    { keys: Object.keys(checkInData || {}) });
+
                 container.innerHTML = `
             <div class="brain-lock-grid">
                 ${brainLockData.map(item => createBrainLockCard(item)).join('')}
@@ -2998,20 +3023,65 @@
             renderSnapshots();
         }
 
-        // Handle comprehensive BrainStatus messages from bots
-        function handleBrainStatusUpdate(brainStatusMessage) {
-            const brainInstanceName = brainStatusMessage.BrainInstanceName;
+        function mwLog(level, msg, obj) {
+            try { console[level](`[MW][${new Date().toISOString()}] ${msg}`, obj ?? ''); } catch (_) { }
+        }
+        function resolveNameFromMsg(m) {
+            const pas = m && m.BrainInstanceName;
+            const cam = m && m.brainInstanceName;
+            const name = pas || cam || null;
+            const casing = pas ? 'PascalCase' : (cam ? 'camelCase' : 'missing');
+            return { name, casing };
+        }
 
-            // Store comprehensive brain data
-            brainData[brainInstanceName] = brainStatusMessage;
+        // Store and reflect comprehensive status; also refresh the card’s check-in snapshot
+        function handleBrainStatusUpdate(msg) {
+            // Accept either BrainInstanceName or brainInstanceName
+            const pas = msg && msg.BrainInstanceName;
+            const cam = msg && msg.brainInstanceName;
+            const name = pas || cam || null;
 
-            // Update UI elements with comprehensive data
-            updateBrainStatusUI(brainStatusMessage);
+            mwLog('debug', '[BrainCards] handleBrainStatusUpdate: entry', { name, hasPascal: !!pas, hasCamel: !!cam });
 
-            // Render performance charts
-            renderBrainCharts(brainStatusMessage);
+            if (!name) {
+                mwLog('warn', '[BrainCards] handleBrainStatusUpdate: missing brain name; aborting', { keys: Object.keys(msg || {}) });
+                return;
+            }
 
-            console.log(`BrainStatus received from ${brainInstanceName}: Markets=${brainStatusMessage.MarketCount}, CPU=${brainStatusMessage.CurrentCpuUsage}%, Errors=${brainStatusMessage.ErrorCount}, StartingUp=${brainStatusMessage.IsStartingUp}, ShuttingDown=${brainStatusMessage.IsShuttingDown}`);
+            // Store the full status for charts/other UI
+            brainData[name] = msg;
+            mwLog('debug', '[BrainCards] handleBrainStatusUpdate: brainData set', { name, storedKeys: Object.keys(brainData[name] || {}) });
+
+            // Derive check-in badge fields for the brain lock card
+            const lastCheckIn = msg.LastCheckIn ?? msg.lastCheckIn ?? null;
+            const lastSnapshot = msg.LastSnapshot ?? msg.lastSnapshot ?? null;
+            const marketCount = (msg.MarketCount ?? msg.marketCount) ?? 0;
+            const errorCount = (msg.ErrorCount ?? msg.errorCount) ?? 0;
+            const isStartingUp = !!(msg.IsStartingUp ?? msg.isStartingUp);
+            const isShuttingDown = !!(msg.IsShuttingDown ?? msg.isShuttingDown);
+
+            checkInData[name] = {
+                brainInstanceName: name,
+                marketCount,
+                errorCount,
+                lastSnapshot,
+                lastCheckIn,
+                isStartingUp,
+                isShuttingDown
+            };
+            mwLog('debug', '[BrainCards] handleBrainStatusUpdate: checkInData updated', checkInData[name]);
+
+            // Update the UI that depends on this status
+            try { updateBrainStatusUI(msg); } catch (e) { mwLog('error', '[BrainCards] updateBrainStatusUI failed', e); }
+            try { renderBrainCharts(msg); } catch (e) { mwLog('error', '[BrainCards] renderBrainCharts failed', e); }
+
+            // Re-render brain cards so badges/timestamps change immediately
+            try {
+                renderBrainLocks();
+                mwLog('debug', '[BrainCards] handleBrainStatusUpdate: renderBrainLocks done', { name, hasCheckIn: !!checkInData[name] });
+            } catch (e) {
+                mwLog('error', '[BrainCards] renderBrainLocks failed', e);
+            }
         }
 
         // Render performance charts for brain cards
@@ -3104,83 +3174,102 @@
 
         // Handle CheckIn messages from bots and update brain cards
         function handleCheckInUpdate(checkInMessage) {
-            console.log('DEBUG: handleCheckInUpdate called with:', checkInMessage);
+            try {
+                console.log('DEBUG: handleCheckInUpdate called with:', checkInMessage);
 
-            const brainInstanceName = checkInMessage.BrainInstanceName;
-            const marketCount = checkInMessage.MarketCount || 0;
-            const errorCount = checkInMessage.ErrorCount || 0;
-            const lastSnapshot = checkInMessage.LastSnapshot;
-            const lastCheckIn = checkInMessage.LastCheckIn;
-            const isStartingUp = checkInMessage.IsStartingUp || false;
-            const isShuttingDown = checkInMessage.IsShuttingDown || false;
-
-            // Update global checkInData object
-            checkInData[brainInstanceName] = {
-                brainInstanceName: brainInstanceName,
-                marketCount: marketCount,
-                errorCount: errorCount,
-                lastSnapshot: lastSnapshot,
-                lastCheckIn: lastCheckIn,
-                isStartingUp: isStartingUp,
-                isShuttingDown: isShuttingDown
-            };
-
-            console.log('DEBUG: Updated checkInData for', brainInstanceName, ':', checkInData[brainInstanceName]);
-
-            // Re-render brain locks to show updated information
-            renderBrainLocks();
-
-            console.log(`CheckIn received from ${brainInstanceName}: Markets=${marketCount}, ErrorCount=${errorCount}, LastSnapshot=${lastSnapshot}, StartingUp=${isStartingUp}, ShuttingDown=${isShuttingDown}`);
-        }
-
-        function updateBrainStatusUI(brainStatusMessage) {
-            const brainInstanceName = brainStatusMessage.BrainInstanceName;
-
-            // Update Last Check In
-            const lastCheckInElement = document.getElementById(`last-checkin-${brainInstanceName}`);
-            if (lastCheckInElement) {
-                const checkInTime = brainStatusMessage.LastCheckIn ? formatDateTime(brainStatusMessage.LastCheckIn) : 'Never';
-                lastCheckInElement.textContent = checkInTime;
-                lastCheckInElement.style.color = brainStatusMessage.LastCheckIn ? '#28a745' : '#6c757d';
-            }
-
-            // Update Last Snapshot
-            const lastSnapshotElement = document.getElementById(`last-snapshot-${brainInstanceName}`);
-            if (lastSnapshotElement) {
-                const snapshotTime = brainStatusMessage.LastSnapshot ? formatDateTime(brainStatusMessage.LastSnapshot) : 'Never';
-                lastSnapshotElement.textContent = snapshotTime;
-                lastSnapshotElement.style.color = brainStatusMessage.LastSnapshot ? '#28a745' : '#6c757d';
-            }
-
-            // Update Error Count
-            const errorCountElement = document.getElementById(`error-count-${brainInstanceName}`);
-            if (errorCountElement) {
-                errorCountElement.textContent = brainStatusMessage.ErrorCount;
-                errorCountElement.style.color = brainStatusMessage.ErrorCount > 0 ? '#dc3545' : '#28a745';
-            }
-
-            // Update Market Count
-            const marketCountElement = document.getElementById(`market-count-${brainInstanceName}`);
-            if (marketCountElement) {
-                marketCountElement.textContent = brainStatusMessage.MarketCount;
-            }
-
-            // Update Status Indicator
-            const statusIndicatorElement = document.getElementById(`status-indicator-${brainInstanceName}`);
-            if (statusIndicatorElement) {
-                let statusText = 'Active';
-                let statusColor = '#28a745';
-
-                if (brainStatusMessage.IsStartingUp) {
-                    statusText = 'Starting Up';
-                    statusColor = '#ffc107';
-                } else if (brainStatusMessage.IsShuttingDown) {
-                    statusText = 'Shutting Down';
-                    statusColor = '#dc3545';
+                if (!checkInMessage || !checkInMessage.BrainInstanceName) {
+                    console.warn('DEBUG: handleCheckInUpdate: missing BrainInstanceName', checkInMessage);
+                    return;
                 }
 
-                statusIndicatorElement.textContent = statusText;
-                statusIndicatorElement.style.color = statusColor;
+                const brainInstanceName = checkInMessage.BrainInstanceName;
+                const marketCount = checkInMessage.MarketCount ?? 0;
+                const errorCount = checkInMessage.ErrorCount ?? 0;
+                const lastSnapshot = checkInMessage.LastSnapshot ?? null;
+                const lastCheckIn = checkInMessage.LastCheckIn ?? null;
+                const isStartingUp = !!checkInMessage.IsStartingUp;
+                const isShuttingDown = !!checkInMessage.IsShuttingDown;
+
+                // Update global cache used by brain cards
+                checkInData[brainInstanceName] = {
+                    brainInstanceName,
+                    marketCount,
+                    errorCount,
+                    lastSnapshot,
+                    lastCheckIn,
+                    isStartingUp,
+                    isShuttingDown
+                };
+
+                console.log('DEBUG: Updated checkInData for', brainInstanceName, ':', checkInData[brainInstanceName]);
+
+                // Re-render cards so stats/status text reflect the new check-in
+                renderBrainLocks();
+
+                console.log(
+                    `CheckIn received from ${brainInstanceName}: Markets=${marketCount}, ` +
+                    `ErrorCount=${errorCount}, LastSnapshot=${lastSnapshot}, ` +
+                    `StartingUp=${isStartingUp}, ShuttingDown=${isShuttingDown}`
+                );
+            } catch (err) {
+                console.error('ERROR: handleCheckInUpdate failed:', err, checkInMessage);
+            }
+        }
+
+        function updateBrainStatusUI(msg) {
+            const pas = msg && msg.BrainInstanceName;
+            const cam = msg && msg.brainInstanceName;
+            const name = pas || cam || '';
+            const casing = pas ? 'PascalCase' : (cam ? 'camelCase' : 'missing');
+            const safe = name.replace(/[^a-zA-Z0-9]/g, '_');
+
+            const lastCheckIn = msg.LastCheckIn ?? msg.lastCheckIn ?? null;
+            const lastSnapshot = msg.LastSnapshot ?? msg.lastSnapshot ?? null;
+            const errorCount = (msg.ErrorCount ?? msg.errorCount) ?? 0;
+            const marketCount = (msg.MarketCount ?? msg.marketCount) ?? 0;
+            const isStartingUp = !!(msg.IsStartingUp ?? msg.isStartingUp);
+            const isShuttingDown = !!(msg.IsShuttingDown ?? msg.isShuttingDown);
+
+            const ids = {
+                lastCheckIn: `last-checkin-${safe}`,
+                lastSnapshot: `last-snapshot-${safe}`,
+                errorCount: `error-count-${safe}`,
+                marketCount: `market-count-${safe}`,
+                status: `status-indicator-${safe}`
+            };
+            const els = {
+                lastCheckIn: document.getElementById(ids.lastCheckIn),
+                lastSnapshot: document.getElementById(ids.lastSnapshot),
+                errorCount: document.getElementById(ids.errorCount),
+                marketCount: document.getElementById(ids.marketCount),
+                status: document.getElementById(ids.status)
+            };
+
+            mwLog('debug', 'updateBrainStatusUI: mapping + presence', {
+                casing, name, safe, ids,
+                present: Object.fromEntries(Object.entries(els).map(([k, v]) => [k, !!v]))
+            });
+
+            if (els.lastCheckIn) {
+                els.lastCheckIn.textContent = lastCheckIn ? formatDateTime(lastCheckIn) : 'Never';
+                els.lastCheckIn.style.color = lastCheckIn ? '#28a745' : '#6c757d';
+            }
+            if (els.lastSnapshot) {
+                els.lastSnapshot.textContent = lastSnapshot ? formatDateTime(lastSnapshot) : 'Never';
+                els.lastSnapshot.style.color = lastSnapshot ? '#28a745' : '#6c757d';
+            }
+            if (els.errorCount) {
+                els.errorCount.textContent = errorCount;
+                els.errorCount.style.color = errorCount > 0 ? '#dc3545' : '#28a745';
+            }
+            if (els.marketCount) {
+                els.marketCount.textContent = marketCount;
+            }
+            if (els.status) {
+                let text = 'Active', color = '#28a745';
+                if (isStartingUp) { text = 'Starting Up'; color = '#ffc107'; }
+                else if (isShuttingDown) { text = 'Shutting Down'; color = '#dc3545'; }
+                els.status.textContent = text; els.status.style.color = color;
             }
         }
 
@@ -3252,7 +3341,14 @@
             }
         }
 
-        // Account data functions - no SignalR needed
+        window.addEventListener('load', async () => {
+            try {
+                await initializeSignalR();
+                await refreshAllData();
+            } catch (e) {
+                console.error('[Boot] failed:', e);
+            }
+        });
     </script>
 </body>
 </html>

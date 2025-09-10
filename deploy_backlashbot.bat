@@ -1,13 +1,13 @@
 @echo off
 echo ===========================================
-echo KalshiBotOverseer Deployment Script
+echo BacklashBot Deployment Script
 echo ===========================================
-echo Publishing KalshiBotOverseer project (appsettings.local.json will NOT be copied)...
+echo Publishing BacklashBot project (appsettings.local.json will NOT be copied)...
 echo.
 echo Starting deployment process...
 setlocal enabledelayedexpansion
 
-REM Determine PowerShell executable
+:: Determine PowerShell executable
 echo Checking for PowerShell...
 set "POWERSHELL_EXE=powershell.exe"
 where pwsh.exe >nul 2>nul
@@ -17,24 +17,23 @@ if %ERRORLEVEL% == 0 (
 echo INFO: Using PowerShell: %POWERSHELL_EXE%
 echo.
 
-REM Set variables
-set PROJECT_NAME=KalshiBotOverseer
-set PROJECT_PATH=KalshiBotOverseer\KalshiBotOverseer.csproj
-set DEPLOY_FOLDER=C:\Deploy\Overseer
-set PUBLISH_PROFILE=Release
-set TARGET_FRAMEWORK=net8.0
-set ZIP_BASENAME=KalshiBotOverseer
-set THIS_SCRIPT_NAME=%~nx0
-set NETWORK_ZIP_PATH=\\DESKTOP-ITC50UT\SmokehouseCandlestickImport
+:: Configuration
+set "PROJECT_NAME=BacklashBot"
+set "PROJECT_PATH=BacklashBot\BacklashBot.csproj"
+set "OUTPUT_PATH=C:\Deploy\BacklashBot"
+set "TARGET_FRAMEWORK=net8.0"
+set "ZIP_BASENAME=BacklashBot"
+set "THIS_SCRIPT_NAME=%~nx0"
+set "NETWORK_ZIP_PATH=\\DESKTOP-ITC50UT\SmokehouseCandlestickImport"
 
-REM Create timestamp for backup
+:: Create timestamp for backup
 for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /value') do set datetime=%%I
 set TIMESTAMP=%datetime:~0,8%_%datetime:~8,6%
 
 echo Deployment started at %TIMESTAMP%
 echo.
 
-REM Check if project file exists
+:: Check if project file exists
 echo Checking if project file exists: %PROJECT_PATH%
 if not exist "%PROJECT_PATH%" (
     echo ERROR: Project file not found at %PROJECT_PATH%
@@ -46,35 +45,37 @@ if not exist "%PROJECT_PATH%" (
 echo Project file found.
 echo.
 
-REM Create deployment directory if it doesn't exist
-if not exist "%DEPLOY_FOLDER%" (
-    echo Creating deployment directory: %DEPLOY_FOLDER%
-    mkdir "%DEPLOY_FOLDER%"
-)
+:: Clean build artifacts only
+echo Cleaning build artifacts...
+rmdir /s /q "BacklashBot\bin" 2>nul
+rmdir /s /q "BacklashBot\obj" 2>nul
+echo Build artifacts cleaned.
+echo.
 
-REM Backup existing deployment if it exists
-if exist "%DEPLOY_FOLDER%\*" (
-    echo Backing up existing deployment...
-    if not exist "%DEPLOY_FOLDER%_backup" mkdir "%DEPLOY_FOLDER%_backup"
-    move "%DEPLOY_FOLDER%" "%DEPLOY_FOLDER%_backup\%TIMESTAMP%" 2>nul
-    mkdir "%DEPLOY_FOLDER%"
+:: Ensure output path exists
+echo Checking output directory: %OUTPUT_PATH%
+if not exist "%OUTPUT_PATH%" (
+    echo INFO: Creating output directory: %OUTPUT_PATH%
+    mkdir "%OUTPUT_PATH%"
+    if errorlevel 1 (
+        echo ERROR: Failed to create output directory
+        echo.
+        echo Press any key to continue...
+        pause >nul
+        exit /b 1
+    )
 )
+echo Output directory ready.
+echo.
 
 echo.
 echo ===========================================
 echo Building and Publishing %PROJECT_NAME%
 echo ===========================================
 
-REM Clean build artifacts only
-echo Cleaning build artifacts...
-rmdir /s /q "%PROJECT_PATH%\..\bin" 2>nul
-rmdir /s /q "%PROJECT_PATH%\..\obj" 2>nul
-echo Build artifacts cleaned.
-echo.
-
-REM Clean the project
+:: Clean project
 echo Cleaning project...
-dotnet clean "%PROJECT_PATH%" -c %PUBLISH_PROFILE%
+dotnet clean "%PROJECT_PATH%" -c Release
 if errorlevel 1 (
     echo ERROR: dotnet clean failed!
     echo.
@@ -85,7 +86,7 @@ if errorlevel 1 (
 echo Project cleaned successfully.
 echo.
 
-REM Restore packages
+:: Restore packages
 echo Restoring NuGet packages...
 dotnet restore "%PROJECT_PATH%"
 if errorlevel 1 (
@@ -98,9 +99,9 @@ if errorlevel 1 (
 echo Packages restored successfully.
 echo.
 
-REM Build the project
+:: Build project
 echo Building project in Release mode...
-dotnet build "%PROJECT_PATH%" -c %PUBLISH_PROFILE%
+dotnet build "%PROJECT_PATH%" -c Release
 if errorlevel 1 (
     echo ERROR: Build failed!
     echo.
@@ -111,11 +112,11 @@ if errorlevel 1 (
 echo Build completed successfully.
 echo.
 
-REM Publish the project with verbose logging
+:: Publish with verbose logging
 echo Publishing project...
-dotnet publish "%PROJECT_PATH%" -c %PUBLISH_PROFILE% -o "%DEPLOY_FOLDER%" -f "%TARGET_FRAMEWORK%" --no-self-contained --no-restore --verbosity detailed > "%DEPLOY_FOLDER%\publish.log"
+dotnet publish "%PROJECT_PATH%" -c Release -o "%OUTPUT_PATH%" -f "%TARGET_FRAMEWORK%" --no-self-contained --no-restore --verbosity detailed > "%OUTPUT_PATH%\publish.log"
 if errorlevel 1 (
-    echo ERROR: Publish failed. Check %DEPLOY_FOLDER%\publish.log.
+    echo ERROR: Publish failed. Check %OUTPUT_PATH%\publish.log.
     echo.
     echo Press any key to continue...
     pause >nul
@@ -145,13 +146,13 @@ popd >nul 2>&1
 :AfterShare
 echo.
 
-REM Create zip file with timestamp (excluding appsettings.json, appsettings.local.json, appsettings.local.backup, etc.)
+:: Create zip file with timestamp (excluding appsettings.json, appsettings.local.json, appsettings.local.backup, etc.)
 echo Creating zip file...
 
-REM Create a temporary PowerShell script for better reliability
+:: Create a temporary PowerShell script for better reliability
 set "TEMP_PS_SCRIPT=%TEMP%\deploy_zip_%TIMESTAMP%.ps1"
 echo $ErrorActionPreference = 'Stop' > "%TEMP_PS_SCRIPT%"
-echo $outputPath = '%DEPLOY_FOLDER%' >> "%TEMP_PS_SCRIPT%"
+echo $outputPath = '%OUTPUT_PATH%' >> "%TEMP_PS_SCRIPT%"
 echo $zipDestPath = '%ZIP_DEST_PATH%' >> "%TEMP_PS_SCRIPT%"
 echo $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss' >> "%TEMP_PS_SCRIPT%"
 echo $zipBaseName = '%ZIP_BASENAME%' >> "%TEMP_PS_SCRIPT%"
@@ -181,17 +182,17 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Clean up temporary script
+:: Clean up temporary script
 del "%TEMP_PS_SCRIPT%" 2>nul
 echo Zip creation completed successfully.
 echo.
 
-REM Create a simple run script
+:: Create a simple run script
 echo Creating run script...
-echo @echo off > "%DEPLOY_FOLDER%\run.bat"
-echo echo Starting %PROJECT_NAME%... >> "%DEPLOY_FOLDER%\run.bat"
-echo %PROJECT_NAME%.exe >> "%DEPLOY_FOLDER%\run.bat"
-echo pause >> "%DEPLOY_FOLDER%\run.bat"
+echo @echo off > "%OUTPUT_PATH%\run.bat"
+echo echo Starting %PROJECT_NAME%... >> "%OUTPUT_PATH%\run.bat"
+echo %PROJECT_NAME%.exe >> "%OUTPUT_PATH%\run.bat"
+echo pause >> "%OUTPUT_PATH%\run.bat"
 echo Run script created in deployment folder.
 echo.
 
@@ -201,7 +202,7 @@ echo ===========================================
 echo.
 echo Deployment Summary:
 echo - Project: %PROJECT_NAME%
-echo - Output: %DEPLOY_FOLDER%
+echo - Output: %OUTPUT_PATH%
 echo - Zip destination: %ZIP_DEST_PATH%
 echo.
 echo Press any key to exit...
