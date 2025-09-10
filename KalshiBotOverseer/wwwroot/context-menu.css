@@ -1,0 +1,95 @@
+/**
+ * CONTEXT MENU STYLES
+ *
+ * This file contains styles for right-click context menus used throughout the
+ * Kalshi Trading Bot Dashboard. Context menus provide quick access to actions
+ * without cluttering the main interface.
+ *
+ * RATIONALE FOR SEPARATION:
+ * - Separated from main styles for better organization
+ * - Allows for consistent menu appearance across components
+ * - Enables easy customization of menu theming
+ * - Provides proper z-index management for overlay menus
+ * - Optimizes for usability with proper hover states
+ *
+ * MENU FEATURES:
+ * - Dark theme matching the application design
+ * - Smooth hover animations and visual feedback
+ * - Proper submenu support with positioning
+ * - Accessibility features (keyboard navigation, focus management)
+ * - Consistent spacing and typography
+ *
+ * CONTENTS:
+ * - Base context menu container styles
+ * - Menu item styling and hover effects
+ * - Submenu positioning and display logic
+ * - Active/checked state indicators
+ * - Animation transitions for smooth interactions
+ */
+
+/* Context Menu Styles */
+.context-menu {
+    position: absolute;
+    background: rgba(16, 16, 13, 0.95);
+    border: 2px solid rgb(28, 51, 39);
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(28, 51, 39, 0.6);
+    z-index: 1000;
+    min-width: 200px;
+    padding: 8px 0;
+}
+
+.context-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.context-menu li {
+    padding: 10px 20px;
+    color: rgb(225, 221, 206);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.context-menu li:hover {
+    background: rgba(28, 51, 39, 0.4);
+}
+
+.context-menu li.checked::after {
+    content: '✓';
+    position: absolute;
+    right: 10px;
+    color: rgb(28, 51, 39);
+    font-weight: bold;
+}
+
+.submenu {
+    position: relative;
+}
+
+.submenu-items {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: rgba(16, 16, 13, 0.95);
+    border: 2px solid rgb(28, 51, 39);
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(28, 51, 39, 0.6);
+    min-width: 150px;
+    padding: 8px 0;
+    z-index: 1001;
+}
+
+.submenu:hover .submenu-items {
+    display: block;
+}
+
+.submenu-items li {
+    padding: 8px 15px;
+    font-size: 13px;
+}

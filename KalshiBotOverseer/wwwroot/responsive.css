@@ -1,0 +1,157 @@
+/**
+ * RESPONSIVE DESIGN STYLES
+ *
+ * This file contains all media queries and responsive design rules for the
+ * Kalshi Trading Bot Dashboard. It ensures the application works well on
+ * different screen sizes from mobile phones to desktop monitors.
+ *
+ * RATIONALE FOR SEPARATION:
+ * - Separated from main styles for better organization
+ * - Allows for easier maintenance of responsive behavior
+ * - Enables testing of responsive design in isolation
+ * - Provides clear breakpoints and scaling rules
+ * - Optimizes loading by separating mobile-specific styles
+ *
+ * BREAKPOINTS:
+ * - Mobile: < 480px (small phones)
+ * - Tablet: 480px - 768px (tablets and large phones)
+ * - Desktop: > 768px (standard desktop and larger)
+ *
+ * RESPONSIVE STRATEGIES:
+ * - Fluid grids that adapt to screen size
+ * - Stacked layouts for mobile devices
+ * - Adjusted font sizes and spacing
+ * - Hidden/collapsed elements on smaller screens
+ * - Touch-friendly button sizes and spacing
+ */
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .header-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .account-info {
+        margin: 10px 0;
+        gap: 15px;
+    }
+
+    .account-item {
+        min-width: 80px;
+        padding: 6px 10px;
+    }
+
+    .market-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 10px;
+    }
+
+    .brain-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .market-card {
+        padding: 10px;
+    }
+
+    .market-metrics {
+        gap: 5px;
+    }
+
+    .filters-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .market-ticker {
+        font-size: 13px;
+    }
+
+    .title-text {
+        font-size: 13px;
+    }
+
+    .market-subtitle {
+        font-size: 10px;
+    }
+
+    .status-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .brain-instance {
+        font-size: 10px;
+        font-weight: 600;
+        color: rgb(225, 221, 206);
+        background: rgba(16, 16, 13, 0.5);
+        padding: 2px 6px;
+        border-radius: 8px;
+    }
+
+    .metric-value {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .market-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .brain-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .market-card {
+        padding: 8px;
+    }
+
+    .market-ticker {
+        font-size: 12px;
+    }
+
+    .title-text {
+        font-size: 12px;
+    }
+
+    .market-subtitle {
+        font-size: 9px;
+    }
+
+    .status-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+    }
+
+    .brain-instance {
+        font-size: 8px;
+        padding: 1px 4px;
+        align-self: flex-start;
+    }
+
+    .brain-badge {
+        font-size: 8px;
+        padding: 2px 5px;
+    }
+
+    .metric-label {
+        font-size: 8px;
+    }
+
+    .metric-value {
+        font-size: 11px;
+    }
+}
