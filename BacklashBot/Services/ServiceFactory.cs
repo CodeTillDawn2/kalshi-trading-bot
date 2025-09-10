@@ -75,9 +75,6 @@ namespace BacklashBot.Services
         {
             lock (_lock)
             {
-                var broadcastService = GetBroadcastService();
-                if (broadcastService != null)
-                    broadcastService.UnsubscribeFromEvents();
                 _scopeManager.Dispose();
             }
         }

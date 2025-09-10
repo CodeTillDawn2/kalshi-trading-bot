@@ -5,6 +5,7 @@ using KalshiBotData.Data.Interfaces;
 using BacklashDTOs;
 using System.Security.Cryptography;
 using System.Text;
+using System.Collections.Generic;
 
 namespace BacklashBot.Hubs
 {
@@ -33,8 +34,6 @@ namespace BacklashBot.Hubs
                 try
                 {
                     _logger.LogDebug("Client connected: {ConnectionId}. Total clients: {ClientCount}", Context.ConnectionId, _connectedClients.Count);
-                    await _serviceFactory.GetBroadcastService().BroadcastAllDataToClientAsync(Context.ConnectionId);
-                    _logger.LogDebug("Initial data broadcast completed for client: {ConnectionId}", Context.ConnectionId);
                     await base.OnConnectedAsync();
                 }
                 catch (Exception ex)
@@ -72,47 +71,6 @@ namespace BacklashBot.Hubs
             }
         }
 
-        public async Task SubscribeToMarket(string marketTicker)
-        {
-            _logger.LogDebug("Subscribing to market: {MarketTicker}", marketTicker);
-            if (string.IsNullOrWhiteSpace(marketTicker))
-            {
-                _logger.LogWarning("SubscribeToMarket failed: Market ticker is empty");
-                await Clients.Caller.SendAsync("ReceiveError", "Market ticker cannot be empty");
-                return;
-            }
-
-            try
-            {
-                await _serviceFactory.GetMarketDataService().AddMarketWatch(marketTicker);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error subscribing to market: {MarketTicker}", marketTicker);
-                await Clients.Caller.SendAsync("ReceiveError", $"Failed to subscribe to market: {ex.Message}");
-            }
-        }
-
-        public async Task UnsubscribeFromMarket(string marketTicker)
-        {
-            _logger.LogInformation("Stats: Unsubscribing from market: {MarketTicker}", marketTicker);
-            if (string.IsNullOrWhiteSpace(marketTicker))
-            {
-                _logger.LogWarning("UnsubscribeFromMarket failed: Market ticker is empty");
-                await Clients.Caller.SendAsync("ReceiveError", "Market ticker cannot be empty");
-                return;
-            }
-
-            try
-            {
-                await _serviceFactory.GetMarketDataService().UnwatchMarket(marketTicker);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error unsubscribing from market: {MarketTicker}", marketTicker);
-                await Clients.Caller.SendAsync("ReceiveError", $"Failed to unsubscribe from market: {ex.Message}");
-            }
-        }
 
         public async Task Handshake(string clientId, string clientName, string clientType)
         {
@@ -189,98 +147,149 @@ namespace BacklashBot.Hubs
             return Convert.ToBase64String(hash);
         }
 
-        public async Task ReceiveOverseerMessage(string messageType, string message)
+        public async Task CheckIn(CheckInData checkInData)
         {
-            _logger.LogInformation("Received message from Overseer: {MessageType} - {Message}", messageType, message);
-
-            // Handle different message types from the overseer
-            switch (messageType.ToLower())
-            {
-                case "status_request":
-                    await HandleStatusRequest(message);
-                    break;
-                case "command":
-                    await HandleCommand(message);
-                    break;
-                case "refresh_data":
-                    await HandleRefreshData(message);
-                    break;
-                case "acknowledgment":
-                    _logger.LogDebug("Acknowledgment received from Overseer: {Message}", message);
-                    break;
-                default:
-                    _logger.LogWarning("Unknown message type from Overseer: {MessageType}", messageType);
-                    break;
-            }
-        }
-
-        private async Task HandleStatusRequest(string request)
-        {
-            _logger.LogInformation("Handling status request from Overseer: {Request}", request);
-
-            // Send back status information
-            var statusData = new
-            {
-                Timestamp = DateTime.UtcNow,
-                MarketsWatched = await _serviceFactory.GetMarketDataService().FetchWatchedMarketsAsync(),
-                ErrorCount = _serviceFactory.GetBacklashErrorHandler().ErrorCount,
-                LastSnapshot = _serviceFactory.GetBacklashErrorHandler().LastSuccessfulSnapshot
-            };
-
-            await Clients.Caller.SendAsync("StatusResponse", statusData);
-        }
-
-        private async Task HandleRefreshData(string request)
-        {
-            _logger.LogInformation("Handling refresh data request from Overseer: {Request}", request);
+            _logger.LogInformation("Sending CheckIn to Overseer");
 
             try
             {
-                var broadcastService = _serviceFactory.GetBroadcastService();
-                if (broadcastService != null)
+                // Send CheckIn data to overseer
+                await Clients.All.SendAsync("CheckIn", checkInData);
+                _logger.LogDebug("CheckIn sent to Overseer successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending CheckIn to Overseer");
+            }
+        }
+
+        public async Task ConfirmTargetTickersReceived(string brainInstanceName)
+        {
+            _logger.LogInformation("Confirming target tickers received for brain: {BrainInstanceName}", brainInstanceName);
+
+            try
+            {
+                // Send confirmation to overseer
+                await Clients.All.SendAsync("ConfirmTargetTickersReceived", brainInstanceName);
+                _logger.LogDebug("Target tickers confirmation sent to Overseer for brain: {BrainInstanceName}", brainInstanceName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending target tickers confirmation to Overseer for brain: {BrainInstanceName}", brainInstanceName);
+            }
+        }
+
+        // SignalR message handlers for overseer responses
+        public async Task HandleCheckInResponse(CheckInResponse response)
+        {
+            _logger.LogInformation("Received CheckInResponse from Overseer");
+
+            try
+            {
+                if (response.Success)
                 {
-                    await broadcastService.BroadcastAllMarketDataOnDemandAsync();
-                    await Clients.Caller.SendAsync("RefreshResponse", new
+                    _logger.LogDebug("CheckIn acknowledged by Overseer");
+
+                    // Handle target tickers if provided
+                    if (response.TargetTickers != null && response.TargetTickers.Length > 0)
                     {
-                        Success = true,
-                        Message = "Market data refresh completed",
-                        Timestamp = DateTime.UtcNow
-                    });
+                        var targetTickers = response.TargetTickers.ToList();
+                        _logger.LogDebug("Received {Count} target tickers from Overseer", targetTickers.Count);
+
+                        // TODO: Process target tickers - update local market watching list
+                        // For now, just confirm receipt
+                        await ConfirmTargetTickersReceived("BacklashBot"); // Use appropriate brain instance name
+                    }
                 }
                 else
                 {
-                    await Clients.Caller.SendAsync("RefreshResponse", new
-                    {
-                        Success = false,
-                        Message = "Broadcast service not available"
-                    });
+                    _logger.LogWarning("CheckIn failed: {Message}", response.Message);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error handling refresh data request");
-                await Clients.Caller.SendAsync("RefreshResponse", new
-                {
-                    Success = false,
-                    Message = $"Refresh failed: {ex.Message}"
-                });
+                _logger.LogError(ex, "Error handling CheckInResponse");
             }
         }
 
-        private async Task HandleCommand(string command)
+        public async Task HandleTargetTickersConfirmationResponse(TargetTickersConfirmationResponse response)
         {
-            _logger.LogInformation("Handling command from Overseer: {Command}", command);
+            _logger.LogInformation("Received TargetTickersConfirmationResponse from Overseer");
 
-            // Example command handling - can be expanded
-            if (command.ToLower().Contains("restart"))
+            try
             {
-                _logger.LogWarning("Restart command received from Overseer - not implemented yet");
-                await Clients.Caller.SendAsync("CommandResponse", "Restart command acknowledged but not implemented");
+                if (response.Success)
+                {
+                    _logger.LogDebug("Target tickers confirmation acknowledged by Overseer for brain: {BrainInstanceName}", response.BrainInstanceName);
+                }
+                else
+                {
+                    _logger.LogWarning("Target tickers confirmation failed: {Message}", response.Message);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await Clients.Caller.SendAsync("CommandResponse", $"Unknown command: {command}");
+                _logger.LogError(ex, "Error handling TargetTickersConfirmationResponse");
             }
         }
+    }
+
+    // Data classes for SignalR communication
+    public class CheckInData
+    {
+        // Basic market data
+        public List<string>? Markets { get; set; }
+        public long ErrorCount { get; set; }
+        public DateTime? LastSnapshot { get; set; }
+        public bool IsStartingUp { get; set; }
+        public bool IsShuttingDown { get; set; }
+
+        // Brain configuration
+        public bool WatchPositions { get; set; }
+        public bool WatchOrders { get; set; }
+        public bool ManagedWatchList { get; set; }
+        public bool CaptureSnapshots { get; set; }
+        public int TargetWatches { get; set; }
+        public double MinimumInterest { get; set; }
+        public double UsageMin { get; set; }
+        public double UsageMax { get; set; }
+
+        // Performance metrics
+        public double CurrentCpuUsage { get; set; }
+        public double EventQueueAvg { get; set; }
+        public double TickerQueueAvg { get; set; }
+        public double NotificationQueueAvg { get; set; }
+        public double OrderbookQueueAvg { get; set; }
+
+        // Connection status
+        public bool IsWebSocketConnected { get; set; }
+
+        // Market watch data
+        public List<MarketWatchData>? WatchedMarkets { get; set; }
+    }
+
+    public class MarketWatchData
+    {
+        public string MarketTicker { get; set; } = "";
+        public double InterestScore { get; set; }
+        public DateTime? InterestScoreDate { get; set; }
+        public DateTime? LastWatched { get; set; }
+        public double? AverageWebsocketEventsPerMinute { get; set; }
+    }
+
+    public class CheckInResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = "";
+        public string[] TargetTickers { get; set; } = Array.Empty<string>();
+        public DateTime Timestamp { get; set; }
+    }
+
+    public class TargetTickersConfirmationResponse
+    {
+        public bool Success { get; set; }
+        public string BrainInstanceName { get; set; } = "";
+        public string Message { get; set; } = "";
+        public DateTime Timestamp { get; set; }
     }
 }

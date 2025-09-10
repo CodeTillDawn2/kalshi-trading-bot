@@ -209,11 +209,11 @@ namespace KalshiBotOverseer
                 };
 
                 await context.AddOrUpdateOverseerInfo(overseerInfo);
-                _logger?.LogInformation("Overseer info: {HostName} at {IPAddress}:{Port}", hostName, localIP, 5000);
+                _logger?.LogInformation("OVERSEER- Overseer info: {HostName} at {IPAddress}:{Port}", hostName, localIP, 5000);
             }
             catch (Exception ex)
             {
-                _logger?.LogWarning(ex, "Failed to log overseer info to database");
+                _logger?.LogWarning(ex, "OVERSEER- Failed to log overseer info to database");
             }
         }
 

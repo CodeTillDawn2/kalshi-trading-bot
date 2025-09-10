@@ -76,9 +76,11 @@ namespace BacklashBot.Services
 
                     // Start CheckIn timer (every 30 seconds)
                     _checkInTimer = new Timer(async _ => await SendCheckInAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(30));
+                    _logger.LogInformation("OVERSEER- CheckIn timer started (every 30 seconds)");
 
                     // Start Overseer Discovery timer (every 3 minutes)
                     _overseerDiscoveryTimer = new Timer(async _ => await PerformOverseerDiscoveryAsync(), null, TimeSpan.FromMinutes(1), _overseerDiscoveryInterval);
+                    _logger.LogInformation("OVERSEER- Overseer discovery timer started (every 3 minutes)");
                 }
                 catch (HttpRequestException httpEx) when (httpEx.Message.Contains("actively refused") || httpEx.Message.Contains("connection"))
                 {
@@ -171,7 +173,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogDebug(ex, "Failed to discover overseer URL, using localhost fallback for testing");
+                _logger.LogDebug(ex, "OVERSEER- Failed to discover overseer URL, using localhost fallback for testing");
                 return "http://localhost:5000/chartHub";
             }
         }
@@ -203,7 +205,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogDebug(ex, "Failed to get overseer URL from configuration");
+                _logger.LogDebug(ex, "OVERSEER- Failed to get overseer URL from configuration");
                 return null;
             }
         }
@@ -620,34 +622,34 @@ namespace BacklashBot.Services
                 };
 
                 await _hubConnection.InvokeAsync("CheckIn", checkInData);
-                _logger.LogDebug("CheckIn sent: {MarketCount} markets, ErrorCount: {ErrorCount}",
+                _logger.LogDebug("OVERSEER- CheckIn sent: {MarketCount} markets, ErrorCount: {ErrorCount}",
                     markets.Count, errorHandler.ErrorCount);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, "Failed to send CheckIn to overseer. This is optional and will be retried.");
+                _logger.LogInformation(ex, "OVERSEER- Failed to send CheckIn to overseer. This is optional and will be retried.");
             }
         }
 
         private void HandleHandshakeResponse(string response)
         {
-            _logger.LogInformation("Handshake response received: {Response}", response);
+            _logger.LogInformation("OVERSEER- Handshake response received: {Response}", response);
         }
 
         private void HandleCheckInResponse(string response)
         {
-            _logger.LogDebug("CheckIn response received: {Response}", response);
+            _logger.LogDebug("OVERSEER- CheckIn response received: {Response}", response);
         }
 
         private void HandleMessageResponse(string response)
         {
-            _logger.LogInformation("Message response received: {Response}", response);
+            _logger.LogInformation("OVERSEER- Message response received: {Response}", response);
         }
 
         private Task HandleConnectionClosed(Exception? exception)
         {
             _isConnected = false;
-            _logger.LogWarning(exception, "Connection to overseer closed");
+            _logger.LogWarning(exception, "OVERSEER- Connection to overseer closed");
 
             // Could implement reconnection logic here
             return Task.CompletedTask;
@@ -656,7 +658,7 @@ namespace BacklashBot.Services
         private Task HandleReconnected(string? connectionId)
         {
             _isConnected = true;
-            _logger.LogInformation("Reconnected to overseer with connection ID: {ConnectionId}", connectionId);
+            _logger.LogInformation("OVERSEER- Reconnected to overseer with connection ID: {ConnectionId}", connectionId);
 
             // Re-perform handshake on reconnection
             Task.Run(async () => await PerformHandshakeAsync());

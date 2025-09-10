@@ -481,9 +481,9 @@
 
         .brain-lock-stats {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
-            max-width: 400px;
+            max-width: 600px;
             margin: 0 auto;
         }
 
@@ -1415,7 +1415,11 @@
                     .build();
 
                 // Set up event handlers
-                connection.on('CheckInUpdate', handleCheckInUpdate);
+                connection.on('BrainStatusUpdate', handleBrainStatusUpdate);
+                connection.on('CheckInResponse', handleCheckInResponse);
+                connection.on('TargetTickersResponse', handleTargetTickersResponse);
+                connection.on('CurrentTickersResponse', handleCurrentTickersResponse);
+                connection.on('TargetTickersConfirmationResponse', handleTargetTickersConfirmationResponse);
 
                 // Start the connection
                 await connection.start();
@@ -1733,20 +1737,9 @@
                             <span class="stat-value" id="market-count-${item.brainInstanceName}">${item.marketCount}</span>
                             <div class="stat-label">Markets</div>
                         </div>
-                    </div>
-
-                    <div class="brain-lock-dates">
-                        <div class="date-item">
-                            <i class="fas fa-clock"></i>
-                            <span>Last Watched: ${lastWatchedFormatted}</span>
-                        </div>
-                        <div class="date-item">
-                            <i class="fas fa-save"></i>
-                            <span>Last Snapshot: ${lastSnapshotFormatted}</span>
-                        </div>
-                        <div class="date-item">
-                            <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
-                            <span>Last Error: ${lastErrorFormatted}</span>
+                        <div class="stat-item">
+                            <span class="stat-value">${lastErrorFormatted}</span>
+                            <div class="stat-label">Last Error</div>
                         </div>
                     </div>
                 </div>
@@ -2927,79 +2920,148 @@
             renderSnapshots();
         }
 
-        // Handle CheckIn messages from bots
-        function handleCheckInUpdate(checkInData) {
-            const brainInstanceName = checkInData.BrainInstanceName;
-            const marketCount = checkInData.MarketCount || 0;
-            const errorCount = checkInData.ErrorCount || 0;
-            const lastSnapshot = checkInData.LastSnapshot;
-            const lastCheckIn = checkInData.LastCheckIn;
-            const isStartingUp = checkInData.IsStartingUp || false;
-            const isShuttingDown = checkInData.IsShuttingDown || false;
+        // Handle comprehensive BrainStatus messages from bots
+        function handleBrainStatusUpdate(brainStatus) {
+            const brainInstanceName = brainStatus.BrainInstanceName;
 
-            // Update checkInData object
-            checkInData[brainInstanceName] = {
-                brainInstanceName: brainInstanceName,
-                marketCount: marketCount,
-                errorCount: errorCount,
-                lastSnapshot: lastSnapshot,
-                lastCheckIn: lastCheckIn,
-                isStartingUp: isStartingUp,
-                isShuttingDown: isShuttingDown
-            };
+            // Store comprehensive brain data
+            brainData[brainInstanceName] = brainStatus;
 
-            // Update UI elements
-            updateCheckInUI(brainInstanceName, marketCount, errorCount, lastSnapshot, lastCheckIn, isStartingUp, isShuttingDown);
+            // Update UI elements with comprehensive data
+            updateBrainStatusUI(brainStatus);
 
-            console.log(`CheckIn received from ${brainInstanceName}: Markets=${marketCount}, ErrorCount=${errorCount}, LastSnapshot=${lastSnapshot}, StartingUp=${isStartingUp}, ShuttingDown=${isShuttingDown}`);
+            console.log(`BrainStatus received from ${brainInstanceName}: Markets=${brainStatus.MarketCount}, CPU=${brainStatus.CurrentCpuUsage}%, Errors=${brainStatus.ErrorCount}, StartingUp=${brainStatus.IsStartingUp}, ShuttingDown=${brainStatus.IsShuttingDown}`);
         }
 
-        function updateCheckInUI(brainInstanceName, marketCount, errorCount, lastSnapshot, lastCheckIn, isStartingUp, isShuttingDown) {
+        // Handle CheckIn response from server
+        function handleCheckInResponse(response) {
+            if (response.Success) {
+                console.log('CheckIn acknowledged by server');
+                // Handle target tickers if provided in response
+                if (response.TargetTickers && response.TargetTickers.length > 0) {
+                    console.log('Target tickers received in CheckIn response:', response.TargetTickers);
+                    // Confirm receipt of target tickers
+                    confirmTargetTickersReceived(response.BrainInstanceName || 'unknown');
+                }
+            } else {
+                console.error('CheckIn failed:', response.Message);
+            }
+        }
+
+        function updateBrainStatusUI(brainStatus) {
+            const brainInstanceName = brainStatus.BrainInstanceName;
+
             // Update Last Check In
             const lastCheckInElement = document.getElementById(`last-checkin-${brainInstanceName}`);
             if (lastCheckInElement) {
-                const checkInTime = lastCheckIn ? formatDateTime(lastCheckIn) : 'Never';
+                const checkInTime = brainStatus.LastCheckIn ? formatDateTime(brainStatus.LastCheckIn) : 'Never';
                 lastCheckInElement.textContent = checkInTime;
-                lastCheckInElement.style.color = lastCheckIn ? '#28a745' : '#6c757d'; // Green if recent, gray if never
+                lastCheckInElement.style.color = brainStatus.LastCheckIn ? '#28a745' : '#6c757d';
             }
 
             // Update Last Snapshot
             const lastSnapshotElement = document.getElementById(`last-snapshot-${brainInstanceName}`);
             if (lastSnapshotElement) {
-                const snapshotTime = lastSnapshot ? formatDateTime(lastSnapshot) : 'Never';
+                const snapshotTime = brainStatus.LastSnapshot ? formatDateTime(brainStatus.LastSnapshot) : 'Never';
                 lastSnapshotElement.textContent = snapshotTime;
-                lastSnapshotElement.style.color = lastSnapshot ? '#28a745' : '#6c757d'; // Green if recent, gray if never
+                lastSnapshotElement.style.color = brainStatus.LastSnapshot ? '#28a745' : '#6c757d';
             }
 
             // Update Error Count
             const errorCountElement = document.getElementById(`error-count-${brainInstanceName}`);
             if (errorCountElement) {
-                errorCountElement.textContent = errorCount;
-                errorCountElement.style.color = errorCount > 0 ? '#dc3545' : '#28a745'; // Red if errors, green if no errors
+                errorCountElement.textContent = brainStatus.ErrorCount;
+                errorCountElement.style.color = brainStatus.ErrorCount > 0 ? '#dc3545' : '#28a745';
             }
 
             // Update Market Count
             const marketCountElement = document.getElementById(`market-count-${brainInstanceName}`);
             if (marketCountElement) {
-                marketCountElement.textContent = marketCount;
+                marketCountElement.textContent = brainStatus.MarketCount;
             }
 
             // Update Status Indicator
             const statusIndicatorElement = document.getElementById(`status-indicator-${brainInstanceName}`);
             if (statusIndicatorElement) {
                 let statusText = 'Active';
-                let statusColor = '#28a745'; // Green for active
+                let statusColor = '#28a745';
 
-                if (isStartingUp) {
+                if (brainStatus.IsStartingUp) {
                     statusText = 'Starting Up';
-                    statusColor = '#ffc107'; // Yellow for starting up
-                } else if (isShuttingDown) {
+                    statusColor = '#ffc107';
+                } else if (brainStatus.IsShuttingDown) {
                     statusText = 'Shutting Down';
-                    statusColor = '#dc3545'; // Red for shutting down
+                    statusColor = '#dc3545';
                 }
 
                 statusIndicatorElement.textContent = statusText;
                 statusIndicatorElement.style.color = statusColor;
+            }
+        }
+
+        // Brain ticker management functions
+        async function confirmTargetTickersReceived(brainInstanceName) {
+            if (connection && connection.state === signalR.HubConnectionState.Connected) {
+                try {
+                    await connection.invoke('ConfirmTargetTickersReceived', brainInstanceName);
+                    console.log(`Confirmed receipt of target tickers for ${brainInstanceName}`);
+                } catch (error) {
+                    console.error('Error confirming target tickers receipt:', error);
+                }
+            } else {
+                console.warn('SignalR connection not available for target tickers confirmation');
+            }
+        }
+
+        async function requestTargetTickers(brainInstanceName) {
+            if (connection && connection.state === signalR.HubConnectionState.Connected) {
+                try {
+                    await connection.invoke('GetTargetTickers', brainInstanceName);
+                    console.log(`Requested target tickers for ${brainInstanceName}`);
+                } catch (error) {
+                    console.error('Error requesting target tickers:', error);
+                }
+            } else {
+                console.warn('SignalR connection not available for target tickers request');
+            }
+        }
+
+        async function updateCurrentTickers(brainInstanceName, tickers) {
+            if (connection && connection.state === signalR.HubConnectionState.Connected) {
+                try {
+                    await connection.invoke('UpdateCurrentTickers', brainInstanceName, tickers);
+                    console.log(`Updated current tickers for ${brainInstanceName}:`, tickers);
+                } catch (error) {
+                    console.error('Error updating current tickers:', error);
+                }
+            } else {
+                console.warn('SignalR connection not available for current tickers update');
+            }
+        }
+
+        // Handle responses from server
+        function handleTargetTickersResponse(response) {
+            if (response.Success) {
+                console.log(`Target tickers received for ${response.BrainInstanceName}:`, response.Tickers);
+                // Optionally update UI or store locally
+            } else {
+                console.error(`Failed to get target tickers for ${response.BrainInstanceName}:`, response.Message);
+            }
+        }
+
+        function handleCurrentTickersResponse(response) {
+            if (response.Success) {
+                console.log(`Current tickers updated successfully for ${response.BrainInstanceName}`);
+            } else {
+                console.error(`Failed to update current tickers for ${response.BrainInstanceName}:`, response.Message);
+            }
+        }
+
+        function handleTargetTickersConfirmationResponse(response) {
+            if (response.Success) {
+                console.log(`Target tickers confirmation acknowledged for ${response.BrainInstanceName}`);
+            } else {
+                console.error(`Target tickers confirmation failed for ${response.BrainInstanceName}:`, response.Message);
             }
         }
 

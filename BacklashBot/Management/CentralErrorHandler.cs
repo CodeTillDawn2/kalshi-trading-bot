@@ -228,7 +228,7 @@ namespace BacklashBot.Management
                                 (exception is HttpRequestException && exception.Message.Contains("actively refused")))
                         {
                             // Overseer connection failure - this is expected when overseer is not running
-                            _logger.LogInformation("Overseer connection failed: {Message}. This is optional and not catastrophic.", exception.Message);
+                            _logger.LogInformation("OVERSEER- Overseer connection failed: {Message}. This is optional and not catastrophic.", exception.Message);
                             // Don't increment error count or mark as catastrophic
                         }
                         else

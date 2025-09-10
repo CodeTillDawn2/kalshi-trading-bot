@@ -387,9 +387,9 @@ namespace BacklashBot.Management
                 _logger.LogInformation("BRAIN: BroadcastService started");
 
                 var overseerClientService = _serviceFactory.GetOverseerClientService();
-                _logger.LogDebug("BRAIN: Starting OverseerClientService...");
+                _logger.LogDebug("OVERSEER- Starting OverseerClientService...");
                 await overseerClientService.StartAsync();
-                _logger.LogInformation("BRAIN: OverseerClientService started");
+                _logger.LogInformation("OVERSEER- OverseerClientService started");
 
                 var marketInitializer = _serviceFactory.GetMarketDataInitializer();
                 _logger.LogDebug("BRAIN: Starting MarketDataInitializer.SetupAsync...");
@@ -501,9 +501,9 @@ namespace BacklashBot.Management
                 _logger.LogDebug("BroadcastService stopped");
 
                 var overseerClientService = _serviceFactory.GetOverseerClientService();
-                _logger.LogDebug("Stopping OverseerClientService...");
+                _logger.LogDebug("OVERSEER- Stopping OverseerClientService...");
                 await overseerClientService.StopAsync();
-                _logger.LogDebug("OverseerClientService stopped");
+                _logger.LogDebug("OVERSEER- OverseerClientService stopped");
 
                 var orderBookService = _serviceFactory.GetOrderBookService();
                 _logger.LogDebug("Stopping OrderBookService...");

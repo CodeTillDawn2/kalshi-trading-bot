@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
+using KalshiBotOverseer.Models;
 
 namespace KalshiBotOverseer
 {
@@ -19,13 +20,16 @@ namespace KalshiBotOverseer
         private static readonly ConcurrentDictionary<string, ClientInfo> _clientInfo = new();
         private readonly ILogger<ChartHub> _logger;
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly BrainPersistenceService _brainService;
 
         public ChartHub(
             ILogger<ChartHub> logger,
-            IServiceScopeFactory scopeFactory)
+            IServiceScopeFactory scopeFactory,
+            BrainPersistenceService brainService)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
+            _brainService = brainService;
         }
 
         public override async Task OnConnectedAsync()
@@ -153,6 +157,8 @@ namespace KalshiBotOverseer
 
         public async Task CheckIn(CheckInData checkInData)
         {
+            _logger.LogInformation("CheckIn received from connection: {ConnectionId}", Context.ConnectionId);
+
             try
             {
                 if (!_clientInfo.TryGetValue(Context.ConnectionId, out var clientInfo))
@@ -172,8 +178,21 @@ namespace KalshiBotOverseer
                     checkInData.ErrorCount,
                     checkInData.LastSnapshot);
 
+                // Update current market tickers in persistence service
+                if (!string.IsNullOrEmpty(clientInfo.ClientName))
+                {
+                    _brainService.UpdateCurrentMarketTickers(clientInfo.ClientName, checkInData.Markets ?? new List<string>());
+                }
+
                 // Update client last seen
                 clientInfo.LastSeen = DateTime.UtcNow;
+
+                // Get target market tickers for this brain
+                var targetTickers = new string[0];
+                if (!string.IsNullOrEmpty(clientInfo.ClientName))
+                {
+                    targetTickers = _brainService.GetTargetMarketTickers(clientInfo.ClientName).ToArray();
+                }
 
                 // Log CheckIn data to database if needed
                 try
@@ -189,45 +208,65 @@ namespace KalshiBotOverseer
                         await context.AddOrUpdateSignalRClient(signalRClient);
                     }
 
-                    // Log CheckIn data
-                    // Note: CheckInLog type may not exist yet, commenting out for now
-                    /*
-                    var checkInLog = new BacklashDTOs.CheckInLog
-                    {
-                        ClientId = clientInfo.ClientId,
-                        ClientName = clientInfo.ClientName,
-                        IPAddress = clientInfo.IPAddress,
-                        MarketsWatched = checkInData.Markets,
-                        ErrorCount = checkInData.ErrorCount,
-                        LastSnapshot = checkInData.LastSnapshot,
-                        Timestamp = DateTime.UtcNow
-                    };
-
-                    await context.AddCheckInLog(checkInLog);
-                    */
+                    // Log CheckIn data - removed commented CheckInLog code as type doesn't exist
                 }
                 catch (Exception dbEx)
                 {
                     _logger.LogWarning(dbEx, "Failed to log CheckIn to database for client: {ClientId}", clientInfo.ClientId);
                 }
 
-                // Broadcast CheckIn data to all connected clients (including web UI)
-                await Clients.All.SendAsync("CheckInUpdate", new
+                // Create comprehensive brain status data
+                var brainStatus = new BrainStatusData
                 {
-                    BrainInstanceName = clientInfo.ClientName,
+                    BrainInstanceName = clientInfo.ClientName ?? "",
+                    BrainLock = null, // Will be populated from database if needed
+
+                    // Configuration from CheckInData
+                    WatchPositions = checkInData.WatchPositions,
+                    WatchOrders = checkInData.WatchOrders,
+                    ManagedWatchList = checkInData.ManagedWatchList,
+                    CaptureSnapshots = checkInData.CaptureSnapshots,
+                    TargetWatches = checkInData.TargetWatches,
+                    MinimumInterest = checkInData.MinimumInterest,
+                    UsageMin = checkInData.UsageMin,
+                    UsageMax = checkInData.UsageMax,
+
+                    // Status information
+                    LastSeen = DateTime.UtcNow,
+                    IsStartingUp = checkInData.IsStartingUp,
+                    IsShuttingDown = checkInData.IsShuttingDown,
+                    IsWebSocketConnected = checkInData.IsWebSocketConnected,
+
+                    // Performance metrics
+                    CurrentCpuUsage = checkInData.CurrentCpuUsage,
+                    EventQueueAvg = checkInData.EventQueueAvg,
+                    TickerQueueAvg = checkInData.TickerQueueAvg,
+                    NotificationQueueAvg = checkInData.NotificationQueueAvg,
+                    OrderbookQueueAvg = checkInData.OrderbookQueueAvg,
+
+                    // Market data
                     MarketCount = checkInData.Markets?.Count ?? 0,
                     ErrorCount = checkInData.ErrorCount,
                     LastSnapshot = checkInData.LastSnapshot,
                     LastCheckIn = DateTime.UtcNow,
-                    IsStartingUp = checkInData.IsStartingUp,
-                    IsShuttingDown = checkInData.IsShuttingDown
-                });
 
-                // Send acknowledgment
+                    // Market watch data
+                    WatchedMarkets = checkInData.WatchedMarkets ?? new List<MarketWatchData>(),
+
+                    // Current and target tickers
+                    CurrentMarketTickers = checkInData.Markets ?? new List<string>(),
+                    TargetMarketTickers = targetTickers.ToList()
+                };
+
+                // Broadcast comprehensive brain status to all connected clients (including web UI)
+                await Clients.All.SendAsync("BrainStatusUpdate", brainStatus);
+
+                // Send acknowledgment with target tickers
                 await Clients.Caller.SendAsync("CheckInResponse", new
                 {
                     Success = true,
                     Message = "CheckIn received successfully",
+                    TargetTickers = targetTickers,
                     Timestamp = DateTime.UtcNow
                 });
 
@@ -243,19 +282,6 @@ namespace KalshiBotOverseer
             }
         }
 
-        public async Task SendOverseerMessage(string messageType, string message)
-        {
-            _logger.LogInformation("Sending message to Overseer: {MessageType} - {Message}", messageType, message);
-
-            // This method can be used by clients to send messages to the overseer
-            // For now, just acknowledge receipt
-            await Clients.Caller.SendAsync("MessageResponse", new
-            {
-                Success = true,
-                MessageType = messageType,
-                Message = "Message received by overseer"
-            });
-        }
 
         private string GenerateAuthToken(string clientId, string clientName)
         {
@@ -279,10 +305,34 @@ namespace KalshiBotOverseer
 
     public class CheckInData
     {
+        // Basic market data
         public List<string>? Markets { get; set; }
         public long ErrorCount { get; set; }
         public DateTime? LastSnapshot { get; set; }
         public bool IsStartingUp { get; set; }
         public bool IsShuttingDown { get; set; }
+
+        // Brain configuration
+        public bool WatchPositions { get; set; }
+        public bool WatchOrders { get; set; }
+        public bool ManagedWatchList { get; set; }
+        public bool CaptureSnapshots { get; set; }
+        public int TargetWatches { get; set; }
+        public double MinimumInterest { get; set; }
+        public double UsageMin { get; set; }
+        public double UsageMax { get; set; }
+
+        // Performance metrics
+        public double CurrentCpuUsage { get; set; }
+        public double EventQueueAvg { get; set; }
+        public double TickerQueueAvg { get; set; }
+        public double NotificationQueueAvg { get; set; }
+        public double OrderbookQueueAvg { get; set; }
+
+        // Connection status
+        public bool IsWebSocketConnected { get; set; }
+
+        // Market watch data
+        public List<MarketWatchData>? WatchedMarkets { get; set; }
     }
 }

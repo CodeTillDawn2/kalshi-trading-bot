@@ -4,8 +4,5 @@ namespace BacklashBot.Services.Interfaces
     {
         Task StartServicesAsync();
         Task StopServicesAsync();
-        Task BroadcastAllDataToClientAsync(string connectionId);
-        Task BroadcastAllMarketDataOnDemandAsync();
-        void UnsubscribeFromEvents();
     }
 }

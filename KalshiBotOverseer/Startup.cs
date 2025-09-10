@@ -113,6 +113,9 @@ namespace KalshiBotOverseer
             // Register SnapshotService
             services.AddScoped<SnapshotService>();
 
+            // Register BrainPersistenceService
+            services.AddSingleton<BrainPersistenceService>();
+
             // Add MVC for controllers
             services.AddControllers();
 
