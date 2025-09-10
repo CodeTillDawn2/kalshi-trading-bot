@@ -327,6 +327,8 @@ namespace KalshiBotOverseer
 
     public class CheckInData
     {
+        public required string BrainInstanceName { get; set; } 
+
         // Basic market data
         public List<string>? Markets { get; set; }
         public long ErrorCount { get; set; }
@@ -350,6 +352,13 @@ namespace KalshiBotOverseer
         public double TickerQueueAvg { get; set; }
         public double NotificationQueueAvg { get; set; }
         public double OrderbookQueueAvg { get; set; }
+
+        public double LastRefreshCycleSeconds { get; set; }
+        public int LastRefreshCycleInterval { get; set; }
+        public int LastRefreshMarketCount { get; set; }
+        public double LastRefreshUsagePercentage { get; set; }
+        public bool LastRefreshTimeAcceptable { get; set; }
+        public DateTime LastPerformanceSampleDate { get; set; }
 
         // Connection status
         public bool IsWebSocketConnected { get; set; }

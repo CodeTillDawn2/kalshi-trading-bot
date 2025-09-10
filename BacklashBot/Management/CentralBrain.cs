@@ -163,11 +163,13 @@ namespace BacklashBot.Management
                 return;
             }
             _isStartingUp = true;
+            _performanceTracker.IsStartingUp = true;
 
             bool internetIsUp = await _errorHandler.CheckInternetConnection();
             if (!internetIsUp)
             {
                 _isStartingUp = false;
+                _performanceTracker.IsStartingUp = false;
                 _logger.LogWarning("BRAIN: Brain did not start due to the internet being down.");
                 _startTimer?.Dispose();
                 _startTimer = new Timer(async _ =>
@@ -448,6 +450,7 @@ namespace BacklashBot.Management
             {
                 _logger.LogInformation("BRAIN: Dashboard sequence complete...");
                 _isStartingUp = false;
+                _performanceTracker.IsStartingUp = false;
             }
         }
 
@@ -465,6 +468,7 @@ namespace BacklashBot.Management
                 return;
             }
             _isShuttingDown = true;
+            _performanceTracker.IsShuttingDown = true;
             _logger.LogDebug("Shutting down dependent services...");
             try
             {
@@ -560,6 +564,7 @@ namespace BacklashBot.Management
             finally
             {
                 _isShuttingDown = false;
+                _performanceTracker.IsShuttingDown = false;
                 if (!_isReset)
                 {
                     _serviceFactory.ResetAll();
@@ -846,7 +851,7 @@ namespace BacklashBot.Management
                 if (_thisBrain.CaptureSnapshots)
                 {
                     double percentUsage = 0;
-                    if (_performanceTracker.LastPerformanceSampleDate != null) percentUsage = _performanceTracker.LastUsagePercentage;
+                    if (_performanceTracker.LastPerformanceSampleDate != null) percentUsage = _performanceTracker.LastRefreshUsagePercentage;
 
                     var snapshotService = _serviceFactory.GetTradingSnapshotService();
                     cancellationToken.ThrowIfCancellationRequested();
@@ -1224,8 +1229,8 @@ namespace BacklashBot.Management
             _performanceMetrics.TickerQueueAvg = tickerQueueAvg;
             _performanceMetrics.NotificationQueueAvg = notificationQueueAvg;
             _performanceMetrics.OrderbookQueueAvg = orderBookQueueAvg;
-            _performanceMetrics.CurrentUsage = _performanceTracker.LastUsagePercentage;
-            _performanceMetrics.CurrentCount = _performanceTracker.LastMarketCount;
+            _performanceMetrics.CurrentUsage = _performanceTracker.LastRefreshUsagePercentage;
+            _performanceMetrics.CurrentCount = _performanceTracker.LastRefreshMarketCount;
         }
 
         private void ResetPerformanceMetrics()

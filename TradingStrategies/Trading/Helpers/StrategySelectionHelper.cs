@@ -7,24 +7,9 @@ namespace TradingStrategies.Trading.Helpers
 {
     public class StrategySelectionHelper
     {
-        // add at class scope
-        private readonly Dictionary<string, Func<string, Dictionary<MarketType, List<Strategy>>>> _mappingFactories;
-
-
         public StrategySelectionHelper()
         {
-            _mappingFactories = new()
-            {
-                ["Bollinger"] = GetBollingerBreakoutStrategy,
-                ["Breakout2"] = GetBreakoutStrategy,
-                ["Nothing"] = GetNothingEverHappensStrategy,
-                ["FlowMo"] = GetFlowMomentumStrategy,
-                ["MLShared"] = GetMLSharedStrategy,
-                ["TryAgain"] = GetTryAgainStrategy,
-                ["SloMo"] = GetSlopeMomentumStrategy,
-                ["Momentum"] = GetFlowMomentumStrategy
-
-            };
+            // Strategy configuration is now centralized in StrategyConfiguration class
         }
 
         public static readonly List<(string Name, Dictionary<BollingerBreakout.ParamKey, double> Parameters)>
@@ -1328,7 +1313,7 @@ namespace TradingStrategies.Trading.Helpers
         { FlowMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.0 },
     }),
 
-    // Spike gate variants (to ensure “unusual” not noise)
+    // Spike gate variants (to ensure ï¿½unusualï¿½ not noise)
     ("FM_SpikeGate_01", new()
     {
         { FlowMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },
@@ -2242,7 +2227,7 @@ namespace TradingStrategies.Trading.Helpers
 
 
 
-        public IEnumerable<string> GetSetKeys() => _mappingFactories.Keys;
+        public IEnumerable<string> GetSetKeys() => StrategyConfiguration.GetStrategyNames();
         public IEnumerable<string> GetWeightNames(string setKey) =>
             setKey switch
             {
@@ -2257,12 +2242,12 @@ namespace TradingStrategies.Trading.Helpers
             };
         public Dictionary<MarketType, List<Strategy>> GetMapping(string setKey, string weightName)
         {
-            if (!_mappingFactories.TryGetValue(setKey, out var factory))
-                throw new ArgumentException($"Unknown set '{setKey}'", nameof(setKey));
+            var factory = StrategyConfiguration.GetStrategyFactory(setKey);
             return factory(weightName);
         }
-        public List<Dictionary<MarketType, List<Strategy>>> GetTrainingMappings(string setKey) =>
-            setKey switch
+        public List<Dictionary<MarketType, List<Strategy>>> GetTrainingMappings(string setKey)
+        {
+            return setKey switch
             {
                 "Bollinger" => GetBollingerBreakoutStrategiesForTraining(),
                 "Breakout2" => GetBreakoutStrategiesForTraining(),
@@ -2274,6 +2259,7 @@ namespace TradingStrategies.Trading.Helpers
                 "Momentum" => GetMomentumTradingStrategiesForTraining(),
                 _ => throw new ArgumentException($"Unknown set '{setKey}'", nameof(setKey))
             };
+        }
 
 
 

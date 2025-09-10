@@ -1,3 +1,4 @@
+// BrainPersistence.cs
 using System;
 using System.Collections.Generic;
 
@@ -19,6 +20,11 @@ namespace KalshiBotOverseer.Models
         public HashSet<string> CurrentMarketTickers { get; set; } = new HashSet<string>();
         public HashSet<string> TargetMarketTickers { get; set; } = new HashSet<string>();
         public string Mode { get; set; } = "Autonomous";
+        public bool IsStartingUp { get; set; }
+        public bool IsShuttingDown { get; set; }
+        public long ErrorCount { get; set; }
+        public DateTime? LastSnapshot { get; set; }
+        public bool IsWebSocketConnected { get; set; }
 
         // Historical performance metrics
         public List<MetricHistory> CpuUsageHistory { get; set; } = new List<MetricHistory>();
@@ -28,6 +34,12 @@ namespace KalshiBotOverseer.Models
         public List<MetricHistory> OrderbookQueueHistory { get; set; } = new List<MetricHistory>();
         public List<MetricHistory> MarketCountHistory { get; set; } = new List<MetricHistory>();
         public List<MetricHistory> ErrorHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> RefreshCycleSecondsHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> RefreshCycleIntervalHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> RefreshMarketCountHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> RefreshUsagePercentageHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> PerformanceSampleDateHistory { get; set; } = new List<MetricHistory>();
+        public bool LastRefreshTimeAcceptable { get; set; }
     }
 
     public class BrainStatusData
@@ -70,6 +82,12 @@ namespace KalshiBotOverseer.Models
         public List<MetricHistory> OrderbookQueueHistory { get; set; } = new List<MetricHistory>();
         public List<MetricHistory> MarketCountHistory { get; set; } = new List<MetricHistory>();
         public List<MetricHistory> ErrorHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> RefreshCycleSecondsHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> RefreshCycleIntervalHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> RefreshMarketCountHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> RefreshUsagePercentageHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> RefreshTimeAcceptableHistory { get; set; } = new List<MetricHistory>();
+        public List<MetricHistory> PerformanceSampleDateHistory { get; set; } = new List<MetricHistory>();
 
         // Market data
         public int MarketCount { get; set; }

@@ -1,3 +1,4 @@
+// ChartHub.cs
 using Microsoft.AspNetCore.SignalR;
 using BacklashBot.Services.Interfaces;
 using KalshiBotData.Models;
@@ -41,7 +42,6 @@ namespace BacklashBot.Hubs
                     _logger.LogError(ex, "Error during OnConnectedAsync for client: {ConnectionId}", Context.ConnectionId);
                 }
             }
-
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
@@ -67,10 +67,8 @@ namespace BacklashBot.Hubs
             lock (_connectedClients)
             {
                 _connectedClients.Clear();
-                // Optionally log this action if you inject a logger statically or via a service locator
             }
         }
-
 
         public async Task Handshake(string clientId, string clientName, string clientType)
         {
@@ -179,7 +177,6 @@ namespace BacklashBot.Hubs
             }
         }
 
-        // SignalR message handlers for overseer responses
         public async Task HandleCheckInResponse(CheckInResponse response)
         {
             _logger.LogInformation("Received CheckInResponse from Overseer");
@@ -234,9 +231,11 @@ namespace BacklashBot.Hubs
         }
     }
 
-    // Data classes for SignalR communication
     public class CheckInData
     {
+        // Basic brain info
+        public string BrainInstanceName { get; set; } = "";
+
         // Basic market data
         public List<string>? Markets { get; set; }
         public long ErrorCount { get; set; }
@@ -260,13 +259,16 @@ namespace BacklashBot.Hubs
         public double TickerQueueAvg { get; set; }
         public double NotificationQueueAvg { get; set; }
         public double OrderbookQueueAvg { get; set; }
+        public double LastRefreshCycleSeconds { get; set; }
+        public TimeSpan? LastRefreshCycleInterval { get; set; }
+        public int LastRefreshMarketCount { get; set; }
+        public double LastRefreshUsagePercentage { get; set; }
+        public bool LastRefreshTimeAcceptable { get; set; }
+        public DateTime? LastPerformanceSampleDate { get; set; }
 
         // Connection status
         public bool IsWebSocketConnected { get; set; }
-
-        // Market watch data removed - not needed for SignalR
     }
-
 
     public class CheckInResponse
     {

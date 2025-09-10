@@ -8,12 +8,14 @@ namespace BacklashBot.Management.Interfaces
         double CalculateAverageWebsocketEventsReceived(string marketTicker);
         double GetQueueHighCountPercentage();
 
-        double LastWorkDuration { get; set; }
-        double LastRefreshInterval { get; set; }
-        int LastMarketCount { get; set; }
-        double LastUsagePercentage { get; set; }
-        double LastExecutionSeconds { get; set; }
-        bool LastExecutionAcceptable { get; set; }
+        double LastRefreshCycleSeconds { get; set; }
+        double LastRefreshCycleInterval { get; set; }
+        int LastRefreshMarketCount { get; set; }
+        double LastRefreshUsagePercentage { get; set; }
+        bool LastRefreshTimeAcceptable { get; set; }
+        bool IsStartingUp { get; set; }
+        bool IsShuttingDown { get; set; }
         DateTime? LastPerformanceSampleDate { get; set; }
+        string BrainInstance { get; }
     }
 }

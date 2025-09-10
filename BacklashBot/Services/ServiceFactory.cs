@@ -59,6 +59,7 @@ namespace BacklashBot.Services
         public IMarketDataService? GetMarketDataService() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<IMarketDataService>() ?? null;
         public ITradingCalculator? GetTradingCalculator() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<ITradingCalculator>() ?? null;
         public IOrderBookService? GetOrderBookService() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<IOrderBookService>() ?? null;
+        public ICentralPerformanceMonitor? GetPerformanceMonitor() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<ICentralPerformanceMonitor>() ?? null;
         public IDataCache? GetDataCache() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<IDataCache>() ?? null;
         public IMarketDataInitializer? GetMarketDataInitializer() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<IMarketDataInitializer>() ?? null;
         public ICandlestickService? GetCandlestickService() => _scopeManager.Scope?.ServiceProvider.GetRequiredService<ICandlestickService>() ?? null;

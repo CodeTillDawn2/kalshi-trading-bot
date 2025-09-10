@@ -1,3 +1,4 @@
+// BroadcastService.cs
 using Microsoft.AspNetCore.SignalR;
 using BacklashBot.Hubs;
 using BacklashBot.Services.Interfaces;
@@ -7,6 +8,8 @@ using BacklashBot.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using KalshiBotData.Models;
+using BacklashBot.Management;
 
 namespace BacklashBot.Services
 {
@@ -102,25 +105,52 @@ namespace BacklashBot.Services
             {
                 var markets = await GetWatchedMarketsAsync();
                 var errorHandler = _serviceFactory.GetBacklashErrorHandler();
+                var performanceTracker = _serviceFactory.GetPerformanceMonitor();
                 var lastSnapshot = errorHandler.LastSuccessfulSnapshot;
                 var lastErrorDate = errorHandler.LastErrorDate;
 
-                // Get brain instance name from configuration
-                var brainInstanceName = _executionConfig.BrainInstance ?? "Unknown";
+                // Get queue averages and CPU usage
+                (double eventQueueAvg, double tickerQueueAvg, double notificationQueueAvg, double orderBookQueueAvg) = performanceTracker.GetQueueCountRollingAverages();
+                var currentCpuUsage = performanceTracker.LastRefreshUsagePercentage;
+                var isWebSocketConnected = _serviceFactory.GetWebSocketHostedService().IsConnected();
 
-                var checkInData = new
+                // Get brain instance name and status from Performance Monitor
+                var isStartingUp = performanceTracker.IsStartingUp;
+                var isShuttingDown = performanceTracker.IsShuttingDown;
+
+                var checkInData = new CheckInData
                 {
-                    BrainInstanceName = brainInstanceName,
+                    BrainInstanceName = performanceTracker.BrainInstance,
                     Markets = markets,
                     ErrorCount = errorHandler.ErrorCount,
                     LastSnapshot = lastSnapshot == DateTime.MinValue ? (DateTime?)null : lastSnapshot,
-                    LastErrorDate = lastErrorDate == DateTime.MinValue ? (DateTime?)null : lastErrorDate,
-                    Timestamp = DateTime.UtcNow
+                    IsStartingUp = isStartingUp,
+                    IsShuttingDown = isShuttingDown,
+                    WatchPositions = false, // Set based on configuration if available
+                    WatchOrders = false, // Set based on configuration if available
+                    ManagedWatchList = false, // Set based on configuration if available
+                    CaptureSnapshots = false, // Set based on configuration if available
+                    TargetWatches = 0, // Set based on configuration if available
+                    MinimumInterest = 0.0, // Set based on configuration if available
+                    UsageMin = 0.0, // Set based on configuration if available
+                    UsageMax = 0.0, // Set based on configuration if available
+                    CurrentCpuUsage = currentCpuUsage,
+                    EventQueueAvg = eventQueueAvg,
+                    TickerQueueAvg = tickerQueueAvg,
+                    NotificationQueueAvg = notificationQueueAvg,
+                    OrderbookQueueAvg = orderBookQueueAvg,
+                    IsWebSocketConnected = isWebSocketConnected,
+                    LastRefreshCycleSeconds = performanceTracker.LastRefreshCycleSeconds,
+                    LastRefreshCycleInterval = TimeSpan.FromSeconds(performanceTracker.LastRefreshCycleInterval),
+                    LastRefreshMarketCount = performanceTracker.LastRefreshMarketCount,
+                    LastRefreshUsagePercentage = performanceTracker.LastRefreshUsagePercentage,
+                    LastRefreshTimeAcceptable = performanceTracker.LastRefreshTimeAcceptable,
+                    LastPerformanceSampleDate = performanceTracker.LastPerformanceSampleDate
                 };
 
                 await _hubContext.Clients.All.SendAsync("CheckIn", checkInData, cancellationToken);
                 _logger.LogDebug("CheckIn broadcasted from {BrainInstanceName} with {MarketCount} markets, ErrorCount: {ErrorCount}, LastSnapshot: {LastSnapshot}, LastErrorDate: {LastErrorDate}",
-                    brainInstanceName, markets.Count, errorHandler.ErrorCount, lastSnapshot, lastErrorDate);
+                    _serviceFactory.GetPerformanceMonitor().BrainInstance, markets.Count, errorHandler.ErrorCount, lastSnapshot, lastErrorDate);
             }
             catch (Exception ex)
             {
@@ -165,18 +195,9 @@ namespace BacklashBot.Services
             _logger.LogDebug("BroadcastService stopped.");
         }
 
-
-
-
         public void Dispose()
         {
             _checkInBroadcastTask?.Dispose();
         }
-
-
-
-
-
-
     }
 }

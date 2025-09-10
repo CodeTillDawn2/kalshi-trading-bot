@@ -1,12 +1,21 @@
 // MainForm.cs: Full class with restored tooltip/hover (black line), back button fix via BackAction, and axis restore on back
+using BacklashDTOs;
 using KalshiBotData.Data;
 using KalshiBotData.Models;
 using Microsoft.Extensions.Configuration;
-using BacklashDTOs;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TradingSimulator;
 using TradingSimulator.TestObjects;
+using TradingStrategies.Strategies.Strats;
+using TradingStrategies.Trading.Helpers;
+
+// Config class for remembering user selections
+public class TradingGUIConfig
+{
+    public string? LastSelectedStrategy { get; set; }
+    public string? LastSelectedWeightSet { get; set; }
+}
 
 namespace SimulatorWinForms
 {
@@ -15,6 +24,7 @@ namespace SimulatorWinForms
         private readonly TradingSimulatorService _simulator;
         private readonly KalshiBotContext _context;
         private readonly string _cacheDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "TestingOutput");
+        private readonly string _configFilePath = Path.Combine(AppContext.BaseDirectory, "trading_gui_config.json");
         private List<(double x, double y, string memo)> _tooltipPoints = new();
         private string? _lastTooltipMemo = null;
         private HashSet<string> _checkedMarketNames = new();
@@ -28,6 +38,11 @@ namespace SimulatorWinForms
         private readonly Dictionary<string, double> _bestPnL = new(StringComparer.OrdinalIgnoreCase);
 
         List<MarketSnapshot> _snapshots = new();
+
+        // Strategy selection controls
+        private ComboBox _strategyTypeComboBox;
+        private ComboBox _weightSetComboBox;
+        private Button _refreshWeightSetsButton;
 
         private (double xMin, double xMax, double yMin, double yMax) _savedChartLimits;
 
@@ -76,6 +91,7 @@ namespace SimulatorWinForms
             };
 
             dgvMarkets.Sorted += (s, e) => RestoreCheckboxes();
+            dgvMarkets.CellFormatting += DgvMarkets_CellFormatting;
 
             _tooltipOverlay = new Label
             {
@@ -110,6 +126,14 @@ namespace SimulatorWinForms
 
             // Initialize typography system
             ApplyInitialTypography();
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            // Initialize strategy selection controls after form is fully loaded
+            InitializeStrategyControls();
         }
 
         private void ResetPnLForMarkets(IEnumerable<string> markets)
@@ -259,6 +283,27 @@ namespace SimulatorWinForms
                     _checkedMarketNames.Add(marketName);
                 else
                     _checkedMarketNames.Remove(marketName);
+            }
+        }
+
+        private void DgvMarkets_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.ColumnIndex == dgvMarkets.Columns["PnL"].Index && e.Value != null)
+            {
+                string pnlStr = e.Value.ToString();
+                if (!string.IsNullOrWhiteSpace(pnlStr) && double.TryParse(pnlStr, out double pnl))
+                {
+                    if (pnl > 0)
+                    {
+                        e.CellStyle.ForeColor = Color.Green;
+                        e.CellStyle.Font = new Font(e.CellStyle.Font, FontStyle.Bold);
+                    }
+                    else if (pnl < 0)
+                    {
+                        e.CellStyle.ForeColor = Color.Red;
+                        e.CellStyle.Font = new Font(e.CellStyle.Font, FontStyle.Bold);
+                    }
+                }
             }
         }
 
@@ -461,7 +506,42 @@ namespace SimulatorWinForms
             EnsureSimulatorSetup();
             try
             {
-                await _simulator.RunMultipleAllStrategiesForGuiAsync(writeToFile: false, marketsToRun: sel);
+                string selectedStrategy = _strategyTypeComboBox.SelectedItem?.ToString();
+
+                if (string.IsNullOrEmpty(selectedStrategy))
+                {
+                    AppendLog("Please select a strategy type.");
+                    return;
+                }
+
+                AppendLog($"Running ALL weight sets for {selectedStrategy} strategy");
+
+                // Get all weight sets for the selected strategy
+                var allWeightSets = GetWeightNamesForStrategy(selectedStrategy).ToList();
+
+                if (!allWeightSets.Any())
+                {
+                    AppendLog($"No weight sets found for {selectedStrategy}");
+                    return;
+                }
+
+                AppendLog($"Found {allWeightSets.Count} weight sets to run: {string.Join(", ", allWeightSets)}");
+
+                // Run each weight set for all selected markets
+                foreach (var weightSet in allWeightSets)
+                {
+                    AppendLog($"Running {selectedStrategy} with parameter set: {weightSet}");
+
+                    await _simulator.RunSelectedSetForGuiAsync(
+                        setKey: selectedStrategy,
+                        weightName: weightSet,
+                        writeToFile: false, // Don't save files when running all weight sets
+                        marketsToRun: sel);
+
+                    AppendLog($"Completed {weightSet} for all markets");
+                }
+
+                AppendLog($"Completed running all {allWeightSets.Count} weight sets for {selectedStrategy}");
             }
             finally
             {
@@ -469,6 +549,7 @@ namespace SimulatorWinForms
                 _simSetup = false;
             }
         }
+
 
         private void btnReload_Click(object sender, EventArgs e)
         {
@@ -755,6 +836,243 @@ namespace SimulatorWinForms
             if (Math.Abs(scaleFactor - 1.0f) > 0.1f)
             {
                 TypographyManager.Instance.ApplyTypography(this, scaleFactor);
+            }
+        }
+
+        private void InitializeStrategyControls()
+        {
+            // Create strategy type ComboBox
+            _strategyTypeComboBox = new ComboBox
+            {
+                Size = new Size(150, 25),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Margin = new Padding(3)
+            };
+
+            // Add actual strategy names from centralized configuration
+            var strategyNames = TradingStrategies.Trading.Helpers.StrategyConfiguration.GetStrategyNames().ToArray();
+            _strategyTypeComboBox.Items.AddRange(strategyNames);
+            _strategyTypeComboBox.SelectedIndexChanged += StrategyTypeComboBox_SelectedIndexChanged;
+
+            // Create weight set ComboBox
+            _weightSetComboBox = new ComboBox
+            {
+                Size = new Size(200, 25),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Enabled = true, // Enabled by default since all strategies use parameter sets
+                Margin = new Padding(3)
+            };
+            _weightSetComboBox.SelectedIndexChanged += WeightSetComboBox_SelectedIndexChanged;
+
+            // Create refresh button for weight sets
+            _refreshWeightSetsButton = new Button
+            {
+                Text = "↻",
+                Size = new Size(30, 25),
+                Margin = new Padding(3),
+                Enabled = true // Enabled by default since all strategies use parameter sets
+            };
+            _refreshWeightSetsButton.Click += RefreshWeightSetsButton_Click;
+
+            // Add controls to buttonPanel
+            // buttonPanel is declared in the designer file and should be accessible
+            buttonPanel.Controls.Add(_strategyTypeComboBox);
+            buttonPanel.Controls.Add(_weightSetComboBox);
+            buttonPanel.Controls.Add(_refreshWeightSetsButton);
+
+            // Move them to the front of the flow (before the buttons)
+            buttonPanel.Controls.SetChildIndex(_strategyTypeComboBox, 0);
+            buttonPanel.Controls.SetChildIndex(_weightSetComboBox, 1);
+            buttonPanel.Controls.SetChildIndex(_refreshWeightSetsButton, 2);
+
+            // Load previous selections from config
+            LoadConfig();
+
+            // Populate weight sets asynchronously
+            _ = PopulateWeightSetsAsync();
+        }
+
+        private void LoadConfig()
+        {
+            try
+            {
+                if (File.Exists(_configFilePath))
+                {
+                    var json = File.ReadAllText(_configFilePath);
+                    var config = JsonSerializer.Deserialize<TradingGUIConfig>(json);
+
+                    if (config != null)
+                    {
+                        // Set strategy selection
+                        if (!string.IsNullOrEmpty(config.LastSelectedStrategy) &&
+                            _strategyTypeComboBox.Items.Contains(config.LastSelectedStrategy))
+                        {
+                            _strategyTypeComboBox.SelectedItem = config.LastSelectedStrategy;
+                        }
+                        else
+                        {
+                            _strategyTypeComboBox.SelectedIndex = 0; // Default to first strategy
+                        }
+                    }
+                    else
+                    {
+                        _strategyTypeComboBox.SelectedIndex = 0; // Default to first strategy
+                    }
+                }
+                else
+                {
+                    _strategyTypeComboBox.SelectedIndex = 0; // Default to first strategy
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendLog($"Failed to load config: {ex.Message}");
+                _strategyTypeComboBox.SelectedIndex = 0; // Default to first strategy
+            }
+        }
+
+        private void SaveConfig()
+        {
+            try
+            {
+                var config = new TradingGUIConfig
+                {
+                    LastSelectedStrategy = _strategyTypeComboBox.SelectedItem?.ToString(),
+                    LastSelectedWeightSet = _weightSetComboBox.SelectedItem?.ToString()
+                };
+
+                var json = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(_configFilePath, json);
+            }
+            catch (Exception ex)
+            {
+                AppendLog($"Failed to save config: {ex.Message}");
+            }
+        }
+
+        private async void StrategyTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string selectedStrategy = _strategyTypeComboBox.SelectedItem?.ToString();
+            if (!string.IsNullOrEmpty(selectedStrategy))
+            {
+                _weightSetComboBox.Enabled = true;
+                _refreshWeightSetsButton.Enabled = true;
+                await PopulateWeightSetsAsync();
+            }
+            else
+            {
+                _weightSetComboBox.Enabled = false;
+                _refreshWeightSetsButton.Enabled = false;
+                _weightSetComboBox.Items.Clear();
+            }
+
+            // Save config when strategy changes
+            SaveConfig();
+        }
+
+        private void WeightSetComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Save config when weight set changes
+            SaveConfig();
+        }
+
+        private async void RefreshWeightSetsButton_Click(object sender, EventArgs e)
+        {
+            await PopulateWeightSetsAsync();
+        }
+
+        private IEnumerable<string> GetWeightNamesForStrategy(string strategyName)
+        {
+            return strategyName switch
+            {
+                "Bollinger" => StrategySelectionHelper.BollingerParameterSets.Select(x => x.Name),
+                "Breakout2" => StrategySelectionHelper.BreakoutParameterSets.Select(x => x.Name),
+                "Nothing" => StrategySelectionHelper.NothingEverHappensParameterSets.Select(x => x.Name),
+                "FlowMo" => StrategySelectionHelper.FlowMomentumParameterSets.Select(x => x.Name),
+                "MLShared" => MLEntrySeekerShared.MLSharedParameterSets.Select(x => x.Name),
+                "TryAgain" => TryAgainStrat.TryAgainStratParameterSets.Select(x => x.Name),
+                "SloMo" => SlopeMomentumStrat.SlopeMomentumParameterSets.Select(x => x.Name),
+                "Momentum" => StrategySelectionHelper.MomentumTradingParameterSets.Select(x => x.Name),
+                _ => Enumerable.Empty<string>()
+            };
+        }
+
+        private async Task PopulateWeightSetsAsync()
+        {
+            if (_weightSetComboBox == null) return;
+
+            _weightSetComboBox.Items.Clear();
+            _weightSetComboBox.Items.Add("Loading...");
+
+            try
+            {
+                string selectedStrategy = _strategyTypeComboBox.SelectedItem?.ToString();
+                if (string.IsNullOrEmpty(selectedStrategy))
+                {
+                    _weightSetComboBox.Items.Clear();
+                    _weightSetComboBox.Items.Add("Select a strategy first");
+                    return;
+                }
+
+                AppendLog($"Loading parameter sets for {selectedStrategy}...");
+
+                // Get weight names from centralized configuration
+                var weightNames = TradingStrategies.Trading.Helpers.StrategyConfiguration.GetStrategiesWithParameterSets()
+                    .Contains(selectedStrategy) ? GetWeightNamesForStrategy(selectedStrategy) : null;
+
+                _weightSetComboBox.Items.Clear();
+
+                if (weightNames != null && weightNames.Any())
+                {
+                    foreach (var weightName in weightNames.OrderBy(name => name))
+                    {
+                        _weightSetComboBox.Items.Add(weightName);
+                    }
+
+                    if (_weightSetComboBox.Items.Count > 0)
+                    {
+                        // Try to restore last selected weight set from config
+                        if (File.Exists(_configFilePath))
+                        {
+                            try
+                            {
+                                var json = File.ReadAllText(_configFilePath);
+                                var config = JsonSerializer.Deserialize<TradingGUIConfig>(json);
+                                if (config != null && !string.IsNullOrEmpty(config.LastSelectedWeightSet) &&
+                                    _weightSetComboBox.Items.Contains(config.LastSelectedWeightSet))
+                                {
+                                    _weightSetComboBox.SelectedItem = config.LastSelectedWeightSet;
+                                }
+                                else
+                                {
+                                    _weightSetComboBox.SelectedIndex = 0;
+                                }
+                            }
+                            catch
+                            {
+                                _weightSetComboBox.SelectedIndex = 0;
+                            }
+                        }
+                        else
+                        {
+                            _weightSetComboBox.SelectedIndex = 0;
+                        }
+                    }
+
+                    AppendLog($"Loaded {weightNames.Count()} parameter sets for {selectedStrategy}.");
+                }
+                else
+                {
+                    _weightSetComboBox.Items.Add("No parameter sets found");
+                    AppendLog($"No parameter sets found for {selectedStrategy}.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _weightSetComboBox.Items.Clear();
+                _weightSetComboBox.Items.Add("Error loading parameter sets");
+                AppendLog($"Failed to load parameter sets: {ex.Message}");
+                AppendLog($"Stack trace: {ex.StackTrace}");
             }
         }
 

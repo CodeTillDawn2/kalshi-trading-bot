@@ -15,6 +15,7 @@ namespace BacklashBot.Services.Interfaces
         IMarketDataService? GetMarketDataService();
         ITradingCalculator? GetTradingCalculator();
         IOrderBookService? GetOrderBookService();
+        ICentralPerformanceMonitor? GetPerformanceMonitor();
         IDataCache? GetDataCache();
         IMarketDataInitializer? GetMarketDataInitializer();
         ICandlestickService? GetCandlestickService();

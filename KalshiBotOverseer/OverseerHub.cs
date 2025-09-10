@@ -1,3 +1,4 @@
+// OverseerHub.cs
 using Microsoft.AspNetCore.SignalR;
 using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -5,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using BacklashDTOs;
 using System.Security.Cryptography;
 using System.Text;
+using System.Collections.Concurrent;
+using KalshiBotOverseer.Models;
 
 namespace KalshiBotOverseer
 {
@@ -12,6 +15,7 @@ namespace KalshiBotOverseer
     {
         private readonly ILogger<OverseerHub> _logger;
         private readonly IServiceScopeFactory _scopeFactory;
+        private static readonly ConcurrentDictionary<string, BrainPersistence> _brainPersistenceCache = new ConcurrentDictionary<string, BrainPersistence>();
 
         public OverseerHub(ILogger<OverseerHub> logger, IServiceScopeFactory scopeFactory)
         {
@@ -120,20 +124,109 @@ namespace KalshiBotOverseer
             }
         }
 
-        public async Task CheckIn(object checkInData)
+        public async Task CheckIn(CheckInData checkInData)
         {
             _logger.LogInformation("Received CheckIn from client: {ConnectionId}", Context.ConnectionId);
 
             try
             {
-                // Process CheckIn data - extract markets, error count, last snapshot
-                // This can be expanded to update overseer state or trigger actions
+                // Update in-memory BrainPersistence
+                var brainInstanceName = checkInData.BrainInstanceName;
+                var brainPersistence = _brainPersistenceCache.GetOrAdd(brainInstanceName, _ => new BrainPersistence
+                {
+                    BrainInstanceName = brainInstanceName,
+                    LastSeen = DateTime.UtcNow
+                });
+
+                // Update all properties
+                brainPersistence.CurrentMarketTickers = new HashSet<string>(checkInData.Markets ?? new List<string>());
+                brainPersistence.ErrorCount = checkInData.ErrorCount;
+                brainPersistence.LastSnapshot = checkInData.LastSnapshot;
+                brainPersistence.IsStartingUp = checkInData.IsStartingUp;
+                brainPersistence.IsShuttingDown = checkInData.IsShuttingDown;
+                brainPersistence.WatchPositions = checkInData.WatchPositions;
+                brainPersistence.WatchOrders = checkInData.WatchOrders;
+                brainPersistence.ManagedWatchList = checkInData.ManagedWatchList;
+                brainPersistence.CaptureSnapshots = checkInData.CaptureSnapshots;
+                brainPersistence.TargetWatches = checkInData.TargetWatches;
+                brainPersistence.MinimumInterest = checkInData.MinimumInterest;
+                brainPersistence.UsageMin = checkInData.UsageMin;
+                brainPersistence.UsageMax = checkInData.UsageMax;
+                brainPersistence.IsWebSocketConnected = checkInData.IsWebSocketConnected;
+
+                // Update metric histories with deduplication based on LastPerformanceSampleDate or current time
+                var timestamp = checkInData.LastPerformanceSampleDate;
+
+                // Helper method to add metric if not duplicate
+                void AddMetric(List<MetricHistory> history, double value)
+                {
+                    if (!history.Any(m => m.Timestamp == timestamp))
+                    {
+                        history.Add(new MetricHistory { Timestamp = timestamp, Value = value });
+                    }
+                }
+
+                // Add queue and CPU metrics
+                AddMetric(brainPersistence.CpuUsageHistory, checkInData.CurrentCpuUsage);
+                AddMetric(brainPersistence.EventQueueHistory, checkInData.EventQueueAvg);
+                AddMetric(brainPersistence.TickerQueueHistory, checkInData.TickerQueueAvg);
+                AddMetric(brainPersistence.NotificationQueueHistory, checkInData.NotificationQueueAvg);
+                AddMetric(brainPersistence.OrderbookQueueHistory, checkInData.OrderbookQueueAvg);
+
+                // Add market count and error count to histories
+                AddMetric(brainPersistence.MarketCountHistory, checkInData.Markets?.Count ?? 0);
+                AddMetric(brainPersistence.ErrorHistory, checkInData.ErrorCount);
+
+                // Add refresh metrics
+                AddMetric(brainPersistence.RefreshCycleSecondsHistory, checkInData.LastRefreshCycleSeconds);
+                AddMetric(brainPersistence.RefreshCycleIntervalHistory, checkInData.LastRefreshCycleInterval);
+                AddMetric(brainPersistence.RefreshMarketCountHistory, checkInData.LastRefreshMarketCount);
+                AddMetric(brainPersistence.RefreshUsagePercentageHistory, checkInData.LastRefreshUsagePercentage);
+                AddMetric(brainPersistence.PerformanceSampleDateHistory, checkInData.LastPerformanceSampleDate.Ticks);
+
+                brainPersistence.LastRefreshTimeAcceptable = checkInData.LastRefreshTimeAcceptable;
+
+                // Send response to caller
                 await Clients.Caller.SendAsync("CheckInReceived", new
                 {
                     Success = true,
                     Timestamp = DateTime.UtcNow,
                     Message = "CheckIn processed successfully"
                 });
+
+                // Broadcast CheckInUpdate to all connected clients
+                await Clients.All.SendAsync("CheckInUpdate", new
+                {
+                    BrainInstanceName = brainInstanceName,
+                    MarketCount = checkInData.Markets?.Count ?? 0,
+                    ErrorCount = checkInData.ErrorCount,
+                    LastSnapshot = checkInData.LastSnapshot,
+                    LastCheckIn = DateTime.UtcNow,
+                    IsStartingUp = checkInData.IsStartingUp,
+                    IsShuttingDown = checkInData.IsShuttingDown,
+                    WatchPositions = checkInData.WatchPositions,
+                    WatchOrders = checkInData.WatchOrders,
+                    ManagedWatchList = checkInData.ManagedWatchList,
+                    CaptureSnapshots = checkInData.CaptureSnapshots,
+                    TargetWatches = checkInData.TargetWatches,
+                    MinimumInterest = checkInData.MinimumInterest,
+                    UsageMin = checkInData.UsageMin,
+                    UsageMax = checkInData.UsageMax,
+                    CurrentCpuUsage = checkInData.CurrentCpuUsage,
+                    EventQueueAvg = checkInData.EventQueueAvg,
+                    TickerQueueAvg = checkInData.TickerQueueAvg,
+                    NotificationQueueAvg = checkInData.NotificationQueueAvg,
+                    OrderbookQueueAvg = checkInData.OrderbookQueueAvg,
+                    IsWebSocketConnected = checkInData.IsWebSocketConnected,
+                    LastRefreshCycleSeconds = checkInData.LastRefreshCycleSeconds,
+                    LastRefreshCycleInterval = checkInData.LastRefreshCycleInterval,
+                    LastRefreshMarketCount = checkInData.LastRefreshMarketCount,
+                    LastRefreshUsagePercentage = checkInData.LastRefreshUsagePercentage,
+                    LastRefreshTimeAcceptable = checkInData.LastRefreshTimeAcceptable,
+                    LastPerformanceSampleDate = checkInData.LastPerformanceSampleDate
+                });
+
+                _logger.LogInformation("Processed CheckIn for bot {BrainInstanceName} with {MarketCount} markets", brainInstanceName, checkInData.Markets?.Count ?? 0);
             }
             catch (Exception ex)
             {

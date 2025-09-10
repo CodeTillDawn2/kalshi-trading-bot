@@ -1,3 +1,4 @@
+// CentralPerformanceMonitor.cs
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,7 @@ using BacklashDTOs.Data;
 using BacklashBot.State.Interfaces;
 using System.Collections.Concurrent;
 using TradingStrategies.Configuration;
+
 namespace BacklashBot.Management
 {
     public class CentralPerformanceMonitor : ICentralPerformanceMonitor
@@ -25,15 +27,17 @@ namespace BacklashBot.Management
         private bool _timerRunning = false;
         private readonly ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>> _queueCountSamples;
 
-        public double LastWorkDuration { get; set; }
-        public double LastRefreshInterval { get; set; }
-        public int LastMarketCount { get; set; }
-        public double LastUsagePercentage { get; set; }
-        public double LastExecutionSeconds { get; set; }
-        public bool LastExecutionAcceptable { get; set; }
+        public double LastRefreshCycleSeconds { get; set; }
+        public double LastRefreshCycleInterval { get; set; }
+        public int LastRefreshMarketCount { get; set; }
+        public double LastRefreshUsagePercentage { get; set; }
+        public bool LastRefreshTimeAcceptable { get; set; }
         public DateTime? LastPerformanceSampleDate { get; set; }
         private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
+
+        public bool IsStartingUp { get; set; } = false;
+        public bool IsShuttingDown { get; set; } = false;
 
         public CentralPerformanceMonitor(
             ILogger<ICentralPerformanceMonitor> logger,
@@ -55,12 +59,10 @@ namespace BacklashBot.Management
             RefreshInterval = TimeSpan.FromMinutes(_tradingConfig.RefreshIntervalMinutes);
             BrainInstance = _executionConfig.BrainInstance;
             _queueCountSamples = new ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>>();
-
         }
 
         public double CalculateAverageWebsocketEventsReceived(string marketTicker)
         {
-
             if (_serviceFactory.GetDataCache() == null || !_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker)) return 0.0;
 
             // Retrieve the last market open time from the data cache
@@ -93,7 +95,7 @@ namespace BacklashBot.Management
             var record = (Timestamp: DateTime.UtcNow, Milliseconds: milliseconds);
             ApiExecutionTimes.AddOrUpdate(
                 methodName,
-                _ => [record],
+                _ => new List<(DateTime Timestamp, long Milliseconds)> { record },
                 (_, list) => { list.Add(record); return list; });
         }
 
@@ -119,7 +121,7 @@ namespace BacklashBot.Management
 
             Task.Run(async () =>
             {
-                while (!_statusTrackerService.GetCancellationToken().IsCancellationRequested)
+                while (!(_statusTrackerService.GetCancellationToken().IsCancellationRequested))
                 {
                     try
                     {
@@ -128,17 +130,16 @@ namespace BacklashBot.Management
                         {
                             if (marketRefreshService.IsRunning())
                             {
-                                LastWorkDuration = marketRefreshService.LastWorkDuration.TotalSeconds;
-                                LastRefreshInterval = RefreshInterval.TotalSeconds;
-                                LastMarketCount = marketRefreshService.LastWorkMarketCount;
-                                LastUsagePercentage = LastRefreshInterval > 0 ? (LastWorkDuration / LastRefreshInterval) * 100 : 0;
-                                LastExecutionSeconds = marketRefreshService.LastWorkDuration.TotalSeconds;
-                                LastExecutionAcceptable = LastUsagePercentage >= dto.UsageMin && LastUsagePercentage <= dto.UsageMax;
+                                LastRefreshCycleSeconds = marketRefreshService.LastWorkDuration.TotalSeconds;
+                                LastRefreshCycleInterval = RefreshInterval.TotalSeconds;
+                                LastRefreshMarketCount = marketRefreshService.LastWorkMarketCount;
+                                LastRefreshUsagePercentage = LastRefreshCycleInterval > 0 ? (LastRefreshCycleSeconds / LastRefreshCycleInterval) * 100 : 0;
+                                LastRefreshTimeAcceptable = LastRefreshUsagePercentage >= dto.UsageMin && LastRefreshUsagePercentage <= dto.UsageMax;
                                 LastPerformanceSampleDate = DateTime.UtcNow;
 
                                 _logger.LogDebug(
                                     "{Service} processing time: Elapsed={ElapsedSeconds:F2}s, Markets={MarketCount}, Usage={UsagePercentage:F2}%, Acceptable={IsAcceptable}",
-                                    marketServiceName, LastExecutionSeconds, LastMarketCount, LastUsagePercentage, LastExecutionAcceptable);
+                                    marketServiceName, LastRefreshCycleSeconds, LastRefreshMarketCount, LastRefreshUsagePercentage, LastRefreshTimeAcceptable);
                             }
                             marketCheckCounter = 0;
                         }
@@ -222,7 +223,6 @@ namespace BacklashBot.Management
             );
         }
 
-
         public double GetQueueHighCountPercentage()
         {
             var fiveMinutesAgo = DateTime.UtcNow.AddMinutes(-5);
@@ -244,7 +244,5 @@ namespace BacklashBot.Management
 
             return percentage;
         }
-
-
     }
 }
