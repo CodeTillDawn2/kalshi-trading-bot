@@ -202,6 +202,9 @@ namespace BacklashBot.Hubs
                 case "command":
                     await HandleCommand(message);
                     break;
+                case "refresh_data":
+                    await HandleRefreshData(message);
+                    break;
                 case "acknowledgment":
                     _logger.LogDebug("Acknowledgment received from Overseer: {Message}", message);
                     break;
@@ -225,6 +228,43 @@ namespace BacklashBot.Hubs
             };
 
             await Clients.Caller.SendAsync("StatusResponse", statusData);
+        }
+
+        private async Task HandleRefreshData(string request)
+        {
+            _logger.LogInformation("Handling refresh data request from Overseer: {Request}", request);
+
+            try
+            {
+                var broadcastService = _serviceFactory.GetBroadcastService();
+                if (broadcastService != null)
+                {
+                    await broadcastService.BroadcastAllMarketDataOnDemandAsync();
+                    await Clients.Caller.SendAsync("RefreshResponse", new
+                    {
+                        Success = true,
+                        Message = "Market data refresh completed",
+                        Timestamp = DateTime.UtcNow
+                    });
+                }
+                else
+                {
+                    await Clients.Caller.SendAsync("RefreshResponse", new
+                    {
+                        Success = false,
+                        Message = "Broadcast service not available"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error handling refresh data request");
+                await Clients.Caller.SendAsync("RefreshResponse", new
+                {
+                    Success = false,
+                    Message = $"Refresh failed: {ex.Message}"
+                });
+            }
         }
 
         private async Task HandleCommand(string command)

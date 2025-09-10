@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <PlatformTarget>x64</PlatformTarget>
     <FileVersion>0.2.5</FileVersion>
+    <UserSecretsId>8404ee8d-67fb-44e1-8c03-a78c63766206</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="BackgroundServices\**" />
@@ -58,11 +59,12 @@
   </ItemGroup>
 
 <ItemGroup>
-  <Content Update="appsettings.local.json">
-    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    <ExcludeFromPublish>true</ExcludeFromPublish>
-	<IncludeInPublish>false</IncludeInPublish>
-  </Content>
+  <Content Remove="appsettings.json;appsettings.local.json" />
+  <None Include="appsettings.json;appsettings.local.json">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+  </None>
 </ItemGroup>
 
   <ItemGroup>
@@ -73,9 +75,4 @@
     <ProjectReference Include="..\TradingStrategies\TradingStrategies.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    </ItemGroup>
 </Project>

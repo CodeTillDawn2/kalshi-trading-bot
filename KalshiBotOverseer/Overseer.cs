@@ -7,6 +7,8 @@ using BacklashDTOs;
 using KalshiBotData.Data;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using System.Text.Json;
 
 namespace KalshiBotOverseer
 {
@@ -15,15 +17,17 @@ namespace KalshiBotOverseer
         private readonly IKalshiWebSocketClient _webSocketClient;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<Overseer> _logger;
+        private readonly IHubContext<ChartHub> _hubContext;
         private Timer? _apiFetchTimer;
         private CancellationTokenSource? _apiFetchCancellationTokenSource;
         private bool _disposed = false;
 
-        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger)
+        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, IHubContext<ChartHub> hubContext)
         {
             _webSocketClient = webSocketClient;
             _scopeFactory = scopeFactory;
             _logger = logger;
+            _hubContext = hubContext;
         }
 
         public async void Start()
@@ -75,6 +79,33 @@ namespace KalshiBotOverseer
         {
             // Handle the event lifecycle event
             _logger?.LogInformation("Received EventLifecycle event: {EventData}", e);
+
+            // Check if this is a check-in from a bot
+            try
+            {
+                // e.Data is JsonElement, deserialize it
+                var checkInData = JsonSerializer.Deserialize<CheckInData>(e.Data.GetRawText());
+                if (checkInData != null)
+                {
+                    // Send CheckInUpdate to all connected clients
+                    await _hubContext.Clients.All.SendAsync("CheckInUpdate", new
+                    {
+                        BrainInstanceName = "UnknownBot", // We don't have this info from WebSocket events
+                        MarketCount = checkInData.Markets?.Count ?? 0,
+                        ErrorCount = checkInData.ErrorCount,
+                        LastSnapshot = checkInData.LastSnapshot,
+                        LastCheckIn = DateTime.UtcNow,
+                        IsStartingUp = checkInData.IsStartingUp,
+                        IsShuttingDown = checkInData.IsShuttingDown
+                    });
+
+                    _logger?.LogInformation("Sent CheckInUpdate for bot with {MarketCount} markets", checkInData.Markets?.Count ?? 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning(ex, "Failed to process check-in from EventLifecycle event");
+            }
 
             // Event lifecycle event processed
         }

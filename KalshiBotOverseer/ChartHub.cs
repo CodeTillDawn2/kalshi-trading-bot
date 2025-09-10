@@ -218,7 +218,9 @@ namespace KalshiBotOverseer
                     MarketCount = checkInData.Markets?.Count ?? 0,
                     ErrorCount = checkInData.ErrorCount,
                     LastSnapshot = checkInData.LastSnapshot,
-                    LastCheckIn = DateTime.UtcNow
+                    LastCheckIn = DateTime.UtcNow,
+                    IsStartingUp = checkInData.IsStartingUp,
+                    IsShuttingDown = checkInData.IsShuttingDown
                 });
 
                 // Send acknowledgment
@@ -280,5 +282,7 @@ namespace KalshiBotOverseer
         public List<string>? Markets { get; set; }
         public long ErrorCount { get; set; }
         public DateTime? LastSnapshot { get; set; }
+        public bool IsStartingUp { get; set; }
+        public bool IsShuttingDown { get; set; }
     }
 }

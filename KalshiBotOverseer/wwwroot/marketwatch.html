@@ -6,9 +6,9 @@
     <title>Backlash Bot Dashboard</title>
     <link rel="icon" href="Images/backlashstudiosicon.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -825,6 +825,65 @@
             padding: 8px 15px;
             font-size: 13px;
         }
+
+        /* Chart Modal Styles */
+        .chart-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .chart-modal-content {
+            background: rgb(16, 16, 13);
+            border-radius: 20px;
+            border: 2px solid rgb(28, 51, 39);
+            max-width: 95vw;
+            max-height: 95vh;
+            width: 1400px;
+            height: 800px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(28, 51, 39, 0.5);
+        }
+
+        .chart-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 2px solid rgb(28, 51, 39);
+            background: rgba(28, 51, 39, 0.1);
+        }
+
+        .chart-close-btn {
+            background: none;
+            border: none;
+            color: rgb(225, 221, 206);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-close-btn:hover {
+            background: rgba(28, 51, 39, 0.3);
+            color: rgb(225, 221, 206);
+        }
+
+        .chart-modal-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -873,10 +932,6 @@
                 <button class="tab-btn" onclick="switchTab('snapshots')">
                     <i class="fas fa-camera"></i>
                     Snapshots
-                </button>
-                <button class="tab-btn" onclick="switchTab('chart')">
-                    <i class="fas fa-chart-line"></i>
-                    Chart
                 </button>
             </div>
 
@@ -1025,15 +1080,136 @@
                 </div>
             </div>
 
-            <div id="chart-tab" class="tab-content" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <button class="refresh-btn" onclick="switchTab(previousTab)">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
-                    </button>
-                    <h2 id="chartTitle" style="color: rgb(225, 221, 206); margin: 0;">Market Chart</h2>
-                    <div></div> <!-- Spacer -->
+
+            <div id="orders-tab" class="tab-content" style="display: none;">
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <label class="filter-label">Search Orders</label>
+                        <input type="text" id="ordersSearchInput" class="filter-input" placeholder="Search by ticker..." onkeyup="filterOrders()">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Status Filter</label>
+                        <select id="ordersStatusFilter" class="filter-select" onchange="filterOrders()">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="filled">Filled</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Side Filter</label>
+                        <select id="ordersSideFilter" class="filter-select" onchange="filterOrders()">
+                            <option value="">All Sides</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort By</label>
+                        <select id="ordersSortSelect" class="filter-select" onchange="sortOrders()">
+                            <option value="marketTicker">Market Ticker</option>
+                            <option value="side">Side</option>
+                            <option value="quantity">Quantity</option>
+                            <option value="price">Price</option>
+                            <option value="status">Status</option>
+                            <option value="createdAt">Created At</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort Order</label>
+                        <button id="ordersSortOrderBtn" class="sort-btn active" onclick="toggleOrdersSortOrder()">
+                            <i class="fas fa-sort-amount-down"></i>
+                            Descending
+                        </button>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <input type="checkbox" id="showCompleteOrders" onchange="filterOrders()">
+                            Show Complete
+                        </label>
+                    </div>
                 </div>
+
+                <div id="ordersContainer">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <div>Loading orders data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu for Brain Cards -->
+    <div id="brainContextMenu" class="context-menu" style="display: none;">
+        <ul>
+            <li onclick="handleWatchedMarkets()">Watched Markets</li>
+            <li onclick="handleChangeWatchSettings()">Change Watch Settings</li>
+            <li onclick="handleLogs()">Logs</li>
+            <li class="submenu">
+                <span>Change Mode</span>
+                <ul class="submenu-items">
+                    <li onclick="handleMode('Autonomous')" class="checked">Autonomous</li>
+                    <li onclick="handleMode('Servant')">Servant</li>
+                </ul>
+            </li>
+            <li class="submenu">
+                <span>Reset</span>
+                <ul class="submenu-items">
+                    <li onclick="handleReset('Graceful')">Graceful</li>
+                    <li onclick="handleReset('Force')">Force</li>
+                </ul>
+            </li>
+            <li onclick="handleStartUp()">Start Up</li>
+            <li class="submenu">
+                <span>Shutdown</span>
+                <ul class="submenu-items">
+                    <li onclick="handleShutdown('Graceful')">Graceful</li>
+                    <li onclick="handleShutdown('Force')">Force</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Context Menu for Market Cards -->
+    <div id="marketContextMenu" class="context-menu" style="display: none;">
+        <ul id="marketMenuItems">
+            <!-- Items will be populated dynamically -->
+        </ul>
+    </div>
+
+    <!-- Context Menu for Positions -->
+    <div id="positionsContextMenu" class="context-menu" style="display: none;">
+        <ul>
+            <li>No options available</li>
+        </ul>
+    </div>
+
+    <!-- Context Menu for Orders -->
+    <div id="ordersContextMenu" class="context-menu" style="display: none;">
+        <ul>
+            <li>No options available</li>
+        </ul>
+    </div>
+
+    <!-- Context Menu for Snapshots -->
+    <div id="snapshotsContextMenu" class="context-menu" style="display: none;">
+        <ul>
+            <li onclick="handleSnapshotGroups()">Groups</li>
+        </ul>
+    </div>
+
+    <!-- Chart Modal -->
+    <div id="chartModal" class="chart-modal" style="display: none;">
+        <div class="chart-modal-content">
+            <div class="chart-modal-header">
+                <h2 id="chartTitle" style="color: rgb(225, 221, 206); margin: 0;">Market Chart</h2>
+                <button class="chart-close-btn" onclick="closeChartModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="chart-modal-body">
                 <div style="display: flex; gap: 20px;">
                     <!-- Main Chart Area -->
                     <div style="flex: 1; background: rgba(16, 16, 13, 0.9); border-radius: 15px; padding: 25px; border: 2px solid rgb(28, 51, 39);">
@@ -1051,7 +1227,7 @@
                                 </select>
                             </div>
                             <div style="display: flex; gap: 10px; align-items: center;">
-                                <button id="refreshChartBtn" class="refresh-btn" style="padding: 8px 16px; font-size: 12px;">
+                                <button id="refreshChartBtn" class="refresh-btn" style="padding: 8px 16px; font-size: 12px;" onclick="requestDataRefresh()">
                                     <i class="fas fa-sync-alt"></i>
                                     Refresh
                                 </button>
@@ -1206,124 +1382,7 @@
                     </div>
                 </div>
             </div>
-
-            <div id="orders-tab" class="tab-content" style="display: none;">
-                <div class="filters-section">
-                    <div class="filter-group">
-                        <label class="filter-label">Search Orders</label>
-                        <input type="text" id="ordersSearchInput" class="filter-input" placeholder="Search by ticker..." onkeyup="filterOrders()">
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Status Filter</label>
-                        <select id="ordersStatusFilter" class="filter-select" onchange="filterOrders()">
-                            <option value="">All Statuses</option>
-                            <option value="pending">Pending</option>
-                            <option value="filled">Filled</option>
-                            <option value="cancelled">Cancelled</option>
-                            <option value="expired">Expired</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Side Filter</label>
-                        <select id="ordersSideFilter" class="filter-select" onchange="filterOrders()">
-                            <option value="">All Sides</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Sort By</label>
-                        <select id="ordersSortSelect" class="filter-select" onchange="sortOrders()">
-                            <option value="marketTicker">Market Ticker</option>
-                            <option value="side">Side</option>
-                            <option value="quantity">Quantity</option>
-                            <option value="price">Price</option>
-                            <option value="status">Status</option>
-                            <option value="createdAt">Created At</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Sort Order</label>
-                        <button id="ordersSortOrderBtn" class="sort-btn active" onclick="toggleOrdersSortOrder()">
-                            <i class="fas fa-sort-amount-down"></i>
-                            Descending
-                        </button>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">
-                            <input type="checkbox" id="showCompleteOrders" onchange="filterOrders()">
-                            Show Complete
-                        </label>
-                    </div>
-                </div>
-
-                <div id="ordersContainer">
-                    <div class="loading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <div>Loading orders data...</div>
-                    </div>
-                </div>
-            </div>
         </div>
-    </div>
-
-    <!-- Context Menu for Brain Cards -->
-    <div id="brainContextMenu" class="context-menu" style="display: none;">
-        <ul>
-            <li onclick="handleWatchedMarkets()">Watched Markets</li>
-            <li onclick="handleChangeWatchSettings()">Change Watch Settings</li>
-            <li onclick="handleLogs()">Logs</li>
-            <li class="submenu">
-                <span>Change Mode</span>
-                <ul class="submenu-items">
-                    <li onclick="handleMode('Autonomous')" class="checked">Autonomous</li>
-                    <li onclick="handleMode('Servant')">Servant</li>
-                </ul>
-            </li>
-            <li class="submenu">
-                <span>Reset</span>
-                <ul class="submenu-items">
-                    <li onclick="handleReset('Graceful')">Graceful</li>
-                    <li onclick="handleReset('Force')">Force</li>
-                </ul>
-            </li>
-            <li onclick="handleStartUp()">Start Up</li>
-            <li class="submenu">
-                <span>Shutdown</span>
-                <ul class="submenu-items">
-                    <li onclick="handleShutdown('Graceful')">Graceful</li>
-                    <li onclick="handleShutdown('Force')">Force</li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Context Menu for Market Cards -->
-    <div id="marketContextMenu" class="context-menu" style="display: none;">
-        <ul id="marketMenuItems">
-            <!-- Items will be populated dynamically -->
-        </ul>
-    </div>
-
-    <!-- Context Menu for Positions -->
-    <div id="positionsContextMenu" class="context-menu" style="display: none;">
-        <ul>
-            <li>No options available</li>
-        </ul>
-    </div>
-
-    <!-- Context Menu for Orders -->
-    <div id="ordersContextMenu" class="context-menu" style="display: none;">
-        <ul>
-            <li>No options available</li>
-        </ul>
-    </div>
-
-    <!-- Context Menu for Snapshots -->
-    <div id="snapshotsContextMenu" class="context-menu" style="display: none;">
-        <ul>
-            <li onclick="handleSnapshotGroups()">Groups</li>
-        </ul>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
@@ -1336,6 +1395,7 @@
         let currentTab = 'brainlocks';
         let previousTab = 'brainlocks';
         let currentChartMarket = '';
+        let chartAutoRefreshInterval = null;
         let sortOrder = 'desc';
         let positionsSortOrder = 'desc';
         let ordersSortOrder = 'desc';
@@ -1574,12 +1634,6 @@
                     <!-- Metrics Section -->
                     <div class="market-metrics">
                         <div class="metric-item">
-                            <div class="metric-label">Ticker</div>
-                            <div class="metric-value" style="font-size: 11px;" title="${item.market_ticker}">
-                                ${item.market_ticker}
-                            </div>
-                        </div>
-                        <div class="metric-item">
                             <div class="metric-label">Interest</div>
                             <div class="metric-value ${item.interestScore > 0 ? 'positive' : ''}">
                                 ${item.interestScore ? item.interestScore.toFixed(1) : 'N/A'}
@@ -1640,6 +1694,9 @@
                         </div>
                         <div style="font-size: 14px; color: #cccccc;">
                             ${item.marketCount} markets
+                        </div>
+                        <div id="status-indicator-${item.brainInstanceName}" style="font-size: 12px; font-weight: 600; color: #28a745;">
+                            Active
                         </div>
                     </div>
 
@@ -1760,6 +1817,11 @@
             if (tabName === 'snapshots' && snapshotsData && snapshotsData.length > 0) {
                 renderSnapshots();
             }
+
+            // Close chart modal when switching tabs
+            if (tabName !== 'markets') {
+                closeChartModal();
+            }
         }
 
         function renderChart() {
@@ -1812,7 +1874,8 @@
                 const labels = [];
                 const prices = [];
                 for (let i = dataPoints; i >= 0; i--) {
-                    labels.push(now.clone().subtract(i, timeUnit));
+                    const date = new Date(now.getTime() - (i * (timeUnit === 'minutes' ? 60000 : 3600000)));
+                    labels.push(date);
                     prices.push(50 + Math.sin(i / (dataPoints / 6)) * 10 + Math.random() * 5); // Sample oscillating price
                 }
 
@@ -1839,7 +1902,7 @@
                                     unit: timeUnit === 'minutes' ? 'minute' : 'hour',
                                     displayFormats: {
                                         minute: 'HH:mm',
-                                        hour: timeFormat
+                                        hour: 'MMM dd HH:mm'
                                     }
                                 },
                                 title: {
@@ -1950,7 +2013,10 @@
                     scales: {
                         x: {
                             type: 'time',
-                            display: false
+                            display: false,
+                            time: {
+                                unit: timeUnit === 'minutes' ? 'minute' : 'hour'
+                            }
                         },
                         y: {
                             ticks: {
@@ -2227,9 +2293,38 @@
         function handleChart() {
             logToBackend(`Chart clicked for market: ${currentMarketTicker}`);
             currentChartMarket = currentMarketTicker;
-            switchTab('chart');
+            openChartModal();
             renderChart();
             hideMarketContextMenu();
+
+            // Automatically request data refresh when chart modal is opened
+            setTimeout(() => {
+                requestDataRefresh();
+            }, 500); // Small delay to ensure modal is open
+        }
+
+        function openChartModal() {
+            const modal = document.getElementById('chartModal');
+            modal.style.display = 'flex';
+
+            // Start auto-refresh every 30 seconds
+            if (chartAutoRefreshInterval) {
+                clearInterval(chartAutoRefreshInterval);
+            }
+            chartAutoRefreshInterval = setInterval(() => {
+                requestDataRefresh();
+            }, 30000); // 30 seconds
+        }
+
+        function closeChartModal() {
+            const modal = document.getElementById('chartModal');
+            modal.style.display = 'none';
+
+            // Stop auto-refresh when modal is closed
+            if (chartAutoRefreshInterval) {
+                clearInterval(chartAutoRefreshInterval);
+                chartAutoRefreshInterval = null;
+            }
         }
 
         function handleForceRefresh() {
@@ -2259,6 +2354,7 @@
             const positionsMenu = document.getElementById('positionsContextMenu');
             const ordersMenu = document.getElementById('ordersContextMenu');
             const snapshotsMenu = document.getElementById('snapshotsContextMenu');
+            const chartModal = document.getElementById('chartModal');
 
             if (!brainMenu.contains(event.target)) {
                 hideBrainContextMenu();
@@ -2275,7 +2371,39 @@
             if (!snapshotsMenu.contains(event.target)) {
                 hideSnapshotsContextMenu();
             }
+
+            // Close chart modal when clicking outside
+            if (chartModal && chartModal.style.display === 'flex' && !chartModal.contains(event.target)) {
+                closeChartModal();
+            }
         });
+
+        function requestDataRefresh() {
+            if (connection && connection.state === signalR.HubConnectionState.Connected) {
+                connection.invoke('SendOverseerMessage', 'refresh_data', 'Request market data refresh')
+                    .then(() => {
+                        console.log('Refresh request sent to overseer');
+                        // Show loading state
+                        const refreshBtn = document.getElementById('refreshChartBtn');
+                        const originalText = refreshBtn.innerHTML;
+                        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+                        refreshBtn.disabled = true;
+
+                        // Re-enable after 5 seconds
+                        setTimeout(() => {
+                            refreshBtn.innerHTML = originalText;
+                            refreshBtn.disabled = false;
+                        }, 5000);
+                    })
+                    .catch(err => {
+                        console.error('Error sending refresh request:', err);
+                        alert('Failed to send refresh request');
+                    });
+            } else {
+                console.warn('SignalR connection not available');
+                alert('Connection not available. Please refresh the page.');
+            }
+        }
 
         // Initialize
         window.onload = async () => {
@@ -2806,6 +2934,8 @@
             const errorCount = checkInData.ErrorCount || 0;
             const lastSnapshot = checkInData.LastSnapshot;
             const lastCheckIn = checkInData.LastCheckIn;
+            const isStartingUp = checkInData.IsStartingUp || false;
+            const isShuttingDown = checkInData.IsShuttingDown || false;
 
             // Update checkInData object
             checkInData[brainInstanceName] = {
@@ -2813,16 +2943,18 @@
                 marketCount: marketCount,
                 errorCount: errorCount,
                 lastSnapshot: lastSnapshot,
-                lastCheckIn: lastCheckIn
+                lastCheckIn: lastCheckIn,
+                isStartingUp: isStartingUp,
+                isShuttingDown: isShuttingDown
             };
 
             // Update UI elements
-            updateCheckInUI(brainInstanceName, marketCount, errorCount, lastSnapshot, lastCheckIn);
+            updateCheckInUI(brainInstanceName, marketCount, errorCount, lastSnapshot, lastCheckIn, isStartingUp, isShuttingDown);
 
-            console.log(`CheckIn received from ${brainInstanceName}: Markets=${marketCount}, ErrorCount=${errorCount}, LastSnapshot=${lastSnapshot}`);
+            console.log(`CheckIn received from ${brainInstanceName}: Markets=${marketCount}, ErrorCount=${errorCount}, LastSnapshot=${lastSnapshot}, StartingUp=${isStartingUp}, ShuttingDown=${isShuttingDown}`);
         }
 
-        function updateCheckInUI(brainInstanceName, marketCount, errorCount, lastSnapshot, lastCheckIn) {
+        function updateCheckInUI(brainInstanceName, marketCount, errorCount, lastSnapshot, lastCheckIn, isStartingUp, isShuttingDown) {
             // Update Last Check In
             const lastCheckInElement = document.getElementById(`last-checkin-${brainInstanceName}`);
             if (lastCheckInElement) {
@@ -2850,6 +2982,24 @@
             const marketCountElement = document.getElementById(`market-count-${brainInstanceName}`);
             if (marketCountElement) {
                 marketCountElement.textContent = marketCount;
+            }
+
+            // Update Status Indicator
+            const statusIndicatorElement = document.getElementById(`status-indicator-${brainInstanceName}`);
+            if (statusIndicatorElement) {
+                let statusText = 'Active';
+                let statusColor = '#28a745'; // Green for active
+
+                if (isStartingUp) {
+                    statusText = 'Starting Up';
+                    statusColor = '#ffc107'; // Yellow for starting up
+                } else if (isShuttingDown) {
+                    statusText = 'Shutting Down';
+                    statusColor = '#dc3545'; // Red for shutting down
+                }
+
+                statusIndicatorElement.textContent = statusText;
+                statusIndicatorElement.style.color = statusColor;
             }
         }
 

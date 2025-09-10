@@ -55,40 +55,7 @@ namespace BacklashBot.Services
 
                 var cancellationToken = _statusTracker.GetCancellationToken();
 
-                // 5-second broadcast loop for other data
-                _realTimeBroadcastTask = Task.Run(async () =>
-                {
-                    while (!cancellationToken.IsCancellationRequested)
-                    {
-                        try
-                        {
-                            if (ChartHub.HasConnectedClients())
-                            {
-                                await BroadcastLastWebSocketUpdateAsync();
-                                await BroadcastExchangeStatusAsync();
-                                var markets = await GetWatchedMarketsAsync();
-                                foreach (var marketTicker in markets)
-                                    await BroadcastRealTimeMetrics(marketTicker);
-                            }
-                            else
-                            {
-                                _logger.LogDebug("No clients connected, skipping broadcast cycle.");
-                            }
-                            await Task.Delay(5000, cancellationToken);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            _logger.LogDebug("Broadcast task canceled.");
-                            break;
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Error in broadcast cycle.");
-                        }
-                    }
-                }, cancellationToken);
-
-                // 30-second CheckIn broadcast loop
+                // Only keep the 30-second CheckIn broadcast loop - no automatic market data broadcasting
                 _checkInBroadcastTask = Task.Run(async () =>
                 {
                     while (!cancellationToken.IsCancellationRequested)
@@ -117,7 +84,7 @@ namespace BacklashBot.Services
                     }
                 }, cancellationToken);
 
-                _logger.LogDebug("BroadcastService started.");
+                _logger.LogDebug("BroadcastService started with automatic check-ins only.");
                 await Task.CompletedTask;
             }
             catch (OperationCanceledException)
@@ -133,7 +100,6 @@ namespace BacklashBot.Services
             try
             {
                 var tasksToWait = new List<Task>();
-                if (_realTimeBroadcastTask != null) tasksToWait.Add(_realTimeBroadcastTask);
                 if (_performanceBroadcastTask != null) tasksToWait.Add(_performanceBroadcastTask);
                 if (_checkInBroadcastTask != null) tasksToWait.Add(_checkInBroadcastTask);
                 if (tasksToWait.Any())
@@ -204,10 +170,68 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Broadcasts all market-related data on demand (called when overseer requests refresh)
+        /// </summary>
+        public async Task BroadcastAllMarketDataOnDemandAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            IncrementBroadcastCount(nameof(BroadcastAllMarketDataOnDemandAsync));
+            var cancellationToken = _statusTracker.GetCancellationToken();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (!ChartHub.HasConnectedClients())
+            {
+                _logger.LogDebug("No clients connected, skipping on-demand market data broadcast.");
+                return;
+            }
+
+            _logger.LogDebug("Broadcasting all market data on demand to all clients");
+            try
+            {
+                await BroadcastMarketListAsync();
+                await BroadcastExchangeStatusAsync();
+                await BroadcastLastWebSocketUpdateAsync();
+                await BroadcastBalanceAsync();
+                await BroadcastPortfolioValueAsync();
+
+                var markets = await GetWatchedMarketsAsync();
+                foreach (var marketTicker in markets)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await _hubContext.Clients.All.SendAsync("StartBatchUpdate", cancellationToken: cancellationToken);
+                    try
+                    {
+                        await BroadcastTickerUpdateAsync(marketTicker);
+                        await BroadcastOrderbookAsync(marketTicker);
+                        await BroadcastPositionsAsync(marketTicker);
+                        await BroadcastHistoricalDataAsync(marketTicker);
+                        await BroadcastRealTimeMetrics(marketTicker);
+                    }
+                    finally
+                    {
+                        await _hubContext.Clients.All.SendAsync("EndBatchUpdate", cancellationToken: cancellationToken);
+                    }
+                }
+                _logger.LogDebug("Broadcasted all market data on demand to all clients");
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("BroadcastAllMarketDataOnDemandAsync was cancelled");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error broadcasting all market data on demand");
+            }
+            finally
+            {
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(BroadcastAllMarketDataOnDemandAsync), stopwatch.ElapsedMilliseconds);
+            }
+        }
+
         public void Dispose()
         {
-
-            _realTimeBroadcastTask?.Dispose();
             _performanceBroadcastTask?.Dispose();
             _checkInBroadcastTask?.Dispose();
         }
@@ -996,146 +1020,37 @@ namespace BacklashBot.Services
 
         private void OnOrderbookDataUpdated(object sender, string marketTicker)
         {
-            if (!ChartHub.HasConnectedClients())
-            {
-                _logger.LogDebug("No clients connected, skipping orderbook broadcast for {MarketTicker}", marketTicker);
-                return;
-            }
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var cancellationToken = _statusTracker.GetCancellationToken();
-                    cancellationToken.ThrowIfCancellationRequested();
-                    await BroadcastOrderbookAsync(marketTicker);
-                    _logger.LogDebug("Broadcast orderbook data for market {MarketTicker} to all clients", marketTicker);
-                }
-                catch (OperationCanceledException)
-                {
-                    _logger.LogDebug("OnOrderbookDataUpdated cancelled for {MarketTicker}", marketTicker);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error broadcasting orderbook data update for {MarketTicker}", marketTicker);
-                }
-            }, _statusTracker.GetCancellationToken());
+            // No longer automatically broadcasting on data updates
+            // Data will only be sent when overseer requests refresh
+            _logger.LogDebug("Orderbook data updated for {MarketTicker}, but not broadcasting automatically", marketTicker);
         }
 
         private void OnAccountBalanceUpdated(object sender, string marketTicker)
         {
-            if (!ChartHub.HasConnectedClients())
-            {
-                _logger.LogDebug("No clients connected, skipping balance broadcast for {MarketTicker}", marketTicker);
-                return;
-            }
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var cancellationToken = _statusTracker.GetCancellationToken();
-                    cancellationToken.ThrowIfCancellationRequested();
-                    await BroadcastBalanceAsync();
-                    _logger.LogDebug("Broadcast Balance data for market {MarketTicker} to all clients", marketTicker);
-                }
-                catch (OperationCanceledException)
-                {
-                    _logger.LogDebug("OnAccountBalanceUpdated cancelled for {MarketTicker}", marketTicker);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error broadcasting Balance data update for {MarketTicker}", marketTicker);
-                }
-            }, _statusTracker.GetCancellationToken());
+            // No longer automatically broadcasting on data updates
+            // Data will only be sent when overseer requests refresh
+            _logger.LogDebug("Account balance updated for {MarketTicker}, but not broadcasting automatically", marketTicker);
         }
 
         private void OnPositionDataUpdated(object sender, string marketTicker)
         {
-            if (!ChartHub.HasConnectedClients())
-            {
-                _logger.LogDebug("No clients connected, skipping position data broadcast for {MarketTicker}", marketTicker);
-                return;
-            }
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var cancellationToken = _statusTracker.GetCancellationToken();
-                    cancellationToken.ThrowIfCancellationRequested();
-                    await BroadcastPositionsAsync(marketTicker);
-                    _logger.LogDebug("Broadcasted position data for market {MarketTicker} to all clients", marketTicker);
-                }
-                catch (OperationCanceledException)
-                {
-                    _logger.LogDebug("OnPositionDataUpdated cancelled for {MarketTicker}", marketTicker);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error broadcasting position data update for {MarketTicker}", marketTicker);
-                }
-            }, _statusTracker.GetCancellationToken());
+            // No longer automatically broadcasting on data updates
+            // Data will only be sent when overseer requests refresh
+            _logger.LogDebug("Position data updated for {MarketTicker}, but not broadcasting automatically", marketTicker);
         }
 
         private void OnMarketDataUpdated(object sender, string marketTicker)
         {
-            if (!ChartHub.HasConnectedClients())
-            {
-                _logger.LogDebug("No clients connected, skipping market data broadcast for {MarketTicker}", marketTicker);
-                return;
-            }
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var cancellationToken = _statusTracker.GetCancellationToken();
-                    cancellationToken.ThrowIfCancellationRequested();
-                    await BroadcastHistoricalDataAsync(marketTicker);
-                    await BroadcastRealTimeMetrics(marketTicker);
-                    await BroadcastMarketListAsync();
-                    _logger.LogDebug("Broadcasted OnMarketDataUpdated for market {MarketTicker} to all clients", marketTicker);
-                }
-                catch (OperationCanceledException)
-                {
-                    _logger.LogDebug("OnMarketDataUpdated cancelled for {MarketTicker}", marketTicker);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error broadcasting data update for {MarketTicker}", marketTicker);
-                }
-            }, _statusTracker.GetCancellationToken());
+            // No longer automatically broadcasting on data updates
+            // Data will only be sent when overseer requests refresh
+            _logger.LogDebug("Market data updated for {MarketTicker}, but not broadcasting automatically", marketTicker);
         }
 
         private void OnTickerAdded(object sender, string marketTicker)
         {
-            if (!ChartHub.HasConnectedClients())
-            {
-                _logger.LogDebug("No clients connected, skipping ticker broadcast for {MarketTicker}", marketTicker);
-                return;
-            }
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var cancellationToken = _statusTracker.GetCancellationToken();
-                    cancellationToken.ThrowIfCancellationRequested();
-                    await BroadcastTickerUpdateAsync(marketTicker);
-                    await BroadcastPositionPriceMetadataAsync(marketTicker);
-                    await BroadcastPortfolioValueAsync();
-                    _logger.LogDebug("Broadcasted all data for market {MarketTicker} to all clients", marketTicker);
-                }
-                catch (OperationCanceledException)
-                {
-                    _logger.LogDebug("OnTickerAdded cancelled for {MarketTicker}", marketTicker);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error broadcasting data update for {MarketTicker}", marketTicker);
-                }
-            }, _statusTracker.GetCancellationToken());
+            // No longer automatically broadcasting on data updates
+            // Data will only be sent when overseer requests refresh
+            _logger.LogDebug("Ticker added for {MarketTicker}, but not broadcasting automatically", marketTicker);
         }
 
 

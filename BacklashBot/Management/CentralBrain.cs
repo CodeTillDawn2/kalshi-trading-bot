@@ -379,6 +379,18 @@ namespace BacklashBot.Management
                     _logger.LogInformation("BRAIN: Snapshot timer already exists, skipping early initialization.");
                 }
 
+                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
+
+                var broadcastService = _serviceFactory.GetBroadcastService();
+                _logger.LogDebug("BRAIN: Starting BroadcastService...");
+                await broadcastService.StartServicesAsync();
+                _logger.LogInformation("BRAIN: BroadcastService started");
+
+                var overseerClientService = _serviceFactory.GetOverseerClientService();
+                _logger.LogDebug("BRAIN: Starting OverseerClientService...");
+                await overseerClientService.StartAsync();
+                _logger.LogInformation("BRAIN: OverseerClientService started");
+
                 var marketInitializer = _serviceFactory.GetMarketDataInitializer();
                 _logger.LogDebug("BRAIN: Starting MarketDataInitializer.SetupAsync...");
                 await marketInitializer.SetupAsync();
@@ -395,17 +407,6 @@ namespace BacklashBot.Management
                 _serviceFactory.GetMarketRefreshService().ExecuteServicesAsync(_statusTrackerService.GetCancellationToken());
                 _logger.LogInformation("MarketRefreshService started");
 
-                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-
-                var broadcastService = _serviceFactory.GetBroadcastService();
-                _logger.LogDebug("BRAIN: Starting BroadcastService...");
-                await broadcastService.StartServicesAsync();
-                _logger.LogInformation("BRAIN: BroadcastService started");
-
-                var overseerClientService = _serviceFactory.GetOverseerClientService();
-                _logger.LogDebug("BRAIN: Starting OverseerClientService...");
-                await overseerClientService.StartAsync();
-                _logger.LogInformation("BRAIN: OverseerClientService started");
 
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
