@@ -7,6 +7,9 @@ using System.Collections.Concurrent;
 using System.Data;
 using System.Text.Json;
 
+using Polly;
+using Polly.Retry;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 namespace KalshiBotData.Data
 {
     public class SqlDataService : ISqlDataService
@@ -45,91 +48,97 @@ namespace KalshiBotData.Data
         {
             const string jobName = "ImportSnapshots";
 
-            try
+            var retryPolicy = Policy.Handle<SqlException>(ex => IsTransient(ex)).WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(i));
+            await retryPolicy.ExecuteAsync(async () =>
             {
-                await using var conn = new SqlConnection(_connectionString);
-                await conn.OpenAsync(cancellationToken);
-
-                // Start the SQL Agent Job
-                await using (var startCmd = new SqlCommand("msdb.dbo.sp_start_job", conn)
                 {
-                    CommandType = CommandType.StoredProcedure,
-                    CommandTimeout = 2400
-                })
-                {
-                    startCmd.Parameters.AddWithValue("@job_name", jobName);
-                    await startCmd.ExecuteNonQueryAsync(cancellationToken);
-                    _logger.LogInformation("Started SQL Agent job: {JobName}", jobName);
-                }
+                    try
+                    {
+                        await using var conn = new SqlConnection(_connectionString);
+                        await conn.OpenAsync(cancellationToken);
 
-                // Get job_id
-                Guid jobId;
-                await using (var getJobIdCmd = new SqlCommand("SELECT job_id FROM msdb.dbo.sysjobs WHERE name = @jobName", conn))
-                {
-                    getJobIdCmd.Parameters.AddWithValue("@jobName", jobName);
-                    var result = await getJobIdCmd.ExecuteScalarAsync(cancellationToken);
-                    jobId = (Guid)result;
-                }
+                        // Start the SQL Agent Job
+                        await using (var startCmd = new SqlCommand("msdb.dbo.sp_start_job", conn)
+                        {
+                            CommandType = CommandType.StoredProcedure,
+                            CommandTimeout = 2400
+                        })
+                        {
+                            startCmd.Parameters.AddWithValue("@job_name", jobName);
+                            await startCmd.ExecuteNonQueryAsync(cancellationToken);
+                            _logger.LogInformation("Started SQL Agent job: {JobName}", jobName);
+                        }
 
-                // Poll for job activity completion
-                bool isRunning = true;
-                while (isRunning)
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+                        // Get job_id
+                        Guid jobId;
+                        await using (var getJobIdCmd = new SqlCommand("SELECT job_id FROM msdb.dbo.sysjobs WHERE name = @jobName", conn))
+                        {
+                            getJobIdCmd.Parameters.AddWithValue("@jobName", jobName);
+                            var result = await getJobIdCmd.ExecuteScalarAsync(cancellationToken);
+                            jobId = (Guid)result;
+                        }
 
-                    await using var activityCmd = new SqlCommand(@"
+                        // Poll for job activity completion
+                        bool isRunning = true;
+                        while (isRunning)
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+
+                            await using var activityCmd = new SqlCommand(@"
                 SELECT stop_execution_date 
                 FROM msdb.dbo.sysjobactivity 
                 WHERE job_id = @jobId 
                   AND stop_execution_date IS NULL", conn);
-                    activityCmd.Parameters.AddWithValue("@jobId", jobId);
+                            activityCmd.Parameters.AddWithValue("@jobId", jobId);
 
-                    var result = await activityCmd.ExecuteScalarAsync(cancellationToken);
-                    isRunning = result != null;
-                }
+                            var result = await activityCmd.ExecuteScalarAsync(cancellationToken);
+                            isRunning = result != null;
+                        }
 
-                // Get last job run status
-                await using var statusCmd = new SqlCommand(@"
+                        // Get last job run status
+                        await using var statusCmd = new SqlCommand(@"
             SELECT TOP 1 run_status, message 
             FROM msdb.dbo.sysjobhistory 
             WHERE job_id = @jobId 
               AND step_id = 0 
             ORDER BY run_date DESC, run_time DESC", conn);
-                statusCmd.Parameters.AddWithValue("@jobId", jobId);
+                        statusCmd.Parameters.AddWithValue("@jobId", jobId);
 
-                await using var reader = await statusCmd.ExecuteReaderAsync(cancellationToken);
-                if (await reader.ReadAsync(cancellationToken))
-                {
-                    int runStatus = Convert.ToInt32(reader["run_status"]); // 1 = success, 0 = failed, etc.
-                    string message = reader["message"]?.ToString() ?? "";
+                        await using var reader = await statusCmd.ExecuteReaderAsync(cancellationToken);
+                        if (await reader.ReadAsync(cancellationToken))
+                        {
+                            int runStatus = Convert.ToInt32(reader["run_status"]); // 1 = success, 0 = failed, etc.
+                            string message = reader["message"]?.ToString() ?? "";
 
-                    if (runStatus == 1)
-                    {
-                        _logger.LogInformation("SQL Agent job '{JobName}' completed successfully.", jobName);
+                            if (runStatus == 1)
+                            {
+                                _logger.LogInformation("SQL Agent job '{JobName}' completed successfully.", jobName);
+                            }
+                            else
+                            {
+                                _logger.LogError("SQL Agent job '{JobName}' failed. Status: {Status}, Message: {Message}", jobName, runStatus, message);
+                                throw new Exception($"Job failed: {message}");
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("Could not retrieve job history.");
+                        }
                     }
-                    else
+                    catch (SqlException ex)
                     {
-                        _logger.LogError("SQL Agent job '{JobName}' failed. Status: {Status}, Message: {Message}", jobName, runStatus, message);
-                        throw new Exception($"Job failed: {message}");
+                        _logger.LogError(ex, "SQL error occurred while executing job {JobName}", jobName);
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Unexpected error while executing job {JobName}", jobName);
+                        throw;
                     }
                 }
-                else
-                {
-                    throw new Exception("Could not retrieve job history.");
-                }
-            }
-            catch (SqlException ex)
-            {
-                _logger.LogError(ex, "SQL error occurred while executing job {JobName}", jobName);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error while executing job {JobName}", jobName);
-                throw;
-            }
-        }
-
+            });
+        
+    }
 
         public Task StoreOrderBookAsync(JsonElement data, string offerType)
         {
@@ -231,8 +240,10 @@ namespace KalshiBotData.Data
                 Identifier = marketTicker,
                 SetParameters = cmd =>
                 {
-                    cmd.Parameters.AddWithValue("@trade_id", "00000000-0000-0000-0000-000000000000");
-                    cmd.Parameters.AddWithValue("@order_id", "00000000-0000-0000-0000-000000000000");
+                    cmd.Parameters.AddWithValue("@trade_id", msg.TryGetProperty("trade_id", out var tradeId)
+                        ? tradeId.GetString() : "00000000-0000-0000-0000-000000000000");
+                    cmd.Parameters.AddWithValue("@order_id", msg.TryGetProperty("order_id", out var orderId)
+                        ? orderId.GetString() : "00000000-0000-0000-0000-000000000000");
                     cmd.Parameters.AddWithValue("@market_ticker", marketTicker);
                     cmd.Parameters.AddWithValue("@is_taker", msg.GetProperty("is_taker").GetBoolean());
                     cmd.Parameters.AddWithValue("@side", msg.GetProperty("side").GetString());
@@ -360,44 +371,48 @@ namespace KalshiBotData.Data
             _cts.Dispose();
         }
 
-
-        private struct DatabaseOperation
+        private static bool IsTransient(SqlException ex)
         {
-            public string StoredProcedure { get; init; }
-            public Action<SqlCommand> SetParameters { get; init; }
-            public string Identifier { get; init; }
+            var transientErrors = new HashSet<int> { 1205, 1222, 49918, 49919, 49920, 4060, 40197, 40501, 40613, 40143, 233, 64 };
+            return transientErrors.Contains(ex.Number);
         }
 
+
+   
         private async Task ProcessQueueAsync(ConcurrentQueue<DatabaseOperation> queue, string operationName, CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
                 if (queue.TryDequeue(out var operation))
                 {
-                    try
+                    var retryPolicy = Policy.Handle<SqlException>(ex => IsTransient(ex)).WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(i));
+                    await retryPolicy.ExecuteAsync(async () =>
                     {
-                        await using var conn = new SqlConnection(_connectionString);
-                        await conn.OpenAsync(cancellationToken);
-                        await using var cmd = new SqlCommand(operation.StoredProcedure, conn) { CommandType = CommandType.StoredProcedure, CommandTimeout = 60 };
-                        operation.SetParameters(cmd);
-                        await cmd.ExecuteNonQueryAsync(cancellationToken);
-                    }
-                    catch (SqlException ex) when (ex.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase))
-                    {
-                        _logger.LogWarning(new KnownDuplicateInsertException(operationName, operation.Identifier,
-                            $"Duplicate insert attempted for {operationName}: {operation.Identifier}", ex),
-                            "Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
-                    }
-                    catch (SqlException ex) when (ex.Message.Contains("deadlocked", StringComparison.OrdinalIgnoreCase))
-                    {
-                        _logger.LogWarning(new MarketInterestScoreDeadlockException(
-                            $"Deadlock occurred for {operationName}: {operation.Identifier}. SQL error: {ex.Message}", ex),
-                            "Deadlock occurred for {OperationName}: {Identifier}. SQL error: {ex.Message}", operationName, operation.Identifier);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to execute {OperationName} for {Identifier}.", operationName, operation.Identifier);
-                    }
+                        try
+                        {
+                            await using var conn = new SqlConnection(_connectionString);
+                            await conn.OpenAsync(cancellationToken);
+                            await using var cmd = new SqlCommand(operation.StoredProcedure, conn) { CommandType = CommandType.StoredProcedure, CommandTimeout = 60 };
+                            operation.SetParameters(cmd);
+                            await cmd.ExecuteNonQueryAsync(cancellationToken);
+                        }
+                        catch (SqlException ex) when (ex.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _logger.LogWarning(new KnownDuplicateInsertException(operationName, operation.Identifier,
+                                $"Duplicate insert attempted for {operationName}: {operation.Identifier}", ex),
+                                "Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
+                        }
+                        catch (SqlException ex) when (ex.Message.Contains("deadlocked", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _logger.LogWarning(new MarketInterestScoreDeadlockException(
+                                $"Deadlock occurred for {operationName}: {operation.Identifier}. SQL error: {ex.Message}", ex),
+                                "Deadlock occurred for {OperationName}: {Identifier}. SQL error: {ex.Message}", operationName, operation.Identifier);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Failed to execute {OperationName} for {Identifier}.", operationName, operation.Identifier);
+                        }
+                    });
                 }
                 else
                 {
@@ -420,6 +435,12 @@ namespace KalshiBotData.Data
             cmd.Parameters.AddWithValue("@resting_contracts", restingContracts);
             cmd.Parameters.AddWithValue("@LoggedDate", DateTime.Now);
         }
-
+        private struct DatabaseOperation
+        {
+            public string StoredProcedure { get; init; }
+            public Action<SqlCommand> SetParameters { get; init; }
+            public string Identifier { get; init; }
+        }
     }
+    
 }

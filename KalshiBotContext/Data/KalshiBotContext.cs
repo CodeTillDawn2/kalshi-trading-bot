@@ -2,6 +2,9 @@ using KalshiBotData.Data.Interfaces;
 using KalshiBotData.Extensions;
 using KalshiBotData.Models;
 using Microsoft.Data.SqlClient;
+using Polly;
+using Polly.Retry;
+using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using BacklashDTOs;
@@ -153,7 +156,7 @@ namespace KalshiBotData.Data
                     }
                 }
 
-                await this.SaveChangesAsync();
+                await SaveChangesWithRetryAsync();
                 await tx.CommitAsync();
             }
             catch (Exception ex)
@@ -1323,6 +1326,16 @@ namespace KalshiBotData.Data
         public async Task<BacklashDTOs.Data.OverseerInfo?> GetOverseerByHostName(string hostName)
         {
             return await OverseerInfos.FirstOrDefaultAsync(oi => oi.HostName == hostName && oi.IsActive);
+        }
+        private async Task SaveChangesWithRetryAsync()
+        {
+            var retryPolicy = Policy.Handle<SqlException>(ex => IsTransient(ex)).WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(i));
+            await retryPolicy.ExecuteAsync(async () => await SaveChangesAsync());
+        }
+        private static bool IsTransient(SqlException ex)
+        {
+            var transientErrors = new HashSet<int> { 1205, 1222, 49918, 49919, 49920, 4060, 40197, 40501, 40613, 40143, 233, 64 };
+            return transientErrors.Contains(ex.Number);
         }
         #endregion
 
