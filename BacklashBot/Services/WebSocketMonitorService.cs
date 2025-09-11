@@ -130,10 +130,18 @@ namespace BacklashBot.Services
 
                             if (status.exchange_active && !_isConnected)
                             {
-                                _logger.LogInformation("Exchange is active, connecting WebSocket");
-                                await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync();
-                                _isConnected = true;
-                                _logger.LogDebug("WebSocket connected successfully");
+                                // Only connect if market data initialization is complete
+                                if (_readyStatus.InitializationCompleted.Task.IsCompleted && _readyStatus.InitializationCompleted.Task.Result)
+                                {
+                                    _logger.LogInformation("Exchange is active and initialization complete, connecting WebSocket");
+                                    await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync();
+                                    _isConnected = true;
+                                    _logger.LogDebug("WebSocket connected successfully");
+                                }
+                                else
+                                {
+                                    _logger.LogDebug("Exchange is active but initialization not complete yet, waiting for MarketDataInitializer to finish");
+                                }
                             }
                             else if (!status.exchange_active && _isConnected)
                             {
@@ -175,10 +183,18 @@ namespace BacklashBot.Services
 
                         if (status.exchange_active && !_isConnected)
                         {
-                            _logger.LogInformation("Exchange is active, connecting WebSocket2");
-                            await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync(0);
-                            _isConnected = true;
-                            _logger.LogInformation("WebSocket connected successfully");
+                            // Only connect if market data initialization is complete
+                            if (_readyStatus.InitializationCompleted.Task.IsCompleted && _readyStatus.InitializationCompleted.Task.Result)
+                            {
+                                _logger.LogInformation("Exchange is active and initialization complete, connecting WebSocket");
+                                await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync(0);
+                                _isConnected = true;
+                                _logger.LogInformation("WebSocket connected successfully");
+                            }
+                            else
+                            {
+                                _logger.LogDebug("Exchange is active but initialization not complete yet, waiting for MarketDataInitializer to finish");
+                            }
                         }
                         else if (!status.exchange_active && _isConnected)
                         {

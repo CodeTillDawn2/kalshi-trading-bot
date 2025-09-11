@@ -607,13 +607,13 @@ namespace BacklashBot.Services
                 var lockObj = _orderbookLocks.GetOrAdd(marketTicker, _ => new object());
                 bool priceChanged = false;
 
-                if (offerType == "SNP")
+                if (offerType == "snapshot")
                 {
                     _logger.LogInformation("Processing snapshot for {MarketTicker}, Seq: {Seq}", marketTicker, seq);
                     updatedOrderbook = ProcessOrderBookSnapshotAsync(message, marketTicker);
                     priceChanged = true;
                 }
-                else if (offerType == "DEL")
+                else if (offerType == "delta")
                 {
                     _logger.LogDebug("Processing delta for {MarketTicker}, Seq: {Seq}", marketTicker, seq);
                     updatedOrderbook = ProcessOrderBookDeltaAsync(message, marketTicker);
@@ -643,7 +643,7 @@ namespace BacklashBot.Services
                 }
                 else
                 {
-                    _logger.LogWarning("Skipping non-SNP/DEL update for {MarketTicker}, Seq: {Seq}", marketTicker, seq);
+                    _logger.LogWarning("Skipping unknown offer type '{OfferType}' for {MarketTicker}, Seq: {Seq}", offerType, marketTicker, seq);
                     return;
                 }
 

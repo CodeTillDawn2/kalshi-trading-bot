@@ -172,6 +172,33 @@ namespace KalshiBotData.Data
             return Task.CompletedTask;
         }
 
+        public Task StoreTickerAsync(JsonElement data)
+        {
+            var msg = data.GetProperty("msg");
+            var marketTicker = msg.GetProperty("market_ticker").GetString() ?? string.Empty;
+            _tradeQueue.Enqueue(new DatabaseOperation
+            {
+                StoredProcedure = "dbo.sp_InsertFeed_Ticker",
+                Identifier = marketTicker,
+                SetParameters = cmd =>
+                {
+                    cmd.Parameters.AddWithValue("@market_id", msg.TryGetProperty("market_id", out var mid)
+                        ? mid.GetString() : "00000000-0000-0000-0000-000000000000");
+                    cmd.Parameters.AddWithValue("@market_ticker", marketTicker);
+                    cmd.Parameters.AddWithValue("@price", msg.GetProperty("price").GetInt32());
+                    cmd.Parameters.AddWithValue("@yes_bid", msg.GetProperty("yes_bid").GetInt32());
+                    cmd.Parameters.AddWithValue("@yes_ask", msg.GetProperty("yes_ask").GetInt32());
+                    cmd.Parameters.AddWithValue("@volume", msg.GetProperty("volume").GetInt32());
+                    cmd.Parameters.AddWithValue("@open_interest", msg.GetProperty("open_interest").GetInt32());
+                    cmd.Parameters.AddWithValue("@dollar_volume", msg.GetProperty("dollar_volume").GetInt32());
+                    cmd.Parameters.AddWithValue("@dollar_open_interest", msg.GetProperty("dollar_open_interest").GetInt32());
+                    cmd.Parameters.AddWithValue("@ts", msg.GetProperty("ts").GetInt64());
+                    cmd.Parameters.AddWithValue("@LoggedDate", DateTime.Now);
+                }
+            });
+            return Task.CompletedTask;
+        }
+
         public Task StoreTradeAsync(JsonElement data)
         {
             var msg = data.GetProperty("msg");

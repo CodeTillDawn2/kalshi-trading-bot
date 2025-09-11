@@ -54,12 +54,24 @@ namespace KalshiBotOverseer
 
             // Register required services
             services.AddScoped<IKalshiAPIService, KalshiAPIService>();
+            services.AddScoped<IWebSocketConnectionManager, WebSocketConnectionManager>();
+            services.AddScoped<IMessageProcessor, MessageProcessor>();
+            services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
+                sp.GetRequiredService<ILogger<SubscriptionManager>>(),
+                sp.GetRequiredService<IWebSocketConnectionManager>(),
+                sp.GetRequiredService<IDataCache>(),
+                sp.GetRequiredService<IStatusTrackerService>()
+            ));
             services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
                 sp.GetRequiredService<IOptions<KalshiConfig>>(),
                 sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
                 sp.GetRequiredService<IBotReadyStatus>(),
                 sp.GetRequiredService<ISqlDataService>(),
+                sp.GetRequiredService<IWebSocketConnectionManager>(),
+                sp.GetRequiredService<ISubscriptionManager>(),
+                sp.GetRequiredService<IMessageProcessor>(),
+                sp.GetRequiredService<IDataCache>(),
                 false
             ));
             services.AddScoped<ISqlDataService, SqlDataService>();
@@ -67,6 +79,7 @@ namespace KalshiBotOverseer
             services.AddScoped<IKalshiBotContext>(provider => provider.GetService<KalshiBotContext>());
             services.AddSingleton<IStatusTrackerService, OverseerStatusTracker>();
             services.AddSingleton<IBotReadyStatus, OverseerReadyStatus>();
+            services.AddScoped<IDataCache, BacklashBot.State.DataCache>();
 
             // Register the new WebSocketMonitorServiceLite as singleton
             services.AddSingleton<IWebSocketMonitorService, WebSocketMonitorServiceLite>();

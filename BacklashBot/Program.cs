@@ -17,6 +17,7 @@ using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State;
 using BacklashBot.State.Interfaces;
+using BacklashInterfaces.KalshiBotOverseer.State;
 using BacklashInterfaces.SmokehouseBot.Services;
 using BacklashDTOs.Data;
 using TradingStrategies.Classification;
@@ -150,18 +151,30 @@ builder.Services.AddScoped<IBroadcastService, BroadcastService>();
 builder.Services.AddScoped<IMarketRefreshService, MarketRefreshService>();
 builder.Services.AddScoped<IWebSocketMonitorService, WebSocketMonitorService>();
 builder.Services.AddSingleton<IOverseerClientService, OverseerClientService>();
+builder.Services.AddScoped<IWebSocketConnectionManager, WebSocketConnectionManager>();
+builder.Services.AddScoped<IMessageProcessor, MessageProcessor>();
+builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
+    sp.GetRequiredService<ILogger<SubscriptionManager>>(),
+    sp.GetRequiredService<IWebSocketConnectionManager>(),
+    sp.GetRequiredService<IDataCache>(),
+    sp.GetRequiredService<IStatusTrackerService>()
+));
 builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
     sp.GetRequiredService<IOptions<KalshiConfig>>(),
     sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IBotReadyStatus>(),
     sp.GetRequiredService<ISqlDataService>(),
+    sp.GetRequiredService<IWebSocketConnectionManager>(),
+    sp.GetRequiredService<ISubscriptionManager>(),
+    sp.GetRequiredService<IMessageProcessor>(),
+    sp.GetRequiredService<IDataCache>(),
     sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents
 ));
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper, OvernightActivitiesHelper>();
 builder.Services.AddScoped<ISnapshotPeriodHelper, SnapshotPeriodHelper>();
-builder.Services.AddScoped<IDataCache, DataCache>();
+builder.Services.AddScoped<IDataCache, BacklashBot.State.DataCache>();
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 

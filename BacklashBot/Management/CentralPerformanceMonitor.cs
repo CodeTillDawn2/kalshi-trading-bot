@@ -73,7 +73,7 @@ namespace BacklashBot.Management
             // Retrieve the tuple of three integers representing WebSocket event counts
             var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
             if (webSocketClient == null) return 0.0;
-            (int event1, int event2, int event3) events = webSocketClient.ReturnWebSocketCountsByMarket(marketTicker);
+            (int event1, int event2, int event3) events = webSocketClient.GetEventCountsByMarket(marketTicker);
 
             // Calculate the timespan in minutes from last market open time to current time
             TimeSpan timeSpan = DateTime.UtcNow - lastMarketOpenTime;

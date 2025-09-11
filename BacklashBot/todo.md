@@ -44,6 +44,7 @@
 - [ ] Add warnings to overseer if SingalRService is not using web sockets or payload gets too big (>1MB), plus any others we can think of
 - [ ] Rebrand
 - [ ] Rotate overseer-dev kalshi key
+- [ ] /portfolio/orders/queue_positions
 
 # v0.2.5
 Notes: Major issue which was causing snapshots after the first to not translate to change over time... all snapshots invalidated.

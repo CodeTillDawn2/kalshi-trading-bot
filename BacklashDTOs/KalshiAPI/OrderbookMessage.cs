@@ -32,40 +32,57 @@ namespace BacklashDTOs.KalshiAPI
         /// <param name="offerType">The type of offer ("SNP" or "DEL").</param>
         public OrderbookMessage(JsonElement data, string offerType)
         {
-            Sid = data.GetProperty("sid").GetInt32();
-            Seq = data.GetProperty("seq").GetInt64();
+            // Handle missing properties gracefully
+            Sid = data.TryGetProperty("sid", out var sidProp) ? sidProp.GetInt32() : 0;
+            Seq = data.TryGetProperty("seq", out var seqProp) ? seqProp.GetInt64() : 0;
             OfferType = offerType;
-            var msg = data.GetProperty("msg");
-            MarketTicker = msg.GetProperty("market_ticker").GetString() ?? string.Empty;
 
-            if (offerType == "SNP")
+            // Get the msg property which contains the actual orderbook data
+            if (data.TryGetProperty("msg", out var msg))
             {
-                YesOrders = new List<PriceLevel>();
-                NoOrders = new List<PriceLevel>();
+                MarketTicker = msg.TryGetProperty("market_ticker", out var tickerProp)
+                    ? tickerProp.GetString() ?? string.Empty
+                    : string.Empty;
 
-                if (msg.TryGetProperty("yes", out var yesOrders) && yesOrders.ValueKind == JsonValueKind.Array)
+                if (offerType == "snapshot")
                 {
-                    YesOrders.AddRange(yesOrders.EnumerateArray().Select(p => new PriceLevel
+                    YesOrders = new List<PriceLevel>();
+                    NoOrders = new List<PriceLevel>();
+
+                    if (msg.TryGetProperty("yes", out var yesOrders) && yesOrders.ValueKind == JsonValueKind.Array)
                     {
-                        Price = p[0].GetInt32(),
-                        RestingContracts = p[1].GetInt32()
-                    }));
+                        YesOrders.AddRange(yesOrders.EnumerateArray().Select(p => new PriceLevel
+                        {
+                            Price = p[0].GetInt32(),
+                            RestingContracts = p[1].GetInt32()
+                        }));
+                    }
+
+                    if (msg.TryGetProperty("no", out var noOrders) && noOrders.ValueKind == JsonValueKind.Array)
+                    {
+                        NoOrders.AddRange(noOrders.EnumerateArray().Select(p => new PriceLevel
+                        {
+                            Price = p[0].GetInt32(),
+                            RestingContracts = p[1].GetInt32()
+                        }));
+                    }
                 }
-
-                if (msg.TryGetProperty("no", out var noOrders) && noOrders.ValueKind == JsonValueKind.Array)
+                else if (offerType == "delta") // DEL
                 {
-                    NoOrders.AddRange(noOrders.EnumerateArray().Select(p => new PriceLevel
-                    {
-                        Price = p[0].GetInt32(),
-                        RestingContracts = p[1].GetInt32()
-                    }));
+                    Price = msg.TryGetProperty("price", out var priceProp) ? priceProp.GetInt32() : null;
+                    Delta = msg.TryGetProperty("delta", out var deltaProp) ? deltaProp.GetInt32() : null;
+                    Side = msg.TryGetProperty("side", out var sideProp) ? sideProp.GetString() ?? string.Empty : string.Empty;
                 }
             }
-            else // DEL
+            else
             {
-                Price = msg.GetProperty("price").GetInt32();
-                Delta = msg.GetProperty("delta").GetInt32();
-                Side = msg.GetProperty("side").GetString() ?? string.Empty;
+                // Fallback if msg property doesn't exist
+                MarketTicker = string.Empty;
+                if (offerType == "SNP")
+                {
+                    YesOrders = new List<PriceLevel>();
+                    NoOrders = new List<PriceLevel>();
+                }
             }
         }
     }

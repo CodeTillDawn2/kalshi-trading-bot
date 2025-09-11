@@ -274,7 +274,7 @@ namespace BacklashBot.Services
                         }
                         else
                         {
-                            _logger.LogDebug("Market {MarketTicker} not watched, skipping position update", marketTicker);
+                            _logger.LogDebug("Market {MarketTicker} not watched, skipping position and orderbook update", marketTicker);
                         }
                     }
                 }
@@ -401,7 +401,7 @@ namespace BacklashBot.Services
 
                 foreach (var channel in KalshiConstants.AllChannels.Select(_serviceFactory.GetKalshiWebSocketClient().GetChannelName))
                 {
-                    _serviceFactory.GetKalshiWebSocketClient().UpdateSubscriptionState(marketTicker, channel, SubscriptionState.Unsubscribed);
+                    _serviceFactory.GetKalshiWebSocketClient().SetSubscriptionState(marketTicker, channel, SubscriptionState.Unsubscribed);
                 }
 
                 if (!_serviceFactory.GetDataCache().WatchedMarkets.Contains(marketTicker))
@@ -459,6 +459,21 @@ namespace BacklashBot.Services
                         _serviceFactory.GetDataCache().RecentlyRemovedMarkets.Remove(marketTicker);
                     await UpdateWatchedMarketsAsync();
                     _logger.LogDebug("Updated WatchedMarkets with {MarketTicker}", marketTicker);
+                }
+
+                // Connect WebSocket if not already connected before subscribing to channels
+                if (!_serviceFactory.GetKalshiWebSocketClient().IsConnected())
+                {
+                    _logger.LogDebug("WebSocket not connected, connecting before subscribing to {MarketTicker}", marketTicker);
+                    await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync();
+                    if (!_serviceFactory.GetKalshiWebSocketClient().IsConnected())
+                    {
+                        _logger.LogWarning("Failed to connect WebSocket for {MarketTicker}, skipping subscription", marketTicker);
+                        return;
+                    }
+                    _logger.LogDebug("WebSocket connected successfully for {MarketTicker}", marketTicker);
+                    // Add a delay to ensure the WebSocket is stable before sending subscriptions
+                    await Task.Delay(2000, _statusTracker.GetCancellationToken());
                 }
 
                 _logger.LogDebug("Subscribing to channels for {MarketTicker}", marketTicker);
@@ -538,11 +553,11 @@ namespace BacklashBot.Services
 
                     foreach (var channel in KalshiConstants.AllChannels.Select(_serviceFactory.GetKalshiWebSocketClient().GetChannelName))
                     {
-                        _serviceFactory.GetKalshiWebSocketClient().UpdateSubscriptionState(marketTicker, channel, SubscriptionState.Unsubscribed);
+                        _serviceFactory.GetKalshiWebSocketClient().SetSubscriptionState(marketTicker, channel, SubscriptionState.Unsubscribed);
                     }
 
                     // Clear orderbook queue for this market
-                    _serviceFactory.GetKalshiWebSocketClient().ClearOrderBookQueueForMarket(marketTicker);
+                    _serviceFactory.GetKalshiWebSocketClient().ClearOrderBookQueue(marketTicker);
 
                     // Clear other queues
                     _serviceFactory.GetOrderBookService().ClearQueueForMarketAsync(marketTicker);
@@ -599,6 +614,13 @@ namespace BacklashBot.Services
             if (!marketTickers.Any())
             {
                 _logger.LogWarning("No markets provided for subscription update: action={Action}", action);
+                return;
+            }
+
+            // Check if WebSocket is connected before attempting subscription update
+            if (!_serviceFactory.GetKalshiWebSocketClient().IsConnected())
+            {
+                _logger.LogWarning("WebSocket not connected, skipping subscription update for action={Action}, markets={Markets}", action, string.Join(", ", marketTickers));
                 return;
             }
 
@@ -668,7 +690,7 @@ namespace BacklashBot.Services
                 {
                     foreach (var channel in KalshiConstants.AllChannels.Select(_serviceFactory.GetKalshiWebSocketClient().GetChannelName))
                     {
-                        _serviceFactory.GetKalshiWebSocketClient().UpdateSubscriptionState(marketTicker, channel, SubscriptionState.Unsubscribed);
+                        _serviceFactory.GetKalshiWebSocketClient().SetSubscriptionState(marketTicker, channel, SubscriptionState.Unsubscribed);
                     }
                 }
                 _lastWatchedMarkets.Clear();

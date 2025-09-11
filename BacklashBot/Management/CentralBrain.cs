@@ -1112,13 +1112,28 @@ namespace BacklashBot.Management
 
         private void ValidateMarketState(MarketSnapshot snapshot)
         {
-            if ((snapshot.DepthAtBestNoBid == 0
+            // Only consider market closed if we have received WebSocket data AND orderbook data but depth is still 0
+            // This prevents false positives when WebSocket subscriptions are delayed or orderbook is empty
+            var marketData = _serviceFactory.GetMarketDataService().GetMarketDetails(snapshot.MarketTicker);
+            bool hasReceivedWebSocketData = marketData != null &&
+                (marketData.LastWebSocketMessageReceived > DateTime.MinValue ||
+                 marketData.Tickers.Any());
+            bool hasOrderbookData = marketData != null && marketData.OrderbookData.Any();
+
+            // Only trigger reset if we have WebSocket data AND orderbook data but depth is still 0 AND first snapshot has been received
+            bool shouldResetForEmptyDepth = snapshot.DepthAtBestNoBid == 0
                 && snapshot.DepthAtBestYesBid == 0
-                && snapshot.CanCloseEarly == true)
-                || snapshot.TimeLeft == null || snapshot.TimeLeft.Value.Ticks < 0)
+                && snapshot.CanCloseEarly == true
+                && hasReceivedWebSocketData
+                && hasOrderbookData
+                && marketData.ReceivedFirstSnapshot;
+
+            if (shouldResetForEmptyDepth
+                || snapshot.TimeLeft == null
+                || snapshot.TimeLeft.Value.Ticks < 0)
             {
-                _logger.LogInformation("BRAIN: Market {0} seems like it is closed. Resetting. DepthNo={1}, DepthYes={2}, CanCloseEarly={3}, TimeLeft={4}",
-                    snapshot.MarketTicker, snapshot.DepthAtBestNoBid, snapshot.DepthAtBestYesBid, snapshot.CanCloseEarly, snapshot.TimeLeft);
+                _logger.LogInformation("BRAIN: Market {0} seems like it is closed. Resetting. DepthNo={1}, DepthYes={2}, CanCloseEarly={3}, TimeLeft={4}, HasWebSocketData={5}, HasOrderbookData={6}, ReceivedFirstSnapshot={7}",
+                    snapshot.MarketTicker, snapshot.DepthAtBestNoBid, snapshot.DepthAtBestYesBid, snapshot.CanCloseEarly, snapshot.TimeLeft, hasReceivedWebSocketData, hasOrderbookData, marketData?.ReceivedFirstSnapshot ?? false);
                 _marketManager.TriggerMarketReset(snapshot.MarketTicker);
             }
         }

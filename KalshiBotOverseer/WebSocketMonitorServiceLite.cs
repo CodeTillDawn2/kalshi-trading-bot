@@ -108,6 +108,17 @@ namespace KalshiBotOverseer
 
         public bool IsConnected()
         {
+            bool monitorConnected = _isConnected;
+            bool clientConnected = _webSocketClient.IsConnected();
+            _logger.LogDebug("Connection state check: Monitor={MonitorConnected}, Client={ClientConnected}", monitorConnected, clientConnected);
+
+            // Sync the states if they don't match
+            if (monitorConnected != clientConnected)
+            {
+                _logger.LogWarning("Connection state mismatch detected: Monitor={MonitorConnected}, Client={ClientConnected}. Syncing states.", monitorConnected, clientConnected);
+                _isConnected = clientConnected;
+            }
+
             return _isConnected;
         }
 
@@ -136,9 +147,17 @@ namespace KalshiBotOverseer
                                 _logger.LogInformation("Exchange is active, connecting WebSocket");
                                 var client = _webSocketClient;
                                 await client.ConnectAsync();
-
-                                _isConnected = true;
-                                _logger.LogDebug("WebSocket connected successfully");
+    
+                                // Check if connection was actually successful
+                                if (client.IsConnected())
+                                {
+                                    _isConnected = true;
+                                    _logger.LogDebug("WebSocket connected successfully");
+                                }
+                                else
+                                {
+                                    _logger.LogWarning("WebSocket connection attempt failed");
+                                }
                             }
                             else if (!status.exchange_active && _isConnected)
                             {
@@ -183,8 +202,16 @@ namespace KalshiBotOverseer
                             var client = _webSocketClient;
                             await client.ConnectAsync(0);
 
-                            _isConnected = true;
-                            _logger.LogInformation("WebSocket connected successfully");
+                            // Check if connection was actually successful
+                            if (client.IsConnected())
+                            {
+                                _isConnected = true;
+                                _logger.LogInformation("WebSocket connected successfully");
+                            }
+                            else
+                            {
+                                _logger.LogWarning("WebSocket connection attempt failed");
+                            }
                         }
                         else if (!status.exchange_active && _isConnected)
                         {

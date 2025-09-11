@@ -35,17 +35,17 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         Task WaitForEmptyOrderBookQueueAsync(string marketTicker, TimeSpan timeout);
         bool IsConnected();
         bool IsSubscribed(string marketTicker, string action);
-        bool CanSubscribe(string marketTicker, string channel);
-        void UpdateSubscriptionState(string marketTicker, string channel, SubscriptionState state);
-        void ClearOrderBookQueueForMarket(string marketTicker);
+        bool CanSubscribeToMarket(string marketTicker, string channel);
+        void SetSubscriptionState(string marketTicker, string channel, SubscriptionState state);
+        void ClearOrderBookQueue(string marketTicker);
         void DisableReconnect();
         void EnableReconnect();
-        int GetNextMessageId();
+        int GenerateNextMessageId();
         void ResetEventCounts();
         string GetChannelName(string action);
         Task SendMessageAsync(string message);
         Task ResubscribeAsync(bool force = false);
 
-        (int orderbookEvents, int tradeEvents, int tickerEvents) ReturnWebSocketCountsByMarket(string marketTicker);
+        (int orderbookEvents, int tradeEvents, int tickerEvents) GetEventCountsByMarket(string marketTicker);
     }
 }

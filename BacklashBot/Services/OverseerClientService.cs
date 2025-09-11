@@ -585,7 +585,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("OVERSEER- Failed to send handshake. Error: {Error}", ex.Message);
+                _logger.LogWarning("OVERSEER- Failed to send handshake. Error: {Error}", ex.Message);
             }
         }
 
