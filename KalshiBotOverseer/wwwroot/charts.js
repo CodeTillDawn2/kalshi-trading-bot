@@ -328,6 +328,9 @@ function renderBrainCharts(brainStatusMessage) {
     // Error Chart
     if (brainStatusMessage.ErrorHistory && brainStatusMessage.ErrorHistory.length > 0) {
         renderMiniChart(`error-chart-${safeName}`, brainStatusMessage.ErrorHistory, 'Errors', '#ff6b6b');
+    } else if (brainStatusMessage.NotificationQueueHistory && brainStatusMessage.NotificationQueueHistory.length > 0) {
+        // Fallback to NotificationQueueHistory if ErrorHistory is not available
+        renderMiniChart(`error-chart-${safeName}`, brainStatusMessage.NotificationQueueHistory, 'Errors', '#ff6b6b');
     }
 }
 

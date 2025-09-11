@@ -172,24 +172,67 @@ namespace KalshiBotOverseer
                     return;
                 }
 
+                // Validate CheckInData
+                if (checkInData == null)
+                {
+                    _logger.LogWarning("CheckIn received with null data from client: {ConnectionId}", Context.ConnectionId);
+                    await Clients.Caller.SendAsync("CheckInResponse", new
+                    {
+                        Success = false,
+                        Message = "CheckIn data is null."
+                    });
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(checkInData.BrainInstanceName))
+                {
+                    _logger.LogWarning("CheckIn received with missing BrainInstanceName from client: {ConnectionId}", Context.ConnectionId);
+                    await Clients.Caller.SendAsync("CheckInResponse", new
+                    {
+                        Success = false,
+                        Message = "BrainInstanceName is required."
+                    });
+                    return;
+                }
+
                 _logger.LogInformation("CheckIn received from {ClientId} ({ClientName}): {MarketCount} markets, ErrorCount: {ErrorCount}, LastSnapshot: {LastSnapshot}",
                     clientInfo.ClientId, clientInfo.ClientName,
                     checkInData.Markets?.Count ?? 0,
                     checkInData.ErrorCount,
                     checkInData.LastSnapshot);
 
+                // Verify brain name consistency between handshake and CheckIn
+                if (clientInfo.ClientName != checkInData.BrainInstanceName)
+                {
+                    _logger.LogWarning("Brain name mismatch! Handshake: '{HandshakeName}', CheckIn: '{CheckInName}' for client {ClientId}",
+                        clientInfo.ClientName, checkInData.BrainInstanceName, clientInfo.ClientId);
+                }
+
+                // Log database brain data availability
+                var dbBrainExists = _brainService.GetBrain(clientInfo.ClientName ?? "") != null;
+                _logger.LogInformation("Database brain data check: ClientName='{ClientName}', ExistsInDB={Exists}",
+                    clientInfo.ClientName, dbBrainExists);
+
                 // Update current market tickers in persistence service
                 if (!string.IsNullOrEmpty(clientInfo.ClientName))
                 {
-                    _brainService.UpdateCurrentMarketTickers(clientInfo.ClientName, checkInData.Markets ?? new List<string>());
+                    try
+                    {
+                        _brainService.UpdateCurrentMarketTickers(clientInfo.ClientName, checkInData.Markets ?? new List<string>());
 
-                    // Update historical metrics
-                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "CpuUsage", checkInData.CurrentCpuUsage);
-                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "EventQueue", checkInData.EventQueueAvg);
-                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "TickerQueue", checkInData.TickerQueueAvg);
-                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "NotificationQueue", checkInData.NotificationQueueAvg);
-                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "OrderbookQueue", checkInData.OrderbookQueueAvg);
-                    _brainService.UpdateMetricHistory(clientInfo.ClientName, "MarketCount", checkInData.Markets?.Count ?? 0);
+                        // Update historical metrics
+                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "CpuUsage", checkInData.CurrentCpuUsage);
+                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "EventQueue", checkInData.EventQueueAvg);
+                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "TickerQueue", checkInData.TickerQueueAvg);
+                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "NotificationQueue", checkInData.NotificationQueueAvg);
+                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "OrderbookQueue", checkInData.OrderbookQueueAvg);
+                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "MarketCount", checkInData.Markets?.Count ?? 0);
+                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "Error", checkInData.ErrorCount);
+                    }
+                    catch (Exception brainEx)
+                    {
+                        _logger.LogWarning(brainEx, "Failed to update brain service for {ClientName}", clientInfo.ClientName);
+                    }
                 }
 
                 // Update client last seen
@@ -199,7 +242,15 @@ namespace KalshiBotOverseer
                 var targetTickers = new string[0];
                 if (!string.IsNullOrEmpty(clientInfo.ClientName))
                 {
-                    targetTickers = _brainService.GetTargetMarketTickers(clientInfo.ClientName).ToArray();
+                    try
+                    {
+                        targetTickers = _brainService.GetTargetMarketTickers(clientInfo.ClientName).ToArray();
+                    }
+                    catch (Exception tickerEx)
+                    {
+                        _logger.LogWarning(tickerEx, "Failed to get target tickers for {ClientName}", clientInfo.ClientName);
+                        targetTickers = new string[0];
+                    }
                 }
 
                 // Log CheckIn data to database if needed
@@ -224,12 +275,26 @@ namespace KalshiBotOverseer
                 }
 
                 // Get existing brain data for historical metrics
-                var existingBrain = _brainService.GetBrain(clientInfo.ClientName ?? "");
+                BrainPersistence existingBrain;
+                if (!string.IsNullOrEmpty(clientInfo.ClientName))
+                {
+                    existingBrain = _brainService.GetBrain(clientInfo.ClientName);
+                    _logger.LogInformation("Retrieved brain persistence data for '{BrainName}': CpuHistory={CpuCount}, EventHistory={EventCount}, ErrorHistory={ErrorCount}",
+                        clientInfo.ClientName,
+                        existingBrain.CpuUsageHistory?.Count ?? 0,
+                        existingBrain.EventQueueHistory?.Count ?? 0,
+                        existingBrain.ErrorHistory?.Count ?? 0);
+                }
+                else
+                {
+                    _logger.LogWarning("ClientName is null or empty, using default brain data");
+                    existingBrain = new BrainPersistence { BrainInstanceName = "" };
+                }
 
                 // Create comprehensive brain status data
                 var brainStatus = new BrainStatusData
                 {
-                    BrainInstanceName = clientInfo.ClientName ?? "",
+                    BrainInstanceName = checkInData.BrainInstanceName!,
 
                     // Configuration from CheckInData
                     WatchPositions = checkInData.WatchPositions,
@@ -327,7 +392,7 @@ namespace KalshiBotOverseer
 
     public class CheckInData
     {
-        public required string BrainInstanceName { get; set; } 
+        public string? BrainInstanceName { get; set; }
 
         // Basic market data
         public List<string>? Markets { get; set; }

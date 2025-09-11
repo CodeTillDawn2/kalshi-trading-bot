@@ -41,6 +41,24 @@ namespace BacklashBot.Logging
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             var message = formatter(state, exception);
+
+            // Ensure BrainStatusService is initialized before accessing properties
+            string sessionIdentifier = "";
+            try
+            {
+                // Try to get session identifier, but don't fail if not initialized yet
+                if (_brainStatus != null)
+                {
+                    // This will throw if not initialized, so we catch it
+                    sessionIdentifier = _brainStatus.SessionIdentifier ?? "";
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                // BrainStatusService not initialized yet, use empty string
+                sessionIdentifier = "";
+            }
+
             var logEntry = new LogEntryDTO
             {
                 Timestamp = DateTime.Now,
@@ -49,7 +67,7 @@ namespace BacklashBot.Logging
                 Exception = exception?.ToString() ?? "",
                 Environment = _loggingConfig.Environment,
                 BrainInstance = _executionConfig.BrainInstance ?? "",
-                SessionIdentifier = _brainStatus.SessionIdentifier ?? "",
+                SessionIdentifier = sessionIdentifier,
                 Source = _categoryName
             };
 

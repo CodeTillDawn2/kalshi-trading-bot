@@ -58,6 +58,7 @@ namespace BacklashBot.Management
             _tradingConfig = tradingConfig.Value;
             RefreshInterval = TimeSpan.FromMinutes(_tradingConfig.RefreshIntervalMinutes);
             BrainInstance = _executionConfig.BrainInstance;
+            _logger.LogInformation("PERFMON: Initialized with BrainInstance='{BrainInstance}' from config", BrainInstance);
             _queueCountSamples = new ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>>();
         }
 

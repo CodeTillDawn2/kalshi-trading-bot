@@ -194,11 +194,6 @@ namespace KalshiBotOverseer
                 // Get local IP address
                 var hostName = System.Net.Dns.GetHostName();
                 
-                if (hostName == "PeterWorkLaptop")
-                {
-                    return;
-                }
-                
                 var localIP = System.Net.Dns.GetHostEntry(hostName).AddressList
                     .FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?
                     .ToString() ?? "127.0.0.1";

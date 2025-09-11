@@ -121,9 +121,12 @@ namespace BacklashBot.Services
                 var isStartingUp = performanceTracker.IsStartingUp;
                 var isShuttingDown = performanceTracker.IsShuttingDown;
 
+                var brainInstanceName = performanceTracker.BrainInstance;
+                _logger.LogInformation("BROADCAST: Creating CheckInData with BrainInstanceName='{BrainInstanceName}'", brainInstanceName);
+
                 var checkInData = new CheckInData
                 {
-                    BrainInstanceName = performanceTracker.BrainInstance,
+                    BrainInstanceName = brainInstanceName,
                     Markets = markets,
                     ErrorCount = errorHandler.ErrorCount,
                     LastSnapshot = lastSnapshot == DateTime.MinValue ? (DateTime?)null : lastSnapshot,

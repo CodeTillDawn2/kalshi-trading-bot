@@ -124,14 +124,24 @@ function handleBrainStatusUpdate(msg) {
     // Update existing brain data with real-time SignalR information
     if (brainData[name]) {
         // Preserve database data and enrich with SignalR real-time data
+        const originalDBData = brainData[name];
         brainData[name] = {
             ...brainData[name], // Keep database data (WatchedMarkets, etc.)
             ...msg, // Override with SignalR real-time data
             brainInstanceName: name // Ensure consistent naming
         };
+        mwLog('debug', '[BrainCards] handleBrainStatusUpdate: brainData merged - DB data preserved', {
+            name,
+            originalMarketCount: originalDBData.marketCount || 0,
+            signalRMarketCount: msg.marketCount || 0,
+            finalMarketCount: brainData[name].marketCount || 0,
+            dbKeys: Object.keys(originalDBData),
+            signalRKeys: Object.keys(msg)
+        });
     } else {
         // If brain not in database data, add it (shouldn't happen with backend filtering)
         brainData[name] = msg;
+        mwLog('warning', '[BrainCards] handleBrainStatusUpdate: brain not found in DB, using SignalR data only', { name });
     }
     mwLog('debug', '[BrainCards] handleBrainStatusUpdate: brainData merged', { name, storedKeys: Object.keys(brainData[name] || {}) });
 

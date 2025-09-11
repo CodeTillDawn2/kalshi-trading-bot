@@ -797,6 +797,7 @@ namespace BacklashBot.Services
 
                 var checkInData = new
                 {
+                    BrainInstanceName = _clientName, // Add the brain instance name
                     Markets = markets,
                     ErrorCount = errorHandler.ErrorCount,
                     LastSnapshot = errorHandler.LastSuccessfulSnapshot == DateTime.MinValue
