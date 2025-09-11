@@ -148,46 +148,81 @@ namespace BacklashBot.Services
 
         private async Task CleanupConnectionAsync()
         {
-            await _connectionSemaphore.WaitAsync();
+            _logger.LogInformation("OVERSEER- EMERGENCY: CleanupConnectionAsync ENTERED - checking if semaphore is already held");
+
+            // Check if we already hold the semaphore (called from AttemptConnectionAsync)
+            bool semaphoreHeld = _connectionSemaphore.CurrentCount == 0;
+            _logger.LogInformation("OVERSEER- EMERGENCY: Semaphore already held: {Held}", semaphoreHeld);
+
+            if (!semaphoreHeld)
+            {
+                _logger.LogInformation("OVERSEER- EMERGENCY: Acquiring cleanup semaphore");
+                await _connectionSemaphore.WaitAsync();
+                _logger.LogInformation("OVERSEER- EMERGENCY: Cleanup semaphore acquired");
+            }
+            else
+            {
+                _logger.LogInformation("OVERSEER- EMERGENCY: Skipping semaphore acquisition (already held)");
+            }
+
             try
             {
                 if (_hubConnection == null)
-                    return;
-
-            try
-            {
-                var currentState = _hubConnection.State;
-                _logger.LogDebug("OVERSEER- Cleaning up HubConnection in state: {State}", currentState);
-
-                // Stop the connection if it's not already disconnected
-                if (currentState != HubConnectionState.Disconnected)
                 {
-                    try
-                    {
-                        await _hubConnection.StopAsync();
-                        _logger.LogDebug("OVERSEER- Stopped existing connection during cleanup");
-                    }
-                    catch (Exception stopEx)
-                    {
-                        _logger.LogWarning("OVERSEER- Error stopping connection during cleanup: {Error}", stopEx.Message);
-                    }
+                    _logger.LogInformation("OVERSEER- EMERGENCY: HubConnection is null, nothing to cleanup");
+                    return;
                 }
 
-                // Always dispose to ensure clean state
-                await _hubConnection.DisposeAsync();
-                _hubConnection = null;
-                _logger.LogDebug("OVERSEER- Disposed HubConnection during cleanup");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning("OVERSEER- Error during connection cleanup: {Error}", ex.Message);
-                // Force null the connection even if disposal failed
-                _hubConnection = null;
-            }
+                _logger.LogInformation("OVERSEER- EMERGENCY: HubConnection exists, state: {State}", _hubConnection.State);
+
+                try
+                {
+                    var currentState = _hubConnection.State;
+                    _logger.LogInformation("OVERSEER- EMERGENCY: Cleaning up HubConnection in state: {State}", currentState);
+
+                    // Stop the connection if it's not already disconnected
+                    if (currentState != HubConnectionState.Disconnected)
+                    {
+                        _logger.LogInformation("OVERSEER- EMERGENCY: About to stop connection");
+                        try
+                        {
+                            await _hubConnection.StopAsync();
+                            _logger.LogInformation("OVERSEER- EMERGENCY: Stopped existing connection during cleanup");
+                        }
+                        catch (Exception stopEx)
+                        {
+                            _logger.LogWarning("OVERSEER- EMERGENCY: Error stopping connection during cleanup: {Error}", stopEx.Message);
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogInformation("OVERSEER- EMERGENCY: Connection already disconnected, skipping stop");
+                    }
+
+                    // Always dispose to ensure clean state
+                    _logger.LogInformation("OVERSEER- EMERGENCY: About to dispose connection");
+                    await _hubConnection.DisposeAsync();
+                    _hubConnection = null;
+                    _logger.LogInformation("OVERSEER- EMERGENCY: Disposed HubConnection during cleanup");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning("OVERSEER- EMERGENCY: Error during connection cleanup: {Error}", ex.Message);
+                    // Force null the connection even if disposal failed
+                    _hubConnection = null;
+                }
             }
             finally
             {
-                _connectionSemaphore.Release();
+                if (!semaphoreHeld)
+                {
+                    _connectionSemaphore.Release();
+                    _logger.LogInformation("OVERSEER- EMERGENCY: Cleanup semaphore released");
+                }
+                else
+                {
+                    _logger.LogInformation("OVERSEER- EMERGENCY: Skipping semaphore release (held by caller)");
+                }
             }
         }
 
@@ -501,76 +536,102 @@ namespace BacklashBot.Services
 
         private async Task AttemptConnectionAsync(string overseerUrl, string reason)
         {
-            await _connectionSemaphore.WaitAsync();
+            _logger.LogInformation("OVERSEER- EMERGENCY: AttemptConnectionAsync ENTERED for {Url}", overseerUrl);
+            _logger.LogInformation("OVERSEER- EMERGENCY: Current semaphore count: {Count}", _connectionSemaphore.CurrentCount);
+
+            // Add timeout to semaphore to prevent hanging
+            using var semaphoreTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            await _connectionSemaphore.WaitAsync(semaphoreTimeout.Token);
+            _logger.LogInformation("OVERSEER- EMERGENCY: Semaphore acquired successfully");
+
             try
             {
                 _logger.LogInformation("OVERSEER- Attempting connection to overseer at {Url} (Reason: {Reason})", overseerUrl, reason);
 
-            // Clean up existing connection safely
-            await CleanupConnectionAsync();
-
-            // Reset connection state
-            lock (_connectionLock)
-            {
-                _isConnected = false;
-                _currentOverseerUrl = null;
-            }
-
-            // Create new connection
-            _hubConnection = new HubConnectionBuilder()
-                .WithUrl(overseerUrl)
-                .WithAutomaticReconnect()
-                .Build();
-
-            _logger.LogDebug("OVERSEER- Created new HubConnection, initial state: {State}", _hubConnection.State);
-
-            // Set up event handlers
-            _hubConnection.On<HandshakeResponse>("HandshakeResponse", HandleHandshakeResponse);
-            _hubConnection.On<CheckInResponse>("CheckInResponse", HandleCheckInResponse);
-            _hubConnection.On<MessageResponse>("MessageResponse", HandleMessageResponse);
-
-            // Handle connection events
-            _hubConnection.Closed += HandleConnectionClosed;
-            _hubConnection.Reconnected += HandleReconnected;
-
-            // Verify connection is in correct state before starting
-            if (_hubConnection.State != HubConnectionState.Disconnected)
-            {
-                _logger.LogWarning("OVERSEER- HubConnection is in {State} state, cannot start. Creating fresh connection.", _hubConnection.State);
+                // Clean up existing connection safely
+                _logger.LogInformation("OVERSEER- EMERGENCY: About to cleanup existing connection");
                 await CleanupConnectionAsync();
+                _logger.LogInformation("OVERSEER- EMERGENCY: Cleanup completed");
 
+                // Reset connection state
+                lock (_connectionLock)
+                {
+                    _isConnected = false;
+                    _currentOverseerUrl = null;
+                }
+                _logger.LogInformation("OVERSEER- EMERGENCY: Connection state reset");
+
+                // Create new connection
+                _logger.LogInformation("OVERSEER- EMERGENCY: Creating new HubConnection");
                 _hubConnection = new HubConnectionBuilder()
                     .WithUrl(overseerUrl)
                     .WithAutomaticReconnect()
                     .Build();
+                _logger.LogInformation("OVERSEER- EMERGENCY: HubConnection created, initial state: {State}", _hubConnection.State);
 
-                // Re-setup event handlers
+                // Set up event handlers
+                _logger.LogInformation("OVERSEER- EMERGENCY: Setting up event handlers");
                 _hubConnection.On<HandshakeResponse>("HandshakeResponse", HandleHandshakeResponse);
                 _hubConnection.On<CheckInResponse>("CheckInResponse", HandleCheckInResponse);
                 _hubConnection.On<MessageResponse>("MessageResponse", HandleMessageResponse);
+
+                // Handle connection events
                 _hubConnection.Closed += HandleConnectionClosed;
                 _hubConnection.Reconnected += HandleReconnected;
+                _logger.LogInformation("OVERSEER- EMERGENCY: Event handlers registered");
+
+                // Verify connection is in correct state before starting
+                if (_hubConnection.State != HubConnectionState.Disconnected)
+                {
+                    _logger.LogWarning("OVERSEER- HubConnection is in {State} state, cannot start. Creating fresh connection.", _hubConnection.State);
+                    await CleanupConnectionAsync();
+
+                    _hubConnection = new HubConnectionBuilder()
+                        .WithUrl(overseerUrl)
+                        .WithAutomaticReconnect()
+                        .Build();
+
+                    // Re-setup event handlers
+                    _hubConnection.On<HandshakeResponse>("HandshakeResponse", HandleHandshakeResponse);
+                    _hubConnection.On<CheckInResponse>("CheckInResponse", HandleCheckInResponse);
+                    _hubConnection.On<MessageResponse>("MessageResponse", HandleMessageResponse);
+                    _hubConnection.Closed += HandleConnectionClosed;
+                    _hubConnection.Reconnected += HandleReconnected;
+                    _logger.LogInformation("OVERSEER- EMERGENCY: Fresh connection created");
+                }
+
+                _logger.LogInformation("OVERSEER- EMERGENCY: About to call StartAsync with 30s timeout");
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                await _hubConnection.StartAsync(cts.Token);
+                _logger.LogInformation("OVERSEER- EMERGENCY: StartAsync completed successfully, state: {State}", _hubConnection.State);
+
+                lock (_connectionLock)
+                {
+                    _isConnected = true;
+                    _currentOverseerUrl = overseerUrl;
+                }
+                _logger.LogInformation("OVERSEER- EMERGENCY: Connection state updated to connected");
+
+                _logger.LogInformation("OVERSEER- Successfully connected to overseer at {Url}", overseerUrl);
+
+                // Perform handshake
+                _logger.LogInformation("OVERSEER- EMERGENCY: About to perform handshake");
+                await PerformHandshakeAsync();
+                _logger.LogInformation("OVERSEER- EMERGENCY: Handshake completed");
             }
-
-            _logger.LogDebug("OVERSEER- Starting HubConnection...");
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-            await _hubConnection.StartAsync(cts.Token);
-            _logger.LogDebug("OVERSEER- HubConnection started, state: {State}", _hubConnection.State);
-
-            lock (_connectionLock)
+            catch (TaskCanceledException)
             {
-                _isConnected = true;
-                _currentOverseerUrl = overseerUrl;
+                _logger.LogWarning("OVERSEER- EMERGENCY: Connection attempt timed out after 30 seconds");
             }
-
-            _logger.LogInformation("OVERSEER- Successfully connected to overseer at {Url}", overseerUrl);
-
-            // Perform handshake
-            await PerformHandshakeAsync();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "OVERSEER- EMERGENCY: Exception in AttemptConnectionAsync: {Message}", ex.Message);
+                _logger.LogError(ex, "OVERSEER- EMERGENCY: Stack trace: {StackTrace}", ex.StackTrace);
             }
             finally
             {
                 _connectionSemaphore.Release();
+                _logger.LogInformation("OVERSEER- EMERGENCY: Semaphore released");
             }
         }
 
@@ -770,17 +831,36 @@ namespace BacklashBot.Services
 
         private async Task PerformHandshakeAsyncInternal()
         {
-            if (!IsConnectionActive() || _hubConnection == null) return;
+            if (_hubConnection == null)
+            {
+                _logger.LogWarning("OVERSEER- Cannot send handshake: HubConnection is null");
+                return;
+            }
+
+            _logger.LogDebug("OVERSEER- Checking connection state for handshake: IsConnected={IsConnected}, State={State}",
+                _isConnected, _hubConnection.State);
+
+            if (!IsConnectionActive())
+            {
+                _logger.LogWarning("OVERSEER- Cannot send handshake: Connection not active (IsConnected={IsConnected}, State={State})",
+                    _isConnected, _hubConnection.State);
+                return;
+            }
 
             try
             {
+                _logger.LogInformation("OVERSEER- Sending handshake with ClientId={ClientId}, ClientName={ClientName}, ClientType={ClientType}",
+                    _clientId, _clientName, _clientType);
                 await _hubConnection.InvokeAsync("Handshake", _clientId, _clientName, _clientType);
-                _logger.LogInformation("OVERSEER- Handshake sent to overseer");
+                _logger.LogInformation("OVERSEER- Handshake sent successfully to overseer");
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
             {
                 _logger.LogWarning("OVERSEER- Connection became inactive during handshake attempt. Will mark as disconnected. Error: {Error}", ex.Message);
-                _isConnected = false;
+                lock (_connectionLock)
+                {
+                    _isConnected = false;
+                }
             }
             catch (Exception ex)
             {

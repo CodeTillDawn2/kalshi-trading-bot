@@ -1268,6 +1268,7 @@ namespace BacklashBot.Services
 
         public List<CandlestickData> ForwardFillCandlesticks(List<CandlestickData> candlesticks, string marketTicker)
         {
+            if (candlesticks.Count <= 1) return candlesticks;
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();

@@ -45,43 +45,43 @@ namespace KalshiBotOverseer.Models
     public class BrainStatusData
     {
         // Basic brain info
-        public string? BrainInstanceName { get; set; }
+        public string? brainInstanceName { get; set; }
 
         // Basic market data
-        public List<string>? Markets { get; set; }
-        public long ErrorCount { get; set; }
-        public DateTime? LastSnapshot { get; set; }
-        public bool IsStartingUp { get; set; }
-        public bool IsShuttingDown { get; set; }
+        public List<string>? markets { get; set; }
+        public long errorCount { get; set; }
+        public DateTime? lastSnapshot { get; set; }
+        public bool isStartingUp { get; set; }
+        public bool isShuttingDown { get; set; }
 
         // Brain configuration
-        public bool WatchPositions { get; set; }
-        public bool WatchOrders { get; set; }
-        public bool ManagedWatchList { get; set; }
-        public bool CaptureSnapshots { get; set; }
-        public int TargetWatches { get; set; }
-        public double MinimumInterest { get; set; }
-        public double UsageMin { get; set; }
-        public double UsageMax { get; set; }
+        public bool watchPositions { get; set; }
+        public bool watchOrders { get; set; }
+        public bool managedWatchList { get; set; }
+        public bool captureSnapshots { get; set; }
+        public int targetWatches { get; set; }
+        public double minimumInterest { get; set; }
+        public double usageMin { get; set; }
+        public double usageMax { get; set; }
 
         // Performance metrics
-        public double CurrentCpuUsage { get; set; }
-        public double EventQueueAvg { get; set; }
-        public double TickerQueueAvg { get; set; }
-        public double NotificationQueueAvg { get; set; }
-        public double OrderbookQueueAvg { get; set; }
-        public double LastRefreshCycleSeconds { get; set; }
-        public double LastRefreshCycleInterval { get; set; }
-        public double LastRefreshMarketCount { get; set; }
-        public double LastRefreshUsagePercentage { get; set; }
-        public bool LastRefreshTimeAcceptable { get; set; }
-        public DateTime? LastPerformanceSampleDate { get; set; }
+        public double currentCpuUsage { get; set; }
+        public double eventQueueAvg { get; set; }
+        public double tickerQueueAvg { get; set; }
+        public double notificationQueueAvg { get; set; }
+        public double orderbookQueueAvg { get; set; }
+        public double lastRefreshCycleSeconds { get; set; }
+        public double lastRefreshCycleInterval { get; set; }
+        public double lastRefreshMarketCount { get; set; }
+        public double lastRefreshUsagePercentage { get; set; }
+        public bool lastRefreshTimeAcceptable { get; set; }
+        public DateTime? lastPerformanceSampleDate { get; set; }
 
         // Connection status
-        public bool IsWebSocketConnected { get; set; }
+        public bool isWebSocketConnected { get; set; }
 
         // Market watch data
-        public List<MarketWatchData>? WatchedMarkets { get; set; }
+        public List<MarketWatchData>? watchedMarkets { get; set; }
     }
 
     public class MetricHistory

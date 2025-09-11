@@ -22,6 +22,8 @@ namespace KalshiBotOverseer
         private readonly IHubContext<ChartHub> _hubContext;
         private Timer? _apiFetchTimer;
         private CancellationTokenSource? _apiFetchCancellationTokenSource;
+        private Timer? _overseerLogTimer;
+        private CancellationTokenSource? _overseerLogCancellationTokenSource;
         private bool _disposed = false;
 
         public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, IHubContext<ChartHub> hubContext)
@@ -48,6 +50,7 @@ namespace KalshiBotOverseer
             _logger?.LogInformation("Subscribed to Fill, MarketLifecycle, and EventLifecycle events.");
 
             StartPeriodicApiFetching();
+            StartPeriodicOverseerLogging();
         }
 
         public void Stop()
@@ -95,13 +98,13 @@ namespace KalshiBotOverseer
                     // Send CheckInUpdate to all connected clients
                     await _hubContext.Clients.All.SendAsync("CheckInUpdate", new
                     {
-                        BrainInstanceName = "UnknownBot", // We don't have this info from WebSocket events
-                        MarketCount = checkInData.Markets?.Count ?? 0,
-                        ErrorCount = checkInData.ErrorCount,
-                        LastSnapshot = checkInData.LastSnapshot,
-                        LastCheckIn = DateTime.UtcNow,
-                        IsStartingUp = checkInData.IsStartingUp,
-                        IsShuttingDown = checkInData.IsShuttingDown
+                        brainInstanceName = checkInData.BrainInstanceName,
+                        marketCount = checkInData.Markets?.Count ?? 0,
+                        errorCount = checkInData.ErrorCount,
+                        lastSnapshot = checkInData.LastSnapshot,
+                        lastCheckIn = DateTime.UtcNow,
+                        isStartingUp = checkInData.IsStartingUp,
+                        isShuttingDown = checkInData.IsShuttingDown
                     });
 
                     _logger?.LogInformation("Sent CheckInUpdate for bot with {MarketCount} markets", checkInData.Markets?.Count ?? 0);
@@ -151,6 +154,44 @@ namespace KalshiBotOverseer
             }
 
             _logger?.LogInformation("Stopped periodic API fetching");
+        }
+
+        /// <summary>
+        /// Starts periodic logging of overseer info every minute
+        /// </summary>
+        public void StartPeriodicOverseerLogging()
+        {
+            if (_overseerLogTimer != null)
+            {
+                _logger?.LogWarning("Periodic overseer logging is already running");
+                return;
+            }
+
+            _overseerLogCancellationTokenSource = new CancellationTokenSource();
+            _overseerLogTimer = new Timer(async _ => await LogOverseerInfoPeriodicallyAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+
+            _logger?.LogInformation("Started periodic overseer logging every minute");
+        }
+
+        /// <summary>
+        /// Stops periodic logging of overseer info
+        /// </summary>
+        public void StopPeriodicOverseerLogging()
+        {
+            if (_overseerLogTimer != null)
+            {
+                _overseerLogTimer.Dispose();
+                _overseerLogTimer = null;
+            }
+
+            if (_overseerLogCancellationTokenSource != null)
+            {
+                _overseerLogCancellationTokenSource.Cancel();
+                _overseerLogCancellationTokenSource.Dispose();
+                _overseerLogCancellationTokenSource = null;
+            }
+
+            _logger?.LogInformation("Stopped periodic overseer logging");
         }
 
         /// <summary>
@@ -220,6 +261,24 @@ namespace KalshiBotOverseer
             catch (Exception ex)
             {
                 _logger?.LogWarning(ex, "OVERSEER- Failed to log overseer info to database");
+            }
+        }
+
+        /// <summary>
+        /// Periodically logs overseer info
+        /// </summary>
+        private async Task LogOverseerInfoPeriodicallyAsync()
+        {
+            try
+            {
+                if (_overseerLogCancellationTokenSource?.IsCancellationRequested == true)
+                    return;
+
+                await LogOverseerInfoAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error during periodic overseer logging: {Message}", ex.Message);
             }
         }
 
@@ -332,6 +391,7 @@ namespace KalshiBotOverseer
         {
             if (_disposed) return;
             StopPeriodicApiFetching();
+            StopPeriodicOverseerLogging();
             Unsubscribe();
             _disposed = true;
         }

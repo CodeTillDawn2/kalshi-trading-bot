@@ -68,6 +68,12 @@ async function initializeSignalR() {
      */
     connection.on('BroadcastTrace', (info) => {
         console.log('[BrainCards] BroadcastTrace:', info);
+        // Handle both camelCase and PascalCase for compatibility
+        const kind = info.kind ?? info.Kind ?? 'unknown';
+        const brain = info.brain ?? info.Brain ?? 'unknown';
+        const marketCount = info.marketCount ?? info.MarketCount ?? 0;
+        const serverUtc = info.serverUtc ?? info.ServerUtc ?? null;
+        console.log(`[BrainCards] Trace: ${kind} for ${brain} with ${marketCount} markets at ${serverUtc}`);
     });
 
     /**
@@ -131,12 +137,12 @@ async function initializeSignalR() {
  * @param {Object} msg - SignalR message containing brain status information
  */
 function handleBrainStatusUpdate(msg) {
-    // Accept either BrainInstanceName or brainInstanceName for compatibility
-    const pas = msg && msg.BrainInstanceName;
+    // Accept either brainInstanceName or BrainInstanceName for compatibility
     const cam = msg && msg.brainInstanceName;
-    const name = pas || cam || null;
+    const pas = msg && msg.BrainInstanceName;
+    const name = cam || pas || null;
 
-    mwLog('debug', '[BrainCards] handleBrainStatusUpdate: entry', { name, hasPascal: !!pas, hasCamel: !!cam });
+    mwLog('debug', '[BrainCards] handleBrainStatusUpdate: entry', { name, hasCamel: !!cam, hasPascal: !!pas });
 
     if (!name) {
         mwLog('warn', '[BrainCards] handleBrainStatusUpdate: missing brain name; aborting', { keys: Object.keys(msg || {}) });
@@ -175,21 +181,21 @@ function handleBrainStatusUpdate(msg) {
     mwLog('debug', '[BrainCards] handleBrainStatusUpdate: brainData merged', { name, normalizedName, storedKeys: Object.keys(brainData[normalizedName] || {}) });
 
     // Derive check-in badge fields for the brain lock card
-    const lastCheckIn = msg.LastCheckIn ?? msg.lastCheckIn ?? null;
-    const lastSnapshot = msg.LastSnapshot ?? msg.lastSnapshot ?? null;
-    const marketCount = (msg.MarketCount ?? msg.marketCount) ?? 0;
-    const errorCount = (msg.ErrorCount ?? msg.errorCount) ?? 0;
-    const isStartingUp = !!(msg.IsStartingUp ?? msg.isStartingUp);
-    const isShuttingDown = !!(msg.IsShuttingDown ?? msg.isShuttingDown);
+    const lastCheckIn = msg.lastCheckIn ?? msg.LastCheckIn ?? null;
+    const lastSnapshot = msg.lastSnapshot ?? msg.LastSnapshot ?? null;
+    const marketCount = (msg.markets?.length ?? msg.Markets?.length ?? msg.marketCount ?? msg.MarketCount) ?? 0;
+    const errorCount = (msg.errorCount ?? msg.ErrorCount) ?? 0;
+    const isStartingUp = !!(msg.isStartingUp ?? msg.IsStartingUp);
+    const isShuttingDown = !!(msg.isShuttingDown ?? msg.IsShuttingDown);
 
     checkInData[normalizedName] = {
         brainInstanceName: name, // Preserve original casing for display
-        marketCount,
-        errorCount,
-        lastSnapshot,
-        lastCheckIn,
-        isStartingUp,
-        isShuttingDown
+        marketCount: marketCount,
+        errorCount: errorCount,
+        lastSnapshot: lastSnapshot,
+        lastCheckIn: lastCheckIn,
+        isStartingUp: isStartingUp,
+        isShuttingDown: isShuttingDown
     };
     mwLog('debug', '[BrainCards] handleBrainStatusUpdate: checkInData updated', checkInData[normalizedName]);
 
@@ -216,13 +222,13 @@ function handleCheckInUpdate(checkInMessage) {
             return;
         }
 
-        const brainInstanceName = checkInMessage.BrainInstanceName;
-        const marketCount = checkInMessage.MarketCount ?? 0;
-        const errorCount = checkInMessage.ErrorCount ?? 0;
-        const lastSnapshot = checkInMessage.LastSnapshot ?? null;
-        const lastCheckIn = checkInMessage.LastCheckIn ?? null;
-        const isStartingUp = !!checkInMessage.IsStartingUp;
-        const isShuttingDown = !!checkInMessage.IsShuttingDown;
+        const brainInstanceName = checkInMessage.brainInstanceName ?? checkInMessage.BrainInstanceName;
+        const marketCount = checkInMessage.marketCount ?? checkInMessage.MarketCount ?? 0;
+        const errorCount = checkInMessage.errorCount ?? checkInMessage.ErrorCount ?? 0;
+        const lastSnapshot = checkInMessage.lastSnapshot ?? checkInMessage.LastSnapshot ?? null;
+        const lastCheckIn = checkInMessage.lastCheckIn ?? checkInMessage.LastCheckIn ?? null;
+        const isStartingUp = !!(checkInMessage.isStartingUp ?? checkInMessage.IsStartingUp);
+        const isShuttingDown = !!(checkInMessage.isShuttingDown ?? checkInMessage.IsShuttingDown);
 
         // Update global cache used by brain cards
         checkInData[brainInstanceName] = {
@@ -251,18 +257,18 @@ function handleCheckInUpdate(checkInMessage) {
 }
 
 function updateBrainStatusUI(msg) {
-    const pas = msg && msg.BrainInstanceName;
     const cam = msg && msg.brainInstanceName;
-    const name = pas || cam || '';
-    const casing = pas ? 'PascalCase' : (cam ? 'camelCase' : 'missing');
+    const pas = msg && msg.BrainInstanceName;
+    const name = cam || pas || '';
+    const casing = cam ? 'camelCase' : (pas ? 'PascalCase' : 'missing');
     const safe = name.replace(/[^a-zA-Z0-9]/g, '_');
 
-    const lastCheckIn = msg.LastCheckIn ?? msg.lastCheckIn ?? null;
-    const lastSnapshot = msg.LastSnapshot ?? msg.lastSnapshot ?? null;
-    const errorCount = (msg.ErrorCount ?? msg.errorCount) ?? 0;
-    const marketCount = (msg.MarketCount ?? msg.marketCount) ?? 0;
-    const isStartingUp = !!(msg.IsStartingUp ?? msg.isStartingUp);
-    const isShuttingDown = !!(msg.IsShuttingDown ?? msg.isShuttingDown);
+    const lastCheckIn = msg.lastCheckIn ?? msg.LastCheckIn ?? null;
+    const lastSnapshot = msg.lastSnapshot ?? msg.LastSnapshot ?? null;
+    const errorCount = (msg.errorCount ?? msg.ErrorCount) ?? 0;
+    const marketCount = (msg.marketCount ?? msg.MarketCount) ?? 0;
+    const isStartingUp = !!(msg.isStartingUp ?? msg.IsStartingUp);
+    const isShuttingDown = !!(msg.isShuttingDown ?? msg.IsShuttingDown);
 
     const ids = {
         lastCheckIn: `last-checkin-${safe}`,
