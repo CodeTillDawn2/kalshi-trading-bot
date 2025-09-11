@@ -1,12 +1,13 @@
-using BacklashBot.Configuration;
-using BacklashBot.Management.Interfaces;
+using KalshiBotData.Data.Interfaces;
 using BacklashDTOs.Data;
 using Microsoft.Extensions.Logging;
+using BacklashDTOs.Configuration;
+using BacklashBot.Management.Interfaces;
 
-namespace BacklashBot.Logging
+namespace KalshiBotLogging
 {
     /// <summary>
-    /// Custom logger implementation that integrates with the BacklashBot logging infrastructure.
+    /// Custom logger implementation that integrates with the KalshiBot logging infrastructure.
     /// This logger formats log messages, outputs them to the console for immediate visibility,
     /// enqueues them for asynchronous database storage via the DatabaseLoggingQueue,
     /// and forwards warnings and errors to the error handler for further processing.
@@ -20,6 +21,8 @@ namespace BacklashBot.Logging
         private readonly LoggingConfig? _loggingConfig;
         private readonly ExecutionConfig? _executionConfig;
         private readonly IBrainStatusService? _brainStatus;
+        private readonly string _defaultEnvironment;
+        private readonly string _defaultInstance;
 
         /// <summary>
         /// Initializes a new instance of the DatabaseLogger class with the specified parameters.
@@ -30,13 +33,17 @@ namespace BacklashBot.Logging
         /// <param name="loggingConfig">Optional logging configuration for dynamic environment settings.</param>
         /// <param name="executionConfig">Optional execution configuration for brain instance settings.</param>
         /// <param name="brainStatus">Optional brain status service for session identifier.</param>
+        /// <param name="defaultEnvironment">Default environment name if not specified in config.</param>
+        /// <param name="defaultInstance">Default instance name if not specified in config.</param>
         public DatabaseLogger(
             string categoryName,
             DatabaseLoggingQueue loggingQueue,
             LogLevel minLevel,
             LoggingConfig? loggingConfig = null,
             ExecutionConfig? executionConfig = null,
-            IBrainStatusService? brainStatus = null)
+            IBrainStatusService? brainStatus = null,
+            string defaultEnvironment = "KalshiBot",
+            string defaultInstance = "DefaultInstance")
         {
             _categoryName = categoryName;
             _loggingQueue = loggingQueue;
@@ -44,6 +51,8 @@ namespace BacklashBot.Logging
             _loggingConfig = loggingConfig;
             _executionConfig = executionConfig;
             _brainStatus = brainStatus;
+            _defaultEnvironment = defaultEnvironment;
+            _defaultInstance = defaultInstance;
         }
 
         /// <summary>
@@ -77,8 +86,8 @@ namespace BacklashBot.Logging
             var message = formatter(state, exception);
 
             // Get dynamic values or use defaults
-            string environment = _loggingConfig?.Environment ?? "BacklashBot";
-            string brainInstance = _executionConfig?.BrainInstance ?? "BacklashInstance";
+            string environment = _loggingConfig?.Environment ?? _defaultEnvironment;
+            string brainInstance = _executionConfig?.BrainInstance ?? _defaultInstance;
             string sessionIdentifier = GetSessionIdentifier();
 
             var logEntry = new LogEntryDTO
@@ -110,14 +119,14 @@ namespace BacklashBot.Logging
 
         private string GetSessionIdentifier()
         {
-            if (_brainStatus == null) return "";
+            if (_brainStatus == null) return "DEF";
             try
             {
-                return _brainStatus.SessionIdentifier ?? "";
+                return _brainStatus.SessionIdentifier ?? "DEF";
             }
             catch (InvalidOperationException)
             {
-                return "";
+                return "DEF";
             }
         }
     }

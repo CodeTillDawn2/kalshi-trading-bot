@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.Management.Interfaces;
-using BacklashBot.Configuration;
+using BacklashDTOs.Configuration;
 using BacklashDTOs;
 using BacklashInterfaces.SmokehouseBot.Services;
 using System.Net;
@@ -14,6 +14,30 @@ namespace BacklashBot.Services
 {
     public class OverseerClientService : IOverseerClientService
     {
+        // Response classes for SignalR events
+        private class HandshakeResponse
+        {
+            public bool Success { get; set; }
+            public string AuthToken { get; set; } = "";
+            public string Message { get; set; } = "";
+        }
+
+        private class CheckInResponse
+        {
+            public bool Success { get; set; }
+            public string Message { get; set; } = "";
+            public string[] TargetTickers { get; set; } = Array.Empty<string>();
+            public DateTime Timestamp { get; set; }
+        }
+
+        private class MessageResponse
+        {
+            public bool Success { get; set; }
+            public string MessageType { get; set; } = "";
+            public DateTime Timestamp { get; set; }
+            public string Message { get; set; } = "";
+        }
+
         private readonly ILogger<OverseerClientService> _logger;
         private readonly IServiceFactory _serviceFactory;
         private HubConnection? _hubConnection;
@@ -501,9 +525,9 @@ namespace BacklashBot.Services
             _logger.LogDebug("OVERSEER- Created new HubConnection, initial state: {State}", _hubConnection.State);
 
             // Set up event handlers
-            _hubConnection.On<string>("HandshakeResponse", HandleHandshakeResponse);
-            _hubConnection.On<string>("CheckInResponse", HandleCheckInResponse);
-            _hubConnection.On<string>("MessageResponse", HandleMessageResponse);
+            _hubConnection.On<HandshakeResponse>("HandshakeResponse", HandleHandshakeResponse);
+            _hubConnection.On<CheckInResponse>("CheckInResponse", HandleCheckInResponse);
+            _hubConnection.On<MessageResponse>("MessageResponse", HandleMessageResponse);
 
             // Handle connection events
             _hubConnection.Closed += HandleConnectionClosed;
@@ -521,9 +545,9 @@ namespace BacklashBot.Services
                     .Build();
 
                 // Re-setup event handlers
-                _hubConnection.On<string>("HandshakeResponse", HandleHandshakeResponse);
-                _hubConnection.On<string>("CheckInResponse", HandleCheckInResponse);
-                _hubConnection.On<string>("MessageResponse", HandleMessageResponse);
+                _hubConnection.On<HandshakeResponse>("HandshakeResponse", HandleHandshakeResponse);
+                _hubConnection.On<CheckInResponse>("CheckInResponse", HandleCheckInResponse);
+                _hubConnection.On<MessageResponse>("MessageResponse", HandleMessageResponse);
                 _hubConnection.Closed += HandleConnectionClosed;
                 _hubConnection.Reconnected += HandleReconnected;
             }
@@ -808,6 +832,12 @@ namespace BacklashBot.Services
                     TickerQueueAvg = 0.0,
                     NotificationQueueAvg = 0.0,
                     OrderbookQueueAvg = 0.0,
+                    LastRefreshCycleSeconds = 0.0,
+                    LastRefreshCycleInterval = 0,
+                    LastRefreshMarketCount = 0,
+                    LastRefreshUsagePercentage = 0.0,
+                    LastRefreshTimeAcceptable = true,
+                    LastPerformanceSampleDate = (DateTime?)null,
                     IsWebSocketConnected = true // Could be determined
                 };
 
@@ -835,19 +865,19 @@ namespace BacklashBot.Services
             }
         }
 
-        private void HandleHandshakeResponse(string response)
+        private void HandleHandshakeResponse(HandshakeResponse response)
         {
-            _logger.LogInformation("OVERSEER- Handshake response received from overseer: {Response}", response);
+            _logger.LogInformation("OVERSEER- Handshake response received from overseer: Success={Success}, Message={Message}", response.Success, response.Message);
         }
 
-        private void HandleCheckInResponse(string response)
+        private void HandleCheckInResponse(CheckInResponse response)
         {
-            _logger.LogInformation("OVERSEER- CheckIn response received from overseer: {Response}", response);
+            _logger.LogInformation("OVERSEER- CheckIn response received from overseer: Success={Success}, Message={Message}, TargetTickers={Count}", response.Success, response.Message, response.TargetTickers.Length);
         }
 
-        private void HandleMessageResponse(string response)
+        private void HandleMessageResponse(MessageResponse response)
         {
-            _logger.LogInformation("OVERSEER- Message response received from overseer: {Response}", response);
+            _logger.LogInformation("OVERSEER- Message response received from overseer: Success={Success}, MessageType={Type}, Message={Message}", response.Success, response.MessageType, response.Message);
         }
 
         private Task HandleConnectionClosed(Exception? exception)

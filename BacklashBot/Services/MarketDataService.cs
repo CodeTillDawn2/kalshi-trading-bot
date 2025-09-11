@@ -1,7 +1,7 @@
 using KalshiBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using BacklashBot.Configuration;
+using BacklashDTOs.Configuration;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;

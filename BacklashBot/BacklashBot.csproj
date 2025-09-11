@@ -73,6 +73,7 @@
     <ProjectReference Include="..\BacklashDTOs\BacklashDTOs.csproj" />
     <ProjectReference Include="..\BacklashInterfaces\BacklashInterfaces.csproj" />
     <ProjectReference Include="..\TradingStrategies\TradingStrategies.csproj" />
+    <ProjectReference Include="..\KalshiBotLogging\KalshiBotLogging.csproj" />
   </ItemGroup>
 
 </Project>

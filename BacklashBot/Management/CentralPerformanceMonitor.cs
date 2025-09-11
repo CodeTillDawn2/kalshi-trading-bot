@@ -2,7 +2,7 @@
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
-using BacklashBot.Configuration;
+using BacklashDTOs.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs.Data;

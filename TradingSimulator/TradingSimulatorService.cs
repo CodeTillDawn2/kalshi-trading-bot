@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using BacklashBot.Configuration;
+using BacklashDTOs.Configuration;
 using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services;

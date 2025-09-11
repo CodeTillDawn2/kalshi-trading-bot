@@ -294,21 +294,24 @@ namespace KalshiBotOverseer
                 // Create comprehensive brain status data
                 var brainStatus = new BrainStatusData
                 {
-                    BrainInstanceName = checkInData.BrainInstanceName!,
+                    BrainInstanceName = checkInData.BrainInstanceName,
 
-                    // Configuration from CheckInData
+                    // Basic market data
+                    Markets = checkInData.Markets,
+                    ErrorCount = checkInData.ErrorCount,
+                    LastSnapshot = checkInData.LastSnapshot,
+                    IsStartingUp = checkInData.IsStartingUp,
+                    IsShuttingDown = checkInData.IsShuttingDown,
+
+                    // Brain configuration
                     WatchPositions = checkInData.WatchPositions,
                     WatchOrders = checkInData.WatchOrders,
                     ManagedWatchList = checkInData.ManagedWatchList,
                     CaptureSnapshots = checkInData.CaptureSnapshots,
                     TargetWatches = checkInData.TargetWatches,
+                    MinimumInterest = checkInData.MinimumInterest,
+                    UsageMin = checkInData.UsageMin,
                     UsageMax = checkInData.UsageMax,
-
-                    // Status information
-                    LastSeen = DateTime.UtcNow,
-                    IsStartingUp = checkInData.IsStartingUp,
-                    IsShuttingDown = checkInData.IsShuttingDown,
-                    IsWebSocketConnected = checkInData.IsWebSocketConnected,
 
                     // Performance metrics
                     CurrentCpuUsage = checkInData.CurrentCpuUsage,
@@ -316,27 +319,18 @@ namespace KalshiBotOverseer
                     TickerQueueAvg = checkInData.TickerQueueAvg,
                     NotificationQueueAvg = checkInData.NotificationQueueAvg,
                     OrderbookQueueAvg = checkInData.OrderbookQueueAvg,
+                    LastRefreshCycleSeconds = checkInData.LastRefreshCycleSeconds,
+                    LastRefreshCycleInterval = checkInData.LastRefreshCycleInterval,
+                    LastRefreshMarketCount = checkInData.LastRefreshMarketCount,
+                    LastRefreshUsagePercentage = checkInData.LastRefreshUsagePercentage,
+                    LastRefreshTimeAcceptable = checkInData.LastRefreshTimeAcceptable,
+                    LastPerformanceSampleDate = checkInData.LastPerformanceSampleDate,
 
-                    // Market data
-                    MarketCount = checkInData.Markets?.Count ?? 0,
-                    ErrorCount = checkInData.ErrorCount,
-                    LastSnapshot = checkInData.LastSnapshot,
-                    LastCheckIn = DateTime.UtcNow,
+                    // Connection status
+                    IsWebSocketConnected = checkInData.IsWebSocketConnected,
 
                     // Market watch data
-                    WatchedMarkets = checkInData.WatchedMarkets ?? new List<MarketWatchData>(),
-
-                    // Current and target tickers
-                    CurrentMarketTickers = checkInData.Markets ?? new List<string>(),
-                    TargetMarketTickers = targetTickers.ToList(),
-
-                    // Historical data from persistence
-                    CpuUsageHistory = existingBrain.CpuUsageHistory,
-                    EventQueueHistory = existingBrain.EventQueueHistory,
-                    TickerQueueHistory = existingBrain.TickerQueueHistory,
-                    NotificationQueueHistory = existingBrain.NotificationQueueHistory,
-                    OrderbookQueueHistory = existingBrain.OrderbookQueueHistory,
-                    MarketCountHistory = existingBrain.MarketCountHistory
+                    WatchedMarkets = checkInData.WatchedMarkets
                 };
 
                 // Broadcast comprehensive brain status to all connected clients (including web UI)
@@ -353,7 +347,7 @@ namespace KalshiBotOverseer
                 {
                     Kind = "BrainStatusUpdate",
                     Brain = brainStatus.BrainInstanceName,
-                    MarketCount = brainStatus.MarketCount,
+                    MarketCount = brainStatus.Markets?.Count ?? 0,
                     ServerUtc = DateTime.UtcNow
                 });
 
@@ -438,6 +432,7 @@ namespace KalshiBotOverseer
 
     public class CheckInData
     {
+        // Basic brain info
         public string? BrainInstanceName { get; set; }
 
         // Basic market data
@@ -463,13 +458,12 @@ namespace KalshiBotOverseer
         public double TickerQueueAvg { get; set; }
         public double NotificationQueueAvg { get; set; }
         public double OrderbookQueueAvg { get; set; }
-
         public double LastRefreshCycleSeconds { get; set; }
-        public int LastRefreshCycleInterval { get; set; }
-        public int LastRefreshMarketCount { get; set; }
+        public double LastRefreshCycleInterval { get; set; }
+        public double LastRefreshMarketCount { get; set; }
         public double LastRefreshUsagePercentage { get; set; }
         public bool LastRefreshTimeAcceptable { get; set; }
-        public DateTime LastPerformanceSampleDate { get; set; }
+        public DateTime? LastPerformanceSampleDate { get; set; }
 
         // Connection status
         public bool IsWebSocketConnected { get; set; }

@@ -2,7 +2,7 @@ using KalshiBotAPI.Configuration;
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
-using BacklashBot.Configuration;
+using BacklashDTOs.Configuration;
 using BacklashBot.Hubs;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State;

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace KalshiBotOverseer.Logging
+namespace KalshiBotLogging
 {
     public class DatabaseLoggingQueue : BackgroundService
     {
@@ -18,7 +18,7 @@ namespace KalshiBotOverseer.Logging
         public ConcurrentQueue<ErrorHandlerTaskInfo> Warnings { get; } = new ConcurrentQueue<ErrorHandlerTaskInfo>();
         public ConcurrentQueue<ErrorHandlerTaskInfo> Errors { get; } = new ConcurrentQueue<ErrorHandlerTaskInfo>();
 
-        public DatabaseLoggingQueue(IServiceProvider serviceProvider, bool isOverseer = true)
+        public DatabaseLoggingQueue(IServiceProvider serviceProvider, bool isOverseer = false)
         {
             _serviceProvider = serviceProvider;
             _isOverseer = isOverseer;

@@ -9,8 +9,9 @@ using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
 using KalshiBotOverseer;
-using KalshiBotOverseer.Logging;
+using KalshiBotLogging;
 using KalshiBotOverseer.Services;
+using BacklashDTOs.Configuration;
 using KalshiBotOverseer.State;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -49,7 +50,16 @@ namespace KalshiBotOverseer
 
             // Add database logging services
             services.AddSingleton<DatabaseLoggingQueue>();
-            services.AddSingleton<ILoggerProvider, DatabaseLoggerProvider>();
+            services.AddSingleton<ILoggerProvider>(provider =>
+                new DatabaseLoggerProvider(
+                    provider.GetRequiredService<DatabaseLoggingQueue>(),
+                    LogLevel.Warning,
+                    null, // loggingConfig
+                    null, // executionConfig
+                    null, // brainStatus
+                    "Overseer", // defaultEnvironment
+                    "OverseerInstance" // defaultInstance
+                ));
             services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
 
             // Register required services
@@ -138,12 +148,23 @@ namespace KalshiBotOverseer
                     o.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
                 });
 
+            // Add CORS
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+
             // Add SignalR
             services.AddSignalR(options =>
             {
                 options.KeepAliveInterval = TimeSpan.FromSeconds(15);
                 options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
-                
+
             }).AddJsonProtocol(o => { o.PayloadSerializerOptions.PropertyNamingPolicy = null; });
         }
 
@@ -156,6 +177,8 @@ namespace KalshiBotOverseer
 
             // Set up static files serving from the wwwroot directory
             app.UseStaticFiles();
+
+            app.UseCors("AllowAll");
 
             app.UseRouting();
 

@@ -1,4 +1,4 @@
-namespace BacklashBot.Configuration
+namespace BacklashDTOs.Configuration
 {
     public class LoggingConfig
     {

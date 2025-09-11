@@ -1,4 +1,4 @@
-using BacklashBot.Logging;
+using KalshiBotLogging;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;

@@ -3,7 +3,7 @@ using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using BacklashBot.Configuration;
+using BacklashDTOs.Configuration;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.KalshiAPI.Interfaces;

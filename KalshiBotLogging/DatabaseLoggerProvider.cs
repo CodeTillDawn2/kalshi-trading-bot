@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using BacklashBot.Configuration;
+using BacklashDTOs.Configuration;
 using BacklashBot.Management.Interfaces;
 
-namespace KalshiBotOverseer.Logging
+namespace KalshiBotLogging
 {
     public class DatabaseLoggerProvider : ILoggerProvider
     {
@@ -12,13 +12,17 @@ namespace KalshiBotOverseer.Logging
         private readonly LoggingConfig? _loggingConfig;
         private readonly ExecutionConfig? _executionConfig;
         private readonly IBrainStatusService? _brainStatus;
+        private readonly string _defaultEnvironment;
+        private readonly string _defaultInstance;
 
         public DatabaseLoggerProvider(
             DatabaseLoggingQueue loggingQueue,
             LogLevel minLevel = LogLevel.Warning,
             LoggingConfig? loggingConfig = null,
             ExecutionConfig? executionConfig = null,
-            IBrainStatusService? brainStatus = null
+            IBrainStatusService? brainStatus = null,
+            string defaultEnvironment = "KalshiBot",
+            string defaultInstance = "DefaultInstance"
             )
         {
             _loggingQueue = loggingQueue;
@@ -26,11 +30,13 @@ namespace KalshiBotOverseer.Logging
             _loggingConfig = loggingConfig;
             _executionConfig = executionConfig;
             _brainStatus = brainStatus;
+            _defaultEnvironment = defaultEnvironment;
+            _defaultInstance = defaultInstance;
         }
 
         public ILogger CreateLogger(string categoryName)
         {
-            return new DatabaseLogger(categoryName, _loggingQueue, _minLevel, _loggingConfig, _executionConfig, _brainStatus);
+            return new DatabaseLogger(categoryName, _loggingQueue, _minLevel, _loggingConfig, _executionConfig, _brainStatus, _defaultEnvironment, _defaultInstance);
         }
 
         public void Dispose() { }

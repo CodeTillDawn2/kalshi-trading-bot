@@ -50,6 +50,7 @@
     <ProjectReference Include="..\BacklashBot\BacklashBot.csproj">
       <ExcludeAssets>Content</ExcludeAssets>
     </ProjectReference>
+    <ProjectReference Include="..\KalshiBotLogging\KalshiBotLogging.csproj" />
   </ItemGroup>
 
 </Project>

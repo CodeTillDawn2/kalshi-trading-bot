@@ -139,7 +139,7 @@ namespace KalshiBotOverseer
                 });
 
                 // Update all properties
-                brainPersistence.CurrentMarketTickers = new HashSet<string>(checkInData.Markets ?? new List<string>());
+                brainPersistence.CurrentMarketTickers = new List<string>(checkInData.Markets ?? new List<string>());
                 brainPersistence.ErrorCount = checkInData.ErrorCount;
                 brainPersistence.LastSnapshot = checkInData.LastSnapshot;
                 brainPersistence.IsStartingUp = checkInData.IsStartingUp;
@@ -155,7 +155,7 @@ namespace KalshiBotOverseer
                 brainPersistence.IsWebSocketConnected = checkInData.IsWebSocketConnected;
 
                 // Update metric histories with deduplication based on LastPerformanceSampleDate or current time
-                var timestamp = checkInData.LastPerformanceSampleDate;
+                var timestamp = checkInData.LastPerformanceSampleDate ?? DateTime.UtcNow;
 
                 // Helper method to add metric if not duplicate
                 void AddMetric(List<MetricHistory> history, double value)
@@ -182,7 +182,7 @@ namespace KalshiBotOverseer
                 AddMetric(brainPersistence.RefreshCycleIntervalHistory, checkInData.LastRefreshCycleInterval);
                 AddMetric(brainPersistence.RefreshMarketCountHistory, checkInData.LastRefreshMarketCount);
                 AddMetric(brainPersistence.RefreshUsagePercentageHistory, checkInData.LastRefreshUsagePercentage);
-                AddMetric(brainPersistence.PerformanceSampleDateHistory, checkInData.LastPerformanceSampleDate.Ticks);
+                AddMetric(brainPersistence.PerformanceSampleDateHistory, checkInData.LastPerformanceSampleDate?.Ticks ?? DateTime.UtcNow.Ticks);
 
                 brainPersistence.LastRefreshTimeAcceptable = checkInData.LastRefreshTimeAcceptable;
 

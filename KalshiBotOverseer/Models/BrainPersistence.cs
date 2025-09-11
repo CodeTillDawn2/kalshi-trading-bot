@@ -17,8 +17,8 @@ namespace KalshiBotOverseer.Models
         public double UsageMin { get; set; }
         public double UsageMax { get; set; }
         public DateTime? LastSeen { get; set; }
-        public HashSet<string> CurrentMarketTickers { get; set; } = new HashSet<string>();
-        public HashSet<string> TargetMarketTickers { get; set; } = new HashSet<string>();
+        public List<string> CurrentMarketTickers { get; set; } = new List<string>();
+        public List<string> TargetMarketTickers { get; set; } = new List<string>();
         public string Mode { get; set; } = "Autonomous";
         public bool IsStartingUp { get; set; }
         public bool IsShuttingDown { get; set; }
@@ -45,27 +45,24 @@ namespace KalshiBotOverseer.Models
     public class BrainStatusData
     {
         // Basic brain info
-        public string BrainInstanceName { get; set; } = "";
-        public Guid? Brain { get; set; }
+        public string? BrainInstanceName { get; set; }
 
-        // Configuration flags
+        // Basic market data
+        public List<string>? Markets { get; set; }
+        public long ErrorCount { get; set; }
+        public DateTime? LastSnapshot { get; set; }
+        public bool IsStartingUp { get; set; }
+        public bool IsShuttingDown { get; set; }
+
+        // Brain configuration
         public bool WatchPositions { get; set; }
         public bool WatchOrders { get; set; }
         public bool ManagedWatchList { get; set; }
         public bool CaptureSnapshots { get; set; }
-
-        // Performance and limits
         public int TargetWatches { get; set; }
         public double MinimumInterest { get; set; }
         public double UsageMin { get; set; }
         public double UsageMax { get; set; }
-
-        // Status information
-        public DateTime? LastSeen { get; set; }
-        public bool IsStartingUp { get; set; }
-        public bool IsShuttingDown { get; set; }
-        public bool IsWebSocketConnected { get; set; }
-        public string Mode { get; set; } = "Autonomous";
 
         // Performance metrics
         public double CurrentCpuUsage { get; set; }
@@ -73,34 +70,18 @@ namespace KalshiBotOverseer.Models
         public double TickerQueueAvg { get; set; }
         public double NotificationQueueAvg { get; set; }
         public double OrderbookQueueAvg { get; set; }
+        public double LastRefreshCycleSeconds { get; set; }
+        public double LastRefreshCycleInterval { get; set; }
+        public double LastRefreshMarketCount { get; set; }
+        public double LastRefreshUsagePercentage { get; set; }
+        public bool LastRefreshTimeAcceptable { get; set; }
+        public DateTime? LastPerformanceSampleDate { get; set; }
 
-        // Historical performance metrics
-        public List<MetricHistory> CpuUsageHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> EventQueueHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> TickerQueueHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> NotificationQueueHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> OrderbookQueueHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> MarketCountHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> ErrorHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> RefreshCycleSecondsHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> RefreshCycleIntervalHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> RefreshMarketCountHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> RefreshUsagePercentageHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> RefreshTimeAcceptableHistory { get; set; } = new List<MetricHistory>();
-        public List<MetricHistory> PerformanceSampleDateHistory { get; set; } = new List<MetricHistory>();
+        // Connection status
+        public bool IsWebSocketConnected { get; set; }
 
-        // Market data
-        public int MarketCount { get; set; }
-        public long ErrorCount { get; set; }
-        public DateTime? LastSnapshot { get; set; }
-        public DateTime? LastCheckIn { get; set; }
-
-        // Market watch data (aggregated from MarketWatch entries)
-        public List<MarketWatchData> WatchedMarkets { get; set; } = new List<MarketWatchData>();
-
-        // Current and target tickers
-        public List<string> CurrentMarketTickers { get; set; } = new List<string>();
-        public List<string> TargetMarketTickers { get; set; } = new List<string>();
+        // Market watch data
+        public List<MarketWatchData>? WatchedMarkets { get; set; }
     }
 
     public class MetricHistory

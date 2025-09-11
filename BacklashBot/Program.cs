@@ -6,10 +6,9 @@ using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using BacklashBot.Configuration;
+using BacklashDTOs.Configuration;
 using BacklashBot.Hubs;
 using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.Logging;
 using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Middleware;
@@ -26,6 +25,7 @@ using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using KalshiBotLogging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,7 +99,9 @@ builder.Services.AddSingleton<ILoggerProvider>(provider =>
         minLevel,
         loggingConfig,
         provider.GetRequiredService<IOptions<ExecutionConfig>>().Value,
-        provider.GetRequiredService<IBrainStatusService>());
+        provider.GetRequiredService<IBrainStatusService>(),
+        "BacklashBot", // defaultEnvironment
+        "BacklashInstance"); // defaultInstance
 });
 
 // Register OrderbookChangeTracker with transient lifetime

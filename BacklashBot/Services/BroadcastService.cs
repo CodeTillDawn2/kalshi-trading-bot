@@ -4,12 +4,8 @@ using BacklashBot.Hubs;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using System.Diagnostics;
-using BacklashBot.Configuration;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using KalshiBotData.Models;
-using BacklashBot.Management;
+using BacklashDTOs.Configuration;
 
 namespace BacklashBot.Services
 {
@@ -147,7 +143,7 @@ namespace BacklashBot.Services
                     OrderbookQueueAvg = orderBookQueueAvg,
                     IsWebSocketConnected = isWebSocketConnected,
                     LastRefreshCycleSeconds = performanceTracker.LastRefreshCycleSeconds,
-                    LastRefreshCycleInterval = TimeSpan.FromSeconds(performanceTracker.LastRefreshCycleInterval),
+                    LastRefreshCycleInterval = performanceTracker.LastRefreshCycleInterval,
                     LastRefreshMarketCount = performanceTracker.LastRefreshMarketCount,
                     LastRefreshUsagePercentage = performanceTracker.LastRefreshUsagePercentage,
                     LastRefreshTimeAcceptable = performanceTracker.LastRefreshTimeAcceptable,

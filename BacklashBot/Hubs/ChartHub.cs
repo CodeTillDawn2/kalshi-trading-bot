@@ -312,7 +312,7 @@ namespace BacklashBot.Hubs
     public class CheckInData
     {
         // Basic brain info
-        public string BrainInstanceName { get; set; } = "";
+        public string? BrainInstanceName { get; set; }
 
         // Basic market data
         public List<string>? Markets { get; set; }
@@ -338,8 +338,8 @@ namespace BacklashBot.Hubs
         public double NotificationQueueAvg { get; set; }
         public double OrderbookQueueAvg { get; set; }
         public double LastRefreshCycleSeconds { get; set; }
-        public TimeSpan? LastRefreshCycleInterval { get; set; }
-        public int LastRefreshMarketCount { get; set; }
+        public double LastRefreshCycleInterval { get; set; }
+        public double LastRefreshMarketCount { get; set; }
         public double LastRefreshUsagePercentage { get; set; }
         public bool LastRefreshTimeAcceptable { get; set; }
         public DateTime? LastPerformanceSampleDate { get; set; }

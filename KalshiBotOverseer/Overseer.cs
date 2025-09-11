@@ -9,6 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
+using System.Linq;
+using KalshiBotOverseer.Services;
 
 namespace KalshiBotOverseer
 {
@@ -34,6 +36,9 @@ namespace KalshiBotOverseer
         {
             // Log overseer IP to database
             await LogOverseerInfoAsync();
+
+            // Log all BrainPersistence information for debugging
+            await LogAllBrainPersistenceInfoAsync();
 
             // Subscribe to the specific events
             _webSocketClient.FillReceived += OnFillReceived;
@@ -193,7 +198,7 @@ namespace KalshiBotOverseer
 
                 // Get local IP address
                 var hostName = System.Net.Dns.GetHostName();
-                
+
                 var localIP = System.Net.Dns.GetHostEntry(hostName).AddressList
                     .FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?
                     .ToString() ?? "127.0.0.1";
@@ -215,6 +220,102 @@ namespace KalshiBotOverseer
             catch (Exception ex)
             {
                 _logger?.LogWarning(ex, "OVERSEER- Failed to log overseer info to database");
+            }
+        }
+
+        /// <summary>
+        /// Logs comprehensive information about all BrainPersistence objects for debugging
+        /// </summary>
+        private async Task LogAllBrainPersistenceInfoAsync()
+        {
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var brainService = scope.ServiceProvider.GetRequiredService<BrainPersistenceService>();
+
+                _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: BrainPersistence logging initialized. Service available: {Available}",
+                    brainService != null);
+
+                var allBrains = brainService.GetAllBrains();
+                var brainCount = 0;
+
+                foreach (var brain in allBrains)
+                {
+                    brainCount++;
+                    _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' - Mode: {Mode}, CurrentMarkets: {CurrentMarketCount}, TargetMarkets: {TargetMarketCount}, ErrorCount: {ErrorCount}, LastSeen: {LastSeen}, IsWebSocketConnected: {WebSocketStatus}",
+                        brain.BrainInstanceName,
+                        brain.Mode,
+                        brain.CurrentMarketTickers?.Count ?? 0,
+                        brain.TargetMarketTickers?.Count ?? 0,
+                        brain.ErrorCount,
+                        brain.LastSeen,
+                        brain.IsWebSocketConnected);
+
+                    // Log configuration settings
+                    _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' Config - WatchPositions: {WatchPositions}, WatchOrders: {WatchOrders}, ManagedWatchList: {ManagedWatchList}, CaptureSnapshots: {CaptureSnapshots}, TargetWatches: {TargetWatches}",
+                        brain.BrainInstanceName,
+                        brain.WatchPositions,
+                        brain.WatchOrders,
+                        brain.ManagedWatchList,
+                        brain.CaptureSnapshots,
+                        brain.TargetWatches);
+
+                    // Log performance settings
+                    _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' Performance - MinInterest: {MinInterest}, UsageMin: {UsageMin}, UsageMax: {UsageMax}, IsStartingUp: {StartingUp}, IsShuttingDown: {ShuttingDown}",
+                        brain.BrainInstanceName,
+                        brain.MinimumInterest,
+                        brain.UsageMin,
+                        brain.UsageMax,
+                        brain.IsStartingUp,
+                        brain.IsShuttingDown);
+
+                    // Log historical data counts
+                    _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' History Counts - CPU: {CpuCount}, Events: {EventCount}, Tickers: {TickerCount}, Notifications: {NotificationCount}, Orderbook: {OrderbookCount}, Markets: {MarketCount}, Errors: {ErrorCount}",
+                        brain.BrainInstanceName,
+                        brain.CpuUsageHistory?.Count ?? 0,
+                        brain.EventQueueHistory?.Count ?? 0,
+                        brain.TickerQueueHistory?.Count ?? 0,
+                        brain.NotificationQueueHistory?.Count ?? 0,
+                        brain.OrderbookQueueHistory?.Count ?? 0,
+                        brain.MarketCountHistory?.Count ?? 0,
+                        brain.ErrorHistory?.Count ?? 0);
+
+                    // Log refresh metrics history counts
+                    _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' Refresh History - CycleSeconds: {CycleSecondsCount}, CycleInterval: {CycleIntervalCount}, MarketCount: {MarketCountHistory}, Usage%: {UsagePercentCount}, SampleDates: {SampleDateCount}, LastRefreshAcceptable: {LastRefreshAcceptable}",
+                        brain.BrainInstanceName,
+                        brain.RefreshCycleSecondsHistory?.Count ?? 0,
+                        brain.RefreshCycleIntervalHistory?.Count ?? 0,
+                        brain.RefreshMarketCountHistory?.Count ?? 0,
+                        brain.RefreshUsagePercentageHistory?.Count ?? 0,
+                        brain.PerformanceSampleDateHistory?.Count ?? 0,
+                        brain.LastRefreshTimeAcceptable);
+
+                    // Log current market tickers (first 10 for brevity)
+                    if (brain.CurrentMarketTickers != null && brain.CurrentMarketTickers.Count > 0)
+                    {
+                        var tickersToShow = brain.CurrentMarketTickers.Take(10);
+                        _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' Current Tickers ({TotalCount}): {Tickers}",
+                            brain.BrainInstanceName,
+                            brain.CurrentMarketTickers.Count,
+                            string.Join(", ", tickersToShow));
+                    }
+
+                    // Log target market tickers (first 10 for brevity)
+                    if (brain.TargetMarketTickers != null && brain.TargetMarketTickers.Count > 0)
+                    {
+                        var tickersToShow = brain.TargetMarketTickers.Take(10);
+                        _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' Target Tickers ({TotalCount}): {Tickers}",
+                            brain.BrainInstanceName,
+                            brain.TargetMarketTickers.Count,
+                            string.Join(", ", tickersToShow));
+                    }
+                }
+
+                _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Completed logging for {BrainCount} brain instances", brainCount);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "BRAIN-PERSISTENCE-DEBUG: Failed to log BrainPersistence information");
             }
         }
 

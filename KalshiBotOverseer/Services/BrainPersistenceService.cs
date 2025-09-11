@@ -23,10 +23,15 @@ namespace KalshiBotOverseer.Services
             return brain.TargetMarketTickers;
         }
 
+        public IEnumerable<BrainPersistence> GetAllBrains()
+        {
+            return _brains.Values;
+        }
+
         public void UpdateCurrentMarketTickers(string brainInstanceName, IEnumerable<string> tickers)
         {
             var brain = GetBrain(brainInstanceName);
-            brain.CurrentMarketTickers = new HashSet<string>(tickers);
+            brain.CurrentMarketTickers = new List<string>(tickers);
             SaveBrain(brain);
         }
 

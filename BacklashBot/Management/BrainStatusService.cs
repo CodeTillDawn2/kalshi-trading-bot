@@ -1,6 +1,6 @@
 using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
-using BacklashBot.Configuration;
+using BacklashDTOs.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashDTOs.Data;
 

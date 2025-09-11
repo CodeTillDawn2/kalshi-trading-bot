@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
-using BacklashBot.Configuration;
+using BacklashDTOs.Configuration;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
