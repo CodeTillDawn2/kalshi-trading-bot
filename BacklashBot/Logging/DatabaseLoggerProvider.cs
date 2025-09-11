@@ -1,35 +1,36 @@
 using Microsoft.Extensions.Options;
 using BacklashBot.Configuration;
 using BacklashBot.Management.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BacklashBot.Logging
 {
     public class DatabaseLoggerProvider : ILoggerProvider
     {
         private readonly DatabaseLoggingQueue _loggingQueue;
-        private readonly LoggingConfig _loggingConfig;
-        private readonly ExecutionConfig _executionConfig;
-        private readonly IBrainStatusService _brainStatuService;
         private readonly LogLevel _minLevel;
+        private readonly LoggingConfig? _loggingConfig;
+        private readonly ExecutionConfig? _executionConfig;
+        private readonly IBrainStatusService? _brainStatus;
 
         public DatabaseLoggerProvider(
             DatabaseLoggingQueue loggingQueue,
-            IOptions<LoggingConfig> loggingConfig,
-            IOptions<ExecutionConfig> executionConfig,
-            IBrainStatusService brainStatus,
-            LogLevel minLevel = LogLevel.Warning
+            LogLevel minLevel = LogLevel.Warning,
+            LoggingConfig? loggingConfig = null,
+            ExecutionConfig? executionConfig = null,
+            IBrainStatusService? brainStatus = null
             )
         {
             _loggingQueue = loggingQueue;
-            _loggingConfig = loggingConfig.Value;
-            _executionConfig = executionConfig.Value;
-            _brainStatuService = brainStatus;
             _minLevel = minLevel;
+            _loggingConfig = loggingConfig;
+            _executionConfig = executionConfig;
+            _brainStatus = brainStatus;
         }
 
         public ILogger CreateLogger(string categoryName)
         {
-            return new DatabaseLogger(categoryName, _loggingQueue, _loggingConfig, _executionConfig, _minLevel, _brainStatuService);
+            return new DatabaseLogger(categoryName, _loggingQueue, _minLevel, _loggingConfig, _executionConfig, _brainStatus);
         }
 
         public void Dispose() { }

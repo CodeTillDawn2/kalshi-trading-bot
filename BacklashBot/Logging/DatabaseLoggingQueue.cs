@@ -2,6 +2,9 @@ using KalshiBotData.Data.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BacklashBot.Logging
 {
@@ -9,14 +12,16 @@ namespace BacklashBot.Logging
     {
         private readonly ConcurrentQueue<LogEntryDTO> _logQueue = new ConcurrentQueue<LogEntryDTO>();
         private readonly IServiceProvider _serviceProvider;
+        private readonly bool _isOverseer;
 
         // Changed from ConcurrentQueue<(Exception Exception, string Identifier)>
         public ConcurrentQueue<ErrorHandlerTaskInfo> Warnings { get; } = new ConcurrentQueue<ErrorHandlerTaskInfo>();
         public ConcurrentQueue<ErrorHandlerTaskInfo> Errors { get; } = new ConcurrentQueue<ErrorHandlerTaskInfo>();
 
-        public DatabaseLoggingQueue(IServiceProvider serviceProvider)
+        public DatabaseLoggingQueue(IServiceProvider serviceProvider, bool isOverseer = false)
         {
             _serviceProvider = serviceProvider;
+            _isOverseer = isOverseer;
         }
 
         public void EnqueueDBLogs(LogEntryDTO logEntry)
@@ -80,7 +85,14 @@ namespace BacklashBot.Logging
                             //File.AppendAllText("logs/logging.log", "-----\n");
 
                             // Save to the database
-                            await context.AddLogEntry(logEntry);
+                            if (_isOverseer)
+                            {
+                                await context.AddOverseerLogEntry(logEntry);
+                            }
+                            else
+                            {
+                                await context.AddLogEntry(logEntry);
+                            }
                         }
                         catch (Exception ex)
                         {

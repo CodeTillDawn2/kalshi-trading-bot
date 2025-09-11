@@ -12,14 +12,16 @@ namespace KalshiBotOverseer.Logging
     {
         private readonly ConcurrentQueue<LogEntryDTO> _logQueue = new ConcurrentQueue<LogEntryDTO>();
         private readonly IServiceProvider _serviceProvider;
+        private readonly bool _isOverseer;
 
         // Changed from ConcurrentQueue<(Exception Exception, string Identifier)>
         public ConcurrentQueue<ErrorHandlerTaskInfo> Warnings { get; } = new ConcurrentQueue<ErrorHandlerTaskInfo>();
         public ConcurrentQueue<ErrorHandlerTaskInfo> Errors { get; } = new ConcurrentQueue<ErrorHandlerTaskInfo>();
 
-        public DatabaseLoggingQueue(IServiceProvider serviceProvider)
+        public DatabaseLoggingQueue(IServiceProvider serviceProvider, bool isOverseer = true)
         {
             _serviceProvider = serviceProvider;
+            _isOverseer = isOverseer;
         }
 
         public void EnqueueDBLogs(LogEntryDTO logEntry)
@@ -83,7 +85,14 @@ namespace KalshiBotOverseer.Logging
                             //File.AppendAllText("logs/logging.log", "-----\n");
 
                             // Save to the database
-                            await context.AddOverseerLogEntry(logEntry);
+                            if (_isOverseer)
+                            {
+                                await context.AddOverseerLogEntry(logEntry);
+                            }
+                            else
+                            {
+                                await context.AddLogEntry(logEntry);
+                            }
                         }
                         catch (Exception ex)
                         {

@@ -2,9 +2,22 @@ using System.Text;
 
 namespace BacklashBot.Helpers
 {
+    /// <summary>
+    /// Provides static utility methods for various trading calculations, including technical indicators, position metrics, and mathematical operations.
+    /// This class is used throughout the trading bot for computing EMA, liquidation prices, fees, ROI, and other essential calculations.
+    /// All methods are designed to be thread-safe and efficient for real-time trading operations.
+    /// </summary>
     public static class TradingCalculations
     {
 
+        /// <summary>
+        /// Calculates the Exponential Moving Average (EMA) for a list of prices over a specified period.
+        /// EMA gives more weight to recent prices, making it responsive to price changes.
+        /// </summary>
+        /// <param name="prices">The list of price values.</param>
+        /// <param name="period">The period for the EMA calculation.</param>
+        /// <param name="previousEMA">Optional previous EMA value for incremental calculation.</param>
+        /// <returns>The calculated EMA value or null if insufficient data or invalid result.</returns>
         public static double? CalculateEMA(List<double> prices, int period, double? previousEMA = null)
         {
             var log = new StringBuilder();
@@ -28,7 +41,6 @@ namespace BacklashBot.Helpers
                 for (int i = period; i < prices.Count; i++)
                 {
                     result = (prices[i] * multiplier) + (result * (1 - multiplier));
-                    log.AppendLine($"Price[{i}]: {prices[i]}, EMA: {result}");
                 }
             }
             else
@@ -45,7 +57,15 @@ namespace BacklashBot.Helpers
             return result;
         }
 
-        public static double ComputeIterativeEMA(List<double> prices, int period, int endIndex)
+        /// <summary>
+        /// Calculates the Exponential Moving Average (EMA) iteratively up to a specified end index.
+        /// This method computes EMA for a subset of prices ending at the given index.
+        /// </summary>
+        /// <param name="prices">The list of price values.</param>
+        /// <param name="period">The period for the EMA calculation.</param>
+        /// <param name="endIndex">The end index in the prices list to calculate EMA up to.</param>
+        /// <returns>The calculated EMA value.</returns>
+        public static double CalculateIterativeEMA(List<double> prices, int period, int endIndex)
         {
 
             if (endIndex < period - 1 || prices.Count <= endIndex)

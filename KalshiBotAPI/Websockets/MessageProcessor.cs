@@ -169,6 +169,8 @@ namespace KalshiBotAPI.Websockets
                 var data = JsonSerializer.Deserialize<JsonElement>(message);
                 var msgType = data.GetProperty("type").GetString() ?? "unknown";
 
+                _logger.LogInformation("Received WebSocket message type: {MsgType}", msgType);
+
                 if (MessageReceived != null)
                     MessageReceived?.Invoke(this, DateTime.UtcNow);
 
@@ -217,7 +219,7 @@ namespace KalshiBotAPI.Websockets
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing WebSocket message");
+                _logger.LogError(ex, "Error processing WebSocket message: {Message}", message);
             }
         }
 
@@ -551,6 +553,10 @@ namespace KalshiBotAPI.Websockets
                         var channel = channelProp.GetString() ?? "";
                         await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(sid, channel);
                     }
+                    else
+                    {
+                        _logger.LogWarning("Subscribed message missing channel property");
+                    }
 
                     // Remove from pending confirms if this ID was pending
                     if (data.TryGetProperty("id", out var idProp))
@@ -558,6 +564,14 @@ namespace KalshiBotAPI.Websockets
                         var id = idProp.GetInt32();
                         _subscriptionManager.RemovePendingConfirmation(id);
                     }
+                    else
+                    {
+                        _logger.LogWarning("Subscribed message missing id property");
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("Subscribed message missing sid property");
                 }
             }
             catch (Exception ex)
@@ -592,11 +606,34 @@ namespace KalshiBotAPI.Websockets
 
             try
             {
-                // Handle update confirmations
+                // Handle update confirmations and possibly subscribe confirmations
                 if (data.TryGetProperty("id", out var idProp))
                 {
                     var id = idProp.GetInt32();
-                    _logger.LogInformation("Update confirmed for ID: {Id}", id);
+                    _logger.LogInformation("Confirmation received for ID: {Id}", id);
+
+                    // Check if this is a subscribe confirmation with sid
+                    if (data.TryGetProperty("sid", out var sidProp))
+                    {
+                        var sid = sidProp.GetInt32();
+                        _logger.LogInformation("Subscribe confirmed with SID: {Sid} for ID: {Id}", sid, id);
+
+                        // Get channel from pending confirm since it's not in the message
+                        var pending = _subscriptionManager.GetPendingConfirm(id);
+                        if (pending.HasValue)
+                        {
+                            var channel = pending.Value.Channel;
+                            await _subscriptionManager.UpdateSubscriptionStateFromConfirmationAsync(sid, channel);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("No pending confirm found for subscribe confirmation ID: {Id}", id);
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Update confirmed for ID: {Id}", id);
+                    }
 
                     // Remove from pending confirms
                     _subscriptionManager.RemovePendingConfirmation(id);
@@ -647,7 +684,7 @@ namespace KalshiBotAPI.Websockets
                         errorMsg = $"Error value: {msgProp.ToString()}";
                     }
 
-                    _logger.LogInformation("WebSocket error received: Code={Code}, Message={ErrorMessage}", errorCode, errorMsg);
+                    _logger.LogWarning("WebSocket error received: Code={Code}, Message={ErrorMessage}", errorCode, errorMsg);
 
                     // Handle specific error codes
                     if (errorCode == 6 && errorMsg.Contains("Already subscribed"))

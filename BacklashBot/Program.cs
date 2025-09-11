@@ -80,12 +80,26 @@ builder.Services.AddHostedService(provider => provider.GetRequiredService<ICentr
 // Register the custom logger provider with DI
 builder.Services.AddSingleton<ILoggerProvider>(provider =>
 {
+    var loggingConfig = provider.GetRequiredService<IOptions<LoggingConfig>>().Value;
+    var minLevel = LogLevel.Warning; // Default
+    if (!string.IsNullOrEmpty(loggingConfig.SqlDatabaseLogLevel))
+    {
+        try
+        {
+            minLevel = Enum.Parse<LogLevel>(loggingConfig.SqlDatabaseLogLevel, true);
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Invalid SqlDatabaseLogLevel '{loggingConfig.SqlDatabaseLogLevel}' in LoggingConfig. Using default Warning level. Error: {ex.Message}");
+        }
+    }
+
     return new DatabaseLoggerProvider(
         provider.GetRequiredService<DatabaseLoggingQueue>(),
-        provider.GetRequiredService<IOptions<LoggingConfig>>(),
-        provider.GetRequiredService<IOptions<ExecutionConfig>>(),
-        provider.GetRequiredService<IBrainStatusService>(),
-        LogLevel.Warning);
+        minLevel,
+        loggingConfig,
+        provider.GetRequiredService<IOptions<ExecutionConfig>>().Value,
+        provider.GetRequiredService<IBrainStatusService>());
 });
 
 // Register OrderbookChangeTracker with transient lifetime

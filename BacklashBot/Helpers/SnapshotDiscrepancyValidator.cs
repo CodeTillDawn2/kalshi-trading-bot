@@ -2,17 +2,60 @@ using BacklashDTOs;
 
 namespace BacklashBot.Helpers
 {
+    /// <summary>
+    /// Provides static methods for validating market snapshots to detect data discrepancies and ensure data integrity.
+    /// This validator is used to filter out invalid snapshots before processing or saving them, preventing downstream issues
+    /// from corrupted or inconsistent market data.
+    /// </summary>
     public static class SnapshotDiscrepancyValidator
     {
+        /// <summary>
+        /// Represents the result of a snapshot validation operation, containing flags for specific discrepancy types
+        /// and an overall validity indicator.
+        /// </summary>
         public class ValidationResult
         {
+            /// <summary>
+            /// Gets or sets a value indicating whether the snapshot passed all validation checks.
+            /// True if no discrepancies were found; false otherwise.
+            /// </summary>
             public bool IsValid { get; set; }
-            // New properties
+
+            /// <summary>
+            /// Gets or sets a value indicating whether the orderbook data is missing or empty.
+            /// This is a critical issue as orderbook data is essential for trading decisions.
+            /// </summary>
             public bool IsOrderbookMissing { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether the best bid and ask prices overlap, which is an invalid state.
+            /// In a properly functioning market, the best bid should be less than the best ask.
+            /// </summary>
             public bool DoPricesOverlap { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether there are significant discrepancies between velocity metrics
+            /// and actual trade/order volumes, suggesting potential data corruption or calculation errors.
+            /// </summary>
             public bool IsRateDiscrepancy { get; set; }
         }
 
+        /// <summary>
+        /// Validates a market snapshot for various types of discrepancies that could indicate data corruption
+        /// or invalid market states. This method performs multiple checks including orderbook presence,
+        /// price overlap detection, and rate consistency validation.
+        /// </summary>
+        /// <param name="snapshot">The market snapshot to validate.</param>
+        /// <returns>A ValidationResult containing the validation outcome and specific discrepancy flags.</returns>
+        /// <remarks>
+        /// The validation process includes:
+        /// - Checking for missing or empty orderbook data
+        /// - Detecting overlapping bid and ask prices
+        /// - Validating consistency between velocity metrics and actual volumes when change metrics are mature
+        ///
+        /// This method is designed to be fast and lightweight, suitable for real-time snapshot processing.
+        /// Invalid snapshots are logged as warnings in the calling service for monitoring purposes.
+        /// </remarks>
         public static ValidationResult ValidateDiscrepancies(MarketSnapshot snapshot)
         {
             var result = new ValidationResult
@@ -29,14 +72,14 @@ namespace BacklashBot.Helpers
                 result.IsValid = false;
             }
 
-            // Check if best prices overlap (BestYesBid == BestNoBid)
-            if (snapshot.BestYesBid != 0 && snapshot.BestNoBid != 0 && snapshot.BestYesBid == snapshot.BestYesAsk)
+            // Check if best prices overlap (BestYesBid >= BestYesAsk, indicating invalid market state)
+            if (snapshot.BestYesBid != 0 && snapshot.BestNoBid != 0 && snapshot.BestYesBid >= snapshot.BestYesAsk)
             {
                 result.DoPricesOverlap = true;
                 result.IsValid = false;
             }
 
-            // Check rate discrepancy for Yes bids when metrics are mature
+            // Check rate discrepancy for bids when metrics are mature
             if (snapshot.ChangeMetricsMature)
             {
                 // Ensure all fields have values; treat null as 0
@@ -54,13 +97,13 @@ namespace BacklashBot.Helpers
                 double velocityNoSum = velocityNoTop + velocityNoBottom;
                 double rateNoSum = orderNoVolume + tradeNoVolume;
 
-                // Check both Diff and Diff2 from SQL query
+                // Calculate absolute differences between velocity sums and volume sums
                 double diff = Math.Abs(velocityYesSum - rateYesSum);
                 double diff2 = Math.Abs(velocityYesSum - (orderYesVolume + tradeYesVolume));
                 double diff3 = Math.Abs(velocityNoSum - rateNoSum);
                 double diff4 = Math.Abs(velocityNoSum - (orderNoVolume + tradeNoVolume));
 
-                // If any discrepancy is too large, flag it
+                // If any discrepancy exceeds the threshold, flag it
                 if (diff > 0.1 || diff2 > 0.1 || diff3 > 0.1 || diff4 > 0.1)
                 {
                     result.IsRateDiscrepancy = true;

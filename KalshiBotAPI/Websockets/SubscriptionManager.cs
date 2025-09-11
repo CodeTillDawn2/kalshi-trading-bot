@@ -905,5 +905,14 @@ namespace KalshiBotAPI.Websockets
             }
             return removed;
         }
+
+        public (string Channel, string[] MarketTickers)? GetPendingConfirm(int id)
+        {
+            if (_pendingConfirms.TryGetValue(id, out var confirm))
+            {
+                return (confirm.Channel, confirm.MarketTickers);
+            }
+            return null;
+        }
     }
 }

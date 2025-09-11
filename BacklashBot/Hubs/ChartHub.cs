@@ -10,6 +10,11 @@ using System.Collections.Generic;
 
 namespace BacklashBot.Hubs
 {
+    /// <summary>
+    /// SignalR hub for managing real-time communication between the BacklashBot trading system and connected clients.
+    /// Handles client connections, handshakes, check-ins, and message routing to the Overseer system.
+    /// Provides methods for broadcasting trading data, confirming target tickers, and processing overseer responses.
+    /// </summary>
     public class ChartHub : Hub
     {
         private static readonly HashSet<string> _connectedClients = new HashSet<string>();
@@ -34,7 +39,7 @@ namespace BacklashBot.Hubs
                 }
                 try
                 {
-                    _logger.LogDebug("Client connected: {ConnectionId}. Total clients: {ClientCount}", Context.ConnectionId, _connectedClients.Count);
+                    _logger.LogInformation("Client connected: {ConnectionId}. Total clients: {ClientCount}", Context.ConnectionId, _connectedClients.Count);
                     await base.OnConnectedAsync();
                 }
                 catch (Exception ex)
@@ -50,7 +55,7 @@ namespace BacklashBot.Hubs
             {
                 _connectedClients.Remove(Context.ConnectionId);
             }
-            _logger.LogDebug("Client disconnected: {ConnectionId}. Total clients: {ClientCount}", Context.ConnectionId, _connectedClients.Count);
+            _logger.LogInformation("Client disconnected: {ConnectionId}. Total clients: {ClientCount}", Context.ConnectionId, _connectedClients.Count);
             await base.OnDisconnectedAsync(exception);
         }
 
@@ -70,6 +75,13 @@ namespace BacklashBot.Hubs
             }
         }
 
+        /// <summary>
+        /// Performs handshake with a connecting client, registers them in the database, and generates an authentication token.
+        /// Updates existing client information or creates new client records as needed.
+        /// </summary>
+        /// <param name="clientId">Unique identifier for the client</param>
+        /// <param name="clientName">Name of the client (typically brain instance name)</param>
+        /// <param name="clientType">Type of client (e.g., "brain", "dashboard")</param>
         public async Task Handshake(string clientId, string clientName, string clientType)
         {
             _logger.LogInformation("Handshake request from client: {ClientId}, Name: {ClientName}, Type: {ClientType}",
@@ -137,7 +149,6 @@ namespace BacklashBot.Hubs
 
         private string GenerateAuthToken(string clientId, string clientName)
         {
-            // Simple token generation - in production, use proper JWT or secure tokens
             using var sha256 = System.Security.Cryptography.SHA256.Create();
             var input = $"{clientId}:{clientName}:{DateTime.UtcNow.Date:yyyy-MM-dd}";
             var bytes = System.Text.Encoding.UTF8.GetBytes(input);
@@ -145,6 +156,11 @@ namespace BacklashBot.Hubs
             return Convert.ToBase64String(hash);
         }
 
+        /// <summary>
+        /// Broadcasts check-in data from a brain instance to all connected clients, typically the Overseer.
+        /// Used for periodic status updates and health monitoring of trading brain instances.
+        /// </summary>
+        /// <param name="checkInData">Comprehensive data about the brain's current state including markets, performance metrics, and configuration</param>
         public async Task CheckIn(CheckInData checkInData)
         {
             _logger.LogInformation("Sending CheckIn to Overseer");
@@ -153,7 +169,7 @@ namespace BacklashBot.Hubs
             {
                 // Send CheckIn data to overseer
                 await Clients.All.SendAsync("CheckIn", checkInData);
-                _logger.LogDebug("CheckIn sent to Overseer successfully");
+                _logger.LogInformation("CheckIn sent to Overseer successfully");
             }
             catch (Exception ex)
             {
@@ -169,7 +185,7 @@ namespace BacklashBot.Hubs
             {
                 // Send confirmation to overseer
                 await Clients.All.SendAsync("ConfirmTargetTickersReceived", brainInstanceName);
-                _logger.LogDebug("Target tickers confirmation sent to Overseer for brain: {BrainInstanceName}", brainInstanceName);
+                _logger.LogInformation("Target tickers confirmation sent to Overseer for brain: {BrainInstanceName}", brainInstanceName);
             }
             catch (Exception ex)
             {
@@ -177,6 +193,11 @@ namespace BacklashBot.Hubs
             }
         }
 
+        /// <summary>
+        /// Processes responses from the Overseer regarding check-in acknowledgments.
+        /// Handles target ticker assignments and confirmation of successful check-in processing.
+        /// </summary>
+        /// <param name="response">Response data from the Overseer containing success status and target tickers</param>
         public async Task HandleCheckInResponse(CheckInResponse response)
         {
             _logger.LogInformation("Received CheckInResponse from Overseer");
@@ -185,15 +206,14 @@ namespace BacklashBot.Hubs
             {
                 if (response.Success)
                 {
-                    _logger.LogDebug("CheckIn acknowledged by Overseer");
+                    _logger.LogInformation("CheckIn acknowledged by Overseer");
 
                     // Handle target tickers if provided
                     if (response.TargetTickers != null && response.TargetTickers.Length > 0)
                     {
                         var targetTickers = response.TargetTickers.ToList();
-                        _logger.LogDebug("Received {Count} target tickers from Overseer", targetTickers.Count);
+                        _logger.LogInformation("Received {Count} target tickers from Overseer", targetTickers.Count);
 
-                        // TODO: Process target tickers - update local market watching list
                         // For now, just confirm receipt
                         await ConfirmTargetTickersReceived("BacklashBot"); // Use appropriate brain instance name
                     }
@@ -209,6 +229,12 @@ namespace BacklashBot.Hubs
             }
         }
 
+        /// <summary>
+        /// Sends typed messages to the Overseer system for processing.
+        /// Currently supports refresh_data messages to trigger data refresh operations across connected clients.
+        /// </summary>
+        /// <param name="messageType">Type of message being sent (e.g., "refresh_data")</param>
+        /// <param name="message">Message content or payload</param>
         public async Task SendOverseerMessage(string messageType, string message)
         {
             _logger.LogInformation("Received SendOverseerMessage: {MessageType} - {Message}", messageType, message);
@@ -263,7 +289,7 @@ namespace BacklashBot.Hubs
             {
                 if (response.Success)
                 {
-                    _logger.LogDebug("Target tickers confirmation acknowledged by Overseer for brain: {BrainInstanceName}", response.BrainInstanceName);
+                    _logger.LogInformation("Target tickers confirmation acknowledged by Overseer for brain: {BrainInstanceName}", response.BrainInstanceName);
                 }
                 else
                 {
@@ -279,6 +305,10 @@ namespace BacklashBot.Hubs
         }
     }
 
+    /// <summary>
+    /// Data structure containing comprehensive information about a brain instance's current state.
+    /// Used for periodic check-ins to report status, performance metrics, and configuration to the Overseer.
+    /// </summary>
     public class CheckInData
     {
         // Basic brain info
@@ -318,6 +348,10 @@ namespace BacklashBot.Hubs
         public bool IsWebSocketConnected { get; set; }
     }
 
+    /// <summary>
+    /// Response structure for check-in acknowledgments from the Overseer.
+    /// Contains success status, optional message, and target tickers for the brain to monitor.
+    /// </summary>
     public class CheckInResponse
     {
         public bool Success { get; set; }
@@ -326,6 +360,10 @@ namespace BacklashBot.Hubs
         public DateTime Timestamp { get; set; }
     }
 
+    /// <summary>
+    /// Response structure for target tickers confirmation acknowledgments.
+    /// Used to confirm that the brain has successfully received and processed target market assignments.
+    /// </summary>
     public class TargetTickersConfirmationResponse
     {
         public bool Success { get; set; }

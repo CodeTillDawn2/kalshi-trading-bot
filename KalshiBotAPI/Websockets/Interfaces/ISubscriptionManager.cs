@@ -28,5 +28,6 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         (int orderbookEvents, int tradeEvents, int tickerEvents) GetEventCountsByMarket(string marketTicker);
         Task UpdateSubscriptionStateFromConfirmationAsync(int sid, string channel);
         bool RemovePendingConfirmation(int id);
+        (string Channel, string[] MarketTickers)? GetPendingConfirm(int id);
     }
 }

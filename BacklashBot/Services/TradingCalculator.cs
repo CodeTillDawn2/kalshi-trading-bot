@@ -5,39 +5,58 @@ using TradingStrategies.Helpers.Interfaces;
 
 namespace BacklashBot.Services
 {
+    /// <summary>
+    /// Provides calculations for various technical indicators used in trading strategies for the Kalshi marketplace.
+    /// This class implements the ITradingCalculator interface and computes indicators such as RSI, MACD, Bollinger Bands,
+    /// Stochastic Oscillator, ATR, VWAP, OBV, support/resistance levels, PSAR, and ADX based on pseudo-candlestick data.
+    /// All calculations are designed for event-driven contracts with prices bounded between 1 and 99 cents.
+    /// </summary>
+    /// <remarks>
+    /// Indicators are calculated using standard formulas adapted for Kalshi's binary outcome markets.
+    /// Null values are returned when insufficient data is available for reliable calculations.
+    /// </remarks>
     public class TradingCalculator : ITradingCalculator
     {
         private readonly ILogger<ITradingCalculator> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the TradingCalculator class.
+        /// </summary>
+        /// <param name="logger">The logger instance for recording calculation events and errors.</param>
+        /// <exception cref="ArgumentNullException">Thrown when logger is null.</exception>
         public TradingCalculator(ILogger<ITradingCalculator> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Calculates the Relative Strength Index (RSI) for a series of pseudo-candlesticks.
+        /// RSI measures the speed and change of price movements on a scale of 0 to 100.
+        /// Values above 70 indicate overbought conditions, below 30 indicate oversold conditions.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price data.</param>
+        /// <param name="periods">The number of periods to use for the RSI calculation (typically 14).</param>
+        /// <returns>The RSI value (0-100) or null if insufficient data or invalid calculation.</returns>
+        /// <exception cref="ArgumentException">Thrown when periods is less than 1.</exception>
         public double? CalculateRSI(List<PseudoCandlestick> pseudoCandles, int periods)
         {
-            var log = new StringBuilder();
-            log.AppendLine($"Calculating RSI for {periods} periods.");
-
             if (periods < 1)
             {
-                log.AppendLine($"Invalid periods parameter: {periods}. Must be at least 1.");
-                _logger.LogError("{Log}", log.ToString());
+                _logger.LogError("Invalid periods parameter: {Periods}. Must be at least 1.", periods);
                 throw new ArgumentException("Periods must be at least 1.", nameof(periods));
             }
 
             if (pseudoCandles == null || pseudoCandles.Count < periods + 1)
             {
-                log.AppendLine($"Insufficient data. Candles: {pseudoCandles?.Count ?? 0}, Required: {periods + 1}.");
-                _logger.LogDebug("{Log}", log.ToString());
+                _logger.LogDebug("Insufficient data for RSI calculation. Candles: {Count}, Required: {Required}.",
+                    pseudoCandles?.Count ?? 0, periods + 1);
                 return null;
             }
 
             var prices = pseudoCandles.TakeLast(periods + 1).Select(pc => pc.MidClose).ToList();
             if (prices.Any(p => p < 0))
             {
-                log.AppendLine("Negative prices detected.");
-                _logger.LogWarning("{Log}", log.ToString());
+                _logger.LogWarning("Negative prices detected in RSI calculation for market data.");
             }
 
             double avgGain = 0, avgLoss = 0;
@@ -54,23 +73,20 @@ namespace BacklashBot.Services
                 }
             }
 
-            avgGain = avgGain / periods;
-            avgLoss = avgLoss / periods;
+            avgGain /= periods;
+            avgLoss /= periods;
 
             double? rsi;
             if (avgLoss == 0 && avgGain != 0)
             {
-                log.AppendLine("Average loss is zero. RSI is 100.");
                 rsi = 100;
             }
             else if (avgGain == 0 && avgLoss != 0)
             {
-                log.AppendLine("Average gain is zero. RSI is 0.");
                 rsi = 0;
             }
             else if (avgGain == 0 && avgLoss == 0)
             {
-                log.AppendLine("Both average gain and loss are zero. RSI is 50.");
                 rsi = 50;
             }
             else
@@ -80,42 +96,47 @@ namespace BacklashBot.Services
             }
 
             rsi = double.IsNaN(rsi.Value) || double.IsInfinity(rsi.Value) ? null : rsi;
-            _logger.LogDebug("{Log}", log.ToString());
+            _logger.LogDebug("RSI calculated: {RSI} for {Periods} periods.", rsi, periods);
 
             return rsi;
         }
 
+        /// <summary>
+        /// Calculates the Moving Average Convergence Divergence (MACD) indicator.
+        /// MACD shows the relationship between two moving averages of a security's price.
+        /// The MACD line is the difference between short and long EMAs, signal line is EMA of MACD,
+        /// and histogram shows the difference between MACD and signal lines.
+        /// </summary>
+        /// <param name="pseudoCandlesticks">The list of pseudo-candlesticks containing price data.</param>
+        /// <param name="shortPeriod">The period for the short EMA (typically 12).</param>
+        /// <param name="longPeriod">The period for the long EMA (typically 26).</param>
+        /// <param name="signalPeriod">The period for the signal line EMA (typically 9).</param>
+        /// <returns>A tuple containing MACD line, signal line, and histogram values, or nulls if insufficient data.</returns>
         public (double? MACD, double? Signal, double? Histogram) CalculateMACD(List<PseudoCandlestick> pseudoCandlesticks, int shortPeriod, int longPeriod, int signalPeriod)
         {
-            var log = new StringBuilder();
-            log.AppendLine($"Calculating MACD with Short={shortPeriod}, Long={longPeriod}, Signal={signalPeriod} periods.");
-
             int totalPeriods = longPeriod + signalPeriod - 1;
             if (pseudoCandlesticks?.Count < totalPeriods)
             {
-                log.AppendLine($"Insufficient data. Candles: {pseudoCandlesticks?.Count ?? 0}, Required: {totalPeriods}.");
-                _logger.LogDebug("{Log}", log.ToString());
+                _logger.LogDebug("Insufficient data for MACD calculation. Candles: {Count}, Required: {Required}.",
+                    pseudoCandlesticks?.Count ?? 0, totalPeriods);
                 return (null, null, null);
             }
 
             var prices = pseudoCandlesticks.Select(pc => pc.MidClose).ToList();
-            log.AppendLine($"Price series: [{string.Join(", ", prices)}]");
 
             var macdValues = new List<double?>();
             for (int i = longPeriod - 1; i < prices.Count; i++)
             {
-                double? shortEma = TradingCalculations.ComputeIterativeEMA(prices, shortPeriod, i);
-                double? longEma = TradingCalculations.ComputeIterativeEMA(prices, longPeriod, i);
+                double? shortEma = TradingCalculations.CalculateIterativeEMA(prices, shortPeriod, i);
+                double? longEma = TradingCalculations.CalculateIterativeEMA(prices, longPeriod, i);
                 if (shortEma.HasValue && longEma.HasValue)
                 {
                     double macd = shortEma.Value - longEma.Value;
                     macdValues.Add(macd);
-                    log.AppendLine($"Index {i}: ShortEMA={shortEma:F6}, LongEMA={longEma:F6}, MACD={macd:F6}");
                 }
                 else
                 {
                     macdValues.Add(null);
-                    log.AppendLine($"Index {i}: ShortEMA={(shortEma.HasValue ? shortEma.Value.ToString("F6") : "null")}, LongEMA={(longEma.HasValue ? longEma.Value.ToString("F6") : "null")}, MACD=null");
                 }
             }
 
@@ -129,20 +150,29 @@ namespace BacklashBot.Services
                     if (macdValues[i].HasValue)
                     {
                         signalLine = (macdValues[i].Value * multiplier) + (signalLine.Value * (1 - multiplier));
-                        log.AppendLine($"Signal Update i={i}: MACD={macdValues[i].Value:F6}, Signal={signalLine:F6}");
                     }
                 }
             }
 
             double? macdLine = macdValues.Last();
             double? histogram = macdLine.HasValue && signalLine.HasValue ? macdLine - signalLine : null;
-            log.AppendLine($"MACD Line: {(macdLine.HasValue ? macdLine.Value.ToString("F6") : "null")}, Signal Line: {(signalLine.HasValue ? signalLine.Value.ToString("F6") : "null")}, Histogram: {(histogram.HasValue ? histogram.Value.ToString("F6") : "null")}");
-            _logger.LogDebug("{Log}", log.ToString());
+            _logger.LogDebug("MACD calculated: Line={Line}, Signal={Signal}, Histogram={Histogram}.",
+                macdLine, signalLine, histogram);
 
             return (macdLine, signalLine, histogram);
         }
 
 
+        /// <summary>
+        /// Calculates Bollinger Bands, which consist of a middle band (SMA) and upper/lower bands based on standard deviation.
+        /// Bollinger Bands are used to identify volatility and potential price reversals.
+        /// Price touching the upper band may indicate overbought conditions, lower band oversold.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price data.</param>
+        /// <param name="period">The period for the moving average and standard deviation calculation (typically 20).</param>
+        /// <param name="stdDevMultiplier">The multiplier for standard deviation to determine band width (typically 2.0).</param>
+        /// <returns>A tuple containing lower band, middle band (SMA), and upper band values, or nulls if insufficient data.</returns>
+        /// <exception cref="ArgumentException">Thrown when period is less than 1 or multiplier is negative.</exception>
         public (double? Lower, double? Middle, double? Upper) CalculateBollingerBands(
             List<PseudoCandlestick> pseudoCandles, int period, double stdDevMultiplier)
         {
@@ -201,6 +231,16 @@ namespace BacklashBot.Services
         }
 
 
+        /// <summary>
+        /// Calculates the Stochastic Oscillator, which compares a closing price to its price range over a period.
+        /// %K shows the current close relative to the high-low range, %D is the moving average of %K.
+        /// Values above 80 indicate overbought, below 20 indicate oversold.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price data.</param>
+        /// <param name="kPeriod">The period for %K calculation (typically 14).</param>
+        /// <param name="dPeriod">The period for %D moving average (typically 3).</param>
+        /// <returns>A tuple containing %K and %D values (0-100), or nulls if insufficient data.</returns>
+        /// <exception cref="ArgumentException">Thrown when periods are less than 1.</exception>
         public (double? K, double? D) CalculateStochastic(List<PseudoCandlestick> pseudoCandles, int kPeriod, int dPeriod)
         {
             var log = new StringBuilder();
@@ -259,6 +299,15 @@ namespace BacklashBot.Services
         }
 
 
+        /// <summary>
+        /// Calculates the Average True Range (ATR), which measures volatility by averaging the true range over a period.
+        /// True range is the maximum of: current high - current low, |current high - previous close|, |current low - previous close|.
+        /// Higher ATR values indicate higher volatility.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price data.</param>
+        /// <param name="period">The period for averaging the true range (typically 14).</param>
+        /// <returns>The ATR value or null if insufficient data or invalid calculation.</returns>
+        /// <exception cref="ArgumentException">Thrown when period is less than 1.</exception>
         public double? CalculateATR(List<PseudoCandlestick> pseudoCandles, int period)
         {
             var log = new StringBuilder();
@@ -308,6 +357,15 @@ namespace BacklashBot.Services
             return result;
         }
 
+        /// <summary>
+        /// Calculates the Volume Weighted Average Price (VWAP) over a specified number of periods.
+        /// VWAP is the average price weighted by volume, providing insight into the average price paid by market participants.
+        /// It's commonly used as a benchmark for intraday trading.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price and volume data.</param>
+        /// <param name="periods">The number of periods to include in the VWAP calculation.</param>
+        /// <returns>The VWAP value or null if insufficient data or zero volume.</returns>
+        /// <exception cref="ArgumentException">Thrown when periods is less than 1.</exception>
         public decimal? CalculateVWAP(List<PseudoCandlestick> pseudoCandles, int periods)
         {
             var log = new StringBuilder();
@@ -348,6 +406,13 @@ namespace BacklashBot.Services
             return result;
         }
 
+        /// <summary>
+        /// Calculates the On-Balance Volume (OBV), which accumulates volume based on price direction.
+        /// Volume is added when price closes higher, subtracted when lower.
+        /// Rising OBV indicates buying pressure, falling OBV indicates selling pressure.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price and volume data.</param>
+        /// <returns>The OBV value (can be positive or negative based on net volume flow).</returns>
         public decimal CalculateOBV(List<PseudoCandlestick> pseudoCandles)
         {
             var log = new StringBuilder();
@@ -381,13 +446,13 @@ namespace BacklashBot.Services
         /// This method identifies key price levels by smoothing the frequency of price occurrences using a Gaussian filter,
         /// detecting peaks in the smoothed distribution, and ensuring a minimum distance between levels to avoid clustering.
         /// The strength of each level is calculated by combining the smoothed frequency with the total trading volume
-        /// around the peak price (±1 cent). It uses the average of AskClose and BidClose prices for normalization.
-        /// Price levels must have a minimum number of touches within ±1 cent of the peak, defined as a percentage of total valid candlesticks.
+        /// around the peak price (ï¿½1 cent). It uses the average of AskClose and BidClose prices for normalization.
+        /// Price levels must have a minimum number of touches within ï¿½1 cent of the peak, defined as a percentage of total valid candlesticks.
         /// Candlesticks with UTC timestamps between 07:00:00 and 11:59:00 (truncated to minutes) are excluded from the analysis.
         /// </summary>
         /// <param name="marketTicker">The market ticker symbol being analyzed (e.g., 'BTCUSD').</param>
         /// <param name="candlesticks">List of candlestick data points containing price, volume, and UTC timestamp information.</param>
-        /// <param name="minCandlestickPercentage">Minimum percentage of total valid candlesticks required for touches within ±1 cent of a price level (default: 0.1 for 10%).</param>
+        /// <param name="minCandlestickPercentage">Minimum percentage of total valid candlesticks required for touches within ï¿½1 cent of a price level (default: 0.1 for 10%).</param>
         /// <param name="maxLevels">Maximum number of support/resistance levels to return (default: 6).</param>
         /// <param name="sigma">Standard deviation for Gaussian smoothing, controlling the price range for consolidation (default: 2.0 cents).</param>
         /// <param name="minDistance">Minimum price distance (in cents) between selected levels to prevent clustering (default: 3).</param>
@@ -415,7 +480,6 @@ namespace BacklashBot.Services
             }
 
             // Filter candlesticks outside 07:00:00 to 11:59:00 UTC
-            // Temporarily disable filter to include all data for level calculation
             var validCandlesticks = candlesticks.ToList();
 
             // Use all historical candlesticks for comprehensive analysis
@@ -497,7 +561,7 @@ namespace BacklashBot.Services
                 if (selectedPrices.Any(p => Math.Abs(p - price) < minDistance))
                     continue;
 
-                // Check total touches within ±1 cent of the peak price
+                // Check total touches within ï¿½1 cent of the peak price
                 int totalTouches = 0;
                 for (int p = Math.Max(minPrice, price - 1); p <= Math.Min(maxPrice, price + 1); p++)
                 {
@@ -510,7 +574,7 @@ namespace BacklashBot.Services
                 // Calculate strength as smoothed frequency
                 double strength = smoothedFrequency[peakIndex];
 
-                // Calculate total volume within ±1 cent of the peak price
+                // Calculate total volume within ï¿½1 cent of the peak price
                 long totalVolume = 0;
                 for (int p = Math.Max(minPrice, price - 1); p <= Math.Min(maxPrice, price + 1); p++)
                 {
@@ -549,7 +613,7 @@ namespace BacklashBot.Services
         /// Calculates the Parabolic Stop and Reverse (PSAR) value for a series of pseudo-candlesticks in the Kalshi marketplace.
         /// This indicator is valuable for event-driven contracts where price trends can emerge rapidly due to evolving news or data releases influencing outcome probabilities.
         /// It identifies trend directions and provides dynamic trailing stop levels, aiding risk management in volatile, bounded-price environments (1 to 99 cents per contract).
-        /// However, in ranging or sideways markets—common when events are distant or uncertain—PSAR may generate frequent false reversal signals (whipsaws), potentially leading to unnecessary trades.
+        /// However, in ranging or sideways marketsï¿½common when events are distant or uncertainï¿½PSAR may generate frequent false reversal signals (whipsaws), potentially leading to unnecessary trades.
         /// It performs best when combined with trend-confirming indicators like the Average Directional Index (ADX) to filter signals.
         /// </summary>
         /// <param name="candlesticks">The list of candlesticks containing ask and bid prices for high, low, and close.</param>
