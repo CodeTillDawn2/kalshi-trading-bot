@@ -42,7 +42,7 @@ builder.Logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
 builder.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
 
 // Register DatabaseLoggingQueue as a singleton and hosted service
-builder.Services.AddSingleton<DatabaseLoggingQueue>();
+builder.Services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetService<IServiceProvider>(), false)); // isOverseer = false
 builder.Services.AddHostedService(provider => provider.GetRequiredService<DatabaseLoggingQueue>());
 
 // ## Configuration Setup

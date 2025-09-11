@@ -143,29 +143,36 @@ function handleBrainStatusUpdate(msg) {
         return;
     }
 
+    // Normalize brain name to lowercase for consistent key lookup
+    const normalizedName = name.toLowerCase();
+
     // Update existing brain data with real-time SignalR information
-    if (brainData[name]) {
+    if (brainData[normalizedName]) {
         // Preserve database data and enrich with SignalR real-time data
-        const originalDBData = brainData[name];
-        brainData[name] = {
-            ...brainData[name], // Keep database data (WatchedMarkets, etc.)
+        const originalDBData = brainData[normalizedName];
+        brainData[normalizedName] = {
+            ...brainData[normalizedName], // Keep database data (WatchedMarkets, etc.)
             ...msg, // Override with SignalR real-time data
-            brainInstanceName: name // Ensure consistent naming
+            brainInstanceName: name // Preserve original casing for display
         };
         mwLog('debug', '[BrainCards] handleBrainStatusUpdate: brainData merged - DB data preserved', {
             name,
+            normalizedName,
             originalMarketCount: originalDBData.marketCount || 0,
             signalRMarketCount: msg.marketCount || 0,
-            finalMarketCount: brainData[name].marketCount || 0,
+            finalMarketCount: brainData[normalizedName].marketCount || 0,
             dbKeys: Object.keys(originalDBData),
             signalRKeys: Object.keys(msg)
         });
     } else {
         // If brain not in database data, add it (shouldn't happen with backend filtering)
-        brainData[name] = msg;
-        mwLog('warning', '[BrainCards] handleBrainStatusUpdate: brain not found in DB, using SignalR data only', { name });
+        brainData[normalizedName] = {
+            ...msg,
+            brainInstanceName: name // Preserve original casing for display
+        };
+        mwLog('warning', '[BrainCards] handleBrainStatusUpdate: brain not found in DB, using SignalR data only', { name, normalizedName });
     }
-    mwLog('debug', '[BrainCards] handleBrainStatusUpdate: brainData merged', { name, storedKeys: Object.keys(brainData[name] || {}) });
+    mwLog('debug', '[BrainCards] handleBrainStatusUpdate: brainData merged', { name, normalizedName, storedKeys: Object.keys(brainData[normalizedName] || {}) });
 
     // Derive check-in badge fields for the brain lock card
     const lastCheckIn = msg.LastCheckIn ?? msg.lastCheckIn ?? null;
@@ -175,8 +182,8 @@ function handleBrainStatusUpdate(msg) {
     const isStartingUp = !!(msg.IsStartingUp ?? msg.isStartingUp);
     const isShuttingDown = !!(msg.IsShuttingDown ?? msg.isShuttingDown);
 
-    checkInData[name] = {
-        brainInstanceName: name,
+    checkInData[normalizedName] = {
+        brainInstanceName: name, // Preserve original casing for display
         marketCount,
         errorCount,
         lastSnapshot,
@@ -184,7 +191,7 @@ function handleBrainStatusUpdate(msg) {
         isStartingUp,
         isShuttingDown
     };
-    mwLog('debug', '[BrainCards] handleBrainStatusUpdate: checkInData updated', checkInData[name]);
+    mwLog('debug', '[BrainCards] handleBrainStatusUpdate: checkInData updated', checkInData[normalizedName]);
 
     // Update the UI that depends on this status
     try { updateBrainStatusUI(msg); } catch (e) { mwLog('error', '[BrainCards] updateBrainStatusUI failed', e); }

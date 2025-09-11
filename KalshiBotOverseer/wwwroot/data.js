@@ -92,9 +92,10 @@ async function loadBrainsData() {
         brainInstances.forEach(brain => {
             const brainName = brain.brainInstanceName || brain.BrainInstanceName;
             if (brainName) {
-                brainData[brainName] = {
+                const normalizedName = brainName.toLowerCase();
+                brainData[normalizedName] = {
                     ...brain,
-                    brainInstanceName: brainName,
+                    brainInstanceName: brainName, // Preserve original casing for display
                     marketCount: brain.WatchedMarkets ? brain.WatchedMarkets.length : 0
                 };
             }

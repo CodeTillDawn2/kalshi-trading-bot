@@ -49,11 +49,11 @@ namespace KalshiBotOverseer
             });
 
             // Add database logging services
-            services.AddSingleton<DatabaseLoggingQueue>();
+            services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetService<IServiceProvider>(), true)); // isOverseer = true
             services.AddSingleton<ILoggerProvider>(provider =>
                 new DatabaseLoggerProvider(
                     provider.GetRequiredService<DatabaseLoggingQueue>(),
-                    LogLevel.Warning,
+                    LogLevel.Information, // Allow Information level and above
                     null, // loggingConfig
                     null, // executionConfig
                     null, // brainStatus

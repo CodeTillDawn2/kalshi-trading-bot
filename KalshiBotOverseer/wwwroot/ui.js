@@ -288,14 +288,15 @@ function renderBrains() {
 function createBrainCard(item) {
     // Handle both camelCase and PascalCase property names
     const brainInstanceName = item.brainInstanceName || item.BrainInstanceName;
-    console.log('DEBUG: createBrainCard called for:', brainInstanceName, 'with checkInData:', checkInData[brainInstanceName]);
+    const normalizedName = brainInstanceName?.toLowerCase();
+    console.log('DEBUG: createBrainCard called for:', brainInstanceName, 'normalized:', normalizedName, 'with checkInData:', checkInData[normalizedName]);
 
     if (!item || !brainInstanceName) {
         console.error('DEBUG: Invalid item or missing brainInstanceName:', item);
         return '<div class="error">Invalid brain data</div>';
     }
 
-    const brainCheckInData = checkInData[brainInstanceName];
+    const brainCheckInData = checkInData[normalizedName];
     let statusText = 'Inactive';
     let statusColor = '#dc3545';
     let hasRecentCheckIn = false;
