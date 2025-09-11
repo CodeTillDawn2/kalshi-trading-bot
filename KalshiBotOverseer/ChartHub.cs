@@ -300,6 +300,7 @@ namespace KalshiBotOverseer
                     markets = checkInData.Markets,
                     errorCount = checkInData.ErrorCount,
                     lastSnapshot = checkInData.LastSnapshot,
+                    lastCheckIn = DateTime.UtcNow, // Add lastCheckIn timestamp
                     isStartingUp = checkInData.IsStartingUp,
                     isShuttingDown = checkInData.IsShuttingDown,
 

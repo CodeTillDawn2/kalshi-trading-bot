@@ -289,7 +289,9 @@ function createBrainCard(item) {
     // Handle both camelCase and PascalCase property names
     const brainInstanceName = item.brainInstanceName || item.BrainInstanceName;
     const normalizedName = brainInstanceName?.toLowerCase();
-    console.log('DEBUG: createBrainCard called for:', brainInstanceName, 'normalized:', normalizedName, 'with checkInData:', checkInData[normalizedName]);
+    console.log('DEBUG: createBrainCard called for:', brainInstanceName, 'normalized:', normalizedName);
+    console.log('DEBUG: checkInData keys:', Object.keys(checkInData));
+    console.log('DEBUG: checkInData for normalized name:', checkInData[normalizedName]);
 
     if (!item || !brainInstanceName) {
         console.error('DEBUG: Invalid item or missing brainInstanceName:', item);
@@ -302,8 +304,14 @@ function createBrainCard(item) {
     let hasRecentCheckIn = false;
     let cardClass = 'brain-card inactive';
 
+    console.log('DEBUG: brainCheckInData found:', !!brainCheckInData);
+    if (brainCheckInData) {
+        console.log('DEBUG: brainCheckInData content:', brainCheckInData);
+    }
+
     if (brainCheckInData && brainCheckInData.lastCheckIn) {
         const timeSinceCheckIn = new Date() - new Date(brainCheckInData.lastCheckIn);
+        console.log('DEBUG: timeSinceCheckIn:', timeSinceCheckIn);
         if (timeSinceCheckIn < 300000) {
             statusText = 'Active';
             statusColor = '#28a745';
@@ -348,7 +356,7 @@ function createBrainCard(item) {
                         ${brainInstanceName}
                     </div>
                     <div style="font-size: 14px; color: #cccccc;">
-                        ${hasRecentCheckIn ? checkInData[brainInstanceName].marketCount + ' markets' : 'Not Connected'}
+                        ${hasRecentCheckIn ? checkInData[normalizedName]?.marketCount + ' markets' : 'Not Connected'}
                     </div>
                     <div id="status-indicator-${brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}" style="font-size: 12px; font-weight: 600; color: ${statusColor};">
                         ${statusText}
@@ -357,7 +365,7 @@ function createBrainCard(item) {
 
                 <div class="brain-stats">
                     <div class="stat-item">
-                        <span class="stat-value">${hasRecentCheckIn ? checkInData[brainInstanceName].marketCount : item.marketCount || '--'}</span>
+                        <span class="stat-value">${hasRecentCheckIn ? checkInData[normalizedName]?.marketCount : item.marketCount || '--'}</span>
                         <div class="stat-label">Current Markets</div>
                     </div>
                     <div class="stat-item">
@@ -365,11 +373,11 @@ function createBrainCard(item) {
                         <div class="stat-label">Target Watches</div>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value" id="last-checkin-${brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}">${hasRecentCheckIn ? formatDateTime(checkInData[brainInstanceName].lastCheckIn) : 'Never'}</span>
+                        <span class="stat-value" id="last-checkin-${brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}">${hasRecentCheckIn ? formatDateTime(checkInData[normalizedName]?.lastCheckIn) : 'Never'}</span>
                         <div class="stat-label">Last Check In</div>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value" id="last-snapshot-${brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}">${hasRecentCheckIn ? formatDateTime(checkInData[brainInstanceName].lastSnapshot) : 'Never'}</span>
+                        <span class="stat-value" id="last-snapshot-${brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_')}">${hasRecentCheckIn ? formatDateTime(checkInData[normalizedName]?.lastSnapshot) : 'Never'}</span>
                         <div class="stat-label">Last Snapshot</div>
                     </div>
                     <div class="stat-item">

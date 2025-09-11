@@ -51,6 +51,7 @@ namespace KalshiBotOverseer.Models
         public List<string>? markets { get; set; }
         public long errorCount { get; set; }
         public DateTime? lastSnapshot { get; set; }
+        public DateTime? lastCheckIn { get; set; }
         public bool isStartingUp { get; set; }
         public bool isShuttingDown { get; set; }
 
