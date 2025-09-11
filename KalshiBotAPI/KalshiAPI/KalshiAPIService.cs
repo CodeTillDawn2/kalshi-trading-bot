@@ -1497,6 +1497,552 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        public async Task<TotalRestingOrderValueResponse?> GetTotalRestingOrderValueAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                string url = "portfolio/summary/total_resting_order_value";
+                var headers = GenerateAuthHeaders("GET", "/trade-api/v2/portfolio/summary/total_resting_order_value");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var result = JsonSerializer.Deserialize<TotalRestingOrderValueResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                _logger.LogInformation("Total resting order value: {TotalValue}", result?.TotalValue);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(GetTotalRestingOrderValueAsync), stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("GetTotalRestingOrderValueAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in GetTotalRestingOrderValueAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<OrderQueuePositionResponse?> GetOrderQueuePositionAsync(string orderId)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                if (string.IsNullOrEmpty(orderId))
+                {
+                    throw new ArgumentNullException(nameof(orderId), "Order ID is required");
+                }
+
+                string url = $"portfolio/orders/{Uri.EscapeDataString(orderId)}/queue_position";
+                var headers = GenerateAuthHeaders("GET", $"/trade-api/v2/portfolio/orders/{orderId}/queue_position");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var result = JsonSerializer.Deserialize<OrderQueuePositionResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                _logger.LogInformation("Order {OrderId} queue position: {QueuePosition}", orderId, result?.QueuePosition);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(GetOrderQueuePositionAsync), stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("GetOrderQueuePositionAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in GetOrderQueuePositionAsync for {OrderId}: {ExceptionType} - {Message}",
+                    orderId, ex.GetType().Name, ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<OrderResponse?> GetOrderDetailsAsync(string orderId)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                if (string.IsNullOrEmpty(orderId))
+                {
+                    throw new ArgumentNullException(nameof(orderId), "Order ID is required");
+                }
+
+                string url = $"portfolio/orders/{Uri.EscapeDataString(orderId)}";
+                var headers = GenerateAuthHeaders("GET", $"/trade-api/v2/portfolio/orders/{orderId}");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var result = JsonSerializer.Deserialize<OrderResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                _logger.LogInformation("Order {OrderId} details: Action={Action}, Status={Status}, Ticker={Ticker}",
+                    orderId, result?.Order.Action, result?.Order.Status, result?.Order.Ticker);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(GetOrderDetailsAsync), stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("GetOrderDetailsAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in GetOrderDetailsAsync for {OrderId}: {ExceptionType} - {Message}",
+                    orderId, ex.GetType().Name, ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<QueuePositionsResponse?> GetOrdersQueuePositionsAsync(string? marketTickers = null)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                var queryParams = new Dictionary<string, string>();
+                if (!string.IsNullOrEmpty(marketTickers))
+                {
+                    queryParams["market_tickers"] = marketTickers;
+                }
+
+                string queryString = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
+                string url = $"portfolio/orders/queue_positions{(string.IsNullOrEmpty(queryString) ? "" : "?" + queryString)}";
+                var headers = GenerateAuthHeaders("GET", "/trade-api/v2/portfolio/orders/queue_positions");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var result = JsonSerializer.Deserialize<QueuePositionsResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                _logger.LogInformation("Retrieved {Count} queue positions", result?.QueuePositions.Count ?? 0);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(GetOrdersQueuePositionsAsync), stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("GetOrdersQueuePositionsAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in GetOrdersQueuePositionsAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<BatchOrdersResponse?> CreateOrdersBatchAsync(BatchOrdersRequest request)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                if (request == null || request.Orders == null || request.Orders.Count == 0)
+                {
+                    throw new ArgumentException("Orders list cannot be empty");
+                }
+
+                string url = "portfolio/orders/batched";
+                var headers = GenerateAuthHeaders("POST", "/trade-api/v2/portfolio/orders/batched");
+                var httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
+                foreach (var header in headers)
+                {
+                    httpRequest.Headers.Add(header.Key, header.Value);
+                }
+
+                var jsonContent = JsonSerializer.Serialize(request, new JsonSerializerOptions
+                {
+                    IgnoreNullValues = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+                });
+                httpRequest.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.SendAsync(httpRequest, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var result = JsonSerializer.Deserialize<BatchOrdersResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                _logger.LogInformation("Batch created {Count} orders", result?.Orders.Count ?? 0);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(CreateOrdersBatchAsync), stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("CreateOrdersBatchAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in CreateOrdersBatchAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<DeleteOrdersBatchResponse?> DeleteOrdersBatchAsync(DeleteOrdersBatchRequest request)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                if (request == null || request.Ids == null || request.Ids.Count == 0)
+                {
+                    throw new ArgumentException("Order IDs list cannot be empty");
+                }
+
+                string url = "portfolio/orders/batched";
+                var headers = GenerateAuthHeaders("DELETE", "/trade-api/v2/portfolio/orders/batched");
+                var httpRequest = new HttpRequestMessage(HttpMethod.Delete, url);
+                foreach (var header in headers)
+                {
+                    httpRequest.Headers.Add(header.Key, header.Value);
+                }
+
+                var jsonContent = JsonSerializer.Serialize(request, new JsonSerializerOptions
+                {
+                    IgnoreNullValues = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+                });
+                httpRequest.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.SendAsync(httpRequest, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var result = JsonSerializer.Deserialize<DeleteOrdersBatchResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                _logger.LogInformation("Batch deleted {Count} orders", result?.Orders.Count ?? 0);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(DeleteOrdersBatchAsync), stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("DeleteOrdersBatchAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in DeleteOrdersBatchAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<bool> ResetOrderGroupAsync(string orderGroupId)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                if (string.IsNullOrEmpty(orderGroupId))
+                {
+                    throw new ArgumentNullException(nameof(orderGroupId), "Order group ID is required");
+                }
+
+                string url = $"portfolio/order_groups/{Uri.EscapeDataString(orderGroupId)}/reset";
+                var headers = GenerateAuthHeaders("PUT", $"/trade-api/v2/portfolio/order_groups/{orderGroupId}/reset");
+                var request = new HttpRequestMessage(HttpMethod.Put, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+
+                _logger.LogInformation("Order group {OrderGroupId} reset successfully", orderGroupId);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(ResetOrderGroupAsync), stopwatch.ElapsedMilliseconds);
+                return true;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("ResetOrderGroupAsync was cancelled");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in ResetOrderGroupAsync for {OrderGroupId}: {ExceptionType} - {Message}",
+                    orderGroupId, ex.GetType().Name, ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteOrderGroupAsync(string orderGroupId)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                if (string.IsNullOrEmpty(orderGroupId))
+                {
+                    throw new ArgumentNullException(nameof(orderGroupId), "Order group ID is required");
+                }
+
+                string url = $"portfolio/order_groups/{Uri.EscapeDataString(orderGroupId)}";
+                var headers = GenerateAuthHeaders("DELETE", $"/trade-api/v2/portfolio/order_groups/{orderGroupId}");
+                var request = new HttpRequestMessage(HttpMethod.Delete, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+
+                _logger.LogInformation("Order group {OrderGroupId} deleted successfully", orderGroupId);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(DeleteOrderGroupAsync), stopwatch.ElapsedMilliseconds);
+                return true;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("DeleteOrderGroupAsync was cancelled");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in DeleteOrderGroupAsync for {OrderGroupId}: {ExceptionType} - {Message}",
+                    orderGroupId, ex.GetType().Name, ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<SettlementsResponse?> GetSettlementsAsync(string? cursor = null, int? limit = null)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                var queryParams = new Dictionary<string, string>();
+                if (!string.IsNullOrEmpty(cursor)) queryParams["cursor"] = cursor;
+                if (limit.HasValue) queryParams["limit"] = limit.Value.ToString();
+
+                string queryString = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
+                string url = $"portfolio/settlements{(string.IsNullOrEmpty(queryString) ? "" : "?" + queryString)}";
+                var headers = GenerateAuthHeaders("GET", "/trade-api/v2/portfolio/settlements");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var result = JsonSerializer.Deserialize<SettlementsResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                _logger.LogInformation("Retrieved {Count} settlements", result?.Settlements.Count ?? 0);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(GetSettlementsAsync), stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("GetSettlementsAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in GetSettlementsAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<FillsResponse?> GetFillsAsync(string? cursor = null, int? limit = null)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                var queryParams = new Dictionary<string, string>();
+                if (!string.IsNullOrEmpty(cursor)) queryParams["cursor"] = cursor;
+                if (limit.HasValue) queryParams["limit"] = limit.Value.ToString();
+
+                string queryString = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
+                string url = $"portfolio/fills{(string.IsNullOrEmpty(queryString) ? "" : "?" + queryString)}";
+                var headers = GenerateAuthHeaders("GET", "/trade-api/v2/portfolio/fills");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var result = JsonSerializer.Deserialize<FillsResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                _logger.LogInformation("Retrieved {Count} fills", result?.Fills.Count ?? 0);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(GetFillsAsync), stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("GetFillsAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in GetFillsAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<IncentiveProgramsResponse?> GetIncentiveProgramsAsync(string? cursor = null, int? limit = null)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                var queryParams = new Dictionary<string, string>();
+                if (!string.IsNullOrEmpty(cursor)) queryParams["cursor"] = cursor;
+                if (limit.HasValue) queryParams["limit"] = limit.Value.ToString();
+
+                string queryString = string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
+                string url = $"incentive_programs{(string.IsNullOrEmpty(queryString) ? "" : "?" + queryString)}";
+                var headers = GenerateAuthHeaders("GET", "/trade-api/v2/incentive_programs");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var result = JsonSerializer.Deserialize<IncentiveProgramsResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                _logger.LogInformation("Retrieved {Count} incentive programs", result?.IncentivePrograms.Count ?? 0);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(GetIncentiveProgramsAsync), stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("GetIncentiveProgramsAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in GetIncentiveProgramsAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<EventMetadataResponse?> GetEventMetadataAsync(string eventTicker)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                if (string.IsNullOrEmpty(eventTicker))
+                {
+                    throw new ArgumentNullException(nameof(eventTicker), "Event ticker is required");
+                }
+
+                string url = $"events/{Uri.EscapeDataString(eventTicker)}/metadata";
+                var headers = GenerateAuthHeaders("GET", $"/trade-api/v2/events/{eventTicker}/metadata");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+
+                var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                response.EnsureSuccessStatusCode();
+                var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
+
+                var result = JsonSerializer.Deserialize<EventMetadataResponse>(
+                    jsonString,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                _logger.LogInformation("Retrieved metadata for event {EventTicker}: Competition={Competition}, Sources={SourcesCount}",
+                    eventTicker, result?.Competition, result?.SettlementSources.Count ?? 0);
+
+                stopwatch.Stop();
+                RecordExecutionTime(nameof(GetEventMetadataAsync), stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogDebug("GetEventMetadataAsync was cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Unexpected error in GetEventMetadataAsync for {EventTicker}: {ExceptionType} - {Message}",
+                    eventTicker, ex.GetType().Name, ex.Message);
+                return null;
+            }
+        }
+
         private void RecordExecutionTime(string broadcastType, long elapsedMs)
         {
             var bag = _executionTimes.GetOrAdd(broadcastType, _ => new ConcurrentBag<long>());

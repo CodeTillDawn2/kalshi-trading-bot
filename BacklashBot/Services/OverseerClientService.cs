@@ -27,6 +27,8 @@ namespace BacklashBot.Services
         private string? _currentOverseerUrl;
         private DateTime _lastOverseerDiscovery = DateTime.MinValue;
         private readonly TimeSpan _overseerDiscoveryInterval = TimeSpan.FromMinutes(3); // Check for better overseer every 3 minutes
+        private readonly object _connectionLock = new object(); // Lock for connection state changes
+        private readonly SemaphoreSlim _connectionSemaphore = new SemaphoreSlim(1, 1); // Semaphore for connection operations
 
         public OverseerClientService(
             ILogger<OverseerClientService> logger,
@@ -62,7 +64,17 @@ namespace BacklashBot.Services
                 if (!string.IsNullOrEmpty(overseerUrl))
                 {
                     _logger.LogInformation("OVERSEER- Attempting initial connection to overseer at: {Url}", overseerUrl);
-                    await AttemptConnectionAsync(overseerUrl, "Initial Startup");
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await AttemptConnectionAsync(overseerUrl, "Initial Startup");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning("OVERSEER- Failed to connect to overseer. Exception: {0}", ex.Message);
+                        }
+                    });
                 }
                 else
                 {
@@ -71,9 +83,8 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                // General startup issues - log as information since overseer is optional
-                _logger.LogError(ex, "OVERSEER- Failed to initialize overseer client. This is optional and the bot will continue without oversight.");
-                // Don't throw - overseer is optional
+                _logger.LogWarning("OVERSEER- Failed to initialize overseer client. This is optional and the bot will continue without oversight. Exception: {0}, ST:{1}"
+                    , ex.Message, ex.StackTrace);
             }
         }
 
@@ -93,21 +104,66 @@ namespace BacklashBot.Services
                     _overseerDiscoveryTimer = null;
                 }
 
-                if (_hubConnection != null)
+                // Use lock to safely clean up connection
+                lock (_connectionLock)
                 {
-                    await _hubConnection.StopAsync();
-                    await _hubConnection.DisposeAsync();
-                    _hubConnection = null;
+                    _isConnected = false;
+                    _currentOverseer = null;
+                    _currentOverseerUrl = null;
                 }
 
-                _isConnected = false;
-                _currentOverseer = null;
-                _currentOverseerUrl = null;
+                await CleanupConnectionAsync();
+
                 _logger.LogInformation("OVERSEER- Overseer client stopped");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error stopping overseer client");
+            }
+        }
+
+        private async Task CleanupConnectionAsync()
+        {
+            await _connectionSemaphore.WaitAsync();
+            try
+            {
+                if (_hubConnection == null)
+                    return;
+
+            try
+            {
+                var currentState = _hubConnection.State;
+                _logger.LogDebug("OVERSEER- Cleaning up HubConnection in state: {State}", currentState);
+
+                // Stop the connection if it's not already disconnected
+                if (currentState != HubConnectionState.Disconnected)
+                {
+                    try
+                    {
+                        await _hubConnection.StopAsync();
+                        _logger.LogDebug("OVERSEER- Stopped existing connection during cleanup");
+                    }
+                    catch (Exception stopEx)
+                    {
+                        _logger.LogWarning("OVERSEER- Error stopping connection during cleanup: {Error}", stopEx.Message);
+                    }
+                }
+
+                // Always dispose to ensure clean state
+                await _hubConnection.DisposeAsync();
+                _hubConnection = null;
+                _logger.LogDebug("OVERSEER- Disposed HubConnection during cleanup");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("OVERSEER- Error during connection cleanup: {Error}", ex.Message);
+                // Force null the connection even if disposal failed
+                _hubConnection = null;
+            }
+            }
+            finally
+            {
+                _connectionSemaphore.Release();
             }
         }
 
@@ -421,173 +477,79 @@ namespace BacklashBot.Services
 
         private async Task AttemptConnectionAsync(string overseerUrl, string reason)
         {
+            await _connectionSemaphore.WaitAsync();
             try
             {
                 _logger.LogInformation("OVERSEER- Attempting connection to overseer at {Url} (Reason: {Reason})", overseerUrl, reason);
 
-                // Check and clean up existing connection
-                if (_hubConnection != null)
-                {
-                    var currentState = _hubConnection.State.ToString();
-                    _logger.LogDebug("OVERSEER- Current HubConnection state: {State}", currentState);
+            // Clean up existing connection safely
+            await CleanupConnectionAsync();
 
-                    // Only dispose if not already disposed
-                    if (_hubConnection.State.ToString() != "Disconnected")
-                    {
-                        try
-                        {
-                            await _hubConnection.StopAsync();
-                            _logger.LogDebug("OVERSEER- Stopped existing connection");
-                        }
-                        catch (Exception stopEx)
-                        {
-                            _logger.LogWarning("OVERSEER- Error stopping existing connection: {Error}", stopEx.Message);
-                        }
-                    }
-
-                    // Always dispose and create new connection to ensure clean state
-                    await _hubConnection.DisposeAsync();
-                    _hubConnection = null;
-                    _logger.LogDebug("OVERSEER- Disposed existing HubConnection");
-                }
-
-                // Reset connection state
+            // Reset connection state
+            lock (_connectionLock)
+            {
                 _isConnected = false;
                 _currentOverseerUrl = null;
+            }
 
-                // Create new connection
+            // Create new connection
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(overseerUrl)
+                .WithAutomaticReconnect()
+                .Build();
+
+            _logger.LogDebug("OVERSEER- Created new HubConnection, initial state: {State}", _hubConnection.State);
+
+            // Set up event handlers
+            _hubConnection.On<string>("HandshakeResponse", HandleHandshakeResponse);
+            _hubConnection.On<string>("CheckInResponse", HandleCheckInResponse);
+            _hubConnection.On<string>("MessageResponse", HandleMessageResponse);
+
+            // Handle connection events
+            _hubConnection.Closed += HandleConnectionClosed;
+            _hubConnection.Reconnected += HandleReconnected;
+
+            // Verify connection is in correct state before starting
+            if (_hubConnection.State != HubConnectionState.Disconnected)
+            {
+                _logger.LogWarning("OVERSEER- HubConnection is in {State} state, cannot start. Creating fresh connection.", _hubConnection.State);
+                await CleanupConnectionAsync();
+
                 _hubConnection = new HubConnectionBuilder()
                     .WithUrl(overseerUrl)
                     .WithAutomaticReconnect()
                     .Build();
 
-                _logger.LogDebug("OVERSEER- Created new HubConnection, initial state: {State}", _hubConnection.State.ToString());
-
-                // Set up event handlers
+                // Re-setup event handlers
                 _hubConnection.On<string>("HandshakeResponse", HandleHandshakeResponse);
                 _hubConnection.On<string>("CheckInResponse", HandleCheckInResponse);
                 _hubConnection.On<string>("MessageResponse", HandleMessageResponse);
-
-                // Handle connection events
                 _hubConnection.Closed += HandleConnectionClosed;
                 _hubConnection.Reconnected += HandleReconnected;
+            }
 
-                // Verify connection is in correct state before starting
-                if (_hubConnection.State.ToString() != "Disconnected")
-                {
-                    _logger.LogWarning("OVERSEER- HubConnection is in {State} state, cannot start. Creating fresh connection.", _hubConnection.State.ToString());
-                    await _hubConnection.DisposeAsync();
-                    _hubConnection = new HubConnectionBuilder()
-                        .WithUrl(overseerUrl)
-                        .WithAutomaticReconnect()
-                        .Build();
+            _logger.LogDebug("OVERSEER- Starting HubConnection...");
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            await _hubConnection.StartAsync(cts.Token);
+            _logger.LogDebug("OVERSEER- HubConnection started, state: {State}", _hubConnection.State);
 
-                    // Re-setup event handlers
-                    _hubConnection.On<string>("HandshakeResponse", HandleHandshakeResponse);
-                    _hubConnection.On<string>("CheckInResponse", HandleCheckInResponse);
-                    _hubConnection.On<string>("MessageResponse", HandleMessageResponse);
-                    _hubConnection.Closed += HandleConnectionClosed;
-                    _hubConnection.Reconnected += HandleReconnected;
-                }
-
-                _logger.LogDebug("OVERSEER- Starting HubConnection...");
-                await _hubConnection.StartAsync();
-                _logger.LogDebug("OVERSEER- HubConnection started, state: {State}", _hubConnection.State.ToString());
-
+            lock (_connectionLock)
+            {
                 _isConnected = true;
                 _currentOverseerUrl = overseerUrl;
-
-                _logger.LogInformation("OVERSEER- Successfully connected to overseer at {Url}", overseerUrl);
-
-                // Perform handshake
-                await PerformHandshakeAsync();
             }
-            catch (HttpRequestException httpEx) when (httpEx.Message.Contains("actively refused") || httpEx.Message.Contains("connection"))
-            {
-                // Overseer is not running or network unreachable
-                _logger.LogInformation("OVERSEER- Overseer is not available at {Url}. Will retry during next discovery cycle. Error: {Error}", overseerUrl, httpEx.Message);
-                _isConnected = false;
-                _currentOverseerUrl = null;
-            }
-            catch (HttpRequestException httpEx) when (httpEx.Message.Contains("503") || httpEx.Message.Contains("Service Unavailable"))
-            {
-                // Service is running but temporarily unavailable
-                _logger.LogWarning("OVERSEER- Overseer at {Url} is temporarily unavailable (503 Service Unavailable). This may indicate the service is starting up or overloaded. Will retry sooner. Error: {Error}", overseerUrl, httpEx.Message);
-                _isConnected = false;
-                _currentOverseerUrl = null;
 
-                // Schedule an immediate retry for 503 errors
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(30)); // Wait 30 seconds then retry
-                    if (!_isConnected)
-                    {
-                        _logger.LogInformation("OVERSEER- Retrying connection to {Url} after 503 error", overseerUrl);
-                        await AttemptConnectionAsync(overseerUrl, "503 Retry");
-                    }
-                });
-            }
-            catch (InvalidOperationException invalidOpEx) when (invalidOpEx.Message.Contains("cannot be started if it is not in the Disconnected state"))
-            {
-                // HubConnection state issue - this is the error we're seeing
-                _logger.LogWarning("OVERSEER- HubConnection state error for {Url}. This usually indicates a previous connection wasn't properly cleaned up. Error: {Error}", overseerUrl, invalidOpEx.Message);
-                _isConnected = false;
-                _currentOverseerUrl = null;
+            _logger.LogInformation("OVERSEER- Successfully connected to overseer at {Url}", overseerUrl);
 
-                // Force cleanup and retry
-                if (_hubConnection != null)
-                {
-                    try
-                    {
-                        await _hubConnection.DisposeAsync();
-                        _hubConnection = null;
-                        _logger.LogDebug("OVERSEER- Force disposed HubConnection due to state error");
-                    }
-                    catch (Exception disposeEx)
-                    {
-                        _logger.LogWarning("OVERSEER- Error force disposing HubConnection: {Error}", disposeEx.Message);
-                    }
-                }
-
-                // Retry after a short delay
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(5));
-                    if (!_isConnected)
-                    {
-                        _logger.LogInformation("OVERSEER- Retrying connection to {Url} after state error", overseerUrl);
-                        await AttemptConnectionAsync(overseerUrl, "State Error Retry");
-                    }
-                });
+            // Perform handshake
+            await PerformHandshakeAsync();
             }
-            catch (Exception connectionEx)
+            finally
             {
-                // Other connection issues - log as information since overseer is optional
-                _logger.LogInformation("OVERSEER- Failed to connect to overseer at {Url}. Will retry during next discovery cycle. Error: {Error}", overseerUrl, connectionEx.Message);
-                _isConnected = false;
-                _currentOverseerUrl = null;
+                _connectionSemaphore.Release();
             }
         }
 
-        private async Task PerformHandshakeAsync()
-        {
-            if (!IsConnectionActive() || _hubConnection == null) return;
-
-            try
-            {
-                await _hubConnection.InvokeAsync("Handshake", _clientId, _clientName, _clientType);
-                _logger.LogInformation("OVERSEER- Handshake sent to overseer");
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
-            {
-                _logger.LogWarning("OVERSEER- Connection became inactive during handshake attempt. Will mark as disconnected. Error: {Error}", ex.Message);
-                _isConnected = false;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning("OVERSEER- Failed to send handshake. Error: {Error}", ex.Message);
-            }
-        }
 
         private async Task ValidateCurrentOverseerAsync()
         {
@@ -777,6 +739,31 @@ namespace BacklashBot.Services
                    _hubConnection.State == HubConnectionState.Connected;
         }
 
+        private async Task PerformHandshakeAsync()
+        {
+            await PerformHandshakeAsyncInternal();
+        }
+
+        private async Task PerformHandshakeAsyncInternal()
+        {
+            if (!IsConnectionActive() || _hubConnection == null) return;
+
+            try
+            {
+                await _hubConnection.InvokeAsync("Handshake", _clientId, _clientName, _clientType);
+                _logger.LogInformation("OVERSEER- Handshake sent to overseer");
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
+            {
+                _logger.LogWarning("OVERSEER- Connection became inactive during handshake attempt. Will mark as disconnected. Error: {Error}", ex.Message);
+                _isConnected = false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("OVERSEER- Failed to send handshake. Error: {Error}", ex.Message);
+            }
+        }
+
         private async Task SendCheckInAsync()
         {
             if (!IsConnectionActive() || _hubConnection == null)
@@ -833,12 +820,18 @@ namespace BacklashBot.Services
             catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
             {
                 _logger.LogWarning("OVERSEER- Connection became inactive during CheckIn attempt. Will mark as disconnected and retry. Error: {Error}", ex.Message);
-                _isConnected = false; // Mark as disconnected so discovery can try to reconnect
+                lock (_connectionLock)
+                {
+                    _isConnected = false; // Mark as disconnected so discovery can try to reconnect
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogWarning("OVERSEER- Failed to send CheckIn to overseer. Connection may have been lost - will retry. Error: {Error}", ex.Message);
-                _isConnected = false; // Mark as disconnected so discovery can try to reconnect
+                lock (_connectionLock)
+                {
+                    _isConnected = false; // Mark as disconnected so discovery can try to reconnect
+                }
             }
         }
 
@@ -859,7 +852,11 @@ namespace BacklashBot.Services
 
         private Task HandleConnectionClosed(Exception? exception)
         {
-            _isConnected = false;
+            lock (_connectionLock)
+            {
+                _isConnected = false;
+            }
+
             if (exception != null)
             {
                 _logger.LogWarning("OVERSEER- Connection to overseer closed unexpectedly. Automatic reconnection will be attempted. Error: {Error}", exception.Message);
@@ -874,7 +871,11 @@ namespace BacklashBot.Services
 
         private Task HandleReconnected(string? connectionId)
         {
-            _isConnected = true;
+            lock (_connectionLock)
+            {
+                _isConnected = true;
+            }
+
             _logger.LogInformation("OVERSEER- Successfully reconnected to overseer with connection ID: {ConnectionId}", connectionId);
 
             // Re-perform handshake on reconnection

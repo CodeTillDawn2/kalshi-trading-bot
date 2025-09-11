@@ -29,6 +29,9 @@ namespace BacklashDTOs.KalshiAPI
         [JsonPropertyName("expiration_time")]
         public string? ExpirationTime { get; set; }
 
+        [JsonPropertyName("last_update_time")]
+        public string? LastUpdateTime { get; set; }
+
         [JsonPropertyName("self_trade_prevention_type")]
         public string SelfTradePreventionType { get; set; } = "";
 
@@ -46,5 +49,35 @@ namespace BacklashDTOs.KalshiAPI
 
         [JsonPropertyName("order_group_id")]
         public string OrderGroupId { get; set; } = "";
+
+        [JsonPropertyName("fill_count")]
+        public int FillCount { get; set; }
+
+        [JsonPropertyName("initial_count")]
+        public int InitialCount { get; set; }
+
+        [JsonPropertyName("remaining_count")]
+        public int RemainingCount { get; set; }
+
+        [JsonPropertyName("queue_position")]
+        public int QueuePosition { get; set; }
+
+        [JsonPropertyName("maker_fees")]
+        public int MakerFees { get; set; }
+
+        [JsonPropertyName("taker_fees")]
+        public int TakerFees { get; set; }
+
+        [JsonPropertyName("maker_fill_cost")]
+        public int MakerFillCost { get; set; }
+
+        [JsonPropertyName("taker_fill_cost")]
+        public int TakerFillCost { get; set; }
+
+        [JsonPropertyName("yes_price_dollars")]
+        public string YesPriceDollars { get; set; } = "";
+
+        [JsonPropertyName("no_price_dollars")]
+        public string NoPriceDollars { get; set; } = "";
     }
 }
