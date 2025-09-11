@@ -21,7 +21,7 @@ namespace BacklashBot.Management
         private readonly ExecutionConfig _executionConfig;
         private readonly IServiceScopeFactory _scopeFactory;
         private IOrderBookService _orderbookService => _serviceFactory.GetOrderBookService();
-        public string BrainInstance { get; private set; }
+        public string? BrainInstance { get; private set; }
         public TimeSpan RefreshInterval { get; private set; }
 
         private bool _timerRunning = false;
@@ -63,13 +63,16 @@ namespace BacklashBot.Management
 
         public double CalculateAverageWebsocketEventsReceived(string marketTicker)
         {
-            if (_serviceFactory.GetDataCache() == null || !_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker)) return 0.0;
+            var dataCache = _serviceFactory.GetDataCache();
+            if (dataCache == null || !dataCache.Markets.ContainsKey(marketTicker)) return 0.0;
 
             // Retrieve the last market open time from the data cache
-            DateTime lastMarketOpenTime = _serviceFactory.GetDataCache().Markets[marketTicker].ChangeTracker.LastMarketOpenTime;
+            DateTime lastMarketOpenTime = dataCache.Markets[marketTicker].ChangeTracker.LastMarketOpenTime;
 
             // Retrieve the tuple of three integers representing WebSocket event counts
-            (int event1, int event2, int event3) events = _serviceFactory.GetKalshiWebSocketClient().ReturnWebSocketCountsByMarket(marketTicker);
+            var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+            if (webSocketClient == null) return 0.0;
+            (int event1, int event2, int event3) events = webSocketClient.ReturnWebSocketCountsByMarket(marketTicker);
 
             // Calculate the timespan in minutes from last market open time to current time
             TimeSpan timeSpan = DateTime.UtcNow - lastMarketOpenTime;
@@ -104,22 +107,19 @@ namespace BacklashBot.Management
             if (_timerRunning) return;
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-            BrainInstanceDTO dto = await context.GetBrainInstance(BrainInstance);
+            BrainInstanceDTO? dto = await context.GetBrainInstance(BrainInstance ?? "");
 
             var marketRefreshService = _serviceFactory.GetMarketRefreshService();
             var kalshiWebSocketClient = _serviceFactory.GetKalshiWebSocketClient();
             var broadcastService = _serviceFactory.GetBroadcastService();
             string marketServiceName = nameof(IMarketRefreshService);
-            string webSocketServiceName = nameof(IKalshiWebSocketClient);
-            string broadcastServiceName = nameof(IBroadcastService);
-            string apiServiceName = "KalshiAPIService";
             TimeSpan frontEndRefreshInterval = TimeSpan.FromSeconds(1); // 1 second for queue polling
             TimeSpan marketRefreshInterval = TimeSpan.FromMinutes(1); // 1 minute for market refresh
             int marketCheckCounter = 0;
 
             _timerRunning = true;
 
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 while (!(_statusTrackerService.GetCancellationToken().IsCancellationRequested))
                 {
@@ -134,7 +134,7 @@ namespace BacklashBot.Management
                                 LastRefreshCycleInterval = RefreshInterval.TotalSeconds;
                                 LastRefreshMarketCount = marketRefreshService.LastWorkMarketCount;
                                 LastRefreshUsagePercentage = LastRefreshCycleInterval > 0 ? (LastRefreshCycleSeconds / LastRefreshCycleInterval) * 100 : 0;
-                                LastRefreshTimeAcceptable = LastRefreshUsagePercentage >= dto.UsageMin && LastRefreshUsagePercentage <= dto.UsageMax;
+                                LastRefreshTimeAcceptable = dto != null && LastRefreshUsagePercentage >= dto.UsageMin && LastRefreshUsagePercentage <= dto.UsageMax;
                                 LastPerformanceSampleDate = DateTime.UtcNow;
 
                                 _logger.LogDebug(
@@ -145,7 +145,7 @@ namespace BacklashBot.Management
                         }
 
                         // Poll OrderBookService queue counts every second
-                        var (eventQueueCount, tickerQueueCount, notificationQueueCount) = _orderbookService.GetQueueCounts();
+                        var (eventQueueCount, tickerQueueCount, notificationQueueCount) = _orderbookService?.GetQueueCounts() ?? (0, 0, 0);
                         var timestamp = DateTime.UtcNow;
 
                         _queueCountSamples.AddOrUpdate(
@@ -203,7 +203,7 @@ namespace BacklashBot.Management
 
             var kalshiWebSocketClient = _serviceFactory.GetKalshiWebSocketClient();
             var timestamp = DateTime.UtcNow;
-            var orderBookQueueCount = kalshiWebSocketClient.OrderBookMessageQueueCount;
+            var orderBookQueueCount = kalshiWebSocketClient?.OrderBookMessageQueueCount ?? 0;
 
             _queueCountSamples.AddOrUpdate(
                 "OrderBookQueue",

@@ -32,7 +32,7 @@ namespace BacklashBot.Management
             _unmanagedService = new UnmanagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, tradingConfig, scopeManagerService, statusTrackerService, brainStatus);
         }
 
-        public void ClearMarketsToReset()
+        public new void ClearMarketsToReset()
         {
             lock (_resetLock)
             {
@@ -42,7 +42,7 @@ namespace BacklashBot.Management
         }
 
 
-        public async Task HandleMarketResets()
+        public new async Task HandleMarketResets()
         {
             try
             {
@@ -59,7 +59,7 @@ namespace BacklashBot.Management
             }
         }
 
-        public void TriggerMarketReset(string marketTicker)
+        public new void TriggerMarketReset(string marketTicker)
         {
             lock (_resetLock)
             {

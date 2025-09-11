@@ -50,7 +50,7 @@ namespace KalshiBotData.Data
         public KalshiBotContext(IConfiguration config)
         {
             _config = config;
-            _connectionString = _config.GetConnectionString("DefaultConnection");
+            _connectionString = _config.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
         }
 
         #region Series
@@ -594,7 +594,7 @@ namespace KalshiBotData.Data
         public async Task RemoveClosedWatches()
         {
             var marketWatches = await MarketWatches.Include(x => x.Market)
-                .Where(x => x.Market.status != KalshiConstants.Status_Active)
+                .Where(x => x.Market != null && x.Market.status != KalshiConstants.Status_Active)
                 .ToListAsync();
 
             for (int i = 0; i < marketWatches.Count; i += 1)
@@ -864,7 +864,7 @@ namespace KalshiBotData.Data
             return await GetSnapshotSchema(version);
         }
 
-        public async Task<SnapshotSchemaDTO?> AddSnapshotSchema(SnapshotSchemaDTO dto)
+        public async Task<SnapshotSchemaDTO> AddSnapshotSchema(SnapshotSchemaDTO dto)
         {
             SnapshotSchema? snapshotSchema = await SnapshotSchemas.FirstOrDefaultAsync(x => x.SchemaVersion == dto.SchemaVersion);
             if (snapshotSchema == null)
@@ -874,12 +874,7 @@ namespace KalshiBotData.Data
                 await SaveChangesAsync();
                 snapshotSchema.SchemaVersion = await SnapshotSchemas.Select(x => x.SchemaVersion).MaxAsync();
             }
-            if (snapshotSchema != null)
-            {
-                return snapshotSchema.ToSnapshotSchemaDTO();
-            }
-            return null;
-
+            return snapshotSchema!.ToSnapshotSchemaDTO();
         }
         #endregion
 

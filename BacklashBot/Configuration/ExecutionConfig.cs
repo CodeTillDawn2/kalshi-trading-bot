@@ -7,7 +7,7 @@ namespace BacklashBot.Configuration
         public string? BrainInstance { get; set; }
         public bool RunOvernightActivities { get; set; }
         public int MaxMarketsPerSubscriptionAction { get; set; }
-        public string HardDataStorageLocation { get; set; }
+        public required string HardDataStorageLocation { get; set; }
         public int QueuesTargetCount { get; set; }
         public double QueuesTargetPercentage { get; set; }
 

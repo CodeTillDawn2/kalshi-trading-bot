@@ -12,7 +12,6 @@ namespace BacklashBot.Management
     public class CentralErrorHandler : ICentralErrorHandler
     {
         private readonly IMarketManagerService _marketManagerService;
-        private readonly ILoggerFactory _loggerFactory;
         private readonly IServiceFactory _serviceFactory;
         private readonly DatabaseLoggingQueue _loggingQueue;
         private readonly ConcurrentQueue<(DateTime Timestamp, ErrorHandlerTaskInfo Error)> _nonCatastrophicErrors = new();
@@ -129,8 +128,16 @@ namespace BacklashBot.Management
                             }
                             else
                             {
-                                await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync();
-                                _logger.LogInformation("HANDLED ERROR: (ConnectionDisruptionException): {ErrorMessage} ... not catastrophic.", condis.Message);
+                                var webSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                                if (webSocketClient != null)
+                                {
+                                    await webSocketClient.ResetConnectionAsync();
+                                    _logger.LogInformation("HANDLED ERROR: (ConnectionDisruptionException): {ErrorMessage} ... not catastrophic.", condis.Message);
+                                }
+                                else
+                                {
+                                    _logger.LogWarning("HANDLED ERROR: (ConnectionDisruptionException): {ErrorMessage} ... WebSocket client not available.", condis.Message);
+                                }
                             }
                         }
                         else if (exception is KnownDuplicateInsertException kdiEx)

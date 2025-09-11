@@ -40,13 +40,13 @@ namespace SimulatorWinForms
         List<MarketSnapshot> _snapshots = new();
 
         // Strategy selection controls
-        private ComboBox _strategyTypeComboBox;
-        private ComboBox _weightSetComboBox;
-        private Button _refreshWeightSetsButton;
+        private ComboBox? _strategyTypeComboBox;
+        private ComboBox? _weightSetComboBox;
+        private Button? _refreshWeightSetsButton;
 
         private (double xMin, double xMax, double yMin, double yMax) _savedChartLimits;
 
-        private SnapshotViewer _snapshotViewer;
+        private SnapshotViewer? _snapshotViewer;
 
         // Original dimensions for scaling reference
         private const int OriginalWidth = 1100;
@@ -80,7 +80,7 @@ namespace SimulatorWinForms
             formsPlot1.MouseMove += FormsPlot1_MouseMove;
             formsPlot1.MouseLeave += FormsPlot1_MouseLeave;
 
-            Load += (_, __) => LoadCache();
+            Load += async (_, __) => await LoadCache();
             dgvMarkets.SelectionChanged += DgvMarkets_SelectionChanged;
 
             dgvMarkets.CellValueChanged += dgvMarkets_CellValueChanged;
@@ -128,12 +128,12 @@ namespace SimulatorWinForms
             ApplyInitialTypography();
         }
 
-        protected override void OnLoad(EventArgs e)
+        protected override async void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
             // Initialize strategy selection controls after form is fully loaded
-            InitializeStrategyControls();
+            await InitializeStrategyControls();
         }
 
         private void ResetPnLForMarkets(IEnumerable<string> markets)
@@ -272,7 +272,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void dgvMarkets_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        private void dgvMarkets_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == dgvMarkets.Columns["CheckedCol"].Index)
             {
@@ -286,11 +286,11 @@ namespace SimulatorWinForms
             }
         }
 
-        private void DgvMarkets_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        private void DgvMarkets_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
         {
-            if (e.ColumnIndex == dgvMarkets.Columns["PnL"].Index && e.Value != null)
+            if (e.ColumnIndex == dgvMarkets.Columns["PnL"].Index && e.Value != null && e.CellStyle != null)
             {
-                string pnlStr = e.Value.ToString();
+                string? pnlStr = e.Value.ToString();
                 if (!string.IsNullOrWhiteSpace(pnlStr) && double.TryParse(pnlStr, out double pnl))
                 {
                     if (pnl > 0)
@@ -319,7 +319,7 @@ namespace SimulatorWinForms
             _simSetup = true;
         }
 
-        private void FormsPlot1_MouseMove(object sender, MouseEventArgs e)
+        private void FormsPlot1_MouseMove(object? sender, MouseEventArgs e)
         {
             // Right-drag panning - only if both flag is set AND button is actually pressed
             if (_isRightPanning && e.Button == MouseButtons.Right && Control.MouseButtons == MouseButtons.Right)
@@ -391,7 +391,7 @@ namespace SimulatorWinForms
 
 
 
-        private void FormsPlot1_MouseLeave(object sender, EventArgs e)
+        private void FormsPlot1_MouseLeave(object? sender, EventArgs e)
         {
             // Reset panning state when mouse leaves the chart
             ResetPanningState();
@@ -470,10 +470,10 @@ namespace SimulatorWinForms
 
 
 
-        private async void DgvMarkets_SelectionChanged(object sender, EventArgs e)
+        private async void DgvMarkets_SelectionChanged(object? sender, EventArgs e)
         {
             if (dgvMarkets.SelectedRows.Count == 0) return;
-            string market = dgvMarkets.SelectedRows[0].Cells["Market"].Value?.ToString();
+            string? market = dgvMarkets.SelectedRows[0].Cells["Market"].Value?.ToString();
             if (!string.IsNullOrWhiteSpace(market))
                 await LoadChart(market);
         }
@@ -506,7 +506,7 @@ namespace SimulatorWinForms
             EnsureSimulatorSetup();
             try
             {
-                string selectedStrategy = _strategyTypeComboBox.SelectedItem?.ToString();
+                string? selectedStrategy = _strategyTypeComboBox?.SelectedItem?.ToString();
 
                 if (string.IsNullOrEmpty(selectedStrategy))
                 {
@@ -551,9 +551,9 @@ namespace SimulatorWinForms
         }
 
 
-        private void btnReload_Click(object sender, EventArgs e)
+        private async void btnReload_Click(object sender, EventArgs e)
         {
-            LoadCache();
+            await LoadCache();
         }
         private async void btnRunSet_Click(object sender, EventArgs e)
         {
@@ -585,7 +585,7 @@ namespace SimulatorWinForms
         /// in OADate form is passed to the dashboard for potential use (not used
         /// currently but reserved for future enhancements).
         /// </summary>
-        private void FormsPlot1_MouseDown(object sender, MouseEventArgs e)
+        private void FormsPlot1_MouseDown(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -770,7 +770,7 @@ namespace SimulatorWinForms
             AppendLog("Switched back to chart view.");
         }
 
-        private void MainForm_ResizeEnd(object sender, EventArgs e)
+        private void MainForm_ResizeEnd(object? sender, EventArgs e)
         {
             // Calculate scale factor based on width and DPI (more conservative scaling)
             float widthScale = Math.Clamp((float)this.Width / OriginalWidth, MinScale, MaxScale);
@@ -806,7 +806,7 @@ namespace SimulatorWinForms
             _panStartPx = Point.Empty;
         }
 
-        private void MainForm_Activated(object sender, EventArgs e)
+        private void MainForm_Activated(object? sender, EventArgs e)
         {
             // Reset panning state when the form becomes active again
             // This handles the case where user returns from snapshot viewer while still holding mouse button
@@ -839,7 +839,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void InitializeStrategyControls()
+        private async Task InitializeStrategyControls()
         {
             // Create strategy type ComboBox
             _strategyTypeComboBox = new ComboBox
@@ -889,7 +889,7 @@ namespace SimulatorWinForms
             LoadConfig();
 
             // Populate weight sets asynchronously
-            _ = PopulateWeightSetsAsync();
+            await PopulateWeightSetsAsync();
         }
 
         private void LoadConfig()
@@ -950,9 +950,9 @@ namespace SimulatorWinForms
             }
         }
 
-        private async void StrategyTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private async void StrategyTypeComboBox_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            string selectedStrategy = _strategyTypeComboBox.SelectedItem?.ToString();
+            string? selectedStrategy = _strategyTypeComboBox?.SelectedItem?.ToString();
             if (!string.IsNullOrEmpty(selectedStrategy))
             {
                 _weightSetComboBox.Enabled = true;
@@ -970,13 +970,13 @@ namespace SimulatorWinForms
             SaveConfig();
         }
 
-        private void WeightSetComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void WeightSetComboBox_SelectedIndexChanged(object? sender, EventArgs e)
         {
             // Save config when weight set changes
             SaveConfig();
         }
 
-        private async void RefreshWeightSetsButton_Click(object sender, EventArgs e)
+        private async void RefreshWeightSetsButton_Click(object? sender, EventArgs e)
         {
             await PopulateWeightSetsAsync();
         }
@@ -1006,7 +1006,7 @@ namespace SimulatorWinForms
 
             try
             {
-                string selectedStrategy = _strategyTypeComboBox.SelectedItem?.ToString();
+                string? selectedStrategy = _strategyTypeComboBox?.SelectedItem?.ToString();
                 if (string.IsNullOrEmpty(selectedStrategy))
                 {
                     _weightSetComboBox.Items.Clear();

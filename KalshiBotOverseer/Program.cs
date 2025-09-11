@@ -20,7 +20,7 @@ class Program
         // Get services and start overseer
         using var scope = host.Services.CreateScope();
         var overseer = scope.ServiceProvider.GetRequiredService<Overseer>();
-        overseer.Start();
+        await overseer.Start();
 
         Console.WriteLine("Services started. Web server running at http://localhost:5000");
         Console.WriteLine("MarketWatch GUI available at: http://localhost:5000/marketwatch");

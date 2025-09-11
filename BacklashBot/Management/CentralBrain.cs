@@ -100,7 +100,7 @@ namespace BacklashBot.Management
         private bool IsWebSocketServiceRunning()
         {
             var webSocketService = _serviceFactory.GetWebSocketHostedService();
-            return webSocketService.IsConnected();
+            return webSocketService?.IsConnected() ?? false;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)

@@ -67,12 +67,11 @@ namespace BacklashBot.Management
                 }
 
                 int expectedSchema = rawSnapshots[0].JSONSchemaVersion;
-                bool allSchemasExpected = true;
                 foreach (var snapshot in rawSnapshots)
                 {
                     if (snapshot.JSONSchemaVersion != expectedSchema)
                     {
-                        allSchemasExpected = false;
+                        // Schema mismatch - could log or handle
                         continue;
                     }
                 }

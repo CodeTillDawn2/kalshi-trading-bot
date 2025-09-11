@@ -172,9 +172,9 @@ namespace BacklashBot.Management
                     }
                     await context.AddOrUpdateMarketWatch(marketWatch);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    _logger.LogWarning("Failed to calculate interest score for market {MarketTicker}.", market);
+                    _logger.LogWarning("Failed to calculate interest score for market {MarketTicker}.", market.market_ticker);
                 }
             }
         }

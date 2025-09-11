@@ -196,7 +196,7 @@ namespace BacklashBot.Services
             }
         }
 
-        private async Task<string?> GetOverseerUrlFromAppSettingsAsync()
+        private Task<string?> GetOverseerUrlFromAppSettingsAsync()
         {
             try
             {
@@ -204,15 +204,15 @@ namespace BacklashBot.Services
                 var configUrl = Environment.GetEnvironmentVariable("OVERSEER_URL");
                 if (!string.IsNullOrEmpty(configUrl))
                 {
-                    return configUrl.EndsWith("/chartHub") ? configUrl : $"{configUrl.TrimEnd('/')}/chartHub";
+                    return Task.FromResult(configUrl.EndsWith("/chartHub") ? configUrl : $"{configUrl.TrimEnd('/')}/chartHub");
                 }
 
-                return null;
+                return Task.FromResult<string?>(null);
             }
             catch (Exception ex)
             {
                 _logger.LogDebug(ex, "OVERSEER- Failed to get overseer URL from appsettings");
-                return null;
+                return Task.FromResult<string?>(null);
             }
         }
 
@@ -322,7 +322,7 @@ namespace BacklashBot.Services
             }
         }
 
-        private string GetLocalIPAddress()
+        private string? GetLocalIPAddress()
         {
             try
             {
@@ -342,7 +342,7 @@ namespace BacklashBot.Services
             }
         }
 
-        private string GetSubnet(string ipAddress)
+        private string? GetSubnet(string ipAddress)
         {
             try
             {
@@ -517,7 +517,7 @@ namespace BacklashBot.Services
                 _currentOverseerUrl = null;
 
                 // Schedule an immediate retry for 503 errors
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromSeconds(30)); // Wait 30 seconds then retry
                     if (!_isConnected)
@@ -550,7 +550,7 @@ namespace BacklashBot.Services
                 }
 
                 // Retry after a short delay
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromSeconds(5));
                     if (!_isConnected)
@@ -571,7 +571,7 @@ namespace BacklashBot.Services
 
         private async Task PerformHandshakeAsync()
         {
-            if (!IsConnectionActive()) return;
+            if (!IsConnectionActive() || _hubConnection == null) return;
 
             try
             {
@@ -779,7 +779,7 @@ namespace BacklashBot.Services
 
         private async Task SendCheckInAsync()
         {
-            if (!IsConnectionActive())
+            if (!IsConnectionActive() || _hubConnection == null)
             {
                 _logger.LogDebug("OVERSEER- Overseer not connected or connection not active, skipping CheckIn (will retry on next cycle)");
                 return;
@@ -877,7 +877,7 @@ namespace BacklashBot.Services
             _logger.LogInformation("OVERSEER- Successfully reconnected to overseer with connection ID: {ConnectionId}", connectionId);
 
             // Re-perform handshake on reconnection
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 try
                 {

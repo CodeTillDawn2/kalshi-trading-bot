@@ -142,27 +142,34 @@ namespace BacklashBot.Management
 
         protected async Task RefreshMarkets()
         {
+            var marketDataService = _serviceFactory.GetMarketDataService();
+            if (marketDataService is null) return;
+
             using var scope = _scopeFactory.CreateScope();
             var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
-            var marketsToRefresh = _serviceFactory.GetMarketDataService().MarketsToRefresh.Distinct().ToList();
+            var marketsToRefresh = marketDataService.MarketsToRefresh.Distinct().ToList();
 
             foreach (var market in marketsToRefresh)
             {
                 if (_statusTrackerService.GetCancellationToken().IsCancellationRequested)
                 {
-                    _serviceFactory.GetMarketDataService().MarketsToRefresh.Clear();
+                    marketDataService.MarketsToRefresh.Clear();
                     break;
                 }
                 _logger.LogDebug("API: refreshing market {0}... refetching from API", market);
                 await apiService.FetchMarketsAsync(tickers: new string[] { market });
                 _logger.LogDebug("BRAIN: Resetting market {0} due to RefreshMarkets", market);
                 TriggerMarketReset(market);
-                _serviceFactory.GetMarketDataService().MarketsToRefresh.RemoveAll(x => x == market);
+                marketDataService.MarketsToRefresh.RemoveAll(x => x == market);
             }
         }
 
         protected async Task ResetMarkets()
         {
+            var marketDataService = _serviceFactory.GetMarketDataService();
+            var dataCache = _serviceFactory.GetDataCache();
+            if (marketDataService is null || dataCache is null) return;
+
             List<string> marketsToAdd;
             lock (_resetLock)
             {
@@ -182,20 +189,20 @@ namespace BacklashBot.Management
                 var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
                 await apiService.FetchMarketsAsync(tickers: new string[] { market });
 
-                if (!_serviceFactory.GetDataCache().WatchedMarkets.Contains(market))
+                if (!dataCache.WatchedMarkets.Contains(market))
                 {
                     List<MarketDTO> mkts = await context.GetMarkets(includedMarkets: new HashSet<string>() { market });
                     MarketDTO? mkt = mkts.FirstOrDefault();
                     if (mkt != null && !KalshiConstants.MarketIsEnded(mkt.status))
                     {
                         _logger.LogInformation("Stats: Adding back {market} after reset, with status {status}", market, mkt.status);
-                        await _serviceFactory.GetMarketDataService().AddMarketWatch(market);
+                        await marketDataService.AddMarketWatch(market);
                     }
                 }
                 else
                 {
                     _logger.LogInformation("Stats: Skipped readding {Market} after reset because already watched. Watched: {Watched}",
-                        market, string.Join(",", _serviceFactory.GetDataCache().WatchedMarkets));
+                        market, string.Join(",", dataCache.WatchedMarkets));
                 }
             }
 
@@ -215,10 +222,10 @@ namespace BacklashBot.Management
                     return;
                 }
 
-                if (_serviceFactory.GetDataCache().WatchedMarkets.Contains(market))
+                if (dataCache.WatchedMarkets.Contains(market))
                 {
                     _logger.LogInformation("Stats: Removing {market} for reset", market);
-                    await _serviceFactory.GetMarketDataService().UnwatchMarket(market);
+                    await marketDataService.UnwatchMarket(market);
                     lock (_resetLock) { MarketsToAddAfterReset.Add(market); }
                 }
                 lock (_resetLock) { MarketsToReset.RemoveAll(x => x == market); }
@@ -232,6 +239,9 @@ namespace BacklashBot.Management
             try
             {
                 var marketDataService = _serviceFactory.GetMarketDataService();
+                var interestScoreHelper = _serviceFactory.GetMarketInterestScoreHelper();
+                if (marketDataService is null || interestScoreHelper is null) return 0;
+
                 var myWatches = await context.GetMarketWatches_cached(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock });
 
                 _logger.LogInformation("BRAIN: Found {0} markets to consider for removal.", myWatches.Count());
@@ -242,7 +252,7 @@ namespace BacklashBot.Management
                 {
                     if (mw.InterestScore == null)
                     {
-                        var score = await _serviceFactory.GetMarketInterestScoreHelper().CalculateMarketInterestScoreAsync(context, mw.market_ticker);
+                        var score = await interestScoreHelper.CalculateMarketInterestScoreAsync(context, mw.market_ticker);
                         mw.InterestScore = score.score;
                         mw.InterestScoreDate = DateTime.Now;
                         await context.AddOrUpdateMarketWatch(mw);
@@ -289,11 +299,15 @@ namespace BacklashBot.Management
         {
             int marketsRemoved = 0;
 
+            var dataCache = _serviceFactory.GetDataCache();
+            var marketDataService = _serviceFactory.GetMarketDataService();
+            if (dataCache is null || marketDataService is null) return 0;
+
             var finalizedWatches = await context.GetFinalizedMarketWatches(_brainStatus.BrainLock);
 
             foreach (MarketWatchDTO watch in finalizedWatches)
             {
-                if (!_serviceFactory.GetDataCache().WatchedMarkets.Contains(watch.market_ticker))
+                if (!dataCache.WatchedMarkets.Contains(watch.market_ticker))
                 {
                     _logger.LogInformation("Stats: Skipped removing {0} because it wasn't actually still being watched", watch.market_ticker);
                     watch.BrainLock = null;
@@ -301,7 +315,7 @@ namespace BacklashBot.Management
                     continue;
                 }
                 _logger.LogInformation("Stats: Removing ended market {market}", watch.market_ticker);
-                await _serviceFactory.GetMarketDataService().UnwatchMarket(watch.market_ticker);
+                await marketDataService.UnwatchMarket(watch.market_ticker);
                 marketsRemoved = marketsRemoved + 1;
 
             }
@@ -317,6 +331,11 @@ namespace BacklashBot.Management
             List<string> marketsAddedList = new List<string>();
             try
             {
+                var interestScoreHelper = _serviceFactory.GetMarketInterestScoreHelper();
+                var marketDataService = _serviceFactory.GetMarketDataService();
+                var dataCache = _serviceFactory.GetDataCache();
+                if (interestScoreHelper is null || marketDataService is null || dataCache is null) return new List<string>();
+
                 var allMarketWatches = await context.GetMarketWatches(brainLockIsNull: true);
 
                 // Prioritize existing high-interest markets
@@ -329,7 +348,7 @@ namespace BacklashBot.Management
                 if (newMarketWatches.Any())
                 {
                     _logger.LogDebug("API: Getting market interest score for {0} in {1}", newMarketWatches.Select(x => x.market_ticker).ToList(), "AddHighInterestMarkets");
-                    var marketScores = await _serviceFactory.GetMarketInterestScoreHelper().GetMarketInterestScores(_scopeFactory, newMarketWatches.Select(x => x.market_ticker).ToList());
+                    var marketScores = await interestScoreHelper.GetMarketInterestScores(_scopeFactory, newMarketWatches.Select(x => x.market_ticker).ToList());
 
                     foreach (var watch in newMarketWatches.ToList())
                     {
@@ -343,11 +362,11 @@ namespace BacklashBot.Management
                             watch.BrainLock = _brainStatus.BrainLock;
                             watch.LastWatched = DateTime.Now;
                             await context.AddOrUpdateMarketWatch(watch);
-                            await _serviceFactory.GetMarketDataService().AddMarketWatch(watch.market_ticker);
+                            await marketDataService.AddMarketWatch(watch.market_ticker);
                             _logger.LogDebug("BRAIN: Locked existing high-interest market {MarketTicker}. Interest: {interest}", watch.market_ticker, watch.InterestScore);
                             marketsAdded++;
                             marketsAddedList.Add(watch.market_ticker);
-                            _serviceFactory.GetDataCache().WatchedMarkets.Add(watch.market_ticker);
+                            dataCache.WatchedMarkets.Add(watch.market_ticker);
                         }
                         else
                         {
@@ -367,7 +386,7 @@ namespace BacklashBot.Management
                     if (candidateMarkets.Any())
                     {
                         _logger.LogDebug("API: Getting market interest score for {0} in {1}", candidateMarkets, "AddHighInterestMarkets2");
-                        var marketScores = await _serviceFactory.GetMarketInterestScoreHelper().GetMarketInterestScores(_scopeFactory, candidateMarkets);
+                        var marketScores = await interestScoreHelper.GetMarketInterestScores(_scopeFactory, candidateMarkets);
 
                         foreach (var market in marketScores)
                         {
@@ -385,7 +404,7 @@ namespace BacklashBot.Management
                                     await context.AddOrUpdateMarketWatch(existingWatch);
                                     marketsAdded++;
                                     marketsAddedList.Add(existingWatch.market_ticker);
-                                    _serviceFactory.GetDataCache().WatchedMarkets.Add(existingWatch.market_ticker);
+                                    dataCache.WatchedMarkets.Add(existingWatch.market_ticker);
                                     _logger.LogInformation("BRAIN: Locked existing market {MarketTicker} after score update. Interest: {score}", market.Ticker, existingWatch.InterestScore);
                                 }
                                 else
@@ -422,7 +441,7 @@ namespace BacklashBot.Management
                                 }
 
                                 marketsAddedList.Add(market.Ticker);
-                                _serviceFactory.GetDataCache().WatchedMarkets.Add(newWatch.market_ticker);
+                                dataCache.WatchedMarkets.Add(newWatch.market_ticker);
                                 marketsAdded++;
                                 _logger.LogInformation("BRAIN: Added and locked market {MarketTicker} due to high interest. Interest: {score}", market.Ticker, market.Score);
                             }
@@ -430,7 +449,7 @@ namespace BacklashBot.Management
                     }
                 }
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
                 _logger.LogWarning("AddHighInterestMarkets canceled adding high interest markets");
             }
@@ -450,6 +469,10 @@ namespace BacklashBot.Management
             int removed = 0;
             try
             {
+                var interestScoreHelper = _serviceFactory.GetMarketInterestScoreHelper();
+                var marketDataService = _serviceFactory.GetMarketDataService();
+                if (interestScoreHelper is null || marketDataService is null) return 0;
+
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
                 var token = cts.Token;
 
@@ -468,7 +491,7 @@ namespace BacklashBot.Management
                 if (tickersToScore.Any())
                 {
                     _logger.LogDebug("API: Getting market interest score for {@Tickers} in {Context}", tickersToScore, "RemoveUninterestingMarkets");
-                    var scores = await _serviceFactory.GetMarketInterestScoreHelper()
+                    var scores = await interestScoreHelper
                         .GetMarketInterestScores(_scopeFactory, tickersToScore);
 
                     foreach (var w in candidates)
@@ -512,7 +535,7 @@ namespace BacklashBot.Management
                     {
                         _logger.LogInformation("Stats: Removing market {MarketTicker} due to low interest. Interest={InterestScore}",
                             watch.market_ticker, watch.InterestScore);
-                        await _serviceFactory.GetMarketDataService().UnwatchMarket(watch.market_ticker);
+                        await marketDataService.UnwatchMarket(watch.market_ticker);
                         removed++;
                     }
                 }

@@ -106,13 +106,16 @@ namespace BacklashBot.Services
                 var markets = await GetWatchedMarketsAsync();
                 var errorHandler = _serviceFactory.GetBacklashErrorHandler();
                 var performanceTracker = _serviceFactory.GetPerformanceMonitor();
+                if (errorHandler == null || performanceTracker == null) return;
+
                 var lastSnapshot = errorHandler.LastSuccessfulSnapshot;
                 var lastErrorDate = errorHandler.LastErrorDate;
 
                 // Get queue averages and CPU usage
                 (double eventQueueAvg, double tickerQueueAvg, double notificationQueueAvg, double orderBookQueueAvg) = performanceTracker.GetQueueCountRollingAverages();
                 var currentCpuUsage = performanceTracker.LastRefreshUsagePercentage;
-                var isWebSocketConnected = _serviceFactory.GetWebSocketHostedService().IsConnected();
+                var webSocketService = _serviceFactory.GetWebSocketHostedService();
+                var isWebSocketConnected = webSocketService?.IsConnected() ?? false;
 
                 // Get brain instance name and status from Performance Monitor
                 var isStartingUp = performanceTracker.IsStartingUp;
@@ -149,8 +152,9 @@ namespace BacklashBot.Services
                 };
 
                 await _hubContext.Clients.All.SendAsync("CheckIn", checkInData, cancellationToken);
+                var perfMonitor = _serviceFactory.GetPerformanceMonitor();
                 _logger.LogDebug("CheckIn broadcasted from {BrainInstanceName} with {MarketCount} markets, ErrorCount: {ErrorCount}, LastSnapshot: {LastSnapshot}, LastErrorDate: {LastErrorDate}",
-                    _serviceFactory.GetPerformanceMonitor().BrainInstance, markets.Count, errorHandler.ErrorCount, lastSnapshot, lastErrorDate);
+                    perfMonitor?.BrainInstance ?? "Unknown", markets.Count, errorHandler.ErrorCount, lastSnapshot, lastErrorDate);
             }
             catch (Exception ex)
             {
@@ -167,6 +171,7 @@ namespace BacklashBot.Services
             var cancellationToken = _statusTracker.GetCancellationToken();
             cancellationToken.ThrowIfCancellationRequested();
             var marketDataService = _serviceFactory.GetMarketDataService();
+            if (marketDataService == null) return new List<string>();
             var markets = await marketDataService.FetchWatchedMarketsAsync();
             return markets;
         }

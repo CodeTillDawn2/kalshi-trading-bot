@@ -89,14 +89,18 @@ builder.Services.AddSingleton<ILoggerProvider>(provider =>
 
 // Register OrderbookChangeTracker with transient lifetime
 builder.Services.AddTransient(provider =>
-    new OrderbookChangeTracker(
+{
+    var dataCache = provider.GetRequiredService<IServiceFactory>().GetDataCache();
+    if (dataCache == null) throw new InvalidOperationException("DataCache is null");
+    return new OrderbookChangeTracker(
         "unknown",
         provider.GetRequiredService<ILogger<OrderbookChangeTracker>>(),
-        provider.GetRequiredService<IServiceFactory>().GetDataCache(),
+        dataCache,
         provider.GetRequiredService<IOptions<TradingConfig>>(),
         provider.GetRequiredService<IScopeManagerService>(),
         provider.GetRequiredService<IStatusTrackerService>()
-    ));
+    );
+});
 
 // Register MarketData factory
 builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
@@ -106,14 +110,17 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
     {
         using var scope = scopeFactory.CreateScope();
         var sp = scope.ServiceProvider;
+        var tradingCalculator = sp.GetRequiredService<IServiceFactory>().GetTradingCalculator();
+        var dataCache = sp.GetRequiredService<IServiceFactory>().GetDataCache();
+        if (tradingCalculator == null || dataCache == null) throw new InvalidOperationException("TradingCalculator or DataCache is null");
         return new MarketData(
             market,
             sp.GetRequiredService<ILogger<MarketData>>(),
-            sp.GetRequiredService<IServiceFactory>().GetTradingCalculator(),
+            tradingCalculator,
             new OrderbookChangeTracker(
                 market.market_ticker,
                 sp.GetRequiredService<ILogger<OrderbookChangeTracker>>(),
-                sp.GetRequiredService<IServiceFactory>().GetDataCache(),
+                dataCache,
                 sp.GetRequiredService<IOptions<TradingConfig>>(),
                 sp.GetRequiredService<IScopeManagerService>(),
                 sp.GetRequiredService<IStatusTrackerService>()
@@ -127,7 +134,7 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
 builder.Services.AddDbContext<KalshiBotContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IKalshiBotContext>(provider => provider.GetService<KalshiBotContext>());
+builder.Services.AddScoped<IKalshiBotContext>(provider => provider.GetRequiredService<KalshiBotContext>());
 builder.Services.AddScoped<IKalshiAPIService, KalshiAPIService>();
 
 // Register services as scoped
@@ -223,73 +230,58 @@ app.Lifetime.ApplicationStopping.Register(() =>
 // ## HTTP Pipeline Configuration
 app.UseRouting();
 app.UseAuthorization();
-app.UseEndpoints(endpoints =>
+
+app.MapHub<ChartHub>("/chartHub");
+app.MapGet("/shutdown-services", async (ICentralBrain brain, ILogger<Program> logger) =>
 {
-    endpoints.MapHub<ChartHub>("/chartHub");
-    endpoints.MapGet("/shutdown-services", async context =>
+    try
     {
-        try
+        if (brain.IsStartingUp)
         {
-            var brain = app.Services.GetRequiredService<ICentralBrain>();
-            var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-
-            if (brain.IsStartingUp)
-            {
-                await context.Response.WriteAsync("Cannot shut down: services are currently starting up.");
-                return;
-            }
-            if (brain.IsShuttingDown)
-            {
-                await context.Response.WriteAsync("Cannot shut down: services are already shutting down.");
-                return;
-            }
-
-            logger.LogInformation("Shutdown services requested at {0}", DateTime.UtcNow);
-
-            await brain.ShutdownDashboardAsync();
-            await context.Response.WriteAsync("Services shut down successfully. Application is stopping.");
+            return Results.BadRequest("Cannot shut down: services are currently starting up.");
         }
-        catch (Exception ex)
+        if (brain.IsShuttingDown)
         {
-            var logger = app.Services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(ex, "Error shutting down services");
-            context.Response.StatusCode = 500;
-            await context.Response.WriteAsync("Error shutting down services.");
+            return Results.BadRequest("Cannot shut down: services are already shutting down.");
         }
-    });
-    endpoints.MapGet("/restart-services", async context =>
+
+        logger.LogInformation("Shutdown services requested at {0}", DateTime.UtcNow);
+
+        await brain.ShutdownDashboardAsync();
+        return Results.Ok("Services shut down successfully. Application is stopping.");
+    }
+    catch (Exception ex)
     {
-        try
+        logger.LogError(ex, "Error shutting down services");
+        return Results.Problem("Error shutting down services.");
+    }
+});
+app.MapGet("/restart-services", async (ICentralBrain brain) =>
+{
+    try
+    {
+        if (brain.IsStartingUp)
         {
-            var brain = app.Services.GetRequiredService<ICentralBrain>();
-
-            if (brain.IsStartingUp)
-            {
-                await context.Response.WriteAsync("Cannot restart: services are already starting up.");
-                return;
-            }
-            if (brain.IsShuttingDown)
-            {
-                await context.Response.WriteAsync("Cannot restart: services are currently shutting down.");
-                return;
-            }
-            if (!brain.IsServicesStopped)
-            {
-                await context.Response.WriteAsync("Cannot restart: services must be stopped first.");
-                return;
-            }
-
-            await brain.StartDashboard();
-            await context.Response.WriteAsync("Services restarted successfully.");
+            return Results.BadRequest("Cannot restart: services are already starting up.");
         }
-        catch (Exception ex)
+        if (brain.IsShuttingDown)
         {
-            var logger = app.Services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(ex, "Error restarting services");
-            context.Response.StatusCode = 500;
-            await context.Response.WriteAsync("Error restarting services.");
+            return Results.BadRequest("Cannot restart: services are currently shutting down.");
         }
-    });
+        if (!brain.IsServicesStopped)
+        {
+            return Results.BadRequest("Cannot restart: services must be stopped first.");
+        }
+
+        await brain.StartDashboard();
+        return Results.Ok("Services restarted successfully.");
+    }
+    catch (Exception ex)
+    {
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Error restarting services");
+        return Results.Problem("Error restarting services.");
+    }
 });
 
 // Start the application

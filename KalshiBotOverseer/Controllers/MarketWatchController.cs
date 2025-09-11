@@ -422,46 +422,54 @@ namespace KalshiBotOverseer.Controllers
                     return (await _context.GetMarketWatches()).ToList();
                 });
 
-                // Filter and enrich brain instances with WatchedMarkets data
-                var cutoff = DateTime.Now.AddHours(-48); // 48 hours ago
-                var filteredBrainInstances = brainInstances
-                    .Select(brainInstance =>
+                // Create a lookup for brain instances by BrainLock
+                var brainLookup = brainInstances
+                    .Where(bi => bi.BrainLock.HasValue)
+                    .ToDictionary(bi => bi.BrainLock.Value, bi => bi);
+
+                // Group market watches by BrainLock
+                var marketWatchesByBrainLock = marketWatches
+                    .Where(mw => mw.BrainLock.HasValue)
+                    .GroupBy(mw => mw.BrainLock.Value)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
+                // Create brain data with their watched markets
+                var brainData = new List<object>();
+
+                foreach (var brainInstance in brainInstances)
+                {
+                    var brainName = brainInstance.BrainInstanceName;
+
+                    // Get markets watched by this brain instance
+                    List<MarketWatchDTO> watchedMarkets = new List<MarketWatchDTO>();
+                    if (brainInstance.BrainLock.HasValue &&
+                        marketWatchesByBrainLock.TryGetValue(brainInstance.BrainLock.Value, out var markets))
                     {
-                        var brainName = brainInstance.BrainInstanceName;
+                        watchedMarkets = markets;
+                    }
 
-                        // Find markets watched by this brain instance
-                        var watchedMarkets = marketWatches.Where(mw =>
-                            mw.BrainLock.HasValue &&
-                            mw.BrainLock.Value == brainInstance.BrainLock).ToList();
-
-                        // Check if brain has been watched in last 48 hours
-                        var hasRecentWatch = watchedMarkets.Any(mw => mw.LastWatched > cutoff);
-
-                        // Only include if watched in last 48 hours
-                        if (!hasRecentWatch)
-                            return null;
-
-                        return new
+                    // Use a single consistent property name for brain instance
+                    // to avoid JSON property collisions due to camelCase naming policy.
+                    brainData.Add(new
+                    {
+                        brainInstanceName = brainName,
+                        // Expose BrainLock and other fields under their original names
+                        brainInstance.BrainLock,
+                        brainInstance.LastSeen,
+                        brainInstance.TargetWatches,
+                        Mode = "Autonomous",
+                        WatchedMarkets = watchedMarkets.Select(mw => new
                         {
-                            brainInstanceName = brainName,
-                            BrainInstanceName = brainName,
-                            brainInstance.BrainLock,
-                            brainInstance.LastSeen,
-                            Mode = "Autonomous",
-                            WatchedMarkets = watchedMarkets.Select(mw => new
-                            {
-                                mw.market_ticker,
-                                mw.LastWatched,
-                                mw.InterestScore,
-                                mw.InterestScoreDate,
-                                mw.AverageWebsocketEventsPerMinute
-                            }).ToList()
-                        };
-                    })
-                    .Where(b => b != null)
-                    .ToList();
+                            mw.market_ticker,
+                            mw.LastWatched,
+                            mw.InterestScore,
+                            mw.InterestScoreDate,
+                            mw.AverageWebsocketEventsPerMinute
+                        }).ToList()
+                    });
+                }
 
-                return Ok(filteredBrainInstances);
+                return Ok(brainData);
             }
             catch (Exception ex)
             {

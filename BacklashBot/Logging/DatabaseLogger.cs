@@ -29,11 +29,16 @@ namespace BacklashBot.Logging
             _brainStatus = brainStatus;
         }
 
-        public IDisposable BeginScope<TState>(TState state) => null;
+        private class NullScope : IDisposable
+        {
+            public void Dispose() { }
+        }
+
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => new NullScope();
 
         public bool IsEnabled(LogLevel logLevel) => logLevel >= _minLevel;
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             var message = formatter(state, exception);
             var logEntry = new LogEntryDTO
@@ -41,10 +46,10 @@ namespace BacklashBot.Logging
                 Timestamp = DateTime.Now,
                 Level = logLevel.ToString(),
                 Message = $"{message} ({_categoryName})",
-                Exception = exception?.ToString(),
+                Exception = exception?.ToString() ?? "",
                 Environment = _loggingConfig.Environment,
-                BrainInstance = _executionConfig.BrainInstance,
-                SessionIdentifier = _brainStatus.SessionIdentifier,
+                BrainInstance = _executionConfig.BrainInstance ?? "",
+                SessionIdentifier = _brainStatus.SessionIdentifier ?? "",
                 Source = _categoryName
             };
 

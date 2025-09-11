@@ -58,6 +58,11 @@ namespace BacklashBot.Management
 
                 var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
                 var marketDataService = _serviceFactory.GetMarketDataService();
+                if (marketDataService == null)
+                {
+                    MonitoringWatchList = false;
+                    return;
+                }
 
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
@@ -100,10 +105,11 @@ namespace BacklashBot.Management
                 }
                 else if (actualTarget > actualMarketCount && metrics.CurrentUsage < brain.UsageMin)
                 {
-                    BrainInstanceDTO dto = await context.GetBrainInstance(_executionConfig.BrainInstance);
+                    BrainInstanceDTO? dto = await context.GetBrainInstance(_executionConfig.BrainInstance ?? "");
                     _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-                    List<string> addedMarkets = await AddHighInterestMarkets(context, apiService, actualTarget - actualMarketCount, dto.MinimumInterest);
-                    if (addedMarkets.Count > 0 && _serviceFactory.GetDataCache().WatchedMarkets != null)
+                    List<string> addedMarkets = await AddHighInterestMarkets(context, apiService, actualTarget - actualMarketCount, dto?.MinimumInterest ?? 0);
+                    var dataCache = _serviceFactory.GetDataCache();
+                    if (addedMarkets.Count > 0 && dataCache?.WatchedMarkets != null)
                     {
                         _logger.LogInformation("BRAIN: Usage too low: {Percentage:F2}% with {ActualMarketCount} markets. Added up to {Count} markets.",
                             metrics.CurrentUsage, actualMarketCount, actualTarget - actualMarketCount);
@@ -113,9 +119,9 @@ namespace BacklashBot.Management
                 }
                 else
                 {
-                    BrainInstanceDTO dto = await context.GetBrainInstance(_executionConfig.BrainInstance);
+                    BrainInstanceDTO? dto = await context.GetBrainInstance(_executionConfig.BrainInstance ?? "");
                     _logger.LogInformation("BRAIN: Usage within acceptable range: {Percentage:F2}%. Checking for uninteresting markets.", metrics.CurrentUsage);
-                    int removed = await RemoveUninterestingMarkets(context, apiService, brain, dto.MinimumInterest);
+                    int removed = await RemoveUninterestingMarkets(context, apiService, brain, dto?.MinimumInterest ?? 0);
                     _logger.LogInformation("BRAIN: Removed {Removed} uninteresting markets.", removed);
                 }
                 _firstWatchUpdate = false;

@@ -9,9 +9,9 @@ namespace BacklashBot.Management
     public class BrainStatusService : IBrainStatusService
     {
         private Guid _brainLock;
-        private string _sessionIdentifier;
+        private string? _sessionIdentifier;
         private bool _initialized;
-        private Task _initTask;
+        private Task? _initTask;
         private readonly object _lock = new();
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ExecutionConfig _executionConfig;
@@ -42,7 +42,7 @@ namespace BacklashBot.Management
                 {
                     throw new InvalidOperationException("Call EnsureInitializedAsync() before accessing properties.");
                 }
-                return _sessionIdentifier;
+                return _sessionIdentifier!;
             }
         }
 
@@ -76,7 +76,7 @@ namespace BacklashBot.Management
                 _sessionIdentifier = GenerateRandomString(5);
                 _initialized = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw; // Rethrow to surface in task; handle as needed in consumers.
             }

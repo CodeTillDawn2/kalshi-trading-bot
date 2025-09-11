@@ -209,7 +209,7 @@ namespace BacklashBot.Hubs
             }
         }
 
-        public async Task HandleTargetTickersConfirmationResponse(TargetTickersConfirmationResponse response)
+        public Task HandleTargetTickersConfirmationResponse(TargetTickersConfirmationResponse response)
         {
             _logger.LogInformation("Received TargetTickersConfirmationResponse from Overseer");
 
@@ -228,6 +228,8 @@ namespace BacklashBot.Hubs
             {
                 _logger.LogError(ex, "Error handling TargetTickersConfirmationResponse");
             }
+
+            return Task.CompletedTask;
         }
     }
 

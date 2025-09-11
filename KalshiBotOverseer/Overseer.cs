@@ -30,7 +30,7 @@ namespace KalshiBotOverseer
             _hubContext = hubContext;
         }
 
-        public async void Start()
+        public async Task Start()
         {
             // Log overseer IP to database
             await LogOverseerInfoAsync();
@@ -45,7 +45,7 @@ namespace KalshiBotOverseer
             StartPeriodicApiFetching();
         }
 
-        public async void Stop()
+        public void Stop()
         {
             Unsubscribe();
             _logger?.LogInformation("Unsubscribed from events.");
@@ -59,7 +59,7 @@ namespace KalshiBotOverseer
             _webSocketClient.EventLifecycleReceived -= OnEventLifecycleReceived;
         }
 
-        private async void OnFillReceived(object sender, FillEventArgs e)
+        private void OnFillReceived(object? sender, FillEventArgs e)
         {
             // Handle the fill event (e.g., log or process)
             _logger?.LogInformation("Received Fill event: {EventData}", e);
@@ -67,7 +67,7 @@ namespace KalshiBotOverseer
             // Fill event processed
         }
 
-        private async void OnMarketLifecycleReceived(object sender, MarketLifecycleEventArgs e)
+        private void OnMarketLifecycleReceived(object? sender, MarketLifecycleEventArgs e)
         {
             // Handle the market lifecycle event
             _logger?.LogInformation("Received MarketLifecycle event: {EventData}", e);
@@ -75,7 +75,7 @@ namespace KalshiBotOverseer
             // Market lifecycle event processed
         }
 
-        private async void OnEventLifecycleReceived(object sender, EventLifecycleEventArgs e)
+        private async void OnEventLifecycleReceived(object? sender, EventLifecycleEventArgs e)
         {
             // Handle the event lifecycle event
             _logger?.LogInformation("Received EventLifecycle event: {EventData}", e);
@@ -193,6 +193,12 @@ namespace KalshiBotOverseer
 
                 // Get local IP address
                 var hostName = System.Net.Dns.GetHostName();
+                
+                if (hostName == "PeterWorkLaptop")
+                {
+                    return;
+                }
+                
                 var localIP = System.Net.Dns.GetHostEntry(hostName).AddressList
                     .FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?
                     .ToString() ?? "127.0.0.1";

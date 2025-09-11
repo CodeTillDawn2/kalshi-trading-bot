@@ -883,8 +883,11 @@ namespace SimulatorWinForms
             psarValue.Text = currentSnapshot.PSAR.ToString() ?? "--";
             adxValue.Text = currentSnapshot.ADX.ToString() ?? "--";
             // Note: +DI and -DI values are not displayed in UI labels, only plotted on secondary chart
-            supportValue.Text = currentSnapshot.AllSupportResistanceLevels.Count != 1 ? currentSnapshot.AllSupportResistanceLevels.Count.ToString()
-                : $"{currentSnapshot.AllSupportResistanceLevels.First().Price}";
+            supportValue.Text = currentSnapshot.AllSupportResistanceLevels != null && currentSnapshot.AllSupportResistanceLevels.Count != 1
+                ? currentSnapshot.AllSupportResistanceLevels.Count.ToString()
+                : (currentSnapshot.AllSupportResistanceLevels != null && currentSnapshot.AllSupportResistanceLevels.Count == 1
+                    ? $"{currentSnapshot.AllSupportResistanceLevels.First().Price}"
+                    : "0");
 
             // Update other info
             chartHeader.Text = marketTitle;
@@ -975,6 +978,13 @@ namespace SimulatorWinForms
             }
             toolTip1.SetToolTip(patternsLabel, patternsTooltip);
 
+            // Update support/resistance levels count
+            supportValue.Text = currentSnapshot.AllSupportResistanceLevels != null && currentSnapshot.AllSupportResistanceLevels.Count != 1
+                ? currentSnapshot.AllSupportResistanceLevels.Count.ToString()
+                : (currentSnapshot.AllSupportResistanceLevels != null && currentSnapshot.AllSupportResistanceLevels.Count == 1
+                    ? $"{currentSnapshot.AllSupportResistanceLevels.First().Price}"
+                    : "0");
+
             // Immediately move the vertical line (fast operation)
             MoveVerticalLineImmediately();
         }
@@ -990,12 +1000,15 @@ namespace SimulatorWinForms
             for (int i = mainPlottables.Count - 1; i >= 0; i--)
             {
                 var plottable = mainPlottables[i];
-                // Check for ScottPlot vertical line types
-                if (plottable.GetType().Name.Contains("VerticalLine") ||
-                    plottable.GetType().FullName.Contains("VerticalLine") ||
-                    plottable.ToString().Contains("Vertical"))
+                if (plottable != null)
                 {
-                    priceChart.Plot.Remove(plottable);
+                    // Check for ScottPlot vertical line types
+                    if (plottable.GetType().Name.Contains("VerticalLine") ||
+                        plottable.GetType().FullName.Contains("VerticalLine") ||
+                        plottable.ToString().Contains("Vertical"))
+                    {
+                        priceChart.Plot.Remove(plottable);
+                    }
                 }
             }
 
@@ -1009,11 +1022,14 @@ namespace SimulatorWinForms
                 for (int i = secondaryPlottables.Count - 1; i >= 0; i--)
                 {
                     var plottable = secondaryPlottables[i];
-                    if (plottable.GetType().Name.Contains("VerticalLine") ||
-                        plottable.GetType().FullName.Contains("VerticalLine") ||
-                        plottable.ToString().Contains("Vertical"))
+                    if (plottable != null)
                     {
-                        secondaryChart.Plot.Remove(plottable);
+                        if (plottable.GetType().Name.Contains("VerticalLine") ||
+                            plottable.GetType().FullName.Contains("VerticalLine") ||
+                            plottable.ToString().Contains("Vertical"))
+                        {
+                            secondaryChart.Plot.Remove(plottable);
+                        }
                     }
                 }
                 var secondaryVerticalLine = secondaryChart.Plot.AddVerticalLine(centerX, Color.Black, 2);

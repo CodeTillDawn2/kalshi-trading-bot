@@ -126,7 +126,7 @@ namespace SimulatorWinForms.Charting
 
             for (int i = 0; i < pts.Count; i++)
             {
-                string memo = string.IsNullOrWhiteSpace(pts[i].Memo) ? fallbackLabel : pts[i].Memo.Trim();
+                string memo = pts[i] != null && !string.IsNullOrWhiteSpace(pts[i].Memo) ? pts[i].Memo.Trim() : fallbackLabel;
                 tooltipPoints.Add((xs[i], ys[i], memo));
             }
         }
