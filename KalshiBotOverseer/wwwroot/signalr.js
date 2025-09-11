@@ -70,6 +70,28 @@ async function initializeSignalR() {
         console.log('[BrainCards] BroadcastTrace:', info);
     });
 
+    /**
+     * Handle response from SendOverseerMessage
+     */
+    connection.on('OverseerMessageReceived', (response) => {
+        console.log('[BrainCards] OverseerMessageReceived:', response);
+        if (response.Success) {
+            console.log('Refresh request processed successfully');
+        } else {
+            console.error('Refresh request failed:', response.Message);
+            alert('Refresh request failed: ' + response.Message);
+        }
+    });
+
+    /**
+     * Handle data refresh broadcast from server
+     */
+    connection.on('DataRefreshRequested', (data) => {
+        console.log('[BrainCards] Data refresh requested by server:', data);
+        // Optionally trigger a UI refresh or data reload here
+        // For example, you could call renderMarkets() or similar functions
+    });
+
     // CONNECTION LIFECYCLE MANAGEMENT
 
     /**

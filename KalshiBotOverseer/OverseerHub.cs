@@ -280,6 +280,7 @@ namespace KalshiBotOverseer
             }
         }
 
+
         private string GenerateAuthToken(string clientId, string clientName)
         {
             // Simple token generation - in production, use proper JWT or secure tokens

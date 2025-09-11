@@ -370,6 +370,52 @@ namespace KalshiBotOverseer
         }
 
 
+        public async Task SendOverseerMessage(string messageType, string message)
+        {
+            _logger.LogInformation("Received SendOverseerMessage: {MessageType} - {Message}", messageType, message);
+
+            try
+            {
+                // Handle different message types
+                switch (messageType.ToLower())
+                {
+                    case "refresh_data":
+                        // Broadcast refresh request to all connected clients
+                        await Clients.All.SendAsync("DataRefreshRequested", new
+                        {
+                            MessageType = messageType,
+                            Message = message,
+                            Timestamp = DateTime.UtcNow,
+                            RequestedBy = Context.ConnectionId
+                        });
+                        break;
+
+                    default:
+                        _logger.LogWarning("Unknown message type received: {MessageType}", messageType);
+                        break;
+                }
+
+                // Send confirmation back to caller
+                await Clients.Caller.SendAsync("OverseerMessageReceived", new
+                {
+                    Success = true,
+                    MessageType = messageType,
+                    Timestamp = DateTime.UtcNow,
+                    Message = "Message processed successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing SendOverseerMessage: {MessageType}", messageType);
+                await Clients.Caller.SendAsync("OverseerMessageReceived", new
+                {
+                    Success = false,
+                    MessageType = messageType,
+                    Message = $"Failed to process message: {ex.Message}"
+                });
+            }
+        }
+
         private string GenerateAuthToken(string clientId, string clientName)
         {
             using var sha256 = System.Security.Cryptography.SHA256.Create();

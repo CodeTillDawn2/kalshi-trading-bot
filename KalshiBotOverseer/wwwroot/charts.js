@@ -63,7 +63,7 @@ function renderChart() {
 
         // Create sample chart data (placeholders)
         const ctx = canvas.getContext('2d');
-        const now = moment();
+        const now = new Date();
 
         // Sample price data points
         const labels = [];
