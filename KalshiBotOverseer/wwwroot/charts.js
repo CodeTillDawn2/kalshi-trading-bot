@@ -307,79 +307,128 @@ function closeChartModal() {
 
 // Render performance charts for brain cards
 function renderBrainCharts(brainStatusMessage) {
-    const brainInstanceName = brainStatusMessage.BrainInstanceName;
-    const safeName = brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_');
+    try {
+        const brainInstanceName = brainStatusMessage.BrainInstanceName;
+        if (!brainInstanceName) {
+            console.warn('[renderBrainCharts] Missing brain instance name');
+            return;
+        }
 
-    // CPU Usage Chart
-    if (brainStatusMessage.CpuUsageHistory && brainStatusMessage.CpuUsageHistory.length > 0) {
-        renderMiniChart(`cpu-chart-${safeName}`, brainStatusMessage.CpuUsageHistory, 'CPU %', '#28a745');
-    }
+        const safeName = brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_');
 
-    // Event Queue Chart
-    if (brainStatusMessage.EventQueueHistory && brainStatusMessage.EventQueueHistory.length > 0) {
-        renderMiniChart(`event-chart-${safeName}`, brainStatusMessage.EventQueueHistory, 'Events', '#ffc107');
-    }
+        // CPU Usage Chart
+        if (brainStatusMessage.CpuUsageHistory && Array.isArray(brainStatusMessage.CpuUsageHistory) && brainStatusMessage.CpuUsageHistory.length > 0) {
+            renderMiniChart(`cpu-chart-${safeName}`, brainStatusMessage.CpuUsageHistory, 'CPU %', '#28a745');
+        }
 
-    // Orderbook Queue Chart
-    if (brainStatusMessage.OrderbookQueueHistory && brainStatusMessage.OrderbookQueueHistory.length > 0) {
-        renderMiniChart(`orderbook-chart-${safeName}`, brainStatusMessage.OrderbookQueueHistory, 'Orders', '#dc3545');
-    }
+        // Event Queue Chart
+        if (brainStatusMessage.EventQueueHistory && Array.isArray(brainStatusMessage.EventQueueHistory) && brainStatusMessage.EventQueueHistory.length > 0) {
+            renderMiniChart(`event-chart-${safeName}`, brainStatusMessage.EventQueueHistory, 'Events', '#ffc107');
+        }
 
-    // Error Chart
-    if (brainStatusMessage.ErrorHistory && brainStatusMessage.ErrorHistory.length > 0) {
-        renderMiniChart(`error-chart-${safeName}`, brainStatusMessage.ErrorHistory, 'Errors', '#ff6b6b');
-    } else if (brainStatusMessage.NotificationQueueHistory && brainStatusMessage.NotificationQueueHistory.length > 0) {
-        // Fallback to NotificationQueueHistory if ErrorHistory is not available
-        renderMiniChart(`error-chart-${safeName}`, brainStatusMessage.NotificationQueueHistory, 'Errors', '#ff6b6b');
+        // Orderbook Queue Chart
+        if (brainStatusMessage.OrderbookQueueHistory && Array.isArray(brainStatusMessage.OrderbookQueueHistory) && brainStatusMessage.OrderbookQueueHistory.length > 0) {
+            renderMiniChart(`orderbook-chart-${safeName}`, brainStatusMessage.OrderbookQueueHistory, 'Orders', '#dc3545');
+        }
+
+        // Error Chart
+        if (brainStatusMessage.ErrorHistory && Array.isArray(brainStatusMessage.ErrorHistory) && brainStatusMessage.ErrorHistory.length > 0) {
+            renderMiniChart(`error-chart-${safeName}`, brainStatusMessage.ErrorHistory, 'Errors', '#ff6b6b');
+        } else if (brainStatusMessage.NotificationQueueHistory && Array.isArray(brainStatusMessage.NotificationQueueHistory) && brainStatusMessage.NotificationQueueHistory.length > 0) {
+            // Fallback to NotificationQueueHistory if ErrorHistory is not available
+            renderMiniChart(`error-chart-${safeName}`, brainStatusMessage.NotificationQueueHistory, 'Errors', '#ff6b6b');
+        }
+    } catch (error) {
+        console.error('[renderBrainCharts] Error rendering charts:', error);
     }
 }
 
 // Render mini chart for brain metrics
 function renderMiniChart(canvasId, historyData, label, color) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-
-    // Prepare data
-    const data = historyData.slice(-10); // Last 10 points for mini chart
-    const labels = data.map(item => new Date(item.Timestamp));
-    const values = data.map(item => item.Value);
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: label,
-                data: values,
-                borderColor: color,
-                backgroundColor: color.replace('rgb', 'rgba').replace(')', ', 0.1)'),
-                borderWidth: 1,
-                pointRadius: 0,
-                fill: true,
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: false,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    display: false
-                },
-                y: {
-                    display: false
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            animation: {
-                duration: 0 // Disable animation for performance
-            }
+    try {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.warn(`[renderMiniChart] Canvas element not found: ${canvasId}`);
+            return;
         }
-    });
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.warn(`[renderMiniChart] Could not get canvas context for: ${canvasId}`);
+            return;
+        }
+
+        // Validate history data
+        if (!Array.isArray(historyData) || historyData.length === 0) {
+            console.warn(`[renderMiniChart] Invalid or empty history data for: ${canvasId}`);
+            return;
+        }
+
+        // Prepare data - ensure we have valid data points
+        const validData = historyData.filter(item =>
+            item && typeof item.Timestamp !== 'undefined' && typeof item.Value === 'number'
+        );
+
+        if (validData.length === 0) {
+            console.warn(`[renderMiniChart] No valid data points found for: ${canvasId}`);
+            return;
+        }
+
+        const data = validData.slice(-10); // Last 10 points for mini chart
+        const labels = data.map(item => {
+            try {
+                return new Date(item.Timestamp);
+            } catch (e) {
+                console.warn(`[renderMiniChart] Invalid timestamp for ${canvasId}:`, item.Timestamp);
+                return new Date();
+            }
+        });
+        const values = data.map(item => item.Value);
+
+        // Clear any existing chart
+        if (canvas.chart) {
+            canvas.chart.destroy();
+        }
+
+        canvas.chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: values,
+                    borderColor: color,
+                    backgroundColor: color.replace('rgb', 'rgba').replace(')', ', 0.1)'),
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        display: false
+                    },
+                    y: {
+                        display: false
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                animation: {
+                    duration: 0 // Disable animation for performance
+                }
+            }
+        });
+
+        console.log(`[renderMiniChart] Successfully rendered chart for ${canvasId} with ${data.length} data points`);
+    } catch (error) {
+        console.error(`[renderMiniChart] Error rendering chart for ${canvasId}:`, error);
+    }
 }

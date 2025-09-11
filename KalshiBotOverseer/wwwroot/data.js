@@ -27,6 +27,7 @@
 async function refreshAllData() {
     await Promise.all([
         loadMarketWatchData(),
+        loadBrainsData(),
         loadPositionsData(),
         loadOrdersData(),
         loadSnapshotsData(),
