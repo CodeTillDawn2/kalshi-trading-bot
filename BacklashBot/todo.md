@@ -1,4 +1,27 @@
-﻿# TradingSnapshotService Feedback
+﻿# WebSocketMonitorService Feedback
+**Class Analysis Summary:**
+- **Purpose**: WebSocketMonitorService manages the Kalshi exchange status monitoring and WebSocket connection lifecycle for the trading bot. It periodically checks exchange operational status, automatically connects/disconnects the WebSocket client based on market availability and bot initialization state, and ensures reliable real-time data streaming with comprehensive error handling and recovery mechanisms.
+- **Key Improvements Made**:
+  - Renamed unclear field names for better clarity (_isConnected → _isWebSocketConnected, _monitorTask → _exchangeStatusMonitorTask)
+  - Renamed unclear method names for better clarity (MonitorExchangeStatusAsync → MonitorAndManageWebSocketConnectionAsync)
+  - Updated logging references from "WebSocketHostedService" to "WebSocketMonitorService" for consistency
+  - Added comprehensive XML documentation for the entire class and all public methods
+  - Promoted important debug logs to Information level for better visibility (WebSocket connection/disconnection events, monitoring task completion)
+  - Verified no placeholders or incomplete implementations exist
+  - Confirmed no unused methods in the class
+  - No notes about removed functionality present
+- **Strengths**: Well-architected service with robust exchange status monitoring, intelligent WebSocket connection management based on initialization state, comprehensive error handling with appropriate retry logic and backoff, actively used in production for real-time data connectivity, follows established patterns, proper integration with dependency injection and service ecosystem, excellent thread safety and cancellation support, effective monitoring loop with configurable timing.
+- **Areas for Improvement**:
+  - Consider implementing configuration options for monitoring intervals instead of hardcoded 1-minute checks
+  - Add performance metrics collection for connection attempt success rates and monitoring operation timing
+  - Consider implementing circuit breaker pattern for repeated connection failures
+  - Add configuration options for error retry delays instead of hardcoded 5-minute backoff
+  - Consider adding health checks for WebSocket connection quality beyond just connected/disconnected state
+  - The monitoring loop could benefit from more sophisticated state management during exchange transitions
+  - Add metrics for exchange status check frequency and success rates
+- **Overall Assessment**: Excellent, production-ready service that effectively manages the critical task of WebSocket connection lifecycle and exchange status monitoring. The improvements enhance code clarity, maintainability, and operational visibility without breaking existing functionality. The class is well-architected with proper separation of concerns, robust error handling, and comprehensive connection management. No critical issues found - the implementation is sophisticated and serves as a reliable foundation for real-time trading data connectivity.
+
+# TradingSnapshotService Feedback
 **Class Analysis Summary:**
 - **Purpose**: TradingSnapshotService manages the complete lifecycle of market data snapshots for the Kalshi trading bot, including saving comprehensive market state to disk and loading historical snapshots for analysis. This service handles snapshot validation, timing controls, parallel processing for efficient data retrieval, and schema compatibility through JSON sanitization. It serves as the critical data persistence layer for trading strategy evaluation and backtesting operations.
 - **Key Improvements Made**:

@@ -149,7 +149,7 @@ namespace KalshiBotAPI.Websockets
 
                 if (_allowReconnect)
                 {
-                    _logger.LogInformation("Waiting 5 seconds");
+                    _logger.LogDebug("Waiting 5 seconds");
                     await Task.Delay(5000);
                     await ConnectAsync();
                 }
@@ -172,7 +172,7 @@ namespace KalshiBotAPI.Websockets
 
         public async Task SendMessageAsync(string message)
         {
-            _logger.LogInformation("Sending WebSocket message: {Message}", message);
+            _logger.LogDebug("Sending WebSocket message: {Message}", message);
             ClientWebSocket currentSocket;
             lock (_webSocketLock)
             {

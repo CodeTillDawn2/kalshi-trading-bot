@@ -298,7 +298,7 @@ namespace BacklashBot.Management
 
                 var myWatches = await context.GetMarketWatches_cached(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock });
 
-                _logger.LogInformation("BRAIN: Found {0} markets to consider for removal.", myWatches.Count());
+                _logger.LogDebug("BRAIN: Found {0} markets to consider for removal.", myWatches.Count());
 
                 if (myWatches.Count() == 0) return 0;
 

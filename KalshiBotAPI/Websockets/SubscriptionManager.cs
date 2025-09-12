@@ -399,7 +399,7 @@ namespace KalshiBotAPI.Websockets
                     channel, subscription.Sid, subscriptionId, action, string.Join(", ", marketsToUpdate));
 
                 // Log the full message for debugging
-                _logger.LogInformation("SUB-Full update_subscription message: {Message}", message);
+                _logger.LogDebug("SUB-Full update_subscription message: {Message}", message);
 
                 if (new[] { "orderbook_delta", "ticker", "trade" }.Contains(channel))
                 {
@@ -738,7 +738,7 @@ namespace KalshiBotAPI.Websockets
                 }
                 {
                     waited = true;
-                    _logger.LogInformation("Waiting for order book queue to clear for market: {MarketTicker}", marketTicker);
+                    _logger.LogDebug("Waiting for order book queue to clear for market: {MarketTicker}", marketTicker);
                 }
 
                 if (DateTime.UtcNow - startTime > timeout)
@@ -751,7 +751,7 @@ namespace KalshiBotAPI.Websockets
             }
 
             if (waited)
-                _logger.LogInformation("Market {0} waited {1}s before saving snapshot", marketTicker, (DateTime.UtcNow - startTime).TotalSeconds);
+                _logger.LogDebug("Market {0} waited {1}s before saving snapshot", marketTicker, (DateTime.UtcNow - startTime).TotalSeconds);
         }
 
         public void ResetEventCounts()

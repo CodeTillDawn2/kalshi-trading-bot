@@ -116,7 +116,7 @@ namespace BacklashBot.Services
                     _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                     var (processed, errors) = await marketService.FetchCandlesticksAsync(
                         market.Event.Series.series_ticker, marketTicker, intervalData.Item1, intervalData.Item2, null, false);
-                    _logger.LogInformation("Fetched {Processed} candlesticks for {MarketTicker} at {Interval}, errors: {Errors}",
+                    _logger.LogDebug("Fetched {Processed} candlesticks for {MarketTicker} at {Interval}, errors: {Errors}",
                         processed, marketTicker, intervalData.Item1, errors);
                 }
                 _logger.LogInformation("Completed candlestick update for {MarketTicker}", marketTicker);
@@ -179,7 +179,7 @@ namespace BacklashBot.Services
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                _logger.LogInformation("Populating market data for {MarketTicker}", marketTicker);
+                _logger.LogDebug("Populating market data for {MarketTicker}", marketTicker);
                 if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
                 {
                     if (!_serviceFactory.GetDataCache().RecentlyRemovedMarkets.Contains(marketTicker))
@@ -457,7 +457,7 @@ namespace BacklashBot.Services
                 startDate = latestExistingDate.Value;
             }
 
-            _logger.LogInformation("Processing candlesticks for {MarketTicker} at {Interval}: StartDate={StartDate}Z, ExistingCount={ExistingCount}",
+            _logger.LogDebug("Processing candlesticks for {MarketTicker} at {Interval}: StartDate={StartDate}Z, ExistingCount={ExistingCount}",
                 marketTicker, interval, startDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), existingCandlesticks.Count);
 
             // Load from Parquet files
@@ -745,7 +745,7 @@ namespace BacklashBot.Services
 
                 // Save to parquet
                 await SaveToParquetAsync(groupCandles, filePath);
-                _logger.LogInformation("Saved {Count} candlesticks to {FilePath} for {Interval}", groupCandles.Count, filePath, interval);
+                _logger.LogDebug("Saved {Count} candlesticks to {FilePath} for {Interval}", groupCandles.Count, filePath, interval);
             });
 
             await Task.WhenAll(saveTasks);
@@ -830,7 +830,7 @@ namespace BacklashBot.Services
                     }
 
                     success = true;
-                    _logger.LogInformation("Saved {Count} candlesticks to {FilePath}", data.Count, filePath);
+                    _logger.LogDebug("Saved {Count} candlesticks to {FilePath}", data.Count, filePath);
                 }
                 catch (Exception ex)
                 {
