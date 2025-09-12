@@ -1,4 +1,8 @@
-// BroadcastService.cs
+/// <summary>
+/// Service responsible for broadcasting system status and health information to connected SignalR clients.
+/// Manages periodic check-in broadcasts containing brain instance status, market data, performance metrics,
+/// and system health indicators to keep monitoring systems and dashboards updated.
+/// </summary>
 using Microsoft.AspNetCore.SignalR;
 using BacklashBot.Hubs;
 using BacklashBot.Services.Interfaces;
@@ -9,17 +13,32 @@ using BacklashDTOs.Configuration;
 
 namespace BacklashBot.Services
 {
+    /// <summary>
+    /// Implements the broadcast service for real-time system status communication.
+    /// Handles periodic broadcasting of comprehensive system health data to connected clients
+    /// including performance metrics, market information, and operational status.
+    /// </summary>
     public class BroadcastService : IBroadcastService
     {
         private readonly IHubContext<ChartHub> _hubContext;
         private readonly IServiceFactory _serviceFactory;
         private readonly ILogger<IBroadcastService> _logger;
-        private Task? _checkInBroadcastTask;
+        private Task? _statusBroadcastTask;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IScopeManagerService _scopeManagerService;
         private readonly IStatusTrackerService _statusTracker;
         private readonly ExecutionConfig _executionConfig;
 
+        /// <summary>
+        /// Initializes a new instance of the BroadcastService with required dependencies.
+        /// </summary>
+        /// <param name="hubContext">SignalR hub context for broadcasting messages to connected clients</param>
+        /// <param name="serviceFactory">Factory for accessing other system services</param>
+        /// <param name="statusTracker">Service for tracking system status and cancellation tokens</param>
+        /// <param name="scopeFactory">Factory for creating service scopes</param>
+        /// <param name="logger">Logger for recording service operations and errors</param>
+        /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
+        /// <param name="executionConfig">Configuration options for execution parameters</param>
         public BroadcastService(
             IHubContext<ChartHub> hubContext,
             IServiceFactory serviceFactory,
@@ -38,16 +57,20 @@ namespace BacklashBot.Services
             _executionConfig = executionConfig.Value;
         }
 
+        /// <summary>
+        /// Starts the broadcast service, initiating the periodic status broadcast loop.
+        /// Creates a background task that broadcasts system status every 30 seconds to connected clients.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation</returns>
         public async Task StartServicesAsync()
         {
             try
             {
-                _logger.LogDebug("BroadcastService starting...");
+                _logger.LogInformation("BroadcastService starting...");
 
                 var cancellationToken = _statusTracker.GetCancellationToken();
 
-                // Only keep the 30-second CheckIn broadcast loop - no automatic market data broadcasting
-                _checkInBroadcastTask = Task.Run(async () =>
+                _statusBroadcastTask = Task.Run(async () =>
                 {
                     while (!cancellationToken.IsCancellationRequested)
                     {
@@ -59,32 +82,38 @@ namespace BacklashBot.Services
                             }
                             else
                             {
-                                _logger.LogDebug("No clients connected, skipping CheckIn broadcast.");
+                                _logger.LogDebug("No clients connected, skipping status broadcast.");
                             }
                             await Task.Delay(30000, cancellationToken); // 30 seconds
                         }
                         catch (OperationCanceledException)
                         {
-                            _logger.LogDebug("CheckIn broadcast task canceled.");
+                            _logger.LogInformation("Status broadcast task canceled.");
                             break;
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError(ex, "Error in CheckIn broadcast cycle.");
+                            _logger.LogError(ex, "Error in status broadcast cycle.");
                         }
                     }
                 }, cancellationToken);
 
-                _logger.LogDebug("BroadcastService started with automatic check-ins only.");
+                _logger.LogInformation("BroadcastService started successfully.");
                 await Task.CompletedTask;
             }
             catch (OperationCanceledException)
             {
-                _logger.LogDebug("BroadcastService.StartAsync stopped due to cancellation");
+                _logger.LogInformation("BroadcastService startup canceled due to cancellation request.");
                 return;
             }
         }
 
+        /// <summary>
+        /// Broadcasts comprehensive system status information to all connected SignalR clients.
+        /// Gathers data from various system services including market information, performance metrics,
+        /// error counts, and operational status, then sends it as a CheckIn message.
+        /// </summary>
+        /// <returns>A task representing the asynchronous broadcast operation</returns>
         private async Task BroadcastCheckInAsync()
         {
             var stopwatch = Stopwatch.StartNew();
@@ -92,11 +121,11 @@ namespace BacklashBot.Services
             cancellationToken.ThrowIfCancellationRequested();
             if (!ChartHub.HasConnectedClients())
             {
-                _logger.LogDebug("No clients connected, skipping CheckIn broadcast.");
+                _logger.LogDebug("No clients connected, skipping status broadcast.");
                 return;
             }
 
-            _logger.LogDebug("Broadcasting CheckIn");
+            _logger.LogInformation("Broadcasting system status check-in");
             try
             {
                 var markets = await GetWatchedMarketsAsync();
@@ -118,7 +147,7 @@ namespace BacklashBot.Services
                 var isShuttingDown = performanceTracker.IsShuttingDown;
 
                 var brainInstanceName = performanceTracker.BrainInstance;
-                _logger.LogInformation("BROADCAST: Creating CheckInData with BrainInstanceName='{BrainInstanceName}'", brainInstanceName);
+                _logger.LogInformation("Creating CheckInData with BrainInstanceName='{BrainInstanceName}'", brainInstanceName);
 
                 var checkInData = new CheckInData
                 {
@@ -128,14 +157,14 @@ namespace BacklashBot.Services
                     LastSnapshot = lastSnapshot == DateTime.MinValue ? (DateTime?)null : lastSnapshot,
                     IsStartingUp = isStartingUp,
                     IsShuttingDown = isShuttingDown,
-                    WatchPositions = false, // Set based on configuration if available
-                    WatchOrders = false, // Set based on configuration if available
-                    ManagedWatchList = false, // Set based on configuration if available
-                    CaptureSnapshots = false, // Set based on configuration if available
-                    TargetWatches = 0, // Set based on configuration if available
-                    MinimumInterest = 0.0, // Set based on configuration if available
-                    UsageMin = 0.0, // Set based on configuration if available
-                    UsageMax = 0.0, // Set based on configuration if available
+                    WatchPositions = false,
+                    WatchOrders = false,
+                    ManagedWatchList = false,
+                    CaptureSnapshots = false,
+                    TargetWatches = 0,
+                    MinimumInterest = 0.0,
+                    UsageMin = 0.0,
+                    UsageMax = 0.0,
                     CurrentCpuUsage = currentCpuUsage,
                     EventQueueAvg = eventQueueAvg,
                     TickerQueueAvg = tickerQueueAvg,
@@ -152,12 +181,12 @@ namespace BacklashBot.Services
 
                 await _hubContext.Clients.All.SendAsync("CheckIn", checkInData, cancellationToken);
                 var perfMonitor = _serviceFactory.GetPerformanceMonitor();
-                _logger.LogDebug("CheckIn broadcasted from {BrainInstanceName} with {MarketCount} markets, ErrorCount: {ErrorCount}, LastSnapshot: {LastSnapshot}, LastErrorDate: {LastErrorDate}",
-                    perfMonitor?.BrainInstance ?? "Unknown", markets.Count, errorHandler.ErrorCount, lastSnapshot, lastErrorDate);
+                _logger.LogInformation("Status broadcast completed from {BrainInstanceName} with {MarketCount} markets, ErrorCount: {ErrorCount}",
+                    perfMonitor?.BrainInstance ?? "Unknown", markets.Count, errorHandler.ErrorCount);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error broadcasting CheckIn");
+                _logger.LogError(ex, "Error broadcasting system status");
             }
             finally
             {
@@ -165,6 +194,10 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Retrieves the list of currently watched markets from the market data service.
+        /// </summary>
+        /// <returns>A list of market identifiers that are currently being watched</returns>
         private async Task<List<string>> GetWatchedMarketsAsync()
         {
             var cancellationToken = _statusTracker.GetCancellationToken();
@@ -175,13 +208,18 @@ namespace BacklashBot.Services
             return markets;
         }
 
+        /// <summary>
+        /// Stops the broadcast service and cleans up resources.
+        /// Waits for the background broadcast task to complete and clears connected clients.
+        /// </summary>
+        /// <returns>A task representing the asynchronous shutdown operation</returns>
         public async Task StopServicesAsync()
         {
-            _logger.LogDebug("BroadcastService stopping...");
+            _logger.LogInformation("BroadcastService stopping...");
             try
             {
                 var tasksToWait = new List<Task>();
-                if (_checkInBroadcastTask != null) tasksToWait.Add(_checkInBroadcastTask);
+                if (_statusBroadcastTask != null) tasksToWait.Add(_statusBroadcastTask);
                 if (tasksToWait.Any())
                 {
                     await Task.WhenAll(tasksToWait).ConfigureAwait(false);
@@ -190,18 +228,21 @@ namespace BacklashBot.Services
             }
             catch (OperationCanceledException)
             {
-                _logger.LogDebug("BroadcastService tasks canceled as expected.");
+                _logger.LogInformation("BroadcastService tasks canceled as expected.");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error stopping BroadcastService.");
             }
-            _logger.LogDebug("BroadcastService stopped.");
+            _logger.LogInformation("BroadcastService stopped.");
         }
 
+        /// <summary>
+        /// Disposes of the broadcast service resources.
+        /// </summary>
         public void Dispose()
         {
-            _checkInBroadcastTask?.Dispose();
+            _statusBroadcastTask?.Dispose();
         }
     }
 }
