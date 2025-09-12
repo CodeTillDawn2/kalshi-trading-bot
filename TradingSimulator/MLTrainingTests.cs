@@ -72,7 +72,7 @@ namespace TradingSimulator.ML
             var db = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
             // Get all snapshot groups and filter to sufficiently long recordings
-            var groups = await db.GetSnapshotGroups_cached().ConfigureAwait(false);
+            var groups = await db.GetSnapshotGroups().ConfigureAwait(false);
             var good = groups.Where(g => (g.EndTime - g.StartTime).TotalHours >= minRecordedHours).ToList();
 
             // Choose up to N markets with the most coverage
@@ -88,7 +88,7 @@ namespace TradingSimulator.ML
                 var allDto = new List<SnapshotDTO>();
                 foreach (var g in m.Groups)
                 {
-                    var snaps = await db.GetSnapshots_cached(marketTicker: g.MarketTicker, startDate: g.StartTime, endDate: g.EndTime).ConfigureAwait(false);
+                    var snaps = await db.GetSnapshots(marketTicker: g.MarketTicker, startDate: g.StartTime, endDate: g.EndTime).ConfigureAwait(false);
                     allDto.AddRange(snaps);
                 }
 

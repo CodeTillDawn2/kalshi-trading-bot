@@ -63,7 +63,7 @@ namespace KalshiBotOverseer
         {
             using var scope = scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-            HashSet<string> inactiveMarkets = await context.GetInactiveMarketsWithNoSnapshots();
+            HashSet<string> inactiveMarkets = await context.GetInactiveMarketTickersWithoutSnapshots();
 
             foreach (string marketTicker in inactiveMarkets)
             {
@@ -102,7 +102,7 @@ namespace KalshiBotOverseer
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
             var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
 
-            List<MarketDTO> MarketsWhichAreLikelyClosed = await context.GetMarkets_cached(
+            List<MarketDTO> MarketsWhichAreLikelyClosed = await context.GetMarketsFiltered(
                 includedStatuses: null,
                 excludedStatuses: new HashSet<string> { KalshiConstants.Status_Finalized,
                                                         KalshiConstants.Status_Inactive,
@@ -154,7 +154,7 @@ namespace KalshiBotOverseer
             using var scope = scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
             var interestScoreHelper = scope.ServiceProvider.GetRequiredService<IInterestScoreService>();
-            var overnightInterestScoresData = await context.GetMarkets(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active },
+            var overnightInterestScoresData = await context.GetMarketsFiltered(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active },
                 maxInterestScoreDate: DateTime.Now.AddHours(-12));
 
             foreach (MarketDTO market in overnightInterestScoresData)

@@ -49,14 +49,14 @@ namespace KalshiBotOverseer.Controllers
                 var markets = await _cache.GetOrCreateAsync(MarketsCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetMarkets(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active })).ToList();
+                    return (await _context.GetMarketsFiltered(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active })).ToList();
                 });
 
                 // Get cached brain instances for lookup
                 var brainInstances = await _cache.GetOrCreateAsync(BrainInstancesCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetBrainInstances_cached())
+                    return (await _context.GetBrainInstancesFiltered(hasBrainLock: true))
                         .Where(bi => bi.BrainLock.HasValue)
                         .ToDictionary(bi => bi.BrainLock.Value, bi => bi.BrainInstanceName);
                 });
@@ -65,7 +65,7 @@ namespace KalshiBotOverseer.Controllers
                 var allBrainInstances = await _cache.GetOrCreateAsync(AllBrainInstancesCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetBrainInstances_cached()).ToList();
+                    return (await _context.GetBrainInstancesFiltered()).ToList();
                 });
 
                 // Get market watches for active markets only
@@ -131,21 +131,21 @@ namespace KalshiBotOverseer.Controllers
                 var markets = await _cache.GetOrCreateAsync(MarketsCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetMarkets(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active })).ToList();
+                    return (await _context.GetMarketsFiltered(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active })).ToList();
                 });
 
                 // Get all brain instances from database (not just those with BrainLock)
                 var allBrainInstances = await _cache.GetOrCreateAsync(AllBrainInstancesCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetBrainInstances_cached()).ToList();
+                    return (await _context.GetBrainInstancesFiltered()).ToList();
                 });
 
                 // Get cached brain instances with BrainLock for lookup
                 var brainInstancesWithLock = await _cache.GetOrCreateAsync(BrainInstancesCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetBrainInstances_cached())
+                    return (await _context.GetBrainInstancesFiltered(hasBrainLock: true))
                         .Where(bi => bi.BrainLock.HasValue)
                         .ToDictionary(bi => bi.BrainLock.Value, bi => bi.BrainInstanceName);
                 });
@@ -174,7 +174,7 @@ namespace KalshiBotOverseer.Controllers
                                 try
                                 {
                                     // Query for snapshot messages
-                                    var snapshotLogs = await _context.GetLogEntries(
+                                    var snapshotLogs = await _context.GetLogEntriesFiltered(
                                         brainInstance: brainInstanceName,
                                         maxRecords: 1);
 
@@ -185,7 +185,7 @@ namespace KalshiBotOverseer.Controllers
                                     }
 
                                     // Query for error messages
-                                    var errorLogs = await _context.GetLogEntries(
+                                    var errorLogs = await _context.GetLogEntriesFiltered(
                                         brainInstance: brainInstanceName,
                                         level: "ERROR",
                                         maxRecords: 1);
@@ -412,7 +412,7 @@ namespace KalshiBotOverseer.Controllers
                 var brainInstances = await _cache.GetOrCreateAsync(AllBrainInstancesCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetBrainInstances_cached()).ToList();
+                    return (await _context.GetBrainInstancesFiltered()).ToList();
                 });
 
                 // Get all market watches

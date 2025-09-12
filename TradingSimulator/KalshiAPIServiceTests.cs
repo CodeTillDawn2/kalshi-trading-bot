@@ -49,7 +49,7 @@ namespace TradingSimulator.Tests
             _realContext = new KalshiBotContext(_configuration);
 
             // Query for an active market
-            var activeMarket = await _realContext.GetMarkets_cached(
+            var activeMarket = await _realContext.GetMarketsFiltered(
                 includedStatuses: new HashSet<string> { KalshiConstants.Status_Active }
             );
 
@@ -61,7 +61,7 @@ namespace TradingSimulator.Tests
             _testEventTicker = marketDto.event_ticker;
 
             // Get series ticker from event
-            var eventDto = await _realContext.GetEventByTicker_cached(_testEventTicker);
+            var eventDto = await _realContext.GetEventByTicker(_testEventTicker);
             Assert.That(eventDto, Is.Not.Null, "Event not found");
             _testSeriesTicker = eventDto.series_ticker;
 
@@ -99,7 +99,7 @@ namespace TradingSimulator.Tests
             // Setup common DB methods used across API functions
             _contextMock.Setup(c => c.AddOrUpdateMarkets(It.IsAny<List<MarketDTO>>())).Returns(Task.CompletedTask);
             _contextMock.Setup(c => c.AddOrUpdateMarket(It.IsAny<MarketDTO>())).Returns(Task.CompletedTask);
-            _contextMock.Setup(c => c.GetMarketByTicker_cached(It.IsAny<string>())).ReturnsAsync(new MarketDTO { status = KalshiConstants.Status_Active });
+            _contextMock.Setup(c => c.GetMarketByTicker(It.IsAny<string>())).ReturnsAsync(new MarketDTO { status = KalshiConstants.Status_Active });
             _contextMock.Setup(c => c.AddOrUpdateSeries(It.IsAny<SeriesDTO>())).Returns(Task.CompletedTask);
             _contextMock.Setup(c => c.AddOrUpdateEvent(It.IsAny<EventDTO>())).Returns(Task.CompletedTask);
             _contextMock.Setup(c => c.GetMarketPositions(null, null, null)).ReturnsAsync(new List<MarketPositionDTO>());

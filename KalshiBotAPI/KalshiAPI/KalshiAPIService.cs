@@ -304,7 +304,7 @@ namespace KalshiBotAPI.KalshiAPI
 
                     foreach (var ticker in tickers.Where(t => !foundTickers.Contains(t)))
                     {
-                        var existingMarket = await context.GetMarketByTicker_cached(ticker);
+                        var existingMarket = await context.GetMarketByTicker(ticker);
 
                         if (existingMarket != null)
                         {

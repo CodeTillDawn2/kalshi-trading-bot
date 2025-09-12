@@ -413,7 +413,7 @@ namespace BacklashBot.Services
             var schemaData = schema.ToJson();
 
             int expectedVersion = _snapshotConfig.Value.SnapshotSchemaVersion;
-            SnapshotSchemaDTO? schemaDTO = await context.GetSnapshotSchema_cached(expectedVersion);
+            SnapshotSchemaDTO? schemaDTO = await context.GetSnapshotSchema(expectedVersion);
             if (schemaDTO == null)
             {
                 throw new Exception($"Schema version {expectedVersion} not found in database");

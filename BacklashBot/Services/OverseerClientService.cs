@@ -292,7 +292,7 @@ namespace BacklashBot.Services
                 var context = scope.ServiceProvider.GetRequiredService<KalshiBotData.Data.Interfaces.IKalshiBotContext>();
 
                 // Get active overseers from database, ordered by most recent heartbeat
-                var activeOverseers = await context.GetActiveOverseers();
+                var activeOverseers = await context.GetActiveOverseerInfos();
 
                 if (activeOverseers.Any())
                 {
@@ -459,7 +459,7 @@ namespace BacklashBot.Services
                 var context = scope.ServiceProvider.GetRequiredService<KalshiBotData.Data.Interfaces.IKalshiBotContext>();
 
                 // Get the most recent active overseer
-                var activeOverseers = await context.GetActiveOverseers();
+                var activeOverseers = await context.GetActiveOverseerInfos();
 
                 if (!activeOverseers.Any())
                 {

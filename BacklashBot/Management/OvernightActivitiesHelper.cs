@@ -97,7 +97,7 @@ namespace BacklashBot.Management
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
             var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
 
-            List<MarketDTO> MarketsWhichAreLikelyClosed = await context.GetMarkets_cached(
+            List<MarketDTO> MarketsWhichAreLikelyClosed = await context.GetMarkets(
                 includedStatuses: null,
                 excludedStatuses: new HashSet<string> { KalshiConstants.Status_Finalized,
                                                         KalshiConstants.Status_Inactive,

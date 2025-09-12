@@ -77,7 +77,7 @@ namespace BacklashBot.Services
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
                 var marketService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
-                var market = await context.GetMarketByTicker_cached(marketTicker);
+                var market = await context.GetMarketByTicker(marketTicker);
                 if (market == null) return;
 
                 DateTime startTime = market.open_time.ToUniversalTime();
@@ -87,7 +87,7 @@ namespace BacklashBot.Services
                 long lastHourTimestamp = startTimestamp;
                 long lastDayTimestamp = startTimestamp;
 
-                CandlestickDTO? lastCandle = await context.GetLastCandlestick(marketTicker, 1);
+                CandlestickDTO? lastCandle = await context.GetLatestCandlestick(marketTicker, 1);
                 if (lastCandle != null)
                 {
                     lastMinuteTimestamp = lastCandle.end_period_ts;
@@ -95,7 +95,7 @@ namespace BacklashBot.Services
                 _logger.LogDebug("Last minute candlestick for {MarketTicker}: end_period_ts={Timestamp}",
                     marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastMinuteTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
 
-                lastCandle = await context.GetLastCandlestick(marketTicker, 2);
+                lastCandle = await context.GetLatestCandlestick(marketTicker, 2);
                 if (lastCandle != null)
                 {
                     lastHourTimestamp = lastCandle.end_period_ts;
@@ -195,7 +195,7 @@ namespace BacklashBot.Services
 
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                var market = await context.GetMarketByTicker_cached(marketTicker);
+                var market = await context.GetMarketByTicker(marketTicker);
                 if (market == null)
                 {
                     _logger.LogWarning("Market not found in database for {MarketTicker}", marketTicker);

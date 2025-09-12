@@ -52,15 +52,15 @@ namespace BacklashBot.Management
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
-            var tickersAnalyzed = await context.GetSnapshotGroups_cached();
+            var tickersAnalyzed = await context.GetSnapshotGroupsFiltered();
             var tickerHashSet = tickersAnalyzed
                 .Select(x => x.MarketTicker)
                 .Distinct()
                 .ToHashSet();
 
-            HashSet<string> tickersWithSnapshots = await context.GetMarketsWithSnapshots();
+            HashSet<string> tickersWithSnapshots = await context.GetMarketTickersWithSnapshots();
 
-            HashSet<string> tickersToAnalyze = (await context.GetMarkets(
+            HashSet<string> tickersToAnalyze = (await context.GetMarketsFiltered(
                 excludedStatuses: new HashSet<string> { KalshiConstants.Status_Active },
                 excludedMarkets: tickerHashSet,
                 includedMarkets: tickersWithSnapshots))
@@ -83,7 +83,7 @@ namespace BacklashBot.Management
                     try
                     {
                         await Task.Delay(5000);
-                        rawSnapshots = await context.GetSnapshots(marketTicker: marketTicker);
+                        rawSnapshots = await context.GetSnapshotsFiltered(marketTicker: marketTicker);
                         rawSnapshots = rawSnapshots.OrderBy(x => x.SnapshotDate).ToList();
                     }
                     catch (Exception retryEx)

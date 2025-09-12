@@ -19,7 +19,7 @@ namespace TradingSimulator
         public async Task<List<SnapshotGroupDTO>> GetFilteredSnapshotGroupsAsync(
             IKalshiBotContext context, List<string>? marketsToRun)
         {
-            var groups = await context.GetSnapshotGroups_cached().ConfigureAwait(false);
+            var groups = await context.GetSnapshotGroups().ConfigureAwait(false);
             var filtered = new List<SnapshotGroupDTO>();
             foreach (var g in groups)
             {
@@ -46,7 +46,7 @@ namespace TradingSimulator
             var allSnapshotData = new List<SnapshotDTO>();
             foreach (var g in marketGroups)
             {
-                var snaps = await context.GetSnapshots_cached(
+                var snaps = await context.GetSnapshots(
                     marketTicker: g.MarketTicker,
                     startDate: g.StartTime,
                     endDate: g.EndTime).ConfigureAwait(false);
@@ -77,7 +77,7 @@ namespace TradingSimulator
                 var allSnapshotData = new List<SnapshotDTO>();
                 foreach (var g in marketGroups)
                 {
-                    var snaps = await context.GetSnapshots_cached(
+                    var snaps = await context.GetSnapshots(
                         marketTicker: g.MarketTicker,
                         startDate: g.StartTime,
                         endDate: g.EndTime).ConfigureAwait(false);

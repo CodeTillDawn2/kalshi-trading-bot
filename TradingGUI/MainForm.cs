@@ -268,7 +268,7 @@ namespace SimulatorWinForms
                 }
 
                 // Query markets from database
-                var markets = await _context.GetMarkets(includedMarkets: bases.ToHashSet());
+                var markets = await _context.GetMarketsFiltered(includedMarkets: bases.ToHashSet());
                 
                 foreach (var market in markets.OrderBy(m => m.market_ticker))
                 {

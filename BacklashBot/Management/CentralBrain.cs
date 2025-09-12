@@ -251,7 +251,7 @@ namespace BacklashBot.Management
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
-                _thisBrain = await context.GetBrainInstance(instanceName: _brainInstance);
+                _thisBrain = await context.GetBrainInstanceByName(instanceName: _brainInstance);
                 if (_thisBrain == null)
                     throw new Exception($"Brain instance was not found: {_brainInstance}");
 
@@ -263,7 +263,7 @@ namespace BacklashBot.Management
                 }
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
                 // Load existing watched markets for this brain lock, sorted by interest score descending
-                var watchedMarketsList = await context.GetMarketWatches_cached(
+                var watchedMarketsList = await context.GetMarketWatchesFiltered(
                     brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock });
                 var sortedWatchedMarkets = watchedMarketsList
                     .OrderByDescending(w => w.InterestScore ?? double.MinValue)
@@ -276,7 +276,7 @@ namespace BacklashBot.Management
                 {
                     List<MarketPositionDTO> positionMarkets = await context.GetMarketPositions(hasPosition: true, hasRestingOrder: false);
                     HashSet<string> positionMarketTickers = positionMarkets.Select(x => x.Ticker).ToHashSet();
-                    watchedList = await context.GetMarketWatches_cached(marketTickers: positionMarketTickers, brainLockIsNull: true);
+                    watchedList = await context.GetMarketWatchesFiltered(marketTickers: positionMarketTickers, brainLockIsNull: true);
                     MarketsWatched = MarketsWatched.Union(watchedList).ToHashSet();
                     foreach (MarketWatchDTO existingWatch in watchedList)
                     {
@@ -302,7 +302,7 @@ namespace BacklashBot.Management
                     List<MarketPositionDTO> restingOrdersMarkets = await context.GetMarketPositions(hasPosition: true, hasRestingOrder: false);
                     HashSet<string> restingTickers = restingOrdersMarkets.Select(x => x.Ticker).ToHashSet();
 
-                    watchedList = await context.GetMarketWatches_cached(marketTickers: restingTickers, brainLockIsNull: true);
+                    watchedList = await context.GetMarketWatchesFiltered(marketTickers: restingTickers, brainLockIsNull: true);
                     MarketsWatched = MarketsWatched.Union(watchedList).ToHashSet();
                     foreach (MarketWatchDTO existingWatch in watchedList)
                     {
@@ -669,7 +669,7 @@ namespace BacklashBot.Management
 
             HashSet<Guid> staleBrainLocks = staleBrains.Where(x => x.BrainLock != null).Select(x => x.BrainLock.Value).ToHashSet();
 
-            List<BrainInstanceDTO> allBrainInstancesWithLock = await context.GetBrainInstances_cached(hasBrainLock: true);
+            List<BrainInstanceDTO> allBrainInstancesWithLock = await context.GetBrainInstancesFiltered(hasBrainLock: true);
             HashSet<Guid> AllBrainLocks = allBrainInstancesWithLock.Select(x => x.BrainLock.Value).ToHashSet();
 
             foreach (BrainInstanceDTO staleBrain in staleBrains)
@@ -692,7 +692,7 @@ namespace BacklashBot.Management
             {
                 try
                 {
-                    var staleLocks = await context.GetMarketWatches(brainLocksIncluded: new HashSet<Guid>() { staleBrainLock });
+                    var staleLocks = await context.GetMarketWatchesFiltered(brainLocksIncluded: new HashSet<Guid>() { staleBrainLock });
                     foreach (MarketWatchDTO staleLock in staleLocks)
                     {
                         staleLock.BrainLock = null;
@@ -707,7 +707,7 @@ namespace BacklashBot.Management
 
             }
 
-            var myWatches = await context.GetMarketWatches_cached(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock });
+            var myWatches = await context.GetMarketWatchesFiltered(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock });
 
             foreach (MarketWatchDTO myWatch in myWatches)
             {
@@ -731,7 +731,7 @@ namespace BacklashBot.Management
                 }
             }
 
-            HashSet<MarketWatchDTO> orphanedWatches = await context.GetMarketWatches_cached(
+            HashSet<MarketWatchDTO> orphanedWatches = await context.GetMarketWatchesFiltered(
                 brainLocksExcluded: AllBrainLocks, brainLockIsNull: false);
 
             foreach (MarketWatchDTO orphanedWatch in orphanedWatches)

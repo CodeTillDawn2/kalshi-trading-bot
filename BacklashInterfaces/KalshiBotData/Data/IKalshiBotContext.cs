@@ -8,60 +8,62 @@ namespace KalshiBotData.Data.Interfaces
     {
         #region Series
         Task<SeriesDTO?> GetSeriesByTicker(string seriesTicker);
-        Task<SeriesDTO?> GetSeriesByTicker_cached(string seriesTicker);
         Task AddOrUpdateSeries(SeriesDTO dto);
         #endregion
 
         #region Events
         Task<EventDTO?> GetEventByTicker(string eventTicker);
-        Task<EventDTO?> GetEventByTicker_cached(string eventTicker);
         Task AddOrUpdateEvent(EventDTO dto);
+        Task AddOrUpdateEvents(List<EventDTO> dtos);
         #endregion
 
         #region Markets
-        Task<MarketDTO?> GetMarketByTicker(string marketName);
-        Task<MarketDTO?> GetMarketByTicker_cached(string marketName);
+        Task<MarketDTO?> GetMarketByTicker(string marketTicker);
+        Task<CandlestickDTO?> GetLatestCandlestick(string marketTicker, int? intervalType);
+        Task<MarketWatchDTO?> GetMarketWatchByTicker(string marketTicker);
+        Task<List<MarketDTO>> GetMarketsFiltered(HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
+            HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null,
+            bool? hasMarketWatch = null, double? minimumInterestScore = null,
+            DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null);
+        Task<HashSet<MarketWatchDTO>> GetMarketWatchesFiltered(HashSet<string>? marketTickers = null,
+            HashSet<Guid>? brainLocksIncluded = null, HashSet<Guid>? brainLocksExcluded = null, bool? brainLockIsNull = null,
+            double? minInterestScore = null, double? maxInterestScore = null, DateTime? maxInterestScoreDate = null);
+        Task<List<SnapshotGroupDTO>> GetSnapshotGroupsFiltered(List<string>? marketTickersToInclude = null, int? maxGroups = null);
+        Task<List<SnapshotDTO>> GetSnapshotsFiltered(string? marketTicker = null, bool? isValidated = null,
+            DateTime? startDate = null, DateTime? endDate = null, int? MaxRecords = null, int? MaxSnapshotVersion = null);
+        Task<List<MarketWatchDTO>> GetFinalizedMarketWatchesByBrainLock(Guid brainLock);
+        Task<HashSet<string>> GetMarketTickersWithSnapshots();
         Task<HashSet<string>> GetMarketsWithSnapshots();
         Task<HashSet<string>> GetInactiveMarketsWithNoSnapshots();
+        Task<HashSet<string>> GetInactiveMarketTickersWithoutSnapshots();
         Task<HashSet<string>> GetProcessedMarkets();
         Task AddOrUpdateMarket(MarketDTO dto);
-        Task AddOrUpdateMarkets(List<MarketDTO> dtos);
         Task DeleteMarket(string marketTicker);
+        Task AddOrUpdateMarkets(List<MarketDTO> dtos);
         Task<List<MarketDTO>> GetMarkets(HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
-            HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null, bool? hasMarketWatch = null,
-            double? minimumInterestScore = null, DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null);
-        Task<List<MarketDTO>> GetMarkets_cached(HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
             HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null, bool? hasMarketWatch = null,
             double? minimumInterestScore = null, DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null);
         Task UpdateMarketLastCandlestick(string marketTicker);
         Task<(bool MarketFound, bool EventFound, bool SeriesFound)> GetMarketStatus(string marketTicker);
-        Task<(bool MarketFound, bool EventFound, bool SeriesFound)> GetMarketStatus_cached(string marketTicker);
         #endregion
 
         #region Tickers
         Task<List<TickerDTO>> GetTickers(string? marketTicker = null, DateTime? loggedDate = null);
-        Task<List<TickerDTO>> GetTickers_cached(string? marketTicker = null, DateTime? loggedDate = null);
-        Task AddOrUpdateTickers(List<TickerDTO> dto);
+        Task AddOrUpdateTickers(List<TickerDTO> dtos);
         Task AddOrUpdateTicker(TickerDTO dto);
         #endregion
 
         #region Candlesticks
         Task<List<CandlestickDTO>> GetCandlesticks(string marketTicker, int? intervalType = null);
-        Task<List<CandlestickDTO>> GetCandlesticks_cached(string marketTicker, int? intervalType = null);
         Task<CandlestickDTO?> GetLastCandlestick(string marketTicker, int? intervalType);
-        Task<CandlestickDTO?> GetLastCandlestick_cached(string marketTicker, int? intervalType);
         Task AddOrUpdateCandlestick(CandlestickDTO dto);
         Task<List<CandlestickData>> RetrieveCandlesticksAsync(CancellationToken token, int intervalType, string marketTicker, DateTime sqlStartTime);
-        Task<List<CandlestickData>> RetrieveCandlesticksAsync_cached(CancellationToken token, int intervalType, string marketTicker, DateTime sqlStartTime);
         Task ImportJsonCandlesticks();
         #endregion
 
         #region Market Watches
         Task<MarketWatchDTO?> GetMarketWatch(string marketTicker);
         Task<HashSet<MarketWatchDTO>> GetMarketWatches(HashSet<string>? marketTickers = null,
-            HashSet<Guid>? brainLocksIncluded = null, HashSet<Guid>? brainLocksExcluded = null, bool? brainLockIsNull = null,
-            double? minInterestScore = null, double? maxInterestScore = null, DateTime? maxInterestScoreDate = null);
-        Task<HashSet<MarketWatchDTO>> GetMarketWatches_cached(HashSet<string>? marketTickers = null,
             HashSet<Guid>? brainLocksIncluded = null, HashSet<Guid>? brainLocksExcluded = null, bool? brainLockIsNull = null,
             double? minInterestScore = null, double? maxInterestScore = null, DateTime? maxInterestScoreDate = null);
         Task<List<MarketWatchDTO>> GetFinalizedMarketWatches(Guid brainLock);
@@ -74,53 +76,43 @@ namespace KalshiBotData.Data.Interfaces
 
         #region Market Positions
         Task<MarketPositionDTO?> GetMarketPosition(string marketTicker);
-        Task<List<MarketPositionDTO>> GetMarketPositions(HashSet<string>? marketTickers = null
-            , bool? hasPosition = null, bool? hasRestingOrder = null);
-        Task<List<MarketPositionDTO>> GetMarketPositions_cached(HashSet<string>? marketTickers = null
-            , bool? hasPosition = null, bool? hasRestingOrder = null);
+        Task<List<MarketPositionDTO>> GetMarketPositions(HashSet<string>? marketTickers = null,
+            bool? hasPosition = null, bool? hasRestingOrder = null);
         Task AddOrUpdateMarketPosition(MarketPositionDTO dto);
         Task RemoveMarketPosition(string marketTicker);
         #endregion
 
         #region Orders
         Task<List<OrderDTO>> GetOrders(string? marketTicker = null, string? status = null);
-        Task<List<OrderDTO>> GetOrders_cached(string? marketTicker = null, string? status = null);
         Task AddOrUpdateOrder(OrderDTO dto);
         #endregion
 
         #region Snapshot
         Task<List<SnapshotDTO>> GetSnapshots(string? marketTicker = null, bool? isValidated = null,
             DateTime? startDate = null, DateTime? endDate = null, int? MaxRecords = null, int? MaxSnapshotVersion = null);
-        Task<List<SnapshotDTO>> GetSnapshots_cached(string? marketTicker = null, bool? isValidated = null,
-            DateTime? startDate = null, DateTime? endDate = null, int? MaxRecords = null, int? MaxSnapshotVersion = null);
         Task AddOrUpdateSnapshot(SnapshotDTO dto);
         Task AddOrUpdateSnapshots(List<SnapshotDTO> dtos);
-
         Task AddSnapshots(List<SnapshotDTO> snapshots);
-
         Task<long> GetSnapshotCount(string marketTicker);
         #endregion
 
         #region Snapshot Schemas
         Task<SnapshotSchemaDTO?> GetSnapshotSchema(int version);
-        Task<SnapshotSchemaDTO?> GetSnapshotSchema_cached(int version);
         Task<List<SnapshotSchemaDTO>> GetSnapshotSchemas();
         Task<SnapshotSchemaDTO> AddSnapshotSchema(SnapshotSchemaDTO dto);
         #endregion
 
         #region Brain Instances
+        Task<BrainInstanceDTO?> GetBrainInstanceByName(string? instanceName);
         Task<BrainInstanceDTO?> GetBrainInstance(string? instanceName);
-        Task<List<BrainInstanceDTO>> GetBrainInstances(string? instanceName = null, bool? hasBrainLock = null);
-        Task<List<BrainInstanceDTO>> GetBrainInstances_cached(string? instanceName = null, bool? hasBrainLock = null);
+        Task<List<BrainInstanceDTO>> GetBrainInstancesFiltered(string? instanceName = null, bool? hasBrainLock = null);
         Task<List<BrainInstanceDTO>> GetStaleBrains(Guid brainLock);
         Task AddOrUpdateBrainInstance(BrainInstanceDTO dto);
         #endregion
 
         #region Snapshot Groups
         Task<List<SnapshotGroupDTO>> GetSnapshotGroups(List<string>? marketTickersToInclude = null, int? maxGroups = null);
-        Task<List<SnapshotGroupDTO>> GetSnapshotGroups_cached(List<string>? marketTickersToInclude = null, int? maxGroups = null);
         Task<HashSet<string>> GetSnapshotGroupNames();
-        Task<HashSet<string>> GetSnapshotGroupNames_cached();
         Task<List<SnapshotDTO>> GetUngroupedSnapshots(int maxMarkets);
         Task AddOrUpdateSnapshotGroups(List<SnapshotGroupDTO> dtoRange);
         Task AddOrUpdateSnapshotGroup(SnapshotGroupDTO dto);
@@ -131,11 +123,12 @@ namespace KalshiBotData.Data.Interfaces
         Task AddOverseerLogEntry(LogEntryDTO dto);
         Task<List<LogEntryDTO>> GetLogEntries(string? brainInstance = null, string? level = null,
             DateTime? startDate = null, DateTime? endDate = null, int? maxRecords = null);
+        Task<List<LogEntryDTO>> GetLogEntriesFiltered(string? brainInstance = null, string? level = null,
+            DateTime? startDate = null, DateTime? endDate = null, int? maxRecords = null);
         #endregion
 
         #region WeightSets
         Task<WeightSetDTO?> GetWeightSetByStrategyName(string strategyName);
-        Task<WeightSetDTO?> GetWeightSetByStrategyName_cached(string strategyName);
         Task<List<WeightSetDTO>> GetWeightSets(HashSet<string>? strategyNames = null);
         Task<List<WeightSetDTO>> GetWeightSetsByMarketTicker(string marketTicker);
         Task AddOrUpdateWeightSet(WeightSetDTO dto);
@@ -153,11 +146,11 @@ namespace KalshiBotData.Data.Interfaces
 
         #region Other
         Task<List<MarketLiquidityStatsDTO>> GetMarketLiquidityStates();
-        Task<List<MarketLiquidityStatsDTO>> GetMarketLiquidityStates_cached();
         #endregion
 
         #region SignalR Clients
         Task<List<SignalRClient>> GetSignalRClients(string? clientId = null, string? ipAddress = null, bool? isActive = null);
+        Task<SignalRClient?> GetSignalRClientById(string clientId);
         Task<SignalRClient?> GetSignalRClient(string clientId);
         Task AddOrUpdateSignalRClient(SignalRClient client);
         Task UpdateSignalRClientConnection(string clientId, string connectionId);
@@ -167,8 +160,8 @@ namespace KalshiBotData.Data.Interfaces
 
         #region Overseer Info
         Task AddOrUpdateOverseerInfo(BacklashDTOs.Data.OverseerInfo overseerInfo);
-        Task<List<BacklashDTOs.Data.OverseerInfo>> GetActiveOverseers();
-        Task<BacklashDTOs.Data.OverseerInfo?> GetOverseerByHostName(string hostName);
+        Task<List<BacklashDTOs.Data.OverseerInfo>> GetActiveOverseerInfos();
+        Task<BacklashDTOs.Data.OverseerInfo?> GetOverseerInfoByHostName(string hostName);
         #endregion
     }
 }

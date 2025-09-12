@@ -336,7 +336,7 @@ namespace TradingSimulator.Executable
 
                         // Get market info for category
                         string? marketCategory = null;
-                        var market = await dbContext.GetMarketByTicker_cached(marketName);
+                        var market = await dbContext.GetMarketByTicker(marketName);
                         if (market?.Event == null)
                         {
                             TestContext.WriteLine($"Warning: Market {marketName} has no associated event. Skipping.");

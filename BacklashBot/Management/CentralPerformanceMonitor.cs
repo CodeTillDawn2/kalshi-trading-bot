@@ -178,7 +178,7 @@ namespace BacklashBot.Management
             if (_timerRunning) return;
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-            BrainInstanceDTO? dto = await context.GetBrainInstance(BrainInstance ?? "");
+            BrainInstanceDTO? dto = await context.GetBrainInstanceByName(BrainInstance ?? "");
 
             var marketRefreshService = _serviceFactory.GetMarketRefreshService();
             var kalshiWebSocketClient = _serviceFactory.GetKalshiWebSocketClient();

@@ -245,7 +245,7 @@ namespace BacklashBot.Management
 
                 if (!dataCache.WatchedMarkets.Contains(market))
                 {
-                    List<MarketDTO> mkts = await context.GetMarkets(includedMarkets: new HashSet<string>() { market });
+                    List<MarketDTO> mkts = await context.GetMarketsFiltered(includedMarkets: new HashSet<string>() { market });
                     MarketDTO? mkt = mkts.FirstOrDefault();
                     if (mkt != null && !KalshiConstants.IsMarketStatusEnded(mkt.status))
                     {
@@ -296,7 +296,7 @@ namespace BacklashBot.Management
                 var interestScoreHelper = _serviceFactory.GetInterestScoreService();
                 if (marketDataService is null || interestScoreHelper is null) return 0;
 
-                var myWatches = await context.GetMarketWatches_cached(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock });
+                var myWatches = await context.GetMarketWatchesFiltered(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock });
 
                 _logger.LogDebug("BRAIN: Found {0} markets to consider for removal.", myWatches.Count());
 
@@ -313,7 +313,7 @@ namespace BacklashBot.Management
                     }
                 }
 
-                var myMarketPositions = await context.GetMarketPositions_cached(myWatches.Select(x => x.market_ticker).ToHashSet());
+                var myMarketPositions = await context.GetMarketPositions(myWatches.Select(x => x.market_ticker).ToHashSet());
 
                 List<MarketWatchDTO> marketsToRemove = myWatches.OrderBy(m => m.InterestScore).ToList();
 
@@ -357,7 +357,7 @@ namespace BacklashBot.Management
             var marketDataService = _serviceFactory.GetMarketDataService();
             if (dataCache is null || marketDataService is null) return 0;
 
-            var finalizedWatches = await context.GetFinalizedMarketWatches(_brainStatus.BrainLock);
+            var finalizedWatches = await context.GetFinalizedMarketWatchesByBrainLock(_brainStatus.BrainLock);
 
             foreach (MarketWatchDTO watch in finalizedWatches)
             {
@@ -390,7 +390,7 @@ namespace BacklashBot.Management
                 var dataCache = _serviceFactory.GetDataCache();
                 if (interestScoreHelper is null || marketDataService is null || dataCache is null) return new List<string>();
 
-                var allMarketWatches = await context.GetMarketWatches(brainLockIsNull: true);
+                var allMarketWatches = await context.GetMarketWatchesFiltered(brainLockIsNull: true);
 
                 // Prioritize existing high-interest markets
                 List<MarketWatchDTO> newMarketWatches = allMarketWatches
@@ -469,7 +469,7 @@ namespace BacklashBot.Management
                                 continue;
                             }
 
-                            var existingDoubleCheck = await context.GetMarketWatches_cached(marketTickers: new HashSet<string> { market.Ticker });
+                            var existingDoubleCheck = await context.GetMarketWatchesFiltered(marketTickers: new HashSet<string> { market.Ticker });
 
                             if (existingDoubleCheck.Count == 0) // Strict check
                             {
@@ -530,7 +530,7 @@ namespace BacklashBot.Management
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
                 var token = cts.Token;
 
-                var candidates = await context.GetMarketWatches_cached(
+                var candidates = await context.GetMarketWatchesFiltered(
                     brainLocksIncluded: new HashSet<Guid> { _brainStatus.BrainLock },
                     maxInterestScore: minimumInterest
                 );
@@ -561,7 +561,7 @@ namespace BacklashBot.Management
 
                 if (brain.WatchPositions || brain.WatchOrders)
                 {
-                    var marketPositions = await context.GetMarketPositions_cached(
+                    var marketPositions = await context.GetMarketPositions(
                         marketTickers: candidates.Select(x => x.market_ticker).ToHashSet());
 
                     if (brain.WatchPositions)

@@ -326,7 +326,7 @@ namespace BacklashBot.Services
             {
                 List<MarketPositionDTO> marketPositionData = await context.GetMarketPositions(new HashSet<string>() { marketData.MarketTicker });
                 marketData.Positions = marketPositionData;
-                marketData.RestingOrders = await context.GetOrders_cached(marketData.MarketTicker, "resting");
+                marketData.RestingOrders = await context.GetOrders(marketData.MarketTicker, "resting");
                 marketData.RefreshPositionMetadata();
             }
         }
@@ -554,7 +554,7 @@ namespace BacklashBot.Services
                 }
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                MarketWatchDTO? marketWatch = await context.GetMarketWatch(marketTicker);
+                MarketWatchDTO? marketWatch = await context.GetMarketWatchByTicker(marketTicker);
                 Guid brainLock = _brainStatus.BrainLock;
                 if (marketWatch != null
                     //&& marketWatch.BrainLock == brainLock
@@ -833,14 +833,14 @@ namespace BacklashBot.Services
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
                 var marketService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
 
-                var marketStatus = await context.GetMarketStatus_cached(marketTicker);
+                var marketStatus = await context.GetMarketStatus(marketTicker);
                 MarketDTO? thisMarket;
 
                 if (!marketStatus.MarketFound)
                 {
                     await marketService.FetchMarketsAsync(marketTicker);
                 }
-                thisMarket = await context.GetMarketByTicker_cached(marketTicker);
+                thisMarket = await context.GetMarketByTicker(marketTicker);
 
                 if (thisMarket == null)
                 {
@@ -874,7 +874,7 @@ namespace BacklashBot.Services
                     thisMarket = await context.GetMarketByTicker(marketTicker);
                 }
 
-                marketStatus = await context.GetMarketStatus_cached(marketTicker);
+                marketStatus = await context.GetMarketStatus(marketTicker);
 
                 if (marketStatus.MarketFound == false || marketStatus.EventFound == false || marketStatus.SeriesFound == false)
                 {
@@ -937,7 +937,7 @@ namespace BacklashBot.Services
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
                 var markets = (await context
-                    .GetMarketWatches(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock })
+                    .GetMarketWatchesFiltered(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock })
                     ).Select(m => m.market_ticker);
 
 
@@ -1017,7 +1017,7 @@ namespace BacklashBot.Services
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
                 var markets = ((await context
-                    .GetMarketWatches(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock }))
+                    .GetMarketWatchesFiltered(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock }))
                     );
 
                 var marketTickers = markets.Select(m => m.market_ticker).ToHashSet();

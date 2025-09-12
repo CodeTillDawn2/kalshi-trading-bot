@@ -15,6 +15,22 @@ using System.Data;
 
 namespace KalshiBotData.Data
 {
+    /// <summary>
+    /// Entity Framework DbContext implementation for the Kalshi trading bot system.
+    /// Provides comprehensive data access layer for managing trading entities including markets,
+    /// events, series, snapshots, brain instances, and various trading-related data.
+    /// Implements IKalshiBotContext interface for dependency injection and testing.
+    /// </summary>
+    /// <remarks>
+    /// This context manages the complete lifecycle of trading data, including:
+    /// - Market and event data synchronization
+    /// - Trading snapshots and historical data
+    /// - Brain instance management and coordination
+    /// - Order and position tracking
+    /// - SignalR client management
+    /// - Logging and audit trails
+    /// - Weight set and strategy management
+    /// </remarks>
     public class KalshiBotContext : DbContext, IKalshiBotContext
     {
         private DbSet<Event> Events { get; set; }
@@ -52,6 +68,12 @@ namespace KalshiBotData.Data
         private readonly IConfiguration _config;
         private readonly ILogger<KalshiBotContext>? _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the KalshiBotContext with configuration and optional logging.
+        /// </summary>
+        /// <param name="config">Application configuration containing database connection strings.</param>
+        /// <param name="logger">Optional logger for context operations. If null, logging is disabled.</param>
+        /// <exception cref="InvalidOperationException">Thrown when DefaultConnection is not configured.</exception>
         public KalshiBotContext(IConfiguration config, ILogger<KalshiBotContext>? logger = null)
         {
             _config = config;
@@ -60,6 +82,11 @@ namespace KalshiBotData.Data
         }
 
         #region Series
+        /// <summary>
+        /// Retrieves a series by its ticker symbol.
+        /// </summary>
+        /// <param name="seriesTicker">The unique ticker identifier for the series.</param>
+        /// <returns>The series data transfer object, or null if not found.</returns>
         public async Task<SeriesDTO?> GetSeriesByTicker(string seriesTicker)
         {
             SeriesDTO? seriesDTO = null;
@@ -71,11 +98,21 @@ namespace KalshiBotData.Data
             return seriesDTO;
         }
 
-        public async Task<SeriesDTO?> GetSeriesByTicker_cached(string seriesTicker)
-        {
-            return await GetSeriesByTicker(seriesTicker);
-        }
 
+        /// <summary>
+        /// Adds or updates a series with its associated tags and settlement sources.
+        /// Performs idempotent operations with case-insensitive deduplication.
+        /// </summary>
+        /// <param name="dto">The series data transfer object containing series information and related data.</param>
+        /// <exception cref="Exception">Thrown when the operation fails, with details about the failure.</exception>
+        /// <remarks>
+        /// This method handles:
+        /// - Creating new series or updating existing ones
+        /// - Managing series tags with case-insensitive deduplication
+        /// - Managing settlement sources with upsert operations
+        /// - Transaction management with rollback on failure
+        /// - Retry logic for transient database errors
+        /// </remarks>
         public async Task AddOrUpdateSeries(SeriesDTO dto)
         {
             using var tx = await this.Database.BeginTransactionAsync();
@@ -172,6 +209,11 @@ namespace KalshiBotData.Data
         #endregion
 
         #region Events
+        /// <summary>
+        /// Retrieves an event by its ticker symbol, including associated series information.
+        /// </summary>
+        /// <param name="eventTicker">The unique ticker identifier for the event.</param>
+        /// <returns>The event data transfer object with series information, or null if not found.</returns>
         public async Task<EventDTO?> GetEventByTicker(string eventTicker)
         {
             var rawEvent = await Events.AsNoTracking().FirstOrDefaultAsync(x => x.event_ticker == eventTicker);
@@ -184,10 +226,6 @@ namespace KalshiBotData.Data
             return rawEvent.ToEventDTO();
         }
 
-        public async Task<EventDTO?> GetEventByTicker_cached(string eventTicker)
-        {
-            return await GetEventByTicker(eventTicker);
-        }
 
         public async Task AddOrUpdateEvent(EventDTO dto)
         {
@@ -256,6 +294,11 @@ namespace KalshiBotData.Data
         #endregion
 
         #region Markets
+        /// <summary>
+        /// Retrieves a market by its ticker symbol, including associated event and series information.
+        /// </summary>
+        /// <param name="marketTicker">The unique ticker identifier for the market.</param>
+        /// <returns>The market data transfer object with event and series information, or null if not found.</returns>
         public async Task<MarketDTO?> GetMarketByTicker(string marketTicker)
         {
             Market? market = await Markets.AsNoTracking()
@@ -279,16 +322,28 @@ namespace KalshiBotData.Data
             return market.ToMarketDTO();
         }
 
-        public async Task<MarketDTO?> GetMarketByTicker_cached(string marketTicker)
-        {
-            return await GetMarketByTicker(marketTicker);
-        }
 
+        /// <summary>
+        /// Retrieves a distinct set of market tickers that have associated snapshots.
+        /// </summary>
+        /// <returns>HashSet of market ticker strings that have at least one snapshot.</returns>
+        /// <remarks>
+        /// This method is useful for identifying markets that have historical trading data
+        /// available for analysis or backtesting purposes.
+        /// </remarks>
         public async Task<HashSet<string>> GetMarketsWithSnapshots()
         {
             return await Snapshots.AsNoTracking().Select(x => x.MarketTicker).Distinct().ToHashSetAsync();
         }
 
+        /// <summary>
+        /// Retrieves inactive markets that don't have any snapshots.
+        /// </summary>
+        /// <returns>HashSet of market tickers for inactive markets without snapshot data.</returns>
+        /// <remarks>
+        /// This method identifies markets that are no longer active and have no historical
+        /// snapshot data, which may be candidates for cleanup or special handling.
+        /// </remarks>
         public async Task<HashSet<string>> GetInactiveMarketsWithNoSnapshots()
         {
             return await Markets.AsNoTracking()
@@ -301,6 +356,19 @@ namespace KalshiBotData.Data
                 .ToHashSetAsync();
         }
 
+        public async Task<HashSet<string>> GetInactiveMarketTickersWithoutSnapshots()
+        {
+            return await GetInactiveMarketsWithNoSnapshots();
+        }
+
+        /// <summary>
+        /// Retrieves inactive markets that have been processed into snapshot groups.
+        /// </summary>
+        /// <returns>HashSet of market tickers for inactive markets that have snapshot groups.</returns>
+        /// <remarks>
+        /// This method identifies markets that are no longer active but have been processed
+        /// into snapshot groups for analysis, indicating they have completed their lifecycle.
+        /// </remarks>
         public async Task<HashSet<string>> GetProcessedMarkets()
         {
             return await Markets.AsNoTracking()
@@ -401,6 +469,22 @@ namespace KalshiBotData.Data
             }
         }
 
+        /// <summary>
+        /// Retrieves a filtered list of markets based on various criteria.
+        /// </summary>
+        /// <param name="includedStatuses">Set of market statuses to include. If specified, only markets with these statuses are returned.</param>
+        /// <param name="excludedStatuses">Set of market statuses to exclude. If specified, markets with these statuses are filtered out.</param>
+        /// <param name="includedMarkets">Set of specific market tickers to include. If specified, only these markets are returned.</param>
+        /// <param name="excludedMarkets">Set of specific market tickers to exclude. If specified, these markets are filtered out.</param>
+        /// <param name="hasMarketWatch">Filter for markets that have (true) or don't have (false) market watch data.</param>
+        /// <param name="minimumInterestScore">Minimum interest score threshold for markets with market watch data.</param>
+        /// <param name="maxInterestScoreDate">Maximum interest score date for filtering market watch data.</param>
+        /// <param name="maxAPILastFetchTime">Maximum API last fetch time for filtering recently updated markets.</param>
+        /// <returns>List of market data transfer objects matching the specified criteria.</returns>
+        /// <remarks>
+        /// This method supports complex filtering combinations and is optimized for performance
+        /// with efficient database queries that combine multiple filter conditions.
+        /// </remarks>
         public async Task<List<MarketDTO>> GetMarkets(
             HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
             HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null,
@@ -432,14 +516,6 @@ namespace KalshiBotData.Data
             return await query.Select(x => x.ToMarketDTO()).ToListAsync();
         }
 
-        public async Task<List<MarketDTO>> GetMarkets_cached(
-            HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
-            HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null,
-            bool? hasMarketWatch = null, double? minimumInterestScore = null,
-            DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null)
-        {
-            return await GetMarkets(includedStatuses, excludedStatuses, includedMarkets, excludedMarkets, hasMarketWatch, minimumInterestScore, maxInterestScoreDate, maxAPILastFetchTime);
-        }
 
         public async Task UpdateMarketLastCandlestick(string marketTicker)
         {
@@ -458,6 +534,15 @@ namespace KalshiBotData.Data
             await cmd.ExecuteNonQueryAsync();
         }
 
+        /// <summary>
+        /// Checks the existence status of a market and its hierarchical relationships (event and series).
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to check.</param>
+        /// <returns>A tuple indicating whether the market, its event, and series were found in the database.</returns>
+        /// <remarks>
+        /// This method performs an efficient single query to check the complete hierarchy
+        /// using RIGHT OUTER JOINs to ensure all relationships are verified in one database call.
+        /// </remarks>
         public async Task<(bool MarketFound, bool EventFound, bool SeriesFound)> GetMarketStatus(string marketTicker)
         {
             await using var conn = new SqlConnection(_connectionString);
@@ -487,10 +572,6 @@ namespace KalshiBotData.Data
             return (false, false, false);
         }
 
-        public async Task<(bool MarketFound, bool EventFound, bool SeriesFound)> GetMarketStatus_cached(string marketTicker)
-        {
-            return await GetMarketStatus(marketTicker);
-        }
         #endregion
 
         #region Tickers
@@ -504,10 +585,6 @@ namespace KalshiBotData.Data
             return await query.Select(x => x.ToTickerDTO()).ToListAsync();
         }
 
-        public async Task<List<TickerDTO>> GetTickers_cached(string? marketTicker = null, DateTime? loggedDate = null)
-        {
-            return await GetTickers(marketTicker, loggedDate);
-        }
 
         public async Task AddOrUpdateTickers(List<TickerDTO> dtos)
         {
@@ -558,10 +635,6 @@ namespace KalshiBotData.Data
             return await query.Select(x => x.ToCandlestickDTO()).ToListAsync();
         }
 
-        public async Task<List<CandlestickDTO>> GetCandlesticks_cached(string marketTicker, int? intervalType = null)
-        {
-            return await GetCandlesticks(marketTicker, intervalType);
-        }
 
         public async Task<CandlestickDTO?> GetLastCandlestick(string marketTicker, int? intervalType)
         {
@@ -572,10 +645,54 @@ namespace KalshiBotData.Data
             return candlestick?.ToCandlestickDTO();
         }
 
-        public async Task<CandlestickDTO?> GetLastCandlestick_cached(string marketTicker, int? intervalType)
+        public async Task<CandlestickDTO?> GetLatestCandlestick(string marketTicker, int? intervalType)
         {
             return await GetLastCandlestick(marketTicker, intervalType);
         }
+
+        public async Task<MarketWatchDTO?> GetMarketWatchByTicker(string marketTicker)
+        {
+            HashSet<MarketWatchDTO> results = await GetMarketWatches(new HashSet<string> { marketTicker });
+            if (results.Count > 1) throw new Exception($"Multiple market watches found for ticker {marketTicker}, in GetMarketWatchByTicker");
+            return results.FirstOrDefault();
+        }
+
+        public async Task<List<MarketDTO>> GetMarketsFiltered(HashSet<string>? includedStatuses = null, HashSet<string>? excludedStatuses = null,
+            HashSet<string>? includedMarkets = null, HashSet<string>? excludedMarkets = null,
+            bool? hasMarketWatch = null, double? minimumInterestScore = null,
+            DateTime? maxInterestScoreDate = null, DateTime? maxAPILastFetchTime = null)
+        {
+            return await GetMarkets(includedStatuses, excludedStatuses, includedMarkets, excludedMarkets, hasMarketWatch, minimumInterestScore, maxInterestScoreDate, maxAPILastFetchTime);
+        }
+
+        public async Task<HashSet<MarketWatchDTO>> GetMarketWatchesFiltered(HashSet<string>? marketTickers = null,
+            HashSet<Guid>? brainLocksIncluded = null, HashSet<Guid>? brainLocksExcluded = null, bool? brainLockIsNull = null,
+            double? minInterestScore = null, double? maxInterestScore = null, DateTime? maxInterestScoreDate = null)
+        {
+            return await GetMarketWatches(marketTickers, brainLocksIncluded, brainLocksExcluded, brainLockIsNull, minInterestScore, maxInterestScore, maxInterestScoreDate);
+        }
+
+        public async Task<List<SnapshotGroupDTO>> GetSnapshotGroupsFiltered(List<string>? marketTickersToInclude = null, int? maxGroups = null)
+        {
+            return await GetSnapshotGroups(marketTickersToInclude, maxGroups);
+        }
+
+        public async Task<List<SnapshotDTO>> GetSnapshotsFiltered(string? marketTicker = null, bool? isValidated = null,
+            DateTime? startDate = null, DateTime? endDate = null, int? MaxRecords = null, int? MaxSnapshotVersion = null)
+        {
+            return await GetSnapshots(marketTicker, isValidated, startDate, endDate, MaxRecords, MaxSnapshotVersion);
+        }
+
+        public async Task<List<MarketWatchDTO>> GetFinalizedMarketWatchesByBrainLock(Guid brainLock)
+        {
+            return await GetFinalizedMarketWatches(brainLock);
+        }
+
+        public async Task<HashSet<string>> GetMarketTickersWithSnapshots()
+        {
+            return await GetMarketsWithSnapshots();
+        }
+
 
         public async Task AddOrUpdateCandlestick(CandlestickDTO dto)
         {
@@ -620,10 +737,6 @@ namespace KalshiBotData.Data
             return rawCandlesticks;
         }
 
-        public async Task<List<CandlestickData>> RetrieveCandlesticksAsync_cached(CancellationToken token, int intervalType, string marketTicker, DateTime sqlStartTime)
-        {
-            return await RetrieveCandlesticksAsync(token, intervalType, marketTicker, sqlStartTime);
-        }
 
         public async Task ImportJsonCandlesticks()
         {
@@ -678,13 +791,6 @@ namespace KalshiBotData.Data
             }
         }
 
-        public async Task<HashSet<MarketWatchDTO>> GetMarketWatches_cached(HashSet<string>? marketTickers = null,
-            HashSet<Guid>? brainLocksIncluded = null, HashSet<Guid>? brainLocksExcluded = null, bool? brainLockIsNull = null,
-            double? minInterestScore = null, double? maxInterestScore = null, DateTime? maxInterestScoreDate = null)
-        {
-            return await GetMarketWatches(marketTickers, brainLocksIncluded, brainLocksExcluded,
-                brainLockIsNull, minInterestScore, maxInterestScore, maxInterestScoreDate);
-        }
 
         public async Task<List<MarketWatchDTO>> GetFinalizedMarketWatches(Guid brainLock)
         {
@@ -797,11 +903,6 @@ namespace KalshiBotData.Data
             return await query.Select(x => x.ToMarketPositionDTO()).ToListAsync();
         }
 
-        public async Task<List<MarketPositionDTO>> GetMarketPositions_cached(HashSet<string>? marketTickers = null,
-            bool? hasPosition = null, bool? hasRestingOrder = null)
-        {
-            return await GetMarketPositions(marketTickers, hasPosition, hasRestingOrder);
-        }
 
         public async Task AddOrUpdateMarketPosition(MarketPositionDTO dto)
         {
@@ -840,10 +941,6 @@ namespace KalshiBotData.Data
             return await query.Select(x => x.ToOrderDTO()).ToListAsync();
         }
 
-        public async Task<List<OrderDTO>> GetOrders_cached(string? marketTicker = null, string? status = null)
-        {
-            return await GetOrders(marketTicker, status);
-        }
 
         public async Task AddOrUpdateOrder(OrderDTO dto)
         {
@@ -898,11 +995,6 @@ namespace KalshiBotData.Data
             return await query.Select(x => x.ToSnapshotDTO()).ToListAsync();
         }
 
-        public async Task<List<SnapshotDTO>> GetSnapshots_cached(string? marketTicker = null, bool? isValidated = null,
-            DateTime? startDate = null, DateTime? endDate = null, int? MaxRecords = null, int? MaxSnapshotVersion = null)
-        {
-            return await GetSnapshots(marketTicker, isValidated, startDate, endDate, MaxRecords, MaxSnapshotVersion);
-        }
 
         public async Task AddOrUpdateSnapshot(SnapshotDTO dto)
         {
@@ -980,10 +1072,6 @@ namespace KalshiBotData.Data
                 .ToListAsync();
         }
 
-        public async Task<SnapshotSchemaDTO?> GetSnapshotSchema_cached(int version)
-        {
-            return await GetSnapshotSchema(version);
-        }
 
         public async Task<SnapshotSchemaDTO> AddSnapshotSchema(SnapshotSchemaDTO dto)
         {
@@ -1000,13 +1088,18 @@ namespace KalshiBotData.Data
         #endregion
 
         #region Brain Instances
-        public async Task<BrainInstanceDTO?> GetBrainInstance(string? instanceName)
+        public async Task<BrainInstanceDTO?> GetBrainInstanceByName(string? instanceName)
         {
             BrainInstance? instance = await BrainInstances.AsNoTracking().FirstOrDefaultAsync(x => x.BrainInstanceName == instanceName);
             return instance?.ToBrainInstanceDTO();
         }
 
-        public async Task<List<BrainInstanceDTO>> GetBrainInstances(string? instanceName = null, bool? hasBrainLock = null)
+        public async Task<BrainInstanceDTO?> GetBrainInstance(string? instanceName)
+        {
+            return await GetBrainInstanceByName(instanceName);
+        }
+
+        public async Task<List<BrainInstanceDTO>> GetBrainInstancesFiltered(string? instanceName = null, bool? hasBrainLock = null)
         {
             IQueryable<BrainInstance> query = BrainInstances.AsNoTracking();
             if (instanceName != null)
@@ -1016,10 +1109,6 @@ namespace KalshiBotData.Data
             return await query.Select(x => x.ToBrainInstanceDTO()).ToListAsync();
         }
 
-        public async Task<List<BrainInstanceDTO>> GetBrainInstances_cached(string? instanceName = null, bool? hasBrainLock = null)
-        {
-            return await GetBrainInstances(instanceName, hasBrainLock);
-        }
 
         public async Task<List<BrainInstanceDTO>> GetStaleBrains(Guid brainLock)
         {
@@ -1063,20 +1152,12 @@ namespace KalshiBotData.Data
             return await query.Select(x => x.ToSnapshotGroupDTO()).ToListAsync();
         }
 
-        public async Task<List<SnapshotGroupDTO>> GetSnapshotGroups_cached(List<string>? marketTickersToInclude = null, int? maxGroups = null)
-        {
-            return await GetSnapshotGroups(marketTickersToInclude, maxGroups);
-        }
 
         public async Task<HashSet<string>> GetSnapshotGroupNames()
         {
             return await SnapshotGroups.AsNoTracking().Select(x => x.MarketTicker).Distinct().ToHashSetAsync();
         }
 
-        public async Task<HashSet<string>> GetSnapshotGroupNames_cached()
-        {
-            return await GetSnapshotGroupNames();
-        }
 
         public async Task<List<SnapshotDTO>> GetUngroupedSnapshots(int maxMarkets)
         {
@@ -1144,10 +1225,6 @@ namespace KalshiBotData.Data
             return dto;
         }
 
-        public async Task<WeightSetDTO?> GetWeightSetByStrategyName_cached(string strategyName)
-        {
-            return await GetWeightSetByStrategyName(strategyName);
-        }
 
         public async Task<List<WeightSetDTO>> GetWeightSets(HashSet<string>? strategyNames = null)
         {
@@ -1300,6 +1377,12 @@ namespace KalshiBotData.Data
             return logEntries.Select(le => le.ToLogEntryDTO()).ToList();
         }
 
+        public async Task<List<LogEntryDTO>> GetLogEntriesFiltered(string? brainInstance = null, string? level = null,
+            DateTime? startDate = null, DateTime? endDate = null, int? maxRecords = null)
+        {
+            return await GetLogEntries(brainInstance, level, startDate, endDate, maxRecords);
+        }
+
         #endregion
 
         #region Announcements
@@ -1336,10 +1419,6 @@ namespace KalshiBotData.Data
             }).ToList();
         }
 
-        public async Task<List<MarketLiquidityStatsDTO>> GetMarketLiquidityStates_cached()
-        {
-            return await GetMarketLiquidityStates();
-        }
         #endregion
 
         #region SignalR Clients
@@ -1355,9 +1434,14 @@ namespace KalshiBotData.Data
             return await query.ToListAsync();
         }
 
-        public async Task<BacklashDTOs.SignalRClient?> GetSignalRClient(string clientId)
+        public async Task<BacklashDTOs.SignalRClient?> GetSignalRClientById(string clientId)
         {
             return await SignalRClients.AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId);
+        }
+
+        public async Task<BacklashDTOs.SignalRClient?> GetSignalRClient(string clientId)
+        {
+            return await GetSignalRClientById(clientId);
         }
 
         public async Task AddOrUpdateSignalRClient(BacklashDTOs.SignalRClient client)
@@ -1433,7 +1517,7 @@ namespace KalshiBotData.Data
             await SaveChangesAsync();
         }
 
-        public async Task<List<BacklashDTOs.Data.OverseerInfo>> GetActiveOverseers()
+        public async Task<List<BacklashDTOs.Data.OverseerInfo>> GetActiveOverseerInfos()
         {
             return await OverseerInfos
                 .Where(oi => oi.IsActive)
@@ -1441,15 +1525,33 @@ namespace KalshiBotData.Data
                 .ToListAsync();
         }
 
-        public async Task<BacklashDTOs.Data.OverseerInfo?> GetOverseerByHostName(string hostName)
+        public async Task<BacklashDTOs.Data.OverseerInfo?> GetOverseerInfoByHostName(string hostName)
         {
             return await OverseerInfos.FirstOrDefaultAsync(oi => oi.HostName == hostName && oi.IsActive);
         }
+        /// <summary>
+        /// Saves changes to the database with retry logic for transient SQL errors.
+        /// </summary>
+        /// <remarks>
+        /// Implements Polly retry policy to handle transient SQL Server errors such as:
+        /// deadlocks (1205), lock timeouts (1222), connection issues, and throttling errors.
+        /// Retries up to 3 times with exponential backoff (1s, 2s, 3s delays).
+        /// </remarks>
         private async Task SaveChangesWithRetryAsync()
         {
             var retryPolicy = Policy.Handle<SqlException>(ex => IsTransient(ex)).WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(i));
             await retryPolicy.ExecuteAsync(async () => await SaveChangesAsync());
         }
+
+        /// <summary>
+        /// Determines if a SQL exception represents a transient error that should be retried.
+        /// </summary>
+        /// <param name="ex">The SQL exception to evaluate.</param>
+        /// <returns>True if the exception is transient and should be retried.</returns>
+        /// <remarks>
+        /// Transient errors include deadlocks, timeouts, connection issues, and Azure SQL throttling.
+        /// Non-transient errors (like constraint violations) are not retried.
+        /// </remarks>
         private static bool IsTransient(SqlException ex)
         {
             var transientErrors = new HashSet<int> { 1205, 1222, 49918, 49919, 49920, 4060, 40197, 40501, 40613, 40143, 233, 64 };
@@ -1457,11 +1559,32 @@ namespace KalshiBotData.Data
         }
         #endregion
 
+        /// <summary>
+        /// Configures the database context to use SQL Server with the configured connection string.
+        /// </summary>
+        /// <param name="optionsBuilder">The options builder for configuring the context.</param>
+        /// <remarks>
+        /// This method is called by Entity Framework during context initialization.
+        /// It sets up the SQL Server provider with the connection string from configuration.
+        /// </remarks>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(_connectionString);
         }
 
+        /// <summary>
+        /// Configures the Entity Framework model with table mappings, keys, relationships, and constraints.
+        /// </summary>
+        /// <param name="modelBuilder">The model builder for configuring entity mappings.</param>
+        /// <remarks>
+        /// This method defines:
+        /// - Table names and schemas
+        /// - Primary keys and composite keys
+        /// - Foreign key relationships and cascade behaviors
+        /// - Database indexes for performance optimization
+        /// - Column constraints and default values
+        /// - Concurrency tokens for optimistic locking
+        /// </remarks>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -15,9 +15,9 @@ namespace KalshiBotOverseer.Services
         public async Task<List<object>> GetSnapshotGroupsDataAsync()
         {
             // Get all snapshot groups with their related markets
-            var snapshotGroups = await _context.GetSnapshotGroups_cached();
+            var snapshotGroups = await _context.GetSnapshotGroups();
 
-            var relatedMarkets = await _context.GetMarkets_cached(includedMarkets: snapshotGroups.Select(x => x.MarketTicker).Distinct().ToHashSet());
+            var relatedMarkets = await _context.GetMarketsFiltered(includedMarkets: snapshotGroups.Select(x => x.MarketTicker).Distinct().ToHashSet());
 
             return GetSnapshotGroupsData(snapshotGroups, relatedMarkets);
         }
