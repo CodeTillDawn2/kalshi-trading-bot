@@ -23,6 +23,14 @@ using System.Text.Json;
 
 namespace KalshiBotAPI.KalshiAPI
 {
+    /// <summary>
+    /// Provides a comprehensive service for interacting with the Kalshi trading API.
+    /// This service handles authentication, market data retrieval, order management, position tracking,
+    /// and various other API operations required for automated trading on the Kalshi platform.
+    /// It implements the IKalshiAPIService interface and uses RSA-based authentication with API keys.
+    /// The service maintains execution time tracking for performance monitoring and includes
+    /// robust error handling with cancellation token support throughout all operations.
+    /// </summary>
     public class KalshiAPIService : IKalshiAPIService
     {
         private readonly ILogger<IKalshiAPIService> _logger;
@@ -35,7 +43,7 @@ namespace KalshiBotAPI.KalshiAPI
         private Dictionary<string, string> AuthHeaders = new Dictionary<string, string>();
         private IStatusTrackerService _statusTrackerService;
 
-        private readonly ConcurrentDictionary<string, ConcurrentBag<long>> _executionTimes = new();
+        private readonly ConcurrentDictionary<string, ConcurrentBag<long>> _methodExecutionDurations = new();
 
         private readonly Dictionary<string, (int Minutes, int DbType, int MaxDays, int CushionSeconds)> _intervals = new()
         {
@@ -71,6 +79,13 @@ namespace KalshiBotAPI.KalshiAPI
             _scopeFactory = scopeFactory;
         }
 
+        /// <summary>
+        /// Generates authentication headers required for Kalshi API requests.
+        /// Creates a timestamp, constructs a message, signs it with the private key, and returns the necessary headers.
+        /// </summary>
+        /// <param name="method">The HTTP method (e.g., "GET", "POST") for the request.</param>
+        /// <param name="path">The API endpoint path for the request.</param>
+        /// <returns>A dictionary containing the authentication headers (KALSHI-ACCESS-KEY, KALSHI-ACCESS-SIGNATURE, KALSHI-ACCESS-TIMESTAMP).</returns>
         private Dictionary<string, string> GenerateAuthHeaders(string method, string path)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -93,21 +108,24 @@ namespace KalshiBotAPI.KalshiAPI
             finally
             {
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GenerateAuthHeaders), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GenerateAuthHeaders), stopwatch.ElapsedMilliseconds);
             }
         }
 
         /// <summary>
-        /// Use updateNotFoundToClosed=false if using filters that might exclude some markets even though explicitly requested
+        /// Fetches market data from the Kalshi API based on the provided filters.
+        /// This method retrieves market information in batches if tickers are specified, processes the API responses into MarketDTO objects,
+        /// and persists them to the database. It handles pagination automatically and supports filtering by various market attributes.
+        /// If specific tickers are requested and updateNotFoundToClosed is true, any tickers not returned by the API will be marked as closed in the database.
         /// </summary>
-        /// <param name="eventTicker"></param>
-        /// <param name="seriesTicker"></param>
-        /// <param name="maxCloseTs"></param>
-        /// <param name="minCloseTs"></param>
-        /// <param name="status"></param>
-        /// <param name="tickers"></param>
-        /// <param name="updateNotFoundToClosed"></param>
-        /// <returns></returns>
+        /// <param name="eventTicker">Optional filter to retrieve markets for a specific event ticker.</param>
+        /// <param name="seriesTicker">Optional filter to retrieve markets for a specific series ticker.</param>
+        /// <param name="maxCloseTs">Optional filter for markets with close time before this timestamp.</param>
+        /// <param name="minCloseTs">Optional filter for markets with close time after this timestamp.</param>
+        /// <param name="status">Optional filter for market status (e.g., "active", "closed").</param>
+        /// <param name="tickers">Optional array of specific market tickers to retrieve. If provided, markets are fetched in batches of up to 20.</param>
+        /// <param name="updateNotFoundToClosed">If true and tickers are specified, marks any requested tickers not found in API responses as closed.</param>
+        /// <returns>A tuple containing the count of successfully processed markets and the count of errors encountered.</returns>
         public async Task<(int ProcessedCount, int ErrorCount)> FetchMarketsAsync(
     string? eventTicker = null, string? seriesTicker = null, string? maxCloseTs = null,
     string? minCloseTs = null, string? status = null, string[]? tickers = null, bool updateNotFoundToClosed = true)
@@ -311,7 +329,7 @@ namespace KalshiBotAPI.KalshiAPI
                 }
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(FetchMarketsAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(FetchMarketsAsync), stopwatch.ElapsedMilliseconds);
                 return (processedCount, errorCount);
             }
             catch (OperationCanceledException)
@@ -327,6 +345,11 @@ namespace KalshiBotAPI.KalshiAPI
         }
 
 
+        /// <summary>
+        /// Retrieves the current exchange schedule from the Kalshi API.
+        /// This includes trading hours, maintenance windows, and other operational schedule information for the exchange.
+        /// </summary>
+        /// <returns>The exchange schedule response containing schedule details, or an empty response if the operation fails.</returns>
         public async Task<ExchangeScheduleResponse> GetExchangeScheduleAsync()
         {
             var stopwatch = Stopwatch.StartNew();
@@ -350,7 +373,7 @@ namespace KalshiBotAPI.KalshiAPI
                 );
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GetExchangeScheduleAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GetExchangeScheduleAsync), stopwatch.ElapsedMilliseconds);
                 return scheduleData ?? new ExchangeScheduleResponse();
             }
             catch (OperationCanceledException)
@@ -365,6 +388,14 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Creates a new order on the Kalshi platform for the specified market.
+        /// Validates the order request parameters and sends the order to the API.
+        /// Supports both market and limit orders with appropriate validation for each type.
+        /// </summary>
+        /// <param name="marketTicker">The ticker symbol of the market for which to create the order.</param>
+        /// <param name="orderRequest">The order details including action, type, side, count, and pricing information.</param>
+        /// <returns>The API response containing order details if successful, null if the operation fails or is cancelled.</returns>
         public async Task<CreateOrderResponse?> CreateOrderAsync(string marketTicker, CreateOrderRequest orderRequest)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -413,7 +444,7 @@ namespace KalshiBotAPI.KalshiAPI
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                 );
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(CreateOrderAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(CreateOrderAsync), stopwatch.ElapsedMilliseconds);
                 return orderResponse;
             }
             catch (OperationCanceledException)
@@ -434,6 +465,12 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Cancels an existing order on the Kalshi platform.
+        /// Sends a DELETE request to the API to cancel the specified order by its ID.
+        /// </summary>
+        /// <param name="orderId">The unique identifier of the order to cancel.</param>
+        /// <returns>The API response containing cancellation details if successful, null if the operation fails or is cancelled.</returns>
         public async Task<CancelOrderResponse?> CancelOrderAsync(string orderId)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -462,7 +499,7 @@ namespace KalshiBotAPI.KalshiAPI
                 );
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(CancelOrderAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(CancelOrderAsync), stopwatch.ElapsedMilliseconds);
                 return cancelResponse;
             }
             catch (OperationCanceledException)
@@ -483,6 +520,13 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Fetches detailed information about a specific series from the Kalshi API.
+        /// Retrieves series metadata including tags and settlement sources, processes the data into DTOs,
+        /// and persists the information to the database for future reference.
+        /// </summary>
+        /// <param name="seriesTicker">The ticker symbol of the series to retrieve.</param>
+        /// <returns>The API response containing series details if successful, null if the operation fails or is cancelled.</returns>
         public async Task<SeriesResponse?> FetchSeriesAsync(string seriesTicker)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -546,9 +590,9 @@ namespace KalshiBotAPI.KalshiAPI
 
                 await context.AddOrUpdateSeries(series);
 
-                _logger.LogDebug("Successfully fetched and saved series data for ticker: {SeriesTicker}", seriesTicker);
+                _logger.LogInformation("Successfully fetched and saved series data for ticker: {SeriesTicker}", seriesTicker);
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(FetchSeriesAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(FetchSeriesAsync), stopwatch.ElapsedMilliseconds);
                 return seriesResponse;
             }
             catch (OperationCanceledException)
@@ -564,6 +608,14 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Fetches detailed information about a specific event from the Kalshi API.
+        /// Optionally includes nested market data if requested. Processes the event data into DTOs
+        /// and persists both event and market information to the database.
+        /// </summary>
+        /// <param name="eventTicker">The ticker symbol of the event to retrieve.</param>
+        /// <param name="withNestedMarkets">If true, includes detailed market data nested within the event response.</param>
+        /// <returns>The API response containing event details if successful, null if the operation fails or is cancelled.</returns>
         public async Task<EventResponse?> FetchEventAsync(string eventTicker, bool withNestedMarkets = false)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -671,9 +723,9 @@ namespace KalshiBotAPI.KalshiAPI
                     }
                 }
 
-                _logger.LogDebug("Successfully fetched and saved event data for ticker: {EventTicker}", eventTicker);
+                _logger.LogInformation("Successfully fetched and saved event data for ticker: {EventTicker}", eventTicker);
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(FetchEventAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(FetchEventAsync), stopwatch.ElapsedMilliseconds);
                 return eventResponse;
             }
             catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key"))
@@ -697,6 +749,17 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Fetches the user's current positions from the Kalshi API.
+        /// Retrieves position data with support for pagination, filtering, and settlement status.
+        /// Processes the API responses into position DTOs and updates the database, removing positions
+        /// that are no longer present in the API response.
+        /// </summary>
+        /// <param name="cursor">Optional pagination cursor for retrieving subsequent pages of positions.</param>
+        /// <param name="limit">Optional limit on the number of positions to retrieve per request.</param>
+        /// <param name="countFilter">Optional filter for positions based on count (e.g., "gt:0" for positions greater than 0).</param>
+        /// <param name="settlementStatus">Optional filter for positions by settlement status.</param>
+        /// <returns>A tuple containing the count of successfully processed positions and the count of errors encountered.</returns>
         public async Task<(int ProcessedCount, int ErrorCount)> FetchPositionsAsync(
             string? cursor = null,
             int? limit = null,
@@ -815,7 +878,7 @@ namespace KalshiBotAPI.KalshiAPI
                     }
                 }
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(FetchPositionsAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(FetchPositionsAsync), stopwatch.ElapsedMilliseconds);
                 return (processedCount, errorCount);
             }
             catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key"))
@@ -837,6 +900,19 @@ namespace KalshiBotAPI.KalshiAPI
 
         }
 
+        /// <summary>
+        /// Fetches candlestick data for a specific market and time interval from the Kalshi API.
+        /// Supports minute, hour, and day intervals with automatic pagination and rate limiting handling.
+        /// Processes the data into candlestick DTOs and persists them to the database.
+        /// Optionally updates the market's last candlestick timestamp for tracking purposes.
+        /// </summary>
+        /// <param name="seriesTicker">The ticker symbol of the series containing the market.</param>
+        /// <param name="marketTicker">The ticker symbol of the market for which to retrieve candlesticks.</param>
+        /// <param name="interval">The time interval for candlesticks ("minute", "hour", or "day").</param>
+        /// <param name="startTs">The starting timestamp for the data range (Unix timestamp).</param>
+        /// <param name="endTs">Optional ending timestamp for the data range. If not provided, calculated based on interval.</param>
+        /// <param name="updateLastCandlestick">If true and interval is "minute", updates the market's last candlestick timestamp.</param>
+        /// <returns>A tuple containing the count of successfully processed candlesticks and the count of errors encountered.</returns>
         public async Task<(int ProcessedCount, int ErrorCount)> FetchCandlesticksAsync(
             string seriesTicker,
             string marketTicker,
@@ -943,7 +1019,7 @@ namespace KalshiBotAPI.KalshiAPI
                     }
                 }
 
-                _logger.LogDebug("Fetched {Count} candlesticks for {MarketTicker} from API", candlesticks.Count, marketTicker);
+                _logger.LogInformation("Fetched {Count} candlesticks for {MarketTicker} from API", candlesticks.Count, marketTicker);
 
                 foreach (var apiCandlestick in candlesticks)
                 {
@@ -1006,7 +1082,7 @@ namespace KalshiBotAPI.KalshiAPI
 
                     try
                     {
-                        _logger.LogDebug("API: Updating last candlestick for market {0}", marketTicker);
+                        _logger.LogInformation("API: Updating last candlestick for market {0}", marketTicker);
                         await context.UpdateMarketLastCandlestick(marketTicker);
                     }
                     catch (Exception ex)
@@ -1018,7 +1094,7 @@ namespace KalshiBotAPI.KalshiAPI
                 }
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(FetchCandlesticksAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(FetchCandlesticksAsync), stopwatch.ElapsedMilliseconds);
                 return (processedCount, errorCount);
             }
             catch (OperationCanceledException)
@@ -1034,6 +1110,11 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Retrieves the current account balance from the Kalshi API.
+        /// Returns the balance in cents as a long integer.
+        /// </summary>
+        /// <returns>The current account balance in cents, or 0 if the operation fails.</returns>
         public async Task<long> GetBalanceAsync()
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1059,7 +1140,7 @@ namespace KalshiBotAPI.KalshiAPI
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                 );
 
-                _logger.LogDebug("Balance: {Balance}", balanceData.Balance);
+                _logger.LogInformation("Balance: {Balance}", balanceData.Balance);
                 return balanceData.Balance;
             }
             catch (OperationCanceledException)
@@ -1075,10 +1156,15 @@ namespace KalshiBotAPI.KalshiAPI
             finally
             {
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GetBalanceAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GetBalanceAsync), stopwatch.ElapsedMilliseconds);
             }
         }
 
+        /// <summary>
+        /// Retrieves the current operational status of the Kalshi exchange.
+        /// This includes information about whether the exchange is open for trading, in maintenance, or closed.
+        /// </summary>
+        /// <returns>The exchange status information, or an empty status object if the operation fails.</returns>
         public async Task<ExchangeStatus?> GetExchangeStatusAsync()
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1117,10 +1203,23 @@ namespace KalshiBotAPI.KalshiAPI
             finally
             {
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GetExchangeStatusAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GetExchangeStatusAsync), stopwatch.ElapsedMilliseconds);
             }
         }
 
+        /// <summary>
+        /// Fetches order data from the Kalshi API with support for various filters and pagination.
+        /// Retrieves orders based on ticker, event ticker, timestamp ranges, status, and other criteria.
+        /// Processes the API responses into order DTOs and persists them to the database.
+        /// </summary>
+        /// <param name="ticker">Optional filter for orders by market ticker.</param>
+        /// <param name="eventTicker">Optional filter for orders by event ticker.</param>
+        /// <param name="minTs">Optional minimum timestamp filter for order creation time.</param>
+        /// <param name="maxTs">Optional maximum timestamp filter for order creation time.</param>
+        /// <param name="status">Optional filter for order status (e.g., "pending", "filled").</param>
+        /// <param name="cursor">Optional pagination cursor for retrieving subsequent pages of orders.</param>
+        /// <param name="limit">Optional limit on the number of orders to retrieve per request.</param>
+        /// <returns>A tuple containing the count of successfully processed orders and the count of errors encountered.</returns>
         public async Task<(int ProcessedCount, int ErrorCount)> FetchOrdersAsync(
             string? ticker = null,
             string? eventTicker = null,
@@ -1243,7 +1342,7 @@ namespace KalshiBotAPI.KalshiAPI
                     }
                 }
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(FetchOrdersAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(FetchOrdersAsync), stopwatch.ElapsedMilliseconds);
                 return (processedCount, errorCount);
             }
             catch (OperationCanceledException)
@@ -1258,6 +1357,11 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Fetches the latest announcements from the Kalshi exchange.
+        /// Retrieves important notifications and updates from the platform and stores them in the database.
+        /// </summary>
+        /// <returns>A tuple containing the count of successfully processed announcements and the count of errors encountered.</returns>
         public async Task<(int ProcessedCount, int ErrorCount)> FetchAnnouncementsAsync()
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1311,7 +1415,7 @@ namespace KalshiBotAPI.KalshiAPI
                 processedCount = announcementsToAdd.Count;
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(FetchAnnouncementsAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(FetchAnnouncementsAsync), stopwatch.ElapsedMilliseconds);
                 return (processedCount, errorCount);
             }
             catch (OperationCanceledException)
@@ -1326,6 +1430,11 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Fetches the complete exchange schedule including trading hours and maintenance windows.
+        /// Processes the schedule data into DTOs and persists the information to the database for operational planning.
+        /// </summary>
+        /// <returns>A tuple containing the count of successfully processed schedule items and the count of errors encountered.</returns>
         public async Task<(int ProcessedCount, int ErrorCount)> FetchExchangeScheduleAsync()
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1482,7 +1591,7 @@ namespace KalshiBotAPI.KalshiAPI
                 processedCount = 1; // One schedule processed
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(FetchExchangeScheduleAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(FetchExchangeScheduleAsync), stopwatch.ElapsedMilliseconds);
                 return (processedCount, errorCount);
             }
             catch (OperationCanceledException)
@@ -1497,6 +1606,11 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Retrieves the total value of all resting orders in the user's account.
+        /// This provides insight into the current exposure from open orders.
+        /// </summary>
+        /// <returns>The total resting order value response, or null if the operation fails.</returns>
         public async Task<TotalRestingOrderValueResponse?> GetTotalRestingOrderValueAsync()
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1522,7 +1636,7 @@ namespace KalshiBotAPI.KalshiAPI
                 _logger.LogInformation("Total resting order value: {TotalValue}", result?.TotalValue);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GetTotalRestingOrderValueAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GetTotalRestingOrderValueAsync), stopwatch.ElapsedMilliseconds);
                 return result;
             }
             catch (OperationCanceledException)
@@ -1537,6 +1651,12 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Retrieves the queue position information for a specific order.
+        /// This provides insight into where the order stands in the matching queue.
+        /// </summary>
+        /// <param name="orderId">The unique identifier of the order to check.</param>
+        /// <returns>The order queue position response, or null if the operation fails.</returns>
         public async Task<OrderQueuePositionResponse?> GetOrderQueuePositionAsync(string orderId)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1567,7 +1687,7 @@ namespace KalshiBotAPI.KalshiAPI
                 _logger.LogInformation("Order {OrderId} queue position: {QueuePosition}", orderId, result?.QueuePosition);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GetOrderQueuePositionAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GetOrderQueuePositionAsync), stopwatch.ElapsedMilliseconds);
                 return result;
             }
             catch (OperationCanceledException)
@@ -1583,6 +1703,12 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Retrieves detailed information about a specific order.
+        /// Provides comprehensive order data including status, fills, and execution details.
+        /// </summary>
+        /// <param name="orderId">The unique identifier of the order to retrieve details for.</param>
+        /// <returns>The order details response, or null if the operation fails.</returns>
         public async Task<OrderResponse?> GetOrderDetailsAsync(string orderId)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1614,7 +1740,7 @@ namespace KalshiBotAPI.KalshiAPI
                     orderId, result?.Order.Action, result?.Order.Status, result?.Order.Ticker);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GetOrderDetailsAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GetOrderDetailsAsync), stopwatch.ElapsedMilliseconds);
                 return result;
             }
             catch (OperationCanceledException)
@@ -1630,6 +1756,12 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Retrieves queue position information for orders in specified markets.
+        /// Provides insights into order queue status across multiple markets.
+        /// </summary>
+        /// <param name="marketTickers">Optional comma-separated list of market tickers to filter the results.</param>
+        /// <returns>The queue positions response containing position data for the specified markets, or null if the operation fails.</returns>
         public async Task<QueuePositionsResponse?> GetOrdersQueuePositionsAsync(string? marketTickers = null)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1662,7 +1794,7 @@ namespace KalshiBotAPI.KalshiAPI
                 _logger.LogInformation("Retrieved {Count} queue positions", result?.QueuePositions.Count ?? 0);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GetOrdersQueuePositionsAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GetOrdersQueuePositionsAsync), stopwatch.ElapsedMilliseconds);
                 return result;
             }
             catch (OperationCanceledException)
@@ -1677,6 +1809,12 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Creates multiple orders in a single batch operation.
+        /// Allows efficient submission of multiple orders to reduce API round trips.
+        /// </summary>
+        /// <param name="request">The batch order request containing the list of orders to create.</param>
+        /// <returns>The batch order response containing results for each order, or null if the operation fails.</returns>
         public async Task<BatchOrdersResponse?> CreateOrdersBatchAsync(BatchOrdersRequest request)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1714,7 +1852,7 @@ namespace KalshiBotAPI.KalshiAPI
                 _logger.LogInformation("Batch created {Count} orders", result?.Orders.Count ?? 0);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(CreateOrdersBatchAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(CreateOrdersBatchAsync), stopwatch.ElapsedMilliseconds);
                 return result;
             }
             catch (OperationCanceledException)
@@ -1729,6 +1867,12 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Cancels multiple orders in a single batch operation.
+        /// Allows efficient cancellation of multiple orders to reduce API round trips.
+        /// </summary>
+        /// <param name="request">The batch delete request containing the list of order IDs to cancel.</param>
+        /// <returns>The batch delete response containing results for each order cancellation, or null if the operation fails.</returns>
         public async Task<DeleteOrdersBatchResponse?> DeleteOrdersBatchAsync(DeleteOrdersBatchRequest request)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1766,7 +1910,7 @@ namespace KalshiBotAPI.KalshiAPI
                 _logger.LogInformation("Batch deleted {Count} orders", result?.Orders.Count ?? 0);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(DeleteOrdersBatchAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(DeleteOrdersBatchAsync), stopwatch.ElapsedMilliseconds);
                 return result;
             }
             catch (OperationCanceledException)
@@ -1781,6 +1925,12 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Resets an order group, clearing its state and allowing it to be reused.
+        /// This operation resets the order group's execution state without deleting it.
+        /// </summary>
+        /// <param name="orderGroupId">The unique identifier of the order group to reset.</param>
+        /// <returns>True if the reset operation was successful, false otherwise.</returns>
         public async Task<bool> ResetOrderGroupAsync(string orderGroupId)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1805,7 +1955,7 @@ namespace KalshiBotAPI.KalshiAPI
                 _logger.LogInformation("Order group {OrderGroupId} reset successfully", orderGroupId);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(ResetOrderGroupAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(ResetOrderGroupAsync), stopwatch.ElapsedMilliseconds);
                 return true;
             }
             catch (OperationCanceledException)
@@ -1821,6 +1971,12 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Deletes an order group and all associated orders.
+        /// This permanently removes the order group and cancels any remaining orders in it.
+        /// </summary>
+        /// <param name="orderGroupId">The unique identifier of the order group to delete.</param>
+        /// <returns>True if the delete operation was successful, false otherwise.</returns>
         public async Task<bool> DeleteOrderGroupAsync(string orderGroupId)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1845,7 +2001,7 @@ namespace KalshiBotAPI.KalshiAPI
                 _logger.LogInformation("Order group {OrderGroupId} deleted successfully", orderGroupId);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(DeleteOrderGroupAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(DeleteOrderGroupAsync), stopwatch.ElapsedMilliseconds);
                 return true;
             }
             catch (OperationCanceledException)
@@ -1861,6 +2017,13 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Retrieves settlement information for completed markets.
+        /// Provides details about market settlements including payout amounts and settlement dates.
+        /// </summary>
+        /// <param name="cursor">Optional pagination cursor for retrieving subsequent pages of settlements.</param>
+        /// <param name="limit">Optional limit on the number of settlements to retrieve per request.</param>
+        /// <returns>The settlements response containing settlement data, or null if the operation fails.</returns>
         public async Task<SettlementsResponse?> GetSettlementsAsync(string? cursor = null, int? limit = null)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1891,7 +2054,7 @@ namespace KalshiBotAPI.KalshiAPI
                 _logger.LogInformation("Retrieved {Count} settlements", result?.Settlements.Count ?? 0);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GetSettlementsAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GetSettlementsAsync), stopwatch.ElapsedMilliseconds);
                 return result;
             }
             catch (OperationCanceledException)
@@ -1906,6 +2069,13 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Retrieves fill information for executed orders.
+        /// Provides details about order executions including prices, quantities, and timestamps.
+        /// </summary>
+        /// <param name="cursor">Optional pagination cursor for retrieving subsequent pages of fills.</param>
+        /// <param name="limit">Optional limit on the number of fills to retrieve per request.</param>
+        /// <returns>The fills response containing execution data, or null if the operation fails.</returns>
         public async Task<FillsResponse?> GetFillsAsync(string? cursor = null, int? limit = null)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1936,7 +2106,7 @@ namespace KalshiBotAPI.KalshiAPI
                 _logger.LogInformation("Retrieved {Count} fills", result?.Fills.Count ?? 0);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GetFillsAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GetFillsAsync), stopwatch.ElapsedMilliseconds);
                 return result;
             }
             catch (OperationCanceledException)
@@ -1951,6 +2121,13 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Retrieves information about available incentive programs.
+        /// Provides details about trading incentives, rewards, and promotional programs offered by the exchange.
+        /// </summary>
+        /// <param name="cursor">Optional pagination cursor for retrieving subsequent pages of incentive programs.</param>
+        /// <param name="limit">Optional limit on the number of incentive programs to retrieve per request.</param>
+        /// <returns>The incentive programs response containing program data, or null if the operation fails.</returns>
         public async Task<IncentiveProgramsResponse?> GetIncentiveProgramsAsync(string? cursor = null, int? limit = null)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1981,7 +2158,7 @@ namespace KalshiBotAPI.KalshiAPI
                 _logger.LogInformation("Retrieved {Count} incentive programs", result?.IncentivePrograms.Count ?? 0);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GetIncentiveProgramsAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GetIncentiveProgramsAsync), stopwatch.ElapsedMilliseconds);
                 return result;
             }
             catch (OperationCanceledException)
@@ -1996,6 +2173,12 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
+        /// <summary>
+        /// Retrieves detailed metadata for a specific event.
+        /// Provides additional information about the event including competition details and settlement sources.
+        /// </summary>
+        /// <param name="eventTicker">The ticker symbol of the event to retrieve metadata for.</param>
+        /// <returns>The event metadata response containing additional event information, or null if the operation fails.</returns>
         public async Task<EventMetadataResponse?> GetEventMetadataAsync(string eventTicker)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -2027,7 +2210,7 @@ namespace KalshiBotAPI.KalshiAPI
                     eventTicker, result?.Competition, result?.SettlementSources.Count ?? 0);
 
                 stopwatch.Stop();
-                RecordExecutionTime(nameof(GetEventMetadataAsync), stopwatch.ElapsedMilliseconds);
+                RecordMethodExecutionDuration(nameof(GetEventMetadataAsync), stopwatch.ElapsedMilliseconds);
                 return result;
             }
             catch (OperationCanceledException)
@@ -2043,9 +2226,15 @@ namespace KalshiBotAPI.KalshiAPI
             }
         }
 
-        private void RecordExecutionTime(string broadcastType, long elapsedMs)
+        /// <summary>
+        /// Records the execution duration of a method for performance monitoring.
+        /// Stores the elapsed time in a thread-safe concurrent bag for later analysis.
+        /// </summary>
+        /// <param name="methodName">The name of the method being tracked.</param>
+        /// <param name="elapsedMs">The execution time in milliseconds.</param>
+        private void RecordMethodExecutionDuration(string methodName, long elapsedMs)
         {
-            var bag = _executionTimes.GetOrAdd(broadcastType, _ => new ConcurrentBag<long>());
+            var bag = _methodExecutionDurations.GetOrAdd(methodName, _ => new ConcurrentBag<long>());
             bag.Add(elapsedMs);
         }
     }
