@@ -15,6 +15,12 @@ using System.Collections.Concurrent;
 
 namespace BacklashBot.Services
 {
+    /// <summary>
+    /// Service responsible for managing candlestick data for trading markets.
+    /// Handles loading, processing, and persistence of historical price data from both
+    /// Parquet files and SQL database, including forward filling and deduplication.
+    /// Provides market data population and candlestick synchronization functionality.
+    /// </summary>
     public class CandlestickService : ICandlestickService
     {
         private readonly ILogger<ICandlestickService> _logger;
@@ -25,6 +31,16 @@ namespace BacklashBot.Services
         private readonly IServiceFactory _serviceFactory;
         private readonly IScopeManagerService _scopeManagerService;
 
+        /// <summary>
+        /// Initializes a new instance of the CandlestickService with required dependencies.
+        /// </summary>
+        /// <param name="logger">Logger for recording service operations and errors</param>
+        /// <param name="scopeFactory">Factory for creating service scopes for database operations</param>
+        /// <param name="statusTracker">Service for tracking system status and cancellation tokens</param>
+        /// <param name="executionConfig">Configuration options for execution parameters</param>
+        /// <param name="loggingConfig">Configuration options for logging behavior</param>
+        /// <param name="serviceFactory">Factory for accessing other system services</param>
+        /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         public CandlestickService(
             ILogger<ICandlestickService> logger,
             IServiceScopeFactory scopeFactory,
@@ -43,6 +59,12 @@ namespace BacklashBot.Services
             _serviceFactory = serviceFactory;
         }
 
+        /// <summary>
+        /// Updates candlestick data for a specific market by fetching the latest data from the API.
+        /// Synchronizes minute, hour, and day interval candlesticks and updates market metadata.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker identifier to update candlesticks for</param>
+        /// <returns>A task representing the asynchronous update operation</returns>
         public async Task UpdateCandlesticksAsync(string marketTicker)
         {
             try
@@ -50,7 +72,7 @@ namespace BacklashBot.Services
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                 if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData)) return;
 
-                _logger.LogDebug("Syncing all candlesticks for {MarketTicker}", marketTicker);
+                _logger.LogInformation("Updating candlesticks for {MarketTicker}", marketTicker);
 
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
@@ -61,46 +83,43 @@ namespace BacklashBot.Services
                 DateTime startTime = market.open_time.ToUniversalTime();
                 long startTimestamp = UnixHelper.ConvertToUnixTimestamp(startTime);
 
-                long LastMinuteCandlestick = startTimestamp;
-                long LastHourCandlestick = startTimestamp;
-                long LastDayCandlestick = startTimestamp;
-
+                long lastMinuteTimestamp = startTimestamp;
+                long lastHourTimestamp = startTimestamp;
+                long lastDayTimestamp = startTimestamp;
 
                 CandlestickDTO? lastCandle = await context.GetLastCandlestick(marketTicker, 1);
                 if (lastCandle != null)
                 {
-                    LastMinuteCandlestick = lastCandle.end_period_ts;
-                    lastCandle = null;
+                    lastMinuteTimestamp = lastCandle.end_period_ts;
                 }
                 _logger.LogDebug("Last minute candlestick for {MarketTicker}: end_period_ts={Timestamp}",
-                    marketTicker, UnixHelper.ConvertFromUnixTimestamp(LastMinuteCandlestick).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                    marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastMinuteTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+
                 lastCandle = await context.GetLastCandlestick(marketTicker, 2);
                 if (lastCandle != null)
                 {
-                    LastHourCandlestick = lastCandle.end_period_ts;
-                    lastCandle = null;
+                    lastHourTimestamp = lastCandle.end_period_ts;
                 }
                 _logger.LogDebug("Last hour candlestick for {MarketTicker}: end_period_ts={Timestamp}",
-                       marketTicker, UnixHelper.ConvertFromUnixTimestamp(LastHourCandlestick).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                       marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastHourTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+
                 lastCandle = await context.GetLastCandlestick(marketTicker, 3);
                 if (lastCandle != null)
                 {
-                    LastDayCandlestick = lastCandle.end_period_ts;
+                    lastDayTimestamp = lastCandle.end_period_ts;
                 }
                 _logger.LogDebug("Last day candlestick for {MarketTicker}: end_period_ts={Timestamp}",
-                        marketTicker, UnixHelper.ConvertFromUnixTimestamp(LastDayCandlestick).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                        marketTicker, UnixHelper.ConvertFromUnixTimestamp(lastDayTimestamp).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
 
-
-                foreach (var intervalData in new[] { ("minute", LastMinuteCandlestick), ("hour", LastHourCandlestick), ("day", LastDayCandlestick) })
+                foreach (var intervalData in new[] { ("minute", lastMinuteTimestamp), ("hour", lastHourTimestamp), ("day", lastDayTimestamp) })
                 {
                     _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                     var (processed, errors) = await marketService.FetchCandlesticksAsync(
                         market.Event.Series.series_ticker, marketTicker, intervalData.Item1, intervalData.Item2, null, false);
-                    _logger.LogDebug("Synced {Processed} candlesticks for {MarketTicker} at {Interval}, errors: {Errors}",
+                    _logger.LogInformation("Fetched {Processed} candlesticks for {MarketTicker} at {Interval}, errors: {Errors}",
                         processed, marketTicker, intervalData.Item1, errors);
                 }
-                _logger.LogDebug("Synced all candlesticks for {MarketTicker}", marketTicker);
-
+                _logger.LogInformation("Completed candlestick update for {MarketTicker}", marketTicker);
 
                 try
                 {
@@ -108,58 +127,68 @@ namespace BacklashBot.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation("Error updating last candlestick for {0}, likely transient failure. ex: {0}, inner ex: {1}",
-                        marketTicker, ex.Message, ex.InnerException?.Message);
+                    _logger.LogWarning("Error updating last candlestick metadata for {MarketTicker}: {Message}",
+                        marketTicker, ex.Message);
                 }
 
                 marketData.RefreshCandlestickMetadata();
-
-
             }
             catch (OperationCanceledException)
             {
-                _logger.LogDebug("UpdateCandlesticksAsync was cancelled for {MarketTicker}", marketTicker);
+                _logger.LogInformation("Candlestick update was cancelled for {MarketTicker}", marketTicker);
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(
                     new CandlestickTransientFailureException(marketTicker
-                    , $"Transient failure while updating candlesticks in FetchCandlesticksAsync for market {marketTicker}"
+                    , $"Transient failure while updating candlesticks for market {marketTicker}"
                     , ex),
-                    "Transient failure while updating candlesticks in FetchCandlesticksAsync for market {market}", marketTicker);
+                    "Transient failure while updating candlesticks for market {MarketTicker}", marketTicker);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"Failed to update candlesticks for {marketTicker}.", ex) ,"Failed to update candlesticks for {MarketTicker}. Exception: {0}", marketTicker, ex.Message);
+                _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"Failed to update candlesticks for {marketTicker}.", ex),
+                    "Failed to update candlesticks for {MarketTicker}", marketTicker);
             }
         }
 
+        /// <summary>
+        /// Retrieves historical candlestick data for a specific market and timeframe.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker identifier</param>
+        /// <param name="timeframe">The timeframe interval (e.g., "minute", "hour", "day")</param>
+        /// <returns>A list of candlestick data for the specified market and timeframe</returns>
         public List<CandlestickData> RetrieveHistoricalCandlesticksAsync(string marketTicker, string timeframe)
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
             if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
                 return new List<CandlestickData>();
 
-            string intervalKey = timeframe;
-
-            return marketData.Candlesticks[intervalKey].ToList();
+            return marketData.Candlesticks[timeframe].ToList();
         }
 
+        /// <summary>
+        /// Populates market data for a specific market by loading candlesticks from multiple sources
+        /// and calculating market statistics. Handles parallel processing of different time intervals
+        /// and performs data validation and deduplication.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker identifier to populate data for</param>
+        /// <returns>A task representing the asynchronous population operation</returns>
         public async Task PopulateMarketDataAsync(string marketTicker)
         {
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                _logger.LogDebug("PopulateMarketDataAsync for {marketTicker}", marketTicker);
+                _logger.LogInformation("Populating market data for {MarketTicker}", marketTicker);
                 if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
                 {
                     if (!_serviceFactory.GetDataCache().RecentlyRemovedMarkets.Contains(marketTicker))
                     {
-                        _logger.LogWarning("Market data not found for {marketTicker}", marketTicker);
+                        _logger.LogWarning("Market data not found for {MarketTicker}", marketTicker);
                     }
                     else
                     {
-                        _logger.LogInformation("Market data not found for {marketTicker}, but it was recently removed.", marketTicker);
+                        _logger.LogInformation("Market data not found for {MarketTicker}, but it was recently removed.", marketTicker);
                     }
                     return;
                 }
@@ -169,7 +198,7 @@ namespace BacklashBot.Services
                 var market = await context.GetMarketByTicker_cached(marketTicker);
                 if (market == null)
                 {
-                    _logger.LogWarning("Market not found in database for {marketTicker}", marketTicker);
+                    _logger.LogWarning("Market not found in database for {MarketTicker}", marketTicker);
                     return;
                 }
                 marketData.MarketInfo = market;
@@ -181,7 +210,7 @@ namespace BacklashBot.Services
                         try
                         {
                             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                            _logger.LogDebug("Retrieving {interval} for market {market}.", interval, marketTicker);
+                            _logger.LogDebug("Processing {Interval} candlesticks for market {MarketTicker}", interval, marketTicker);
 
                             string hardDataStorageLocation = _executionConfig.HardDataStorageLocation;
                             var existingCandlesticks = marketData.Candlesticks[interval];
@@ -193,24 +222,23 @@ namespace BacklashBot.Services
                             try
                             {
                                 newCandlesticks = await LoadAndProcessCandlesticksAsync(existingCandlesticks, marketTicker, interval, hardDataStorageLocation, latestExistingDate, market.open_time);
-
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogWarning("Error loading candlesticks for {interval}, market {market}. Returning empty list.", interval, marketTicker);
+                                _logger.LogWarning("Error loading candlesticks for {Interval}, market {MarketTicker}: {Message}", interval, marketTicker, ex.Message);
                                 newCandlesticks = new List<CandlestickData>();
                             }
 
                             // Validate newCandlesticks
                             if (newCandlesticks == null)
                             {
-                                _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"LoadAndProcessCandlesticksAsync returned null for {interval}, market {market}"), 
-                                    "LoadAndProcessCandlesticksAsync returned null for {interval}, market {market}", interval, marketTicker);
+                                _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"LoadAndProcessCandlesticksAsync returned null for {interval}, market {marketTicker}"),
+                                    "LoadAndProcessCandlesticksAsync returned null for {Interval}, market {MarketTicker}", interval, marketTicker);
                                 return (Interval: interval, Candlesticks: new List<CandlestickData>());
                             }
 
-                            _logger.LogDebug("Matching {interval} for market {market}. NewCandlesticksCount: {count2}",
-                                interval, marketTicker, newCandlesticks.Count);
+                            _logger.LogDebug("Loaded {Count} new candlesticks for {Interval}, market {MarketTicker}",
+                                newCandlesticks.Count, interval, marketTicker);
 
                             // Validate Date properties and sorted order
                             if (existingCandlesticks.Any(c => c.Date == default) || newCandlesticks.Any(c => c.Date == default))
@@ -296,108 +324,109 @@ namespace BacklashBot.Services
                     return;
                 }
 
-                // Rest of the method (unchanged)
-                var minuteCandles = marketData.Candlesticks["minute"]
+                // Calculate market statistics from minute candlesticks
+                var validMinuteCandles = marketData.Candlesticks["minute"]
                     .SkipWhile(x => x.Volume == 0)
                     .ToList();
 
-                _logger.LogDebug("Calculating all-time highs and lows for {MarketTicker} amongst {minuteCandles} valid candles", marketTicker, minuteCandles.Count());
+                _logger.LogDebug("Calculating market statistics for {MarketTicker} using {Count} valid minute candles",
+                    marketTicker, validMinuteCandles.Count);
 
-                var candle = minuteCandles.MaxBy(x => x.BidHigh);
-                marketData.AllTimeHighYes_Bid = candle != null ? (candle.BidHigh, candle.Date) : default;
-                candle = minuteCandles.MinBy(x => x.BidLow);
-                marketData.AllTimeHighYes_Bid = candle != null ? (candle.BidLow, candle.Date) : default;
+                // Calculate all-time highs and lows
+                var highestBidCandle = validMinuteCandles.MaxBy(x => x.BidHigh);
+                marketData.AllTimeHighYes_Bid = highestBidCandle != null ? (highestBidCandle.BidHigh, highestBidCandle.Date) : default;
 
+                var lowestBidCandle = validMinuteCandles.MinBy(x => x.BidLow);
+                marketData.AllTimeLowYes_Bid = lowestBidCandle != null ? (lowestBidCandle.BidLow, lowestBidCandle.Date) : default;
+
+                // Calculate recent (3-month) highs and lows
                 DateTime recentCutoff = DateTime.UtcNow.AddMonths(-3);
-                var recentData = minuteCandles.Where(x => x.Date >= recentCutoff);
+                var recentCandles = validMinuteCandles.Where(x => x.Date >= recentCutoff).ToList();
 
-                if (recentData.Any())
+                if (recentCandles.Any())
                 {
-                    _logger.LogDebug("Calculating recent highs and lows for {MarketTicker}", marketTicker);
+                    _logger.LogDebug("Calculating recent statistics for {MarketTicker} using {Count} recent candles",
+                        marketTicker, recentCandles.Count);
 
-                    candle = recentData.MaxBy(x => x.BidHigh);
-                    marketData.RecentHighYes_Bid = (candle.BidHigh, candle.Date);
-                    candle = recentData.MinBy(x => x.BidLow);
-                    marketData.RecentLowYes_Bid = (candle.BidLow, candle.Date);
+                    highestBidCandle = recentCandles.MaxBy(x => x.BidHigh);
+                    marketData.RecentHighYes_Bid = (highestBidCandle.BidHigh, highestBidCandle.Date);
+
+                    lowestBidCandle = recentCandles.MinBy(x => x.BidLow);
+                    marketData.RecentLowYes_Bid = (lowestBidCandle.BidLow, lowestBidCandle.Date);
                 }
-                _logger.LogDebug("Calculating recent volume for {MarketTicker}", marketTicker);
 
+                _logger.LogDebug("Calculating volume statistics for {MarketTicker}", marketTicker);
+
+                // Calculate volume statistics for different time periods
                 recentCutoff = DateTime.UtcNow.AddMonths(-1);
-                double recentVolume_LastMonth = minuteCandles
+                marketData.RecentVolume_LastMonth = validMinuteCandles
                     .Where(x => x.Date >= recentCutoff)
                     .Sum(x => x.Volume);
-                marketData.RecentVolume_LastMonth = recentVolume_LastMonth;
 
                 recentCutoff = DateTime.UtcNow.AddHours(-3);
-                double recentVolume_LastThreeHours = minuteCandles
+                marketData.RecentVolume_LastThreeHours = validMinuteCandles
                     .Where(x => x.Date >= recentCutoff)
                     .Sum(x => x.Volume);
-                marketData.RecentVolume_LastThreeHours = recentVolume_LastThreeHours;
 
                 recentCutoff = DateTime.UtcNow.AddHours(-1);
-                double recentVolume_LastHour = minuteCandles
+                marketData.RecentVolume_LastHour = validMinuteCandles
                     .Where(x => x.Date >= recentCutoff)
                     .Sum(x => x.Volume);
-                marketData.RecentVolume_LastHour = recentVolume_LastHour;
 
-                var hourCandles = marketData.Candlesticks["hour"]
+                // Calculate highest volumes for different intervals
+                var validHourCandles = marketData.Candlesticks["hour"]
                     .SkipWhile(x => x.Volume == 0)
                     .ToList();
-                var dayCandles = marketData.Candlesticks["day"]
+                var validDayCandles = marketData.Candlesticks["day"]
                     .SkipWhile(x => x.Volume == 0)
                     .ToList();
 
-                double HighestVolume_Day = 0;
-                if (dayCandles.Count > 0)
-                {
-                    HighestVolume_Day = dayCandles
-                        .Max(x => x.Volume);
-                }
-                marketData.HighestVolume_Day = HighestVolume_Day;
+                marketData.HighestVolume_Day = validDayCandles.Any() ? validDayCandles.Max(x => x.Volume) : 0;
+                marketData.HighestVolume_Hour = validHourCandles.Any() ? validHourCandles.Max(x => x.Volume) : 0;
+                marketData.HighestVolume_Minute = validMinuteCandles.Any() ? validMinuteCandles.Max(x => x.Volume) : 0;
 
-                double HighestVolume_Hour = 0;
-                if (hourCandles.Count > 0)
-                {
-                    HighestVolume_Hour = hourCandles
-                        .Max(x => x.Volume);
-                }
-                marketData.HighestVolume_Hour = HighestVolume_Hour;
-
-                double HighestVolume_Minute = 0;
-                if (minuteCandles.Count > 0)
-                {
-                    HighestVolume_Minute = minuteCandles
-                        .Max(x => x.Volume);
-                }
-                marketData.HighestVolume_Minute = HighestVolume_Minute;
-
+                // Refresh tickers if WebSocket events are being stored
                 if (_loggingConfig.StoreWebSocketEvents)
                 {
                     _logger.LogDebug("Refreshing tickers for {MarketTicker}", marketTicker);
                     await RefreshTickersFromData(marketTicker);
                 }
+
+                // Final metadata refresh
                 _logger.LogDebug("Refreshing metadata for {MarketTicker}", marketTicker);
                 marketData.RefreshAllMetadata();
-                _logger.LogDebug("Refreshed metadata for {MarketTicker}", marketTicker);
+                _logger.LogInformation("Completed market data population for {MarketTicker}", marketTicker);
             }
             catch (OperationCanceledException)
             {
-                _logger.LogDebug("PopulateMarketDataAsync was cancelled for {marketTicker}", marketTicker);
+                _logger.LogInformation("Market data population was cancelled for {MarketTicker}", marketTicker);
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(
                     new CandlestickTransientFailureException(marketTicker
-                    , $"Transient failure while updating candlesticks in PopulateMarketDataAsync for market {marketTicker}"
+                    , $"Transient failure while populating market data for market {marketTicker}"
                     , ex),
-                    "Transient failure while updating candlesticks in PopulateMarketDataAsync for market {market}", marketTicker);
+                    "Transient failure while populating market data for market {MarketTicker}", marketTicker);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to populate market data for {marketTicker}", marketTicker);
+                _logger.LogError(ex, "Failed to populate market data for {MarketTicker}", marketTicker);
             }
         }
 
+        /// <summary>
+        /// Loads and processes candlestick data from both Parquet files and SQL database.
+        /// Performs deduplication, forward filling, and data validation before returning
+        /// the final processed candlestick list.
+        /// </summary>
+        /// <param name="existingCandlesticks">Currently loaded candlesticks for this market/interval</param>
+        /// <param name="marketTicker">The market ticker identifier</param>
+        /// <param name="interval">The time interval (minute/hour/day)</param>
+        /// <param name="hardDataStorageLocation">Path to the hard data storage location</param>
+        /// <param name="latestExistingDate">Latest date of existing candlesticks</param>
+        /// <param name="marketOpenTime">Market open time</param>
+        /// <returns>A list of processed and validated candlestick data</returns>
         private async Task<List<CandlestickData>> LoadAndProcessCandlesticksAsync(List<CandlestickData> existingCandlesticks, string marketTicker, string interval, string hardDataStorageLocation, DateTime? latestExistingDate, DateTime marketOpenTime)
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -428,11 +457,8 @@ namespace BacklashBot.Services
                 startDate = latestExistingDate.Value;
             }
 
-            _logger.LogDebug("Starting candlestick processing for {MarketTicker} at {Interval}: StartDate={StartDate}Z, ExistingCandlesticks={ExistingCount}",
+            _logger.LogInformation("Processing candlesticks for {MarketTicker} at {Interval}: StartDate={StartDate}Z, ExistingCount={ExistingCount}",
                 marketTicker, interval, startDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), existingCandlesticks.Count);
-            _logger.LogDebug("StartDate set to {StartDate}Z for {MarketTicker} at {Interval}: MarketOpenTime={MarketOpenTime}Z, LatestExistingDate={LatestExistingDate}Z, LastTimestamp={LastTimestamp}Z",
-                startDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), marketTicker, interval, marketOpenTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                latestExistingDate?.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") ?? "null", existingCandlesticks.Any() ? existingCandlesticks.Max(c => c.Date).ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : "null");
 
             // Load from Parquet files
             string basePath = Path.Combine(hardDataStorageLocation, "Candlesticks", marketTicker);
@@ -614,6 +640,16 @@ namespace BacklashBot.Services
             return finalCandlesticks;
         }
 
+        /// <summary>
+        /// Saves historical candlestick data to organized Parquet files based on time intervals.
+        /// Groups data by appropriate time periods (daily for minutes, weekly for hours, monthly for days)
+        /// and saves to structured directory hierarchy for efficient storage and retrieval.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker identifier</param>
+        /// <param name="interval">The time interval (minute/hour/day)</param>
+        /// <param name="candlesticks">The candlestick data to save</param>
+        /// <param name="hardDataStorageLocation">Base path for data storage</param>
+        /// <returns>A task representing the asynchronous save operation</returns>
         private async Task SavePreviousPeriodsToParquetAsync(string marketTicker, string interval, List<CandlestickData> candlesticks, string hardDataStorageLocation)
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -625,7 +661,7 @@ namespace BacklashBot.Services
             // Filter out future data and data that is not of the current interval type
             var relevantCandlesticks = candlesticks
                 .Where(c => c.Date.Date < DateTime.UtcNow.Date && c.IntervalType == intervalType)
-                .ToList(); // To avoid multiple enumerations
+                .ToList();
 
             if (interval == "day")
             {
@@ -639,7 +675,6 @@ namespace BacklashBot.Services
                 groups = relevantCandlesticks
                     .GroupBy(c =>
                     {
-                        var daysInMonth = DateTime.DaysInMonth(c.Date.Year, c.Date.Month);
                         var dayOfMonth = c.Date.Day;
                         var weekNumber = (dayOfMonth - 1) / 7 + 1; // 1-based week number (1-5)
                         return $"{c.Date.Year}-{c.Date.Month:D2}-Week{weekNumber}";
@@ -710,12 +745,18 @@ namespace BacklashBot.Services
 
                 // Save to parquet
                 await SaveToParquetAsync(groupCandles, filePath);
-                _logger.LogDebug("Saved {Count} candlesticks to {FilePath} for {Interval}", groupCandles.Count, filePath, interval);
+                _logger.LogInformation("Saved {Count} candlesticks to {FilePath} for {Interval}", groupCandles.Count, filePath, interval);
             });
 
             await Task.WhenAll(saveTasks);
         }
 
+        /// <summary>
+        /// Refreshes ticker data for a specific market from the database.
+        /// Updates the market data cache with the latest ticker information ordered by date.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker identifier to refresh tickers for</param>
+        /// <returns>A task representing the asynchronous refresh operation</returns>
         private async Task RefreshTickersFromData(string marketTicker)
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -728,6 +769,13 @@ namespace BacklashBot.Services
             marketData.Tickers = new ConcurrentBag<TickerDTO>(tickers.OrderByDescending(t => t.LoggedDate));
         }
 
+        /// <summary>
+        /// Saves candlestick data to a Parquet file with retry logic for robustness.
+        /// Creates the Parquet schema and writes data in columnar format for efficient storage.
+        /// </summary>
+        /// <param name="data">The candlestick data to save</param>
+        /// <param name="filePath">The file path where the Parquet file should be saved</param>
+        /// <returns>A task representing the asynchronous save operation</returns>
         private async Task SaveToParquetAsync(List<CandlestickData> data, string filePath)
         {
             if (!data.Any()) return;
@@ -736,7 +784,7 @@ namespace BacklashBot.Services
             int attempt = 0;
             bool success = false;
 
-            // Define the schema for your Parquet file
+            // Define the schema for the Parquet file
             var schema = new ParquetSchema(
                 new DataField<DateTime>("Date"),
                 new DataField<string>("MarketTicker"),
@@ -782,11 +830,11 @@ namespace BacklashBot.Services
                     }
 
                     success = true;
-                    _logger.LogDebug("Saved {Count} rows to {filePath}", data.Count, filePath);
+                    _logger.LogInformation("Saved {Count} candlesticks to {FilePath}", data.Count, filePath);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Attempt {Attempt} failed with error: {Message}", attempt, ex.Message);
+                    _logger.LogWarning(ex, "Attempt {Attempt} failed to save Parquet file: {Message}", attempt, ex.Message);
                     if (attempt < maxAttempts && File.Exists(filePath))
                     {
                         await Task.Run(() => File.Delete(filePath));
@@ -797,10 +845,16 @@ namespace BacklashBot.Services
 
             if (!success)
             {
-                _logger.LogWarning("Failed to save valid Parquet file after {MaxAttempts} attempts", maxAttempts);
+                _logger.LogError("Failed to save valid Parquet file after {MaxAttempts} attempts to {FilePath}", maxAttempts, filePath);
             }
         }
 
+        /// <summary>
+        /// Loads candlestick data from a Parquet file and converts it to CandlestickData objects.
+        /// Handles file reading errors gracefully by deleting corrupted files and returning empty data.
+        /// </summary>
+        /// <param name="filePath">The path to the Parquet file to load</param>
+        /// <returns>A list of candlestick data loaded from the file</returns>
         private async Task<List<CandlestickData>> LoadFromParquetAsync(string filePath)
         {
             var candlestickData = new List<CandlestickData>();
@@ -815,7 +869,6 @@ namespace BacklashBot.Services
                         var schema = reader.Schema;
 
                         // Create a dictionary to quickly map column names to their DataFields
-                        // This is more efficient than calling First(f => f.Name == "...") repeatedly
                         var fieldMap = schema.Fields.ToDictionary(f => f.Name, f => f as DataField);
 
                         for (int i = 0; i < reader.RowGroupCount; i++)
@@ -823,7 +876,6 @@ namespace BacklashBot.Services
                             using (var groupReader = reader.OpenRowGroupReader(i))
                             {
                                 // Read columns using the mapped DataFields
-                                // It's important to cast the field to DataField as schema.Fields returns Field
                                 var dateColumn = await groupReader.ReadColumnAsync(fieldMap["Date"]);
                                 var marketTickerColumn = await groupReader.ReadColumnAsync(fieldMap["MarketTicker"]);
                                 var intervalTypeColumn = await groupReader.ReadColumnAsync(fieldMap["IntervalType"]);
@@ -863,12 +915,12 @@ namespace BacklashBot.Services
                         }
                     }
                 }
-                _logger.LogDebug("Loaded {Count} rows from {FilePath}", candlestickData.Count, filePath);
+                _logger.LogInformation("Loaded {Count} candlesticks from {FilePath}", candlestickData.Count, filePath);
                 return candlestickData;
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error reading parquet file: {Message}", ex.Message);
+                _logger.LogWarning(ex, "Error reading Parquet file {FilePath}: {Message}", filePath, ex.Message);
                 try
                 {
                     if (File.Exists(filePath))
@@ -879,7 +931,7 @@ namespace BacklashBot.Services
                 }
                 catch (Exception deleteEx)
                 {
-                    _logger.LogWarning(deleteEx, "Error deleting file after read failure: {Message}", deleteEx.Message);
+                    _logger.LogWarning(deleteEx, "Error deleting corrupted file {FilePath}: {Message}", filePath, deleteEx.Message);
                 }
                 return new List<CandlestickData>();
             }
