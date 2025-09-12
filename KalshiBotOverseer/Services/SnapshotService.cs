@@ -3,15 +3,29 @@ using BacklashDTOs.Data;
 
 namespace KalshiBotOverseer.Services
 {
+    /// <summary>
+    /// Provides services for retrieving and processing snapshot group data from the database.
+    /// This service aggregates snapshot groups by market ticker, calculates recorded hours,
+    /// market hours, and recorded hours percentages, and returns structured data for analysis.
+    /// </summary>
     public class SnapshotService
     {
         private readonly IKalshiBotContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the SnapshotService class.
+        /// </summary>
+        /// <param name="context">The database context interface for accessing snapshot and market data.</param>
         public SnapshotService(IKalshiBotContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Asynchronously retrieves all snapshot groups from the database and processes them
+        /// into aggregated market data without related market information.
+        /// </summary>
+        /// <returns>A list of anonymous objects containing aggregated snapshot data per market.</returns>
         public async Task<List<object>> GetSnapshotGroupsDataAsync()
         {
             // Get all snapshot groups with their related markets
@@ -22,6 +36,12 @@ namespace KalshiBotOverseer.Services
             return GetSnapshotGroupsData(snapshotGroups, relatedMarkets);
         }
 
+        /// <summary>
+        /// Processes a list of snapshot groups into aggregated market data without related market information.
+        /// Groups snapshots by market ticker and calculates total recorded hours and other metrics.
+        /// </summary>
+        /// <param name="snapshotGroups">The list of snapshot groups to process.</param>
+        /// <returns>A list of anonymous objects containing aggregated snapshot data per market.</returns>
         public List<object> GetSnapshotGroupsData(List<SnapshotGroupDTO> snapshotGroups)
         {
             // Group by MarketTicker and calculate aggregated data
@@ -67,6 +87,14 @@ namespace KalshiBotOverseer.Services
             return groupedSnapshots.Cast<object>().ToList();
         }
 
+        /// <summary>
+        /// Processes a list of snapshot groups into aggregated market data with related market information.
+        /// Groups snapshots by market ticker, calculates recorded hours, market hours, and percentages
+        /// using the provided market data for accurate calculations.
+        /// </summary>
+        /// <param name="snapshotGroups">The list of snapshot groups to process.</param>
+        /// <param name="relatedMarkets">The list of related market data for percentage calculations.</param>
+        /// <returns>A list of anonymous objects containing aggregated snapshot data per market.</returns>
         public List<object> GetSnapshotGroupsData(List<SnapshotGroupDTO> snapshotGroups, List<MarketDTO> relatedMarkets)
         {
             // Create a lookup for markets for faster access
