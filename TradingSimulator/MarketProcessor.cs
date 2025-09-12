@@ -12,16 +12,51 @@ using TradingStrategies.Strategies;
 
 namespace TradingSimulator
 {
+    /// <summary>
+    /// Processes individual markets in the trading simulator by running trading strategies,
+    /// analyzing event logs, and generating visualization data points for market analysis.
+    /// This class orchestrates the complete market processing pipeline from simulation to data persistence.
+    /// </summary>
     public class MarketProcessor
     {
+        /// <summary>
+        /// The trading overseer responsible for executing trading scenarios and simulations.
+        /// </summary>
         private readonly TradingOverseer _overseer;
+
+        /// <summary>
+        /// Factory for creating service scopes to resolve dependencies during processing.
+        /// </summary>
         private readonly IServiceScopeFactory _scopeFactory;
+
+        /// <summary>
+        /// Set of market tickers that have already been processed to avoid duplicate processing.
+        /// </summary>
         private readonly HashSet<string> _processedMarkets;
+
+        /// <summary>
+        /// Directory path where processed market data is cached for future use.
+        /// </summary>
         private readonly string _cacheDirectory;
+
+        /// <summary>
+        /// Reporting service for detecting velocity discrepancies in market snapshots.
+        /// </summary>
         private readonly SimulatorReporting _simulatorReporting;
 
+        /// <summary>
+        /// Event raised to report progress during market processing operations.
+        /// </summary>
         public event Action<string> OnTestProgress;
 
+        /// <summary>
+        /// Initializes a new instance of the MarketProcessor class with required dependencies.
+        /// </summary>
+        /// <param name="overseer">The trading overseer for running simulations.</param>
+        /// <param name="scopeFactory">Factory for creating service scopes.</param>
+        /// <param name="processedMarkets">Set of already processed market tickers.</param>
+        /// <param name="cacheDirectory">Directory for caching processed data.</param>
+        /// <param name="simulatorReporting">Reporting service for discrepancy detection.</param>
         public MarketProcessor(
             TradingOverseer overseer,
             IServiceScopeFactory scopeFactory,
@@ -36,6 +71,20 @@ namespace TradingSimulator
             _simulatorReporting = simulatorReporting;
         }
 
+        /// <summary>
+        /// Processes a single market by running trading strategies and generating visualization data.
+        /// This method orchestrates the complete market processing workflow including simulation,
+        /// discrepancy detection, and data point generation for charting and analysis.
+        /// </summary>
+        /// <param name="marketTicker">The ticker symbol of the market to process.</param>
+        /// <param name="marketSnapshots">List of historical market snapshots for the simulation.</param>
+        /// <param name="strategiesDict">Dictionary mapping market types to their associated trading strategies.</param>
+        /// <param name="progressPrefix">Optional prefix for progress reporting messages.</param>
+        /// <param name="writeToFile">Whether to save the processed data to a cache file.</param>
+        /// <param name="detectVelocityDiscrepancies">Whether to detect and report orderbook velocity discrepancies.</param>
+        /// <param name="group">Optional snapshot group metadata for file naming and organization.</param>
+        /// <param name="ignoreProcessedCache">Whether to ignore the processed markets cache and reprocess.</param>
+        /// <returns>A tuple containing final P&L, position, average cost, and various lists of price points for visualization.</returns>
         public async Task<(double finalPnL, int finalPosition, double finalAverageCost, List<PricePoint> bidPoints, List<PricePoint> askPoints,
             List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
             List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
@@ -54,7 +103,7 @@ namespace TradingSimulator
             if (!ignoreProcessedCache && _processedMarkets.Contains(marketTicker))
             {
                 OnTestProgress?.Invoke($"{progressPrefix}Skipping cached market: {marketTicker}");
-                return (0, 0, 0.0, null, null, null, null, null, null, null, null, null, null, null, null, null);
+                return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
             }
 
             OnTestProgress?.Invoke($"{progressPrefix}Processing market: {marketTicker}");
@@ -90,9 +139,21 @@ namespace TradingSimulator
                 OnTestProgress?.Invoke($"{progressPrefix}Error processing {marketTicker}: {ex.Message}");
             }
 
-            return (0, 0, 0.0, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
         }
 
+        /// <summary>
+        /// Processes the event logs from a trading simulation to generate comprehensive visualization data.
+        /// This method extracts trading actions, position changes, and market events from the simulation results
+        /// and converts them into various price point collections for charting and analysis.
+        /// </summary>
+        /// <param name="marketSnapshots">The original market snapshots used in the simulation.</param>
+        /// <param name="eventLogs">The event logs generated by the trading simulation.</param>
+        /// <param name="marketTicker">The ticker symbol of the market being processed.</param>
+        /// <param name="writeToFile">Whether to save the processed data to a cache file.</param>
+        /// <param name="progressPrefix">Optional prefix for progress reporting messages.</param>
+        /// <param name="group">Optional snapshot group metadata for file naming.</param>
+        /// <returns>A tuple containing final P&L, position, average cost, and various lists of price points for visualization.</returns>
         private (double, int, double, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>,
             List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>,
             List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>)
@@ -132,6 +193,13 @@ namespace TradingSimulator
                 averageCostPoints, restingOrdersPoints, new List<PricePoint>(), patternPoints);
         }
 
+        /// <summary>
+        /// Creates price point collections for bid and ask prices from market snapshots.
+        /// This method extracts the best bid and ask prices at each snapshot timestamp
+        /// to provide the baseline price data for market visualization.
+        /// </summary>
+        /// <param name="marketSnapshots">The list of market snapshots to extract price data from.</param>
+        /// <returns>A tuple containing lists of bid and ask price points for charting.</returns>
         private (List<PricePoint>, List<PricePoint>) CreateBidAskPoints(List<MarketSnapshot> marketSnapshots)
         {
             var bidPoints = marketSnapshots.Select(s => new PricePoint(s.Timestamp, s.BestYesBid, " Best Bid")).ToList();
@@ -139,6 +207,13 @@ namespace TradingSimulator
             return (bidPoints, askPoints);
         }
 
+        /// <summary>
+        /// Creates price point collections for various trading actions from event logs.
+        /// This method analyzes the event logs to identify buy/sell actions, intended trades,
+        /// and explicit exits, converting them into timestamped price points for visualization.
+        /// </summary>
+        /// <param name="eventLogs">The event logs from the trading simulation to analyze.</param>
+        /// <returns>A tuple containing lists of buy, sell, exit, intended long, and intended short price points.</returns>
         private (List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>)
         CreateTradePoints(List<ReportGenerator.EventLog> eventLogs)
         {
@@ -186,6 +261,13 @@ namespace TradingSimulator
             return (buyPoints, sellPoints, exitPoints, intendedLongPoints, intendedShortPoints);
         }
 
+        /// <summary>
+        /// Creates price point collections for significant market events from event logs.
+        /// This method extracts all event memos and associates them with mid-price points
+        /// for visualization of important market occurrences during the simulation.
+        /// </summary>
+        /// <param name="eventLogs">The event logs containing market events and memos.</param>
+        /// <returns>A list of price points representing significant market events.</returns>
         private List<PricePoint> CreateEventPoints(List<ReportGenerator.EventLog> eventLogs)
         {
             return eventLogs
@@ -193,6 +275,13 @@ namespace TradingSimulator
                 .ToList();
         }
 
+        /// <summary>
+        /// Creates price point collections for position and average cost tracking from event logs.
+        /// This method extracts position sizes and average costs at each event timestamp
+        /// to provide visualization of portfolio changes over time.
+        /// </summary>
+        /// <param name="eventLogs">The event logs containing position and cost information.</param>
+        /// <returns>A tuple containing lists of position and average cost price points.</returns>
         private (List<PricePoint>, List<PricePoint>) CreatePositionPoints(List<ReportGenerator.EventLog> eventLogs)
         {
             var positionPoints = eventLogs
@@ -206,6 +295,13 @@ namespace TradingSimulator
             return (positionPoints, averageCostPoints);
         }
 
+        /// <summary>
+        /// Creates price point collections for resting orders count from event logs.
+        /// This method parses the resting orders data from event logs to track
+        /// the number of outstanding orders at each point in time.
+        /// </summary>
+        /// <param name="eventLogs">The event logs containing resting orders information.</param>
+        /// <returns>A list of price points representing resting orders count over time.</returns>
         private List<PricePoint> CreateRestingOrdersPoints(List<ReportGenerator.EventLog> eventLogs)
         {
             return eventLogs
@@ -246,6 +342,13 @@ namespace TradingSimulator
                 .ToList();
         }
 
+        /// <summary>
+        /// Creates price point collections for detected candlestick patterns from event logs.
+        /// This method extracts pattern detection events and converts them into
+        /// visualization points for technical analysis pattern recognition.
+        /// </summary>
+        /// <param name="eventLogs">The event logs containing pattern detection information.</param>
+        /// <returns>A list of price points representing detected patterns.</returns>
         private List<PricePoint> CreatePatternPoints(List<ReportGenerator.EventLog> eventLogs)
         {
             var patternPoints = new List<PricePoint>();
@@ -262,6 +365,29 @@ namespace TradingSimulator
             return patternPoints;
         }
 
+        /// <summary>
+        /// Saves the processed market data to a JSON cache file for future use.
+        /// This method serializes all the processed market data including price points,
+        /// trading results, and visualization data into a structured JSON format.
+        /// </summary>
+        /// <param name="marketTicker">The ticker symbol of the market being saved.</param>
+        /// <param name="finalPnL">The final profit and loss from the simulation.</param>
+        /// <param name="finalPosition">The final position size at the end of the simulation.</param>
+        /// <param name="finalAverageCost">The final average cost of the position.</param>
+        /// <param name="bidPoints">List of bid price points for visualization.</param>
+        /// <param name="askPoints">List of ask price points for visualization.</param>
+        /// <param name="buyPoints">List of buy trade points for visualization.</param>
+        /// <param name="sellPoints">List of sell trade points for visualization.</param>
+        /// <param name="exitPoints">List of exit trade points for visualization.</param>
+        /// <param name="eventPoints">List of event points for visualization.</param>
+        /// <param name="intendedLongPoints">List of intended long positions for visualization.</param>
+        /// <param name="intendedShortPoints">List of intended short positions for visualization.</param>
+        /// <param name="positionPoints">List of position size points for visualization.</param>
+        /// <param name="averageCostPoints">List of average cost points for visualization.</param>
+        /// <param name="restingOrdersPoints">List of resting orders count points for visualization.</param>
+        /// <param name="discrepancyPoints">List of discrepancy detection points for visualization.</param>
+        /// <param name="patternPoints">List of pattern detection points for visualization.</param>
+        /// <param name="fileNameSuffix">Optional suffix for the cache file name.</param>
         public void SaveMarketDataToFile(
             string marketTicker, double finalPnL, int finalPosition, double finalAverageCost,
             List<PricePoint> bidPoints, List<PricePoint> askPoints,
