@@ -75,7 +75,7 @@ namespace BacklashBot.Services
             return Task.CompletedTask;
         }
 
-        public void AssignWebSocketHandlers()
+        public void ConfigureWebSocketEventHandlers()
         {
             _serviceFactory.GetKalshiWebSocketClient().OrderBookReceived -= HandleOrderBookReceived;
             _serviceFactory.GetKalshiWebSocketClient().TradeReceived -= HandleTradeReceived;
@@ -901,7 +901,7 @@ namespace BacklashBot.Services
                 }
 
                 _logger.LogDebug("Applying orderbook ticker update for {MarketTicker}, Bid={Bid}, Ask={Ask}", marketTicker, ticker.yes_bid, ticker.yes_ask);
-                _serviceFactory.GetMarketDataService().ReceiveTicker(
+                _serviceFactory.GetMarketDataService().ProcessTickerUpdate(
                     marketTicker,
                     marketId: ticker.market_id,
                     price: ticker.price,

@@ -47,8 +47,8 @@ namespace BacklashBot.Services
                 var marketDataService = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IMarketDataService>();
                 var orderBookService = _scopeManager.Scope?.ServiceProvider.GetRequiredService<IOrderBookService>();
 
-                marketDataService.AssignWebSocketHandlers();
-                orderBookService.AssignWebSocketHandlers();
+                marketDataService.ConfigureWebSocketEventHandlers();
+                orderBookService.ConfigureWebSocketEventHandlers();
             }
         }
 

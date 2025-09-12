@@ -1,4 +1,9 @@
-// Refactored TradingOverseer.cs with improved separation of concerns
+/// <summary>
+/// Orchestrates trading scenario simulations and performance analysis for the Kalshi trading bot.
+/// This class serves as the central coordinator for running trading strategies against historical market snapshots,
+/// generating detailed performance reports, and calculating equity metrics. It integrates with the simulation engine,
+/// equity calculator, and report generator to provide comprehensive backtesting capabilities.
+/// </summary>
 using Microsoft.Extensions.DependencyInjection;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
@@ -19,6 +24,12 @@ namespace TradingStrategies
         private readonly EquityCalculator _equityCalculator;
         private readonly string _cacheDirectory = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
 
+        /// <summary>
+        /// Initializes a new instance of the TradingOverseer class.
+        /// Sets up dependencies for simulation, equity calculation, and snapshot services.
+        /// </summary>
+        /// <param name="scopeFactory">Factory for creating service scopes to resolve dependencies.</param>
+        /// <param name="snapshotService">Service for managing trading snapshot data.</param>
         public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService)
         {
             _scopeFactory = scopeFactory;
@@ -27,8 +38,19 @@ namespace TradingStrategies
             _equityCalculator = new EquityCalculator();
         }
 
-        private record SnapshotGroupTemp(string MarketTicker, DateTime StartTime, DateTime EndTime);
+        private record SnapshotMetadata(string MarketTicker, DateTime StartTime, DateTime EndTime);
 
+        /// <summary>
+        /// Executes a trading scenario simulation against a series of market snapshots.
+        /// This method orchestrates the complete simulation process, including running strategies,
+        /// generating performance reports, and returning detailed results for analysis.
+        /// </summary>
+        /// <param name="scenario">The trading scenario containing strategies and market conditions to simulate.</param>
+        /// <param name="snapshots">List of market snapshots representing historical market data.</param>
+        /// <param name="writeToFile">Whether to write detailed reports to file output.</param>
+        /// <param name="initialCash">Starting cash amount for the simulation (default: 100.0).</param>
+        /// <param name="group">Optional snapshot group metadata for organizing results.</param>
+        /// <returns>List of tuples containing performance metrics and event logs for each simulation path.</returns>
         public List<(PathPerformance performance, List<EventLog> events)> TestScenario(Scenario scenario, List<MarketSnapshot> snapshots, bool writeToFile, double initialCash = 100.0, SnapshotGroupDTO? group = null)
         {
             if (snapshots == null || snapshots.Count == 0) return new List<(PathPerformance, List<EventLog>)>();
@@ -37,12 +59,23 @@ namespace TradingStrategies
 
             var activePaths = _simulationEngine.RunSimulation(scenario, snapshots, isSingleStrategy);
 
-            var pathData = GenerateReportsAndPerformances(group, activePaths, snapshots, initialCash, writeToFile);
+            var pathData = GeneratePerformanceReportsAndMetrics(group, activePaths, snapshots, initialCash, writeToFile);
 
             return pathData;
         }
 
-        private List<(PathPerformance performance, List<EventLog> events)> GenerateReportsAndPerformances(SnapshotGroupDTO group, List<SimulationPath> activePaths, List<MarketSnapshot> snapshots, double initialCash, bool writeToFile)
+        /// <summary>
+        /// Generates comprehensive performance reports and metrics for simulation paths.
+        /// Processes each simulation path to calculate equity, trades, and market conditions,
+        /// then creates detailed CSV reports for top-performing paths and summary reports.
+        /// </summary>
+        /// <param name="group">Snapshot group metadata for file naming and organization.</param>
+        /// <param name="activePaths">List of simulation paths from the simulation engine.</param>
+        /// <param name="snapshots">Original market snapshots used in the simulation.</param>
+        /// <param name="initialCash">Starting cash amount for equity calculations.</param>
+        /// <param name="writeToFile">Whether to write reports to the file system.</param>
+        /// <returns>List of performance metrics and event logs for each path.</returns>
+        private List<(PathPerformance performance, List<EventLog> events)> GeneratePerformanceReportsAndMetrics(SnapshotGroupDTO group, List<SimulationPath> activePaths, List<MarketSnapshot> snapshots, double initialCash, bool writeToFile)
         {
             string outputDir = _cacheDirectory;
             string uniqueId = group != null ? Path.GetFileNameWithoutExtension(group.JsonPath) : snapshots.FirstOrDefault()?.MarketTicker;
@@ -99,7 +132,7 @@ namespace TradingStrategies
                 {
                     var performanceFile = Path.Combine(outputDir, $"{uniqueId}_DetailedPerformance_Path{i + 1}.csv");
                     var reportGen = new ReportGenerator();
-                    var pathSpecificPaths = GetPathSpecificPaths(path.StrategiesByMarketConditions);
+                    var pathSpecificPaths = GetStrategyPathsByMarketType(path.StrategiesByMarketConditions);
                     var detailedReport = reportGen.GenerateDetailedPerformanceReport(uniqueId, eventLogs, initialCash, pathSpecificPaths, writeToFile, outputDir);
                     if (writeToFile) File.WriteAllText(performanceFile, detailedReport);
                     Console.WriteLine(detailedReport);
@@ -124,12 +157,25 @@ namespace TradingStrategies
             return pathData;
         }
 
+        /// <summary>
+        /// Calculates the current equity value for a simulation path at a given market snapshot.
+        /// Delegates to the equity calculator to determine the total value including cash and position.
+        /// </summary>
+        /// <param name="path">The simulation path containing position and cash information.</param>
+        /// <param name="lastSnapshot">The market snapshot to use for pricing calculations.</param>
+        /// <returns>The calculated equity value.</returns>
         private double GetEquity(SimulationPath path, MarketSnapshot lastSnapshot)
         {
             return _equityCalculator.GetEquity(path, lastSnapshot);
         }
 
-        private Dictionary<string, ReportGenerator.PathInfo> GetPathSpecificPaths(Dictionary<MarketType, HashSet<Strategy>> strategiesByMarketConditions)
+        /// <summary>
+        /// Extracts strategy information organized by market type for reporting purposes.
+        /// Creates a mapping of market types to their associated strategy names for use in performance reports.
+        /// </summary>
+        /// <param name="strategiesByMarketConditions">Dictionary mapping market types to sets of strategies.</param>
+        /// <returns>Dictionary mapping market type strings to path information containing strategy names.</returns>
+        private Dictionary<string, ReportGenerator.PathInfo> GetStrategyPathsByMarketType(Dictionary<MarketType, HashSet<Strategy>> strategiesByMarketConditions)
         {
             var result = new Dictionary<string, ReportGenerator.PathInfo>();
             foreach (var kv in strategiesByMarketConditions)

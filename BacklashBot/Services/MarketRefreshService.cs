@@ -189,7 +189,7 @@ namespace BacklashBot.Services
                     if (freshWatched.Contains(marketTicker))
                     {
                         _logger.LogDebug("Market {MarketTicker} confirmed currently watched", marketTicker);
-                        await _serviceFactory.GetMarketDataService().AddMarketWatch(marketTicker);
+                        await _serviceFactory.GetMarketDataService().AddMarketToWatchList(marketTicker);
                         marketData = _serviceFactory.GetMarketDataService().GetMarketDetails(marketTicker);
                         if (marketData == null)
                         {
@@ -281,7 +281,7 @@ namespace BacklashBot.Services
                 }
             }
 
-            await _serviceFactory.GetMarketDataService().FetchPositionsAsync();
+            await _serviceFactory.GetMarketDataService().RetrieveAndUpdatePositionsAsync();
             LastWorkDuration = DateTime.UtcNow - workStartTime;
             LastWorkMarketCount = watchedMarkets.Count;
             stopwatch.Stop();

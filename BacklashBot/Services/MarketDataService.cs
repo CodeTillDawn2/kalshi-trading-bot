@@ -20,6 +20,20 @@ using TradingStrategies.Configuration;
 
 namespace BacklashBot.Services
 {
+    /// <summary>
+    /// Core service responsible for managing market data operations, WebSocket event handling,
+    /// market watchlist management, and real-time data synchronization for the Kalshi trading bot.
+    /// </summary>
+    /// <remarks>
+    /// This service handles:
+    /// - WebSocket event processing (ticker, lifecycle, fill events)
+    /// - Market data caching and synchronization
+    /// - Market watchlist management (adding/removing markets)
+    /// - Order book and position data management
+    /// - Ticker data processing with deduplication
+    /// - Forward filling of candlestick data
+    /// - Client notification events for UI updates
+    /// </remarks>
     public class MarketDataService : IMarketDataService
     {
         private readonly IServiceFactory _serviceFactory;
@@ -84,10 +98,21 @@ namespace BacklashBot.Services
             _brainStatus = brainStatus;
         }
 
-        public void AssignWebSocketHandlers()
+        /// <summary>
+        /// Configures WebSocket event handlers for real-time data processing.
+        /// </summary>
+        /// <remarks>
+        /// Sets up event handlers for:
+        /// - MessageReceived: Updates last WebSocket timestamp
+        /// - TickerReceived: Processes ticker price updates
+        /// - MarketLifecycleReceived: Handles market status changes
+        /// - EventLifecycleReceived: Processes event lifecycle updates
+        /// - FillReceived: Handles order fill notifications
+        /// </remarks>
+        public void ConfigureWebSocketEventHandlers()
         {
             _serviceFactory.GetKalshiWebSocketClient().MessageReceived += (sender, timestamp) => _serviceFactory.GetDataCache().LastWebSocketTimestamp = timestamp;
-            _serviceFactory.GetKalshiWebSocketClient().TickerReceived += (sender, args) => _ = Task.Run(() => ReceiveTicker(
+            _serviceFactory.GetKalshiWebSocketClient().TickerReceived += (sender, args) => _ = Task.Run(() => ProcessTickerUpdate(
                 args.market_ticker,
                 args.market_id,
                 args.price,
@@ -101,10 +126,10 @@ namespace BacklashBot.Services
                 args.LoggedDate,
                 args.ProcessedDate
             ));
-            _serviceFactory.GetKalshiWebSocketClient().MarketLifecycleReceived += HandleMarketLifecycleEventAsync;
-            _serviceFactory.GetKalshiWebSocketClient().EventLifecycleReceived += HandleEventLifecycleEventAsync;
+            _serviceFactory.GetKalshiWebSocketClient().MarketLifecycleReceived += ProcessMarketLifecycleEventAsync;
+            _serviceFactory.GetKalshiWebSocketClient().EventLifecycleReceived += ProcessEventLifecycleEventAsync;
             _serviceFactory.GetKalshiWebSocketClient().FillReceived += (sender, args) =>
-                Task.Run(() => HandleFillEventAsync(args));
+                Task.Run(() => ProcessFillEventAsync(args));
         }
 
 
@@ -170,7 +195,7 @@ namespace BacklashBot.Services
             }
         }
 
-        private void HandleMarketLifecycleEventAsync(object sender, MarketLifecycleEventArgs args)
+        private void ProcessMarketLifecycleEventAsync(object sender, MarketLifecycleEventArgs args)
         {
             try
             {
@@ -195,22 +220,22 @@ namespace BacklashBot.Services
                             {
                                 _serviceFactory.GetDataCache().Markets.First(x => x.Key == marketTicker).Value.MarketStatus = statusElement.GetString();
                             }
-                            _logger.LogInformation("Lifestyle event updated market status for {MarketTicker} to {MarketStatus}", marketTicker, statusElement.GetString());
+                            _logger.LogInformation("Lifecycle event updated market status for {MarketTicker} to {MarketStatus}", marketTicker, statusElement.GetString());
                         }
                     }
                 }
             }
             catch (OperationCanceledException)
             {
-                _logger.LogDebug("HandleMarketLifecycleEventAsync was cancelled");
+                _logger.LogDebug("ProcessMarketLifecycleEventAsync was cancelled");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to handle lifecycle event");
+                _logger.LogError(ex, "Failed to process lifecycle event");
             }
         }
 
-        private async void HandleEventLifecycleEventAsync(object sender, EventLifecycleEventArgs args)
+        private async void ProcessEventLifecycleEventAsync(object sender, EventLifecycleEventArgs args)
         {
             try
             {
@@ -253,7 +278,7 @@ namespace BacklashBot.Services
             }
         }
 
-        private async Task HandleFillEventAsync(FillEventArgs args)
+        private async Task ProcessFillEventAsync(FillEventArgs args)
         {
             try
             {
@@ -269,7 +294,7 @@ namespace BacklashBot.Services
                         if (_serviceFactory.GetDataCache().WatchedMarkets.Contains(marketTicker))
                         {
                             _logger.LogDebug("Market {MarketTicker} is watched, updating positions", marketTicker);
-                            await FetchPositionsAsync();
+                            await RetrieveAndUpdatePositionsAsync();
                             NotifyPositionDataUpdated(marketTicker);
                         }
                         else
@@ -289,7 +314,7 @@ namespace BacklashBot.Services
             }
         }
 
-        public async Task FetchPositionsAsync()
+        public async Task RetrieveAndUpdatePositionsAsync()
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
             using var scope = _scopeFactory.CreateScope();
@@ -307,14 +332,14 @@ namespace BacklashBot.Services
         }
 
 
-        public void TriggerClientMarketRefresh()
+        public void NotifyClientsOfMarketListChange()
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-            _logger.LogDebug("Triggering client market refresh");
+            _logger.LogDebug("Notifying clients of market list change");
             WatchListChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public async Task AddMarketWatch(string marketTicker, double? interestScore = null)
+        public async Task AddMarketToWatchList(string marketTicker, double? interestScore = null)
         {
             _logger.LogInformation("Adding market watch to database: {MarketTicker}", marketTicker);
             var initSemaphore = _marketInitializationLocks.GetOrAdd(marketTicker, _ => new SemaphoreSlim(1, 1));
@@ -340,7 +365,7 @@ namespace BacklashBot.Services
                 };
                 await context.AddOrUpdateMarketWatch(marketWatch);
 
-                _serviceFactory.GetMarketDataService().TriggerClientMarketRefresh();
+                NotifyClientsOfMarketListChange();
                 _logger.LogInformation("Successfully added market watch for {MarketTicker} to database", marketTicker);
             }
             catch (OperationCanceledException)
@@ -406,13 +431,13 @@ namespace BacklashBot.Services
 
                 if (!_serviceFactory.GetDataCache().WatchedMarkets.Contains(marketTicker))
                 {
-                    _logger.LogInformation("Stats: Added {market} to watch list after list double-check", marketTicker);
+                    _logger.LogInformation("Market {MarketTicker} added to watch list after validation", marketTicker);
                     _serviceFactory.GetDataCache().WatchedMarkets.Add(marketTicker);
                     await UpdateWatchedMarketsAsync();
                 }
 
                 _logger.LogDebug("Initiating subscription for {MarketTicker}", marketTicker);
-                await SubscribeToMarketAsync(marketTicker);
+                await SubscribeToMarketChannelsAsync(marketTicker);
 
                 await SyncMarketDataAsync(marketTicker);
 
@@ -428,7 +453,7 @@ namespace BacklashBot.Services
             }
         }
 
-        public async Task SubscribeToMarketAsync(string marketTicker)
+        public async Task SubscribeToMarketChannelsAsync(string marketTicker)
         {
             _logger.LogDebug("Subscribing to market: {MarketTicker}", marketTicker);
             try
@@ -537,7 +562,7 @@ namespace BacklashBot.Services
                 {
                     marketWatch.BrainLock = null;
                     await context.AddOrUpdateMarketWatch(marketWatch);
-                    _logger.LogInformation("Stats: Successfully unwatched {MarketTicker}", marketTicker);
+                    _logger.LogInformation("Market {MarketTicker} successfully removed from watch list", marketTicker);
                     if (_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker))
                     {
                         _serviceFactory.GetDataCache().Markets[marketTicker].ChangeTracker.Shutdown();
@@ -603,7 +628,7 @@ namespace BacklashBot.Services
                     if (!NoNeedToRemove)
                         _marketInitializationLocks.TryRemove(marketTicker, out _);
                 }
-                _serviceFactory.GetMarketDataService().TriggerClientMarketRefresh();
+                NotifyClientsOfMarketListChange();
             }
         }
 
@@ -1130,7 +1155,7 @@ namespace BacklashBot.Services
             }
         }
 
-        public void ReceiveTicker(string marketTicker, Guid marketId, int price, int yesBid, int yesAsk, int volume, int openInterest, int dollarVolume, int dollarOpenInterest, long ts, DateTime loggedDate, DateTime? processedDate = null)
+        public void ProcessTickerUpdate(string marketTicker, Guid marketId, int price, int yesBid, int yesAsk, int volume, int openInterest, int dollarVolume, int dollarOpenInterest, long ts, DateTime loggedDate, DateTime? processedDate = null)
         {
             var ticker = new TickerDTO
             {
@@ -1369,7 +1394,6 @@ namespace BacklashBot.Services
                 return new List<CandlestickData>();
             }
         }
-
 
     }
 }

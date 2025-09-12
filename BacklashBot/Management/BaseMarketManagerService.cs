@@ -196,7 +196,7 @@ namespace BacklashBot.Management
                     if (mkt != null && !KalshiConstants.MarketIsEnded(mkt.status))
                     {
                         _logger.LogInformation("Stats: Adding back {market} after reset, with status {status}", market, mkt.status);
-                        await marketDataService.AddMarketWatch(market);
+                        await marketDataService.AddMarketToWatchList(market);
                     }
                 }
                 else
@@ -362,7 +362,7 @@ namespace BacklashBot.Management
                             watch.BrainLock = _brainStatus.BrainLock;
                             watch.LastWatched = DateTime.Now;
                             await context.AddOrUpdateMarketWatch(watch);
-                            await marketDataService.AddMarketWatch(watch.market_ticker);
+                            await marketDataService.AddMarketToWatchList(watch.market_ticker);
                             _logger.LogDebug("BRAIN: Locked existing high-interest market {MarketTicker}. Interest: {interest}", watch.market_ticker, watch.InterestScore);
                             marketsAdded++;
                             marketsAddedList.Add(watch.market_ticker);

@@ -95,7 +95,7 @@ namespace SimulatorWinForms
             btnRun.Size = new Size(75, 23);
             btnRun.TabIndex = 0;
             btnRun.Text = "Run All";
-            btnRun.Click += btnRun_Click;
+            btnRun.Click += HandleRunSimulation;
             // 
             // btnReload
             // 
@@ -104,7 +104,7 @@ namespace SimulatorWinForms
             btnReload.Size = new Size(90, 23);
             btnReload.TabIndex = 1;
             btnReload.Text = "Reload Cache";
-            btnReload.Click += btnReload_Click;
+            btnReload.Click += HandleReloadMarkets;
             // 
             // btnRunSet
             // 
@@ -113,7 +113,7 @@ namespace SimulatorWinForms
             btnRunSet.Size = new Size(75, 23);
             btnRunSet.TabIndex = 2;
             btnRunSet.Text = "Run Set";
-            btnRunSet.Click += btnRunSet_Click;
+            btnRunSet.Click += HandleRunSpecificSet;
             // 
             // formsPlot1
             // 
@@ -177,7 +177,7 @@ namespace SimulatorWinForms
             btnCheckAll.Size = new Size(75, 23);
             btnCheckAll.TabIndex = 3;
             btnCheckAll.Text = "Check All";
-            btnCheckAll.Click += BtnCheckAll_Click;
+            btnCheckAll.Click += HandleCheckAllMarkets;
             // 
             // btnUncheckAll
             // 
@@ -186,7 +186,7 @@ namespace SimulatorWinForms
             btnUncheckAll.Size = new Size(90, 23);
             btnUncheckAll.TabIndex = 4;
             btnUncheckAll.Text = "Uncheck All";
-            btnUncheckAll.Click += BtnUncheckAll_Click;
+            btnUncheckAll.Click += HandleUncheckAllMarkets;
             // 
             // btnRunML
             // 
@@ -195,7 +195,7 @@ namespace SimulatorWinForms
             btnRunML.Size = new Size(90, 23);
             btnRunML.TabIndex = 5;
             btnRunML.Text = "Run ML";
-            btnRunML.Click += btnRunML_Click;
+            btnRunML.Click += HandleRunMLTraining;
             // 
             // MainForm
             // 

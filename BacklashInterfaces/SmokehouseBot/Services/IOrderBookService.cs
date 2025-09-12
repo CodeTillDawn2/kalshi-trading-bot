@@ -5,7 +5,7 @@ namespace BacklashBot.Services.Interfaces
     public interface IOrderBookService
     {
         event EventHandler<string> OrderBookUpdated;
-        void AssignWebSocketHandlers();
+        void ConfigureWebSocketEventHandlers();
         List<OrderbookData> GetCurrentOrderBook(string marketTicker);
         Task SyncOrderBookAsync(string marketTicker);
         void ClearQueueForMarketAsync(string marketTicker);

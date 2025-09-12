@@ -1,4 +1,4 @@
-// MainForm.cs: Full class with restored tooltip/hover (black line), back button fix via BackAction, and axis restore on back
+// MainForm.cs
 using BacklashDTOs;
 using KalshiBotData.Data;
 using KalshiBotData.Models;
@@ -19,6 +19,14 @@ public class TradingGUIConfig
 
 namespace SimulatorWinForms
 {
+    /// <summary>
+    /// Main form for the Kalshi Trading Bot GUI application.
+    /// Provides a comprehensive interface for running trading strategy simulations,
+    /// visualizing market data through interactive charts, and managing market selections.
+    /// Integrates with the TradingSimulatorService for backtesting and the KalshiBotContext
+    /// for database operations. Supports real-time chart interaction including panning,
+    /// zooming, and tooltips, as well as switching to detailed snapshot views.
+    /// </summary>
     public partial class MainForm : Form
     {
         private readonly TradingSimulatorService _simulator;
@@ -53,6 +61,12 @@ namespace SimulatorWinForms
         private const float MinScale = 0.8f;  // Minimum font scale (80% of original)
         private const float MaxScale = 2.0f;  // Maximum font scale (200% of original)
 
+        /// <summary>
+        /// Initializes a new instance of the MainForm class.
+        /// Sets up the trading simulator service, database context, chart controls,
+        /// event handlers for user interactions, and typography scaling system.
+        /// Configures ScottPlot charts to disable built-in pan/zoom for custom handling.
+        /// </summary>
         public MainForm()
         {
             InitializeComponent();
@@ -71,19 +85,19 @@ namespace SimulatorWinForms
             _simulator.EnsureInitialized();
             _simulator.OnTestProgress += msg => AppendLog(msg);
             _simulator.OnProfitLossUpdate += (m, pnl) => UpdatePnL(m, pnl);
-            _simulator.OnMarketProcessed += m => AppendLog($"? Processed {m}");
+            _simulator.OnMarketProcessed += m => AppendLog($"Processed market: {m}");
             // DISABLE ScottPlot's built-in pan/zoom to prevent conflicts
             formsPlot1.Configuration.Pan = false;
             formsPlot1.Configuration.Zoom = false;
             formsPlot1.Configuration.ScrollWheelZoom = false;
 
-            formsPlot1.MouseMove += FormsPlot1_MouseMove;
-            formsPlot1.MouseLeave += FormsPlot1_MouseLeave;
+            formsPlot1.MouseMove += HandleChartMouseMove;
+            formsPlot1.MouseLeave += HandleChartMouseLeave;
 
             Load += async (_, __) => await LoadCache();
-            dgvMarkets.SelectionChanged += DgvMarkets_SelectionChanged;
+            dgvMarkets.SelectionChanged += HandleMarketSelectionChanged;
 
-            dgvMarkets.CellValueChanged += dgvMarkets_CellValueChanged;
+            dgvMarkets.CellValueChanged += HandleMarketCheckStateChanged;
             dgvMarkets.CurrentCellDirtyStateChanged += (s, e) =>
             {
                 if (dgvMarkets.IsCurrentCellDirty)
@@ -91,7 +105,7 @@ namespace SimulatorWinForms
             };
 
             dgvMarkets.Sorted += (s, e) => RestoreCheckboxes();
-            dgvMarkets.CellFormatting += DgvMarkets_CellFormatting;
+            dgvMarkets.CellFormatting += FormatMarketGridCell;
 
             _tooltipOverlay = new Label
             {
@@ -116,13 +130,13 @@ namespace SimulatorWinForms
             _hoverLine.IsVisible = false;
 
             // wire a MouseDown handler to allow swapping the chart with the dashboard on click
-            formsPlot1.MouseDown += FormsPlot1_MouseDown;
+            formsPlot1.MouseDown += HandleChartMouseDown;
 
             // Add resize handler for dynamic scaling
-            this.ResizeEnd += MainForm_ResizeEnd;
+            this.ResizeEnd += HandleFormResize;
 
             // Add activation handler to reset panning state
-            this.Activated += MainForm_Activated;
+            this.Activated += HandleFormActivated;
 
             // Initialize typography system
             ApplyInitialTypography();
@@ -157,6 +171,13 @@ namespace SimulatorWinForms
             }
         }
 
+        /// <summary>
+        /// Loads market data from the database and cache files, populating the market grid.
+        /// Retrieves market information from the database, enriches it with cached PnL data,
+        /// and displays it in the DataGridView with appropriate formatting and checkboxes.
+        /// Supports filtering by specific market bases for targeted loading.
+        /// </summary>
+        /// <param name="includeBases">Optional list of market base names to include. If null, loads all available markets.</param>
         private async Task LoadCache(List<string>? includeBases = null)
         {
             dgvMarkets.Columns.Clear();
@@ -272,7 +293,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void dgvMarkets_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
+        private void HandleMarketCheckStateChanged(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == dgvMarkets.Columns["CheckedCol"].Index)
             {
@@ -286,7 +307,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void DgvMarkets_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
+        private void FormatMarketGridCell(object? sender, DataGridViewCellFormattingEventArgs e)
         {
             if (e.ColumnIndex == dgvMarkets.Columns["PnL"].Index && e.Value != null && e.CellStyle != null)
             {
@@ -319,7 +340,7 @@ namespace SimulatorWinForms
             _simSetup = true;
         }
 
-        private void FormsPlot1_MouseMove(object? sender, MouseEventArgs e)
+        private void HandleChartMouseMove(object? sender, MouseEventArgs e)
         {
             // Right-drag panning - only if both flag is set AND button is actually pressed
             if (_isRightPanning && e.Button == MouseButtons.Right && Control.MouseButtons == MouseButtons.Right)
@@ -391,7 +412,7 @@ namespace SimulatorWinForms
 
 
 
-        private void FormsPlot1_MouseLeave(object? sender, EventArgs e)
+        private void HandleChartMouseLeave(object? sender, EventArgs e)
         {
             // Reset panning state when mouse leaves the chart
             ResetPanningState();
@@ -401,11 +422,11 @@ namespace SimulatorWinForms
             if (_hoverLine != null)
                 _hoverLine.IsVisible = false;
             formsPlot1.Render();
+
+
         }
 
-
-
-        private void BtnCheckAll_Click(object sender, EventArgs e)
+        private void HandleCheckAllMarkets(object sender, EventArgs e)
         {
             foreach (DataGridViewRow row in dgvMarkets.Rows)
             {
@@ -416,7 +437,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void BtnUncheckAll_Click(object sender, EventArgs e)
+        private void HandleUncheckAllMarkets(object sender, EventArgs e)
         {
             foreach (DataGridViewRow row in dgvMarkets.Rows)
             {
@@ -470,13 +491,20 @@ namespace SimulatorWinForms
 
 
 
-        private async void DgvMarkets_SelectionChanged(object? sender, EventArgs e)
+        private async void HandleMarketSelectionChanged(object? sender, EventArgs e)
         {
             if (dgvMarkets.SelectedRows.Count == 0) return;
             string? market = dgvMarkets.SelectedRows[0].Cells["Market"].Value?.ToString();
             if (!string.IsNullOrWhiteSpace(market))
                 await LoadChart(market);
         }
+        /// <summary>
+        /// Loads and renders a chart for the specified market using cached simulation data.
+        /// Uses MarketChartRenderer to create interactive visualizations with tooltips,
+        /// hover lines, and trading signals. Updates the snapshot data for the market
+        /// to support dashboard navigation.
+        /// </summary>
+        /// <param name="market">The market ticker symbol to load chart data for.</param>
         private async Task LoadChart(string market)
         {
             _lastTooltipMemo = null;
@@ -496,7 +524,7 @@ namespace SimulatorWinForms
         }
 
 
-        private async void btnRun_Click(object sender, EventArgs e)
+        private async void HandleRunSimulation(object sender, EventArgs e)
         {
             var sel = GetCheckedMarkets();
 
@@ -551,11 +579,11 @@ namespace SimulatorWinForms
         }
 
 
-        private async void btnReload_Click(object sender, EventArgs e)
+        private async void HandleReloadMarkets(object sender, EventArgs e)
         {
             await LoadCache();
         }
-        private async void btnRunSet_Click(object sender, EventArgs e)
+        private async void HandleRunSpecificSet(object sender, EventArgs e)
         {
             var sel = GetCheckedMarkets();
 
@@ -585,7 +613,7 @@ namespace SimulatorWinForms
         /// in OADate form is passed to the dashboard for potential use (not used
         /// currently but reserved for future enhancements).
         /// </summary>
-        private void FormsPlot1_MouseDown(object? sender, MouseEventArgs e)
+        private void HandleChartMouseDown(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -615,6 +643,13 @@ namespace SimulatorWinForms
         /// click on the chart, filling the whole window.
         /// </summary>
         /// <param name="xOADate">The x-coordinate of the click in OADate time.</param>
+        /// <summary>
+        /// Switches the main form view to a detailed SnapshotViewer dashboard.
+        /// Creates or reuses a SnapshotViewer control, populates it with market data
+        /// and snapshots corresponding to the clicked chart position, then replaces
+        /// the main form content with the dashboard for detailed analysis.
+        /// </summary>
+        /// <param name="xOADate">The x-coordinate in OADate format where the user clicked on the chart.</param>
         private void ShowDashboardAt(double xOADate)
         {
             _savedChartLimits = (formsPlot1.Plot.GetAxisLimits().XMin, formsPlot1.Plot.GetAxisLimits().XMax, formsPlot1.Plot.GetAxisLimits().YMin, formsPlot1.Plot.GetAxisLimits().YMax);
@@ -752,6 +787,11 @@ namespace SimulatorWinForms
         /// <summary>
         /// Switches the form back to the main layout view and restores the previous axis limits.
         /// </summary>
+        /// <summary>
+        /// Switches back from the SnapshotViewer dashboard to the main chart view.
+        /// Restores the main form layout, re-enables chart controls, and restores
+        /// the previously saved chart axis limits to maintain user context.
+        /// </summary>
         private void HideDashboard()
         {
             this.SuspendLayout();
@@ -770,7 +810,7 @@ namespace SimulatorWinForms
             AppendLog("Switched back to chart view.");
         }
 
-        private void MainForm_ResizeEnd(object? sender, EventArgs e)
+        private void HandleFormResize(object? sender, EventArgs e)
         {
             // Calculate scale factor based on width and DPI (more conservative scaling)
             float widthScale = Math.Clamp((float)this.Width / OriginalWidth, MinScale, MaxScale);
@@ -806,7 +846,7 @@ namespace SimulatorWinForms
             _panStartPx = Point.Empty;
         }
 
-        private void MainForm_Activated(object? sender, EventArgs e)
+        private void HandleFormActivated(object? sender, EventArgs e)
         {
             // Reset panning state when the form becomes active again
             // This handles the case where user returns from snapshot viewer while still holding mouse button
@@ -1076,7 +1116,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private async void btnRunML_Click(object sender, EventArgs e)
+        private async void HandleRunMLTraining(object sender, EventArgs e)
         {
             var sel = GetCheckedMarkets();
 

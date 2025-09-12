@@ -1,4 +1,3 @@
-// SimulatorTests.cs
 // Updated to avoid redundant data loads for markets, remove parallel operations, and maintain separate strategy set methods
 
 using KalshiBotData.Data;
@@ -41,6 +40,13 @@ namespace TradingSimulator
         public TradingDecision Decision { get; set; } = new TradingDecision();
     }
 
+    /// <summary>
+    /// Core service for orchestrating trading strategy simulations and backtesting operations.
+    /// This service manages the complete lifecycle of running trading strategies against historical market snapshots,
+    /// including data loading, strategy execution, performance analysis, and result reporting.
+    /// It integrates with various components like DataLoader, MarketProcessor, and StrategyResolver to provide
+    /// comprehensive simulation capabilities for evaluating trading strategies.
+    /// </summary>
     public class TradingSimulatorService
     {
         private ITradingSnapshotService _snapshotService;
@@ -71,7 +77,11 @@ namespace TradingSimulator
         private MarketProcessor _marketProcessor;
         private StrategyResolver _strategyResolver;
 
-        // SimulatorTests.cs
+        /// <summary>
+        /// Initializes the trading simulator service by setting up dependencies, configuration, and database context.
+        /// This method configures the service collection, builds the dependency injection container, and initializes
+        /// all required services and helpers for simulation operations.
+        /// </summary>
         public void Setup()
         {
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
@@ -99,7 +109,6 @@ namespace TradingSimulator
 
             _scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
-            // FIX: init order construct helpers AFTER these are ready
             _snapshotPeriodHelper = new SnapshotPeriodHelper();
             _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, _snapshotOptions, _tradingOptions, _scopeFactory);
             _overseer = new TradingOverseer(_scopeFactory, _snapshotService);
@@ -122,12 +131,23 @@ namespace TradingSimulator
             OnTestProgress?.Invoke("Setup completed.");
         }
 
+        /// <summary>
+        /// Ensures the service is properly initialized by calling Setup if the scope factory is not available.
+        /// This method provides a safe way to initialize the service on-demand without redundant setup calls.
+        /// </summary>
         public void EnsureInitialized()
         {
             if (_scopeFactory == null) Setup();
         }
 
 
+        /// <summary>
+        /// Retrieves filtered snapshot groups based on the provided market list and context.
+        /// This method delegates to the DataLoader to filter snapshot groups by market names and duration requirements.
+        /// </summary>
+        /// <param name="context">The database context for accessing snapshot data.</param>
+        /// <param name="marketsToRun">Optional list of market names to filter by. If null, all markets are included.</param>
+        /// <returns>A list of filtered SnapshotGroupDTO objects containing market snapshot metadata.</returns>
         public async Task<List<SnapshotGroupDTO>> GetFilteredSnapshotGroupsAsync(
             IKalshiBotContext context, List<string>? marketsToRun)
         {
@@ -139,6 +159,12 @@ namespace TradingSimulator
 
 
 
+        /// <summary>
+        /// Retrieves all market snapshots for a specific market name.
+        /// This method loads historical snapshot data for the specified market, filtering and ordering the results chronologically.
+        /// </summary>
+        /// <param name="marketName">The name of the market to retrieve snapshots for.</param>
+        /// <returns>A list of MarketSnapshot objects ordered by timestamp for the specified market.</returns>
         public async Task<List<MarketSnapshot>> ReturnSnapshotsForMarket(string marketName)
         {
             using var scope = _scopeFactory.CreateScope();
@@ -147,6 +173,15 @@ namespace TradingSimulator
         }
 
 
+        /// <summary>
+        /// Runs a specific strategy set for GUI display, processing the selected parameter set against the specified markets.
+        /// This method resolves the strategy family from the set key, finds the matching weight set, and executes
+        /// the simulation for all specified markets, optionally writing results to files and reporting progress.
+        /// </summary>
+        /// <param name="setKey">The key identifying the strategy family (e.g., "bollinger", "breakout").</param>
+        /// <param name="weightName">The name of the specific parameter set within the strategy family.</param>
+        /// <param name="writeToFile">Whether to save detailed market data to JSON files in the cache directory.</param>
+        /// <param name="marketsToRun">Optional list of market names to process. If null, processes all available markets.</param>
         public async Task RunSelectedSetForGuiAsync(
             string setKey,
             string weightName,
@@ -184,7 +219,6 @@ namespace TradingSimulator
 
             OnTestProgress?.Invoke($"{label}/{dto.StrategyName}: 1 strategy set {dataset.Count} markets");
 
-            // NEW: Running counter for discrepancies
             int totalDiscrepancies = 0;
 
             // Clear cache directory if writeToFile is true
@@ -256,6 +290,13 @@ namespace TradingSimulator
         }
 
 
+        /// <summary>
+        /// Runs all enabled strategy families sequentially for GUI display.
+        /// This method iterates through a predefined list of strategy families and executes each one,
+        /// allowing comprehensive testing of multiple trading approaches against the same market data.
+        /// </summary>
+        /// <param name="writeToFile">Whether to save detailed market data to JSON files for each strategy.</param>
+        /// <param name="marketsToRun">Optional list of market names to process. If null, processes all available markets.</param>
         public async Task RunMultipleAllStrategiesForGuiAsync(
             bool writeToFile,
             List<string>? marketsToRun = null)
@@ -281,6 +322,11 @@ namespace TradingSimulator
             }
         }
 
+        /// <summary>
+        /// Retrieves the names of all available snapshot groups from the database.
+        /// This method provides a list of market names that have associated snapshot data for simulation.
+        /// </summary>
+        /// <returns>A HashSet of unique market names that have snapshot groups available.</returns>
         public async Task<HashSet<string>> GetSnapshotGroupNames()
         {
             using var scope = _scopeFactory.CreateScope();
@@ -288,6 +334,13 @@ namespace TradingSimulator
             return await context.GetSnapshotGroupNames();
         }
 
+        /// <summary>
+        /// Retrieves a list of valid base market names that have sufficient snapshot data for simulation.
+        /// This method filters snapshot groups by duration and optionally by a provided list of base markets,
+        /// then extracts the base market names (removing numeric suffixes) and returns them sorted.
+        /// </summary>
+        /// <param name="basesToInclude">Optional list of base market names to filter by. If null, includes all valid bases.</param>
+        /// <returns>A sorted list of valid base market names with available snapshot data.</returns>
         public async Task<List<string>> GetValidBaseMarketsAsync(List<string>? basesToInclude = null)
         {
             using var scope = _scopeFactory.CreateScope();
@@ -328,10 +381,13 @@ ResolveFamily(StrategyFamily family)
         }
 
         /// <summary>
-        /// Runs offline training, evaluation, and online simulation for MLShared strategy.
-        /// Produces only a best-fit report ranking parameter sets by proximity to large spikes.
-        /// Includes diagnostic logging to console to identify issues with entry generation.
+        /// Runs machine learning training and simulation for the MLShared strategy family.
+        /// This method performs offline training on historical data, evaluates parameter sets,
+        /// and generates a best-fit report ranking strategies by their proximity to large price spikes.
+        /// The process includes data splitting (80% train, 20% test), strategy evaluation, and comprehensive reporting.
         /// </summary>
+        /// <param name="writeToFile">Whether to save the best-fit report to a CSV file in the cache directory.</param>
+        /// <param name="marketsToRun">Optional list of market names to process. If null, processes all available markets.</param>
         public async Task RunMLTrainingAndSimulationForGuiAsync(
             bool writeToFile,
             List<string>? marketsToRun = null)
@@ -511,6 +567,14 @@ ResolveFamily(StrategyFamily family)
             }
         }
 
+        /// <summary>
+        /// Runs all parameter sets for a specific strategy family against the provided markets.
+        /// This method executes comprehensive backtesting for all available parameter combinations within a strategy family,
+        /// generating performance reports and optionally saving detailed results to files.
+        /// </summary>
+        /// <param name="family">The strategy family to execute (e.g., Bollinger, Breakout, MLShared).</param>
+        /// <param name="writeToFile">Whether to save detailed market data to JSON files for each parameter set.</param>
+        /// <param name="marketsToRun">Optional list of market names to process. If null, processes all available markets.</param>
         public async Task RunMultipleForGuiAsync(
             StrategyFamily family,
             bool writeToFile,
@@ -539,7 +603,6 @@ ResolveFamily(StrategyFamily family)
 
             OnTestProgress?.Invoke($"{label}: {strategiesList.Count} strategy sets {dataset.Count} markets");
 
-            // Running counter for discrepancies
             int totalDiscrepancies = 0;
 
             var marketList = dataset.Keys.ToList();
@@ -604,6 +667,11 @@ ResolveFamily(StrategyFamily family)
 
 
 
+        /// <summary>
+        /// Cleans up resources and disposes of database contexts and services.
+        /// This method should be called when the simulator service is no longer needed to ensure
+        /// proper resource cleanup and prevent memory leaks.
+        /// </summary>
         public void TearDown()
         {
             _dbContext.Dispose();

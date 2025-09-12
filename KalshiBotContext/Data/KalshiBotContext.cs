@@ -7,6 +7,7 @@ using Polly.Retry;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
@@ -49,10 +50,12 @@ namespace KalshiBotData.Data
 
         private readonly string _connectionString;
         private readonly IConfiguration _config;
+        private readonly ILogger<KalshiBotContext>? _logger;
 
-        public KalshiBotContext(IConfiguration config)
+        public KalshiBotContext(IConfiguration config, ILogger<KalshiBotContext>? logger = null)
         {
             _config = config;
+            _logger = logger;
             _connectionString = _config.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
         }
 
@@ -198,7 +201,23 @@ namespace KalshiBotData.Data
             {
                 existingEvent.UpdateEvent(dto);
             }
-            await SaveChangesAsync();
+            try
+            {
+                await SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
+                {
+                    // Duplicate key violation - this is expected when multiple bots are running
+                    _logger?.LogWarning(ex, "Duplicate event key {EventTicker} encountered during save, continuing", dto.event_ticker);
+                }
+                else
+                {
+                    // Re-throw for other DbUpdateExceptions
+                    throw;
+                }
+            }
         }
 
         public async Task AddOrUpdateEvents(List<EventDTO> dtos)
@@ -215,8 +234,24 @@ namespace KalshiBotData.Data
                 {
                     existingEvent.UpdateEvent(dto);
                 }
+                try
+                {
+                    await SaveChangesAsync();
+                }
+                catch (DbUpdateException ex)
+                {
+                    if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
+                    {
+                        // Duplicate key violation - this is expected when multiple bots are running
+                        _logger?.LogWarning(ex, "Duplicate event key {EventTicker} encountered during save, continuing", dto.event_ticker);
+                    }
+                    else
+                    {
+                        // Re-throw for other DbUpdateExceptions
+                        throw;
+                    }
+                }
             }
-            await SaveChangesAsync();
         }
         #endregion
 
@@ -291,7 +326,23 @@ namespace KalshiBotData.Data
             {
                 market.UpdateMarket(dto);
             }
-            await SaveChangesAsync();
+            try
+            {
+                await SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
+                {
+                    // Duplicate key violation - this is expected when multiple bots are running
+                    _logger?.LogWarning(ex, "Duplicate market key {MarketTicker} encountered during save, continuing", dto.market_ticker);
+                }
+                else
+                {
+                    // Re-throw for other DbUpdateExceptions
+                    throw;
+                }
+            }
         }
         public async Task DeleteMarket(string marketTicker)
         {
@@ -321,14 +372,33 @@ namespace KalshiBotData.Data
                     await SaveChangesAsync();
                     Thread.Sleep(50);
                 }
-                catch (Exception)
+                catch (DbUpdateException ex)
                 {
-                    await SaveChangesAsync();
-                    Thread.Sleep(50);
+                    if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
+                    {
+                        // Duplicate key violation - this is expected when multiple bots are running
+                        _logger?.LogWarning(ex, "Duplicate market key {MarketTicker} encountered during save, continuing", dto.market_ticker);
+                    }
+                    else
+                    {
+                        // Re-throw for other DbUpdateExceptions
+                        throw;
+                    }
                 }
-
+                catch (Exception ex)
+                {
+                    // For other exceptions, retry once
+                    try
+                    {
+                        await SaveChangesAsync();
+                        Thread.Sleep(50);
+                    }
+                    catch (Exception retryEx)
+                    {
+                        _logger?.LogError(retryEx, "Failed to save market {MarketTicker} after retry", dto.market_ticker);
+                    }
+                }
             }
-
         }
 
         public async Task<List<MarketDTO>> GetMarkets(
@@ -658,7 +728,23 @@ namespace KalshiBotData.Data
             {
                 marketWatch.UpdateMarketWatch(dto);
             }
-            await SaveChangesAsync();
+            try
+            {
+                await SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
+                {
+                    // Duplicate key violation - this is expected when multiple bots are running
+                    _logger?.LogWarning(ex, "Duplicate market watch key {MarketTicker} encountered during save, continuing", dto.market_ticker);
+                }
+                else
+                {
+                    // Re-throw for other DbUpdateExceptions
+                    throw;
+                }
+            }
         }
 
         public async Task RemoveMarketWatches(List<MarketWatchDTO> dtoRange)
@@ -761,7 +847,7 @@ namespace KalshiBotData.Data
 
         public async Task AddOrUpdateOrder(OrderDTO dto)
         {
-            Order? order = await Orders.FirstOrDefaultAsync(x => x.Ticker == dto.Ticker);
+            Order? order = await Orders.FirstOrDefaultAsync(x => x.OrderId == dto.OrderId);
             if (order == null)
             {
                 order = dto.ToOrder();
@@ -772,7 +858,23 @@ namespace KalshiBotData.Data
             {
                 order.UpdateOrder(dto);
             }
-            await SaveChangesAsync();
+            try
+            {
+                await SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
+                {
+                    // Duplicate key violation - this is expected when multiple bots are running
+                    _logger?.LogWarning(ex, "Duplicate order key {OrderId} encountered during save, continuing", dto.OrderId);
+                }
+                else
+                {
+                    // Re-throw for other DbUpdateExceptions
+                    throw;
+                }
+            }
         }
         #endregion
 
@@ -814,7 +916,23 @@ namespace KalshiBotData.Data
             {
                 snapshot.UpdateSnapshot(dto);
             }
-            await SaveChangesAsync();
+            try
+            {
+                await SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
+                {
+                    // Duplicate key violation - this is expected when multiple bots are running
+                    _logger?.LogWarning(ex, "Duplicate snapshot key {MarketTicker} {SnapshotDate} encountered during save, continuing", dto.MarketTicker, dto.SnapshotDate);
+                }
+                else
+                {
+                    // Re-throw for other DbUpdateExceptions
+                    throw;
+                }
+            }
         }
 
         public async Task AddOrUpdateSnapshots(List<SnapshotDTO> dtos)

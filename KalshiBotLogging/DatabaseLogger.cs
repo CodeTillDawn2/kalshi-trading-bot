@@ -8,10 +8,12 @@ namespace KalshiBotLogging
 {
     /// <summary>
     /// Custom logger implementation that integrates with the KalshiBot logging infrastructure.
-    /// This logger formats log messages, outputs them to the console for immediate visibility,
-    /// enqueues them for asynchronous database storage via the DatabaseLoggingQueue,
-    /// and forwards warnings and errors to the error handler for further processing.
-    /// Supports optional configuration for dynamic values.
+    /// This logger provides comprehensive logging functionality by:
+    /// - Formatting log messages and outputting them to the console for immediate developer visibility
+    /// - Enqueuing log entries for asynchronous database storage via the DatabaseLoggingQueue
+    /// - Forwarding warnings and errors to the error handler for centralized error management
+    /// - Supporting dynamic configuration for environment-specific settings
+    /// - Maintaining structured logging with consistent metadata across all log entries
     /// </summary>
     public class DatabaseLogger : ILogger
     {
@@ -32,7 +34,7 @@ namespace KalshiBotLogging
         /// <param name="minLevel">The minimum log level that this logger will process; logs below this level are ignored.</param>
         /// <param name="loggingConfig">Optional logging configuration for dynamic environment settings.</param>
         /// <param name="executionConfig">Optional execution configuration for brain instance settings.</param>
-        /// <param name="brainStatus">Optional brain status service for session identifier.</param>
+        /// <param name="brainStatus">Optional brain status service for session identifier retrieval.</param>
         /// <param name="defaultEnvironment">Default environment name if not specified in config.</param>
         /// <param name="defaultInstance">Default instance name if not specified in config.</param>
         public DatabaseLogger(
@@ -73,7 +75,7 @@ namespace KalshiBotLogging
         /// <summary>
         /// Logs a message with the specified log level, event ID, state, and optional exception.
         /// The message is formatted, logged to console, enqueued for database storage if appropriate,
-        /// and forwarded to the error handler.
+        /// and forwarded to the error handler for centralized error management.
         /// </summary>
         /// <typeparam name="TState">The type of the state object.</typeparam>
         /// <param name="logLevel">The severity level of the log message.</param>
@@ -102,11 +104,17 @@ namespace KalshiBotLogging
                 Source = _categoryName
             };
 
-            // Console logging for immediate visibility
+            // Console logging for immediate developer visibility
             string formattedLogLevel = $"[{logEntry.Level}]".PadRight(12);
-            Console.WriteLine($"{formattedLogLevel} {logEntry.Timestamp}: {message} {(logEntry.Exception != "" && logEntry.Exception != null ? "Exception: " + logEntry.Exception : "")} ({logEntry.Source})");
+            string consoleMessage = $"{formattedLogLevel} {logEntry.Timestamp:yyyy-MM-dd HH:mm:ss}: {message}";
+            if (!string.IsNullOrEmpty(logEntry.Exception))
+            {
+                consoleMessage += $" | Exception: {logEntry.Exception}";
+            }
+            consoleMessage += $" | Source: {logEntry.Source}";
+            Console.WriteLine(consoleMessage);
 
-            // Database logging for persistent storage
+            // Database logging for persistent storage - only for configured minimum level
             LogLevel minSqlLogLevel = _loggingConfig != null ? Enum.Parse<LogLevel>(_loggingConfig.SqlDatabaseLogLevel, true) : LogLevel.Information;
             if (logLevel >= minSqlLogLevel)
             {
@@ -117,15 +125,23 @@ namespace KalshiBotLogging
             _loggingQueue.EnqueueErrorHandlerLogs(logEntry.Message, logEntry.Source, logLevel, exception);
         }
 
+        /// <summary>
+        /// Retrieves the current session identifier from the brain status service.
+        /// Returns "DEF" as a fallback if the service is unavailable or the identifier cannot be retrieved.
+        /// </summary>
+        /// <returns>The session identifier string, or "DEF" if unavailable.</returns>
         private string GetSessionIdentifier()
         {
-            if (_brainStatus == null) return "DEF";
+            if (_brainStatus == null)
+                return "DEF";
+
             try
             {
                 return _brainStatus.SessionIdentifier ?? "DEF";
             }
             catch (InvalidOperationException)
             {
+                // Brain status service may not be initialized yet
                 return "DEF";
             }
         }

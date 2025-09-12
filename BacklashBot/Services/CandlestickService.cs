@@ -130,7 +130,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to update candlesticks for {MarketTicker}", marketTicker);
+                _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"Failed to update candlesticks for {marketTicker}.", ex) ,"Failed to update candlesticks for {MarketTicker}. Exception: {0}", marketTicker, ex.Message);
             }
         }
 
@@ -204,7 +204,8 @@ namespace BacklashBot.Services
                             // Validate newCandlesticks
                             if (newCandlesticks == null)
                             {
-                                _logger.LogError("LoadAndProcessCandlesticksAsync returned null for {interval}, market {market}", interval, marketTicker);
+                                _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"LoadAndProcessCandlesticksAsync returned null for {interval}, market {market}"), 
+                                    "LoadAndProcessCandlesticksAsync returned null for {interval}, market {market}", interval, marketTicker);
                                 return (Interval: interval, Candlesticks: new List<CandlestickData>());
                             }
 
@@ -214,7 +215,8 @@ namespace BacklashBot.Services
                             // Validate Date properties and sorted order
                             if (existingCandlesticks.Any(c => c.Date == default) || newCandlesticks.Any(c => c.Date == default))
                             {
-                                _logger.LogError("Invalid Date detected in candlesticks for {interval}, market {market}", interval, marketTicker);
+                                _logger.LogWarning(new MarketTransientFailureException(marketTicker, $"Invalid Date detected in candlesticks for {interval}, market {market}"),
+                                    "Invalid Date detected in candlesticks for {interval}, market {market}", interval, marketTicker);
                                 return (Interval: interval, Candlesticks: new List<CandlestickData>());
                             }
                             // Verify existingCandlesticks is sorted

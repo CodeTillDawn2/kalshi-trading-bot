@@ -16,6 +16,20 @@ using TradingStrategies.Configuration;
 
 namespace BacklashBot.Management
 {
+    /// <summary>
+    /// Central orchestrator for the Kalshi trading bot system. Manages the complete bot lifecycle including
+    /// startup, shutdown, market monitoring, snapshot creation, and error handling. Acts as the main
+    /// coordination point between various services and components.
+    /// </summary>
+    /// <remarks>
+    /// This class implements IHostedService and coordinates multiple responsibilities:
+    /// - Service lifecycle management (start/stop)
+    /// - Periodic market data snapshots
+    /// - Brain instance management and locking
+    /// - Market watchlist monitoring and adjustments
+    /// - Error detection and recovery
+    /// - Scheduled overnight maintenance tasks
+    /// </remarks>
     public class CentralBrain : ICentralBrain
     {
         private readonly ILogger<ICentralBrain> _logger;
@@ -103,6 +117,19 @@ namespace BacklashBot.Management
             return webSocketService?.IsConnected() ?? false;
         }
 
+        /// <summary>
+        /// Starts the CentralBrain service and initializes all dependent components.
+        /// </summary>
+        /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// This method performs the following initialization steps:
+        /// 1. Ensures brain status is initialized
+        /// 2. Initializes brain instance management
+        /// 3. Starts dashboard services if enabled
+        /// 4. Sets up error monitoring timer
+        /// 5. Begins the complete startup sequence
+        /// </remarks>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             try
@@ -116,9 +143,9 @@ namespace BacklashBot.Management
                     _logger.LogInformation("BRAIN: LaunchDataDashboard is false, skipping dashboard startup and daily timers.");
                     return;
                 }
-                _errorCheckTimer = new Timer(CheckForErrors, null, TimeSpan.FromSeconds(.5), TimeSpan.FromSeconds(.5));
+                _errorCheckTimer = new Timer(MonitorAndHandleErrors, null, TimeSpan.FromSeconds(.5), TimeSpan.FromSeconds(.5));
 
-                _=Task.Run(() => DoFinalInitialization(), cancellationToken);
+                _=Task.Run(() => CompleteStartupSequence(), cancellationToken);
 
                 _logger.LogInformation("BRAIN: SmokehouseBrain running...");
             }
@@ -129,6 +156,18 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Stops the CentralBrain service and gracefully shuts down all dependent components.
+        /// </summary>
+        /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// This method performs an orderly shutdown by:
+        /// 1. Canceling all active operations
+        /// 2. Waiting briefly for operations to complete
+        /// 3. Shutting down the dashboard and all services
+        /// 4. Logging the shutdown completion
+        /// </remarks>
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             File.AppendAllText("logs/stopasync_init.log", $"BRAIN: StopAsync called at {DateTime.UtcNow}. Host token cancelled: {cancellationToken.IsCancellationRequested}\n");
@@ -149,10 +188,10 @@ namespace BacklashBot.Management
             }
         }
 
-        private async Task DoFinalInitialization()
+        private async Task CompleteStartupSequence()
         {
             await StartDashboard();
-            SetupDailyTimers();
+            ConfigureScheduledTasks();
         }
 
         public async Task StartDashboard()
@@ -187,7 +226,7 @@ namespace BacklashBot.Management
                             _logger.LogError(ex, "BRAIN: Error during retry start timer callback");
                         }
                     }
-                    SetupDailyTimers();
+                    ConfigureScheduledTasks();
                 }, null, TimeSpan.FromMinutes(5), Timeout.InfiniteTimeSpan);
                 return;
             }
@@ -220,7 +259,7 @@ namespace BacklashBot.Management
 
                 if (_thisBrain.WatchPositions || _thisBrain.WatchOrders)
                 {
-                    await marketDataService.FetchPositionsAsync();
+                    await marketDataService.RetrieveAndUpdatePositionsAsync();
                 }
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
                 // Load existing watched markets for this brain lock, sorted by interest score descending
@@ -350,7 +389,7 @@ namespace BacklashBot.Management
                 // Start WebSocket services BEFORE snapshot timer to ensure markets receive data
                 _logger.LogDebug("BRAIN: Starting WebSocketHostedService...");
                 webSocketService.StartServices(_statusTrackerService.GetCancellationToken());
-                _logger.LogInformation("BRAIN: WebSocketHostedService started");
+               _logger.LogInformation("BRAIN: WebSocketHostedService started successfully");
 
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
 
@@ -369,7 +408,7 @@ namespace BacklashBot.Management
                 if (_snapshotTimer == null)
                 {
                     _snapshotTimer = new Timer(
-                        async state => await CreateSnapshotAndTriggerAnalysis(state),
+                        async state => await ExecuteSnapshotCycle(state),
                         null,
                         TimeSpan.FromMinutes(1),
                         _decisionInterval
@@ -448,7 +487,7 @@ namespace BacklashBot.Management
             }
             finally
             {
-                _logger.LogInformation("BRAIN: Dashboard sequence complete...");
+                _logger.LogInformation("BRAIN: Dashboard startup sequence completed successfully");
                 _isStartingUp = false;
                 _performanceTracker.IsStartingUp = false;
             }
@@ -586,22 +625,22 @@ namespace BacklashBot.Management
 
         private void InitializeBrain()
         {
-            ManageBrain();
+            InitializeOrUpdateBrainInstance();
             _logger.LogDebug("BRAIN: Checking snapshot schema...");
         }
 
-        private async void ManageBrain()
+        private async void InitializeOrUpdateBrainInstance()
         {
             _logger.LogDebug("BRAIN: Checking in...");
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
             _thisBrain = await context.GetBrainInstance(instanceName: _brainInstance);
-            CheckIn(_thisBrain);
-            ManageBrainLocks(_thisBrain);
+            UpdateBrainInstanceStatus(_thisBrain);
+            CleanupStaleBrainLocks(_thisBrain);
         }
 
-        private async void CheckIn(BrainInstanceDTO? brainInstance)
+        private async void UpdateBrainInstanceStatus(BrainInstanceDTO? brainInstance)
         {
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
@@ -621,7 +660,7 @@ namespace BacklashBot.Management
             await context.AddOrUpdateBrainInstance(brainInstance);
         }
 
-        private async void ManageBrainLocks(BrainInstanceDTO? brainInstance)
+        private async void CleanupStaleBrainLocks(BrainInstanceDTO? brainInstance)
         {
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
@@ -701,7 +740,7 @@ namespace BacklashBot.Management
             }
         }
 
-        private bool IsDataReady()
+        private bool AreConditionsMetForSnapshot()
         {
             var cancellationToken = _statusTrackerService.GetCancellationToken();
             if (IsServicesStopped
@@ -722,7 +761,7 @@ namespace BacklashBot.Management
             return true;
         }
 
-        private async Task CreateSnapshotAndTriggerAnalysis(object state)
+        private async Task ExecuteSnapshotCycle(object state)
         {
             try
             {
@@ -743,11 +782,11 @@ namespace BacklashBot.Management
                     return;
                 }
 
-                ManageBrain();
-                if (IsDataReady())
+                InitializeOrUpdateBrainInstance();
+                if (AreConditionsMetForSnapshot())
                 {
                     UpdatePerformanceMetrics();
-                    await CreateSnapshots();
+                    await GenerateMarketSnapshots();
                     await _marketManager.HandleMarketResets(); ;
                     await _marketManager.MonitorWatchList(_thisBrain, _performanceMetrics);
                 }
@@ -763,7 +802,7 @@ namespace BacklashBot.Management
 
         }
 
-        private async Task CreateSnapshots()
+        private async Task GenerateMarketSnapshots()
         {
 
             _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
@@ -892,7 +931,7 @@ namespace BacklashBot.Management
             {
                 _logger.LogDebug("BRAIN: Triggering analysis for snapshot at {Timestamp}, Markets {0}", allSnapshots.Timestamp, String.Join(",", allSnapshots.Markets));
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-                AnalyzeMarketsAsync(allSnapshots);
+                ProcessSnapshotAnalysis(allSnapshots);
             }
             catch (OperationCanceledException)
             {
@@ -1081,7 +1120,7 @@ namespace BacklashBot.Management
         }
 
 
-        private void AnalyzeMarketsAsync(CacheSnapshot snapshot)
+        private void ProcessSnapshotAnalysis(CacheSnapshot snapshot)
         {
             try
             {
@@ -1095,8 +1134,8 @@ namespace BacklashBot.Management
                     cancellationToken.ThrowIfCancellationRequested();
                     if (marketSnapshot != null)
                     {
-                        ValidateMarketState(marketSnapshot);
-                        AnalyzeMarketAsync(marketSnapshot);
+                        CheckMarketClosureConditions(marketSnapshot);
+                        PerformMarketAnalysis(marketSnapshot);
                     }
                 }
             }
@@ -1110,7 +1149,7 @@ namespace BacklashBot.Management
             }
         }
 
-        private void ValidateMarketState(MarketSnapshot snapshot)
+        private void CheckMarketClosureConditions(MarketSnapshot snapshot)
         {
             // Only consider market closed if we have received WebSocket data AND orderbook data but depth is still 0
             // This prevents false positives when WebSocket subscriptions are delayed or orderbook is empty
@@ -1138,7 +1177,7 @@ namespace BacklashBot.Management
             }
         }
 
-        private void AnalyzeMarketAsync(MarketSnapshot marketSnapshot)
+        private void PerformMarketAnalysis(MarketSnapshot marketSnapshot)
         {
             string marketTicker = marketSnapshot.MarketTicker;
             try
@@ -1177,7 +1216,7 @@ namespace BacklashBot.Management
             return _serviceFactory.GetMarketRefreshService().IsRunning();
         }
 
-        private void SetupDailyTimers()
+        private void ConfigureScheduledTasks()
         {
             if (IsServicesStopped)
             {
@@ -1218,13 +1257,13 @@ namespace BacklashBot.Management
                     }
                     finally
                     {
-                        SetupDailyTimers();
+                        ConfigureScheduledTasks();
                     }
                 }, null, overnightTaskDelay, Timeout.InfiniteTimeSpan);
             }
         }
 
-        private async void CheckForErrors(object state)
+        private async void MonitorAndHandleErrors(object state)
         {
             if (await _errorHandler.HandleErrors())
             {

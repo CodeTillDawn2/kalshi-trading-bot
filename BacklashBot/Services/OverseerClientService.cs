@@ -142,7 +142,7 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error stopping overseer client");
+                _logger.LogWarning("Error stopping overseer client. Error: {0}", ex.Message);
             }
         }
 
@@ -625,8 +625,8 @@ namespace BacklashBot.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "OVERSEER- EMERGENCY: Exception in AttemptConnectionAsync: {Message}", ex.Message);
-                _logger.LogError(ex, "OVERSEER- EMERGENCY: Stack trace: {StackTrace}", ex.StackTrace);
+                _logger.LogWarning("OVERSEER- EMERGENCY: Exception in AttemptConnectionAsync: {Message}", ex.Message);
+                _logger.LogWarning("OVERSEER- EMERGENCY: Stack trace: {StackTrace}", ex.StackTrace);
             }
             finally
             {

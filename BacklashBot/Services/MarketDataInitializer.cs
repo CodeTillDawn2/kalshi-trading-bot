@@ -60,7 +60,7 @@ namespace BacklashBot.Services
                             if (!_serviceFactory.GetDataCache().Markets.ContainsKey(ticker))
                             {
                                 _logger.LogDebug("Adding market subscription for {MarketTicker}", ticker);
-                                await _serviceFactory.GetMarketDataService().SubscribeToMarketAsync(ticker);
+                                await _serviceFactory.GetMarketDataService().SubscribeToMarketChannelsAsync(ticker);
                                 _logger.LogDebug("Subscribed to market {MarketTicker}", ticker);
                                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                                 _logger.LogDebug("Waiting for initial WebSocket data for {MarketTicker}", ticker);
@@ -91,7 +91,7 @@ namespace BacklashBot.Services
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
 
                 _logger.LogDebug("Fetching positions...");
-                await _serviceFactory.GetMarketDataService().FetchPositionsAsync();
+                await _serviceFactory.GetMarketDataService().RetrieveAndUpdatePositionsAsync();
                 _logger.LogDebug("Fetched positions");
 
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();

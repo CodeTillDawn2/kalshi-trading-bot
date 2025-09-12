@@ -14,17 +14,10 @@ namespace BacklashBot.Services.Interfaces
         event EventHandler<string> AccountBalanceUpdated;
 
         List<string> MarketsToRefresh { get; set; }
-
-        void AssignWebSocketHandlers();
+        Task AddMarketToWatchList(string marketTicker, double? interestScore = null);
         DateTime? GetLatestOrderbookTimestamp(string marketTicker);
         bool GetExchangeStatus();
         bool GetTradingStatus();
-        Task FetchPositionsAsync();
-        void TriggerClientMarketRefresh();
-        // Adds market to db and watch, triggers subscription check which connects all markets in cache
-        Task AddMarketWatch(string marketTicker, double? interestScore = null);
-        // Adds market to the db and watch, subscribes one market at a time
-        Task SubscribeToMarketAsync(string marketTicker);
         Task UnwatchMarket(string marketTicker);
         Task UpdateMarketSubscriptionAsync(string action, string[] marketTickers);
         void StopServicesAsync();
@@ -39,11 +32,14 @@ namespace BacklashBot.Services.Interfaces
         double GetPortfolioValue();
         DateTime GetLatestWebSocketTimestamp();
         Task UpdateAccountBalanceAsync();
-        void ReceiveTicker(string marketTicker, Guid marketId, int price, int yesBid, int yesAsk, int volume, int openInterest, int dollarVolume, int dollarOpenInterest, long ts, DateTime loggedDate, DateTime? processedDate = null);
+        void ProcessTickerUpdate(string marketTicker, Guid marketId, int price, int yesBid, int yesAsk, int volume, int openInterest, int dollarVolume, int dollarOpenInterest, long ts, DateTime loggedDate, DateTime? processedDate = null);
         void NotifyMarketDataUpdated(string marketTicker);
         void NotifyPositionDataUpdated(string marketTicker);
         void NotifyTickerAdded(string marketTicker);
         void NotifyAccountBalanceUpdated(string marketTicker);
         List<CandlestickData> ForwardFillCandlesticks(List<CandlestickData> candlesticks, string marketTicker);
+        void ConfigureWebSocketEventHandlers();
+        Task RetrieveAndUpdatePositionsAsync();
+        Task SubscribeToMarketChannelsAsync(string marketTicker);
     }
 }
