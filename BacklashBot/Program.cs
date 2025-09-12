@@ -99,7 +99,7 @@ builder.Services.AddSingleton<ILoggerProvider>(provider =>
         minLevel,
         loggingConfig,
         provider.GetRequiredService<IOptions<ExecutionConfig>>().Value,
-        provider.GetRequiredService<IBrainStatusService>(),
+        null, // IBrainStatusService - avoid circular dependency
         "BacklashBot", // defaultEnvironment
         "BacklashInstance"); // defaultInstance
 });
