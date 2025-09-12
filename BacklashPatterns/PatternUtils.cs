@@ -1,9 +1,28 @@
 using BacklashDTOs;
 using static BacklashPatterns.TrendCalcs;
+
 namespace BacklashPatterns
 {
+    /// <summary>
+    /// Provides utility methods for calculating comprehensive metrics for individual candles in candlestick pattern analysis.
+    /// This class serves as the core computation engine for the pattern recognition system, aggregating data from
+    /// multiple lookback periods and trend calculations to provide rich context for pattern detection algorithms.
+    /// It integrates with the TrendCalcs static class to compute various technical indicators and market metrics.
+    /// </summary>
     public static class PatternUtils
     {
+        /// <summary>
+        /// Computes comprehensive metrics for a specific candle at the given index, utilizing caching for performance.
+        /// This method aggregates basic candle properties (body size, wicks, range) with advanced trend analysis
+        /// including mean trends, consistency measures, volume ratios, and directional ratios across multiple
+        /// lookback periods. The metrics are cached to avoid redundant calculations during pattern scanning.
+        /// </summary>
+        /// <param name="metricsCache">Reference to the cache dictionary for storing computed metrics by index.</param>
+        /// <param name="index">The index of the candle in the prices array to analyze.</param>
+        /// <param name="prices">Array of candle data containing OHLC and volume information.</param>
+        /// <param name="trendLookback">Number of candles to look back for trend calculations.</param>
+        /// <param name="loadLookbackMetrics">Whether to compute expensive lookback-based metrics or skip them for performance.</param>
+        /// <returns>A CandleMetrics struct containing all computed metrics for the specified candle.</returns>
         public static CandleMetrics GetCandleMetrics(
             ref Dictionary<int, CandleMetrics> metricsCache,
             int index,
@@ -17,7 +36,7 @@ namespace BacklashPatterns
                 double[] meanTrend = new double[5];
                 double[] lookbackAvgRange = new double[5];
                 double[] trendConsistency = new double[5];
-                double[] AvgVoumeVsLookback = new double[5];
+                double[] AvgVolumeVsLookback = new double[5];
                 double[] bullishRatio = new double[5];
                 double[] bearishRatio = new double[5];
                 if (loadLookbackMetrics)
@@ -37,11 +56,11 @@ namespace BacklashPatterns
                     if (index >= 4) meanTrend[2] = CalculateLookbackMeanTrend(prices, index, trendLookback, 3);
                     if (index >= 5) meanTrend[3] = CalculateLookbackMeanTrend(prices, index, trendLookback, 4);
                     if (index >= 6) meanTrend[4] = CalculateLookbackMeanTrend(prices, index, trendLookback, 5);
-                    if (index >= 2) AvgVoumeVsLookback[0] = CalculateAverageVolume(prices, index, trendLookback, 1);
-                    if (index >= 3) AvgVoumeVsLookback[1] = CalculateAverageVolume(prices, index, trendLookback, 2);
-                    if (index >= 4) AvgVoumeVsLookback[2] = CalculateAverageVolume(prices, index, trendLookback, 3);
-                    if (index >= 5) AvgVoumeVsLookback[3] = CalculateAverageVolume(prices, index, trendLookback, 4);
-                    if (index >= 6) AvgVoumeVsLookback[4] = CalculateAverageVolume(prices, index, trendLookback, 5);
+                    if (index >= 2) AvgVolumeVsLookback[0] = CalculateAverageVolume(prices, index, trendLookback, 1);
+                    if (index >= 3) AvgVolumeVsLookback[1] = CalculateAverageVolume(prices, index, trendLookback, 2);
+                    if (index >= 4) AvgVolumeVsLookback[2] = CalculateAverageVolume(prices, index, trendLookback, 3);
+                    if (index >= 5) AvgVolumeVsLookback[3] = CalculateAverageVolume(prices, index, trendLookback, 4);
+                    if (index >= 6) AvgVolumeVsLookback[4] = CalculateAverageVolume(prices, index, trendLookback, 5);
                     if (index >= 2) bullishRatio[0] = CalculateTrendDirectionRatio(index, trendLookback, prices, 1, true);
                     if (index >= 3) bullishRatio[1] = CalculateTrendDirectionRatio(index, trendLookback, prices, 2, true);
                     if (index >= 4) bullishRatio[2] = CalculateTrendDirectionRatio(index, trendLookback, prices, 3, true);
@@ -82,7 +101,7 @@ namespace BacklashPatterns
                     LookbackMeanTrend = meanTrend,
                     LookbackAvgRange = lookbackAvgRange,
                     LookbackTrendConsistency = trendConsistency,
-                    AvgVoumeVsLookback = AvgVoumeVsLookback,
+                    AvgVolumeVsLookback = AvgVolumeVsLookback,
                     BullishRatio = bullishRatio,
                     BearishRatio = bearishRatio,
                     IntervalType = intervalType,
@@ -96,6 +115,14 @@ namespace BacklashPatterns
         }
 
 
+        /// <summary>
+        /// Determines whether a candle represents a significant price movement that warrants pattern analysis.
+        /// This method filters out minor price fluctuations to focus computational resources on meaningful market events.
+        /// Significance is determined by either substantial price change, high volatility, or notable body size.
+        /// </summary>
+        /// <param name="current">The current candle to evaluate for significance.</param>
+        /// <param name="previous">The previous candle for comparison (null for the first candle, which is always considered significant).</param>
+        /// <returns>True if the candle shows significant movement, false otherwise.</returns>
         public static bool IsPatternSignificant(CandleMids current, CandleMids? previous)
         {
             if (previous == null) return true; // Always process the first candle
@@ -110,6 +137,13 @@ namespace BacklashPatterns
 
 
 
+        /// <summary>
+        /// Parses a timestamp string in ISO 8601 format and converts it to a DateTime object with UTC kind.
+        /// This method is used for processing timestamp data from external sources, ensuring consistent
+        /// UTC representation for time-based calculations and comparisons in the trading system.
+        /// </summary>
+        /// <param name="timestamp">The timestamp string in "yyyy-MM-dd'T'HH:mm:ss'Z'" format.</param>
+        /// <returns>A DateTime object representing the parsed timestamp in UTC.</returns>
         public static DateTime GetBreakpointTimestamp(string timestamp)
         {
             // Parse the exact ISO 8601 format and enforce UTC

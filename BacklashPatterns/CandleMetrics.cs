@@ -19,7 +19,7 @@ namespace BacklashPatterns
         /// </summary>
         public double[] LookbackMeanTrend { get; set; }
         public double[] LookbackTrendConsistency { get; set; }
-        public double[] AvgVoumeVsLookback { get; set; }
+        public double[] AvgVolumeVsLookback { get; set; }
         public double[] LookbackAvgRange { get; set; }
         public double[] BullishRatio { get; set; }
         public double[] BearishRatio { get; set; }
@@ -27,28 +27,28 @@ namespace BacklashPatterns
 
         public double GetLookbackMeanTrend(int patternLength)
         {
-            if (LookbackMeanTrend[patternLength - 1] != null)
+            if (LookbackMeanTrend != null && patternLength - 1 < LookbackMeanTrend.Length)
                 return LookbackMeanTrend[patternLength - 1];
             return 0;
         }
 
         public double GetLookbackTrendConsistency(int patternLength)
         {
-            if (LookbackTrendConsistency[patternLength - 1] != null)
+            if (LookbackTrendConsistency != null && patternLength - 1 < LookbackTrendConsistency.Length)
                 return LookbackTrendConsistency[patternLength - 1];
             return 0;
         }
 
-        public double GetAvgVoumeVsLookback(int patternLength)
+        public double GetAvgVolumeVsLookback(int patternLength)
         {
-            if (AvgVoumeVsLookback[patternLength - 1] != null)
-                return AvgVoumeVsLookback[patternLength - 1];
+            if (AvgVolumeVsLookback != null && patternLength - 1 < AvgVolumeVsLookback.Length)
+                return AvgVolumeVsLookback[patternLength - 1];
             return 0;
         }
 
         public double GetLookbackAvgRange(int patternLength)
         {
-            if (LookbackAvgRange[patternLength - 1] != null)
+            if (LookbackAvgRange != null && patternLength - 1 < LookbackAvgRange.Length)
                 return LookbackAvgRange[patternLength - 1];
             return 0;
         }

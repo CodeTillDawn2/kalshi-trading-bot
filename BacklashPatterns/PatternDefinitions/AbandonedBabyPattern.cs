@@ -92,7 +92,7 @@ namespace BacklashPatterns.PatternDefinitions
 
                 if (isFirstBearish && hasInitialGap && hasSecondGap && isFinalReversal && isPrecedingDowntrend)
                     return new AbandonedBabyPattern(candles, prices,
-                        thirdMetrics.GetAvgVoumeVsLookback(candles.Count), true);
+                        thirdMetrics.GetAvgVolumeVsLookback(candles.Count), true);
             }
             else
             {
@@ -104,7 +104,7 @@ namespace BacklashPatterns.PatternDefinitions
 
                 if (isFirstBullish && hasInitialGap && hasSecondGap && isFinalReversal && isPrecedingUptrend)
                     return new AbandonedBabyPattern(candles, prices,
-                        thirdMetrics.GetAvgVoumeVsLookback(candles.Count), false);
+                        thirdMetrics.GetAvgVolumeVsLookback(candles.Count), false);
             }
 
             return null;
