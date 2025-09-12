@@ -246,7 +246,7 @@ namespace BacklashBot.Management
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
                 var snapshotService = _serviceFactory.GetTradingSnapshotService();
                 var marketDataService = _serviceFactory.GetMarketDataService();
-                snapshotService.ResetLastSnapshot();
+                snapshotService.ResetSnapshotTracking();
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
@@ -255,7 +255,7 @@ namespace BacklashBot.Management
                 if (_thisBrain == null)
                     throw new Exception($"Brain instance was not found: {_brainInstance}");
 
-                SchemaVerified = await snapshotService.CheckSchemaMatches();
+                SchemaVerified = await snapshotService.ValidateSnapshotSchema();
 
                 if (_thisBrain.WatchPositions || _thisBrain.WatchOrders)
                 {

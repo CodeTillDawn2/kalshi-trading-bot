@@ -915,7 +915,7 @@ namespace BacklashBot.Services
                         }
                     }
                 }
-                _logger.LogInformation("Loaded {Count} candlesticks from {FilePath}", candlestickData.Count, filePath);
+                _logger.LogDebug("Loaded {Count} candlesticks from {FilePath}", candlestickData.Count, filePath);
                 return candlestickData;
             }
             catch (Exception ex)

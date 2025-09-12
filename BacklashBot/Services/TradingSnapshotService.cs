@@ -16,19 +16,45 @@ using TradingStrategies.Configuration;
 
 namespace BacklashBot.Services
 {
+    /// <summary>
+    /// Service responsible for managing trading snapshot operations, including saving market data snapshots to disk
+    /// and loading them for analysis. This service handles snapshot validation, timing controls, and schema management
+    /// to ensure reliable data persistence and retrieval for trading strategy evaluation.
+    /// </summary>
+    /// <remarks>
+    /// The service implements timing-based snapshot saving with tolerance windows to handle irregular market data arrival.
+    /// It uses parallel processing for efficient loading of multiple snapshots and maintains schema compatibility
+    /// through version-based JSON sanitization. Snapshots are stored as JSON files in a configured directory
+    /// for later analysis by trading strategies and backtesting systems.
+    /// </remarks>
     public class TradingSnapshotService : ITradingSnapshotService
     {
         private readonly ILogger<ITradingSnapshotService> _logger;
         private readonly IOptions<SnapshotConfig> _snapshotConfig;
         private readonly IOptions<TradingConfig> _tradingConfig;
-        private DateTime? _lastSnapshotTimestamp; // Actual timestamp of the last saved snapshot
-        public DateTime? NextExpectedSnapshotTimestamp { get; set; } // The timestamp when the next snapshot is ideally expected
-        private bool _isFirstSnapshot = true;
-        private readonly TimeSpan _expectedInterval;
-        private readonly TimeSpan _tolerance;
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly string _snapshotDirectory = @"\\DESKTOP-ITC50UT\SmokehouseDataStorage\NewSnapshots"; // Hardcoded directory path
+        private DateTime? _lastSavedSnapshotTimestamp; // Actual timestamp of the last saved snapshot
 
+        /// <summary>
+        /// Gets or sets the timestamp when the next snapshot is ideally expected based on the configured decision frequency.
+        /// </summary>
+        /// <remarks>
+        /// This property is used to detect timing irregularities in snapshot arrival. It is updated after each successful
+        /// snapshot save and reset when snapshot tracking is cleared. Null indicates no expected timing has been established.
+        /// </remarks>
+        public DateTime? NextExpectedSnapshotTimestamp { get; set; } // The timestamp when the next snapshot is ideally expected
+        private bool _isFirstSnapshotTaken = true;
+        private readonly TimeSpan _decisionFrequencyInterval;
+        private readonly TimeSpan _snapshotTimingTolerance;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly string _snapshotStorageDirectory = @"\\DESKTOP-ITC50UT\SmokehouseDataStorage\NewSnapshots"; // Hardcoded directory path
+
+        /// <summary>
+        /// Initializes a new instance of the TradingSnapshotService with required dependencies.
+        /// </summary>
+        /// <param name="logger">Logger for recording snapshot operations, warnings, and errors.</param>
+        /// <param name="snapshotConfig">Configuration options for snapshot behavior including tolerance settings.</param>
+        /// <param name="tradingConfig">Configuration options for trading parameters including decision frequency.</param>
+        /// <param name="scopeFactory">Factory for creating service scopes to access database services.</param>
         public TradingSnapshotService(
             ILogger<ITradingSnapshotService> logger,
             IOptions<SnapshotConfig> snapshotConfig,
@@ -38,17 +64,32 @@ namespace BacklashBot.Services
             _logger = logger;
             _snapshotConfig = snapshotConfig;
             _tradingConfig = tradingConfig;
-            _scopeFactory = scopeFactory;
-            _expectedInterval = TimeSpan.FromSeconds(tradingConfig.Value.DecisionFrequencySeconds);
-            _tolerance = TimeSpan.FromSeconds(snapshotConfig.Value.SnapshotToleranceSeconds);
+            _serviceScopeFactory = scopeFactory;
+            _decisionFrequencyInterval = TimeSpan.FromSeconds(tradingConfig.Value.DecisionFrequencySeconds);
+            _snapshotTimingTolerance = TimeSpan.FromSeconds(snapshotConfig.Value.SnapshotToleranceSeconds);
 
             // Ensure the directory exists
-            if (!Directory.Exists(_snapshotDirectory))
+            if (!Directory.Exists(_snapshotStorageDirectory))
             {
-                Directory.CreateDirectory(_snapshotDirectory);
+                Directory.CreateDirectory(_snapshotStorageDirectory);
             }
         }
 
+        /// <summary>
+        /// Saves a snapshot of market data to disk, validating timing and market conditions before persistence.
+        /// </summary>
+        /// <param name="BrainInstance">Identifier for the brain instance creating this snapshot.</param>
+        /// <param name="cacheSnapshot">The complete snapshot data containing market information and timing details.</param>
+        /// <returns>A list of market tickers that were successfully saved in this snapshot.</returns>
+        /// <remarks>
+        /// This method performs several validations:
+        /// - Checks timing regularity against expected intervals with tolerance windows
+        /// - Validates WebSocket data freshness
+        /// - Filters out ended markets and markets without sufficient data
+        /// - Applies snapshot validation rules before saving
+        /// - Saves data as JSON files organized by timestamp
+        /// Returns empty list if snapshot is discarded due to timing issues.
+        /// </remarks>
         public async Task<List<string>> SaveSnapshotAsync(string BrainInstance, CacheSnapshot cacheSnapshot)
         {
             try
@@ -57,13 +98,13 @@ namespace BacklashBot.Services
                 var timestamp = cacheSnapshot.Timestamp;
                 var timestampString = timestamp.ToString("yyyyMMddTHHmmssZ");
 
-                var discardThreshold = _expectedInterval + TimeSpan.FromSeconds(_snapshotConfig.Value.SnapshotToleranceSeconds * 2);
+                var discardThreshold = _decisionFrequencyInterval + TimeSpan.FromSeconds(_snapshotConfig.Value.SnapshotToleranceSeconds * 2);
 
-                if (_isFirstSnapshot)
+                if (_isFirstSnapshotTaken)
                 {
-                    NextExpectedSnapshotTimestamp = timestamp + _expectedInterval;
+                    NextExpectedSnapshotTimestamp = timestamp + _decisionFrequencyInterval;
                 }
-                else if (_lastSnapshotTimestamp.HasValue)
+                else if (_lastSavedSnapshotTimestamp.HasValue)
                 {
                     if (NextExpectedSnapshotTimestamp.HasValue && timestamp > NextExpectedSnapshotTimestamp.Value + discardThreshold)
                     {
@@ -75,9 +116,9 @@ namespace BacklashBot.Services
                         return new List<string>();
                     }
 
-                    var actualTimeSinceLastSnapshot = timestamp - _lastSnapshotTimestamp.Value;
-                    var minInterval = _expectedInterval - _tolerance;
-                    var maxInterval = _expectedInterval + _tolerance;
+                    var actualTimeSinceLastSnapshot = timestamp - _lastSavedSnapshotTimestamp.Value;
+                    var minInterval = _decisionFrequencyInterval - _snapshotTimingTolerance;
+                    var maxInterval = _decisionFrequencyInterval + _snapshotTimingTolerance;
 
                     if (actualTimeSinceLastSnapshot < minInterval || actualTimeSinceLastSnapshot > maxInterval)
                     {
@@ -85,7 +126,7 @@ namespace BacklashBot.Services
                             "Snapshot timing irregularity detected: {CurrentTimestamp} is {TimeSinceLastSnapshot} seconds " +
                             "after {LastTimestamp}, expected approximately {ExpectedInterval} seconds",
                             timestampString, actualTimeSinceLastSnapshot.TotalSeconds,
-                            _lastSnapshotTimestamp.Value.ToString("yyyyMMddTHHmmssZ"), _expectedInterval.TotalSeconds);
+                            _lastSavedSnapshotTimestamp.Value.ToString("yyyyMMddTHHmmssZ"), _decisionFrequencyInterval.TotalSeconds);
                     }
                 }
 
@@ -124,7 +165,7 @@ namespace BacklashBot.Services
                             continue;
                         }
 
-                        if (!SnapshotIsValid(marketSnapshot.Value))
+                        if (!ValidateMarketSnapshot(marketSnapshot.Value))
                         {
                             continue;
                         }
@@ -163,14 +204,14 @@ namespace BacklashBot.Services
                     {
                         var fileJson = JsonSerializer.Serialize(snapshotsToSave, options);
                         var fileName = $"Snapshot_{timestampString}.json";
-                        var fullPath = Path.Combine(_snapshotDirectory, fileName);
+                        var fullPath = Path.Combine(_snapshotStorageDirectory, fileName);
                         await File.WriteAllTextAsync(fullPath, fileJson, Encoding.Unicode);
                         _logger.LogInformation("Saved {Count} snapshots to file: {FilePath}", SavedCount, fullPath);
                     }
 
-                    _lastSnapshotTimestamp = timestamp;
-                    NextExpectedSnapshotTimestamp = timestamp + _expectedInterval;
-                    _isFirstSnapshot = false;
+                    _lastSavedSnapshotTimestamp = timestamp;
+                    NextExpectedSnapshotTimestamp = timestamp + _decisionFrequencyInterval;
+                    _isFirstSnapshotTaken = false;
                 }
 
                 return snapshotsActuallySaved;
@@ -183,7 +224,18 @@ namespace BacklashBot.Services
         }
 
 
-        // Updated LoadManySnapshots method in TradingSnapshotService.cs with parallelization
+        /// <summary>
+        /// Loads multiple market snapshots from database records, processing them in parallel for efficiency.
+        /// </summary>
+        /// <param name="snapshots">List of snapshot metadata records to load from the database.</param>
+        /// <param name="forceLoad">When true, bypasses any loading restrictions (currently unused).</param>
+        /// <returns>Dictionary mapping market tickers to lists of their historical snapshots, sorted by timestamp.</returns>
+        /// <remarks>
+        /// This method uses parallel processing to efficiently load snapshots grouped by market ticker.
+        /// Each snapshot is deserialized from JSON, upgraded to the current schema version, and validated.
+        /// Failed deserializations are logged as warnings but don't stop processing of other snapshots.
+        /// The returned dictionary only includes markets that have successfully loaded snapshots.
+        /// </remarks>
         public async Task<Dictionary<string, List<MarketSnapshot>>> LoadManySnapshots(List<SnapshotDTO> snapshots, bool forceLoad = false)
         {
             try
@@ -242,7 +294,7 @@ namespace BacklashBot.Services
                         if (newCacheSnapshots.Any())
                         {
                             result[marketTicker] = newCacheSnapshots;
-                            _logger.LogDebug("Loaded {Count} snapshots for {MarketTicker}", newCacheSnapshots.Count, marketTicker);
+                            _logger.LogInformation("Loaded {Count} snapshots for {MarketTicker}", newCacheSnapshots.Count, marketTicker);
                         }
                     }
                 });
@@ -256,7 +308,19 @@ namespace BacklashBot.Services
             }
         }
 
-        public bool SnapshotIsValid(MarketSnapshot marketSnapshot)
+        /// <summary>
+        /// Validates a market snapshot for data integrity and consistency before saving or processing.
+        /// </summary>
+        /// <param name="marketSnapshot">The market snapshot to validate.</param>
+        /// <returns>True if the snapshot passes all validation checks, false otherwise.</returns>
+        /// <remarks>
+        /// This method uses SnapshotDiscrepancyValidator to check for:
+        /// - Missing orderbook data
+        /// - Overlapping bid/ask prices
+        /// - Rate discrepancies in trading metrics
+        /// Validation failures are logged as warnings with detailed information about the issues found.
+        /// </remarks>
+        public bool ValidateMarketSnapshot(MarketSnapshot marketSnapshot)
         {
             bool hasValidMarket = false;
 
@@ -316,15 +380,33 @@ namespace BacklashBot.Services
             return hasValidMarket;
         }
 
-        public void ResetLastSnapshot()
+        /// <summary>
+        /// Resets the internal state used for tracking snapshot timing and expectations.
+        /// </summary>
+        /// <remarks>
+        /// This method clears the last saved snapshot timestamp and expected next snapshot timestamp,
+        /// effectively resetting the service to its initial state. This is typically called when
+        /// restarting the brain or when snapshot timing needs to be recalibrated.
+        /// </remarks>
+        public void ResetSnapshotTracking()
         {
-            _lastSnapshotTimestamp = null;
+            _lastSavedSnapshotTimestamp = null;
             NextExpectedSnapshotTimestamp = null; // Reset the expected timestamp as well
         }
 
-        public async Task<bool> CheckSchemaMatches()
+        /// <summary>
+        /// Validates that the current CacheSnapshot schema matches the expected schema stored in the database.
+        /// </summary>
+        /// <returns>True if the schemas match, false otherwise.</returns>
+        /// <remarks>
+        /// This method generates the JSON schema for CacheSnapshot and compares it against the schema
+        /// stored in the database for the configured snapshot schema version. Schema mismatches
+        /// can indicate data compatibility issues that need to be addressed before saving snapshots.
+        /// </remarks>
+        /// <exception cref="Exception">Thrown when the expected schema version is not found in the database.</exception>
+        public async Task<bool> ValidateSnapshotSchema()
         {
-            using var scope = _scopeFactory.CreateScope();
+            using var scope = _serviceScopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
             var schema = JsonSchema.FromType<CacheSnapshot>();
@@ -340,12 +422,17 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
-        /// Removes json fields which are no longer relevant
+        /// Sanitizes snapshot JSON by removing deprecated fields based on the target schema version.
         /// </summary>
-        /// <param name="currentVersion"></param>
-        /// <param name="JSON"></param>
-        /// <returns></returns>
-        public string SterilizeJSON(int currentVersion, string JSON)
+        /// <param name="currentVersion">The target schema version to sanitize for.</param>
+        /// <param name="JSON">The raw JSON string to sanitize.</param>
+        /// <returns>The sanitized JSON string with deprecated fields removed.</returns>
+        /// <remarks>
+        /// This method handles schema migrations by removing fields that are no longer relevant
+        /// in newer schema versions. It processes the JSON document and rebuilds it without
+        /// the deprecated properties, ensuring compatibility with current data structures.
+        /// </remarks>
+        public string SanitizeSnapshotJson(int currentVersion, string JSON)
         {
             using JsonDocument doc = JsonDocument.Parse(JSON);
             var root = doc.RootElement.Clone();

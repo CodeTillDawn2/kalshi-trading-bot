@@ -1,4 +1,27 @@
-﻿# OverseerClientService Feedback
+﻿# TradingSnapshotService Feedback
+**Class Analysis Summary:**
+- **Purpose**: TradingSnapshotService manages the complete lifecycle of market data snapshots for the Kalshi trading bot, including saving comprehensive market state to disk and loading historical snapshots for analysis. This service handles snapshot validation, timing controls, parallel processing for efficient data retrieval, and schema compatibility through JSON sanitization. It serves as the critical data persistence layer for trading strategy evaluation and backtesting operations.
+- **Key Improvements Made**:
+  - Renamed unclear field names for better clarity (_isFirstSnapshot → _isFirstSnapshotTaken, _lastSnapshotTimestamp → _lastSavedSnapshotTimestamp, _expectedInterval → _decisionFrequencyInterval, _tolerance → _snapshotTimingTolerance, _scopeFactory → _serviceScopeFactory, _snapshotDirectory → _snapshotStorageDirectory)
+  - Renamed unclear method names for better clarity (SnapshotIsValid → ValidateMarketSnapshot, ResetLastSnapshot → ResetSnapshotTracking, CheckSchemaMatches → ValidateSnapshotSchema, SterilizeJSON → SanitizeSnapshotJson)
+  - Updated interface ITradingSnapshotService to reflect renamed methods
+  - Added comprehensive XML documentation for the entire class and all public methods
+  - Promoted important debug logs to Information level for better visibility (snapshot loading completion)
+  - Verified no placeholders or incomplete implementations exist
+  - Confirmed no unused methods in the class
+  - No notes about removed functionality present
+- **Strengths**: Well-architected service with robust snapshot validation, efficient parallel processing for loading operations, comprehensive timing controls with tolerance windows, proper schema management and JSON sanitization, actively used in production for data persistence, follows established patterns, excellent error handling with detailed logging, effective integration with file system storage and database services.
+- **Areas for Improvement**:
+  - Consider implementing configuration options for snapshot storage directory instead of hardcoded path
+  - Add performance metrics collection for snapshot save/load operations and timing
+  - Consider implementing snapshot compression to reduce storage footprint
+  - Add input validation for snapshot data integrity before processing
+  - Consider implementing snapshot deduplication to prevent redundant data storage
+  - The hardcoded storage path could benefit from environment-specific configuration
+  - Add configuration for parallel processing limits to prevent resource exhaustion during high-volume operations
+- **Overall Assessment**: Excellent, production-ready service that effectively manages the complex task of snapshot persistence and retrieval. The improvements enhance code clarity, maintainability, and operational visibility without breaking existing functionality. The class is well-architected with proper separation of concerns, robust error handling, and efficient data processing capabilities. No critical issues found - the implementation is sophisticated and serves as a reliable foundation for trading data management.
+
+# OverseerClientService Feedback
 **Class Analysis Summary:**
 - **Purpose**: OverseerClientService manages the client-side connection to an Overseer server for monitoring and oversight of the trading bot. This service establishes and maintains a SignalR connection to an Overseer instance, handles periodic check-ins with system status information, and automatically discovers and switches to better overseer servers when available. It provides resilience through automatic reconnection, connection validation, and failover mechanisms. The service integrates with the broader bot ecosystem to report market data, error counts, and performance metrics.
 - **Key Improvements Made**:
@@ -486,32 +509,18 @@
 - **Overall Assessment**: Excellent core service that effectively manages all market data operations and real-time synchronization. The improvements enhance code clarity and maintainability without affecting functionality. The service is well-architected with proper separation of concerns and robust error handling.
 
 # Backlog
-- [ ] Look into warnings during deploy
-- [ ] SignalR for sending messages across network?
-- [ ] I heard they might switch to "fractional cents"
-
-# Front End
-- [ ] Restructure front end for maintainability and performance
-- [ ] Ensure clients don't lose connection over time
-- [ ] Ensure that the clients are not being marked absent when they are still connected
-- [ ] Debounce refreshes from front end
-- [ ] Ensure spamming front end add/remove buttons doesn't affect server performance
-- [ ] Last Web Socket Event and orderbook last update shows 2024 years ago if empty
-- [ ] Test on phone
-- [ ] Add information about your resting orders to the front end
-- [ ] Change position label to be more clear
-
-# Soon
+- [ ] Fix build warnings
+- [ ] Change to "fractional cents"
 - [ ] Alerts?
 - [ ] Variable refresh interval time? Why does it need to be the same length each time? Instead just refresh occasionally and work based on average web socket events capacity
 - [ ] Refine average web socket events so that it resets when appropriate and doesn't divide by more time if market resets occur
 - [ ] Add primary brain field to brain instances, so one of my instances can move watched markets between instances
 - [ ] What are "Milestones" in the Kalshi API? Seems like it could be things that need to happen for events to trigger? Could be used for analysis
 - [ ] Evaluate whether we can trust ticker feed to indicate when we should get candlesticks
-- [ ] Batch subscription updates
 - [ ] Expand Web socket testing to include: adding and removing markets quickly, conflicting commands, etc
 - [ ] Detect upcoming downtimes and react to them, schedule maintenance
-- [ ] ticker_v2
+- [ ] ticker_v2?
+- [ ] Subscribe to rss feed for ChangeLog
 - [ ] Need some kind of "traffic cop" intermediary to handle graceful handoffs, potentially handle some of the maintenance duties
 - [ ] userdatatimestamp endpoint (https://docs.kalshi.com/api-reference/get-user-data-timestamp). Make system that monitors this and, beyond a defined threshold, cancels all resting orders and shuts down until it improves. 
 

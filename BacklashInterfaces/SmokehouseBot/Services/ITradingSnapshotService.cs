@@ -7,10 +7,10 @@ namespace BacklashBot.Services.Interfaces
     {
         Task<List<string>> SaveSnapshotAsync(string BrainInstance, CacheSnapshot cacheSnapshot);
         Task<Dictionary<string, List<MarketSnapshot>>> LoadManySnapshots(List<SnapshotDTO> snapshots, bool forceLoad = false);
-        bool SnapshotIsValid(MarketSnapshot marketSnapshot);
-        void ResetLastSnapshot();
-        Task<bool> CheckSchemaMatches();
-        string SterilizeJSON(int currentVersion, string JSON);
+        bool ValidateMarketSnapshot(MarketSnapshot marketSnapshot);
+        void ResetSnapshotTracking();
+        Task<bool> ValidateSnapshotSchema();
+        string SanitizeSnapshotJson(int currentVersion, string JSON);
         public DateTime? NextExpectedSnapshotTimestamp { get; set; }
     }
 }
