@@ -2,6 +2,13 @@ using BacklashDTOs;
 
 namespace BacklashPatterns
 {
+    /// <summary>
+    /// Provides static utility methods for calculating various trend-related metrics and ratios
+    /// used in candlestick pattern analysis. This class serves as a computational foundation for
+    /// assessing market trends, consistency, volume patterns, and directional biases over specified
+    /// lookback periods. All methods are designed to be thread-safe and efficient for real-time
+    /// pattern detection algorithms.
+    /// </summary>
     public static class TrendCalcs
     {
 
@@ -36,7 +43,16 @@ namespace BacklashPatterns
             return totalTrendChange;
         }
 
-        public static double CalculateLookbackMeanTrend(
+        /// <summary>
+        /// Calculates the average trend change over a specified lookback period before a pattern.
+        /// This method computes the mean price movement per candle to assess overall trend direction.
+        /// </summary>
+        /// <param name="prices">Array of candle data.</param>
+        /// <param name="index">The current candle index.</param>
+        /// <param name="lookback">Number of candles to look back.</param>
+        /// <param name="patternSize">Number of candles in the pattern.</param>
+        /// <returns>The average trend change per candle, or zero if insufficient data.</returns>
+        public static double CalculateAverageTrendOverLookbackPeriod(
                     CandleMids[] prices,
                     int index,
                     int lookback,
@@ -61,7 +77,17 @@ namespace BacklashPatterns
             return totalChange / lookbackCount;
         }
 
-        public static double CalculateLookbackTrendConsistency(
+        /// <summary>
+        /// Calculates the consistency ratio of trend direction over a lookback period.
+        /// This method measures how consistently the market has been trending in one direction,
+        /// providing a smoothed ratio between 0 and 1.
+        /// </summary>
+        /// <param name="index">The current candle index.</param>
+        /// <param name="lookback">Number of candles to look back.</param>
+        /// <param name="prices">Array of candle data.</param>
+        /// <param name="patternSize">Number of candles in the pattern.</param>
+        /// <returns>A smoothed ratio (0-1) indicating trend consistency, or zero if insufficient data.</returns>
+        public static double CalculateTrendConsistencyRatio(
             int index,
             int lookback,
             CandleMids[] prices,
@@ -89,7 +115,17 @@ namespace BacklashPatterns
             return Math.Min(smoothedRatio, 1.0);
         }
 
-        public static double CalculateLookbackAvgRange(
+        /// <summary>
+        /// Calculates the average price range over a specified lookback period before a pattern.
+        /// This method computes the mean volatility (high-low difference) per candle to assess
+        /// market volatility levels.
+        /// </summary>
+        /// <param name="index">The current candle index.</param>
+        /// <param name="lookback">Number of candles to look back.</param>
+        /// <param name="prices">Array of candle data.</param>
+        /// <param name="patternSize">Number of candles in the pattern.</param>
+        /// <returns>The average price range per candle, or zero if insufficient data.</returns>
+        public static double CalculateAverageRangeOverLookbackPeriod(
             int index,
             int lookback,
             CandleMids[] prices,
@@ -115,7 +151,17 @@ namespace BacklashPatterns
             return totalRangeSum / lookbackCount;
         }
 
-        public static double CalculateAverageVolume(
+        /// <summary>
+        /// Calculates the ratio of current candle volume to historical average volume.
+        /// This method compares the volume of the current candle against the average volume
+        /// over a lookback period to identify unusual volume activity.
+        /// </summary>
+        /// <param name="prices">Array of candle data.</param>
+        /// <param name="index">The current candle index.</param>
+        /// <param name="lookback">Number of candles to look back for historical average.</param>
+        /// <param name="patternSize">Number of candles in the pattern (kept for consistency).</param>
+        /// <returns>The volume ratio (current/historical average), or infinity if historical average is zero.</returns>
+        public static double CalculateVolumeRatioToHistoricalAverage(
             CandleMids[] prices,
             int index,
             int lookback,
@@ -150,7 +196,16 @@ namespace BacklashPatterns
             return currentVolume / historicalAvg;
         }
 
-        public static double CalculateBullishRatio(int index, int lookback, CandleMids[] prices)
+        /// <summary>
+        /// Calculates the ratio of bullish candles over a specified lookback period.
+        /// This method determines the proportion of candles that closed higher than they opened,
+        /// providing insight into bullish market sentiment.
+        /// </summary>
+        /// <param name="index">The current candle index.</param>
+        /// <param name="lookback">Number of candles to look back.</param>
+        /// <param name="prices">Array of candle data.</param>
+        /// <returns>A smoothed ratio (0-1) of bullish candles, or zero if insufficient data.</returns>
+        public static double CalculateBullishCandleRatio(int index, int lookback, CandleMids[] prices)
         {
             int bullishCount = 0;
             int totalCount = 0;
