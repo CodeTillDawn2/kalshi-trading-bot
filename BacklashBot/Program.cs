@@ -16,7 +16,6 @@ using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State;
 using BacklashBot.State.Interfaces;
-using BacklashInterfaces.KalshiBotOverseer.State;
 using BacklashInterfaces.SmokehouseBot.Services;
 using BacklashDTOs.Data;
 using TradingStrategies.Classification;

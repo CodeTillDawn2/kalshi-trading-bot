@@ -61,7 +61,7 @@ public class HammerPattern : PatternDefinition
                      candleMetrics.LowerWick >= WickBodyRatio * candleMetrics.BodySize &&
                      candleMetrics.UpperWick <= candleMetrics.BodySize;
 
-        bool hasDowntrend = candleMetrics.GetLookbackMeanTrend(1) <= TrendThreshold;
+        bool hasDowntrend = candleMetrics.GetLookbackAverageTrend(1) <= TrendThreshold;
 
         if (!(shape && hasDowntrend)) return null;
 
@@ -69,3 +69,9 @@ public class HammerPattern : PatternDefinition
         return new HammerPattern(candles);
     }
 }
+
+
+
+
+
+

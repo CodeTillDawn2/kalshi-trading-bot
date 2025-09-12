@@ -110,7 +110,7 @@ namespace BacklashPatterns.PatternDefinitions
                 // Combine all conditions for bullish case
                 bool isPatternValid = atLeastOneBearish && containment &&
                                      ask5.Close >= ask1.Close + CloseDifference &&
-                                     metrics5.GetLookbackMeanTrend(5) > TrendThreshold; // Requires a prior uptrend
+                                     metrics5.GetLookbackAverageTrend(5) > TrendThreshold; // Requires a prior uptrend
 
                 if (!isPatternValid) return null;
             }
@@ -139,7 +139,7 @@ namespace BacklashPatterns.PatternDefinitions
                 // Combine all conditions for bearish case
                 bool isPatternValid = atLeastOneBullish && containment &&
                                      ask5.Close <= ask1.Close - CloseDifference &&
-                                     metrics5.GetLookbackMeanTrend(5) < -TrendThreshold; // Requires a prior downtrend
+                                     metrics5.GetLookbackAverageTrend(5) < -TrendThreshold; // Requires a prior downtrend
 
                 if (!isPatternValid) return null;
             }
@@ -152,3 +152,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

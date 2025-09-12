@@ -40,10 +40,10 @@ public class EngulfingPattern : PatternDefinition
         var prevMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, 2, false);
 
         bool hasTrend = isBullish
-            ? currMetrics.GetLookbackMeanTrend(2) < 0 && Math.Abs(currMetrics.GetLookbackMeanTrend(2)) >= TrendThreshold &&
-              currMetrics.GetLookbackTrendConsistency(2) <= -TrendConsistencyThreshold
-            : currMetrics.GetLookbackMeanTrend(2) > 0 && currMetrics.GetLookbackMeanTrend(2) >= TrendThreshold &&
-              currMetrics.GetLookbackTrendConsistency(2) >= TrendConsistencyThreshold;
+            ? currMetrics.GetLookbackAverageTrend(2) < 0 && Math.Abs(currMetrics.GetLookbackAverageTrend(2)) >= TrendThreshold &&
+              currMetrics.GetLookbackTrendStability(2) <= -TrendConsistencyThreshold
+            : currMetrics.GetLookbackAverageTrend(2) > 0 && currMetrics.GetLookbackAverageTrend(2) >= TrendThreshold &&
+              currMetrics.GetLookbackTrendStability(2) >= TrendConsistencyThreshold;
         if (!hasTrend) return null;
 
         if (prevMetrics.BodySize <= 0 || currMetrics.BodySize <= prevMetrics.BodySize) return null;
@@ -64,3 +64,9 @@ public class EngulfingPattern : PatternDefinition
         return new EngulfingPattern(candles, isBullish);
     }
 }
+
+
+
+
+
+

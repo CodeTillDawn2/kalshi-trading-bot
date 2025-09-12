@@ -86,10 +86,16 @@ namespace BacklashPatterns.PatternDefinitions
             if (currentMetrics.UpperWick > MaxWickSize) return null;
 
             // Downtrend check
-            if (currentMetrics.GetLookbackMeanTrend(2) > TrendThreshold) return null;
+            if (currentMetrics.GetLookbackAverageTrend(2) > TrendThreshold) return null;
 
             var candles = new List<int> { index - 1, index };
             return new InNeckPattern(candles);
         }
     }
 }
+
+
+
+
+
+

@@ -77,8 +77,8 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Adjusted trend conditions from original: Use CandleMetrics methods
             bool priorTrend = isBullish
-                ? (metrics.GetLookbackMeanTrend(1) <= -TrendThreshold && metrics.GetLookbackTrendConsistency(1) <= -TrendConsistencyThreshold) // Consistent downtrend
-                : (metrics.GetLookbackMeanTrend(1) >= TrendThreshold && metrics.GetLookbackTrendConsistency(1) >= TrendConsistencyThreshold);   // Consistent uptrend
+                ? (metrics.GetLookbackAverageTrend(1) <= -TrendThreshold && metrics.GetLookbackTrendStability(1) <= -TrendConsistencyThreshold) // Consistent downtrend
+                : (metrics.GetLookbackAverageTrend(1) >= TrendThreshold && metrics.GetLookbackTrendStability(1) >= TrendConsistencyThreshold);   // Consistent uptrend
 
             // If the trend condition isn’t met, return null
             if (!priorTrend) return null;
@@ -91,3 +91,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

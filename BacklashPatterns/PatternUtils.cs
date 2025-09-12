@@ -17,31 +17,31 @@ namespace BacklashPatterns
                 double[] meanTrend = new double[5];
                 double[] lookbackAvgRange = new double[5];
                 double[] trendConsistency = new double[5];
-                double[] avgVoumeVsLookback = new double[5];
+                double[] avgVolumeVsLookback = new double[5];
                 double[] bullishRatio = new double[5];
                 double[] bearishRatio = new double[5];
                 if (loadLookbackMetrics)
                 {
-                    if (index >= 2) trendConsistency[0] = CalculateLookbackTrendConsistency(index, trendLookback, prices, 1);
-                    if (index >= 3) trendConsistency[1] = CalculateLookbackTrendConsistency(index, trendLookback, prices, 2);
-                    if (index >= 4) trendConsistency[2] = CalculateLookbackTrendConsistency(index, trendLookback, prices, 3);
-                    if (index >= 5) trendConsistency[3] = CalculateLookbackTrendConsistency(index, trendLookback, prices, 4);
-                    if (index >= 6) trendConsistency[4] = CalculateLookbackTrendConsistency(index, trendLookback, prices, 5);
+                    if (index >= 2) trendConsistency[0] = CalculateLookbackTrendStability(index, trendLookback, prices, 1);
+                    if (index >= 3) trendConsistency[1] = CalculateLookbackTrendStability(index, trendLookback, prices, 2);
+                    if (index >= 4) trendConsistency[2] = CalculateLookbackTrendStability(index, trendLookback, prices, 3);
+                    if (index >= 5) trendConsistency[3] = CalculateLookbackTrendStability(index, trendLookback, prices, 4);
+                    if (index >= 6) trendConsistency[4] = CalculateLookbackTrendStability(index, trendLookback, prices, 5);
                     if (index >= 2) lookbackAvgRange[0] = CalculateLookbackAvgRange(index, trendLookback, prices, 1);
                     if (index >= 3) lookbackAvgRange[1] = CalculateLookbackAvgRange(index, trendLookback, prices, 2);
                     if (index >= 4) lookbackAvgRange[2] = CalculateLookbackAvgRange(index, trendLookback, prices, 3);
                     if (index >= 5) lookbackAvgRange[3] = CalculateLookbackAvgRange(index, trendLookback, prices, 4);
                     if (index >= 6) lookbackAvgRange[4] = CalculateLookbackAvgRange(index, trendLookback, prices, 5);
-                    if (index >= 2) meanTrend[0] = CalculateLookbackMeanTrend(prices, index, trendLookback, 1);
-                    if (index >= 3) meanTrend[1] = CalculateLookbackMeanTrend(prices, index, trendLookback, 2);
-                    if (index >= 4) meanTrend[2] = CalculateLookbackMeanTrend(prices, index, trendLookback, 3);
-                    if (index >= 5) meanTrend[3] = CalculateLookbackMeanTrend(prices, index, trendLookback, 4);
-                    if (index >= 6) meanTrend[4] = CalculateLookbackMeanTrend(prices, index, trendLookback, 5);
-                    if (index >= 2) avgVoumeVsLookback[0] = CalculateAverageVolume(prices, index, trendLookback, 1);
-                    if (index >= 3) avgVoumeVsLookback[1] = CalculateAverageVolume(prices, index, trendLookback, 2);
-                    if (index >= 4) avgVoumeVsLookback[2] = CalculateAverageVolume(prices, index, trendLookback, 3);
-                    if (index >= 5) avgVoumeVsLookback[3] = CalculateAverageVolume(prices, index, trendLookback, 4);
-                    if (index >= 6) avgVoumeVsLookback[4] = CalculateAverageVolume(prices, index, trendLookback, 5);
+                    if (index >= 2) meanTrend[0] = CalculateLookbackAverageTrend(prices, index, trendLookback, 1);
+                    if (index >= 3) meanTrend[1] = CalculateLookbackAverageTrend(prices, index, trendLookback, 2);
+                    if (index >= 4) meanTrend[2] = CalculateLookbackAverageTrend(prices, index, trendLookback, 3);
+                    if (index >= 5) meanTrend[3] = CalculateLookbackAverageTrend(prices, index, trendLookback, 4);
+                    if (index >= 6) meanTrend[4] = CalculateLookbackAverageTrend(prices, index, trendLookback, 5);
+                    if (index >= 2) avgVolumeVsLookback[0] = CalculateAverageVolume(prices, index, trendLookback, 1);
+                    if (index >= 3) avgVolumeVsLookback[1] = CalculateAverageVolume(prices, index, trendLookback, 2);
+                    if (index >= 4) avgVolumeVsLookback[2] = CalculateAverageVolume(prices, index, trendLookback, 3);
+                    if (index >= 5) avgVolumeVsLookback[3] = CalculateAverageVolume(prices, index, trendLookback, 4);
+                    if (index >= 6) avgVolumeVsLookback[4] = CalculateAverageVolume(prices, index, trendLookback, 5);
                     if (index >= 2) bullishRatio[0] = CalculateTrendDirectionRatio(index, trendLookback, prices, 1, true);
                     if (index >= 3) bullishRatio[1] = CalculateTrendDirectionRatio(index, trendLookback, prices, 2, true);
                     if (index >= 4) bullishRatio[2] = CalculateTrendDirectionRatio(index, trendLookback, prices, 3, true);
@@ -56,7 +56,7 @@ namespace BacklashPatterns
 
                 // Calculate intervalType based on timestamp difference
                 int intervalType = 0; // Default value
-                if (index > 0) // Ensure there’s a previous candle to compare
+                if (index > 0) // Ensure thereï¿½s a previous candle to compare
                 {
                     double timeDiff = (prices[index].Timestamp - prices[index - 1].Timestamp).TotalSeconds;
                     // Assuming Timestamp is in milliseconds (adjust if it's in seconds or another unit)
@@ -79,10 +79,10 @@ namespace BacklashPatterns
                     HasNoUpperWick = candle.High == Math.Max(candle.Open, candle.Close),
                     HasNoLowerWick = candle.Low == Math.Min(candle.Open, candle.Close),
                     BodyMidPoint = (candle.Open + candle.Close) / 2.0,
-                    LookbackMeanTrend = meanTrend,
+                    LookbackAverageTrend = meanTrend,
                     LookbackAvgRange = lookbackAvgRange,
-                    LookbackTrendConsistency = trendConsistency,
-                    AvgVoumeVsLookback = avgVoumeVsLookback,
+                    LookbackTrendStability = trendConsistency,
+                    AvgVolumeVsLookback = avgVolumeVsLookback,
                     BullishRatio = bullishRatio,
                     BearishRatio = bearishRatio,
                     IntervalType = intervalType,
@@ -119,3 +119,9 @@ namespace BacklashPatterns
 
     }
 }
+
+
+
+
+
+

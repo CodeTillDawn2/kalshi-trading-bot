@@ -76,9 +76,15 @@ public class GravestoneDojiPattern : PatternDefinition
             metrics.UpperWick < WickBodyRatio * metrics.BodySize ||
             metrics.LowerWick > LowerWickMaxRatio * metrics.TotalRange) return null;
 
-        if (metrics.GetLookbackMeanTrend(1) <= TrendThreshold) return null;
+        if (metrics.GetLookbackAverageTrend(1) <= TrendThreshold) return null;
 
         var candles = new List<int> { index };
         return new GravestoneDojiPattern(candles);
     }
 }
+
+
+
+
+
+

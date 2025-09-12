@@ -83,10 +83,16 @@ namespace BacklashPatterns.PatternDefinitions
             if (!shape) return null;
 
             // Downtrend check
-            if (metrics3.GetLookbackMeanTrend(3) > TrendThreshold) return null;
+            if (metrics3.GetLookbackAverageTrend(3) > TrendThreshold) return null;
 
             var candles = new List<int> { c1, c2, c3 };
             return new Unique3RiverPattern(candles);
         }
     }
 }
+
+
+
+
+
+

@@ -64,9 +64,9 @@ namespace BacklashPatterns.PatternDefinitions
         {
             var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
 
-            // Downtrend check using LookbackMeanTrend and LookbackTrendConsistency
-            if (metrics.GetLookbackMeanTrend(1) > TrendThreshold ||
-                metrics.GetLookbackTrendConsistency(1) < MinTrendConsistency) return null;
+            // Downtrend check using LookbackAverageTrend and LookbackTrendStability
+            if (metrics.GetLookbackAverageTrend(1) > TrendThreshold ||
+                metrics.GetLookbackTrendStability(1) < MinTrendConsistency) return null;
 
             // Range and shape conditions
             if (metrics.TotalRange < MinRange) return null;
@@ -83,3 +83,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

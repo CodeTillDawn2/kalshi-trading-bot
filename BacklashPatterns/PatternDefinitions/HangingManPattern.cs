@@ -72,8 +72,8 @@ namespace BacklashPatterns.PatternDefinitions
             if (currentMetrics.LowerWick < WickBodyRatio * currentMetrics.BodySize) return null;
             if (currentMetrics.UpperWick > UpperWickMaxRatio * currentMetrics.TotalRange) return null;
 
-            bool hasUptrend = currentMetrics.GetLookbackMeanTrend(1) > TrendThreshold &&
-                              currentMetrics.GetLookbackTrendConsistency(1) >= ConsistencyThreshold;
+            bool hasUptrend = currentMetrics.GetLookbackAverageTrend(1) > TrendThreshold &&
+                              currentMetrics.GetLookbackTrendStability(1) >= ConsistencyThreshold;
             if (!hasUptrend) return null;
 
             var candles = new List<int> { index };
@@ -81,3 +81,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

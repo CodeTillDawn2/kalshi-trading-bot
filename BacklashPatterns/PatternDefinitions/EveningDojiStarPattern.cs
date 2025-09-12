@@ -66,10 +66,16 @@ namespace BacklashPatterns.PatternDefinitions
 
             if (!thirdMetrics.IsBearish || prices[thirdIdx].Close >= firstMetrics.BodyMidPoint) return null;
 
-            if (thirdMetrics.GetLookbackMeanTrend(3) <= TrendThreshold) return null;
+            if (thirdMetrics.GetLookbackAverageTrend(3) <= TrendThreshold) return null;
 
             var candles = new List<int> { firstIdx, secondIdx, thirdIdx };
             return new EveningDojiStarPattern(candles);
         }
     }
 }
+
+
+
+
+
+

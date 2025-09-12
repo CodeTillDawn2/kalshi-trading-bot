@@ -94,8 +94,8 @@ namespace BacklashPatterns.PatternDefinitions
                 prices[c3].Close <= prices[c1].Close) return null;
 
             // Require a downtrend based on the mean trend and consistency
-            if (metrics3.GetLookbackMeanTrend(3) > TrendThreshold ||
-                metrics3.GetLookbackTrendConsistency(3) < MinTrendConsistency) return null;
+            if (metrics3.GetLookbackAverageTrend(3) > TrendThreshold ||
+                metrics3.GetLookbackTrendStability(3) < MinTrendConsistency) return null;
 
             // Define the candle indices for the pattern (three candles)
             var candles = new List<int> { c1, c2, c3 };
@@ -105,3 +105,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

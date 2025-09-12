@@ -75,7 +75,7 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMids fourthPrices = prices[index];
 
             // Downtrend check
-            if (fourthMetrics.GetLookbackMeanTrend(4) > TrendThreshold) return null;
+            if (fourthMetrics.GetLookbackAverageTrend(4) > TrendThreshold) return null;
 
             // First candle: Bearish, large body, small wicks
             if (!firstMetrics.IsBearish || firstMetrics.BodySize < MinBodySize ||
@@ -102,3 +102,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

@@ -71,7 +71,7 @@ namespace BacklashPatterns.PatternDefinitions
                 return null;
 
             // Require a downtrend based on the mean trend (restored original threshold)
-            if (currMetrics.GetLookbackMeanTrend(2) > TrendThreshold) return null;
+            if (currMetrics.GetLookbackAverageTrend(2) > TrendThreshold) return null;
 
             // Check if the second candle’s open and close are sufficiently close to the first candle’s close
             bool isPatternValid = Math.Abs(currentPrices.Open - previousPrices.Close) <= MaxOpenCloseDifference &&
@@ -88,3 +88,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

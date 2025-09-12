@@ -96,7 +96,7 @@ namespace BacklashPatterns.PatternDefinitions
                     Math.Abs(ask3.High - ask2.High) > MaxRangeDifference) return null;
 
                 // Weak uptrend check
-                if (metrics3.GetLookbackMeanTrend(3) <= TrendThreshold) return null;
+                if (metrics3.GetLookbackAverageTrend(3) <= TrendThreshold) return null;
             }
             else
             {
@@ -114,7 +114,7 @@ namespace BacklashPatterns.PatternDefinitions
                     Math.Abs(ask3.Low - ask2.Low) > MaxRangeDifference) return null;
 
                 // Weak downtrend check
-                if (metrics3.GetLookbackMeanTrend(3) >= -TrendThreshold) return null;
+                if (metrics3.GetLookbackAverageTrend(3) >= -TrendThreshold) return null;
             }
 
             var candles = new List<int> { c1, c2, c3 };
@@ -122,3 +122,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

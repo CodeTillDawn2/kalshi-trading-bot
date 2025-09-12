@@ -79,7 +79,7 @@ namespace BacklashPatterns.PatternDefinitions
             var currMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
 
             // Require a downtrend using CandleMetrics method
-            if (currMetrics.GetLookbackMeanTrend(2) > TrendThreshold) return null;
+            if (currMetrics.GetLookbackAverageTrend(2) > TrendThreshold) return null;
 
             // Use precomputed metrics for efficiency
             double body1 = prevMetrics.BodySize;
@@ -107,3 +107,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

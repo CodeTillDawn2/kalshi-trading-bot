@@ -52,9 +52,9 @@ namespace BacklashPatterns.PatternDefinitions
             var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
             var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
 
-            // Trend check using LookbackMeanTrend (3 candles)
-            bool hasTrend = isBullish ? metrics3.GetLookbackMeanTrend(3) > TrendThreshold
-                                     : metrics3.GetLookbackMeanTrend(3) < -TrendThreshold;
+            // Trend check using LookbackAverageTrend (3 candles)
+            bool hasTrend = isBullish ? metrics3.GetLookbackAverageTrend(3) > TrendThreshold
+                                     : metrics3.GetLookbackAverageTrend(3) < -TrendThreshold;
             if (!hasTrend) return null;
 
             var ask1 = prices[c1];
@@ -105,3 +105,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

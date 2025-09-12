@@ -77,8 +77,8 @@ namespace BacklashPatterns.PatternDefinitions
                 // Significant bodies
                 if (body1 < MinBodySize || body2 < MinBodySize || body3 < MinBodySize) return null;
 
-                // Downtrend check using LookbackMeanTrend (3 candles)
-                if (metrics3.GetLookbackMeanTrend(3) > -TrendThreshold) return null;
+                // Downtrend check using LookbackAverageTrend (3 candles)
+                if (metrics3.GetLookbackAverageTrend(3) > -TrendThreshold) return null;
             }
             else // Bearish
             {
@@ -95,8 +95,8 @@ namespace BacklashPatterns.PatternDefinitions
                 // Significant bodies
                 if (body1 < MinBodySize || body2 < MinBodySize || body3 < MinBodySize) return null;
 
-                // Uptrend check using LookbackMeanTrend (3 candles)
-                if (metrics3.GetLookbackMeanTrend(3) < TrendThreshold) return null;
+                // Uptrend check using LookbackAverageTrend (3 candles)
+                if (metrics3.GetLookbackAverageTrend(3) < TrendThreshold) return null;
             }
 
             var candles = new List<int> { c1, c2, c3 };
@@ -104,3 +104,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

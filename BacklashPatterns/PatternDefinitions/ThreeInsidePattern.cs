@@ -96,8 +96,8 @@ namespace BacklashPatterns.PatternDefinitions
                 // Downtrend check using CandleMetrics
                 int lookbackCount = Math.Min(10, index - 2);
                 if (lookbackCount < MinLookbackCount) return null;
-                if (metrics3.GetLookbackMeanTrend(1) > -TrendThreshold ||
-                    metrics3.GetLookbackTrendConsistency(1) < 0.4) return null;
+                if (metrics3.GetLookbackAverageTrend(1) > -TrendThreshold ||
+                    metrics3.GetLookbackTrendStability(1) < 0.4) return null;
             }
             else // Three Inside Down
             {
@@ -123,8 +123,8 @@ namespace BacklashPatterns.PatternDefinitions
                 // Uptrend check using CandleMetrics
                 int lookbackCount = Math.Min(10, index - 2);
                 if (lookbackCount < MinLookbackCount) return null;
-                if (metrics3.GetLookbackMeanTrend(1) < TrendThreshold ||
-                    metrics3.GetLookbackTrendConsistency(1) < 0.4) return null;
+                if (metrics3.GetLookbackAverageTrend(1) < TrendThreshold ||
+                    metrics3.GetLookbackTrendStability(1) < 0.4) return null;
             }
 
             var candles = new List<int> { c1, c2, c3 };
@@ -132,3 +132,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

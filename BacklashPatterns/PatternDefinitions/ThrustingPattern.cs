@@ -66,7 +66,7 @@ namespace BacklashPatterns.PatternDefinitions
 
             if (isBullish)
             {
-                if (currMetrics.GetLookbackMeanTrend(2) > BullishTrendThreshold) return null;
+                if (currMetrics.GetLookbackAverageTrend(2) > BullishTrendThreshold) return null;
 
                 bool isPatternValid = prevMetrics.BodySize >= MinBodySize &&
                                       prevMetrics.IsBearish &&
@@ -79,7 +79,7 @@ namespace BacklashPatterns.PatternDefinitions
             }
             else
             {
-                if (currMetrics.GetLookbackMeanTrend(2) <= BearishTrendThreshold) return null;
+                if (currMetrics.GetLookbackAverageTrend(2) <= BearishTrendThreshold) return null;
 
                 bool isPatternValid = prevMetrics.BodySize >= MinBodySize &&
                                       prevMetrics.IsBullish &&
@@ -96,3 +96,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

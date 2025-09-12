@@ -76,10 +76,16 @@ namespace BacklashPatterns.PatternDefinitions
             if (metrics1.LowerWick > MaxWickSize || metrics2.LowerWick > MaxWickSize || metrics3.LowerWick > MaxWickSize) return null;
 
             // Uptrend check using CandleMetrics
-            if (metrics3.GetLookbackMeanTrend(3) <= TrendThreshold) return null;
+            if (metrics3.GetLookbackAverageTrend(3) <= TrendThreshold) return null;
 
             var candles = new List<int> { c1, c2, c3 };
             return new ThreeBlackCrowsPattern(candles);
         }
     }
 }
+
+
+
+
+
+

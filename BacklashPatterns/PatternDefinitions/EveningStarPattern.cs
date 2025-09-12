@@ -59,8 +59,8 @@ public class EveningStarPattern : PatternDefinition
         var secondMetrics = GetCandleMetrics(ref metricsCache, secondIndex, prices, trendLookback, false);
         var thirdMetrics = GetCandleMetrics(ref metricsCache, thirdIndex, prices, trendLookback, true);
 
-        if (thirdMetrics.GetLookbackMeanTrend(3) <= TrendThreshold ||
-            thirdMetrics.GetLookbackTrendConsistency(3) < TrendConsistencyThreshold) return null;
+        if (thirdMetrics.GetLookbackAverageTrend(3) <= TrendThreshold ||
+            thirdMetrics.GetLookbackTrendStability(3) < TrendConsistencyThreshold) return null;
 
         if (!firstMetrics.IsBullish || firstMetrics.BodySize < MinBodySize) return null;
         if (secondMetrics.BodySize > SmallBodyMax) return null;
@@ -73,3 +73,9 @@ public class EveningStarPattern : PatternDefinition
         return new EveningStarPattern(candles);
     }
 }
+
+
+
+
+
+

@@ -79,7 +79,7 @@ namespace BacklashPatterns.PatternDefinitions
             var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
 
             // Require an uptrend (original: meanTrend > 0.3, trendConsistency >= 0.4)
-            if (metrics.GetLookbackMeanTrend(1) <= TrendThreshold || metrics.GetLookbackTrendConsistency(1) < ConsistencyThreshold) return null;
+            if (metrics.GetLookbackAverageTrend(1) <= TrendThreshold || metrics.GetLookbackTrendStability(1) < ConsistencyThreshold) return null;
 
             // Check if total range meets minimum requirement (original: >= 2)
             if (metrics.TotalRange < MinRange) return null;
@@ -101,3 +101,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

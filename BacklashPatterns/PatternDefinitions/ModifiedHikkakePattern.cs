@@ -68,8 +68,8 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Minimal trend check (almost neutral) using CandleMetrics method
             bool trendCondition = isBullish
-                ? thirdMetrics.GetLookbackMeanTrend(3) <= 0  // No strong uptrend before bullish reversal
-                : thirdMetrics.GetLookbackMeanTrend(3) >= 0; // No strong downtrend before bearish reversal
+                ? thirdMetrics.GetLookbackAverageTrend(3) <= 0  // No strong uptrend before bullish reversal
+                : thirdMetrics.GetLookbackAverageTrend(3) >= 0; // No strong downtrend before bearish reversal
             if (!trendCondition) return null;
 
             // Define the candle indices for the pattern (three candles)
@@ -80,3 +80,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

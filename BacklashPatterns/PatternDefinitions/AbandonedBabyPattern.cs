@@ -88,11 +88,11 @@ namespace BacklashPatterns.PatternDefinitions
                 bool hasInitialGap = middlePrices.High < firstPrices.Low;
                 bool hasSecondGap = thirdPrices.Low > middlePrices.High;
                 bool isFinalReversal = thirdMetrics.IsBullish;
-                bool isPrecedingDowntrend = firstMetrics.LookbackMeanTrend[0] < trendThreshold; // Trend check: downtrend before bullish pattern
+                bool isPrecedingDowntrend = firstMetrics.LookbackAverageTrend[0] < trendThreshold; // Trend check: downtrend before bullish pattern
 
                 if (isFirstBearish && hasInitialGap && hasSecondGap && isFinalReversal && isPrecedingDowntrend)
                     return new AbandonedBabyPattern(candles, prices,
-                        thirdMetrics.GetAvgVoumeVsLookback(candles.Count), true);
+                        thirdMetrics.GetAvgVolumeVsLookback(candles.Count), true);
             }
             else
             {
@@ -100,11 +100,11 @@ namespace BacklashPatterns.PatternDefinitions
                 bool hasInitialGap = middlePrices.Low > firstPrices.High;
                 bool hasSecondGap = thirdPrices.High < middlePrices.Low;
                 bool isFinalReversal = thirdMetrics.IsBearish;
-                bool isPrecedingUptrend = firstMetrics.LookbackMeanTrend[0] > -trendThreshold; // Trend check: uptrend before bearish pattern
+                bool isPrecedingUptrend = firstMetrics.LookbackAverageTrend[0] > -trendThreshold; // Trend check: uptrend before bearish pattern
 
                 if (isFirstBullish && hasInitialGap && hasSecondGap && isFinalReversal && isPrecedingUptrend)
                     return new AbandonedBabyPattern(candles, prices,
-                        thirdMetrics.GetAvgVoumeVsLookback(candles.Count), false);
+                        thirdMetrics.GetAvgVolumeVsLookback(candles.Count), false);
             }
 
             return null;
@@ -163,3 +163,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

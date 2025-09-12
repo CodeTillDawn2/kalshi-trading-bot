@@ -95,8 +95,8 @@ namespace BacklashPatterns.PatternDefinitions
             if (!reversal) return null;
 
             bool trendCondition = isBullish
-                ? thirdMetrics.GetLookbackMeanTrend(3) <= -TrendThreshold
-                : thirdMetrics.GetLookbackMeanTrend(3) >= TrendThreshold;
+                ? thirdMetrics.GetLookbackAverageTrend(3) <= -TrendThreshold
+                : thirdMetrics.GetLookbackAverageTrend(3) >= TrendThreshold;
             if (!trendCondition) return null;
 
             var candles = new List<int> { firstIdx, secondIdx, thirdIdx };
@@ -104,3 +104,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

@@ -72,10 +72,16 @@ namespace BacklashPatterns.PatternDefinitions
             if (metrics.UpperWick < WickRangeRatio * metrics.TotalRange ||
                 metrics.LowerWick < WickRangeRatio * metrics.TotalRange) return null;
 
-            if (Math.Abs(metrics.GetLookbackTrendConsistency(1)) > MaxTrendConsistency) return null;
+            if (Math.Abs(metrics.GetLookbackTrendStability(1)) > MaxTrendConsistency) return null;
 
             var candles = new List<int> { index };
             return new HighWaveCandlePattern(candles);
         }
     }
 }
+
+
+
+
+
+

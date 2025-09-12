@@ -71,11 +71,17 @@ namespace BacklashPatterns.PatternDefinitions
             var ask3 = prices[c3];
             if (ask2.Close <= ask1.Close || ask3.Close <= ask2.Close) return null;
 
-            // Downtrend check using LookbackMeanTrend (3 candles)
-            if (metrics3.GetLookbackMeanTrend(3) > TrendThreshold) return null;
+            // Downtrend check using LookbackAverageTrend (3 candles)
+            if (metrics3.GetLookbackAverageTrend(3) > TrendThreshold) return null;
 
             var candles = new List<int> { c1, c2, c3 };
             return new ThreeAdvancingWhiteSoldiersPattern(candles);
         }
     }
 }
+
+
+
+
+
+

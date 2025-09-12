@@ -72,10 +72,16 @@ namespace BacklashPatterns.PatternDefinitions
                 prices[c3].Close > prices[c1].Open + GapTolerance) return null;
 
             // Minimal uptrend check
-            if (metrics3.GetLookbackMeanTrend(3) <= 0.05) return null;
+            if (metrics3.GetLookbackAverageTrend(3) <= 0.05) return null;
 
             var candles = new List<int> { c1, c2, c3 };
             return new TwoCrowsPattern(candles);
         }
     }
 }
+
+
+
+
+
+

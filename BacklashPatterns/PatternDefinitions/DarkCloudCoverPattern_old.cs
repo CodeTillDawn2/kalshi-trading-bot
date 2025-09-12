@@ -58,7 +58,7 @@ namespace BacklashPatterns.PatternDefinitions
             var currPrices = prices[index];
 
             // Uptrend check
-            if (currMetrics.GetLookbackMeanTrend(2) <= TrendThreshold) return null;
+            if (currMetrics.GetLookbackAverageTrend(2) <= TrendThreshold) return null;
 
             // Check minimum body size
             if (prevMetrics.BodySize < MinBodySize || currMetrics.BodySize < MinBodySize) return null;
@@ -80,3 +80,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

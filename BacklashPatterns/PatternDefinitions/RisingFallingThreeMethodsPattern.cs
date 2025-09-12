@@ -89,7 +89,7 @@ namespace BacklashPatterns.PatternDefinitions
             if (metrics1.IsBullish) // Rising
             {
                 // Require a downtrend
-                if (metrics5.GetLookbackMeanTrend(5) >= -TrendThreshold) return null;
+                if (metrics5.GetLookbackAverageTrend(5) >= -TrendThreshold) return null;
 
                 // Fifth candle: Must be bullish, significant body, close higher
                 if (!metrics5.IsBullish ||
@@ -117,7 +117,7 @@ namespace BacklashPatterns.PatternDefinitions
             else if (metrics1.IsBearish) // Falling
             {
                 // Require an uptrend
-                if (metrics5.GetLookbackMeanTrend(5) <= TrendThreshold) return null;
+                if (metrics5.GetLookbackAverageTrend(5) <= TrendThreshold) return null;
 
                 // Fifth candle: Must be bearish, significant body, close lower
                 if (!metrics5.IsBearish ||
@@ -155,3 +155,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

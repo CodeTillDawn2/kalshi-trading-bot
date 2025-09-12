@@ -64,3 +64,9 @@ public class DragonflyDojiPattern : PatternDefinition
         return new DragonflyDojiPattern(candles);
     }
 }
+
+
+
+
+
+

@@ -42,7 +42,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double CloseToleranceBase { get; } = 1.5;
 
         /// <summary>
-        /// Factor applied to the first candle’s range to adjust close tolerance dynamically.
+        /// Factor applied to the first candleï¿½s range to adjust close tolerance dynamically.
         /// Strictest: 0.1 (tight range-based tolerance), Loosest: 0.3 (broader range allowance).
         /// </summary>
         public static double CloseToleranceRangeFactor { get; } = 0.2;
@@ -103,12 +103,6 @@ namespace BacklashPatterns.PatternDefinitions
             var ask2 = prices[c2];
             var ask3 = prices[c3];
 
-            if (ask3.Timestamp == new DateTime(2024, 7, 20, 12, 35, 0, DateTimeKind.Utc) &&
-                isBullish == false) // Bearish BeltHold
-            {
-                // BREAKPOINT HERE: Set your breakpoint on the line below
-                Console.WriteLine($"Breakpoint hit: Checking BeltHold_Bearish at {ask3.Timestamp}");
-            }
 
             // Loosened gap condition (restored from original: min 0.3-point gap or body outside range)
             bool gapValid = isBullish
@@ -121,10 +115,10 @@ namespace BacklashPatterns.PatternDefinitions
             bool closesMatch = Math.Abs(ask3.Close - ask1.Close) <= tolerance;
             if (!closesMatch) return null;
 
-            // Loosened trend check using CandleMetrics method (restored from original: ±0.3)
+            // Loosened trend check using CandleMetrics method (restored from original: ï¿½0.3)
             bool trendValid = isBullish
-                ? (metrics3.GetLookbackMeanTrend(3) <= -TrendThreshold) // Downtrend for bullish
-                : (metrics3.GetLookbackMeanTrend(3) >= TrendThreshold);  // Uptrend for bearish
+                ? (metrics3.GetLookbackAverageTrend(3) <= -TrendThreshold) // Downtrend for bullish
+                : (metrics3.GetLookbackAverageTrend(3) >= TrendThreshold);  // Uptrend for bearish
             if (!trendValid) return null;
 
             // Define the candle indices for the pattern (matches original)

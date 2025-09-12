@@ -85,7 +85,7 @@ namespace BacklashPatterns.PatternDefinitions
             if (!similarLows) return null;
 
             // Relaxed trend (from original)
-            bool hasDowntrend = metrics[4].GetLookbackMeanTrend(5) <= -TrendThreshold;
+            bool hasDowntrend = metrics[4].GetLookbackAverageTrend(5) <= -TrendThreshold;
             if (!hasDowntrend) return null;
 
             // Define the candle indices for the pattern (five candles)
@@ -95,3 +95,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

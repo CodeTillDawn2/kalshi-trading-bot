@@ -67,7 +67,7 @@ namespace BacklashPatterns.PatternDefinitions
                 // Step 5: Simplified strike condition
                 if (prices[c4].Close >= prices[c3].Close) return null;
                 // Step 6: Trend check only if c1 >= 0
-                if (c1 >= 0 && metrics4.GetLookbackMeanTrend(4) >= -TrendThreshold) return null;
+                if (c1 >= 0 && metrics4.GetLookbackAverageTrend(4) >= -TrendThreshold) return null;
             }
             else
             {
@@ -82,7 +82,7 @@ namespace BacklashPatterns.PatternDefinitions
                 // Step 5: Simplified strike condition
                 if (prices[c4].Close <= prices[c3].Close) return null;
                 // Step 6: Trend check only if c1 >= 0
-                if (c1 >= 0 && metrics4.GetLookbackMeanTrend(4) <= TrendThreshold) return null;
+                if (c1 >= 0 && metrics4.GetLookbackAverageTrend(4) <= TrendThreshold) return null;
             }
 
             var candles = new List<int> { c1, c2, c3, c4 };
@@ -90,3 +90,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

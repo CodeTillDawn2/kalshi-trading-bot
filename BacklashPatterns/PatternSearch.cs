@@ -1,13 +1,54 @@
 using BacklashDTOs;
 using BacklashPatterns.PatternDefinitions;
+using Microsoft.Extensions.Logging;
 using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns
 {
+    /// <summary>
+    /// Provides functionality for detecting and filtering candlestick patterns in financial market data.
+    /// This static class analyzes arrays of candle data to identify various technical analysis patterns,
+    /// applying filtering rules to eliminate redundant or less significant patterns.
+    /// </summary>
+    /// <remarks>
+    /// The class supports detection of single-candle, two-candle, three-candle, four-candle, and five-candle patterns.
+    /// Patterns are filtered based on precedence rules to ensure only the most relevant patterns are retained.
+    /// </remarks>
     public static class PatternSearch
     {
-        public static readonly List<int> TempIndices = new List<int>();
+        /// <summary>
+        /// Logger instance for recording pattern detection and filtering activities.
+        /// </summary>
+        private static ILogger? _logger;
 
+        /// <summary>
+        /// Sets the logger instance for this static class.
+        /// </summary>
+        /// <param name="logger">The logger to use for logging operations.</param>
+        public static void SetLogger(ILogger logger)
+        {
+            _logger = logger;
+        }
+
+        /// <summary>
+        /// Temporary storage for indices of potential patterns during detection process.
+        /// Used to track candidate patterns before final filtering.
+        /// </summary>
+        public static readonly List<int> CandidatePatternIndices = new List<int>();
+
+        /// <summary>
+        /// Detects candlestick patterns in the provided price data array.
+        /// Analyzes each candle position to identify various technical analysis patterns,
+        /// from single-candle formations to complex multi-candle patterns.
+        /// </summary>
+        /// <param name="prices">Array of candle data containing price and volume information.</param>
+        /// <param name="trendLookback">Number of candles to look back for trend analysis and pattern context.</param>
+        /// <returns>Dictionary mapping candle indices to lists of detected pattern definitions.</returns>
+        /// <remarks>
+        /// The method performs significance checks to skip insignificant candles and applies
+        /// pattern detection algorithms for different candle counts (1-5 candles).
+        /// Detected patterns are then filtered to remove redundancies and less significant formations.
+        /// </remarks>
         public static Dictionary<int, List<PatternDefinition>> DetectPatterns(CandleMids[] prices,
                 int trendLookback)
         {
@@ -21,7 +62,7 @@ namespace BacklashPatterns
 
             for (int i = 0; i < prices.Length; i++)
             {
-                TempIndices.Clear();
+                CandidatePatternIndices.Clear();
                 var patternsFound = new PatternDefinition[initialCapacity]; // Now stores PatternDefinition objects
                 int patternCount = 0;
 
@@ -400,7 +441,7 @@ namespace BacklashPatterns
 
                 if (patternCount > 0)
                 {
-                    var filteredPatterns = FilterPatterns(patternsFound, patternCount, prices, "C:\\Users\\Peter\\Documents\\GitHub\\kalshi-bot\\TestingOutput\\Pattern Exclusion Logs\\PatternLogs.txt");
+                    var filteredPatterns = FilterPatterns(patternsFound, patternCount, prices);
                     if (filteredPatterns.Count > 0)
                         detailedPatterns[i] = filteredPatterns;
                 }
@@ -422,7 +463,20 @@ namespace BacklashPatterns
             Array.Resize(ref patternsFound, capacity);
         }
 
-        private static List<PatternDefinition> FilterPatterns(PatternDefinition[] patterns, int patternCount, CandleMids[] candles, string logFilePath)
+        /// <summary>
+        /// Filters detected patterns to remove redundancies and less significant formations.
+        /// Applies a comprehensive set of exclusion rules based on pattern precedence and specificity.
+        /// </summary>
+        /// <param name="patterns">Array of detected pattern definitions to filter.</param>
+        /// <param name="patternCount">Number of valid patterns in the array.</param>
+        /// <param name="candles">Array of candle data for context information.</param>
+        /// <returns>List of filtered patterns with redundancies removed.</returns>
+        /// <remarks>
+        /// The filtering process groups patterns by their last candle index and applies
+        /// hierarchical exclusion rules where more specific patterns take precedence over
+        /// general ones. Replacement statistics are logged for analysis.
+        /// </remarks>
+        private static List<PatternDefinition> FilterPatterns(PatternDefinition[] patterns, int patternCount, CandleMids[] candles)
         {
             var filteredPatterns = new List<PatternDefinition>(patternCount);
             var patternsByCandle = new Dictionary<int, List<PatternDefinition>>();
@@ -439,368 +493,365 @@ namespace BacklashPatterns
                 patternsByCandle[candleIndex].Add(pattern);
             }
 
-            // Ensure log file directory exists
-            Directory.CreateDirectory(Path.GetDirectoryName(logFilePath));
-
-            using (var logWriter = new StreamWriter(logFilePath, append: true))
+            foreach (var kvp in patternsByCandle)
             {
-                foreach (var kvp in patternsByCandle)
+                var candlePatterns = kvp.Value;
+                int index = kvp.Key;
+
+                string market = index < candles.Length ? candles[index].MarketTicker : "Unknown Market";
+                string timestamp = index < candles.Length ? candles[index].Timestamp.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown Timestamp";
+
+                _logger?.LogInformation($"Index {index} ({market}, {timestamp}): Patterns before filter: {string.Join(", ", candlePatterns.Select(p => p.Name))}");
+
+                // Define all pattern presence flags (unchanged)
+                bool hasDoji = candlePatterns.Any(p => p.Name == "Doji");
+                bool hasDragonflyDoji = candlePatterns.Any(p => p.Name == "DragonflyDoji");
+                bool hasGravestoneDoji = candlePatterns.Any(p => p.Name == "GravestoneDoji");
+                bool hasLongLeggedDoji = candlePatterns.Any(p => p.Name == "LongLeggedDoji");
+                bool hasRickshawMan = candlePatterns.Any(p => p.Name == "RickshawMan");
+                bool hasHammer = candlePatterns.Any(p => p.Name == "Hammer");
+                bool hasHangingMan = candlePatterns.Any(p => p.Name == "HangingMan");
+                bool hasInvertedHammer = candlePatterns.Any(p => p.Name == "InvertedHammer");
+                bool hasShootingStar = candlePatterns.Any(p => p.Name == "ShootingStar");
+                bool hasTakuri = candlePatterns.Any(p => p.Name == "Takuri");
+                bool hasSpinningTop = candlePatterns.Any(p => p.Name == "SpinningTop");
+                bool hasHighWaveCandle = candlePatterns.Any(p => p.Name == "HighWaveCandle");
+                bool hasClosingMarubozuBullish = candlePatterns.Any(p => p.Name == "ClosingMarubozu_Bullish");
+                bool hasClosingMarubozuBearish = candlePatterns.Any(p => p.Name == "ClosingMarubozu_Bearish");
+                bool hasLongLineCandleBullish = candlePatterns.Any(p => p.Name == "LongLineCandle_Bullish");
+                bool hasLongLineCandleBearish = candlePatterns.Any(p => p.Name == "LongLineCandle_Bearish");
+                bool hasMarubozuBullish = candlePatterns.Any(p => p.Name == "Marubozu_Bullish");
+                bool hasMarubozuBearish = candlePatterns.Any(p => p.Name == "Marubozu_Bearish");
+                bool hasShortLineCandleBullish = candlePatterns.Any(p => p.Name == "ShortLineCandle_Bullish");
+                bool hasShortLineCandleBearish = candlePatterns.Any(p => p.Name == "ShortLineCandle_Bearish");
+                bool hasStickSandwichBearish = candlePatterns.Any(p => p.Name == "StickSandwich_Bearish");
+                bool hasStickSandwichBullish = candlePatterns.Any(p => p.Name == "StickSandwich_Bullish");
+                bool hasLadderBottom = candlePatterns.Any(p => p.Name == "LadderBottom");
+                bool hasMatHoldBullish = candlePatterns.Any(p => p.Name == "MatHold_Bullish");
+                bool hasMatHoldBearish = candlePatterns.Any(p => p.Name == "MatHold_Bearish");
+                bool hasRisingFallingThreeMethods = candlePatterns.Any(p => p.Name == "RisingFallingThreeMethods");
+                bool hasDarkCloudCover = candlePatterns.Any(p => p.Name == "DarkCloudCover");
+                bool hasPiercingPattern = candlePatterns.Any(p => p.Name == "Piercing");
+                bool hasBullishEngulfing = candlePatterns.Any(p => p.Name == "BullishEngulfing");
+                bool hasKickingBullish = candlePatterns.Any(p => p.Name == "Kicking_Bullish");
+                bool hasKickingBearish = candlePatterns.Any(p => p.Name == "Kicking_Bearish");
+                bool hasKickingByLengthBullish = candlePatterns.Any(p => p.Name == "KickingByLength_Bullish");
+                bool hasKickingByLengthBearish = candlePatterns.Any(p => p.Name == "KickingByLength_Bearish");
+                bool hasTasukiGapBullish = candlePatterns.Any(p => p.Name == "TasukiGap_Bullish");
+                bool hasTasukiGapBearish = candlePatterns.Any(p => p.Name == "TasukiGap_Bearish");
+                bool hasThrustingBullish = candlePatterns.Any(p => p.Name == "Thrusting_Bullish");
+                bool hasThrustingBearish = candlePatterns.Any(p => p.Name == "Thrusting_Bearish");
+                bool hasThreeLineStrikeBullish = candlePatterns.Any(p => p.Name == "ThreeLineStrike_Bullish");
+                bool hasThreeLineStrikeBearish = candlePatterns.Any(p => p.Name == "ThreeLineStrike_Bearish");
+                bool hasThreeBlackCrows = candlePatterns.Any(p => p.Name == "ThreeBlackCrows");
+                bool hasThreeAdvancingWhiteSoldiers = candlePatterns.Any(p => p.Name == "ThreeAdvancingWhiteSoldiers");
+                bool hasDownsideGapThreeMethods = candlePatterns.Any(p => p.Name == "DownsideGapThreeMethods");
+                bool hasModifiedHikkakeBullish = candlePatterns.Any(p => p.Name == "ModifiedHikkake_Bullish");
+                bool hasModifiedHikkakeBearish = candlePatterns.Any(p => p.Name == "ModifiedHikkake_Bearish");
+                bool hasAnyDojiVariant = hasDragonflyDoji || hasGravestoneDoji || hasLongLeggedDoji || hasRickshawMan;
+                bool hasAnyDirectionalPattern = hasHammer || hasHangingMan || hasInvertedHammer || hasShootingStar || hasTakuri ||
+                                              hasClosingMarubozuBullish || hasClosingMarubozuBearish ||
+                                              hasLongLineCandleBullish || hasLongLineCandleBearish ||
+                                              hasMarubozuBullish || hasMarubozuBearish ||
+                                              hasShortLineCandleBullish || hasShortLineCandleBearish;
+
+                foreach (var pattern in candlePatterns)
                 {
-                    var candlePatterns = kvp.Value;
-                    int index = kvp.Key;
+                    string key = pattern.Name;
 
-                    string market = index < candles.Length ? candles[index].MarketTicker : "Unknown Market";
-                    string timestamp = index < candles.Length ? candles[index].Timestamp.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown Timestamp";
-
-                    logWriter.WriteLine($"Index {index} ({market}, {timestamp}): Patterns before filter: {string.Join(", ", candlePatterns.Select(p => p.Name))}");
-
-                    // Define all pattern presence flags (unchanged)
-                    bool hasDoji = candlePatterns.Any(p => p.Name == "Doji");
-                    bool hasDragonflyDoji = candlePatterns.Any(p => p.Name == "DragonflyDoji");
-                    bool hasGravestoneDoji = candlePatterns.Any(p => p.Name == "GravestoneDoji");
-                    bool hasLongLeggedDoji = candlePatterns.Any(p => p.Name == "LongLeggedDoji");
-                    bool hasRickshawMan = candlePatterns.Any(p => p.Name == "RickshawMan");
-                    bool hasHammer = candlePatterns.Any(p => p.Name == "Hammer");
-                    bool hasHangingMan = candlePatterns.Any(p => p.Name == "HangingMan");
-                    bool hasInvertedHammer = candlePatterns.Any(p => p.Name == "InvertedHammer");
-                    bool hasShootingStar = candlePatterns.Any(p => p.Name == "ShootingStar");
-                    bool hasTakuri = candlePatterns.Any(p => p.Name == "Takuri");
-                    bool hasSpinningTop = candlePatterns.Any(p => p.Name == "SpinningTop");
-                    bool hasHighWaveCandle = candlePatterns.Any(p => p.Name == "HighWaveCandle");
-                    bool hasClosingMarubozuBullish = candlePatterns.Any(p => p.Name == "ClosingMarubozu_Bullish");
-                    bool hasClosingMarubozuBearish = candlePatterns.Any(p => p.Name == "ClosingMarubozu_Bearish");
-                    bool hasLongLineCandleBullish = candlePatterns.Any(p => p.Name == "LongLineCandle_Bullish");
-                    bool hasLongLineCandleBearish = candlePatterns.Any(p => p.Name == "LongLineCandle_Bearish");
-                    bool hasMarubozuBullish = candlePatterns.Any(p => p.Name == "Marubozu_Bullish");
-                    bool hasMarubozuBearish = candlePatterns.Any(p => p.Name == "Marubozu_Bearish");
-                    bool hasShortLineCandleBullish = candlePatterns.Any(p => p.Name == "ShortLineCandle_Bullish");
-                    bool hasShortLineCandleBearish = candlePatterns.Any(p => p.Name == "ShortLineCandle_Bearish");
-                    bool hasStickSandwichBearish = candlePatterns.Any(p => p.Name == "StickSandwich_Bearish");
-                    bool hasStickSandwichBullish = candlePatterns.Any(p => p.Name == "StickSandwich_Bullish");
-                    bool hasLadderBottom = candlePatterns.Any(p => p.Name == "LadderBottom");
-                    bool hasMatHoldBullish = candlePatterns.Any(p => p.Name == "MatHold_Bullish");
-                    bool hasMatHoldBearish = candlePatterns.Any(p => p.Name == "MatHold_Bearish");
-                    bool hasRisingFallingThreeMethods = candlePatterns.Any(p => p.Name == "RisingFallingThreeMethods");
-                    bool hasDarkCloudCover = candlePatterns.Any(p => p.Name == "DarkCloudCover");
-                    bool hasPiercingPattern = candlePatterns.Any(p => p.Name == "Piercing");
-                    bool hasBullishEngulfing = candlePatterns.Any(p => p.Name == "BullishEngulfing");
-                    bool hasKickingBullish = candlePatterns.Any(p => p.Name == "Kicking_Bullish");
-                    bool hasKickingBearish = candlePatterns.Any(p => p.Name == "Kicking_Bearish");
-                    bool hasKickingByLengthBullish = candlePatterns.Any(p => p.Name == "KickingByLength_Bullish");
-                    bool hasKickingByLengthBearish = candlePatterns.Any(p => p.Name == "KickingByLength_Bearish");
-                    bool hasTasukiGapBullish = candlePatterns.Any(p => p.Name == "TasukiGap_Bullish");
-                    bool hasTasukiGapBearish = candlePatterns.Any(p => p.Name == "TasukiGap_Bearish");
-                    bool hasThrustingBullish = candlePatterns.Any(p => p.Name == "Thrusting_Bullish");
-                    bool hasThrustingBearish = candlePatterns.Any(p => p.Name == "Thrusting_Bearish");
-                    bool hasThreeLineStrikeBullish = candlePatterns.Any(p => p.Name == "ThreeLineStrike_Bullish");
-                    bool hasThreeLineStrikeBearish = candlePatterns.Any(p => p.Name == "ThreeLineStrike_Bearish");
-                    bool hasThreeBlackCrows = candlePatterns.Any(p => p.Name == "ThreeBlackCrows");
-                    bool hasThreeAdvancingWhiteSoldiers = candlePatterns.Any(p => p.Name == "ThreeAdvancingWhiteSoldiers");
-                    bool hasDownsideGapThreeMethods = candlePatterns.Any(p => p.Name == "DownsideGapThreeMethods");
-                    bool hasModifiedHikkakeBullish = candlePatterns.Any(p => p.Name == "ModifiedHikkake_Bullish");
-                    bool hasModifiedHikkakeBearish = candlePatterns.Any(p => p.Name == "ModifiedHikkake_Bearish");
-                    bool hasAnyDojiVariant = hasDragonflyDoji || hasGravestoneDoji || hasLongLeggedDoji || hasRickshawMan;
-                    bool hasAnyDirectionalPattern = hasHammer || hasHangingMan || hasInvertedHammer || hasShootingStar || hasTakuri ||
-                                                  hasClosingMarubozuBullish || hasClosingMarubozuBearish ||
-                                                  hasLongLineCandleBullish || hasLongLineCandleBearish ||
-                                                  hasMarubozuBullish || hasMarubozuBearish ||
-                                                  hasShortLineCandleBullish || hasShortLineCandleBearish;
-
-                    foreach (var pattern in candlePatterns)
+                    // Helper method to record a replacement
+                    void RecordReplacement(string replacedPattern, string replacedBy)
                     {
-                        string key = pattern.Name;
-
-                        // Helper method to record a replacement
-                        void RecordReplacement(string replacedPattern, string replacedBy)
-                        {
-                            if (!replacementCounts.ContainsKey(replacedPattern))
-                                replacementCounts[replacedPattern] = new Dictionary<string, int>();
-                            if (!replacementCounts[replacedPattern].ContainsKey(replacedBy))
-                                replacementCounts[replacedPattern][replacedBy] = 0;
-                            replacementCounts[replacedPattern][replacedBy]++;
-                        }
-
-                        // Apply all exclusion rules and record replacements
-                        if (candlePatterns.Any(p => p.Name == "EveningStar") &&
-                            key == "Stalled" &&
-                            pattern.Candles.Last() == candlePatterns.First(p => p.Name == "EveningStar").Candles.Last())
-                        {
-                            RecordReplacement("Stalled", "EveningStar");
-                            continue;
-                        }
-
-                        if (hasThreeLineStrikeBearish && key == "ThreeBlackCrows" &&
-                            pattern.Candles.Last() == candlePatterns.First(p => p.Name == "ThreeLineStrike_Bearish").Candles.Last() - 1)
-                        {
-                            RecordReplacement("ThreeBlackCrows", "ThreeLineStrike_Bearish");
-                            continue;
-                        }
-
-                        if (hasThreeLineStrikeBullish && key == "ThreeAdvancingWhiteSoldiers" &&
-                            pattern.Candles.Last() == candlePatterns.First(p => p.Name == "ThreeLineStrike_Bullish").Candles.Last() - 1)
-                        {
-                            RecordReplacement("ThreeAdvancingWhiteSoldiers", "ThreeLineStrike_Bullish");
-                            continue;
-                        }
-
-                        if (key == "UpsideDownsideGapThreeMethods_Bearish" && hasDownsideGapThreeMethods &&
-                            pattern.Candles.Last() == candlePatterns.First(p => p.Name == "DownsideGapThreeMethods").Candles.Last())
-                        {
-                            RecordReplacement("UpsideDownsideGapThreeMethods_Bearish", "DownsideGapThreeMethods");
-                            continue;
-                        }
-
-                        if (key == "UpsideDownsideGapThreeMethods_Bullish" && hasTasukiGapBullish &&
-                            pattern.Candles.Last() == candlePatterns.First(p => p.Name == "TasukiGap_Bullish").Candles.Last())
-                        {
-                            RecordReplacement("UpsideDownsideGapThreeMethods_Bullish", "TasukiGap_Bullish");
-                            continue;
-                        }
-
-                        if (key == "UpsideDownsideGapThreeMethods_Bearish" && hasTasukiGapBearish &&
-                            pattern.Candles.Last() == candlePatterns.First(p => p.Name == "TasukiGap_Bearish").Candles.Last())
-                        {
-                            RecordReplacement("UpsideDownsideGapThreeMethods_Bearish", "TasukiGap_Bearish");
-                            continue;
-                        }
-
-                        if (key == "Engulfing_Bearish" && candlePatterns.Any(p => p.Name == "ThreeOutsideDown" &&
-                            p.Candles.Count == 3 && p.Candles[1] == pattern.Candles[0] && p.Candles[2] == pattern.Candles[1]))
-                        {
-                            RecordReplacement("Engulfing_Bearish", "ThreeOutsideDown");
-                            continue;
-                        }
-
-                        if (hasDarkCloudCover && key == "Thrusting_Bearish" &&
-                            pattern.Candles.Last() == candlePatterns.First(p => p.Name == "DarkCloudCover").Candles.Last())
-                        {
-                            RecordReplacement("Thrusting_Bearish", "DarkCloudCover");
-                            continue;
-                        }
-
-                        if (hasPiercingPattern && key == "Thrusting_Bullish" &&
-                            pattern.Candles.Last() == candlePatterns.First(p => p.Name == "Piercing").Candles.Last())
-                        {
-                            RecordReplacement("Thrusting_Bullish", "Piercing");
-                            continue;
-                        }
-
-                        if (key == "Engulfing_Bullish" && candlePatterns.Any(p => p.Name == "ThreeOutsideUp" &&
-                            p.Candles.Count == 3 && p.Candles[1] == pattern.Candles[0] && p.Candles[2] == pattern.Candles[1]))
-                        {
-                            RecordReplacement("Engulfing_Bullish", "ThreeOutsideUp");
-                            continue;
-                        }
-
-                        if (key == "Kicking_Bullish" && hasKickingByLengthBullish)
-                        {
-                            RecordReplacement("Kicking_Bullish", "KickingByLength_Bullish");
-                            continue;
-                        }
-
-                        if (key == "Kicking_Bearish" && hasKickingByLengthBearish)
-                        {
-                            RecordReplacement("Kicking_Bearish", "KickingByLength_Bearish");
-                            continue;
-                        }
-
-                        if (key == "Hammer" && hasTakuri)
-                        {
-                            RecordReplacement("Hammer", "Takuri");
-                            continue;
-                        }
-
-                        if (key == "LongLineCandle_Bullish" && (hasMarubozuBullish || hasClosingMarubozuBullish))
-                        {
-                            RecordReplacement("LongLineCandle_Bullish", hasMarubozuBullish ? "Marubozu_Bullish" : "ClosingMarubozu_Bullish");
-                            continue;
-                        }
-
-                        if (key == "LongLineCandle_Bearish" && (hasMarubozuBearish || hasClosingMarubozuBearish))
-                        {
-                            RecordReplacement("LongLineCandle_Bearish", hasMarubozuBearish ? "Marubozu_Bearish" : "ClosingMarubozu_Bearish");
-                            continue;
-                        }
-
-                        if (key == "ClosingMarubozu_Bullish" && hasMarubozuBullish)
-                        {
-                            RecordReplacement("ClosingMarubozu_Bullish", "Marubozu_Bullish");
-                            continue;
-                        }
-
-                        if (key == "ClosingMarubozu_Bearish" && hasMarubozuBearish)
-                        {
-                            RecordReplacement("ClosingMarubozu_Bearish", "Marubozu_Bearish");
-                            continue;
-                        }
-
-                        if (hasTasukiGapBullish && key == "Thrusting_Bullish" &&
-                            pattern.Candles.Last() == candlePatterns.First(p => p.Name == "TasukiGap_Bullish").Candles.Last())
-                        {
-                            RecordReplacement("Thrusting_Bullish", "TasukiGap_Bullish");
-                            continue;
-                        }
-
-                        if (hasTasukiGapBearish && key == "Thrusting_Bearish" &&
-                            pattern.Candles.Last() == candlePatterns.First(p => p.Name == "TasukiGap_Bearish").Candles.Last())
-                        {
-                            RecordReplacement("Thrusting_Bearish", "TasukiGap_Bearish");
-                            continue;
-                        }
-
-                        if ((key == "ShortLineCandle_Bullish" || key == "ShortLineCandle_Bearish") && hasSpinningTop)
-                        {
-                            RecordReplacement(key, "SpinningTop");
-                            continue;
-                        }
-
-                        if (key == "SpinningTop" && hasHighWaveCandle)
-                        {
-                            RecordReplacement("SpinningTop", "HighWaveCandle");
-                            continue;
-                        }
-
-                        if (hasBullishEngulfing && key == "Piercing" &&
-                            pattern.Candles.Last() == candlePatterns.First(p => p.Name == "Engulfing_Bullish").Candles.Last())
-                        {
-                            RecordReplacement("Piercing", "Engulfing_Bullish");
-                            continue;
-                        }
-
-                        if (key == "Doji" && hasAnyDojiVariant)
-                        {
-                            RecordReplacement("Doji", hasDragonflyDoji ? "DragonflyDoji" : hasGravestoneDoji ? "GravestoneDoji" : hasLongLeggedDoji ? "LongLeggedDoji" : "RickshawMan");
-                            continue;
-                        }
-
-                        if (key == "Doji" && (hasHammer || hasHangingMan || hasInvertedHammer || hasShootingStar || hasTakuri || hasSpinningTop || hasHighWaveCandle))
-                        {
-                            RecordReplacement("Doji", hasHammer ? "Hammer" : hasHangingMan ? "HangingMan" : hasInvertedHammer ? "InvertedHammer" : hasShootingStar ? "ShootingStar" : hasTakuri ? "Takuri" : hasSpinningTop ? "SpinningTop" : "HighWaveCandle");
-                            continue;
-                        }
-
-                        if (key == "LongLeggedDoji" && hasRickshawMan)
-                        {
-                            RecordReplacement("LongLeggedDoji", "RickshawMan");
-                            continue;
-                        }
-
-                        if (key == "LongLeggedDoji" && (hasDragonflyDoji || hasGravestoneDoji))
-                        {
-                            RecordReplacement("LongLeggedDoji", hasDragonflyDoji ? "DragonflyDoji" : "GravestoneDoji");
-                            continue;
-                        }
-
-                        if (key == "LongLeggedDoji" && hasSpinningTop)
-                        {
-                            RecordReplacement("LongLeggedDoji", "SpinningTop");
-                            continue;
-                        }
-
-                        if (key == "LongLeggedDoji" && hasHighWaveCandle)
-                        {
-                            RecordReplacement("LongLeggedDoji", "HighWaveCandle");
-                            continue;
-                        }
-
-                        if (key == "DragonflyDoji" && hasRickshawMan)
-                        {
-                            RecordReplacement("DragonflyDoji", "RickshawMan");
-                            continue;
-                        }
-
-                        if (key == "DragonflyDoji" && (hasHammer || hasTakuri))
-                        {
-                            RecordReplacement("DragonflyDoji", hasHammer ? "Hammer" : "Takuri");
-                            continue;
-                        }
-
-                        if (key == "DragonflyDoji" && hasGravestoneDoji)
-                        {
-                            RecordReplacement("DragonflyDoji", "GravestoneDoji");
-                            continue;
-                        }
-
-                        if (key == "GravestoneDoji" && hasRickshawMan)
-                        {
-                            RecordReplacement("GravestoneDoji", "RickshawMan");
-                            continue;
-                        }
-
-                        if (key == "GravestoneDoji" && hasShootingStar)
-                        {
-                            RecordReplacement("GravestoneDoji", "ShootingStar");
-                            continue;
-                        }
-
-                        if (key == "GravestoneDoji" && hasInvertedHammer)
-                        {
-                            RecordReplacement("GravestoneDoji", "InvertedHammer");
-                            continue;
-                        }
-
-                        if (key == "GravestoneDoji" && hasDragonflyDoji)
-                        {
-                            RecordReplacement("GravestoneDoji", "DragonflyDoji");
-                            continue;
-                        }
-
-                        if (key == "RickshawMan" && (hasHammer || hasTakuri || hasShootingStar || hasInvertedHammer))
-                        {
-                            RecordReplacement("RickshawMan", hasHammer ? "Hammer" : hasTakuri ? "Takuri" : hasShootingStar ? "ShootingStar" : "InvertedHammer");
-                            continue;
-                        }
-
-                        if (key == "RickshawMan" && hasHighWaveCandle)
-                        {
-                            RecordReplacement("RickshawMan", "HighWaveCandle");
-                            continue;
-                        }
-
-                        if (key == "SpinningTop" && (hasLongLeggedDoji || hasRickshawMan || hasDragonflyDoji || hasGravestoneDoji))
-                        {
-                            RecordReplacement("SpinningTop", hasLongLeggedDoji ? "LongLeggedDoji" : hasRickshawMan ? "RickshawMan" : hasDragonflyDoji ? "DragonflyDoji" : "GravestoneDoji");
-                            continue;
-                        }
-
-                        if (key == "HighWaveCandle" && (hasLongLeggedDoji || hasRickshawMan))
-                        {
-                            RecordReplacement("HighWaveCandle", hasLongLeggedDoji ? "LongLeggedDoji" : "RickshawMan");
-                            continue;
-                        }
-
-                        if (key == "InvertedHammer" && hasShootingStar)
-                        {
-                            RecordReplacement("InvertedHammer", "ShootingStar");
-                            continue;
-                        }
-
-                        if (key == "ShortLineCandle_Bullish" && (hasHammer || hasTakuri || hasClosingMarubozuBullish || hasLongLineCandleBullish || hasMarubozuBullish))
-                        {
-                            RecordReplacement("ShortLineCandle_Bullish", hasHammer ? "Hammer" : hasTakuri ? "Takuri" : hasClosingMarubozuBullish ? "ClosingMarubozu_Bullish" : hasLongLineCandleBullish ? "LongLineCandle_Bullish" : "Marubozu_Bullish");
-                            continue;
-                        }
-
-                        if (key == "ShortLineCandle_Bearish" && (hasHangingMan || hasShootingStar || hasClosingMarubozuBearish || hasLongLineCandleBearish || hasMarubozuBearish))
-                        {
-                            RecordReplacement("ShortLineCandle_Bearish", hasHangingMan ? "HangingMan" : hasShootingStar ? "ShootingStar" : hasClosingMarubozuBearish ? "ClosingMarubozu_Bearish" : hasLongLineCandleBearish ? "LongLineCandle_Bearish" : "Marubozu_Bearish");
-                            continue;
-                        }
-
-                        filteredPatterns.Add(pattern);
+                        if (!replacementCounts.ContainsKey(replacedPattern))
+                            replacementCounts[replacedPattern] = new Dictionary<string, int>();
+                        if (!replacementCounts[replacedPattern].ContainsKey(replacedBy))
+                            replacementCounts[replacedPattern][replacedBy] = 0;
+                        replacementCounts[replacedPattern][replacedBy]++;
                     }
 
-                    logWriter.WriteLine($"Index {index} ({market}, {timestamp}): Patterns after filter: {string.Join(", ", filteredPatterns.Where(p => p.Candles.Last() == index).Select(p => p.Name))}");
+                    // Apply all exclusion rules and record replacements
+                    if (candlePatterns.Any(p => p.Name == "EveningStar") &&
+                        key == "Stalled" &&
+                        pattern.Candles.Last() == candlePatterns.First(p => p.Name == "EveningStar").Candles.Last())
+                    {
+                        RecordReplacement("Stalled", "EveningStar");
+                        continue;
+                    }
+
+                    if (hasThreeLineStrikeBearish && key == "ThreeBlackCrows" &&
+                        pattern.Candles.Last() == candlePatterns.First(p => p.Name == "ThreeLineStrike_Bearish").Candles.Last() - 1)
+                    {
+                        RecordReplacement("ThreeBlackCrows", "ThreeLineStrike_Bearish");
+                        continue;
+                    }
+
+                    if (hasThreeLineStrikeBullish && key == "ThreeAdvancingWhiteSoldiers" &&
+                        pattern.Candles.Last() == candlePatterns.First(p => p.Name == "ThreeLineStrike_Bullish").Candles.Last() - 1)
+                    {
+                        RecordReplacement("ThreeAdvancingWhiteSoldiers", "ThreeLineStrike_Bullish");
+                        continue;
+                    }
+
+                    if (key == "UpsideDownsideGapThreeMethods_Bearish" && hasDownsideGapThreeMethods &&
+                        pattern.Candles.Last() == candlePatterns.First(p => p.Name == "DownsideGapThreeMethods").Candles.Last())
+                    {
+                        RecordReplacement("UpsideDownsideGapThreeMethods_Bearish", "DownsideGapThreeMethods");
+                        continue;
+                    }
+
+                    if (key == "UpsideDownsideGapThreeMethods_Bullish" && hasTasukiGapBullish &&
+                        pattern.Candles.Last() == candlePatterns.First(p => p.Name == "TasukiGap_Bullish").Candles.Last())
+                    {
+                        RecordReplacement("UpsideDownsideGapThreeMethods_Bullish", "TasukiGap_Bullish");
+                        continue;
+                    }
+
+                    if (key == "UpsideDownsideGapThreeMethods_Bearish" && hasTasukiGapBearish &&
+                        pattern.Candles.Last() == candlePatterns.First(p => p.Name == "TasukiGap_Bearish").Candles.Last())
+                    {
+                        RecordReplacement("UpsideDownsideGapThreeMethods_Bearish", "TasukiGap_Bearish");
+                        continue;
+                    }
+
+                    if (key == "Engulfing_Bearish" && candlePatterns.Any(p => p.Name == "ThreeOutsideDown" &&
+                        p.Candles.Count == 3 && p.Candles[1] == pattern.Candles[0] && p.Candles[2] == pattern.Candles[1]))
+                    {
+                        RecordReplacement("Engulfing_Bearish", "ThreeOutsideDown");
+                        continue;
+                    }
+
+                    if (hasDarkCloudCover && key == "Thrusting_Bearish" &&
+                        pattern.Candles.Last() == candlePatterns.First(p => p.Name == "DarkCloudCover").Candles.Last())
+                    {
+                        RecordReplacement("Thrusting_Bearish", "DarkCloudCover");
+                        continue;
+                    }
+
+                    if (hasPiercingPattern && key == "Thrusting_Bullish" &&
+                        pattern.Candles.Last() == candlePatterns.First(p => p.Name == "Piercing").Candles.Last())
+                    {
+                        RecordReplacement("Thrusting_Bullish", "Piercing");
+                        continue;
+                    }
+
+                    if (key == "Engulfing_Bullish" && candlePatterns.Any(p => p.Name == "ThreeOutsideUp" &&
+                        p.Candles.Count == 3 && p.Candles[1] == pattern.Candles[0] && p.Candles[2] == pattern.Candles[1]))
+                    {
+                        RecordReplacement("Engulfing_Bullish", "ThreeOutsideUp");
+                        continue;
+                    }
+
+                    if (key == "Kicking_Bullish" && hasKickingByLengthBullish)
+                    {
+                        RecordReplacement("Kicking_Bullish", "KickingByLength_Bullish");
+                        continue;
+                    }
+
+                    if (key == "Kicking_Bearish" && hasKickingByLengthBearish)
+                    {
+                        RecordReplacement("Kicking_Bearish", "KickingByLength_Bearish");
+                        continue;
+                    }
+
+                    if (key == "Hammer" && hasTakuri)
+                    {
+                        RecordReplacement("Hammer", "Takuri");
+                        continue;
+                    }
+
+                    if (key == "LongLineCandle_Bullish" && (hasMarubozuBullish || hasClosingMarubozuBullish))
+                    {
+                        RecordReplacement("LongLineCandle_Bullish", hasMarubozuBullish ? "Marubozu_Bullish" : "ClosingMarubozu_Bullish");
+                        continue;
+                    }
+
+                    if (key == "LongLineCandle_Bearish" && (hasMarubozuBearish || hasClosingMarubozuBearish))
+                    {
+                        RecordReplacement("LongLineCandle_Bearish", hasMarubozuBearish ? "Marubozu_Bearish" : "ClosingMarubozu_Bearish");
+                        continue;
+                    }
+
+                    if (key == "ClosingMarubozu_Bullish" && hasMarubozuBullish)
+                    {
+                        RecordReplacement("ClosingMarubozu_Bullish", "Marubozu_Bullish");
+                        continue;
+                    }
+
+                    if (key == "ClosingMarubozu_Bearish" && hasMarubozuBearish)
+                    {
+                        RecordReplacement("ClosingMarubozu_Bearish", "Marubozu_Bearish");
+                        continue;
+                    }
+
+                    if (hasTasukiGapBullish && key == "Thrusting_Bullish" &&
+                        pattern.Candles.Last() == candlePatterns.First(p => p.Name == "TasukiGap_Bullish").Candles.Last())
+                    {
+                        RecordReplacement("Thrusting_Bullish", "TasukiGap_Bullish");
+                        continue;
+                    }
+
+                    if (hasTasukiGapBearish && key == "Thrusting_Bearish" &&
+                        pattern.Candles.Last() == candlePatterns.First(p => p.Name == "TasukiGap_Bearish").Candles.Last())
+                    {
+                        RecordReplacement("Thrusting_Bearish", "TasukiGap_Bearish");
+                        continue;
+                    }
+
+                    if ((key == "ShortLineCandle_Bullish" || key == "ShortLineCandle_Bearish") && hasSpinningTop)
+                    {
+                        RecordReplacement(key, "SpinningTop");
+                        continue;
+                    }
+
+                    if (key == "SpinningTop" && hasHighWaveCandle)
+                    {
+                        RecordReplacement("SpinningTop", "HighWaveCandle");
+                        continue;
+                    }
+
+                    if (hasBullishEngulfing && key == "Piercing" &&
+                        pattern.Candles.Last() == candlePatterns.First(p => p.Name == "Engulfing_Bullish").Candles.Last())
+                    {
+                        RecordReplacement("Piercing", "Engulfing_Bullish");
+                        continue;
+                    }
+
+                    if (key == "Doji" && hasAnyDojiVariant)
+                    {
+                        RecordReplacement("Doji", hasDragonflyDoji ? "DragonflyDoji" : hasGravestoneDoji ? "GravestoneDoji" : hasLongLeggedDoji ? "LongLeggedDoji" : "RickshawMan");
+                        continue;
+                    }
+
+                    if (key == "Doji" && (hasHammer || hasHangingMan || hasInvertedHammer || hasShootingStar || hasTakuri || hasSpinningTop || hasHighWaveCandle))
+                    {
+                        RecordReplacement("Doji", hasHammer ? "Hammer" : hasHangingMan ? "HangingMan" : hasInvertedHammer ? "InvertedHammer" : hasShootingStar ? "ShootingStar" : hasTakuri ? "Takuri" : hasSpinningTop ? "SpinningTop" : "HighWaveCandle");
+                        continue;
+                    }
+
+                    if (key == "LongLeggedDoji" && hasRickshawMan)
+                    {
+                        RecordReplacement("LongLeggedDoji", "RickshawMan");
+                        continue;
+                    }
+
+                    if (key == "LongLeggedDoji" && (hasDragonflyDoji || hasGravestoneDoji))
+                    {
+                        RecordReplacement("LongLeggedDoji", hasDragonflyDoji ? "DragonflyDoji" : "GravestoneDoji");
+                        continue;
+                    }
+
+                    if (key == "LongLeggedDoji" && hasSpinningTop)
+                    {
+                        RecordReplacement("LongLeggedDoji", "SpinningTop");
+                        continue;
+                    }
+
+                    if (key == "LongLeggedDoji" && hasHighWaveCandle)
+                    {
+                        RecordReplacement("LongLeggedDoji", "HighWaveCandle");
+                        continue;
+                    }
+
+                    if (key == "DragonflyDoji" && hasRickshawMan)
+                    {
+                        RecordReplacement("DragonflyDoji", "RickshawMan");
+                        continue;
+                    }
+
+                    if (key == "DragonflyDoji" && (hasHammer || hasTakuri))
+                    {
+                        RecordReplacement("DragonflyDoji", hasHammer ? "Hammer" : "Takuri");
+                        continue;
+                    }
+
+                    if (key == "DragonflyDoji" && hasGravestoneDoji)
+                    {
+                        RecordReplacement("DragonflyDoji", "GravestoneDoji");
+                        continue;
+                    }
+
+                    if (key == "GravestoneDoji" && hasRickshawMan)
+                    {
+                        RecordReplacement("GravestoneDoji", "RickshawMan");
+                        continue;
+                    }
+
+                    if (key == "GravestoneDoji" && hasShootingStar)
+                    {
+                        RecordReplacement("GravestoneDoji", "ShootingStar");
+                        continue;
+                    }
+
+                    if (key == "GravestoneDoji" && hasInvertedHammer)
+                    {
+                        RecordReplacement("GravestoneDoji", "InvertedHammer");
+                        continue;
+                    }
+
+                    if (key == "GravestoneDoji" && hasDragonflyDoji)
+                    {
+                        RecordReplacement("GravestoneDoji", "DragonflyDoji");
+                        continue;
+                    }
+
+                    if (key == "RickshawMan" && (hasHammer || hasTakuri || hasShootingStar || hasInvertedHammer))
+                    {
+                        RecordReplacement("RickshawMan", hasHammer ? "Hammer" : hasTakuri ? "Takuri" : hasShootingStar ? "ShootingStar" : "InvertedHammer");
+                        continue;
+                    }
+
+                    if (key == "RickshawMan" && hasHighWaveCandle)
+                    {
+                        RecordReplacement("RickshawMan", "HighWaveCandle");
+                        continue;
+                    }
+
+                    if (key == "SpinningTop" && (hasLongLeggedDoji || hasRickshawMan || hasDragonflyDoji || hasGravestoneDoji))
+                    {
+                        RecordReplacement("SpinningTop", hasLongLeggedDoji ? "LongLeggedDoji" : hasRickshawMan ? "RickshawMan" : hasDragonflyDoji ? "DragonflyDoji" : "GravestoneDoji");
+                        continue;
+                    }
+
+                    if (key == "HighWaveCandle" && (hasLongLeggedDoji || hasRickshawMan))
+                    {
+                        RecordReplacement("HighWaveCandle", hasLongLeggedDoji ? "LongLeggedDoji" : "RickshawMan");
+                        continue;
+                    }
+
+                    if (key == "InvertedHammer" && hasShootingStar)
+                    {
+                        RecordReplacement("InvertedHammer", "ShootingStar");
+                        continue;
+                    }
+
+                    if (key == "ShortLineCandle_Bullish" && (hasHammer || hasTakuri || hasClosingMarubozuBullish || hasLongLineCandleBullish || hasMarubozuBullish))
+                    {
+                        RecordReplacement("ShortLineCandle_Bullish", hasHammer ? "Hammer" : hasTakuri ? "Takuri" : hasClosingMarubozuBullish ? "ClosingMarubozu_Bullish" : hasLongLineCandleBullish ? "LongLineCandle_Bullish" : "Marubozu_Bullish");
+                        continue;
+                    }
+
+                    if (key == "ShortLineCandle_Bearish" && (hasHangingMan || hasShootingStar || hasClosingMarubozuBearish || hasLongLineCandleBearish || hasMarubozuBearish))
+                    {
+                        RecordReplacement("ShortLineCandle_Bearish", hasHangingMan ? "HangingMan" : hasShootingStar ? "ShootingStar" : hasClosingMarubozuBearish ? "ClosingMarubozu_Bearish" : hasLongLineCandleBearish ? "LongLineCandle_Bearish" : "Marubozu_Bearish");
+                        continue;
+                    }
+
+                    filteredPatterns.Add(pattern);
                 }
 
-                // Write CSV summary
-                logWriter.WriteLine("\nPattern Replacement Summary (CSV):");
-                logWriter.WriteLine("Pattern,ReplacedPattern,Count");
+                _logger?.LogInformation($"Index {index} ({market}, {timestamp}): Patterns after filter: {string.Join(", ", filteredPatterns.Where(p => p.Candles.Last() == index).Select(p => p.Name))}");
+            }
+
+            // Log CSV summary
+            if (_logger != null)
+            {
+                _logger.LogInformation("Pattern Replacement Summary (CSV):");
+                _logger.LogInformation("Pattern,ReplacedPattern,Count");
                 foreach (var pattern in replacementCounts)
                 {
                     foreach (var replacement in pattern.Value)
                     {
-                        logWriter.WriteLine($"\"{pattern.Key}\",\"{replacement.Key}\",\"{replacement.Value}\"");
+                        _logger.LogInformation($"\"{pattern.Key}\",\"{replacement.Key}\",\"{replacement.Value}\"");
                     }
                 }
             }
@@ -811,3 +862,9 @@ namespace BacklashPatterns
 
 
 }
+
+
+
+
+
+

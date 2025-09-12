@@ -84,8 +84,8 @@ namespace BacklashPatterns.PatternDefinitions
             if (!prevDirection || !currDirection) return null;
 
             bool trendValid = isBullish
-                ? currMetrics.GetLookbackMeanTrend(2) <= -TrendThreshold
-                : currMetrics.GetLookbackMeanTrend(2) >= TrendThreshold;
+                ? currMetrics.GetLookbackAverageTrend(2) <= -TrendThreshold
+                : currMetrics.GetLookbackAverageTrend(2) >= TrendThreshold;
             if (!trendValid) return null;
 
             var candles = new List<int> { index - 1, index };
@@ -93,3 +93,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

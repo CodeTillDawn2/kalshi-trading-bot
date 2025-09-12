@@ -72,7 +72,7 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMetrics thirdMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
 
             // Require a downtrend based on the mean trend
-            if (thirdMetrics.GetLookbackMeanTrend(3) > TrendThreshold) return null;
+            if (thirdMetrics.GetLookbackAverageTrend(3) > TrendThreshold) return null;
 
             // Extract the three relevant candles
             var asks = prices.Skip(index - 2).Take(3).ToArray();
@@ -105,3 +105,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+

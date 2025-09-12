@@ -69,7 +69,7 @@ namespace BacklashPatterns.PatternDefinitions
             var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
 
             // Uptrend check
-            if (metrics3.GetLookbackMeanTrend(3) <= TrendThreshold) return null;
+            if (metrics3.GetLookbackAverageTrend(3) <= TrendThreshold) return null;
 
             // First candle: Bullish with sufficient body
             if (metrics1.BodySize < FirstCandleMinBodySize || !metrics1.IsBullish) return null;
@@ -91,3 +91,9 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
+
+
+
+
+
