@@ -23,7 +23,6 @@ namespace BacklashBot.Services
         private readonly TimeSpan _updateInterval;
         private readonly TradingConfig _tradingConfig;
         private DateTime? _lastRefreshTime;
-        private bool _hasRunInitialRefresh;
         private Task _executeTask;
         /// <summary>
         /// Event raised when a market's data has been updated.
@@ -109,7 +108,6 @@ namespace BacklashBot.Services
                             var workDuration = DateTime.UtcNow - workStartTime;
 
                             _lastRefreshTime = DateTime.UtcNow;
-                            _hasRunInitialRefresh = true;
 
                             var timeSinceLastRefresh = _lastRefreshTime.Value - workStartTime;
                             var remainingDelay = _updateInterval - timeSinceLastRefresh;
