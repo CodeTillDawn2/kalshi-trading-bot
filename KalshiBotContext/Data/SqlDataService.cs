@@ -13,22 +13,74 @@ using Polly.Retry;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 namespace KalshiBotData.Data
 {
+    /// <summary>
+    /// Provides asynchronous data persistence services for real-time market data from Kalshi's trading platform.
+    /// This service manages concurrent queues for different data types (order book, trades, fills, lifecycle events)
+    /// and processes them using background worker tasks with retry logic for transient SQL errors.
+    /// Implements the ISqlDataService interface for dependency injection and proper resource management.
+    /// </summary>
+    /// <remarks>
+    /// The service uses Polly for retry policies on SQL operations and maintains separate queues to ensure
+    /// data integrity and prevent blocking between different data types. All operations are asynchronous
+    /// to support high-throughput real-time data processing without impacting the main application flow.
+    /// </remarks>
     public class SqlDataService : ISqlDataService
     {
+        /// <summary>
+        /// The database connection string retrieved from application configuration.
+        /// </summary>
         private readonly string _connectionString;
+
+        /// <summary>
+        /// Logger instance for recording operational events, errors, and performance metrics.
+        /// </summary>
         private readonly ILogger<ISqlDataService> _logger;
+
+        /// <summary>
+        /// Thread-safe queue for order book data operations awaiting database persistence.
+        /// </summary>
         private readonly ConcurrentQueue<DatabaseOperation> _orderBookQueue;
+
+        /// <summary>
+        /// Thread-safe queue for trade data operations awaiting database persistence.
+        /// </summary>
         private readonly ConcurrentQueue<DatabaseOperation> _tradeQueue;
+
+        /// <summary>
+        /// Thread-safe queue for fill data operations awaiting database persistence.
+        /// </summary>
         private readonly ConcurrentQueue<DatabaseOperation> _fillQueue;
+
+        /// <summary>
+        /// Thread-safe queue for event lifecycle data operations awaiting database persistence.
+        /// </summary>
         private readonly ConcurrentQueue<DatabaseOperation> _eventLifecycleQueue;
+
+        /// <summary>
+        /// Thread-safe queue for market lifecycle data operations awaiting database persistence.
+        /// </summary>
         private readonly ConcurrentQueue<DatabaseOperation> _marketLifecycleQueue;
+
+        /// <summary>
+        /// Cancellation token source for coordinating graceful shutdown of background worker tasks.
+        /// </summary>
         private readonly CancellationTokenSource _cts;
+
+        /// <summary>
+        /// Array of background tasks processing the respective data queues asynchronously.
+        /// </summary>
         private readonly Task[] _workerTasks;
 
+        /// <summary>
+        /// Initializes a new instance of the SqlDataService with configuration and logging dependencies.
+        /// Sets up concurrent queues for different data types and starts background worker tasks for processing.
+        /// </summary>
+        /// <param name="configuration">Application configuration containing database connection string.</param>
+        /// <param name="logger">Logger for recording service operations and errors.</param>
         public SqlDataService(IConfiguration configuration, ILogger<ISqlDataService> logger)
         {
             _logger = logger;
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
             _orderBookQueue = new ConcurrentQueue<DatabaseOperation>();
             _tradeQueue = new ConcurrentQueue<DatabaseOperation>();
             _fillQueue = new ConcurrentQueue<DatabaseOperation>();
@@ -45,7 +97,15 @@ namespace KalshiBotData.Data
             };
         }
 
-        public async Task ImportSnapshotsFromFilesAsync(CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Executes a SQL Server Agent job to import market snapshot data from external files into the database.
+        /// Monitors the job execution status and waits for completion, with retry logic for transient failures.
+        /// </summary>
+        /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <exception cref="SqlException">Thrown when SQL operations fail after retries.</exception>
+        /// <exception cref="Exception">Thrown when job execution fails or cannot be monitored.</exception>
+        public async Task ExecuteSnapshotImportJobAsync(CancellationToken cancellationToken = default)
         {
             const string jobName = "ImportSnapshots";
 
@@ -141,6 +201,13 @@ namespace KalshiBotData.Data
         
     }
 
+        /// <summary>
+        /// Asynchronously stores order book data from WebSocket messages into the database queue for processing.
+        /// Handles both snapshot (SNP) and delta (DEL) order book updates, converting prices for "no" side orders.
+        /// </summary>
+        /// <param name="data">The JSON element containing the WebSocket message data.</param>
+        /// <param name="offerType">The type of order book update: "SNP" for snapshots or "DEL" for deltas.</param>
+        /// <returns>A completed task since the operation is queued for background processing.</returns>
         public Task StoreOrderBookAsync(JsonElement data, string offerType)
         {
             var msg = data.GetProperty("msg");
@@ -161,7 +228,7 @@ namespace KalshiBotData.Data
                             {
                                 StoredProcedure = "dbo.sp_InsertFeed_OrderBook",
                                 Identifier = marketTicker,
-                                SetParameters = cmd => SetOrderBookParameters(cmd, msg, sid, kalshiSeq.Value, marketTicker, offerType, price, null, side, priceLevel[1].GetInt32())
+                                SetParameters = cmd => SetOrderBookParameters(cmd, msg, sid, kalshiSeq, marketTicker, offerType, price, null, side, priceLevel[1].GetInt32())
                             });
                         }
                     }
@@ -175,13 +242,19 @@ namespace KalshiBotData.Data
                 {
                     StoredProcedure = "dbo.sp_InsertFeed_OrderBook",
                     Identifier = marketTicker,
-                    SetParameters = cmd => SetOrderBookParameters(cmd, msg, sid, kalshiSeq.Value, marketTicker, offerType, price,
+                    SetParameters = cmd => SetOrderBookParameters(cmd, msg, sid, kalshiSeq, marketTicker, offerType, price,
                         msg.GetProperty("delta").GetInt32(), msg.GetProperty("side").GetString() ?? string.Empty, 0)
                 });
             }
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Asynchronously stores ticker data from WebSocket messages into the database queue for processing.
+        /// Captures current market prices, bid/ask spreads, volume, and open interest information.
+        /// </summary>
+        /// <param name="data">The JSON element containing the WebSocket ticker message data.</param>
+        /// <returns>A completed task since the operation is queued for background processing.</returns>
         public Task StoreTickerAsync(JsonElement data)
         {
             var msg = data.GetProperty("msg");
@@ -209,6 +282,12 @@ namespace KalshiBotData.Data
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Asynchronously stores trade execution data from WebSocket messages into the database queue for processing.
+        /// Records trade details including prices, volumes, and taker side information.
+        /// </summary>
+        /// <param name="data">The JSON element containing the WebSocket trade message data.</param>
+        /// <returns>A completed task since the operation is queued for background processing.</returns>
         public Task StoreTradeAsync(JsonElement data)
         {
             var msg = data.GetProperty("msg");
@@ -231,6 +310,12 @@ namespace KalshiBotData.Data
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Asynchronously stores order fill data from WebSocket messages into the database queue for processing.
+        /// Records fill details including trade IDs, order IDs, prices, and execution information.
+        /// </summary>
+        /// <param name="data">The JSON element containing the WebSocket fill message data.</param>
+        /// <returns>A completed task since the operation is queued for background processing.</returns>
         public Task StoreFillAsync(JsonElement data)
         {
             var msg = data.GetProperty("msg");
@@ -261,6 +346,12 @@ namespace KalshiBotData.Data
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Asynchronously stores event lifecycle data from WebSocket messages into the database queue for processing.
+        /// Records event metadata including titles, subtitles, collateral types, and timing information.
+        /// </summary>
+        /// <param name="data">The JSON element containing the WebSocket event lifecycle message data.</param>
+        /// <returns>A completed task since the operation is queued for background processing.</returns>
         public Task StoreEventLifecycleAsync(JsonElement data)
         {
             var msg = data.GetProperty("msg");
@@ -288,6 +379,14 @@ namespace KalshiBotData.Data
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Asynchronously stores market lifecycle data from WebSocket messages into the database queue for processing.
+        /// Records market state changes including open/close times, determination times, and settlement results.
+        /// Validates required market ticker presence before queuing the operation.
+        /// </summary>
+        /// <param name="data">The JSON element containing the WebSocket market lifecycle message data.</param>
+        /// <returns>A completed task since the operation is queued for background processing.</returns>
+        /// <exception cref="ArgumentException">Thrown when required 'msg' or 'market_ticker' properties are missing.</exception>
         public Task StoreMarketLifecycleAsync(JsonElement data)
         {
             // Check if "msg" property exists
@@ -358,6 +457,10 @@ namespace KalshiBotData.Data
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Disposes of the service resources, canceling background worker tasks and cleaning up cancellation tokens.
+        /// Waits for worker tasks to complete gracefully within a timeout period.
+        /// </summary>
         public void Dispose()
         {
             _cts.Cancel();
@@ -367,11 +470,17 @@ namespace KalshiBotData.Data
             }
             catch (AggregateException ex) when (ex.InnerExceptions.All(e => e is OperationCanceledException))
             {
-                _logger.LogDebug("SqlDataService worker tasks were canceled as expected during disposal.");
+                _logger.LogInformation("SqlDataService worker tasks were canceled as expected during disposal.");
             }
             _cts.Dispose();
         }
 
+        /// <summary>
+        /// Determines whether a SQL exception represents a transient error that should be retried.
+        /// Checks against a predefined list of SQL error codes known to be transient in nature.
+        /// </summary>
+        /// <param name="ex">The SQL exception to evaluate.</param>
+        /// <returns>True if the exception is transient and should be retried; otherwise, false.</returns>
         private static bool IsTransient(SqlException ex)
         {
             var transientErrors = new HashSet<int> { 1205, 1222, 49918, 49919, 49920, 4060, 40197, 40501, 40613, 40143, 233, 64 };
@@ -380,6 +489,14 @@ namespace KalshiBotData.Data
 
 
    
+        /// <summary>
+        /// Background worker method that continuously processes database operations from a specific queue.
+        /// Executes stored procedures with retry logic for transient SQL errors and handles specific error conditions.
+        /// </summary>
+        /// <param name="queue">The concurrent queue containing database operations to process.</param>
+        /// <param name="operationName">Descriptive name of the operation type for logging and error handling.</param>
+        /// <param name="cancellationToken">Token to signal when processing should stop.</param>
+        /// <returns>A task representing the asynchronous processing operation.</returns>
         private async Task ProcessQueueAsync(ConcurrentQueue<DatabaseOperation> queue, string operationName, CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -411,7 +528,7 @@ namespace KalshiBotData.Data
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError(ex, "Failed to execute {OperationName} for {Identifier}.", operationName, operation.Identifier);
+                            _logger.LogError(ex, "Failed to execute {OperationName} for {Identifier}", operationName, operation.Identifier);
                         }
                     });
                 }
@@ -421,13 +538,27 @@ namespace KalshiBotData.Data
                 }
             }
         }
-        private void SetOrderBookParameters(SqlCommand cmd, JsonElement msg, int sid, long kalshiSeq,
+        /// <summary>
+        /// Configures the SQL command parameters for order book stored procedure execution.
+        /// Maps WebSocket message data to the required stored procedure parameters.
+        /// </summary>
+        /// <param name="cmd">The SQL command to configure with parameters.</param>
+        /// <param name="msg">The JSON message element containing order book data.</param>
+        /// <param name="sid">The subscription ID for the order book data.</param>
+        /// <param name="kalshiSeq">The Kalshi sequence number for ordering.</param>
+        /// <param name="marketTicker">The market ticker identifier.</param>
+        /// <param name="offerType">The type of order book offer (SNP or DEL).</param>
+        /// <param name="price">The price level for the order book entry.</param>
+        /// <param name="delta">The change in quantity for delta updates (null for snapshots).</param>
+        /// <param name="side">The side of the order book (yes or no).</param>
+        /// <param name="restingContracts">The number of resting contracts at this price level.</param>
+        private void SetOrderBookParameters(SqlCommand cmd, JsonElement msg, int sid, long? kalshiSeq,
             string marketTicker, string offerType, int price, int? delta, string side, int restingContracts)
         {
             cmd.Parameters.AddWithValue("@market_id", msg.TryGetProperty("market_id", out var mid)
                 ? mid.GetString() : "00000000-0000-0000-0000-000000000000");
             cmd.Parameters.AddWithValue("@sid", sid);
-            cmd.Parameters.AddWithValue("@kalshi_seq", kalshiSeq);
+            cmd.Parameters.AddWithValue("@kalshi_seq", (object)kalshiSeq ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@market_ticker", marketTicker);
             cmd.Parameters.AddWithValue("@offer_type", offerType);
             cmd.Parameters.AddWithValue("@price", price);
@@ -436,10 +567,25 @@ namespace KalshiBotData.Data
             cmd.Parameters.AddWithValue("@resting_contracts", restingContracts);
             cmd.Parameters.AddWithValue("@LoggedDate", DateTime.Now);
         }
+        /// <summary>
+        /// Represents a database operation to be executed asynchronously by the background worker tasks.
+        /// Encapsulates the stored procedure name, parameter configuration, and an identifier for logging.
+        /// </summary>
         private struct DatabaseOperation
         {
+            /// <summary>
+            /// The name of the stored procedure to execute.
+            /// </summary>
             public string StoredProcedure { get; init; }
+
+            /// <summary>
+            /// Action delegate that configures the SQL command parameters for the stored procedure.
+            /// </summary>
             public Action<SqlCommand> SetParameters { get; init; }
+
+            /// <summary>
+            /// Identifier for the operation (typically market ticker) used for logging and error tracking.
+            /// </summary>
             public string Identifier { get; init; }
         }
     }

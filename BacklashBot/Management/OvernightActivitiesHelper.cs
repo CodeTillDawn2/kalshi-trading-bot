@@ -43,8 +43,8 @@ namespace BacklashBot.Management
             _logger.LogInformation("OVERNIGHT-Refreshed all likely closed markets.");
             await CalculateOvernightMarketInterestScores(scopeFactory, cancellationToken);
             _logger.LogInformation("OVERNIGHT-Calculated missing market interest scores.");
-            await _sqlDataService.ImportSnapshotsFromFilesAsync(cancellationToken);
-            await _sqlDataService.ImportSnapshotsFromFilesAsync(cancellationToken); //Do twice to make sure we have as few outstanding snapshots as possible when we generate groups
+            await _sqlDataService.ExecuteSnapshotImportJobAsync(cancellationToken);
+            await _sqlDataService.ExecuteSnapshotImportJobAsync(cancellationToken); //Do twice to make sure we have as few outstanding snapshots as possible when we generate groups
             _logger.LogInformation("OVERNIGHT-Imported snapshots from files.");
             await RemoveOldWatches(scopeFactory);
             _logger.LogInformation("OVERNIGHT-Removed old market watches.");

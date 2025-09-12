@@ -10,6 +10,6 @@ namespace BacklashBot.Services.Interfaces
         Task StoreFillAsync(JsonElement data);
         Task StoreEventLifecycleAsync(JsonElement data);
         Task StoreMarketLifecycleAsync(JsonElement data);
-        Task ImportSnapshotsFromFilesAsync(CancellationToken cancellationToken = default);
+        Task ExecuteSnapshotImportJobAsync(CancellationToken cancellationToken = default);
     }
 }
