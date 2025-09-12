@@ -145,9 +145,9 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
-        /// Waits for initial market data to become available after subscribing to a market channel.
-        /// This method polls for market data availability with a timeout to ensure WebSocket data
-        /// has been received before proceeding with initialization.
+        /// Waits for initial market data and the first orderbook snapshot to become available after subscribing to a market channel.
+        /// This method polls for market data availability and ReceivedFirstSnapshot with a timeout to ensure the orderbook
+        /// has been fully populated before proceeding with initialization.
         /// </summary>
         /// <param name="marketTicker">The market ticker symbol to wait for data on.</param>
         /// <returns>A task representing the asynchronous wait operation.</returns>
