@@ -1,4 +1,10 @@
-// Overseer.cs
+/// <summary>
+/// Central orchestrator for the KalshiBot Overseer system that manages WebSocket connections,
+/// handles real-time market data events, coordinates periodic data fetching, and maintains
+/// system health monitoring. This class serves as the main entry point for overseer operations,
+/// integrating with WebSocket clients, database services, and SignalR hubs to provide
+/// comprehensive monitoring and control of the trading bot ecosystem.
+/// </summary>
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -14,6 +20,13 @@ using KalshiBotOverseer.Services;
 
 namespace KalshiBotOverseer
 {
+    /// <summary>
+    /// Central orchestrator for the KalshiBot Overseer system that manages WebSocket connections,
+    /// handles real-time market data events, coordinates periodic data fetching, and maintains
+    /// system health monitoring. This class serves as the main entry point for overseer operations,
+    /// integrating with WebSocket clients, database services, and SignalR hubs to provide
+    /// comprehensive monitoring and control of the trading bot ecosystem.
+    /// </summary>
     public class Overseer : IDisposable
     {
         private readonly IKalshiWebSocketClient _webSocketClient;
@@ -22,10 +35,17 @@ namespace KalshiBotOverseer
         private readonly IHubContext<ChartHub> _hubContext;
         private Timer? _apiFetchTimer;
         private CancellationTokenSource? _apiFetchCancellationTokenSource;
-        private Timer? _overseerLogTimer;
-        private CancellationTokenSource? _overseerLogCancellationTokenSource;
+        private Timer? _systemInfoLogTimer;
+        private CancellationTokenSource? _systemInfoLogCancellationTokenSource;
         private bool _disposed = false;
 
+        /// <summary>
+        /// Initializes a new instance of the Overseer class with required dependencies.
+        /// </summary>
+        /// <param name="webSocketClient">WebSocket client for real-time market data streaming.</param>
+        /// <param name="scopeFactory">Factory for creating service scopes for dependency injection.</param>
+        /// <param name="logger">Logger for recording system events and diagnostics.</param>
+        /// <param name="hubContext">SignalR hub context for real-time client communication.</param>
         public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, IHubContext<ChartHub> hubContext)
         {
             _webSocketClient = webSocketClient;
@@ -34,68 +54,89 @@ namespace KalshiBotOverseer
             _hubContext = hubContext;
         }
 
+        /// <summary>
+        /// Starts the overseer system by initializing logging, subscribing to WebSocket events,
+        /// and beginning periodic data fetching and system monitoring operations.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task Start()
         {
-            // Log overseer IP to database
-            await LogOverseerInfoAsync();
+            // Log system information to database for monitoring
+            await LogSystemInfoAsync();
 
-            // Log all BrainPersistence information for debugging
-            await LogAllBrainPersistenceInfoAsync();
+            // Log comprehensive brain persistence state for debugging and monitoring
+            await LogBrainPersistenceStateAsync();
 
-            // Subscribe to the specific events
-            _webSocketClient.FillReceived += OnFillReceived;
-            _webSocketClient.MarketLifecycleReceived += OnMarketLifecycleReceived;
-            _webSocketClient.EventLifecycleReceived += OnEventLifecycleReceived;
+            // Subscribe to WebSocket events for real-time market data processing
+            _webSocketClient.FillReceived += HandleFillEvent;
+            _webSocketClient.MarketLifecycleReceived += HandleMarketLifecycleEvent;
+            _webSocketClient.EventLifecycleReceived += HandleEventLifecycleEvent;
 
             _logger?.LogInformation("Subscribed to Fill, MarketLifecycle, and EventLifecycle events.");
 
-            StartPeriodicApiFetching();
-            StartPeriodicOverseerLogging();
+            StartApiDataFetchTimer();
+            StartSystemInfoLoggingTimer();
         }
 
+        /// <summary>
+        /// Stops the overseer system by unsubscribing from events and halting periodic operations.
+        /// </summary>
         public void Stop()
         {
             Unsubscribe();
             _logger?.LogInformation("Unsubscribed from events.");
         }
 
+        /// <summary>
+        /// Unsubscribes from all WebSocket events to prevent memory leaks and ensure clean shutdown.
+        /// </summary>
         private void Unsubscribe()
         {
             if (_disposed) return;
-            _webSocketClient.FillReceived -= OnFillReceived;
-            _webSocketClient.MarketLifecycleReceived -= OnMarketLifecycleReceived;
-            _webSocketClient.EventLifecycleReceived -= OnEventLifecycleReceived;
+            _webSocketClient.FillReceived -= HandleFillEvent;
+            _webSocketClient.MarketLifecycleReceived -= HandleMarketLifecycleEvent;
+            _webSocketClient.EventLifecycleReceived -= HandleEventLifecycleEvent;
         }
 
-        private void OnFillReceived(object? sender, FillEventArgs e)
+        /// <summary>
+        /// Handles fill events from the WebSocket feed, processing trade execution data.
+        /// Currently logs the event for monitoring purposes.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">Event arguments containing fill data.</param>
+        private void HandleFillEvent(object? sender, FillEventArgs e)
         {
-            // Handle the fill event (e.g., log or process)
             _logger?.LogInformation("Received Fill event: {EventData}", e);
-
-            // Fill event processed
         }
 
-        private void OnMarketLifecycleReceived(object? sender, MarketLifecycleEventArgs e)
+        /// <summary>
+        /// Handles market lifecycle events from the WebSocket feed, processing market state changes.
+        /// Currently logs the event for monitoring purposes.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">Event arguments containing market lifecycle data.</param>
+        private void HandleMarketLifecycleEvent(object? sender, MarketLifecycleEventArgs e)
         {
-            // Handle the market lifecycle event
             _logger?.LogInformation("Received MarketLifecycle event: {EventData}", e);
-
-            // Market lifecycle event processed
         }
 
-        private async void OnEventLifecycleReceived(object? sender, EventLifecycleEventArgs e)
+        /// <summary>
+        /// Handles event lifecycle events from the WebSocket feed, processing event state changes
+        /// and coordinating with brain instances through check-in data.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">Event arguments containing event lifecycle data.</param>
+        private async void HandleEventLifecycleEvent(object? sender, EventLifecycleEventArgs e)
         {
-            // Handle the event lifecycle event
             _logger?.LogInformation("Received EventLifecycle event: {EventData}", e);
 
-            // Check if this is a check-in from a bot
+            // Process check-in data from brain instances
             try
             {
-                // e.Data is JsonElement, deserialize it
                 var checkInData = JsonSerializer.Deserialize<CheckInData>(e.Data.GetRawText());
                 if (checkInData != null)
                 {
-                    // Send CheckInUpdate to all connected clients
+                    // Broadcast check-in update to all connected SignalR clients
                     await _hubContext.Clients.All.SendAsync("CheckInUpdate", new
                     {
                         BrainInstanceName = checkInData.BrainInstanceName,
@@ -114,31 +155,30 @@ namespace KalshiBotOverseer
             {
                 _logger?.LogWarning(ex, "Failed to process check-in from EventLifecycle event");
             }
-
-            // Event lifecycle event processed
         }
 
         /// <summary>
-        /// Starts periodic fetching of announcements and exchange schedule data every minute
+        /// Starts periodic fetching of announcements and exchange schedule data every 10 minutes.
+        /// This ensures the system stays synchronized with Kalshi's API data.
         /// </summary>
-        public void StartPeriodicApiFetching()
+        public void StartApiDataFetchTimer()
         {
             if (_apiFetchTimer != null)
             {
-                _logger?.LogWarning("Periodic API fetching is already running");
+                _logger?.LogWarning("Periodic API data fetching is already running");
                 return;
             }
 
             _apiFetchCancellationTokenSource = new CancellationTokenSource();
-            _apiFetchTimer = new Timer(async _ => await FetchApiDataAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(10));
+            _apiFetchTimer = new Timer(async _ => await FetchApiDataPeriodicallyAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(10));
 
-            _logger?.LogInformation("Started periodic API fetching every minute");
+            _logger?.LogInformation("Started periodic API data fetching every 10 minutes");
         }
 
         /// <summary>
-        /// Stops periodic fetching of API data
+        /// Stops periodic fetching of API data and cleans up resources.
         /// </summary>
-        public void StopPeriodicApiFetching()
+        public void StopApiDataFetchTimer()
         {
             if (_apiFetchTimer != null)
             {
@@ -153,51 +193,52 @@ namespace KalshiBotOverseer
                 _apiFetchCancellationTokenSource = null;
             }
 
-            _logger?.LogInformation("Stopped periodic API fetching");
+            _logger?.LogInformation("Stopped periodic API data fetching");
         }
 
         /// <summary>
-        /// Starts periodic logging of overseer info every minute
+        /// Starts periodic logging of system information every minute for monitoring purposes.
         /// </summary>
-        public void StartPeriodicOverseerLogging()
+        public void StartSystemInfoLoggingTimer()
         {
-            if (_overseerLogTimer != null)
+            if (_systemInfoLogTimer != null)
             {
-                _logger?.LogWarning("Periodic overseer logging is already running");
+                _logger?.LogWarning("Periodic system info logging is already running");
                 return;
             }
 
-            _overseerLogCancellationTokenSource = new CancellationTokenSource();
-            _overseerLogTimer = new Timer(async _ => await LogOverseerInfoPeriodicallyAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+            _systemInfoLogCancellationTokenSource = new CancellationTokenSource();
+            _systemInfoLogTimer = new Timer(async _ => await LogSystemInfoPeriodicallyAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
-            _logger?.LogInformation("Started periodic overseer logging every minute");
+            _logger?.LogInformation("Started periodic system info logging every minute");
         }
 
         /// <summary>
-        /// Stops periodic logging of overseer info
+        /// Stops periodic logging of system information and cleans up resources.
         /// </summary>
-        public void StopPeriodicOverseerLogging()
+        public void StopSystemInfoLoggingTimer()
         {
-            if (_overseerLogTimer != null)
+            if (_systemInfoLogTimer != null)
             {
-                _overseerLogTimer.Dispose();
-                _overseerLogTimer = null;
+                _systemInfoLogTimer.Dispose();
+                _systemInfoLogTimer = null;
             }
 
-            if (_overseerLogCancellationTokenSource != null)
+            if (_systemInfoLogCancellationTokenSource != null)
             {
-                _overseerLogCancellationTokenSource.Cancel();
-                _overseerLogCancellationTokenSource.Dispose();
-                _overseerLogCancellationTokenSource = null;
+                _systemInfoLogCancellationTokenSource.Cancel();
+                _systemInfoLogCancellationTokenSource.Dispose();
+                _systemInfoLogCancellationTokenSource = null;
             }
 
-            _logger?.LogInformation("Stopped periodic overseer logging");
+            _logger?.LogInformation("Stopped periodic system info logging");
         }
 
         /// <summary>
-        /// Fetches announcements and exchange schedule data from Kalshi API
+        /// Periodically fetches announcements and exchange schedule data from Kalshi API
+        /// to keep the system synchronized with current market information.
         /// </summary>
-        private async Task FetchApiDataAsync()
+        private async Task FetchApiDataPeriodicallyAsync()
         {
             try
             {
@@ -228,9 +269,10 @@ namespace KalshiBotOverseer
         }
 
         /// <summary>
-        /// Logs overseer information including IP address to database
+        /// Logs system information including IP address and hostname to the database
+        /// for monitoring and discovery purposes.
         /// </summary>
-        private async Task LogOverseerInfoAsync()
+        private async Task LogSystemInfoAsync()
         {
             try
             {
@@ -256,142 +298,85 @@ namespace KalshiBotOverseer
                 };
 
                 await context.AddOrUpdateOverseerInfo(overseerInfo);
-                _logger?.LogInformation("OVERSEER- Overseer info: {HostName} at {IPAddress}:{Port}", hostName, localIP, 5000);
+                _logger?.LogInformation("System info logged: {HostName} at {IPAddress}:{Port}", hostName, localIP, 5000);
             }
             catch (Exception ex)
             {
-                _logger?.LogWarning(ex, "OVERSEER- Failed to log overseer info to database");
+                _logger?.LogWarning(ex, "Failed to log system info to database");
             }
         }
 
         /// <summary>
-        /// Periodically logs overseer info
+        /// Periodically logs system information for monitoring purposes.
         /// </summary>
-        private async Task LogOverseerInfoPeriodicallyAsync()
+        private async Task LogSystemInfoPeriodicallyAsync()
         {
             try
             {
-                if (_overseerLogCancellationTokenSource?.IsCancellationRequested == true)
+                if (_systemInfoLogCancellationTokenSource?.IsCancellationRequested == true)
                     return;
 
-                await LogOverseerInfoAsync();
+                await LogSystemInfoAsync();
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error during periodic overseer logging: {Message}", ex.Message);
+                _logger?.LogError(ex, "Error during periodic system info logging: {Message}", ex.Message);
             }
         }
 
         /// <summary>
-        /// Logs comprehensive information about all BrainPersistence objects for debugging
+        /// Logs comprehensive information about all brain persistence objects for monitoring and debugging.
+        /// Provides a summary of brain states, configurations, and performance metrics.
         /// </summary>
-        private async Task LogAllBrainPersistenceInfoAsync()
+        private async Task LogBrainPersistenceStateAsync()
         {
             try
             {
                 using var scope = _scopeFactory.CreateScope();
                 var brainService = scope.ServiceProvider.GetRequiredService<BrainPersistenceService>();
 
-                _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: BrainPersistence logging initialized. Service available: {Available}",
-                    brainService != null);
-
                 var allBrains = brainService.GetAllBrains();
-                var brainCount = 0;
+                var brainCount = allBrains.Count();
+
+                _logger?.LogInformation("Brain persistence state: {BrainCount} brain instances found", brainCount);
 
                 foreach (var brain in allBrains)
                 {
-                    brainCount++;
-                    _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' - Mode: {Mode}, CurrentMarkets: {CurrentMarketCount}, TargetMarkets: {TargetMarketCount}, ErrorCount: {ErrorCount}, LastSeen: {LastSeen}, IsWebSocketConnected: {WebSocketStatus}",
+                    _logger?.LogInformation("Brain '{BrainName}': Mode={Mode}, Markets={CurrentCount}/{TargetCount}, Errors={ErrorCount}, Connected={WebSocketStatus}",
                         brain.BrainInstanceName,
                         brain.Mode,
                         brain.CurrentMarketTickers?.Count ?? 0,
                         brain.TargetMarketTickers?.Count ?? 0,
                         brain.ErrorCount,
-                        brain.LastSeen,
                         brain.IsWebSocketConnected);
 
-                    // Log configuration settings
-                    _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' Config - WatchPositions: {WatchPositions}, WatchOrders: {WatchOrders}, ManagedWatchList: {ManagedWatchList}, CaptureSnapshots: {CaptureSnapshots}, TargetWatches: {TargetWatches}",
-                        brain.BrainInstanceName,
-                        brain.WatchPositions,
-                        brain.WatchOrders,
-                        brain.ManagedWatchList,
-                        brain.CaptureSnapshots,
-                        brain.TargetWatches);
-
-                    // Log performance settings
-                    _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' Performance - MinInterest: {MinInterest}, UsageMin: {UsageMin}, UsageMax: {UsageMax}, IsStartingUp: {StartingUp}, IsShuttingDown: {ShuttingDown}",
-                        brain.BrainInstanceName,
-                        brain.MinimumInterest,
-                        brain.UsageMin,
-                        brain.UsageMax,
-                        brain.IsStartingUp,
-                        brain.IsShuttingDown);
-
-                    // Log historical data counts
-                    _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' History Counts - CPU: {CpuCount}, Events: {EventCount}, Tickers: {TickerCount}, Notifications: {NotificationCount}, Orderbook: {OrderbookCount}, Markets: {MarketCount}, Errors: {ErrorCount}",
-                        brain.BrainInstanceName,
-                        brain.CpuUsageHistory?.Count ?? 0,
-                        brain.EventQueueHistory?.Count ?? 0,
-                        brain.TickerQueueHistory?.Count ?? 0,
-                        brain.NotificationQueueHistory?.Count ?? 0,
-                        brain.OrderbookQueueHistory?.Count ?? 0,
-                        brain.MarketCountHistory?.Count ?? 0,
-                        brain.ErrorHistory?.Count ?? 0);
-
-                    // Log refresh metrics history counts
-                    _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' Refresh History - CycleSeconds: {CycleSecondsCount}, CycleInterval: {CycleIntervalCount}, MarketCount: {MarketCountHistory}, Usage%: {UsagePercentCount}, SampleDates: {SampleDateCount}, LastRefreshAcceptable: {LastRefreshAcceptable}",
-                        brain.BrainInstanceName,
-                        brain.RefreshCycleSecondsHistory?.Count ?? 0,
-                        brain.RefreshCycleIntervalHistory?.Count ?? 0,
-                        brain.RefreshMarketCountHistory?.Count ?? 0,
-                        brain.RefreshUsagePercentageHistory?.Count ?? 0,
-                        brain.PerformanceSampleDateHistory?.Count ?? 0,
-                        brain.LastRefreshTimeAcceptable);
-
-                    // Log current market tickers (first 10 for brevity)
+                    // Log market tickers summary (first 5 for brevity)
                     if (brain.CurrentMarketTickers != null && brain.CurrentMarketTickers.Count > 0)
                     {
-                        var tickersToShow = brain.CurrentMarketTickers.Take(10);
-                        _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' Current Tickers ({TotalCount}): {Tickers}",
+                        var tickersToShow = brain.CurrentMarketTickers.Take(5);
+                        _logger?.LogInformation("Brain '{BrainName}' markets: {Tickers}{Overflow}",
                             brain.BrainInstanceName,
-                            brain.CurrentMarketTickers.Count,
-                            string.Join(", ", tickersToShow));
-                    }
-
-                    // Log target market tickers (first 10 for brevity)
-                    if (brain.TargetMarketTickers != null && brain.TargetMarketTickers.Count > 0)
-                    {
-                        var tickersToShow = brain.TargetMarketTickers.Take(10);
-                        _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Brain '{BrainName}' Target Tickers ({TotalCount}): {Tickers}",
-                            brain.BrainInstanceName,
-                            brain.TargetMarketTickers.Count,
-                            string.Join(", ", tickersToShow));
+                            string.Join(", ", tickersToShow),
+                            brain.CurrentMarketTickers.Count > 5 ? $" (+{brain.CurrentMarketTickers.Count - 5} more)" : "");
                     }
                 }
 
-                _logger?.LogInformation("BRAIN-PERSISTENCE-DEBUG: Completed logging for {BrainCount} brain instances", brainCount);
+                _logger?.LogInformation("Completed brain persistence state logging");
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "BRAIN-PERSISTENCE-DEBUG: Failed to log BrainPersistence information");
+                _logger?.LogError(ex, "Failed to log brain persistence state");
             }
         }
 
         /// <summary>
-        /// Manually triggers a single API data fetch (useful for testing)
+        /// Disposes of the overseer and cleans up all resources including timers and event subscriptions.
         /// </summary>
-        public async Task TriggerManualApiFetchAsync()
-        {
-            _logger?.LogInformation("Manual API fetch triggered");
-            await FetchApiDataAsync();
-        }
-
         public void Dispose()
         {
             if (_disposed) return;
-            StopPeriodicApiFetching();
-            StopPeriodicOverseerLogging();
+            StopApiDataFetchTimer();
+            StopSystemInfoLoggingTimer();
             Unsubscribe();
             _disposed = true;
         }
