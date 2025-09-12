@@ -18,12 +18,12 @@ namespace SimulatorWinForms
                 components.Dispose();
             }
 
-            // Clean up navigation timer
-            if (_navigationTimer != null)
+            // Clean up chart update timer
+            if (_chartUpdateTimer != null)
             {
-                _navigationTimer.Stop();
-                _navigationTimer.Dispose();
-                _navigationTimer = null;
+                _chartUpdateTimer.Stop();
+                _chartUpdateTimer.Dispose();
+                _chartUpdateTimer = null;
             }
 
             base.Dispose(disposing);
@@ -367,7 +367,6 @@ namespace SimulatorWinForms
             leftColumn.RowStyles.Add(new RowStyle(SizeType.Percent, 53.0516434F));
             leftColumn.Size = new Size(150, 426);
             leftColumn.TabIndex = 0;
-            leftColumn.Paint += leftColumn_Paint;
             // 
             // pricesGrid
             // 
@@ -1848,7 +1847,6 @@ namespace SimulatorWinForms
             positionsLayout.RowStyles.Add(new RowStyle());
             positionsLayout.Size = new Size(561, 179);
             positionsLayout.TabIndex = 0;
-            positionsLayout.Paint += positionsLayout_Paint;
             // 
             // strategyOutputTextbox
             // 

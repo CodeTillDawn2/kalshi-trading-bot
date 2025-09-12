@@ -9,6 +9,20 @@ using TradingSimulator.TestObjects;
 
 namespace SimulatorWinForms
 {
+    /// <summary>
+    /// A comprehensive Windows Forms user control for visualizing and analyzing Kalshi trading market snapshots.
+    /// Provides interactive charts, order book display, technical indicators, and navigation through historical market data.
+    /// Supports both real-time and historical snapshot analysis with advanced charting capabilities including panning, zooming, and technical overlays.
+    /// </summary>
+    /// <remarks>
+    /// This control serves as the primary interface for backtesting and analyzing trading strategies against historical market data.
+    /// It integrates with the KalshiBotContext for data access and provides rich visualization of market dynamics including:
+    /// - Price charts with technical indicators (RSI, MACD, EMA, Bollinger Bands, etc.)
+    /// - Order book visualization with bid/ask spreads
+    /// - Market metrics and trading signals
+    /// - Interactive navigation through time series data
+    /// - Support for simulated position and strategy analysis
+    /// </remarks>
     public partial class SnapshotViewer : UserControl
     {
         private MarketSnapshot currentSnapshot;
@@ -16,26 +30,59 @@ namespace SimulatorWinForms
         private int currentIndex;
         private List<string> memos;
         private string memoText = "";
-        private bool _isEvaluatingChartFilters = false; // Flag to prevent conflicts between UpdateChart and EvaluateChartFilters
-        private int _simulatedPosition = 0;
-        private double _averageCost = 0.0;
-        private int _simulatedRestingOrders = 0;
-        private List<PricePoint> _positionPoints = new List<PricePoint>();
-        private List<PricePoint> _averageCostPoints = new List<PricePoint>();
-        private List<PricePoint> _restingOrdersPoints = new List<PricePoint>();
-        private List<PricePoint> _patternPoints = new List<PricePoint>();
+        /// <summary>
+        /// Flag to prevent recursive conflicts between chart update operations.
+        /// Set to true during chart filter evaluation to avoid simultaneous updates.
+        /// </summary>
+        private bool _isEvaluatingChartFilters = false;
+        private int _hypotheticalPositionSize = 0;
+        private double _hypotheticalAverageCost = 0.0;
+        private int _hypotheticalRestingOrdersCount = 0;
+        private List<PricePoint> _historicalPositionDataPoints = new List<PricePoint>();
+        private List<PricePoint> _historicalAverageCostDataPoints = new List<PricePoint>();
+        private List<PricePoint> _historicalRestingOrdersDataPoints = new List<PricePoint>();
+        private List<PricePoint> _historicalPatternDataPoints = new List<PricePoint>();
         private readonly KalshiBotContext _context;
 
         public Action BackAction { get; set; }
 
         public string CacheDir { get; set; }  // New property to receive cache dir from MainForm
 
-        // Original dimensions for scaling reference (based on designer default size)
+        /// <summary>
+        /// Original control width in pixels used as baseline for responsive scaling calculations.
+        /// </summary>
         private const int OriginalWidth = 933;
-        private const int OriginalHeight = 692;
-        private const float MinScale = 0.8f;  // Minimum font scale (80% of original)
-        private const float MaxScale = 2.0f;  // Maximum font scale (200% of original)
 
+        /// <summary>
+        /// Original control height in pixels used as baseline for responsive scaling calculations.
+        /// </summary>
+        private const int OriginalHeight = 692;
+
+        /// <summary>
+        /// Minimum allowed font scaling factor (80% of original size) to maintain readability.
+        /// </summary>
+        private const float MinScale = 0.8f;
+
+        /// <summary>
+        /// Maximum allowed font scaling factor (200% of original size) to prevent UI overflow.
+        /// </summary>
+        private const float MaxScale = 2.0f;
+
+        /// <summary>
+        /// Initializes a new instance of the SnapshotViewer control.
+        /// Sets up the user interface, configures chart controls, initializes navigation systems,
+        /// and establishes event handlers for interactive functionality.
+        /// </summary>
+        /// <remarks>
+        /// This constructor performs comprehensive initialization including:
+        /// - Component initialization and layout setup
+        /// - Database context configuration for market data access
+        /// - Chart configuration (disabling built-in pan/zoom for custom controls)
+        /// - Mouse and keyboard event handler registration
+        /// - Navigation timer setup for deferred chart updates
+        /// - Typography system initialization for responsive scaling
+        /// - Tooltip configuration for user guidance
+        /// </remarks>
         public SnapshotViewer()
         {
             InitializeComponent();
@@ -81,7 +128,7 @@ namespace SimulatorWinForms
             orderbookGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             orderbookGrid.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
 
-            AddMouseDownHandlers(this);
+            RegisterMouseDownHandlers(this);
 
             // Add resize handler for dynamic scaling
             this.Resize += SnapshotViewer_ResizeEnd;
@@ -103,18 +150,15 @@ namespace SimulatorWinForms
             secondaryChart.MouseWheel += SecondaryChart_MouseWheel;
 
             // Initialize navigation timer for deferred updates
-            _navigationTimer = new System.Windows.Forms.Timer();
-            _navigationTimer.Interval = 300; // 300ms delay after user stops pressing keys
-            _navigationTimer.Tick += NavigationTimer_Tick;
-
-            // Add chart synchronization
-            SetupChartSynchronization();
+            _chartUpdateTimer = new System.Windows.Forms.Timer();
+            _chartUpdateTimer.Interval = 300; // 300ms delay after user stops pressing keys
+            _chartUpdateTimer.Tick += NavigationTimer_Tick;
 
             // Add panning support for snapshot viewer charts
-            SetupChartPanning();
+            InitializeChartPanning();
 
             // Add detailed tooltips for trading metrics
-            SetupTooltips();
+            ConfigureTooltips();
 
             // Ensure secondary chart is properly initialized
             secondaryChart.Visible = false; // Start hidden, will be shown when metrics are checked
@@ -122,13 +166,8 @@ namespace SimulatorWinForms
             secondaryChart.Plot.AxisAutoY();
         }
 
-        private void SetupChartSynchronization()
-        {
-            // Removed synchronization with secondary chart on mouse up
-            // Secondary chart now maintains its own independent view
-        }
 
-        private void SetupChartPanning()
+        private void InitializeChartPanning()
         {
             // Add right-click panning support to both charts
             // Make sure to remove any existing handlers first to avoid duplicates
@@ -160,27 +199,75 @@ namespace SimulatorWinForms
             secondaryChart.Enabled = true;
         }
 
-        private (double xMin, double xMax)? _fullDataRange; // Store full data range for zoom bounds
-        private System.Windows.Forms.Timer _navigationTimer; // Timer for deferred chart updates during navigation
+        /// <summary>
+        /// Cached range of all historical data points for zoom boundary enforcement.
+        /// Prevents zooming out beyond available data range.
+        /// </summary>
+        private (double xMin, double xMax)? _fullChartDataRange;
 
-        // Progressive speed navigation fields
-        private int _consecutiveNavigations = 0; // Track consecutive navigation steps
-        private DateTime _lastNavigationTime = DateTime.MinValue; // Track timing for speed acceleration
-        private int _navigationStepSize = 1; // Current step size (1, 2, 5, or 60)
+        /// <summary>
+        /// Timer for deferring expensive chart rendering operations during rapid navigation.
+        /// Allows immediate UI updates while batching complex chart operations.
+        /// </summary>
+        private System.Windows.Forms.Timer _chartUpdateTimer;
 
-        // Cursor line fields
-        private ScottPlot.Plottable.IPlottable? _cursorLine; // Light grey line following mouse cursor
+        /// <summary>
+        /// Counter tracking consecutive navigation actions for progressive speed acceleration.
+        /// Resets to zero when navigation pauses, enabling speed ramp-up.
+        /// </summary>
+        private int _navigationSpeedCounter = 0;
 
-        // Removed CheckAndSyncSecondaryChart method - secondary chart now independent
+        /// <summary>
+        /// Timestamp of the last navigation action for detecting pause periods.
+        /// Used to reset speed acceleration when user stops rapid navigation.
+        /// </summary>
+        private DateTime _lastNavigationTimestamp = DateTime.MinValue;
 
-        // Removed SyncSecondaryChart methods - secondary chart now independent
+        /// <summary>
+        /// Current navigation step size (1, 2, 5, or 60 snapshots per action).
+        /// Increases with consecutive navigations for efficient browsing of large datasets.
+        /// </summary>
+        private int _currentNavigationStepSize = 1;
 
-        // Panning support for snapshot viewer charts
-        private bool _isPriceChartPanning = false;
+        /// <summary>
+        /// Interactive cursor line that follows mouse movement on charts.
+        /// Provides visual feedback for precise time position identification.
+        /// </summary>
+        private ScottPlot.Plottable.IPlottable? _mouseCursorLine;
+
+
+        /// <summary>
+        /// Flag indicating whether the main price chart is currently being panned via right-click drag.
+        /// </summary>
+        private bool _isMainChartPanning = false;
+
+        /// <summary>
+        /// Flag indicating whether the secondary chart is currently being panned via right-click drag.
+        /// </summary>
         private bool _isSecondaryChartPanning = false;
-        private Point _priceChartPanStartPx;
-        private Point _secondaryChartPanStartPx;
-        private (double xMin, double xMax, double yMin, double yMax) _priceChartPanStartLimits;
+
+        /// <summary>
+        /// Starting pixel coordinates for main chart panning operation.
+        /// Used to calculate drag deltas during right-click panning.
+        /// </summary>
+        private Point _mainChartPanStartPixel;
+
+        /// <summary>
+        /// Starting pixel coordinates for secondary chart panning operation.
+        /// Used to calculate drag deltas during right-click panning.
+        /// </summary>
+        private Point _secondaryChartPanStartPixel;
+
+        /// <summary>
+        /// Axis limits of the main chart at the start of panning operation.
+        /// Preserved to calculate relative movement during drag operations.
+        /// </summary>
+        private (double xMin, double xMax, double yMin, double yMax) _mainChartPanStartLimits;
+
+        /// <summary>
+        /// Axis limits of the secondary chart at the start of panning operation.
+        /// Preserved to calculate relative movement during drag operations.
+        /// </summary>
         private (double xMin, double xMax, double yMin, double yMax) _secondaryChartPanStartLimits;
 
         private void PriceChart_MouseDown(object sender, MouseEventArgs e)
@@ -188,10 +275,10 @@ namespace SimulatorWinForms
             if (e.Button == MouseButtons.Right)
             {
                 // Start panning
-                _isPriceChartPanning = true;
-                _priceChartPanStartPx = e.Location;
+                _isMainChartPanning = true;
+                _mainChartPanStartPixel = e.Location;
                 var lim = priceChart.Plot.GetAxisLimits();
-                _priceChartPanStartLimits = (lim.XMin, lim.XMax, lim.YMin, lim.YMax);
+                _mainChartPanStartLimits = (lim.XMin, lim.XMax, lim.YMin, lim.YMax);
                 priceChart.Cursor = Cursors.SizeAll;
 
                 // Note: Custom panning logic will override ScottPlot's default right-click behavior
@@ -200,13 +287,13 @@ namespace SimulatorWinForms
 
         private void PriceChart_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_isPriceChartPanning && e.Button == MouseButtons.Right)
+            if (_isMainChartPanning && e.Button == MouseButtons.Right)
             {
                 // Compute data-space deltas from pixel movement
                 double xNow = priceChart.Plot.GetCoordinateX(e.X);
-                double xStart = priceChart.Plot.GetCoordinateX(_priceChartPanStartPx.X);
+                double xStart = priceChart.Plot.GetCoordinateX(_mainChartPanStartPixel.X);
                 double yNow = priceChart.Plot.GetCoordinateY(e.Y);
-                double yStart = priceChart.Plot.GetCoordinateY(_priceChartPanStartPx.Y);
+                double yStart = priceChart.Plot.GetCoordinateY(_mainChartPanStartPixel.Y);
 
                 double dx = xNow - xStart;
                 double dy = yNow - yStart;
@@ -215,10 +302,10 @@ namespace SimulatorWinForms
                 if (Math.Abs(dx) > 0.001 || Math.Abs(dy) > 0.001)
                 {
                     priceChart.Plot.SetAxisLimits(
-                        _priceChartPanStartLimits.xMin - dx,
-                        _priceChartPanStartLimits.xMax - dx,
-                        _priceChartPanStartLimits.yMin - dy,
-                        _priceChartPanStartLimits.yMax - dy);
+                        _mainChartPanStartLimits.xMin - dx,
+                        _mainChartPanStartLimits.xMax - dx,
+                        _mainChartPanStartLimits.yMin - dy,
+                        _mainChartPanStartLimits.yMax - dy);
 
                     // Single refresh to minimize flicker
                     priceChart.Refresh();
@@ -228,11 +315,11 @@ namespace SimulatorWinForms
 
         private void PriceChart_MouseUp(object sender, MouseEventArgs e)
         {
-            if (_isPriceChartPanning)
+            if (_isMainChartPanning)
             {
-                _isPriceChartPanning = false;
+                _isMainChartPanning = false;
                 priceChart.Cursor = Cursors.Default;
-                _priceChartPanStartPx = Point.Empty;
+                _mainChartPanStartPixel = Point.Empty;
             }
         }
 
@@ -242,7 +329,7 @@ namespace SimulatorWinForms
             {
                 // Start panning
                 _isSecondaryChartPanning = true;
-                _secondaryChartPanStartPx = e.Location;
+                _secondaryChartPanStartPixel = e.Location;
                 var lim = secondaryChart.Plot.GetAxisLimits();
                 _secondaryChartPanStartLimits = (lim.XMin, lim.XMax, lim.YMin, lim.YMax);
                 secondaryChart.Cursor = Cursors.SizeAll;
@@ -255,9 +342,9 @@ namespace SimulatorWinForms
             {
                 // Compute data-space deltas from pixel movement
                 double xNow = secondaryChart.Plot.GetCoordinateX(e.X);
-                double xStart = secondaryChart.Plot.GetCoordinateX(_secondaryChartPanStartPx.X);
+                double xStart = secondaryChart.Plot.GetCoordinateX(_secondaryChartPanStartPixel.X);
                 double yNow = secondaryChart.Plot.GetCoordinateY(e.Y);
-                double yStart = secondaryChart.Plot.GetCoordinateY(_secondaryChartPanStartPx.Y);
+                double yStart = secondaryChart.Plot.GetCoordinateY(_secondaryChartPanStartPixel.Y);
 
                 double dx = xNow - xStart;
                 double dy = yNow - yStart;
@@ -284,7 +371,7 @@ namespace SimulatorWinForms
             {
                 _isSecondaryChartPanning = false;
                 secondaryChart.Cursor = Cursors.Default;
-                _secondaryChartPanStartPx = Point.Empty;
+                _secondaryChartPanStartPixel = Point.Empty;
             }
         }
 
@@ -334,21 +421,36 @@ namespace SimulatorWinForms
             double xPos = chart.Plot.GetCoordinateX(e.X);
 
             // Add new cursor line
-            _cursorLine = chart.Plot.AddVerticalLine(xPos, Color.LightGray, 1, ScottPlot.LineStyle.Dash);
+            _mouseCursorLine = chart.Plot.AddVerticalLine(xPos, Color.LightGray, 1, ScottPlot.LineStyle.Dash);
             chart.Refresh();
         }
 
         private void RemoveCursorLine(ScottPlot.FormsPlot chart)
         {
-            if (_cursorLine != null)
+            if (_mouseCursorLine != null)
             {
                 // Remove the cursor line
-                chart.Plot.Remove(_cursorLine);
-                _cursorLine = null;
+                chart.Plot.Remove(_mouseCursorLine);
+                _mouseCursorLine = null;
                 chart.Refresh();
             }
         }
 
+        /// <summary>
+        /// Handles click-to-jump functionality, allowing users to click on chart positions to navigate to specific snapshots.
+        /// Finds the closest historical snapshot to the clicked time position and navigates to it.
+        /// </summary>
+        /// <param name="chart">The chart control that was clicked (primary or secondary).</param>
+        /// <param name="e">Mouse event arguments containing click coordinates.</param>
+        /// <remarks>
+        /// This method provides intuitive time navigation:
+        /// - Converts pixel coordinates to data time coordinates
+        /// - Finds nearest historical snapshot by timestamp proximity
+        /// - Updates current snapshot and navigation state
+        /// - Adjusts main chart zoom when clicking secondary chart
+        /// - Triggers immediate UI updates for responsive interaction
+        /// - Resets navigation speed counters for fresh interaction
+        /// </remarks>
         private async void JumpToClickedPosition(ScottPlot.FormsPlot chart, MouseEventArgs e)
         {
             if (historySnapshots == null || historySnapshots.Count == 0) return;
@@ -381,8 +483,8 @@ namespace SimulatorWinForms
                     memoText = memos != null && newIndex < memos.Count ? memos[newIndex] : "";
 
                     // Update position and average cost for current snapshot
-                    _simulatedPosition = currentSnapshot.PositionSize;
-                    _averageCost = currentSnapshot.BuyinPrice;
+                    _hypotheticalPositionSize = currentSnapshot.PositionSize;
+                    _hypotheticalAverageCost = currentSnapshot.BuyinPrice;
 
                     // If clicking on secondary chart, reset main chart zoom to show the new position
                     if (chart == secondaryChart)
@@ -395,18 +497,18 @@ namespace SimulatorWinForms
                     }
 
                     // Update UI immediately
-                    _ = UpdateUIFast();
+                    _ = RefreshUIQuickly();
 
                     // Reset navigation speed counters
-                    _consecutiveNavigations = 0;
-                    _navigationStepSize = 1;
+                    _navigationSpeedCounter = 0;
+                    _currentNavigationStepSize = 1;
                 }
             }
         }
 
         private void PriceChart_MouseWheel(object sender, MouseEventArgs e)
         {
-            if (currentSnapshot == null || !_fullDataRange.HasValue) return;
+            if (currentSnapshot == null || !_fullChartDataRange.HasValue) return;
 
             // Get current limits
             var currentLimits = priceChart.Plot.GetAxisLimits();
@@ -419,7 +521,7 @@ namespace SimulatorWinForms
             double newSpan = currentSpan * zoomFactor;
 
             // Don't allow zooming out past full data range
-            double fullDataSpan = _fullDataRange.Value.xMax - _fullDataRange.Value.xMin;
+            double fullDataSpan = _fullChartDataRange.Value.xMax - _fullChartDataRange.Value.xMin;
             if (newSpan > fullDataSpan)
             {
                 newSpan = fullDataSpan;
@@ -433,16 +535,16 @@ namespace SimulatorWinForms
             // If centering on snapshot would go outside data bounds, adjust the center
             double newXMin, newXMax;
 
-            if (desiredXMin < _fullDataRange.Value.xMin)
+            if (desiredXMin < _fullChartDataRange.Value.xMin)
             {
                 // Would go too far left, so center as far left as possible
-                newXMin = _fullDataRange.Value.xMin;
+                newXMin = _fullChartDataRange.Value.xMin;
                 newXMax = newXMin + newSpan;
             }
-            else if (desiredXMax > _fullDataRange.Value.xMax)
+            else if (desiredXMax > _fullChartDataRange.Value.xMax)
             {
                 // Would go too far right, so center as far right as possible
-                newXMax = _fullDataRange.Value.xMax;
+                newXMax = _fullChartDataRange.Value.xMax;
                 newXMin = newXMax - newSpan;
             }
             else
@@ -460,7 +562,7 @@ namespace SimulatorWinForms
 
         private void SecondaryChart_MouseWheel(object sender, MouseEventArgs e)
         {
-            if (currentSnapshot == null || !_fullDataRange.HasValue) return;
+            if (currentSnapshot == null || !_fullChartDataRange.HasValue) return;
 
             // Get current limits
             var currentLimits = secondaryChart.Plot.GetAxisLimits();
@@ -473,7 +575,7 @@ namespace SimulatorWinForms
             double newSpan = currentSpan * zoomFactor;
 
             // Don't allow zooming out past full data range
-            double fullDataSpan = _fullDataRange.Value.xMax - _fullDataRange.Value.xMin;
+            double fullDataSpan = _fullChartDataRange.Value.xMax - _fullChartDataRange.Value.xMin;
             if (newSpan > fullDataSpan)
             {
                 newSpan = fullDataSpan;
@@ -487,16 +589,16 @@ namespace SimulatorWinForms
             // If centering on snapshot would go outside data bounds, adjust the center
             double newXMin, newXMax;
 
-            if (desiredXMin < _fullDataRange.Value.xMin)
+            if (desiredXMin < _fullChartDataRange.Value.xMin)
             {
                 // Would go too far left, so center as far left as possible
-                newXMin = _fullDataRange.Value.xMin;
+                newXMin = _fullChartDataRange.Value.xMin;
                 newXMax = newXMin + newSpan;
             }
-            else if (desiredXMax > _fullDataRange.Value.xMax)
+            else if (desiredXMax > _fullChartDataRange.Value.xMax)
             {
                 // Would go too far right, so center as far right as possible
-                newXMax = _fullDataRange.Value.xMax;
+                newXMax = _fullChartDataRange.Value.xMax;
                 newXMin = newXMax - newSpan;
             }
             else
@@ -515,17 +617,17 @@ namespace SimulatorWinForms
         private void NavigationTimer_Tick(object sender, EventArgs e)
         {
             // Stop the timer and reset navigation flag
-            _navigationTimer.Stop();
+            _chartUpdateTimer.Stop();
 
             // Reset navigation speed counters when user stops
-            _consecutiveNavigations = 0;
-            _navigationStepSize = 1;
+            _navigationSpeedCounter = 0;
+            _currentNavigationStepSize = 1;
 
             // Perform only the expensive chart operations (metrics, secondary chart rendering)
-            UpdateChartsExpensive();
+            RefreshChartMetrics();
         }
 
-        private void UpdateChartsExpensive()
+        private void RefreshChartMetrics()
         {
             if (currentSnapshot == null) return;
 
@@ -591,31 +693,45 @@ namespace SimulatorWinForms
             }
         }
 
+        /// <summary>
+        /// Processes keyboard input for navigation control, enabling arrow key navigation through snapshots.
+        /// Provides keyboard shortcuts for efficient browsing of historical market data.
+        /// </summary>
+        /// <param name="msg">The Windows message containing keyboard input details.</param>
+        /// <param name="keyData">The key data identifying which key was pressed.</param>
+        /// <returns>True if the key was handled by this control, false to allow further processing.</returns>
+        /// <remarks>
+        /// This method enables intuitive keyboard navigation:
+        /// - Left arrow key: Navigate to previous snapshot
+        /// - Right arrow key: Navigate to next snapshot
+        /// - Returns true to mark keys as handled, preventing propagation
+        /// - Falls back to base implementation for unhandled keys
+        /// </remarks>
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Left)
             {
-                NavigateFast(-1);
+                PerformFastNavigation(-1);
                 return true;  // Mark as handled to prevent further propagation
             }
             else if (keyData == Keys.Right)
             {
-                NavigateFast(1);
+                PerformFastNavigation(1);
                 return true;  // Mark as handled
             }
             return base.ProcessCmdKey(ref msg, keyData);  // Allow other keys to pass through
         }
 
-        private void AddMouseDownHandlers(Control control)
+        private void RegisterMouseDownHandlers(Control control)
         {
-            control.MouseDown += Control_MouseDown;
+            control.MouseDown += HandleMouseDown;
             foreach (Control c in control.Controls)
             {
-                AddMouseDownHandlers(c);
+                RegisterMouseDownHandlers(c);
             }
         }
 
-        private void Control_MouseDown(object sender, MouseEventArgs e)
+        private void HandleMouseDown(object sender, MouseEventArgs e)
         {
             // Only handle right-click for back action if it's not on a chart control
             if (e.Button == MouseButtons.Right && !(sender is ScottPlot.FormsPlot || sender is System.Windows.Forms.PictureBox))
@@ -624,7 +740,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void SetupTooltips()
+        private void ConfigureTooltips()
         {
             // Trading Metrics Tooltips
             toolTip1.SetToolTip(rsiLabel, "Relative Strength Index (RSI): Momentum oscillator measuring price changes to evaluate overbought/oversold conditions. Values above 70 indicate overbought (potential sell), below 30 indicate oversold (potential buy).");
@@ -649,7 +765,7 @@ namespace SimulatorWinForms
 
             toolTip1.SetToolTip(supportLabel, "Support/Resistance Levels: Historical price levels where buying/selling pressure caused reversals. Support levels catch falling prices, resistance levels cap rising prices.");
 
-            // Patterns tooltip is now handled in UpdateUIFast() to ensure currentSnapshot is available
+            // Patterns tooltip is now handled in RefreshUIQuickly() to ensure currentSnapshot is available
 
             // Flow/Momentum Tooltips
             toolTip1.SetToolTip(topVelocityCB, "Top Velocity: Rate of price change at the best bid/ask levels. High values indicate strong momentum in that direction.");
@@ -685,21 +801,33 @@ namespace SimulatorWinForms
             toolTip1.SetToolTip(restingOrdersLabel, "Resting Orders: Unfilled limit orders waiting in the order book. Indicates planned entry/exit points.");
         }
 
-        // Removed SnapshotViewer_KeyDown (handled by parent form)
 
 
         private async void Navigate(int delta)
         {
             // Use the fast navigation approach for better performance
-            NavigateFast(delta);
+            PerformFastNavigation(delta);
         }
 
-        private async void NavigateFast(int delta)
+        /// <summary>
+        /// Performs efficient navigation through historical snapshots with progressive speed acceleration.
+        /// Updates the current snapshot, position data, and triggers UI refresh while deferring expensive chart operations.
+        /// </summary>
+        /// <param name="delta">Direction and magnitude of navigation (-1 for previous, +1 for next snapshot).</param>
+        /// <remarks>
+        /// This method implements intelligent navigation features:
+        /// - Progressive speed increase with consecutive navigations (1→2→5→60 step increments)
+        /// - Boundary checking to prevent out-of-range access
+        /// - Immediate UI updates for responsive feel
+        /// - Deferred expensive chart rendering via timer to maintain performance
+        /// - Automatic speed reset after navigation pauses
+        /// </remarks>
+        private async void PerformFastNavigation(int delta)
         {
             if (historySnapshots == null || historySnapshots.Count == 0) return;
 
             // Calculate progressive step size based on consecutive navigations
-            int stepSize = CalculateNavigationStepSize();
+            int stepSize = DetermineNavigationStepSize();
 
             // Apply the step size to the delta
             int actualDelta = delta * stepSize;
@@ -717,13 +845,13 @@ namespace SimulatorWinForms
             memoText = memos[newIndex];
 
             // Update position and average cost for current snapshot
-            _simulatedPosition = currentSnapshot.PositionSize;
-            _averageCost = currentSnapshot.BuyinPrice;
+            _hypotheticalPositionSize = currentSnapshot.PositionSize;
+            _hypotheticalAverageCost = currentSnapshot.BuyinPrice;
 
             // Update resting orders count for current snapshot
-            if (_restingOrdersPoints != null && _restingOrdersPoints.Count > 0)
+            if (_historicalRestingOrdersDataPoints != null && _historicalRestingOrdersDataPoints.Count > 0)
             {
-                var matchingPoint = _restingOrdersPoints.FirstOrDefault(p =>
+                var matchingPoint = _historicalRestingOrdersDataPoints.FirstOrDefault(p =>
                     Math.Abs((p.Date - currentSnapshot.Timestamp).TotalSeconds) < 1);
                 if (matchingPoint != null)
                 {
@@ -745,9 +873,9 @@ namespace SimulatorWinForms
             }
 
             // Update resting orders count for current snapshot
-            if (_restingOrdersPoints != null && _restingOrdersPoints.Count > 0)
+            if (_historicalRestingOrdersDataPoints != null && _historicalRestingOrdersDataPoints.Count > 0)
             {
-                var matchingPoint = _restingOrdersPoints.FirstOrDefault(p =>
+                var matchingPoint = _historicalRestingOrdersDataPoints.FirstOrDefault(p =>
                     Math.Abs((p.Date - currentSnapshot.Timestamp).TotalSeconds) < 1);
                 if (matchingPoint != null)
                 {
@@ -769,52 +897,79 @@ namespace SimulatorWinForms
             }
 
             // Immediately update all UI elements (fast operations)
-            _ = UpdateUIFast();
+            _ = RefreshUIQuickly();
 
             // Update orderbook from the new snapshot
-            UpdateUIFromSnapshot();
+            PopulateUIFromSnapshot();
 
             // Start navigation mode and reset timer for expensive operations
-            _navigationTimer.Stop();
-            _navigationTimer.Start();
+            _chartUpdateTimer.Stop();
+            _chartUpdateTimer.Start();
         }
 
-        private int CalculateNavigationStepSize()
+        /// <summary>
+        /// Calculates the progressive navigation step size based on user interaction patterns.
+        /// Implements speed acceleration for efficient browsing of large datasets.
+        /// </summary>
+        /// <returns>The number of snapshots to skip per navigation action (1, 2, 5, or 60).</returns>
+        /// <remarks>
+        /// This method provides intelligent navigation acceleration:
+        /// - Normal speed (1 snapshot) for initial interactions
+        /// - Medium speed (2 snapshots) after 5 consecutive navigations
+        /// - Fast speed (5 snapshots) after 15 consecutive navigations
+        /// - Rapid speed (60 snapshots) after 60 consecutive navigations
+        /// - Automatic reset to normal speed after 500ms pause
+        /// - Boundary detection prevents invalid navigation
+        /// </remarks>
+        private int DetermineNavigationStepSize()
         {
             DateTime now = DateTime.Now;
 
             // Reset consecutive count if too much time has passed
-            if ((now - _lastNavigationTime).TotalMilliseconds > 500)
+            if ((now - _lastNavigationTimestamp).TotalMilliseconds > 500)
             {
-                _consecutiveNavigations = 0;
-                _navigationStepSize = 1;
+                _navigationSpeedCounter = 0;
+                _currentNavigationStepSize = 1;
             }
 
-            _consecutiveNavigations++;
-            _lastNavigationTime = now;
+            _navigationSpeedCounter++;
+            _lastNavigationTimestamp = now;
 
             // Progressive speed based on consecutive navigations
-            if (_consecutiveNavigations >= 60)
+            if (_navigationSpeedCounter >= 60)
             {
-                _navigationStepSize = 60; // Jump 60 bars at a time
+                _currentNavigationStepSize = 60; // Jump 60 bars at a time
             }
-            else if (_consecutiveNavigations >= 15)
+            else if (_navigationSpeedCounter >= 15)
             {
-                _navigationStepSize = 5; // Jump 5 bars at a time
+                _currentNavigationStepSize = 5; // Jump 5 bars at a time
             }
-            else if (_consecutiveNavigations >= 5)
+            else if (_navigationSpeedCounter >= 5)
             {
-                _navigationStepSize = 2; // Jump 2 bars at a time
+                _currentNavigationStepSize = 2; // Jump 2 bars at a time
             }
             else
             {
-                _navigationStepSize = 1; // Normal speed
+                _currentNavigationStepSize = 1; // Normal speed
             }
 
-            return _navigationStepSize;
+            return _currentNavigationStepSize;
         }
 
-        private async Task UpdateUIFast()
+        /// <summary>
+        /// Performs rapid UI updates for all display elements without expensive chart rendering.
+        /// Updates market data, metrics, positions, and patterns while preserving current chart zoom state.
+        /// </summary>
+        /// <remarks>
+        /// This method focuses on fast UI operations to maintain responsive navigation:
+        /// - Updates market information and pricing displays
+        /// - Refreshes trading metrics and technical indicators
+        /// - Updates position and order book information
+        /// - Handles pattern detection visualization
+        /// - Moves vertical timeline indicator immediately
+        /// - Queries database for market titles with fallback to ticker symbols
+        /// </remarks>
+        private async Task RefreshUIQuickly()
         {
             if (currentSnapshot == null) return;
 
@@ -834,7 +989,6 @@ namespace SimulatorWinForms
             catch (Exception ex)
             {
                 // If database query fails, fall back to ticker
-                // Could add logging here if needed
             }
 
             marketTickerLabel.Text = marketTitle;
@@ -939,25 +1093,25 @@ namespace SimulatorWinForms
             positionUpsideValue.Text = currentSnapshot.PositionUpside.ToString("F2");
             positionDownsideValue.Text = currentSnapshot.PositionDownside.ToString("F2");
             // Use simulated resting orders count passed as parameter
-            restingOrdersValue.Text = _simulatedRestingOrders.ToString();
+            restingOrdersValue.Text = _hypotheticalRestingOrdersCount.ToString();
             simulatedPositionValue.Text = currentSnapshot.PositionSize.ToString();  // Use snapshot data for consistency
 
             // Update patterns count for CURRENT snapshot only
             int currentSnapshotPatterns = 0;
-            if (_patternPoints != null && currentSnapshot != null)
+            if (_historicalPatternDataPoints != null && currentSnapshot != null)
             {
                 // Count patterns that match the current snapshot timestamp (within 1 second)
-                currentSnapshotPatterns = _patternPoints.Count(p =>
+                currentSnapshotPatterns = _historicalPatternDataPoints.Count(p =>
                     Math.Abs((p.Date - currentSnapshot.Timestamp).TotalSeconds) < 1);
             }
             patternsValue.Text = currentSnapshotPatterns.ToString();
 
             // Update tooltip to show patterns at CURRENT snapshot only
             string patternsTooltip = "Patterns: Detected technical analysis patterns in price data.";
-            if (_patternPoints != null && _patternPoints.Count > 0 && currentSnapshot != null)
+            if (_historicalPatternDataPoints != null && _historicalPatternDataPoints.Count > 0 && currentSnapshot != null)
             {
                 // Find patterns that match the current snapshot timestamp (within 1 second)
-                var currentSnapshotPatternsList = _patternPoints
+                var currentSnapshotPatternsList = _historicalPatternDataPoints
                     .Where(p => Math.Abs((p.Date - currentSnapshot.Timestamp).TotalSeconds) < 1)
                     .Select(p => p.Memo?.Replace("Pattern: ", "") ?? "Unknown")
                     .Distinct()
@@ -1043,12 +1197,43 @@ namespace SimulatorWinForms
             }
         }
 
-        public async void NavigateSnapshot(int delta)
+        /// <summary>
+        /// Navigates through the historical snapshots by a specified number of steps.
+        /// Provides programmatic control over snapshot navigation for automated analysis.
+        /// </summary>
+        /// <param name="delta">Number of snapshots to move forward (positive) or backward (negative) in time.</param>
+        /// <remarks>
+        /// This method delegates to PerformFastNavigation for efficient UI updates.
+        /// Navigation respects boundaries and provides smooth user experience during analysis.
+        /// </remarks>
+        public async void NavigateToSnapshot(int delta)
         {
             // Use fast navigation for better performance
-            NavigateFast(delta);
+            PerformFastNavigation(delta);
         }
 
+        /// <summary>
+        /// Populates the SnapshotViewer with market data for analysis and visualization.
+        /// Initializes the control with a specific snapshot, historical context, and simulation parameters.
+        /// </summary>
+        /// <param name="snapshot">The initial market snapshot to display and analyze.</param>
+        /// <param name="history">Complete chronological sequence of market snapshots for navigation and trend analysis.</param>
+        /// <param name="memosList">Strategy memos corresponding to each historical snapshot, providing trading rationale.</param>
+        /// <param name="simulatedPosition">Hypothetical position size for backtesting scenarios (default: 0).</param>
+        /// <param name="averageCost">Hypothetical average cost basis for the simulated position (default: 0.0).</param>
+        /// <param name="simulatedRestingOrders">Count of hypothetical resting orders in the strategy (default: 0).</param>
+        /// <param name="positionPoints">Time series data for position size changes during simulation (optional).</param>
+        /// <param name="averageCostPoints">Time series data for average cost evolution (optional).</param>
+        /// <param name="restingOrdersPoints">Time series data for resting orders count (optional).</param>
+        /// <param name="patternPoints">Time series data for detected technical patterns (optional).</param>
+        /// <remarks>
+        /// This method performs comprehensive data initialization:
+        /// - Validates and sets the current snapshot with fallback logic
+        /// - Orders historical data chronologically
+        /// - Maps simulation data to individual snapshots
+        /// - Updates the UI to reflect the new data context
+        /// - Handles edge cases like invalid timestamps gracefully
+        /// </remarks>
         public void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history, List<string> memosList, int simulatedPosition = 0, double averageCost = 0.0, int simulatedRestingOrders = 0, List<PricePoint>? positionPoints = null, List<PricePoint>? averageCostPoints = null, List<PricePoint>? restingOrdersPoints = null, List<PricePoint>? patternPoints = null)
         {
             currentSnapshot = snapshot;
@@ -1088,21 +1273,21 @@ namespace SimulatorWinForms
             }
 
             // Store simulated position and average cost
-            _simulatedPosition = simulatedPosition;
-            _averageCost = averageCost;
-            _simulatedRestingOrders = simulatedRestingOrders;
-            _positionPoints = positionPoints ?? new List<PricePoint>();
-            _averageCostPoints = averageCostPoints ?? new List<PricePoint>();
-            _restingOrdersPoints = restingOrdersPoints ?? new List<PricePoint>();
-            _patternPoints = patternPoints ?? new List<PricePoint>();
+            _hypotheticalPositionSize = simulatedPosition;
+            _hypotheticalAverageCost = averageCost;
+            _hypotheticalRestingOrdersCount = simulatedRestingOrders;
+            _historicalPositionDataPoints = positionPoints ?? new List<PricePoint>();
+            _historicalAverageCostDataPoints = averageCostPoints ?? new List<PricePoint>();
+            _historicalRestingOrdersDataPoints = restingOrdersPoints ?? new List<PricePoint>();
+            _historicalPatternDataPoints = patternPoints ?? new List<PricePoint>();
             simulatedPositionValue.Text = simulatedPosition.ToString();
 
             // Map position data to individual snapshots
-            if (_positionPoints != null && _positionPoints.Count > 0)
+            if (_historicalPositionDataPoints != null && _historicalPositionDataPoints.Count > 0)
             {
                 foreach (var histSnapshot in historySnapshots)
                 {
-                    var matchingPoint = _positionPoints.FirstOrDefault(p =>
+                    var matchingPoint = _historicalPositionDataPoints.FirstOrDefault(p =>
                         Math.Abs((p.Date - histSnapshot.Timestamp).TotalSeconds) < 1); // Match within 1 second
                     if (matchingPoint != null)
                     {
@@ -1112,11 +1297,11 @@ namespace SimulatorWinForms
             }
 
             // Map average cost data to individual snapshots
-            if (_averageCostPoints != null && _averageCostPoints.Count > 0)
+            if (_historicalAverageCostDataPoints != null && _historicalAverageCostDataPoints.Count > 0)
             {
                 foreach (var histSnapshot in historySnapshots)
                 {
-                    var matchingPoint = _averageCostPoints.FirstOrDefault(p =>
+                    var matchingPoint = _historicalAverageCostDataPoints.FirstOrDefault(p =>
                         Math.Abs((p.Date - histSnapshot.Timestamp).TotalSeconds) < 1); // Match within 1 second
                     if (matchingPoint != null)
                     {
@@ -1126,11 +1311,11 @@ namespace SimulatorWinForms
             }
 
             // Map resting orders data to individual snapshots
-            if (_restingOrdersPoints != null && _restingOrdersPoints.Count > 0)
+            if (_historicalRestingOrdersDataPoints != null && _historicalRestingOrdersDataPoints.Count > 0)
             {
                 foreach (var histSnapshot in historySnapshots)
                 {
-                    var matchingPoint = _restingOrdersPoints.FirstOrDefault(p =>
+                    var matchingPoint = _historicalRestingOrdersDataPoints.FirstOrDefault(p =>
                         Math.Abs((p.Date - histSnapshot.Timestamp).TotalSeconds) < 1); // Match within 1 second
                     if (matchingPoint != null)
                     {
@@ -1150,7 +1335,7 @@ namespace SimulatorWinForms
                 }
             }
 
-            UpdateUIFromSnapshot();  // Full UI update
+            PopulateUIFromSnapshot();  // Full UI update
         }
 
         private string FormatTimeSpan(TimeSpan? ts)
@@ -1158,7 +1343,20 @@ namespace SimulatorWinForms
             return ts.HasValue ? $"{ts.Value.Days} days, {ts.Value.Hours} hours" : "--";
         }
 
-        private async void UpdateUIFromSnapshot()
+        /// <summary>
+        /// Populates the order book display with current bid and ask data from the snapshot.
+        /// Organizes and visualizes market depth with proper sorting and color coding.
+        /// </summary>
+        /// <remarks>
+        /// This method handles order book visualization with:
+        /// - Separation of bids and asks with distinct color schemes
+        /// - Proper sorting (asks descending, bids ascending for display)
+        /// - Price filtering to remove noise at extremes
+        /// - Visual spacer between bid and ask sides
+        /// - Automatic scrolling to center on the current spread
+        /// - Size calculations showing both quantity and value
+        /// </remarks>
+        private async void PopulateUIFromSnapshot()
         {
             // Clear and repopulate order book with bids and asks
             orderbookGrid.Rows.Clear();
@@ -1260,9 +1458,22 @@ namespace SimulatorWinForms
             }
 
             // Update all UI elements (fast operations)
-            _ = UpdateUIFast();
+            _ = RefreshUIQuickly();
         }
 
+        /// <summary>
+        /// Updates the main price chart with current market data and technical indicators.
+        /// Handles chart rendering, layout adjustments, and zoom state preservation.
+        /// </summary>
+        /// <remarks>
+        /// This method manages comprehensive chart updates including:
+        /// - Clearing and re-rendering base price data
+        /// - Applying selected technical indicators (RSI, MACD, EMA, etc.)
+        /// - Managing secondary chart visibility based on metric selection
+        /// - Preserving user zoom/pan state when appropriate
+        /// - Updating chart legends and layout
+        /// - Handling both primary and secondary chart synchronization
+        /// </remarks>
         private void UpdateChart()
         {
             if (currentSnapshot == null) return;
@@ -1335,6 +1546,20 @@ namespace SimulatorWinForms
             chartLayout.PerformLayout();
         }
 
+        /// <summary>
+        /// Handles control resize events to maintain proper typography scaling and chart proportions.
+        /// Applies responsive font scaling based on control dimensions and DPI settings.
+        /// </summary>
+        /// <param name="sender">The source of the resize event.</param>
+        /// <param name="e">Event arguments (unused).</param>
+        /// <remarks>
+        /// This method ensures consistent visual appearance across different screen sizes:
+        /// - Calculates scaling factors based on width/height ratios
+        /// - Applies conservative DPI-aware typography scaling
+        /// - Updates chart axis labels and tick marks for readability
+        /// - Only applies scaling when changes are significant (>10% difference)
+        /// - Refreshes both primary and secondary charts after scaling
+        /// </remarks>
         private void SnapshotViewer_ResizeEnd(object sender, EventArgs e)
         {
             // Calculate isotropic scale factor with DPI awareness (more conservative)
@@ -1402,6 +1627,20 @@ namespace SimulatorWinForms
             }
         }
 
+        /// <summary>
+        /// Evaluates and applies chart filter changes with comprehensive re-rendering.
+        /// Handles technical indicator toggling and chart layout adjustments with full context updates.
+        /// </summary>
+        /// <remarks>
+        /// This method provides complete chart refresh functionality:
+        /// - Temporarily hides charts to prevent visual flickering
+        /// - Re-renders all base data and selected indicators
+        /// - Adjusts chart layout based on secondary metric visibility
+        /// - Preserves appropriate zoom states
+        /// - Forces layout updates for proper sizing
+        /// - Includes multiple refresh cycles for stability
+        /// - Thread-safe with evaluation flag protection
+        /// </remarks>
         private void EvaluateChartFilters()
         {
             if (currentSnapshot == null) return;
@@ -1520,16 +1759,19 @@ namespace SimulatorWinForms
         }
 
 
-        private void leftColumn_Paint(object sender, PaintEventArgs e)
-        {
 
-        }
-
-        private void positionsLayout_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
+        /// <summary>
+        /// Renders the fundamental price data (bids, asks, buy/sell signals) on the specified chart.
+        /// Attempts to use cached chart data for performance, falling back to snapshot-based rendering.
+        /// </summary>
+        /// <param name="chart">The ScottPlot chart control to render price data on.</param>
+        /// <remarks>
+        /// This method implements a two-tier rendering approach:
+        /// - Primary: Uses cached chart images from the CacheDir for instant loading
+        /// - Fallback: Generates price data directly from market snapshots
+        /// Includes vertical line marker at current snapshot time and initial zoom setup.
+        /// Handles both cached and dynamic rendering with proper error recovery.
+        /// </remarks>
         private void RenderBasePriceData(ScottPlot.FormsPlot chart)
         {
             if (historySnapshots == null || historySnapshots.Count == 0 || currentSnapshot == null) return;
@@ -1575,11 +1817,11 @@ namespace SimulatorWinForms
             chart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
 
             // Store full data range for zoom bounds
-            if (!_fullDataRange.HasValue && historySnapshots != null && historySnapshots.Count > 0)
+            if (!_fullChartDataRange.HasValue && historySnapshots != null && historySnapshots.Count > 0)
             {
                 double minTime = historySnapshots.Min(s => s.Timestamp.ToOADate());
                 double maxTime = historySnapshots.Max(s => s.Timestamp.ToOADate());
-                _fullDataRange = (minTime, maxTime);
+                _fullChartDataRange = (minTime, maxTime);
             }
         }
 
@@ -1622,6 +1864,21 @@ namespace SimulatorWinForms
             }
         }
 
+        /// <summary>
+        /// Renders primary chart technical indicators and overlays on the main price chart.
+        /// Includes EMA, Bollinger Bands, VWAP, PSAR, support/resistance levels, and pattern markers.
+        /// </summary>
+        /// <param name="chart">The ScottPlot chart control to render technical indicators on.</param>
+        /// <remarks>
+        /// This method handles comprehensive technical analysis visualization:
+        /// - Moving averages (EMA) for trend identification
+        /// - Volatility bands (Bollinger) for overbought/oversold signals
+        /// - Volume-weighted pricing (VWAP) for institutional benchmarks
+        /// - Trend following (PSAR) for stop-loss placement
+        /// - Historical support/resistance levels with visual markers
+        /// - Technical pattern detection with interactive tooltips
+        /// - Dynamic legend generation based on active indicators
+        /// </remarks>
         private void RenderY1Metrics(ScottPlot.FormsPlot chart)
         {
             var legendItems = new List<string>();
@@ -1745,13 +2002,13 @@ namespace SimulatorWinForms
             }
 
             // Patterns - Plot pattern occurrences as markers with tooltips on PRIMARY chart
-            if (patternsLabel.Checked && _patternPoints != null && _patternPoints.Count > 0)
+            if (patternsLabel.Checked && _historicalPatternDataPoints != null && _historicalPatternDataPoints.Count > 0)
             {
                 var patternTimePoints = new List<double>();
                 var patternValuePoints = new List<double>();
                 var patternTooltips = new List<string>();
 
-                foreach (var patternPoint in _patternPoints)
+                foreach (var patternPoint in _historicalPatternDataPoints)
                 {
                     patternTimePoints.Add(patternPoint.Date.ToOADate());
                     patternValuePoints.Add(patternPoint.Price);
@@ -1793,6 +2050,21 @@ namespace SimulatorWinForms
             }
         }
 
+        /// <summary>
+        /// Renders advanced technical indicators and market metrics on the secondary chart.
+        /// Displays MACD, RSI, ATR, ADX, Stochastic, OBV, and various market flow indicators.
+        /// </summary>
+        /// <param name="chart">The ScottPlot chart control for the secondary chart display.</param>
+        /// <remarks>
+        /// This method provides comprehensive secondary analysis including:
+        /// - Momentum indicators (MACD, RSI, Stochastic) for entry/exit signals
+        /// - Volatility measures (ATR) for risk management
+        /// - Trend strength (ADX) with directional components
+        /// - Volume analysis (OBV) for trend confirmation
+        /// - Market microstructure (velocity, order flow, depth) for advanced analysis
+        /// - Position and performance metrics for strategy evaluation
+        /// - Automatic legend generation and full time range display
+        /// </remarks>
         private void RenderSecondaryMetrics(ScottPlot.FormsPlot chart)
         {
             var legendItems = new List<string>();
@@ -2251,9 +2523,9 @@ namespace SimulatorWinForms
                 var timePoints = new List<double>();
 
                 // Use cached position data if available, otherwise fall back to snapshot data
-                if (_positionPoints != null && _positionPoints.Count > 0)
+                if (_historicalPositionDataPoints != null && _historicalPositionDataPoints.Count > 0)
                 {
-                    foreach (var point in _positionPoints)
+                    foreach (var point in _historicalPositionDataPoints)
                     {
                         timePoints.Add(point.Date.ToOADate());
                         simulatedPosPoints.Add(point.Price);
@@ -2330,14 +2602,28 @@ namespace SimulatorWinForms
             chart.Plot.AxisAutoY(); // Auto-scale Y-axis
 
             // Store full data range for zoom constraints (only if not already set)
-            if (!_fullDataRange.HasValue && historySnapshots != null && historySnapshots.Count > 0)
+            if (!_fullChartDataRange.HasValue && historySnapshots != null && historySnapshots.Count > 0)
             {
                 double minTime = historySnapshots.Min(s => s.Timestamp.ToOADate());
                 double maxTime = historySnapshots.Max(s => s.Timestamp.ToOADate());
-                _fullDataRange = (minTime, maxTime);
+                _fullChartDataRange = (minTime, maxTime);
             }
         }
 
+        /// <summary>
+        /// Determines whether any secondary chart metrics are currently enabled for display.
+        /// Used to control secondary chart visibility and layout adjustments.
+        /// </summary>
+        /// <returns>True if any secondary metrics checkboxes are checked, false otherwise.</returns>
+        /// <remarks>
+        /// This method checks all secondary chart metric controls including:
+        /// - Technical indicators (MACD, RSI, ATR, ADX, Stochastic, OBV)
+        /// - Market flow metrics (velocity, order rates, trade volume, size)
+        /// - Order book analysis (imbalance, depth, center mass, contracts)
+        /// - Position metrics (size, ROI, resting orders)
+        /// - Pattern detection
+        /// Returns true if any are enabled, triggering secondary chart display.
+        /// </remarks>
         private bool HasSecondaryMetricsChecked()
         {
             return macdLabel.Checked ||
