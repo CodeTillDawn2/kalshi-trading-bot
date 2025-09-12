@@ -12,32 +12,51 @@ using TradingStrategies.Helpers.Interfaces;
 
 namespace BacklashBot.Services
 {
+    /// <summary>
+    /// Service for managing dependency injection scopes in the Kalshi trading bot system.
+    /// This service handles the creation, initialization, and disposal of service scopes,
+    /// ensuring proper resource management and access to scoped services throughout the application.
+    /// </summary>
     public class KaslhiBotScopeManagerService : IScopeManagerService
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<IScopeManagerService> _logger;
         private IServiceScope? _scope;
+
+        /// <summary>
+        /// Gets the current active service scope, or null if no scope has been initialized.
+        /// </summary>
         public IServiceScope? Scope => _scope;
 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KaslhiBotScopeManagerService"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">The root service provider for creating scopes.</param>
+        /// <param name="logger">The logger instance for recording service operations.</param>
         public KaslhiBotScopeManagerService(IServiceProvider serviceProvider, ILogger<IScopeManagerService> logger)
         {
             _serviceProvider = serviceProvider;
-
             _logger = logger;
         }
 
+        /// <summary>
+        /// Initializes a new service scope and resolves critical services to ensure they are available.
+        /// This method creates a scope from the root service provider and validates that essential
+        /// services can be resolved, preventing runtime errors due to missing dependencies.
+        /// </summary>
         public void InitializeScope()
         {
-
             if (_scope != null)
             {
-                _logger.LogWarning("ServiceFactory already initialized, skipping reinitialization.");
+                _logger.LogWarning("Service scope already initialized, skipping reinitialization.");
                 return;
             }
 
             _scope = _serviceProvider.CreateScope();
             var sp = _scope.ServiceProvider;
+
+            // Resolve critical services to validate scope initialization
             var configuration = sp.GetRequiredService<IConfiguration>();
             var executionConfig = sp.GetRequiredService<IOptions<ExecutionConfig>>();
             var kalshiConfig = sp.GetRequiredService<IOptions<KalshiConfig>>();
@@ -60,21 +79,34 @@ namespace BacklashBot.Services
             var marketFactory = sp.GetRequiredService<Func<MarketDTO, MarketData>>();
             var marketDataService = sp.GetRequiredService<IMarketDataService>();
             var orderBookService = sp.GetRequiredService<IOrderBookService>();
-
-
         }
 
+        /// <summary>
+        /// Resets the current service scope by disposing it and clearing the reference.
+        /// This method should be called when the scope needs to be recreated or when
+        /// the service is being shut down.
+        /// </summary>
         public void ResetAll()
         {
             _scope?.Dispose();
             _scope = null;
         }
 
+        /// <summary>
+        /// Creates a new service scope from the root service provider.
+        /// This method provides direct access to create scopes without initializing
+        /// the managed scope used by this service.
+        /// </summary>
+        /// <returns>A new service scope instance.</returns>
         public IServiceScope CreateScope()
         {
             return _serviceProvider.CreateScope();
         }
 
+        /// <summary>
+        /// Disposes the current service scope and releases all associated resources.
+        /// This method implements the IDisposable pattern for proper cleanup.
+        /// </summary>
         public void Dispose()
         {
             _scope?.Dispose();
