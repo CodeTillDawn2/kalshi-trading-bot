@@ -23,7 +23,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MaxWickSize { get; } = 1.5;
 
         /// <summary>
-        /// Maximum difference between a candle’s open and the previous close. Ensures continuity.
+        /// Maximum difference between a candleï¿½s open and the previous close. Ensures continuity.
         /// Strictest: 0.1 (very tight), Loosest: 1.0 (loose continuity).
         /// </summary>
         public static double MaxOpenCloseDiff { get; } = 0.5;
@@ -76,13 +76,14 @@ namespace BacklashPatterns.PatternDefinitions
             if (metrics1.LowerWick > MaxWickSize || metrics2.LowerWick > MaxWickSize || metrics3.LowerWick > MaxWickSize) return null;
 
             // Uptrend check using CandleMetrics
-            if (metrics3.GetLookbackAverageTrend(3) <= TrendThreshold) return null;
+            if (metrics3.GetLookbackMeanTrend(3) <= TrendThreshold) return null;
 
             var candles = new List<int> { c1, c2, c3 };
             return new ThreeBlackCrowsPattern(candles);
         }
     }
 }
+
 
 
 

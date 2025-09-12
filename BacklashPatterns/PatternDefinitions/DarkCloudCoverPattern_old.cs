@@ -9,7 +9,7 @@ namespace BacklashPatterns.PatternDefinitions
     /// Requirements (Source: Investopedia, BabyPips):
     /// - Occurs after an uptrend.
     /// - First candle: Bullish, showing strong buying.
-    /// - Second candle: Bearish, opens above first close (often gapped up), closes significantly into first candle’s body (typically below midpoint but above open).
+    /// - Second candle: Bearish, opens above first close (often gapped up), closes significantly into first candleï¿½s body (typically below midpoint but above open).
     /// </summary>
     public class DarkCloudCoverPattern : PatternDefinition
     {
@@ -58,7 +58,7 @@ namespace BacklashPatterns.PatternDefinitions
             var currPrices = prices[index];
 
             // Uptrend check
-            if (currMetrics.GetLookbackAverageTrend(2) <= TrendThreshold) return null;
+            if (currMetrics.GetLookbackMeanTrend(2) <= TrendThreshold) return null;
 
             // Check minimum body size
             if (prevMetrics.BodySize < MinBodySize || currMetrics.BodySize < MinBodySize) return null;
@@ -80,6 +80,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

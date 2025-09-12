@@ -11,34 +11,34 @@ namespace BacklashPatterns.PatternDefinitions
      *   - Occurs in a downtrend.
      *   - First candle: Bearish with a significant body.
      *   - Second candle: Doji (very small body), typically gapped down from the first candle.
-     *   - Third candle: Bullish, closes above the first candle’s midpoint or close, confirming reversal.
-     *   - Indicates: Stronger bullish reversal potential due to the Doji’s indecision.
+     *   - Third candle: Bullish, closes above the first candleï¿½s midpoint or close, confirming reversal.
+     *   - Indicates: Stronger bullish reversal potential due to the Dojiï¿½s indecision.
      */
     public class MorningDojiStarPattern : PatternDefinition
     {
         /// <summary>
         /// Minimum body size for the first bearish candle, ensuring a significant downward move.
         /// - Strictest: 1.0 (significant body).
-        /// - Loosest: 0.5 (smaller but noticeable bearish candle, per BabyPips’ loose reversal patterns).
+        /// - Loosest: 0.5 (smaller but noticeable bearish candle, per BabyPipsï¿½ loose reversal patterns).
         /// </summary>
         public static double MinBodySize { get; } = 1.0;
 
         /// <summary>
         /// Threshold for confirming a downtrend prior to the pattern. Negative values indicate a bearish trend.
         /// - Strictest: -0.5 (strong downtrend).
-        /// - Loosest: -0.1 (minimal downtrend, per Investopedia’s relaxed Morning Doji Star).
+        /// - Loosest: -0.1 (minimal downtrend, per Investopediaï¿½s relaxed Morning Doji Star).
         /// </summary>
         public static double TrendThreshold { get; } = -0.3;
 
         /// <summary>
-        /// Maximum allowable gap between the first candle’s close and the second candle’s open.
+        /// Maximum allowable gap between the first candleï¿½s close and the second candleï¿½s open.
         /// - Strictest: 0.2 (tight gap for clear Doji indecision).
         /// - Loosest: 1.0 (larger gap allowed, per loose Doji Star definitions).
         /// </summary>
         public static double MaxOpenGap { get; } = 0.5;
 
         /// <summary>
-        /// Factor determining the minimum size of the third candle’s body relative to the first candle’s body.
+        /// Factor determining the minimum size of the third candleï¿½s body relative to the first candleï¿½s body.
         /// - Strictest: 0.5 (third candle closes at least at the midpoint).
         /// - Loosest: 0.1 (minimal penetration, per relaxed reversal standards).
         /// </summary>
@@ -47,7 +47,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Minimum absolute body size for the third candle, ensuring a significant bullish move.
         /// - Strictest: 1.0 (significant bullish candle).
-        /// - Loosest: 0.5 (smaller but noticeable bullish move, per BabyPips’ flexibility).
+        /// - Loosest: 0.5 (smaller but noticeable bullish move, per BabyPipsï¿½ flexibility).
         /// </summary>
         public static double MinThirdBody { get; } = 1.0;
         public const string BaseName = "MorningDojiStar";
@@ -72,7 +72,7 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMetrics thirdMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
 
             // Require a downtrend based on the mean trend
-            if (thirdMetrics.GetLookbackAverageTrend(3) > TrendThreshold) return null;
+            if (thirdMetrics.GetLookbackMeanTrend(3) > TrendThreshold) return null;
 
             // Extract the three relevant candles
             var asks = prices.Skip(index - 2).Take(3).ToArray();
@@ -105,6 +105,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

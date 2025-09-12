@@ -95,8 +95,8 @@ namespace BacklashPatterns.PatternDefinitions
             if (metrics1.LowerWick > MaxWickSize || metrics2.LowerWick > MaxWickSize || metrics3.LowerWick > MaxWickSize) return null;
 
             // Uptrend check
-            bool uptrend = metrics3.GetLookbackAverageTrend(3) > TrendThreshold &&
-                           metrics3.GetLookbackTrendStability(3) >= ConsistencyThreshold;
+            bool uptrend = metrics3.GetLookbackMeanTrend(3) > TrendThreshold &&
+                           metrics3.GetLookbackTrendConsistency(3) >= ConsistencyThreshold;
             if (!uptrend) return null;
 
             var candles = new List<int> { i1, i2, i3 };
@@ -104,6 +104,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

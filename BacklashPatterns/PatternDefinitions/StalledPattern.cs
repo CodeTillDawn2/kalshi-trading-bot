@@ -55,7 +55,7 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache)
         {
-            // Early exit if there aren’t enough prior candles for a three-candle pattern
+            // Early exit if there arenï¿½t enough prior candles for a three-candle pattern
             if (index < 2) return null;
 
             // Define candle indices
@@ -83,7 +83,7 @@ namespace BacklashPatterns.PatternDefinitions
                 prices[c3].Close < prices[c1].Close - 0.5) return null;
 
             // Ensure the pattern occurs in an uptrend
-            if (metrics3.GetLookbackAverageTrend(3) <= TrendThreshold || metrics3.GetLookbackTrendStability(3) < ConsistencyThreshold) return null;
+            if (metrics3.GetLookbackMeanTrend(3) <= TrendThreshold || metrics3.GetLookbackTrendConsistency(3) < ConsistencyThreshold) return null;
 
             // Define the candle indices for the pattern (three candles)
             var candles = new List<int> { c1, c2, c3 };
@@ -93,6 +93,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

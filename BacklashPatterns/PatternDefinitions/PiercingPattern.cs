@@ -20,8 +20,8 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MinBodySizeSecond { get; } = 0.3;
 
         /// <summary>
-        /// Minimum ratio of the second candle’s body size to its total range.
-        /// Purpose: Ensures the body is significant relative to the candle’s volatility.
+        /// Minimum ratio of the second candleï¿½s body size to its total range.
+        /// Purpose: Ensures the body is significant relative to the candleï¿½s volatility.
         /// Loosest: 0.3 (allows smaller bodies in volatile ranges); Strictest: 0.5 (standard requirement).
         /// </summary>
         public static double BodyToRangeRatio { get; } = 0.4;
@@ -34,14 +34,14 @@ namespace BacklashPatterns.PatternDefinitions
         public static double TrendThreshold { get; } = -0.3;
 
         /// <summary>
-        /// Tolerance for the gap between the first candle’s close and second candle’s open.
+        /// Tolerance for the gap between the first candleï¿½s close and second candleï¿½s open.
         /// Purpose: Allows flexibility in the gap-down requirement.
         /// Loosest: 1.0 (wide gap tolerance); Strictest: 0.0 (no gap allowed).
         /// </summary>
         public static double OpenTolerance { get; } = 0.5;
 
         /// <summary>
-        /// Tolerance for the second candle’s close relative to the first candle’s midpoint.
+        /// Tolerance for the second candleï¿½s close relative to the first candleï¿½s midpoint.
         /// Purpose: Ensures the close is near or above the midpoint while allowing flexibility.
         /// Loosest: 1.0 (wide tolerance); Strictest: 0.0 (exact midpoint).
         /// </summary>
@@ -62,7 +62,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Occurs in a downtrend.
         /// - First candle is bearish with a significant body.
         /// - Second candle is bullish, opens below or near the first candle's close, 
-        ///   and closes above the midpoint of the first candle’s body but below its open.
+        ///   and closes above the midpoint of the first candleï¿½s body but below its open.
         /// Indicates: Potential reversal from bearish to bullish momentum as buyers step in after a gap down.
         /// </summary>
         public static PiercingPattern IsPattern(
@@ -79,7 +79,7 @@ namespace BacklashPatterns.PatternDefinitions
             var currMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
 
             // Require a downtrend using CandleMetrics method
-            if (currMetrics.GetLookbackAverageTrend(2) > TrendThreshold) return null;
+            if (currMetrics.GetLookbackMeanTrend(2) > TrendThreshold) return null;
 
             // Use precomputed metrics for efficiency
             double body1 = prevMetrics.BodySize;
@@ -107,6 +107,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

@@ -15,8 +15,8 @@ namespace BacklashPatterns.PatternDefinitions
     /// Your single-candle check doesn�t include this.
     /// The pattern�s reliability often increases near support/resistance levels or after extreme price moves. Your code focuses solely on the candle and prior trend, not broader market context.
     //Suggestion: This might be out of scope for raw pattern detection, but you could flag patterns near key levels(e.g., 25, 50, 75 on a 0�100 scale) for your ML model.
-    /// Many sources (e.g., Investopedia) suggest that a Belt Hold with higher-than-average volume strengthens the reversal signal. Your CandleMetrics calculates AvgVolumeVsLookback, but it�s not used in IsPattern.
-    //Suggestion: Add an optional volume check(e.g., AvgVolumeVsLookback > 1.0) to filter for stronger signals, especially for machine learning where volume might be predictive.
+    /// Many sources (e.g., Investopedia) suggest that a Belt Hold with higher-than-average volume strengthens the reversal signal. Your CandleMetrics calculates AvgVoumeVsLookback, but it�s not used in IsPattern.
+    //Suggestion: Add an optional volume check(e.g., AvgVoumeVsLookback > 1.0) to filter for stronger signals, especially for machine learning where volume might be predictive.
     /// </summary>
     public class BeltHoldPattern_old : PatternDefinition
     {
@@ -103,8 +103,8 @@ namespace BacklashPatterns.PatternDefinitions
             double upperShadow = isBullish ? currentMetrics.UpperWick : currentPrices.High - currentPrices.Open;
             double lowerShadow = isBullish ? currentPrices.Open - currentPrices.Low : currentMetrics.LowerWick;
             if (upperShadow > ShadowMax || lowerShadow > ShadowMax) return null;
-            double meanTrend = currentMetrics.GetLookbackAverageTrend(1);
-            double trendConsistency = currentMetrics.GetLookbackTrendStability(1);
+            double meanTrend = currentMetrics.GetLookbackMeanTrend(1);
+            double trendConsistency = currentMetrics.GetLookbackTrendConsistency(1);
             bool hasTrend = isBullish ? (meanTrend < -TrendThreshold && trendConsistency >= TrendConsistencyMin)
                                      : (meanTrend > TrendThreshold && trendConsistency >= TrendConsistencyMin);
             if (!hasTrend) return null;
@@ -113,3 +113,4 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+

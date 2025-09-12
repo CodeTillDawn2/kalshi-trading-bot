@@ -21,7 +21,7 @@ public class GravestoneDojiPattern : PatternDefinition
 
     /// <summary>
     /// Maximum ratio of body size to total range.
-    /// Purpose: Ensures the body remains small relative to the candle’s range.
+    /// Purpose: Ensures the body remains small relative to the candleï¿½s range.
     /// Strictest: 0.05 (extremely small body), Loosest: 0.25 (larger body allowed per loose standards).
     /// </summary>
     public static double BodyRangeRatio { get; set; } = 0.1;
@@ -76,12 +76,13 @@ public class GravestoneDojiPattern : PatternDefinition
             metrics.UpperWick < WickBodyRatio * metrics.BodySize ||
             metrics.LowerWick > LowerWickMaxRatio * metrics.TotalRange) return null;
 
-        if (metrics.GetLookbackAverageTrend(1) <= TrendThreshold) return null;
+        if (metrics.GetLookbackMeanTrend(1) <= TrendThreshold) return null;
 
         var candles = new List<int> { index };
         return new GravestoneDojiPattern(candles);
     }
 }
+
 
 
 

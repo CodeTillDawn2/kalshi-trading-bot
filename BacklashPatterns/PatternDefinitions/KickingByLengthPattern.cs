@@ -68,8 +68,8 @@ namespace BacklashPatterns.PatternDefinitions
             var currMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
 
             // Trend check
-            if (isBullish && currMetrics.GetLookbackAverageTrend(2) >= -TrendThreshold) return null;
-            if (!isBullish && currMetrics.GetLookbackAverageTrend(2) <= TrendThreshold) return null;
+            if (isBullish && currMetrics.GetLookbackMeanTrend(2) >= -TrendThreshold) return null;
+            if (!isBullish && currMetrics.GetLookbackMeanTrend(2) <= TrendThreshold) return null;
 
             // Body size check
             if (prevMetrics.BodySize < MinBodySize || currMetrics.BodySize < MinBodySize) return null;
@@ -87,6 +87,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

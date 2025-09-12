@@ -101,8 +101,8 @@ namespace BacklashPatterns.PatternDefinitions
             if (!notEngulfing) return null;
 
             // Trend check
-            double meanTrend = currMetrics.GetLookbackAverageTrend(2);
-            double trendConsistency = currMetrics.GetLookbackTrendStability(2);
+            double meanTrend = currMetrics.GetLookbackMeanTrend(2);
+            double trendConsistency = currMetrics.GetLookbackTrendConsistency(2);
             bool hasTrend = isBullish ? (meanTrend <= -TrendThreshold && trendConsistency >= TrendConsistencyMin)
                                      : (meanTrend >= TrendThreshold && trendConsistency >= TrendConsistencyMin);
             if (!hasTrend) return null;
@@ -111,6 +111,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

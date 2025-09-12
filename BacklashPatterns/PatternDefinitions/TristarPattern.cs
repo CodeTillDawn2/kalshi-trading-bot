@@ -117,8 +117,8 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Loosened trend check using CandleMetrics method (restored from original: �0.3)
             bool trendValid = isBullish
-                ? (metrics3.GetLookbackAverageTrend(3) <= -TrendThreshold) // Downtrend for bullish
-                : (metrics3.GetLookbackAverageTrend(3) >= TrendThreshold);  // Uptrend for bearish
+                ? (metrics3.GetLookbackMeanTrend(3) <= -TrendThreshold) // Downtrend for bullish
+                : (metrics3.GetLookbackMeanTrend(3) >= TrendThreshold);  // Uptrend for bearish
             if (!trendValid) return null;
 
             // Define the candle indices for the pattern (matches original)
@@ -137,3 +137,4 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+

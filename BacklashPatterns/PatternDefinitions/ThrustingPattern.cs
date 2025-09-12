@@ -31,8 +31,8 @@ namespace BacklashPatterns.PatternDefinitions
 
         /// <summary>
         /// Represents a Thrusting pattern (Bullish or Bearish).
-        /// - Bullish Thrusting: A potential continuation or weak reversal in a downtrend. First candle is bearish, second is bullish but doesn’t close above the first’s open, indicating hesitation.
-        /// - Bearish Thrusting: A potential continuation or weak reversal in an uptrend. First candle is bullish, second is bearish but doesn’t close below the first’s open, showing indecision.
+        /// - Bullish Thrusting: A potential continuation or weak reversal in a downtrend. First candle is bearish, second is bullish but doesnï¿½t close above the firstï¿½s open, indicating hesitation.
+        /// - Bearish Thrusting: A potential continuation or weak reversal in an uptrend. First candle is bullish, second is bearish but doesnï¿½t close below the firstï¿½s open, showing indecision.
         /// Requirements sourced from: https://www.babypips.com/learn/forex/thrusting-pattern
         /// </summary>
         public const string BaseName = "Thrusting";
@@ -66,7 +66,7 @@ namespace BacklashPatterns.PatternDefinitions
 
             if (isBullish)
             {
-                if (currMetrics.GetLookbackAverageTrend(2) > BullishTrendThreshold) return null;
+                if (currMetrics.GetLookbackMeanTrend(2) > BullishTrendThreshold) return null;
 
                 bool isPatternValid = prevMetrics.BodySize >= MinBodySize &&
                                       prevMetrics.IsBearish &&
@@ -79,7 +79,7 @@ namespace BacklashPatterns.PatternDefinitions
             }
             else
             {
-                if (currMetrics.GetLookbackAverageTrend(2) <= BearishTrendThreshold) return null;
+                if (currMetrics.GetLookbackMeanTrend(2) <= BearishTrendThreshold) return null;
 
                 bool isPatternValid = prevMetrics.BodySize >= MinBodySize &&
                                       prevMetrics.IsBullish &&
@@ -96,6 +96,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

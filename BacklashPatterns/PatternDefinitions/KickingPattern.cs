@@ -67,8 +67,8 @@ namespace BacklashPatterns.PatternDefinitions
             var currMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
 
             // Trend check
-            bool trendValid = isBullish ? currMetrics.GetLookbackAverageTrend(2) <= -TrendThreshold
-                                       : currMetrics.GetLookbackAverageTrend(2) >= TrendThreshold;
+            bool trendValid = isBullish ? currMetrics.GetLookbackMeanTrend(2) <= -TrendThreshold
+                                       : currMetrics.GetLookbackMeanTrend(2) >= TrendThreshold;
             if (!trendValid) return null;
 
             // Body size check
@@ -87,6 +87,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

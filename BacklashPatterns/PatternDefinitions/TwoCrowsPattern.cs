@@ -38,8 +38,8 @@ namespace BacklashPatterns.PatternDefinitions
          *   Indicates a potential top as two bearish candles ("crows") follow a strong bullish candle.
          * - Requirements (Source: Investopedia):
          *   1. First candle: Strong bullish candle in an uptrend.
-         *   2. Second candle: Bearish, gaps up from the first candle’s close.
-         *   3. Third candle: Bearish, opens within the second candle’s range, closes near or below the first candle’s close.
+         *   2. Second candle: Bearish, gaps up from the first candleï¿½s close.
+         *   3. Third candle: Bearish, opens within the second candleï¿½s range, closes near or below the first candleï¿½s close.
          * - Indication: Suggests selling pressure overcoming buying momentum, potential reversal to downtrend.
          */
         public static TwoCrowsPattern IsPattern(
@@ -72,13 +72,14 @@ namespace BacklashPatterns.PatternDefinitions
                 prices[c3].Close > prices[c1].Open + GapTolerance) return null;
 
             // Minimal uptrend check
-            if (metrics3.GetLookbackAverageTrend(3) <= 0.05) return null;
+            if (metrics3.GetLookbackMeanTrend(3) <= 0.05) return null;
 
             var candles = new List<int> { c1, c2, c3 };
             return new TwoCrowsPattern(candles);
         }
     }
 }
+
 
 
 

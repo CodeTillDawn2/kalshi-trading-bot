@@ -6,9 +6,9 @@ namespace BacklashPatterns.PatternDefinitions
     public class ModifiedHikkakePattern : PatternDefinition
     {
         /// <summary>
-        /// Minimum directional move required for the second candle’s breakout or breakdown from the first candle’s close.
+        /// Minimum directional move required for the second candleï¿½s breakout or breakdown from the first candleï¿½s close.
         /// - Strictest: 0.5 (noticeable breakout/breakdown).
-        /// - Loosest: 0.0 (any move qualifies, per your original loose definition and Investopedia’s flexibility).
+        /// - Loosest: 0.0 (any move qualifies, per your original loose definition and Investopediaï¿½s flexibility).
         /// </summary>
         public static double BreakoutThreshold { get; } = 0;
         public const string BaseName = "ModifiedHikkake";
@@ -27,8 +27,8 @@ namespace BacklashPatterns.PatternDefinitions
         /// Identifies a Modified Hikkake pattern, a three-candle reversal pattern.
         /// Requirements (sourced from Investopedia and adapted to your logic):
         /// - A three-candle pattern where the first candle sets a reference point.
-        /// - Second candle shows a slight breakout (bullish) or breakdown (bearish) from the first candle’s close.
-        /// - Third candle reverses the second candle’s direction, continuing the trend loosely.
+        /// - Second candle shows a slight breakout (bullish) or breakdown (bearish) from the first candleï¿½s close.
+        /// - Third candle reverses the second candleï¿½s direction, continuing the trend loosely.
         /// - Indicates a potential reversal with minimal trend confirmation.
         /// Your original logic uses a very loose definition compared to the standard Hikkake.
         /// </summary>
@@ -68,8 +68,8 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Minimal trend check (almost neutral) using CandleMetrics method
             bool trendCondition = isBullish
-                ? thirdMetrics.GetLookbackAverageTrend(3) <= 0  // No strong uptrend before bullish reversal
-                : thirdMetrics.GetLookbackAverageTrend(3) >= 0; // No strong downtrend before bearish reversal
+                ? thirdMetrics.GetLookbackMeanTrend(3) <= 0  // No strong uptrend before bullish reversal
+                : thirdMetrics.GetLookbackMeanTrend(3) >= 0; // No strong downtrend before bearish reversal
             if (!trendCondition) return null;
 
             // Define the candle indices for the pattern (three candles)
@@ -80,6 +80,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

@@ -108,3 +108,4 @@ public class DarkCloudCoverPattern2 : PatternDefinition
 
 
 
+

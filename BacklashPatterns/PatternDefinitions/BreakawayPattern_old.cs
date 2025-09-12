@@ -74,7 +74,7 @@ namespace BacklashPatterns.PatternDefinitions
             var metrics5 = GetCandleMetrics(ref metricsCache, startIndex + 4, prices, trendLookback, true);
 
             // Check trend and first candle
-            double meanTrend = metrics5.GetLookbackAverageTrend(5);
+            double meanTrend = metrics5.GetLookbackMeanTrend(5);
             bool hasTrend = isBullish
                 ? (metrics1.IsBearish && metrics1.BodySize >= MinBodySize && meanTrend <= -TrendThreshold)
                 : (metrics1.IsBullish && metrics1.BodySize >= MinBodySize && meanTrend >= TrendThreshold);
@@ -114,6 +114,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

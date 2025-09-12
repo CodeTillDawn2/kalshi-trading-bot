@@ -36,7 +36,7 @@ namespace BacklashPatterns
             return totalTrendChange;
         }
 
-        public static double CalculateLookbackAverageTrend(
+        public static double CalculateLookbackMeanTrend(
                     CandleMids[] prices,
                     int index,
                     int lookback,
@@ -61,7 +61,7 @@ namespace BacklashPatterns
             return totalChange / lookbackCount;
         }
 
-        public static double CalculateLookbackTrendStability(
+        public static double CalculateLookbackTrendConsistency(
             int index,
             int lookback,
             CandleMids[] prices,
@@ -213,6 +213,7 @@ namespace BacklashPatterns
 
     }
 }
+
 
 
 

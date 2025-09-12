@@ -38,7 +38,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Identifies a Stick Sandwich pattern, a three-candle reversal pattern.
         /// Bullish: Occurs in a downtrend; two bearish candles sandwich a bullish candle, with c1 and c3 closes nearly equal.
         /// Bearish: Occurs in an uptrend; two bullish candles sandwich a bearish candle, with c1 and c3 closes nearly equal.
-        /// Indicates a potential reversal as the middle candle’s move is rejected.
+        /// Indicates a potential reversal as the middle candleï¿½s move is rejected.
         /// Source: https://www.tradingview.com/education/stick-sandwich/
         /// </summary>
         public static StickSandwichPattern IsPattern(
@@ -71,14 +71,14 @@ namespace BacklashPatterns.PatternDefinitions
                 bool closesMatch = Math.Abs(prices[c3].Close - prices[c1].Close) <= MaxCloseDifference;
                 if (!closesMatch) return null;
 
-                // Second candle exceeds first candle’s range
+                // Second candle exceeds first candleï¿½s range
                 if (prices[c2].High < prices[c1].High || prices[c2].Low > prices[c1].Low) return null;
 
                 // Significant bodies
                 if (body1 < MinBodySize || body2 < MinBodySize || body3 < MinBodySize) return null;
 
-                // Downtrend check using LookbackAverageTrend (3 candles)
-                if (metrics3.GetLookbackAverageTrend(3) > -TrendThreshold) return null;
+                // Downtrend check using LookbackMeanTrend (3 candles)
+                if (metrics3.GetLookbackMeanTrend(3) > -TrendThreshold) return null;
             }
             else // Bearish
             {
@@ -89,14 +89,14 @@ namespace BacklashPatterns.PatternDefinitions
                 bool closesMatch = Math.Abs(prices[c3].Close - prices[c1].Close) <= MaxCloseDifference;
                 if (!closesMatch) return null;
 
-                // Second candle exceeds first candle’s range
+                // Second candle exceeds first candleï¿½s range
                 if (prices[c2].High < prices[c1].High || prices[c2].Low > prices[c1].Low) return null;
 
                 // Significant bodies
                 if (body1 < MinBodySize || body2 < MinBodySize || body3 < MinBodySize) return null;
 
-                // Uptrend check using LookbackAverageTrend (3 candles)
-                if (metrics3.GetLookbackAverageTrend(3) < TrendThreshold) return null;
+                // Uptrend check using LookbackMeanTrend (3 candles)
+                if (metrics3.GetLookbackMeanTrend(3) < TrendThreshold) return null;
             }
 
             var candles = new List<int> { c1, c2, c3 };
@@ -104,6 +104,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

@@ -24,7 +24,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double BearishEngulfFactor { get; set; } = 0.8;
 
         /// <summary>
-        /// Threshold for determining the preceding trend strength (± value).
+        /// Threshold for determining the preceding trend strength (ï¿½ value).
         /// Strictest: 0.5 (strong trend), Loosest: 0.1 (very weak trend still identifiable).
         /// </summary>
         public static double TrendThreshold { get; set; } = 0.3;
@@ -80,7 +80,7 @@ namespace BacklashPatterns.PatternDefinitions
                 bool thirdConfirms = metrics3.IsBullish && prices[thirdIndex].Close > prices[secondIndex].Close;
                 if (!thirdConfirms) return null;
 
-                bool hasDowntrend = metrics3.GetLookbackAverageTrend(3) <= -TrendThreshold;
+                bool hasDowntrend = metrics3.GetLookbackMeanTrend(3) <= -TrendThreshold;
                 if (!hasDowntrend) return null;
             }
             else // ThreeOutsideDown
@@ -97,7 +97,7 @@ namespace BacklashPatterns.PatternDefinitions
                 bool thirdConfirms = metrics3.IsBearish && prices[thirdIndex].Close < prices[secondIndex].Close;
                 if (!thirdConfirms) return null;
 
-                bool hasUptrend = metrics3.GetLookbackAverageTrend(3) >= TrendThreshold;
+                bool hasUptrend = metrics3.GetLookbackMeanTrend(3) >= TrendThreshold;
                 if (!hasUptrend) return null;
             }
 
@@ -106,6 +106,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

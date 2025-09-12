@@ -101,13 +101,14 @@ namespace BacklashPatterns.PatternDefinitions
                 prices[c3].Low < prices[c2].Low - LowTolerance || prices[c3].High > prices[c2].High + HighTolerance ||
                 metrics3.LowerWick > MaxLowerWick) return null;
 
-            if (metrics3.GetLookbackAverageTrend(3) > TrendThreshold) return null;
+            if (metrics3.GetLookbackMeanTrend(3) > TrendThreshold) return null;
 
             var candles = new List<int> { c1, c2, c3 };
             return new ThreeStarsInTheSouthPattern(candles);
         }
     }
 }
+
 
 
 

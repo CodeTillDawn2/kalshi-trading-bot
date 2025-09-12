@@ -67,8 +67,8 @@ public class DojiStarPattern : PatternDefinition
         bool strongTrend = firstMetrics.BodySize >= FirstCandleMinBodySize;
         if (!strongTrend) return null;
 
-        bool isBullishDojiStar = secondMetrics.GetLookbackAverageTrend(2) < -TrendThreshold && firstMetrics.IsBearish;
-        bool isBearishDojiStar = secondMetrics.GetLookbackAverageTrend(2) > TrendThreshold && firstMetrics.IsBullish;
+        bool isBullishDojiStar = secondMetrics.GetLookbackMeanTrend(2) < -TrendThreshold && firstMetrics.IsBearish;
+        bool isBearishDojiStar = secondMetrics.GetLookbackMeanTrend(2) > TrendThreshold && firstMetrics.IsBullish;
 
         if (isBullishDojiStar)
             return new DojiStarPattern(new List<int> { index - 1, index }, true);
@@ -77,6 +77,7 @@ public class DojiStarPattern : PatternDefinition
         return null;
     }
 }
+
 
 
 

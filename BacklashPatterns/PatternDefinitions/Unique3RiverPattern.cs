@@ -18,7 +18,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MaxBodySize { get; } = 2.0;
 
         /// <summary>
-        /// Tolerance for how close the second candle’s close must be to the first candle’s low.
+        /// Tolerance for how close the second candleï¿½s close must be to the first candleï¿½s low.
         /// Strictest: 0.1 (very close), Loosest: 1.0 (broader range for nearness).
         /// </summary>
         public static double LowCloseTolerance { get; } = 0.5;
@@ -83,13 +83,14 @@ namespace BacklashPatterns.PatternDefinitions
             if (!shape) return null;
 
             // Downtrend check
-            if (metrics3.GetLookbackAverageTrend(3) > TrendThreshold) return null;
+            if (metrics3.GetLookbackMeanTrend(3) > TrendThreshold) return null;
 
             var candles = new List<int> { c1, c2, c3 };
             return new Unique3RiverPattern(candles);
         }
     }
 }
+
 
 
 

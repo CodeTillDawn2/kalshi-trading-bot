@@ -60,8 +60,8 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Validate the trend direction using CandleMetrics method
             bool trendValid = isBullish
-                ? metrics.GetLookbackAverageTrend(1) < -TrendThreshold // Downtrend before bullish
-                : metrics.GetLookbackAverageTrend(1) > TrendThreshold;  // Uptrend before bearish
+                ? metrics.GetLookbackMeanTrend(1) < -TrendThreshold // Downtrend before bullish
+                : metrics.GetLookbackMeanTrend(1) > TrendThreshold;  // Uptrend before bearish
 
             // Combine conditions to confirm the pattern
             bool isPatternValid = (strictBullish || strictBearish) && direction && trendValid;
@@ -76,6 +76,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

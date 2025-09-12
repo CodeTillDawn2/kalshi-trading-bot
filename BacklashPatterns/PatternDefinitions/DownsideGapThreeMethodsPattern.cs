@@ -49,7 +49,7 @@ public class DownsideGapThreeMethodsPattern : PatternDefinition
 
         var asks = prices.Skip(index - 2).Take(3).ToArray();
 
-        if (metrics3.GetLookbackAverageTrend(3) > TrendThreshold) return null;
+        if (metrics3.GetLookbackMeanTrend(3) > TrendThreshold) return null;
 
         if (!metrics1.IsBearish || metrics1.BodySize < MinBodySize) return null;
         if (asks[1].Open >= asks[0].Close - GapSize) return null;
@@ -61,6 +61,7 @@ public class DownsideGapThreeMethodsPattern : PatternDefinition
         return new DownsideGapThreeMethodsPattern(candles);
     }
 }
+
 
 
 

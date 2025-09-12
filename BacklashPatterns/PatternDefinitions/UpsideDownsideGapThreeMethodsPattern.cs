@@ -54,7 +54,7 @@ public class UpsideDownsideGapThreeMethodsPattern : PatternDefinition
             if (metrics3.BodySize < MinBodySize ||
                 metrics3.TotalRange <= 0 ||
                 metrics3.LowerWick > 0.1 * metrics3.TotalRange) return null;
-            if (metrics3.GetLookbackAverageTrend(3) <= TrendThreshold) return null;
+            if (metrics3.GetLookbackMeanTrend(3) <= TrendThreshold) return null;
         }
         else
         {
@@ -68,13 +68,14 @@ public class UpsideDownsideGapThreeMethodsPattern : PatternDefinition
             if (metrics3.BodySize < MinBodySize ||
                 metrics3.TotalRange <= 0 ||
                 metrics3.UpperWick > 0.1 * metrics3.TotalRange) return null;
-            if (metrics3.GetLookbackAverageTrend(3) >= -TrendThreshold) return null;
+            if (metrics3.GetLookbackMeanTrend(3) >= -TrendThreshold) return null;
         }
 
         var candles = new List<int> { c1, c2, c3 };
         return new UpsideDownsideGapThreeMethodsPattern(candles);
     }
 }
+
 
 
 

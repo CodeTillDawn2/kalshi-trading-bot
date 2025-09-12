@@ -12,7 +12,7 @@ public class EveningStarPattern : PatternDefinition
     public static double MinBodySize { get; set; } = 1.0;
 
     /// <summary>
-    /// Maximum body size for the second candle to ensure it’s small.
+    /// Maximum body size for the second candle to ensure itï¿½s small.
     /// Strictest: 0.5 (very small); Loosest: 1.5 (moderate size).
     /// </summary>
     public static double SmallBodyMax { get; set; } = 1.0;
@@ -59,8 +59,8 @@ public class EveningStarPattern : PatternDefinition
         var secondMetrics = GetCandleMetrics(ref metricsCache, secondIndex, prices, trendLookback, false);
         var thirdMetrics = GetCandleMetrics(ref metricsCache, thirdIndex, prices, trendLookback, true);
 
-        if (thirdMetrics.GetLookbackAverageTrend(3) <= TrendThreshold ||
-            thirdMetrics.GetLookbackTrendStability(3) < TrendConsistencyThreshold) return null;
+        if (thirdMetrics.GetLookbackMeanTrend(3) <= TrendThreshold ||
+            thirdMetrics.GetLookbackTrendConsistency(3) < TrendConsistencyThreshold) return null;
 
         if (!firstMetrics.IsBullish || firstMetrics.BodySize < MinBodySize) return null;
         if (secondMetrics.BodySize > SmallBodyMax) return null;
@@ -73,6 +73,7 @@ public class EveningStarPattern : PatternDefinition
         return new EveningStarPattern(candles);
     }
 }
+
 
 
 

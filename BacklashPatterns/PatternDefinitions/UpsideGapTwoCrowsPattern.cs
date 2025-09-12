@@ -27,7 +27,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double GapOverlapTolerance { get; set; } = 0.5;
 
         /// <summary>
-        /// Tolerance for how far the third candle’s close can deviate above the first candle’s close.
+        /// Tolerance for how far the third candleï¿½s close can deviate above the first candleï¿½s close.
         /// Purpose: Ensures the third candle closes near the first to signal weakening momentum.
         /// Strictest: 0 (exact match), Loosest: 2.0 (allows wider deviation while still bearish).
         /// </summary>
@@ -69,7 +69,7 @@ namespace BacklashPatterns.PatternDefinitions
             var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
 
             // Uptrend check
-            if (metrics3.GetLookbackAverageTrend(3) <= TrendThreshold) return null;
+            if (metrics3.GetLookbackMeanTrend(3) <= TrendThreshold) return null;
 
             // First candle: Bullish with sufficient body
             if (metrics1.BodySize < FirstCandleMinBodySize || !metrics1.IsBullish) return null;
@@ -79,7 +79,7 @@ namespace BacklashPatterns.PatternDefinitions
                 prices[c2].Open < prices[c1].Close - GapOverlapTolerance ||
                 prices[c2].Close <= prices[c1].Open) return null;
 
-            // Third candle: Bearish, opens between second’s range, closes below second, near first close
+            // Third candle: Bearish, opens between secondï¿½s range, closes below second, near first close
             if (!metrics3.IsBearish ||
                 prices[c3].Open > prices[c2].Open + GapOverlapTolerance ||
                 prices[c3].Open < prices[c2].Close - GapOverlapTolerance ||
@@ -91,6 +91,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

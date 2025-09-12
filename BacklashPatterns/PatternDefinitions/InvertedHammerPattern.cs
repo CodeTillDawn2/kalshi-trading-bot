@@ -79,7 +79,7 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMetrics metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
 
             // Downtrend check
-            if (metrics.GetLookbackAverageTrend(1) > TrendThreshold) return null;
+            if (metrics.GetLookbackMeanTrend(1) > TrendThreshold) return null;
 
             // Range check
             if (metrics.TotalRange < MinRange) return null;
@@ -98,6 +98,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

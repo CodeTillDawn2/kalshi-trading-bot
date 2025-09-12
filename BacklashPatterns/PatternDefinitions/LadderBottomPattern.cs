@@ -42,7 +42,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Identifies a Ladder Bottom, a five-candle bullish reversal pattern.
         /// Requirements (sourced from StockCharts and technical analysis texts):
         /// - Four bearish candles with descending closes, often with similar lows.
-        /// - Fifth candle is bullish, closing above the fourth candle’s close.
+        /// - Fifth candle is bullish, closing above the fourth candleï¿½s close.
         /// - Occurs after a downtrend, signaling exhaustion and reversal.
         /// Indicates: Potential bullish reversal as selling pressure weakens.
         /// </summary>
@@ -85,7 +85,7 @@ namespace BacklashPatterns.PatternDefinitions
             if (!similarLows) return null;
 
             // Relaxed trend (from original)
-            bool hasDowntrend = metrics[4].GetLookbackAverageTrend(5) <= -TrendThreshold;
+            bool hasDowntrend = metrics[4].GetLookbackMeanTrend(5) <= -TrendThreshold;
             if (!hasDowntrend) return null;
 
             // Define the candle indices for the pattern (five candles)
@@ -95,6 +95,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

@@ -12,15 +12,15 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MinBodySize { get; set; } = 0.5;
 
         /// <summary>
-        /// Threshold for confirming the strength of the preceding trend (± value).
+        /// Threshold for confirming the strength of the preceding trend (ï¿½ value).
         /// Strictest: 0.5 (original logic), Loosest: 0.1 (minimal trend still detectable).
         /// </summary>
         public static double TrendThreshold { get; set; } = 0.1;
 
         /// <summary>
         /// Represents a Three Line Strike pattern (Bullish or Bearish).
-        /// - Bullish: A reversal pattern in a downtrend. Three bullish candles with ascending closes, followed by a bearish candle that strikes back, closing below the second candle’s close.
-        /// - Bearish: A reversal pattern in an uptrend. Three bearish candles with descending closes, followed by a bullish candle that strikes back, closing above the second candle’s close.
+        /// - Bullish: A reversal pattern in a downtrend. Three bullish candles with ascending closes, followed by a bearish candle that strikes back, closing below the second candleï¿½s close.
+        /// - Bearish: A reversal pattern in an uptrend. Three bearish candles with descending closes, followed by a bullish candle that strikes back, closing above the second candleï¿½s close.
         /// Requirements sourced from: https://www.investopedia.com/terms/t/three-line-strike.asp
         /// </summary>
         public const string BaseName = "ThreeLineStrike";
@@ -67,7 +67,7 @@ namespace BacklashPatterns.PatternDefinitions
                 // Step 5: Simplified strike condition
                 if (prices[c4].Close >= prices[c3].Close) return null;
                 // Step 6: Trend check only if c1 >= 0
-                if (c1 >= 0 && metrics4.GetLookbackAverageTrend(4) >= -TrendThreshold) return null;
+                if (c1 >= 0 && metrics4.GetLookbackMeanTrend(4) >= -TrendThreshold) return null;
             }
             else
             {
@@ -82,7 +82,7 @@ namespace BacklashPatterns.PatternDefinitions
                 // Step 5: Simplified strike condition
                 if (prices[c4].Close <= prices[c3].Close) return null;
                 // Step 6: Trend check only if c1 >= 0
-                if (c1 >= 0 && metrics4.GetLookbackAverageTrend(4) <= TrendThreshold) return null;
+                if (c1 >= 0 && metrics4.GetLookbackMeanTrend(4) <= TrendThreshold) return null;
             }
 
             var candles = new List<int> { c1, c2, c3, c4 };
@@ -90,6 +90,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

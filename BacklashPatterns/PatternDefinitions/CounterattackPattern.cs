@@ -195,8 +195,8 @@ namespace BacklashPatterns.PatternDefinitions
                             (currentPrices.Open > previousPrices.Close && currentPrices.Close < previousPrices.Open)) return null;
 
             // [CHANGED] Trend checks: Add minimum meanTrend for bearish
-            double meanTrend = currMetrics.GetLookbackAverageTrend(PatternSize);
-            double trendConsistency = currMetrics.GetLookbackTrendStability(PatternSize);
+            double meanTrend = currMetrics.GetLookbackMeanTrend(PatternSize);
+            double trendConsistency = currMetrics.GetLookbackTrendConsistency(PatternSize);
             double trendDirectionRatio = isBullish ? currMetrics.BearishRatio[PatternSize - 1] : currMetrics.BullishRatio[PatternSize - 1];
             if (isBullish)
             {
@@ -216,3 +216,4 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
