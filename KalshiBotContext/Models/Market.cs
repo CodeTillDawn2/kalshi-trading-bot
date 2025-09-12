@@ -2,7 +2,12 @@
 
 namespace KalshiBotData.Models
 {
-
+    /// <summary>
+    /// Represents a tradable market with comprehensive pricing, volume, and status information.
+    /// This entity serves as the core data model for all market-related operations in the trading bot,
+    /// containing real-time and historical market data, order book information, and market metadata.
+    /// Maps to the Markets database table and is central to the trading system's data model.
+    /// </summary>
     public class Market
     {
         public required string market_ticker { get; set; }
