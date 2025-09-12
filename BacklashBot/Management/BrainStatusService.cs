@@ -1,11 +1,16 @@
 using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using BacklashDTOs.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashDTOs.Data;
 
 namespace BacklashBot.Management
 {
+    /// <summary>
+    /// Service responsible for managing the initialization and status of a brain instance,
+    /// providing access to the brain lock and session identifier in a thread-safe manner.
+    /// </summary>
     public class BrainStatusService : IBrainStatusService
     {
         private Guid _brainLock;
@@ -15,13 +20,25 @@ namespace BacklashBot.Management
         private readonly object _lock = new();
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ExecutionConfig _executionConfig;
+        private readonly ILogger<BrainStatusService> _logger;
 
-        public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions<ExecutionConfig> executionConfig)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BrainStatusService"/> class.
+        /// </summary>
+        /// <param name="scopeFactory">Factory for creating service scopes to access database context.</param>
+        /// <param name="executionConfig">Configuration options for execution settings.</param>
+        /// <param name="logger">Logger for recording service operations and errors.</param>
+        public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions<ExecutionConfig> executionConfig, ILogger<BrainStatusService> logger)
         {
             _scopeFactory = scopeFactory;
             _executionConfig = executionConfig.Value;
+            _logger = logger;
         }
 
+        /// <summary>
+        /// Gets the unique brain lock GUID for this brain instance.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when the service has not been initialized.</exception>
         public Guid BrainLock
         {
             get
@@ -34,6 +51,10 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Gets the session identifier string for this brain instance.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when the service has not been initialized.</exception>
         public string SessionIdentifier
         {
             get
@@ -46,6 +67,11 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Ensures the brain status service is initialized asynchronously.
+        /// Uses double-checked locking to prevent multiple initialization attempts.
+        /// </summary>
+        /// <returns>A task representing the initialization operation.</returns>
         public Task EnsureInitializedAsync()
         {
             if (_initTask == null)
@@ -61,6 +87,11 @@ namespace BacklashBot.Management
             return _initTask;
         }
 
+        /// <summary>
+        /// Populates the brain lock and session identifier fields by retrieving the brain instance from the database.
+        /// </summary>
+        /// <returns>A task representing the field population operation.</returns>
+        /// <exception cref="Exception">Thrown when the brain instance is not found in the database.</exception>
         private async Task PopulateFieldsAsync()
         {
             try
@@ -70,18 +101,26 @@ namespace BacklashBot.Management
                 BrainInstanceDTO? brainInstance = await context.GetBrainInstance(_executionConfig.BrainInstance);
                 if (brainInstance == null)
                 {
+                    _logger.LogError("Brain instance with ID {BrainInstance} not found.", _executionConfig.BrainInstance);
                     throw new Exception($"Brain instance with ID {_executionConfig.BrainInstance} not found.");
                 }
                 _brainLock = brainInstance.BrainLock ?? Guid.NewGuid();
                 _sessionIdentifier = GenerateRandomString(5);
                 _initialized = true;
+                _logger.LogInformation("Brain status service initialized successfully for brain instance {BrainInstance}.", _executionConfig.BrainInstance);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to initialize brain status service for brain instance {BrainInstance}.", _executionConfig.BrainInstance);
                 throw; // Rethrow to surface in task; handle as needed in consumers.
             }
         }
 
+        /// <summary>
+        /// Generates a random alphanumeric string of the specified length.
+        /// </summary>
+        /// <param name="length">The length of the string to generate.</param>
+        /// <returns>A random alphanumeric string.</returns>
         private string GenerateRandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -90,9 +129,13 @@ namespace BacklashBot.Management
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
+        /// <summary>
+        /// Disposes of the brain status service resources.
+        /// Currently no unmanaged resources are held, so this is a no-op.
+        /// </summary>
         public void Dispose()
         {
-
+            // No unmanaged resources to dispose
         }
     }
 }

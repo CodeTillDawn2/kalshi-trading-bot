@@ -12,6 +12,28 @@ using TradingStrategies.Configuration;
 
 namespace BacklashBot.Management
 {
+    /// <summary>
+    /// Central performance monitoring service that tracks system performance metrics,
+    /// records execution times, and monitors queue depths for the Kalshi trading bot.
+    /// This class provides comprehensive performance analytics including WebSocket event
+    /// rates, API execution times, and queue utilization metrics.
+    /// </summary>
+    /// <remarks>
+    /// The performance monitor serves multiple purposes:
+    /// - Tracks API method execution times for performance analysis
+    /// - Monitors queue depths for event, ticker, and notification queues
+    /// - Calculates WebSocket event averages per market
+    /// - Provides rolling averages for queue utilization over 5-minute windows
+    /// - Integrates with market refresh service metrics
+    /// - Supports performance-based decision making for market management
+    ///
+    /// Key metrics tracked:
+    /// - Method execution times with timestamps
+    /// - Queue counts for various system queues
+    /// - WebSocket event counts per market
+    /// - Market refresh cycle performance
+    /// - System startup and shutdown states
+    /// </remarks>
     public class CentralPerformanceMonitor : ICentralPerformanceMonitor
     {
         private readonly ILogger<ICentralPerformanceMonitor> _logger;
@@ -39,6 +61,16 @@ namespace BacklashBot.Management
         public bool IsStartingUp { get; set; } = false;
         public bool IsShuttingDown { get; set; } = false;
 
+        /// <summary>
+        /// Initializes a new instance of the CentralPerformanceMonitor class.
+        /// </summary>
+        /// <param name="logger">Logger instance for recording performance monitoring operations.</param>
+        /// <param name="serviceFactory">Factory for accessing system services and data caches.</param>
+        /// <param name="executionConfig">Configuration settings for execution parameters.</param>
+        /// <param name="tradingConfig">Configuration settings for trading parameters.</param>
+        /// <param name="scopeFactory">Factory for creating service scopes.</param>
+        /// <param name="scopeManagerService">Service for managing database operation scopes.</param>
+        /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens.</param>
         public CentralPerformanceMonitor(
             ILogger<ICentralPerformanceMonitor> logger,
             IServiceFactory serviceFactory,
@@ -62,6 +94,19 @@ namespace BacklashBot.Management
             _queueCountSamples = new ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>>();
         }
 
+        /// <summary>
+        /// Calculates the average WebSocket events received per minute for a specific market.
+        /// </summary>
+        /// <param name="marketTicker">The ticker symbol of the market to analyze.</param>
+        /// <returns>The average events per minute, rounded to 2 decimal places. Returns 0.0 if data is unavailable or invalid.</returns>
+        /// <remarks>
+        /// This method calculates the average by:
+        /// 1. Getting the total WebSocket events (sum of three event types) since market open
+        /// 2. Calculating elapsed time in minutes since market open
+        /// 3. Computing events per minute, handling edge cases for invalid time spans
+        ///
+        /// Used for performance monitoring and market activity assessment.
+        /// </remarks>
         public double CalculateAverageWebsocketEventsReceived(string marketTicker)
         {
             var dataCache = _serviceFactory.GetDataCache();
@@ -94,6 +139,17 @@ namespace BacklashBot.Management
             return Math.Round(averageEventsPerMinute, 2);
         }
 
+        /// <summary>
+        /// Records the execution time for a specific API method or operation.
+        /// </summary>
+        /// <param name="methodName">The name of the method or operation being timed.</param>
+        /// <param name="milliseconds">The execution time in milliseconds.</param>
+        /// <remarks>
+        /// Execution times are stored in a thread-safe concurrent dictionary with timestamps.
+        /// This data can be used for performance analysis, bottleneck identification,
+        /// and optimization efforts. Multiple executions of the same method are accumulated
+        /// in a list for statistical analysis.
+        /// </remarks>
         public void RecordExecutionTime(string methodName, long milliseconds)
         {
             var record = (Timestamp: DateTime.UtcNow, Milliseconds: milliseconds);
@@ -103,6 +159,20 @@ namespace BacklashBot.Management
                 (_, list) => { list.Add(record); return list; });
         }
 
+        /// <summary>
+        /// Starts the performance monitoring timer that periodically collects system metrics.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// This method initiates a background timer that:
+        /// - Runs every second to poll queue counts
+        /// - Every minute, collects market refresh service performance metrics
+        /// - Updates rolling averages for queue utilization
+        /// - Monitors system performance indicators
+        ///
+        /// The timer continues until the cancellation token is triggered.
+        /// Multiple calls to StartTimer() are ignored if already running.
+        /// </remarks>
         public async Task StartTimer()
         {
             if (_timerRunning) return;
@@ -138,7 +208,7 @@ namespace BacklashBot.Management
                                 LastRefreshTimeAcceptable = dto != null && LastRefreshUsagePercentage >= dto.UsageMin && LastRefreshUsagePercentage <= dto.UsageMax;
                                 LastPerformanceSampleDate = DateTime.UtcNow;
 
-                                _logger.LogDebug(
+                                _logger.LogInformation(
                                     "{Service} processing time: Elapsed={ElapsedSeconds:F2}s, Markets={MarketCount}, Usage={UsagePercentage:F2}%, Acceptable={IsAcceptable}",
                                     marketServiceName, LastRefreshCycleSeconds, LastRefreshMarketCount, LastRefreshUsagePercentage, LastRefreshTimeAcceptable);
                             }
@@ -182,6 +252,19 @@ namespace BacklashBot.Management
             });
         }
 
+        /// <summary>
+        /// Calculates rolling averages for all system queue counts over the last 5 minutes.
+        /// </summary>
+        /// <returns>A tuple containing the average counts for EventQueue, TickerQueue, NotificationQueue, and OrderBookQueue.</returns>
+        /// <remarks>
+        /// This method provides a snapshot of system queue utilization by:
+        /// - Filtering samples to the last 5 minutes
+        /// - Computing averages for each queue type
+        /// - Cleaning up old samples to prevent memory growth
+        /// - Including WebSocket order book queue data
+        ///
+        /// Used for monitoring system performance and detecting potential bottlenecks.
+        /// </remarks>
         public (double EventQueueAvg, double TickerQueueAvg, double NotificationQueueAvg, double OrderBookQueueAvg) GetQueueCountRollingAverages()
         {
             var fiveMinutesAgo = DateTime.UtcNow.AddMinutes(-5);
@@ -224,6 +307,19 @@ namespace BacklashBot.Management
             );
         }
 
+        /// <summary>
+        /// Calculates the percentage of time the EventQueue has been at or above the target threshold over the last 5 minutes.
+        /// </summary>
+        /// <returns>The percentage (0-100) of samples where the queue count exceeded the target threshold.</returns>
+        /// <remarks>
+        /// This method monitors queue utilization by:
+        /// - Analyzing EventQueue samples from the last 5 minutes
+        /// - Counting samples that exceed the configured target count
+        /// - Calculating the percentage of high-utilization periods
+        /// - Cleaning up old samples to manage memory
+        ///
+        /// Used for performance monitoring and system health assessment.
+        /// </remarks>
         public double GetQueueHighCountPercentage()
         {
             var fiveMinutesAgo = DateTime.UtcNow.AddMinutes(-5);

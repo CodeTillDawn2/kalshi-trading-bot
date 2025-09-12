@@ -104,6 +104,7 @@ namespace TradingSimulator.Executable
             var overnightLoggerMock = new Mock<ILogger<OvernightActivitiesHelper>>();
             var interestLoggerMock = new Mock<ILogger<InterestScoreService>>();
             var tradingLoggerMock = new Mock<ILogger<TradingStrategy<MarketSnapshot>>>();
+            var marketAnalysisLoggerMock = new Mock<ILogger<MarketAnalysisHelper>>();
 
             // Add mocks for missing dependencies
             var scopeManagerMock = new Mock<IScopeManagerService>();
@@ -136,7 +137,7 @@ namespace TradingSimulator.Executable
             _serviceProvider = services.BuildServiceProvider();
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
-            _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig);
+            _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, marketAnalysisLoggerMock.Object);
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _marketAnalysisHelper, _executionConfig, _sqlDataService);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _snapshotOptions, Options.Create(tradingConfig), _scopeFactory);
             _snapshotPeriodAnalyzer = new SnapshotPeriodHelper();

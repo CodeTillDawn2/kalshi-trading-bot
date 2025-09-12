@@ -94,6 +94,7 @@ namespace TradingSimulator
             _serviceFactory = new Mock<IServiceFactory>().Object;
             _strategyLoggerMock = new Mock<ILogger<TradingStrategy<MarketSnapshot>>>();
             _interestScoreLoggerMock = new Mock<ILogger<IInterestScoreService>>();
+            var marketAnalysisLoggerMock = new Mock<ILogger<MarketAnalysisHelper>>();
 
             var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>();
             var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>();
@@ -112,7 +113,7 @@ namespace TradingSimulator
             _snapshotPeriodHelper = new SnapshotPeriodHelper();
             _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, _snapshotOptions, _tradingOptions, _scopeFactory);
             _overseer = new TradingOverseer(_scopeFactory, _snapshotService);
-            _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig);
+            _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 
             _dbContext = serviceProvider.GetRequiredService<IKalshiBotContext>();

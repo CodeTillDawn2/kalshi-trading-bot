@@ -9,6 +9,27 @@ using System.Text.RegularExpressions;
 
 namespace BacklashBot.Management
 {
+    /// <summary>
+    /// Central error handling service that processes logged errors and warnings from the system,
+    /// determines catastrophic failure conditions, and triggers appropriate recovery actions.
+    /// This class acts as the main error coordinator for the Kalshi trading bot, handling various
+    /// exception types with specific recovery strategies including market resets, connection
+    /// recovery, and system restarts.
+    /// </summary>
+    /// <remarks>
+    /// The error handler processes errors from a database logging queue and categorizes them
+    /// as either catastrophic (requiring system restart) or non-catastrophic (handled with
+    /// market resets or connection recovery). It maintains counters for error tracking and
+    /// implements threshold-based catastrophic detection based on error frequency.
+    ///
+    /// Key responsibilities:
+    /// - Process warnings and errors from the logging queue
+    /// - Handle specific exception types with targeted recovery actions
+    /// - Monitor error frequency and detect catastrophic conditions
+    /// - Maintain error statistics and timestamps
+    /// - Trigger market resets for transient failures
+    /// - Manage internet connectivity checks for connection-related errors
+    /// </remarks>
     public class CentralErrorHandler : ICentralErrorHandler
     {
         private readonly IMarketManagerService _marketManagerService;
@@ -18,16 +39,66 @@ namespace BacklashBot.Management
         private readonly TimeSpan _errorWindow = TimeSpan.FromMinutes(5); // Adjustable window
         private readonly int _errorThreshold = 10; // Adjustable threshold
         private ILogger<ICentralErrorHandler> _logger;
+
+        /// <summary>
+        /// Gets or sets the total count of warnings processed by the error handler.
+        /// </summary>
         public long WarningCount { get; set; } = 0;
+
+        /// <summary>
+        /// Gets or sets the total count of errors processed by the error handler.
+        /// </summary>
         public long ErrorCount { get; set; } = 0;
+
+        /// <summary>
+        /// Gets the current count of non-catastrophic errors within the monitoring window.
+        /// </summary>
+        /// <remarks>
+        /// This count is used to determine if the error threshold has been exceeded,
+        /// which would trigger a catastrophic failure condition.
+        /// </remarks>
         public int NonCatastrophicErrorCount => _nonCatastrophicErrors.Count;
+
+        /// <summary>
+        /// Gets or sets a flag indicating whether a catastrophic error has already been detected.
+        /// </summary>
+        /// <remarks>
+        /// When set to true, prevents further error processing to avoid redundant handling
+        /// and focuses on system recovery procedures.
+        /// </remarks>
         public bool CatastrophicErrorAlreadyDetected { get; set; } = false;
+
+        /// <summary>
+        /// Gets the queue of pending warnings to be processed.
+        /// </summary>
         public ConcurrentQueue<ErrorHandlerTaskInfo> Warnings { get; } = new ConcurrentQueue<ErrorHandlerTaskInfo>();
+
+        /// <summary>
+        /// Gets the queue of pending errors to be processed.
+        /// </summary>
         public ConcurrentQueue<ErrorHandlerTaskInfo> Errors { get; } = new ConcurrentQueue<ErrorHandlerTaskInfo>();
 
+        /// <summary>
+        /// Gets or sets the timestamp of the last successful snapshot creation.
+        /// </summary>
+        /// <remarks>
+        /// Used to detect prolonged periods without successful snapshots,
+        /// which may indicate a catastrophic system failure.
+        /// </remarks>
         public DateTime LastSuccessfulSnapshot { get; set; } = DateTime.MinValue;
+
+        /// <summary>
+        /// Gets or sets the timestamp of the last error occurrence.
+        /// </summary>
         public DateTime LastErrorDate { get; set; } = DateTime.MinValue;
 
+        /// <summary>
+        /// Initializes a new instance of the CentralErrorHandler class.
+        /// </summary>
+        /// <param name="marketManagerService">Service for managing market operations and resets.</param>
+        /// <param name="serviceFactory">Factory for creating and accessing various system services.</param>
+        /// <param name="loggingQueue">Queue containing logged errors and warnings to be processed.</param>
+        /// <param name="logger">Logger instance for recording error handler operations.</param>
         public CentralErrorHandler(
             IMarketManagerService marketManagerService,
             IServiceFactory serviceFactory,
@@ -41,6 +112,29 @@ namespace BacklashBot.Management
             LastSuccessfulSnapshot = DateTime.MinValue;
         }
 
+        /// <summary>
+        /// Processes all pending errors and warnings from the logging queue, determines if any
+        /// constitute catastrophic failures, and triggers appropriate recovery actions.
+        /// </summary>
+        /// <returns>True if a catastrophic error was detected requiring system restart; otherwise false.</returns>
+        /// <remarks>
+        /// This method performs the following operations:
+        /// 1. Dequeues all errors and warnings from the logging queue
+        /// 2. Processes warnings, converting those with exceptions to errors if necessary
+        /// 3. Handles each error based on its exception type with specific recovery strategies
+        /// 4. Monitors error frequency and triggers catastrophic failure if thresholds are exceeded
+        /// 5. Cleans up old non-catastrophic errors and clears processed queues
+        ///
+        /// Specific exception handling includes:
+        /// - MarketInterestScoreDeadlockException: Logged as handled
+        /// - ConnectionDisruptionException: Attempts WebSocket reconnection
+        /// - KnownDuplicateInsertException: Logged as handled
+        /// - Various market-related exceptions: Triggers market resets
+        /// - WebSocketRetryFailedException: Marked as catastrophic
+        /// - Internet connectivity issues: Marked as catastrophic
+        /// - Overseer connection failures: Logged as informational (not catastrophic)
+        /// - Unhandled exceptions: Marked as catastrophic
+        /// </remarks>
         public async Task<bool> HandleErrors()
         {
             bool isCatastrophic = false;
@@ -55,7 +149,7 @@ namespace BacklashBot.Management
             }
             if (!Warnings.IsEmpty)
             {
-                _logger.LogDebug("BRAIN: Processing warnings. Warnings to handle: {WarningCount}", Warnings.Count);
+                _logger.LogInformation("BRAIN: Processing warnings. Warnings to handle: {WarningCount}", Warnings.Count);
                 while (Warnings.TryDequeue(out var warningTaskInfo))
                 {
                     var exceptionFromWarning = warningTaskInfo.OriginalException;
@@ -91,7 +185,7 @@ namespace BacklashBot.Management
 
             if (!Errors.IsEmpty)
             {
-                _logger.LogDebug("BRAIN: Checking for catastrophic failure. Errors to handle: {ErrorCount}", Errors.Count);
+                _logger.LogInformation("BRAIN: Checking for catastrophic failure. Errors to handle: {ErrorCount}", Errors.Count);
                 while (Errors.TryDequeue(out var errorTaskInfo) && !CatastrophicErrorAlreadyDetected)
                 {
                     var exception = errorTaskInfo.OriginalException;
@@ -282,6 +376,16 @@ namespace BacklashBot.Management
             return isCatastrophic;
         }
 
+        /// <summary>
+        /// Adds a warning to the processing queue for later handling.
+        /// </summary>
+        /// <param name="ex">The exception associated with the warning, if any.</param>
+        /// <param name="identifier">Identifier for the source of the warning (e.g., service or component name).</param>
+        /// <param name="message">Optional custom message to use instead of the exception message.</param>
+        /// <remarks>
+        /// Warnings are processed during the next HandleErrors() call. If an exception is provided,
+        /// it may be converted to an error if it matches certain criteria during processing.
+        /// </remarks>
         public void AddWarning(Exception ex, string identifier, string? message = null)
         {
             var cts = new CancellationTokenSource();
@@ -296,6 +400,16 @@ namespace BacklashBot.Management
             WarningCount++;
         }
 
+        /// <summary>
+        /// Adds an error to the processing queue for immediate handling.
+        /// </summary>
+        /// <param name="ex">The exception associated with the error. If null, a default exception is created.</param>
+        /// <param name="identifier">Identifier for the source of the error (e.g., service or component name).</param>
+        /// <param name="message">Optional custom message to use instead of the exception message.</param>
+        /// <remarks>
+        /// Errors are processed during the next HandleErrors() call. This method increments
+        /// the error count and updates the last error timestamp.
+        /// </remarks>
         public void AddError(Exception ex, string identifier, string? message = null)
         {
             var cts = new CancellationTokenSource();
@@ -312,21 +426,31 @@ namespace BacklashBot.Management
             LastErrorDate = timestamp;
         }
 
-        private string ExtractValue(string logMessage, string variableName)
+        private string ExtractValueFromLogMessage(string logMessage, string variableName)
         {
             string pattern = $@"{variableName}\s*:\s*""([^""]+)""";
             var match = Regex.Match(logMessage, pattern);
             if (match.Success && match.Groups.Count > 1) return match.Groups[1].Value;
-            _logger.LogTrace("ExtractValue called for '{VariableName}' in message '{LogMessage}', returning empty. Consider using custom exceptions.", variableName, logMessage);
+            _logger.LogTrace("ExtractValueFromLogMessage called for '{VariableName}' in message '{LogMessage}', returning empty. Consider using custom exceptions.", variableName, logMessage);
             return string.Empty;
         }
 
-        private bool MatchesTemplate(string logMessage, string template)
+        private bool MatchesLogMessageTemplate(string logMessage, string template)
         {
             string pattern = Regex.Escape(template).Replace(@"\{\w+\}", ".*?");
             return Regex.IsMatch(logMessage, $"^{pattern}$");
         }
 
+        /// <summary>
+        /// Performs a series of internet connectivity checks with exponential backoff retry logic.
+        /// </summary>
+        /// <returns>True if internet connection is confirmed; false if all attempts fail.</returns>
+        /// <remarks>
+        /// This method attempts to verify internet connectivity up to 100 times with increasing
+        /// delays between attempts (starting at 1 second, doubling each time, max 60 seconds).
+        /// Used primarily during system startup to ensure network availability before proceeding
+        /// with dashboard initialization.
+        /// </remarks>
         public async Task<bool> CheckInternetConnection()
         {
             int maxAttempts = 100;
@@ -357,6 +481,15 @@ namespace BacklashBot.Management
             return true;
         }
 
+        /// <summary>
+        /// Performs a single internet connectivity check by pinging Google's DNS server.
+        /// </summary>
+        /// <returns>True if the ping succeeds; false otherwise.</returns>
+        /// <remarks>
+        /// Uses ICMP ping to 8.8.8.8 (Google's public DNS) with a 1-second timeout.
+        /// This is a simple connectivity test that doesn't guarantee full internet access
+        /// but provides a reliable indicator of network availability.
+        /// </remarks>
         private async Task<bool> IsInternetUpAsync()
         {
             try
