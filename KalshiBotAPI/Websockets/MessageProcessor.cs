@@ -36,7 +36,7 @@ namespace KalshiBotAPI.Websockets
         private readonly Dictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions;
         private readonly object _sequenceNumberSynchronizationLock = new object();
         private long _latestProcessedSequenceNumber = 0;
-        private int _orderBookSubscriptionId = 0;
+        // private int _orderBookSubscriptionId = 0; // Currently unused, reserved for future subscription ID tracking
         private Task _messageReceivingTask = null!;
         private CancellationToken _processingCancellationToken;
         private DateTime _lastMessageTimestamp = DateTime.UtcNow;
