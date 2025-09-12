@@ -162,12 +162,42 @@ namespace BacklashBot.Services
         /// </summary>
         /// <returns>True if the WebSocket is currently connected, false otherwise.</returns>
         /// <remarks>
-        /// This method provides a thread-safe way to check the current connection state.
-        /// The connection state is managed internally by the monitoring logic.
+        /// This method checks the actual WebSocket connection state rather than relying on internal flags.
+        /// If there's a discrepancy between the monitor's flag and actual connection, it logs a warning.
         /// </remarks>
         public bool IsConnected()
         {
-            return _isWebSocketConnected;
+            try
+            {
+                // Check actual WebSocket connection state
+                var kalshiWebSocketClient = _serviceFactory.GetKalshiWebSocketClient();
+                if (kalshiWebSocketClient != null)
+                {
+                    bool actualConnectionState = kalshiWebSocketClient.IsConnected();
+
+                    // Log discrepancy if monitor flag doesn't match actual state
+                    if (_isWebSocketConnected != actualConnectionState)
+                    {
+                        _logger.LogWarning("WebSocket connection state discrepancy detected: MonitorFlag={MonitorFlag}, ActualState={ActualState}",
+                            _isWebSocketConnected, actualConnectionState);
+
+                        // Update monitor flag to match actual state
+                        _isWebSocketConnected = actualConnectionState;
+                    }
+
+                    return actualConnectionState;
+                }
+                else
+                {
+                    _logger.LogWarning("KalshiWebSocketClient is null, falling back to monitor flag");
+                    return _isWebSocketConnected;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking WebSocket connection state, falling back to monitor flag");
+                return _isWebSocketConnected;
+            }
         }
 
         /// <summary>
