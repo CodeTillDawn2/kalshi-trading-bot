@@ -1,4 +1,10 @@
-// OverseerHub.cs
+/// <summary>
+/// SignalR hub that manages real-time communication between the Kalshi trading bot overseer
+/// and connected brain instances. This hub handles client connections, authentication via
+/// handshakes, periodic status check-ins from brain instances, and broadcasting of trading
+/// data and updates. It serves as the central communication point for the overseer system,
+/// enabling real-time monitoring and control of trading bot operations.
+/// </summary>
 using Microsoft.AspNetCore.SignalR;
 using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -11,18 +17,34 @@ using KalshiBotOverseer.Models;
 
 namespace KalshiBotOverseer
 {
+    /// <summary>
+    /// SignalR hub for managing real-time communication with brain instances in the
+    /// Kalshi trading bot overseer system. Handles authentication, status updates,
+    /// and data broadcasting between the overseer and distributed brain components.
+    /// </summary>
     public class OverseerHub : Hub
     {
         private readonly ILogger<OverseerHub> _logger;
         private readonly IServiceScopeFactory _scopeFactory;
-        private static readonly ConcurrentDictionary<string, BrainPersistence> _brainPersistenceCache = new ConcurrentDictionary<string, BrainPersistence>();
+        private static readonly ConcurrentDictionary<string, BrainPersistence> _brainStateCache = new ConcurrentDictionary<string, BrainPersistence>();
 
+        /// <summary>
+        /// Initializes a new instance of the OverseerHub with required dependencies.
+        /// </summary>
+        /// <param name="logger">Logger instance for recording hub operations and errors.</param>
+        /// <param name="scopeFactory">Factory for creating service scopes to access database context.</param>
         public OverseerHub(ILogger<OverseerHub> logger, IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
         }
 
+        /// <summary>
+        /// Handles client connection events, performing authentication and connection setup.
+        /// Validates client credentials from query parameters and establishes the connection
+        /// if authentication succeeds. Aborts the connection for invalid or missing credentials.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public override async Task OnConnectedAsync()
         {
             var httpContext = Context.GetHttpContext();
@@ -31,9 +53,9 @@ namespace KalshiBotOverseer
 
             if (!string.IsNullOrEmpty(clientId) && !string.IsNullOrEmpty(authToken))
             {
-                if (await ValidateClient(clientId, authToken))
+                if (await AuthenticateClient(clientId, authToken))
                 {
-                    await UpdateClientConnection(clientId, Context.ConnectionId);
+                    await UpdateClientConnectionId(clientId, Context.ConnectionId);
                     _logger.LogInformation("Authenticated client connected: {ClientId}", clientId);
                 }
                 else
@@ -53,12 +75,26 @@ namespace KalshiBotOverseer
             await base.OnConnectedAsync();
         }
 
+        /// <summary>
+        /// Handles client disconnection events, logging the disconnection for monitoring purposes.
+        /// </summary>
+        /// <param name="exception">The exception that caused the disconnection, if any.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            _logger.LogDebug("Client disconnected: {ConnectionId}", Context.ConnectionId);
+            _logger.LogInformation("Client disconnected: {ConnectionId}", Context.ConnectionId);
             await base.OnDisconnectedAsync(exception);
         }
 
+        /// <summary>
+        /// Performs initial handshake with a client, validating and storing client information,
+        /// generating an authentication token, and logging the client to the database.
+        /// This establishes the client's identity and prepares it for authenticated operations.
+        /// </summary>
+        /// <param name="clientId">Unique identifier for the client.</param>
+        /// <param name="clientName">Name of the client (typically the brain instance name).</param>
+        /// <param name="clientType">Type of client connecting (e.g., brain, dashboard).</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task Handshake(string clientId, string clientName, string clientType)
         {
             _logger.LogInformation("Handshake request from client: {ClientId}, Name: {ClientName}, Type: {ClientType}",
@@ -124,6 +160,14 @@ namespace KalshiBotOverseer
             }
         }
 
+        /// <summary>
+        /// Processes periodic check-in data from a brain instance, updating its state in memory
+        /// and broadcasting the updated status to all connected clients. This method handles
+        /// comprehensive brain status updates including market data, performance metrics,
+        /// and operational state information.
+        /// </summary>
+        /// <param name="checkInData">The check-in data containing brain status and metrics.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task CheckIn(CheckInData checkInData)
         {
             _logger.LogInformation("Received CheckIn from client: {ConnectionId}", Context.ConnectionId);
@@ -132,7 +176,7 @@ namespace KalshiBotOverseer
             {
                 // Update in-memory BrainPersistence
                 var brainInstanceName = checkInData.BrainInstanceName;
-                var brainPersistence = _brainPersistenceCache.GetOrAdd(brainInstanceName, _ => new BrainPersistence
+                var brainPersistence = _brainStateCache.GetOrAdd(brainInstanceName, _ => new BrainPersistence
                 {
                     BrainInstanceName = brainInstanceName,
                     LastSeen = DateTime.UtcNow
@@ -239,7 +283,15 @@ namespace KalshiBotOverseer
             }
         }
 
-        private async Task<bool> ValidateClient(string clientId, string authToken)
+        /// <summary>
+        /// Authenticates a client by validating their credentials against the database
+        /// and verifying the provided authentication token. Updates the client's last
+        /// seen timestamp upon successful authentication.
+        /// </summary>
+        /// <param name="clientId">The unique identifier of the client to authenticate.</param>
+        /// <param name="authToken">The authentication token provided by the client.</param>
+        /// <returns>True if authentication succeeds, false otherwise.</returns>
+        private async Task<bool> AuthenticateClient(string clientId, string authToken)
         {
             try
             {
@@ -261,12 +313,19 @@ namespace KalshiBotOverseer
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error validating client credentials for {ClientId}", clientId);
+                _logger.LogError(ex, "Error authenticating client credentials for {ClientId}", clientId);
                 return false;
             }
         }
 
-        private async Task UpdateClientConnection(string clientId, string connectionId)
+        /// <summary>
+        /// Updates the connection ID for a client in the database to maintain
+        /// the mapping between client identity and SignalR connection.
+        /// </summary>
+        /// <param name="clientId">The unique identifier of the client.</param>
+        /// <param name="connectionId">The new SignalR connection ID for the client.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task UpdateClientConnectionId(string clientId, string connectionId)
         {
             try
             {
@@ -280,10 +339,16 @@ namespace KalshiBotOverseer
             }
         }
 
-
+        /// <summary>
+        /// Generates a simple authentication token based on client ID, name, and current date.
+        /// This provides basic authentication for client connections and should be replaced
+        /// with more secure token generation in production environments.
+        /// </summary>
+        /// <param name="clientId">The client's unique identifier.</param>
+        /// <param name="clientName">The client's name.</param>
+        /// <returns>A base64-encoded hash string serving as the auth token.</returns>
         private string GenerateAuthToken(string clientId, string clientName)
         {
-            // Simple token generation - in production, use proper JWT or secure tokens
             using var sha256 = SHA256.Create();
             var input = $"{clientId}:{clientName}:{DateTime.UtcNow.Date:yyyy-MM-dd}";
             var bytes = Encoding.UTF8.GetBytes(input);
