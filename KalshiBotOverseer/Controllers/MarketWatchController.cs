@@ -2,6 +2,7 @@ using KalshiBotData.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashBot.KalshiAPI.Interfaces;
@@ -11,6 +12,13 @@ using KalshiBotOverseer.Services;
 
 namespace KalshiBotOverseer.Controllers
 {
+    /// <summary>
+    /// ASP.NET Core Web API controller that provides endpoints for retrieving market watch data,
+    /// brain instance locks, trading positions, orders, account information, and snapshot data.
+    /// This controller serves as the primary interface for the Kalshi trading bot's monitoring and
+    /// data retrieval operations, utilizing caching for performance optimization and integrating
+    /// with database and external API services.
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class MarketWatchController : ControllerBase
@@ -19,6 +27,7 @@ namespace KalshiBotOverseer.Controllers
         private readonly IMemoryCache _cache;
         private readonly IKalshiAPIService _apiService;
         private readonly SnapshotService _snapshotService;
+        private readonly ILogger<MarketWatchController> _logger;
         private const string MarketsCacheKey = "ActiveMarkets";
         private const string BrainInstancesCacheKey = "BrainInstances";
         private const string AllBrainInstancesCacheKey = "AllBrainInstances";
@@ -26,20 +35,40 @@ namespace KalshiBotOverseer.Controllers
         private readonly TimeSpan MarketsCacheDuration = TimeSpan.FromMinutes(15);
         private readonly TimeSpan LogDataCacheDuration = TimeSpan.FromMinutes(5); // Shorter cache for log data
 
-        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotService snapshotService)
+        /// <summary>
+        /// Initializes a new instance of the MarketWatchController with required dependencies.
+        /// </summary>
+        /// <param name="context">Database context for accessing trading data.</param>
+        /// <param name="cache">Memory cache for performance optimization.</param>
+        /// <param name="apiService">Service for interacting with Kalshi API.</param>
+        /// <param name="snapshotService">Service for managing market snapshots.</param>
+        /// <param name="logger">Logger for recording operational information and errors.</param>
+        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotService snapshotService, ILogger<MarketWatchController> logger)
         {
             _context = context;
             _cache = cache;
             _apiService = apiService;
             _snapshotService = snapshotService;
+            _logger = logger;
         }
 
+        /// <summary>
+        /// Serves the main market watch HTML page for the web interface.
+        /// </summary>
+        /// <returns>The marketwatch.html file as a physical file response.</returns>
         [HttpGet]
         public IActionResult Index()
         {
             return PhysicalFile(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "marketwatch.html"), "text/html");
         }
 
+        /// <summary>
+        /// Retrieves comprehensive market watch data including active markets, brain instance assignments,
+        /// interest scores, and market details for monitoring and analysis.
+        /// </summary>
+        /// <returns>A list of market watch data objects containing market information, brain assignments, and metrics.</returns>
+        /// <response code="200">Returns the market watch data successfully.</response>
+        /// <response code="500">Internal server error occurred while retrieving data.</response>
         [HttpGet("data")]
         public async Task<IActionResult> GetMarketWatchData()
         {
@@ -53,7 +82,7 @@ namespace KalshiBotOverseer.Controllers
                 });
 
                 // Get cached brain instances for lookup
-                var brainInstances = await _cache.GetOrCreateAsync(BrainInstancesCacheKey, async entry =>
+                var brainInstancesByLock = await _cache.GetOrCreateAsync(BrainInstancesCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
                     return (await _context.GetBrainInstancesFiltered(hasBrainLock: true))
@@ -78,7 +107,7 @@ namespace KalshiBotOverseer.Controllers
                 var marketWatchData = marketWatches.Select(mw =>
                 {
                     marketLookup.TryGetValue(mw.market_ticker, out var market);
-                    brainInstances.TryGetValue(mw.BrainLock ?? Guid.Empty, out var brainInstanceName);
+                    brainInstancesByLock.TryGetValue(mw.BrainLock ?? Guid.Empty, out var brainInstanceName);
 
                     return new
                     {
@@ -116,12 +145,18 @@ namespace KalshiBotOverseer.Controllers
             catch (Exception ex)
             {
                 // Log the error and return a proper error response
-                Console.WriteLine($"Error in GetMarketWatchData: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                _logger.LogError(ex, "Failed to retrieve market watch data");
                 return StatusCode(500, new { error = "Failed to retrieve market watch data", details = ex.Message });
             }
         }
 
+        /// <summary>
+        /// Retrieves comprehensive brain lock data including brain instance assignments, market counts,
+        /// interest scores, and activity metrics for monitoring brain performance and distribution.
+        /// </summary>
+        /// <returns>A list of brain lock data objects containing brain instance information, market assignments, and metrics.</returns>
+        /// <response code="200">Returns the brain locks data successfully.</response>
+        /// <response code="500">Internal server error occurred while retrieving data.</response>
         [HttpGet("brainlocks")]
         public async Task<IActionResult> GetBrainLocksData()
         {
@@ -142,7 +177,7 @@ namespace KalshiBotOverseer.Controllers
                 });
 
                 // Get cached brain instances with BrainLock for lookup
-                var brainInstancesWithLock = await _cache.GetOrCreateAsync(BrainInstancesCacheKey, async entry =>
+                var brainInstancesByLock = await _cache.GetOrCreateAsync(BrainInstancesCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
                     return (await _context.GetBrainInstancesFiltered(hasBrainLock: true))
@@ -157,7 +192,7 @@ namespace KalshiBotOverseer.Controllers
                 // Get snapshot and error data from LogEntry table for brain instances (optimized with caching)
                 var brainInstanceNames = allBrainInstances.Select(bi => bi.BrainInstanceName).Distinct().ToList();
 
-                var logData = await _cache.GetOrCreateAsync(LogDataCacheKey, async entry =>
+                var brainInstanceLogData = await _cache.GetOrCreateAsync(LogDataCacheKey, async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = LogDataCacheDuration;
 
@@ -197,21 +232,21 @@ namespace KalshiBotOverseer.Controllers
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.WriteLine($"Error getting log data for brain instance {brainInstanceName}: {ex.Message}");
+                                    _logger.LogWarning(ex, "Failed to retrieve log data for brain instance {BrainInstanceName}", brainInstanceName);
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Error getting log data: {ex.Message}");
+                            _logger.LogError(ex, "Failed to retrieve brain instance log data");
                         }
                     }
 
                     return new { SnapshotData = snapshotData, ErrorData = errorData };
                 });
 
-                var snapshotData = logData.SnapshotData;
-                var errorData = logData.ErrorData;
+                var snapshotData = brainInstanceLogData.SnapshotData;
+                var errorData = brainInstanceLogData.ErrorData;
 
                 // Create brain lock data for all brain instances
                 var brainLockGroups = allBrainInstances.Select(brainInstance =>
@@ -219,7 +254,7 @@ namespace KalshiBotOverseer.Controllers
                     // Find market watches for this brain instance
                     var brainMarketWatches = marketWatches.Where(mw =>
                         mw.BrainLock.HasValue &&
-                        brainInstancesWithLock.TryGetValue(mw.BrainLock.Value, out var name) &&
+                        brainInstancesByLock.TryGetValue(mw.BrainLock.Value, out var name) &&
                         name == brainInstance.BrainInstanceName).ToList();
 
                     snapshotData.TryGetValue(brainInstance.BrainInstanceName, out var lastSnapshotDate);
@@ -257,12 +292,18 @@ namespace KalshiBotOverseer.Controllers
             catch (Exception ex)
             {
                 // Log the error and return a proper error response
-                Console.WriteLine($"Error in GetBrainLocksData: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                _logger.LogError(ex, "Failed to retrieve brain locks data");
                 return StatusCode(500, new { error = "Failed to retrieve brain locks data", details = ex.Message });
             }
         }
 
+        /// <summary>
+        /// Retrieves trading position data with optional filtering for current positions only.
+        /// </summary>
+        /// <param name="currentOnly">If true, returns only positions with non-zero values; if false, returns all positions.</param>
+        /// <returns>A list of position data objects containing trading position information.</returns>
+        /// <response code="200">Returns the positions data successfully.</response>
+        /// <response code="500">Internal server error occurred while retrieving data.</response>
         [HttpGet("positions")]
         public async Task<IActionResult> GetPositionsData(bool currentOnly = true)
         {
@@ -298,12 +339,17 @@ namespace KalshiBotOverseer.Controllers
             catch (Exception ex)
             {
                 // Log the error and return a proper error response
-                Console.WriteLine($"Error in GetPositionsData: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                _logger.LogError(ex, "Failed to retrieve positions data");
                 return StatusCode(500, new { error = "Failed to retrieve positions data", details = ex.Message });
             }
         }
 
+        /// <summary>
+        /// Retrieves trading order data including active and historical orders.
+        /// </summary>
+        /// <returns>A list of order data objects containing order information and status.</returns>
+        /// <response code="200">Returns the orders data successfully.</response>
+        /// <response code="500">Internal server error occurred while retrieving data.</response>
         [HttpGet("orders")]
         public async Task<IActionResult> GetOrdersData()
         {
@@ -335,12 +381,17 @@ namespace KalshiBotOverseer.Controllers
             catch (Exception ex)
             {
                 // Log the error and return a proper error response
-                Console.WriteLine($"Error in GetOrdersData: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                _logger.LogError(ex, "Failed to retrieve orders data");
                 return StatusCode(500, new { error = "Failed to retrieve orders data", details = ex.Message });
             }
         }
 
+        /// <summary>
+        /// Retrieves account balance and portfolio information from the Kalshi API.
+        /// </summary>
+        /// <returns>An object containing account balance and portfolio value.</returns>
+        /// <response code="200">Returns the account data successfully.</response>
+        /// <response code="500">Internal server error occurred while retrieving data.</response>
         [HttpGet("account")]
         public async Task<IActionResult> GetAccountData()
         {
@@ -350,30 +401,35 @@ namespace KalshiBotOverseer.Controllers
                 var balance = await _apiService.GetBalanceAsync();
                 var balanceInDollars = (double)balance / 100.0;
 
-                // Portfolio value calculation will be implemented later
-                // For now, return balance only
+                // Portfolio value calculation is not yet implemented
                 return Ok(new
                 {
                     balance = balanceInDollars,
-                    portfolioValue = 0.0 // Placeholder - will be implemented later
+                    portfolioValue = 0.0
                 });
             }
             catch (Exception ex)
             {
                 // Log the error and return a proper error response
-                Console.WriteLine($"Error in GetAccountData: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                _logger.LogError(ex, "Failed to retrieve account data");
                 return StatusCode(500, new { error = "Failed to retrieve account data", details = ex.Message });
             }
         }
 
+        /// <summary>
+        /// Logs client-side events for monitoring and debugging purposes.
+        /// </summary>
+        /// <param name="request">The event data to log.</param>
+        /// <returns>A confirmation response indicating the event was logged.</returns>
+        /// <response code="200">Event logged successfully.</response>
+        /// <response code="500">Internal server error occurred while logging the event.</response>
         [HttpPost("log")]
         public async Task<IActionResult> LogEvent([FromBody] object request)
         {
             try
             {
-                // Log the event to console
-                Console.WriteLine($"Log event: {request}");
+                // Log the event using structured logging
+                _logger.LogInformation("Client log event received: {Request}", request);
 
                 // Optionally, you could also insert into the LogEntry table if needed
                 // await _context.InsertLogEntry(new LogEntry { ... });
@@ -382,11 +438,17 @@ namespace KalshiBotOverseer.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error logging event: {ex.Message}");
+                _logger.LogError(ex, "Failed to log client event");
                 return StatusCode(500, new { error = "Failed to log event", details = ex.Message });
             }
         }
 
+        /// <summary>
+        /// Retrieves snapshot group data aggregated by market for analysis and monitoring.
+        /// </summary>
+        /// <returns>A list of snapshot group data objects containing market snapshot information.</returns>
+        /// <response code="200">Returns the snapshots data successfully.</response>
+        /// <response code="500">Internal server error occurred while retrieving data.</response>
         [HttpGet("snapshots")]
         public async Task<IActionResult> GetSnapshotsData()
         {
@@ -397,12 +459,17 @@ namespace KalshiBotOverseer.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetSnapshotsData: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                _logger.LogError(ex, "Failed to retrieve snapshots data");
                 return StatusCode(500, new { error = "Failed to retrieve snapshots data", details = ex.Message });
             }
         }
 
+        /// <summary>
+        /// Retrieves comprehensive brain instance data including watched markets and configuration.
+        /// </summary>
+        /// <returns>A list of brain data objects containing brain instance information and market assignments.</returns>
+        /// <response code="200">Returns the brains data successfully.</response>
+        /// <response code="500">Internal server error occurred while retrieving data.</response>
         [HttpGet("brains")]
         public async Task<IActionResult> GetBrainsData()
         {
@@ -473,8 +540,7 @@ namespace KalshiBotOverseer.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetBrainsData: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                _logger.LogError(ex, "Failed to retrieve brains data");
                 return StatusCode(500, new { error = "Failed to retrieve brains data", details = ex.Message });
             }
         }
