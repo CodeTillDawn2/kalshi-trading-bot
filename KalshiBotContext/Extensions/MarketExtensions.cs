@@ -3,14 +3,23 @@ using BacklashDTOs.Data;
 
 namespace KalshiBotData.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for converting between Market model and MarketDTO,
+    /// supporting comprehensive market data transfer including trading information and associated events.
+    /// </summary>
     public static class MarketExtensions
     {
+        /// <summary>
+        /// Converts a Market model to its DTO representation,
+        /// including optional associated event data if the market has a linked event.
+        /// </summary>
+        /// <param name="market">The Market model to convert.</param>
+        /// <returns>A new MarketDTO with all market properties and associated event data mapped.</returns>
         public static MarketDTO ToMarketDTO(this Market market)
         {
-
-            EventDTO? theEvent = null;
+            EventDTO? associatedEvent = null;
             if (market.Event != null)
-                theEvent = market.Event.ToEventDTO();
+                associatedEvent = market.Event.ToEventDTO();
 
             return new MarketDTO
             {
@@ -56,10 +65,16 @@ namespace KalshiBotData.Extensions
                 LastModifiedDate = market.LastModifiedDate,
                 LastCandlestickUTC = market.LastCandlestickUTC,
                 APILastFetchedDate = market.APILastFetchedDate,
-                Event = theEvent
+                Event = associatedEvent
             };
         }
 
+        /// <summary>
+        /// Converts a MarketDTO to its model representation,
+        /// creating a new Market with all properties mapped from the DTO.
+        /// </summary>
+        /// <param name="marketDTO">The MarketDTO to convert.</param>
+        /// <returns>A new Market model with all properties mapped from the DTO.</returns>
         public static Market ToMarket(this MarketDTO marketDTO)
         {
             return new Market
@@ -109,6 +124,14 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Updates an existing Market model with data from a MarketDTO,
+        /// validating market ticker match before applying changes and updating the modification timestamp.
+        /// </summary>
+        /// <param name="market">The Market model to update.</param>
+        /// <param name="marketDTO">The MarketDTO containing updated data.</param>
+        /// <returns>The updated Market model.</returns>
+        /// <exception cref="Exception">Thrown when market tickers do not match.</exception>
         public static Market UpdateMarket(this Market market, MarketDTO marketDTO)
         {
             if (market.market_ticker != marketDTO.market_ticker)
@@ -146,7 +169,7 @@ namespace KalshiBotData.Extensions
             market.result = marketDTO.result;
             market.can_close_early = marketDTO.can_close_early;
             market.expiration_value = marketDTO.expiration_value;
-            if (marketDTO.category != "") market.category = marketDTO.category;
+            if (!string.IsNullOrEmpty(marketDTO.category)) market.category = marketDTO.category;
             market.risk_limit_cents = marketDTO.risk_limit_cents;
             market.strike_type = marketDTO.strike_type;
             market.floor_strike = marketDTO.floor_strike;

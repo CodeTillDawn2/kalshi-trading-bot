@@ -3,8 +3,18 @@ using BacklashDTOs.Data;
 
 namespace KalshiBotData.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for converting between Order model and OrderDTO,
+    /// supporting comprehensive order management and trading operation data transfer.
+    /// </summary>
     public static class OrderExtensions
     {
+        /// <summary>
+        /// Converts an Order model to its DTO representation,
+        /// mapping all order properties including trading details and execution counts.
+        /// </summary>
+        /// <param name="order">The Order model to convert.</param>
+        /// <returns>A new OrderDTO with all order properties mapped.</returns>
         public static OrderDTO ToOrderDTO(this Order order)
         {
             return new OrderDTO
@@ -41,6 +51,12 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Converts an OrderDTO to its model representation,
+        /// creating a new Order with all properties mapped from the DTO.
+        /// </summary>
+        /// <param name="orderDTO">The OrderDTO to convert.</param>
+        /// <returns>A new Order model with all properties mapped from the DTO.</returns>
         public static Order ToOrder(this OrderDTO orderDTO)
         {
             return new Order
@@ -77,6 +93,14 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Updates an existing Order model with data from an OrderDTO,
+        /// validating ticker match before applying changes and updating the modification timestamp.
+        /// </summary>
+        /// <param name="order">The Order model to update.</param>
+        /// <param name="orderDTO">The OrderDTO containing updated data.</param>
+        /// <returns>The updated Order model.</returns>
+        /// <exception cref="Exception">Thrown when order tickers do not match.</exception>
         public static Order UpdateOrder(this Order order, OrderDTO orderDTO)
         {
             if (order.Ticker != orderDTO.Ticker)

@@ -3,8 +3,18 @@ using BacklashDTOs.Data;
 
 namespace KalshiBotData.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for converting between Snapshot model and SnapshotDTO,
+    /// supporting market snapshot data transfer for analysis and historical record keeping.
+    /// </summary>
     public static class SnapshotExtensions
     {
+        /// <summary>
+        /// Converts a Snapshot model to its DTO representation,
+        /// mapping all snapshot properties including market data, velocities, and validation status.
+        /// </summary>
+        /// <param name="snapshot">The Snapshot model to convert.</param>
+        /// <returns>A new SnapshotDTO with all snapshot properties mapped.</returns>
         public static SnapshotDTO ToSnapshotDTO(this Snapshot snapshot)
         {
             return new SnapshotDTO
@@ -31,6 +41,12 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Converts a SnapshotDTO to its model representation,
+        /// creating a new Snapshot with all properties mapped from the DTO.
+        /// </summary>
+        /// <param name="snapshotDTO">The SnapshotDTO to convert.</param>
+        /// <returns>A new Snapshot model with all properties mapped from the DTO.</returns>
         public static Snapshot ToSnapshot(this SnapshotDTO snapshotDTO)
         {
             return new Snapshot
@@ -57,6 +73,14 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Updates an existing Snapshot model with data from a SnapshotDTO,
+        /// validating market ticker and snapshot date match before applying all property changes.
+        /// </summary>
+        /// <param name="snapshot">The Snapshot model to update.</param>
+        /// <param name="snapshotDTO">The SnapshotDTO containing updated data.</param>
+        /// <returns>The updated Snapshot model.</returns>
+        /// <exception cref="Exception">Thrown when market tickers or snapshot dates do not match.</exception>
         public static Snapshot UpdateSnapshot(this Snapshot snapshot, SnapshotDTO snapshotDTO)
         {
             if (snapshot.MarketTicker != snapshotDTO.MarketTicker || snapshot.SnapshotDate != snapshotDTO.SnapshotDate)

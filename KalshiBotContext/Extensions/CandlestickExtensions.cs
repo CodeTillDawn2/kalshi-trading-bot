@@ -3,8 +3,18 @@ using BacklashDTOs.Data;
 
 namespace KalshiBotData.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for converting between Candlestick model and CandlestickDTO,
+    /// supporting market data analysis and historical price information transfer.
+    /// </summary>
     public static class CandlestickExtensions
     {
+        /// <summary>
+        /// Converts a Candlestick model to its DTO representation,
+        /// mapping all candlestick data including market information, time periods, and price data.
+        /// </summary>
+        /// <param name="candlestick">The Candlestick model to convert.</param>
+        /// <returns>A new CandlestickDTO with all candlestick properties mapped.</returns>
         public static CandlestickDTO ToCandlestickDTO(this Candlestick candlestick)
         {
             return new CandlestickDTO
@@ -37,6 +47,12 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Converts a CandlestickDTO to its model representation,
+        /// creating a new Candlestick with all properties mapped from the DTO.
+        /// </summary>
+        /// <param name="candlestickDTO">The CandlestickDTO to convert.</param>
+        /// <returns>A new Candlestick model with all properties mapped from the DTO.</returns>
         public static Candlestick ToCandlestick(this CandlestickDTO candlestickDTO)
         {
             return new Candlestick
@@ -69,6 +85,14 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Updates an existing Candlestick model with data from a CandlestickDTO,
+        /// validating market ticker, interval type, and timestamp match before updating price and volume data.
+        /// </summary>
+        /// <param name="candlestick">The Candlestick model to update.</param>
+        /// <param name="candlestickDTO">The CandlestickDTO containing updated data.</param>
+        /// <returns>The updated Candlestick model.</returns>
+        /// <exception cref="Exception">Thrown when market identifiers or timestamps do not match.</exception>
         public static Candlestick UpdateCandlestick(this Candlestick candlestick, CandlestickDTO candlestickDTO)
         {
             if (candlestick.market_ticker != candlestickDTO.market_ticker || candlestick.end_period_ts != candlestickDTO.end_period_ts

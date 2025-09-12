@@ -3,8 +3,18 @@ using BacklashDTOs.Data;
 
 namespace KalshiBotData.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for converting between BrainInstance model and BrainInstanceDTO,
+    /// facilitating data transfer for brain instance management and monitoring operations.
+    /// </summary>
     public static class BrainInstanceExtensions
     {
+        /// <summary>
+        /// Converts a BrainInstance model to its DTO representation,
+        /// mapping all brain instance properties for external data transfer.
+        /// </summary>
+        /// <param name="brainInstance">The BrainInstance model to convert.</param>
+        /// <returns>A new BrainInstanceDTO with all properties mapped from the model.</returns>
         public static BrainInstanceDTO ToBrainInstanceDTO(this BrainInstance brainInstance)
         {
             return new BrainInstanceDTO
@@ -23,6 +33,12 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Converts a BrainInstanceDTO to its model representation,
+        /// creating a new BrainInstance with all properties mapped from the DTO.
+        /// </summary>
+        /// <param name="brainInstanceDTO">The BrainInstanceDTO to convert.</param>
+        /// <returns>A new BrainInstance model with all properties mapped from the DTO.</returns>
         public static BrainInstance ToBrainInstance(this BrainInstanceDTO brainInstanceDTO)
         {
             return new BrainInstance
@@ -41,6 +57,14 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Updates an existing BrainInstance model with data from a BrainInstanceDTO,
+        /// validating the brain instance name match before applying selective property updates.
+        /// </summary>
+        /// <param name="brainInstance">The BrainInstance model to update.</param>
+        /// <param name="brainInstanceDTO">The BrainInstanceDTO containing updated data.</param>
+        /// <returns>The updated BrainInstance model.</returns>
+        /// <exception cref="Exception">Thrown when brain instance names do not match.</exception>
         public static BrainInstance UpdateBrainInstance(this BrainInstance brainInstance, BrainInstanceDTO brainInstanceDTO)
         {
             if (brainInstance.BrainInstanceName != brainInstanceDTO.BrainInstanceName)
@@ -48,15 +72,7 @@ namespace KalshiBotData.Extensions
                 throw new Exception("Brain instance name doesn't match for Update BrainInstance");
             }
             brainInstance.BrainLock = brainInstanceDTO.BrainLock;
-            //brainInstance.WatchPositions = brainInstanceDTO.WatchPositions;
-            //brainInstance.WatchOrders = brainInstanceDTO.WatchOrders;
-            //brainInstance.ManagedWatchList = brainInstanceDTO.ManagedWatchList;
-            //brainInstance.TargetWatches = brainInstanceDTO.TargetWatches;
             brainInstance.LastSeen = brainInstanceDTO.LastSeen;
-            //brainInstance.CaptureSnapshots = brainInstanceDTO.CaptureSnapshots;
-            //brainInstance.MinimumInterest = brainInstanceDTO.MinimumInterest;
-            //brainInstance.UsageMin = brainInstanceDTO.UsageMin;
-            //brainInstance.UsageMax = brainInstanceDTO.UsageMax;
             return brainInstance;
         }
     }

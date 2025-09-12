@@ -3,8 +3,18 @@ using BacklashDTOs.Data;
 
 namespace KalshiBotData.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for converting between MarketWatch model and MarketWatchDTO,
+    /// supporting market monitoring and interest scoring data transfer operations.
+    /// </summary>
     public static class MarketWatchExtensions
     {
+        /// <summary>
+        /// Converts a MarketWatch model to its DTO representation,
+        /// mapping all market watch properties for data transfer.
+        /// </summary>
+        /// <param name="marketWatch">The MarketWatch model to convert.</param>
+        /// <returns>A new MarketWatchDTO with all market watch properties mapped.</returns>
         public static MarketWatchDTO ToMarketWatchDTO(this MarketWatch marketWatch)
         {
             return new MarketWatchDTO
@@ -18,6 +28,12 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Converts a MarketWatchDTO to its model representation,
+        /// creating a new MarketWatch with all properties mapped from the DTO.
+        /// </summary>
+        /// <param name="marketWatchDTO">The MarketWatchDTO to convert.</param>
+        /// <returns>A new MarketWatch model with all properties mapped from the DTO.</returns>
         public static MarketWatch ToMarketWatch(this MarketWatchDTO marketWatchDTO)
         {
             return new MarketWatch
@@ -27,10 +43,18 @@ namespace KalshiBotData.Extensions
                 InterestScore = marketWatchDTO.InterestScore,
                 InterestScoreDate = marketWatchDTO.InterestScoreDate,
                 LastWatched = marketWatchDTO.LastWatched,
-                AverageWebsocketEventsPerMinute = marketWatchDTO.AverageWebsocketEventsPerMinute,
+                AverageWebsocketEventsPerMinute = marketWatchDTO.AverageWebsocketEventsPerMinute
             };
         }
 
+        /// <summary>
+        /// Updates an existing MarketWatch model with data from a MarketWatchDTO,
+        /// validating market ticker match before applying selective property updates.
+        /// </summary>
+        /// <param name="marketWatch">The MarketWatch model to update.</param>
+        /// <param name="marketWatchDTO">The MarketWatchDTO containing updated data.</param>
+        /// <returns>The updated MarketWatch model.</returns>
+        /// <exception cref="Exception">Thrown when market tickers do not match.</exception>
         public static MarketWatch UpdateMarketWatch(this MarketWatch marketWatch, MarketWatchDTO marketWatchDTO)
         {
             if (marketWatch.market_ticker != marketWatchDTO.market_ticker)

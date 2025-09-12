@@ -3,8 +3,18 @@ using BacklashDTOs.Data;
 
 namespace KalshiBotData.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for converting between Series model and SeriesDTO,
+    /// including nested tags and settlement sources for comprehensive series data transfer.
+    /// </summary>
     public static class SeriesExtensions
     {
+        /// <summary>
+        /// Converts a Series model to its DTO representation,
+        /// including optional nested tags and settlement sources if they exist.
+        /// </summary>
+        /// <param name="series">The Series model to convert.</param>
+        /// <returns>A new SeriesDTO with all series properties and nested collections mapped.</returns>
         public static SeriesDTO ToSeriesDTO(this Series series)
         {
             List<SeriesTagDTO>? seriesTags = null;
@@ -27,10 +37,16 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Converts a SeriesDTO to its model representation,
+        /// creating a new Series with all properties and nested collections mapped from the DTO.
+        /// </summary>
+        /// <param name="seriesDTO">The SeriesDTO to convert.</param>
+        /// <returns>A new Series model with all properties and nested collections mapped.</returns>
         public static Series ToSeries(this SeriesDTO seriesDTO)
         {
-            List<SeriesTag> seriesTags = seriesDTO.Tags.Select(x => x.ToSeriesTag()).ToList();
-            List<SeriesSettlementSource> settlementSources = seriesDTO.SettlementSources.Select(x => x.ToSeriesSettlementSource()).ToList();
+            List<SeriesTag> seriesTags = seriesDTO.Tags?.Select(x => x.ToSeriesTag()).ToList() ?? new List<SeriesTag>();
+            List<SeriesSettlementSource> settlementSources = seriesDTO.SettlementSources?.Select(x => x.ToSeriesSettlementSource()).ToList() ?? new List<SeriesSettlementSource>();
 
             return new Series
             {
@@ -46,6 +62,14 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Updates an existing Series model with data from a SeriesDTO,
+        /// validating series ticker match before applying changes and updating the modification timestamp.
+        /// </summary>
+        /// <param name="series">The Series model to update.</param>
+        /// <param name="seriesDTO">The SeriesDTO containing updated data.</param>
+        /// <returns>The updated Series model.</returns>
+        /// <exception cref="Exception">Thrown when series tickers do not match.</exception>
         public static Series UpdateSeries(this Series series, SeriesDTO seriesDTO)
         {
             if (series.series_ticker != seriesDTO.series_ticker)
@@ -58,7 +82,7 @@ namespace KalshiBotData.Extensions
             series.category = seriesDTO.category;
             series.contract_url = seriesDTO.contract_url;
             series.CreatedDate = seriesDTO.CreatedDate;
-            series.LastModifiedDate = DateTime.Now;
+            series.LastModifiedDate = DateTime.UtcNow;
 
             return series;
         }

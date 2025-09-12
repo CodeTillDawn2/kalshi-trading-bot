@@ -3,8 +3,18 @@ using BacklashDTOs.Data;
 
 namespace KalshiBotData.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for converting between StandardHoursSession model and StandardHoursSessionDTO,
+    /// supporting individual session data transfer within exchange standard hours.
+    /// </summary>
     public static class StandardHoursSessionExtensions
     {
+        /// <summary>
+        /// Converts a StandardHoursSession model to its DTO representation,
+        /// mapping all session properties for data transfer.
+        /// </summary>
+        /// <param name="standardHoursSessionModel">The StandardHoursSession model to convert.</param>
+        /// <returns>A new StandardHoursSessionDTO with all session properties mapped.</returns>
         public static StandardHoursSessionDTO ToStandardHoursSessionDTO(this StandardHoursSession standardHoursSessionModel)
         {
             return new StandardHoursSessionDTO
@@ -19,6 +29,12 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Converts a StandardHoursSessionDTO to its model representation,
+        /// creating a new StandardHoursSession with all properties mapped from the DTO.
+        /// </summary>
+        /// <param name="standardHoursSessionDTO">The StandardHoursSessionDTO to convert.</param>
+        /// <returns>A new StandardHoursSession model with all properties mapped from the DTO.</returns>
         public static StandardHoursSession ToStandardHoursSession(this StandardHoursSessionDTO standardHoursSessionDTO)
         {
             return new StandardHoursSession
@@ -33,6 +49,14 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Updates an existing StandardHoursSession model with data from a StandardHoursSessionDTO,
+        /// validating session ID match before applying changes and updating the modification timestamp.
+        /// </summary>
+        /// <param name="standardHoursSessionModel">The StandardHoursSession model to update.</param>
+        /// <param name="standardHoursSessionDTO">The StandardHoursSessionDTO containing updated data.</param>
+        /// <returns>The updated StandardHoursSession model.</returns>
+        /// <exception cref="Exception">Thrown when session IDs do not match.</exception>
         public static StandardHoursSession UpdateStandardHoursSession(this StandardHoursSession standardHoursSessionModel, StandardHoursSessionDTO standardHoursSessionDTO)
         {
             if (standardHoursSessionModel.SessionID != standardHoursSessionDTO.SessionID)
@@ -44,7 +68,7 @@ namespace KalshiBotData.Extensions
             standardHoursSessionModel.StartTime = standardHoursSessionDTO.StartTime;
             standardHoursSessionModel.EndTime = standardHoursSessionDTO.EndTime;
             standardHoursSessionModel.CreatedDate = standardHoursSessionDTO.CreatedDate;
-            standardHoursSessionModel.LastModifiedDate = DateTime.Now;
+            standardHoursSessionModel.LastModifiedDate = DateTime.UtcNow;
             return standardHoursSessionModel;
         }
     }

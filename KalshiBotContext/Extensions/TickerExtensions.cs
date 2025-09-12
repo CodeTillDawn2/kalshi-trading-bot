@@ -3,8 +3,18 @@ using BacklashDTOs.Data;
 
 namespace KalshiBotData.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for converting between Ticker model and TickerDTO,
+    /// supporting real-time market ticker data transfer and price information updates.
+    /// </summary>
     public static class TickerExtensions
     {
+        /// <summary>
+        /// Converts a Ticker model to its DTO representation,
+        /// mapping all ticker data including market information, prices, and volume metrics.
+        /// </summary>
+        /// <param name="ticker">The Ticker model to convert.</param>
+        /// <returns>A new TickerDTO with all ticker properties mapped.</returns>
         public static TickerDTO ToTickerDTO(this Ticker ticker)
         {
             return new TickerDTO
@@ -24,6 +34,12 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Converts a TickerDTO to its model representation,
+        /// creating a new Ticker with all properties mapped from the DTO.
+        /// </summary>
+        /// <param name="tickerDTO">The TickerDTO to convert.</param>
+        /// <returns>A new Ticker model with all properties mapped from the DTO.</returns>
         public static Ticker ToTicker(this TickerDTO tickerDTO)
         {
             return new Ticker
@@ -43,6 +59,14 @@ namespace KalshiBotData.Extensions
             };
         }
 
+        /// <summary>
+        /// Updates an existing Ticker model with data from a TickerDTO,
+        /// validating market ticker and logged date match before updating price and volume data.
+        /// </summary>
+        /// <param name="ticker">The Ticker model to update.</param>
+        /// <param name="tickerDTO">The TickerDTO containing updated data.</param>
+        /// <returns>The updated Ticker model.</returns>
+        /// <exception cref="Exception">Thrown when market tickers or logged dates do not match.</exception>
         public static Ticker UpdateTicker(this Ticker ticker, TickerDTO tickerDTO)
         {
             if (ticker.market_ticker != tickerDTO.market_ticker || ticker.LoggedDate != tickerDTO.LoggedDate)
