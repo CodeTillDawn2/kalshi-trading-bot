@@ -14,6 +14,13 @@ using KalshiBotOverseer.Models;
 
 namespace KalshiBotOverseer
 {
+    /// <summary>
+    /// SignalR hub that manages real-time communication between the Kalshi trading bot overseer
+    /// and connected clients. This hub handles client connections, authentication via handshakes,
+    /// periodic status check-ins from brain instances, and broadcasting of trading data and updates.
+    /// It serves as the central communication point for the overseer system, enabling real-time
+    /// monitoring and control of trading bot operations.
+    /// </summary>
     public class ChartHub : Hub
     {
         private static readonly HashSet<string> _connectedClients = new HashSet<string>();
@@ -32,6 +39,10 @@ namespace KalshiBotOverseer
             _brainService = brainService;
         }
 
+        /// <summary>
+        /// Handles client connection events, tracking connected clients and logging connection details.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public override async Task OnConnectedAsync()
         {
             lock (_connectedClients)
@@ -48,6 +59,11 @@ namespace KalshiBotOverseer
             await base.OnConnectedAsync();
         }
 
+        /// <summary>
+        /// Handles client disconnection events, cleaning up client tracking and logging disconnection details.
+        /// </summary>
+        /// <param name="exception">The exception that caused the disconnection, if any.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             string clientId = "";
@@ -67,6 +83,10 @@ namespace KalshiBotOverseer
             await base.OnDisconnectedAsync(exception);
         }
 
+        /// <summary>
+        /// Checks if there are any connected clients to the hub.
+        /// </summary>
+        /// <returns>True if there are connected clients, false otherwise.</returns>
         public static bool HasConnectedClients()
         {
             lock (_connectedClients)
@@ -75,6 +95,9 @@ namespace KalshiBotOverseer
             }
         }
 
+        /// <summary>
+        /// Clears all connected client tracking, useful for testing or reset scenarios.
+        /// </summary>
         public static void ClearConnectedClients()
         {
             lock (_connectedClients)
@@ -84,6 +107,14 @@ namespace KalshiBotOverseer
             }
         }
 
+        /// <summary>
+        /// Performs initial handshake with a client, validating and storing client information,
+        /// generating an authentication token, and logging the client to the database.
+        /// </summary>
+        /// <param name="clientId">Unique identifier for the client.</param>
+        /// <param name="clientName">Name of the client (typically the brain instance name).</param>
+        /// <param name="clientType">Type of client connecting (e.g., brain, dashboard).</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task Handshake(string clientId, string clientName, string clientType)
         {
             _logger.LogInformation("Handshake request from client: {ClientId}, Name: {ClientName}, Type: {ClientType}",
@@ -155,7 +186,7 @@ namespace KalshiBotOverseer
             }
         }
 
-        public async Task CheckIn(CheckInData checkInData)
+        public async Task ProcessCheckIn(CheckInData checkInData)
         {
             _logger.LogInformation("CheckIn received from connection: {ConnectionId}", Context.ConnectionId);
 
@@ -253,7 +284,7 @@ namespace KalshiBotOverseer
                     }
                 }
 
-                // Log CheckIn data to database if needed
+                // Update client last seen in database
                 try
                 {
                     using var scope = _scopeFactory.CreateScope();
@@ -266,8 +297,6 @@ namespace KalshiBotOverseer
                         signalRClient.LastSeen = DateTime.UtcNow;
                         await context.AddOrUpdateSignalRClient(signalRClient);
                     }
-
-                    // Log CheckIn data - removed commented CheckInLog code as type doesn't exist
                 }
                 catch (Exception dbEx)
                 {
@@ -335,15 +364,12 @@ namespace KalshiBotOverseer
                 };
 
                 // Broadcast comprehensive brain status to all connected clients (including web UI)
-                // (A) log how many clients are connected on this hub instance
                 var connections = _connectedClients.Count;
-                _logger.LogInformation("[ChartHub] Broadcasting BrainStatusUpdate for {Brain} to {Count} connections",
+                _logger.LogInformation("Broadcasting BrainStatusUpdate for {Brain} to {Count} connections",
                     brainStatus.BrainInstanceName, connections);
 
-                // (B) send the real payload
                 await Clients.All.SendAsync("BrainStatusUpdate", brainStatus);
 
-                // (C) send a tiny trace ping so the browser can prove it received *something* even if deserialization ever failed
                 await Clients.All.SendAsync("BroadcastTrace", new
                 {
                     kind = "BrainStatusUpdate",
@@ -365,7 +391,14 @@ namespace KalshiBotOverseer
         }
 
 
-        public async Task SendOverseerMessage(string messageType, string message)
+        /// <summary>
+        /// Processes messages from overseer clients, handling different message types
+        /// such as data refresh requests.
+        /// </summary>
+        /// <param name="messageType">The type of message being sent (e.g., "refresh_data").</param>
+        /// <param name="message">The message content or payload.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task HandleOverseerMessage(string messageType, string message)
         {
             _logger.LogInformation("Received SendOverseerMessage: {MessageType} - {Message}", messageType, message);
 
@@ -411,6 +444,13 @@ namespace KalshiBotOverseer
             }
         }
 
+        /// <summary>
+        /// Generates a simple authentication token based on client ID, name, and current date.
+        /// This is used for basic client validation during the handshake process.
+        /// </summary>
+        /// <param name="clientId">The client's unique identifier.</param>
+        /// <param name="clientName">The client's name.</param>
+        /// <returns>A base64-encoded hash string serving as the auth token.</returns>
         private string GenerateAuthToken(string clientId, string clientName)
         {
             using var sha256 = System.Security.Cryptography.SHA256.Create();
@@ -420,56 +460,183 @@ namespace KalshiBotOverseer
             return Convert.ToBase64String(hash);
         }
 
+        /// <summary>
+        /// Represents information about a connected client, including identification,
+        /// connection details, and last activity timestamp.
+        /// </summary>
         public class ClientInfo
         {
+            /// <summary>
+            /// Gets or sets the unique identifier for the client.
+            /// </summary>
             public string ClientId { get; set; } = "";
+
+            /// <summary>
+            /// Gets or sets the name of the client (typically the brain instance name).
+            /// </summary>
             public string ClientName { get; set; } = "";
+
+            /// <summary>
+            /// Gets or sets the type of client (e.g., brain, dashboard).
+            /// </summary>
             public string ClientType { get; set; } = "";
+
+            /// <summary>
+            /// Gets or sets the IP address of the connecting client.
+            /// </summary>
             public string IPAddress { get; set; } = "";
+
+            /// <summary>
+            /// Gets or sets the SignalR connection ID for this client.
+            /// </summary>
             public string ConnectionId { get; set; } = "";
+
+            /// <summary>
+            /// Gets or sets the timestamp of the client's last activity.
+            /// </summary>
             public DateTime LastSeen { get; set; }
         }
     }
 
+    /// <summary>
+    /// Data structure containing comprehensive information about a brain instance's current state,
+    /// used during periodic check-in operations to report status to the overseer system.
+    /// </summary>
     public class CheckInData
     {
-        // Basic brain info
+        /// <summary>
+        /// Gets or sets the name of the brain instance performing the check-in.
+        /// </summary>
         public string? BrainInstanceName { get; set; }
 
-        // Basic market data
+        /// <summary>
+        /// Gets or sets the list of market tickers currently being monitored by the brain.
+        /// </summary>
         public List<string>? Markets { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total count of errors encountered by the brain since startup.
+        /// </summary>
         public long ErrorCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp of the last snapshot taken by the brain.
+        /// </summary>
         public DateTime? LastSnapshot { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the brain is currently starting up.
+        /// </summary>
         public bool IsStartingUp { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the brain is currently shutting down.
+        /// </summary>
         public bool IsShuttingDown { get; set; }
 
-        // Brain configuration
+        /// <summary>
+        /// Gets or sets a value indicating whether the brain is monitoring positions.
+        /// </summary>
         public bool WatchPositions { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the brain is monitoring orders.
+        /// </summary>
         public bool WatchOrders { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the brain uses a managed watch list.
+        /// </summary>
         public bool ManagedWatchList { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the brain captures snapshots.
+        /// </summary>
         public bool CaptureSnapshots { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target number of markets to watch.
+        /// </summary>
         public int TargetWatches { get; set; }
+
+        /// <summary>
+        /// Gets or sets the minimum interest threshold for market selection.
+        /// </summary>
         public double MinimumInterest { get; set; }
+
+        /// <summary>
+        /// Gets or sets the minimum usage threshold for the brain.
+        /// </summary>
         public double UsageMin { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum usage threshold for the brain.
+        /// </summary>
         public double UsageMax { get; set; }
 
-        // Performance metrics
+        /// <summary>
+        /// Gets or sets the current CPU usage percentage of the brain process.
+        /// </summary>
         public double CurrentCpuUsage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the average size of the event processing queue.
+        /// </summary>
         public double EventQueueAvg { get; set; }
+
+        /// <summary>
+        /// Gets or sets the average size of the ticker processing queue.
+        /// </summary>
         public double TickerQueueAvg { get; set; }
+
+        /// <summary>
+        /// Gets or sets the average size of the notification processing queue.
+        /// </summary>
         public double NotificationQueueAvg { get; set; }
+
+        /// <summary>
+        /// Gets or sets the average size of the orderbook processing queue.
+        /// </summary>
         public double OrderbookQueueAvg { get; set; }
+
+        /// <summary>
+        /// Gets or sets the duration in seconds of the last refresh cycle.
+        /// </summary>
         public double LastRefreshCycleSeconds { get; set; }
+
+        /// <summary>
+        /// Gets or sets the interval between refresh cycles.
+        /// </summary>
         public double LastRefreshCycleInterval { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of markets processed in the last refresh cycle.
+        /// </summary>
         public double LastRefreshMarketCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CPU usage percentage during the last refresh cycle.
+        /// </summary>
         public double LastRefreshUsagePercentage { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the last refresh cycle completed within acceptable time limits.
+        /// </summary>
         public bool LastRefreshTimeAcceptable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp of the last performance sample.
+        /// </summary>
         public DateTime? LastPerformanceSampleDate { get; set; }
 
-        // Connection status
+        /// <summary>
+        /// Gets or sets a value indicating whether the brain is connected to the WebSocket feed.
+        /// </summary>
         public bool IsWebSocketConnected { get; set; }
 
-        // Market watch data
+        /// <summary>
+        /// Gets or sets the list of markets currently being watched with detailed information.
+        /// </summary>
         public List<MarketWatchData>? WatchedMarkets { get; set; }
     }
 }
