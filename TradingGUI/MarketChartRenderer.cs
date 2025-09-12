@@ -1,4 +1,11 @@
-// MarketChartRenderer.cs (full file with modifications: adjusted per-series collectTooltips to match old behavior)
+/// <summary>
+/// Provides static methods for rendering market data charts using ScottPlot.
+/// This class is responsible for loading cached market data from JSON files,
+/// merging multiple data sources if necessary, and plotting various market series
+/// (bids, asks, trades, events) onto a ScottPlot chart control. It handles
+/// data aggregation, sorting, and visualization to support trading analysis
+/// and simulation in the GUI application.
+/// </summary>
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TradingSimulator.TestObjects;
@@ -7,6 +14,19 @@ namespace SimulatorWinForms.Charting
 {
     internal static class MarketChartRenderer
     {
+        /// <summary>
+        /// Renders a complete market chart by loading cached data and plotting all series.
+        /// This method handles data loading from either a single canonical JSON file or
+        /// multiple partitioned files, merges and sorts the data chronologically,
+        /// and adds each series to the plot with appropriate styling and tooltips.
+        /// The chart is automatically scaled and rendered for display.
+        /// </summary>
+        /// <param name="plot">The ScottPlot FormsPlot control to render the chart onto.</param>
+        /// <param name="cacheDir">Directory path containing the cached market data JSON files.</param>
+        /// <param name="market">Market identifier, potentially with a suffix that gets stripped for file matching.</param>
+        /// <param name="log">Optional logging action for operational messages and errors.</param>
+        /// <param name="collectTooltips">Whether to collect tooltip data for interactive chart points.</param>
+        /// <returns>List of tooltip points with coordinates and labels, or empty list if tooltips disabled.</returns>
         public static List<(double x, double y, string memo)> Render(
             ScottPlot.FormsPlot plot,
             string cacheDir,
@@ -105,6 +125,21 @@ namespace SimulatorWinForms.Charting
             return tooltipPoints ?? new List<(double x, double y, string memo)>();
         }
 
+        /// <summary>
+        /// Adds a series of price points to the chart as a scatter plot.
+        /// This helper method converts PricePoint data to coordinate arrays,
+        /// adds the series to the plot with specified styling, and optionally
+        /// collects tooltip information for interactive elements. It handles
+        /// empty or null data gracefully by returning early.
+        /// </summary>
+        /// <param name="plot">The ScottPlot FormsPlot control to add the series to.</param>
+        /// <param name="pts">List of PricePoint objects containing date, price, and memo data.</param>
+        /// <param name="fallbackLabel">Default label to use for tooltips when memo is empty.</param>
+        /// <param name="color">Color to use for the scatter plot markers and lines.</param>
+        /// <param name="size">Size of the scatter plot markers.</param>
+        /// <param name="collectTooltips">Whether to collect tooltip data for this series.</param>
+        /// <param name="connectLine">Whether to connect points with a line (true) or show only markers (false).</param>
+        /// <param name="tooltipPoints">List to append tooltip data to, if collecting tooltips. Can be null if tooltips are disabled.</param>
         private static void Add(
             ScottPlot.FormsPlot plot,
             List<PricePoint> pts,
@@ -113,7 +148,7 @@ namespace SimulatorWinForms.Charting
             int size,
             bool collectTooltips,
             bool connectLine,
-            List<(double x, double y, string memo)> tooltipPoints)
+            List<(double x, double y, string memo)>? tooltipPoints)
         {
             if (pts == null || pts.Count == 0) return;
 
@@ -126,7 +161,7 @@ namespace SimulatorWinForms.Charting
 
             for (int i = 0; i < pts.Count; i++)
             {
-                string memo = pts[i] != null && !string.IsNullOrWhiteSpace(pts[i].Memo) ? pts[i].Memo.Trim() : fallbackLabel;
+                string memo = pts[i]?.Memo != null && !string.IsNullOrWhiteSpace(pts[i].Memo) ? pts[i].Memo.Trim() : fallbackLabel;
                 tooltipPoints.Add((xs[i], ys[i], memo));
             }
         }
