@@ -44,11 +44,9 @@ namespace TradingSimulator.Executable
         private IKalshiBotContext _dbContext;
         private ServiceProvider? _serviceProvider;
         private IOptions<SnapshotConfig> _snapshotOptions;
-        private int _priceOffCount_major;
-        private int _orderbookMissingCount;
+        private int _missingOrderbookCount;
         private int _overlappingPriceCount;
         private int _rateDiscrepancyCount; // New counter
-        private readonly Dictionary<string, List<DiscrepancyMetadata>> _majorDiscrepancies = new();
         private readonly Dictionary<string, List<MissingOrderbookMetadata>> _missingOrderbooks = new();
         private readonly Dictionary<string, List<OverlappingPriceMetadata>> _overlappingPrices = new();
         private readonly Dictionary<string, List<RateDiscrepancyMetadata>> _rateDiscrepancies = new(); // New dictionary
@@ -56,42 +54,6 @@ namespace TradingSimulator.Executable
         private IServiceScopeFactory _scopeFactory;
         private SqlDataService _sqlDataService;
 
-        /// <summary>
-        /// Metadata container for tracking price discrepancies in market snapshots.
-        /// Used to record and report instances where expected bid prices differ from actual values.
-        /// </summary>
-        private class DiscrepancyMetadata
-        {
-            /// <summary>
-            /// The market ticker symbol where the discrepancy was detected.
-            /// </summary>
-            public string MarketTicker { get; set; }
-
-            /// <summary>
-            /// The timestamp when the snapshot was taken.
-            /// </summary>
-            public DateTime SnapshotDate { get; set; }
-
-            /// <summary>
-            /// The expected bid price for the Yes position.
-            /// </summary>
-            public int ExpectedYesBid { get; set; }
-
-            /// <summary>
-            /// The actual bid price for the Yes position found in the snapshot.
-            /// </summary>
-            public int ActualYesBid { get; set; }
-
-            /// <summary>
-            /// The expected bid price for the No position.
-            /// </summary>
-            public int ExpectedNoBid { get; set; }
-
-            /// <summary>
-            /// The actual bid price for the No position found in the snapshot.
-            /// </summary>
-            public int ActualNoBid { get; set; }
-        }
 
         /// <summary>
         /// Metadata container for tracking snapshots with missing orderbook data.
@@ -232,8 +194,7 @@ namespace TradingSimulator.Executable
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _snapshotOptions, Options.Create(tradingConfig), _scopeFactory);
 
             _dbContext = new KalshiBotContext(config);
-            _priceOffCount_major = 0;
-            _orderbookMissingCount = 0;
+            _missingOrderbookCount = 0;
             _overlappingPriceCount = 0;
             _rateDiscrepancyCount = 0; // Initialize new counter
         }
@@ -477,8 +438,8 @@ namespace TradingSimulator.Executable
         /// <summary>
         /// Generates a detailed discrepancy report for a specific market.
         /// This method creates a comprehensive text file containing validation results,
-        /// including major price discrepancies, overlapping prices, rate discrepancies,
-        /// and missing orderbook data with detailed breakdowns by date and type.
+        /// including overlapping prices, rate discrepancies, and missing orderbook data
+        /// with detailed breakdowns by date and type.
         /// </summary>
         /// <param name="marketTicker">The market ticker symbol for the report.</param>
         /// <param name="validCount">Number of valid snapshots processed.</param>
@@ -486,7 +447,6 @@ namespace TradingSimulator.Executable
         /// <param name="overlappingPriceCount">Number of snapshots with overlapping prices.</param>
         /// <param name="rateDiscrepancyCount">Number of snapshots with rate discrepancies.</param>
         /// <param name="errorCount">Number of snapshots that failed processing.</param>
-        /// <param name="majorDiscrepancies">List of major price discrepancy metadata.</param>
         /// <param name="missingOrderbooks">List of missing orderbook metadata.</param>
         /// <param name="overlappingPrices">List of overlapping price metadata.</param>
         /// <param name="rateDiscrepancies">List of rate discrepancy metadata.</param>
@@ -497,7 +457,6 @@ namespace TradingSimulator.Executable
             int overlappingPriceCount,
             int rateDiscrepancyCount, // New parameter
             int errorCount,
-            List<DiscrepancyMetadata> majorDiscrepancies,
             List<MissingOrderbookMetadata> missingOrderbooks,
             List<OverlappingPriceMetadata> overlappingPrices,
             List<RateDiscrepancyMetadata> rateDiscrepancies) // New parameter
@@ -517,39 +476,6 @@ namespace TradingSimulator.Executable
             await writer.WriteLineAsync($"Errors: {errorCount}");
             await writer.WriteLineAsync(new string('-', 50));
 
-            await writer.WriteLineAsync("Major Price Discrepancies");
-            await writer.WriteLineAsync(new string('=', 50));
-            if (majorDiscrepancies.Any())
-            {
-                var dateGroups = majorDiscrepancies
-                    .GroupBy(d => d.SnapshotDate.Date)
-                    .OrderBy(g => g.Key)
-                    .Select(g => $"{g.Key:yyyy-MM-dd}: {g.Count()} discrepancies");
-                await writer.WriteLineAsync("Discrepancies by Date:");
-                await writer.WriteLineAsync(string.Join("\n", dateGroups));
-                await writer.WriteLineAsync();
-
-                var versionGroups = majorDiscrepancies
-                    .GroupBy(d => d.MarketTicker)
-                    .OrderBy(g => g.Key)
-                    .Select(g => $"{g.Key}: {g.Count()} discrepancies");
-                await writer.WriteLineAsync("Discrepancies by Snapshot Version:");
-                await writer.WriteLineAsync(string.Join("\n", versionGroups));
-                await writer.WriteLineAsync();
-
-                await writer.WriteLineAsync("Details:");
-                foreach (var discrepancy in majorDiscrepancies.OrderBy(d => d.SnapshotDate))
-                {
-                    await writer.WriteLineAsync($"  - Date: {discrepancy.SnapshotDate:yyyy-MM-dd HH:mm:ss}");
-                    await writer.WriteLineAsync($"    Yes Bid: Expected={discrepancy.ExpectedYesBid}, Actual={discrepancy.ActualYesBid}");
-                    await writer.WriteLineAsync($"    No Bid: Expected={discrepancy.ExpectedNoBid}, Actual={discrepancy.ActualNoBid}");
-                }
-            }
-            else
-            {
-                await writer.WriteLineAsync("None");
-            }
-            await writer.WriteLineAsync(new string('-', 50));
 
             await writer.WriteLineAsync("Overlapping Price Discrepancies");
             await writer.WriteLineAsync(new string('=', 50));
@@ -652,40 +578,6 @@ namespace TradingSimulator.Executable
             await writer.WriteLineAsync(new string('-', 50));
         }
 
-        /// <summary>
-        /// Logs a major price discrepancy detected during snapshot validation.
-        /// Records the expected vs actual bid prices for both Yes and No positions
-        /// and stores the metadata for later reporting.
-        /// </summary>
-        /// <param name="marketTicker">The market ticker where the discrepancy occurred.</param>
-        /// <param name="snapshotDate">The timestamp of the snapshot.</param>
-        /// <param name="snapshotVersion">The snapshot version number (currently unused).</param>
-        /// <param name="expectedYesBid">The expected bid price for Yes position.</param>
-        /// <param name="actualYesBid">The actual bid price for Yes position found in snapshot.</param>
-        /// <param name="expectedNoBid">The expected bid price for No position.</param>
-        /// <param name="actualNoBid">The actual bid price for No position found in snapshot.</param>
-        private void LogMajorDiscrepancy(string marketTicker, DateTime snapshotDate, int? snapshotVersion,
-            int expectedYesBid, int actualYesBid, int expectedNoBid, int actualNoBid)
-        {
-            var metadata = new DiscrepancyMetadata
-            {
-                MarketTicker = marketTicker,
-                SnapshotDate = snapshotDate,
-                ExpectedYesBid = expectedYesBid,
-                ActualYesBid = actualYesBid,
-                ExpectedNoBid = expectedNoBid,
-                ActualNoBid = actualNoBid
-            };
-            lock (_majorDiscrepancies)
-            {
-                if (!_majorDiscrepancies.ContainsKey(marketTicker))
-                {
-                    _majorDiscrepancies[marketTicker] = new List<DiscrepancyMetadata>();
-                }
-                _majorDiscrepancies[marketTicker].Add(metadata);
-            }
-            _priceOffCount_major++;
-        }
 
         /// <summary>
         /// Logs an overlapping price issue where Yes and No bid prices are identical.
@@ -734,7 +626,7 @@ namespace TradingSimulator.Executable
                 }
                 _missingOrderbooks[marketTicker].Add(metadata);
             }
-            _orderbookMissingCount++;
+            _missingOrderbookCount++;
         }
 
         /// <summary>
@@ -770,7 +662,7 @@ namespace TradingSimulator.Executable
         /// <summary>
         /// Exports a comprehensive discrepancy report to file system.
         /// This method generates detailed reports for all markets with validation issues,
-        /// including price discrepancies, overlapping prices, rate discrepancies, and missing orderbooks.
+        /// including overlapping prices, rate discrepancies, and missing orderbooks.
         /// Reports are saved as text files in the test directory for analysis.
         /// </summary>
         private async Task ExportDiscrepancyReport()
@@ -782,48 +674,6 @@ namespace TradingSimulator.Executable
                 await priceWriter.WriteLineAsync($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
                 await priceWriter.WriteLineAsync(new string('-', 50));
 
-                await priceWriter.WriteLineAsync("Major Price Discrepancies");
-                await priceWriter.WriteLineAsync(new string('=', 50));
-                var priceDateGroups = _majorDiscrepancies.Values
-                    .SelectMany(d => d)
-                    .GroupBy(d => d.SnapshotDate.Date)
-                    .OrderBy(g => g.Key)
-                    .Select(g => $"{g.Key:yyyy-MM-dd}: {g.Count()} discrepancies");
-                await priceWriter.WriteLineAsync("Discrepancies by Date:");
-                await priceWriter.WriteLineAsync(string.Join("\n", priceDateGroups.Any() ? priceDateGroups : new[] { "None" }));
-                await priceWriter.WriteLineAsync();
-
-                var priceVersionGroups = _majorDiscrepancies.Values
-                    .SelectMany(d => d)
-                    .GroupBy(d => d.MarketTicker)
-                    .OrderBy(g => g.Key)
-                    .Select(g => $"{g.Key}: {g.Count()} discrepancies");
-                await priceWriter.WriteLineAsync("Discrepancies by Snapshot Version:");
-                await priceWriter.WriteLineAsync(string.Join("\n", priceVersionGroups.Any() ? priceVersionGroups : new[] { "None" }));
-                await priceWriter.WriteLineAsync(new string('-', 50));
-
-                foreach (var market in _majorDiscrepancies.Keys.OrderBy(k => k))
-                {
-                    var discrepancies = _majorDiscrepancies[market];
-                    var minDate = discrepancies.Min(d => d.SnapshotDate);
-                    var maxDate = discrepancies.Max(d => d.SnapshotDate);
-
-                    await priceWriter.WriteLineAsync($"Market Ticker: {market}");
-                    await priceWriter.WriteLineAsync($"Discrepancy Count: {discrepancies.Count}");
-                    await priceWriter.WriteLineAsync($"Date Range: {minDate:yyyy-MM-dd HH:mm:ss} to {maxDate:yyyy-MM-dd HH:mm:ss}");
-                    await priceWriter.WriteLineAsync("Details:");
-
-                    foreach (var discrepancy in discrepancies.OrderBy(d => d.SnapshotDate))
-                    {
-                        await priceWriter.WriteLineAsync($"  - Date: {discrepancy.SnapshotDate:yyyy-MM-dd HH:mm:ss}");
-                        await priceWriter.WriteLineAsync($"    Yes Bid: Expected={discrepancy.ExpectedYesBid}, Actual={discrepancy.ActualYesBid}");
-                        await priceWriter.WriteLineAsync($"    No Bid: Expected={discrepancy.ExpectedNoBid}, Actual={discrepancy.ActualNoBid}");
-                    }
-                    await priceWriter.WriteLineAsync(new string('-', 50));
-                }
-                await priceWriter.WriteLineAsync($"Total Markets Affected: {_majorDiscrepancies.Keys.Count}");
-                await priceWriter.WriteLineAsync($"Total Discrepancies: {_priceOffCount_major}");
-                await priceWriter.WriteLineAsync(new string('-', 50));
 
                 await priceWriter.WriteLineAsync("Overlapping Price Discrepancies");
                 await priceWriter.WriteLineAsync(new string('=', 50));
@@ -956,7 +806,7 @@ namespace TradingSimulator.Executable
                     await orderbookWriter.WriteLineAsync(new string('-', 50));
                 }
                 await orderbookWriter.WriteLineAsync($"Total Markets Affected: {_missingOrderbooks.Keys.Count}");
-                await orderbookWriter.WriteLineAsync($"Total Missing Orderbooks: {_orderbookMissingCount}");
+                await orderbookWriter.WriteLineAsync($"Total Missing Orderbooks: {_missingOrderbookCount}");
             }
         }
 
