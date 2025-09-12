@@ -247,7 +247,7 @@ namespace BacklashBot.Management
                 {
                     List<MarketDTO> mkts = await context.GetMarkets(includedMarkets: new HashSet<string>() { market });
                     MarketDTO? mkt = mkts.FirstOrDefault();
-                    if (mkt != null && !KalshiConstants.MarketIsEnded(mkt.status))
+                    if (mkt != null && !KalshiConstants.IsMarketStatusEnded(mkt.status))
                     {
                         _logger.LogInformation("Re-adding market {Market} after reset (status: {Status})", market, mkt.status);
                         await marketDataService.AddMarketToWatchList(market);

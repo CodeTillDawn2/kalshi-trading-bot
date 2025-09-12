@@ -693,7 +693,7 @@ namespace KalshiBotData.Data
                 .Include(x => x.Market)
                 .ToListAsync();
 
-            return finalizedWatches.Where(x => x.Market != null && KalshiConstants.MarketIsEnded(x.Market.status))
+            return finalizedWatches.Where(x => x.Market != null && KalshiConstants.IsMarketStatusEnded(x.Market.status))
                 .Select(x => x.ToMarketWatchDTO())
                 .ToList();
         }
@@ -1081,7 +1081,7 @@ namespace KalshiBotData.Data
         public async Task<List<SnapshotDTO>> GetUngroupedSnapshots(int maxMarkets)
         {
             List<Market> markets = await Markets.AsNoTracking()
-                .Where(x => x.status != "active" && !SnapshotGroups.Any(sg => sg.MarketTicker == x.market_ticker))
+                .Where(x => x.status != KalshiConstants.Status_Active && !SnapshotGroups.Any(sg => sg.MarketTicker == x.market_ticker))
                 .Take(maxMarkets)
                 .ToListAsync();
 

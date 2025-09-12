@@ -6,6 +6,7 @@ using BacklashBot.State.Interfaces;
 using System.Collections.Concurrent;
 using System.Text.Json;
 using BacklashDTOs;
+using BacklashInterfaces.Constants;
 
 namespace KalshiBotAPI.Websockets
 {
@@ -123,7 +124,7 @@ namespace KalshiBotAPI.Websockets
                 }
 
                 // For market-specific channels, check if ALL requested markets are already subscribed
-                if (new[] { "orderbook_delta", "ticker", "trade" }.Contains(channel) && subscription.Sid != 0)
+                if (KalshiConstants.MarketChannelsDelta.Contains(channel) && subscription.Sid != 0)
                 {
                     var alreadySubscribedMarkets = marketTickers.Where(ticker => subscription.Markets.Contains(ticker)).ToArray();
                     var notSubscribedMarkets = marketTickers.Where(ticker => !subscription.Markets.Contains(ticker)).ToArray();
@@ -144,7 +145,7 @@ namespace KalshiBotAPI.Websockets
                 }
 
                 // For market-specific channels, if we have a SID, use update_subscription instead of subscribe
-                if (new[] { "orderbook_delta", "ticker", "trade" }.Contains(channel) && subscription.Sid != 0 && marketTickers.Any())
+                if (KalshiConstants.MarketChannelsDelta.Contains(channel) && subscription.Sid != 0 && marketTickers.Any())
                 {
                     _logger.LogDebug("Channel {Channel} already has SID {Sid}, using update_subscription for new markets", channel, subscription.Sid);
                     // Release semaphore before calling UpdateSubscriptionAsync to avoid deadlock
@@ -163,7 +164,7 @@ namespace KalshiBotAPI.Websockets
 
                 _logger.LogDebug("SUB-New subscriptions for {Channel}: {NewMarkets}, existing: {Existing}", channel, string.Join(", ", newSubscriptions), string.Join(", ", subscription.Markets));
 
-                if (new[] { "fill", "market_lifecycle_v2" }.Contains(channel))
+                if (new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.Channel_Market_Lifecycle_V2 }.Contains(channel))
                 {
                     if (newSubscriptions.Any())
                     {
@@ -172,7 +173,7 @@ namespace KalshiBotAPI.Websockets
                     }
                 }
 
-                if (!newSubscriptions.Any() && !new[] { "fill", "market_lifecycle" }.Contains(channel) && subscription.Markets.Any())
+                if (!newSubscriptions.Any() && !new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.Channel_Market_Lifecycle_V2 }.Contains(channel) && subscription.Markets.Any())
                 {
                     _logger.LogWarning("No new markets to subscribe for {Channel}: requested {Markets}, existing {Existing}", channel, string.Join(", ", marketTickers), string.Join(", ", subscription.Markets));
                     return;
@@ -188,7 +189,7 @@ namespace KalshiBotAPI.Websockets
                 string message;
                 bool SkipMessage = false;
 
-                if (subscription.Sid != 0 && subscription.Markets.Any() && !new[] { "fill", "market_lifecycle_v2" }.Contains(channel))
+                if (subscription.Sid != 0 && subscription.Markets.Any() && !new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.Channel_Market_Lifecycle_V2 }.Contains(channel))
                 {
                     var updateCommand = new
                     {
@@ -205,9 +206,9 @@ namespace KalshiBotAPI.Websockets
                 }
                 else
                 {
-                    string[] marketsToSubscribeTo = new[] { "orderbook_delta", "ticker", "trade" }.Contains(channel) ? newSubscriptions : Array.Empty<string>();
+                    string[] marketsToSubscribeTo = KalshiConstants.MarketChannelsDelta.Contains(channel) ? newSubscriptions : Array.Empty<string>();
 
-                    if (new[] { "orderbook_delta", "ticker", "trade" }.Contains(channel) && newSubscriptions.Length == 0)
+                    if (KalshiConstants.MarketChannelsDelta.Contains(channel) && newSubscriptions.Length == 0)
                     {
                         _logger.LogWarning("No markets to subscribe for {Channel}, but channel requires market tickers: {Markets}. Skipping subscription.", channel, string.Join(", ", newSubscriptions));
                         SkipMessage = true;
@@ -226,7 +227,7 @@ namespace KalshiBotAPI.Websockets
                     message = JsonSerializer.Serialize(subscribeCommand);
                 }
 
-                if (new[] { "orderbook_delta", "ticker", "trade" }.Contains(channel) && !SkipMessage)
+                if (KalshiConstants.MarketChannelsDelta.Contains(channel) && !SkipMessage)
                 {
                     _pendingConfirms.TryAdd(subscriptionId, (SentTime: DateTime.UtcNow, Message: message, Channel: channel, MarketTickers: newSubscriptions));
                 }
@@ -298,7 +299,7 @@ namespace KalshiBotAPI.Websockets
                 }
 
                 _logger.LogInformation("Subscribing to watched markets: {Markets}", string.Join(", ", WatchedMarkets));
-                foreach (var action in new[] { "orderbook", "ticker", "trade" })
+                foreach (var action in KalshiConstants.MarketChannels)
                 {
                     _globalCancellationToken.ThrowIfCancellationRequested();
                     var marketsToSubscribe = WatchedMarkets
@@ -401,7 +402,7 @@ namespace KalshiBotAPI.Websockets
                 // Log the full message for debugging
                 _logger.LogDebug("SUB-Full update_subscription message: {Message}", message);
 
-                if (new[] { "orderbook_delta", "ticker", "trade" }.Contains(channel))
+                if (KalshiConstants.MarketChannelsDelta.Contains(channel))
                 {
                     _pendingConfirms.TryAdd(subscriptionId, (DateTime.UtcNow, message, channel, marketsToUpdate));
                     if (action == "delete_markets")
@@ -652,7 +653,7 @@ namespace KalshiBotAPI.Websockets
                 var channel = subscription.Key;
                 var markets = subscription.Value.Markets.ToArray();
 
-                if (markets.Any() || new[] { "fill", "market_lifecycle_v2" }.Contains(channel))
+                if (markets.Any() || new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.Channel_Market_Lifecycle_V2 }.Contains(channel))
                 {
                     _logger.LogDebug("Resubscribing to {Channel} for markets: {Markets}", channel, string.Join(", ", markets));
                     await SubscribeToChannelAsync(GetActionFromChannel(channel), markets);

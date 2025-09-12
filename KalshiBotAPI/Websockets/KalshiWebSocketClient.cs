@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs;
+using BacklashInterfaces.Constants;
 using BacklashInterfaces.Enums;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
@@ -167,7 +168,7 @@ namespace KalshiBotAPI.Websockets
             if (_connectionManager.IsConnected())
             {
                 // Subscribe to enabled non-market-specific channels
-                var enabledChannels = new[] { "fill", "lifecycle" }.Where(IsChannelEnabled);
+                var enabledChannels = new[] { KalshiConstants.ScriptType_Feed_Fill, KalshiConstants.ScriptType_Feed_Lifecycle }.Where(IsChannelEnabled);
                 foreach (var channel in enabledChannels)
                 {
                     _globalCancellationToken.ThrowIfCancellationRequested();
@@ -207,7 +208,7 @@ namespace KalshiBotAPI.Websockets
             _logger.LogInformation("Subscribing to watched markets: {Markets}", string.Join(", ", _subscriptionManager.WatchedMarkets));
 
             // Only subscribe to enabled channels
-            var enabledChannels = new[] { "orderbook", "ticker", "trade" }.Where(IsChannelEnabled);
+            var enabledChannels = KalshiConstants.MarketChannels.Where(IsChannelEnabled);
             foreach (var action in enabledChannels)
             {
                 _globalCancellationToken.ThrowIfCancellationRequested();
@@ -365,14 +366,14 @@ namespace KalshiBotAPI.Websockets
         {
             // Initialize channels with appropriate default states
             // Non-market-specific channels that should be enabled by default
-            _enabledChannels["fill"] = true;
-            _enabledChannels["lifecycle"] = true;
-            _enabledChannels["event_lifecycle"] = true;
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Fill] = true;
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Lifecycle] = true;
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Event_Lifecycle] = true;
 
             // Market-specific channels that should be enabled by default
-            _enabledChannels["orderbook"] = true;
-            _enabledChannels["ticker"] = true;
-            _enabledChannels["trade"] = true;
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Orderbook] = true;
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Ticker] = true;
+            _enabledChannels[KalshiConstants.ScriptType_Feed_Trade] = true;
         }
 
         public async Task StartReceivingAsync()

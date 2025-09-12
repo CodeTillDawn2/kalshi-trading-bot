@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs.Exceptions;
+using BacklashInterfaces.Constants;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Text.Json;
@@ -252,7 +253,7 @@ namespace KalshiBotData.Data
                     cmd.Parameters.AddWithValue("@no_price", msg.TryGetProperty("no_price", out var noPrice)
                         ? noPrice.GetInt32() : (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@count", msg.GetProperty("count").GetInt32());
-                    cmd.Parameters.AddWithValue("@action", msg.GetProperty("action").GetString());
+                    cmd.Parameters.AddWithValue(KalshiConstants.Parameter_Action, msg.GetProperty("action").GetString());
                     cmd.Parameters.AddWithValue("@ts", msg.GetProperty("ts").GetInt64());
                     cmd.Parameters.AddWithValue("@LoggedDate", DateTime.Now);
                 }

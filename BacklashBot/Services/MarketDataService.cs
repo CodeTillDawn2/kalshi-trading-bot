@@ -591,7 +591,7 @@ namespace BacklashBot.Services
                     if (!_serviceFactory.GetDataCache().WatchedMarkets.Any())
                     {
                         _logger.LogDebug("No watched markets remain, unsubscribing from market-specific channels");
-                        foreach (var action in new[] { "orderbook", "ticker", "trade" })
+                        foreach (var action in KalshiConstants.MarketChannels)
                         {
                             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                             _logger.LogDebug("Unsubscribing from channel {Action}", action);
@@ -866,7 +866,7 @@ namespace BacklashBot.Services
 
                 // Check for incomplete market data (e.g., missing title or invalid close_time)
                 if (thisMarket != null && (string.IsNullOrEmpty(thisMarket.title) ||
-                    (thisMarket.close_time <= DateTime.UtcNow && !KalshiConstants.MarketIsEnded(thisMarket.status))))
+                    (thisMarket.close_time <= DateTime.UtcNow && !KalshiConstants.IsMarketStatusEnded(thisMarket.status))))
                 {
                     _logger.LogInformation("Market {MarketTicker} has incomplete data, refetching from API", marketTicker);
                     await marketService.FetchMarketsAsync(tickers: new[] { marketTicker });

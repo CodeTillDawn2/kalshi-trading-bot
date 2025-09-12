@@ -195,7 +195,7 @@ CalculateMarketInterestScoreAsync(
                 }
 
                 // Calculate score
-                if (KalshiConstants.MarketIsEnded(market.status) || market.yes_bid == 0 || market.no_bid == 0)
+                if (KalshiConstants.IsMarketStatusEnded(market.status) || market.yes_bid == 0 || market.no_bid == 0)
                 {
                     _logger.LogDebug("MarketInterestScore 0.0 for {MarketTicker} due to market being ended.", marketTicker);
                     return (0.0, (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));

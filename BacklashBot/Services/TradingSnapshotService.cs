@@ -153,7 +153,7 @@ namespace BacklashBot.Services
                     var snapshotsToSave = new List<object>();
                     foreach (var marketSnapshot in cacheSnapshot.Markets)
                     {
-                        if (KalshiConstants.MarketIsEnded(marketSnapshot.Value.MarketStatus))
+                        if (KalshiConstants.IsMarketStatusEnded(marketSnapshot.Value.MarketStatus))
                         {
                             _logger.LogInformation("Market {market} has ended so snapshot was skipped.", marketSnapshot.Key);
                             continue;

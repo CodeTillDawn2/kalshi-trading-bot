@@ -5,6 +5,7 @@ using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
 using BacklashDTOs.KalshiAPI;
+using BacklashInterfaces.Constants;
 using System.Collections.Concurrent;
 using System.Text.Json;
 
@@ -651,7 +652,7 @@ namespace BacklashBot.Services
                 }
                 try
                 {
-                    foreach (var action in new[] { "orderbook", "ticker", "trade" })
+                    foreach (var action in KalshiConstants.MarketChannels)
                         await _serviceFactory.GetKalshiWebSocketClient().UpdateSubscriptionAsync("delete_markets", new string[] { marketTicker }, action);
                 }
                 catch (Exception ex)

@@ -93,7 +93,7 @@ namespace BacklashBot.Helpers
         /// </summary>
         /// <param name="dt">The DateTime to truncate.</param>
         /// <returns>A new DateTime with seconds and milliseconds set to zero, in UTC.</returns>
-        public static DateTime TruncateToMinute(DateTime dt)
+        public static DateTime TruncateDateTimeToMinute(DateTime dt)
         {
             return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0, DateTimeKind.Utc);
         }
