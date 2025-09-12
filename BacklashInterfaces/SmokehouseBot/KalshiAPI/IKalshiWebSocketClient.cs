@@ -31,7 +31,7 @@ namespace KalshiBotAPI.WebSockets.Interfaces
         Task UnsubscribeFromAllAsync();
         Task UpdateSubscriptionAsync(string action, string[] marketTickers, string channelAction);
         Task ResetConnectionAsync();
-        Task StopServicesAsync();
+        Task ShutdownAsync();
         Task WaitForEmptyOrderBookQueueAsync(string marketTicker, TimeSpan timeout);
         bool IsConnected();
         bool IsSubscribed(string marketTicker, string action);

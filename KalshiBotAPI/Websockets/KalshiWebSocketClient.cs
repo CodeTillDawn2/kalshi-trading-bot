@@ -14,6 +14,22 @@ using System.Text.Json;
 
 namespace KalshiBotAPI.Websockets
 {
+    /// <summary>
+    /// Main WebSocket client for connecting to Kalshi's trading platform.
+    /// Manages the complete lifecycle of WebSocket connections, subscriptions to market data channels,
+    /// and real-time message processing. Acts as the central orchestrator between connection management,
+    /// subscription handling, and message processing components.
+    /// </summary>
+    /// <remarks>
+    /// This class implements the IKalshiWebSocketClient interface and coordinates with:
+    /// - IWebSocketConnectionManager: Handles low-level WebSocket connection and reconnection
+    /// - ISubscriptionManager: Manages channel subscriptions and subscription states
+    /// - IMessageProcessor: Processes incoming WebSocket messages and raises events
+    /// - IDataCache: Provides access to watched markets and other cached data
+    /// - ISqlDataService: Handles database operations for market data persistence
+    /// - IStatusTrackerService: Provides cancellation tokens and status tracking
+    /// - IBotReadyStatus: Tracks bot readiness state
+    /// </remarks>
     public class KalshiWebSocketClient : IKalshiWebSocketClient
     {
         private readonly ISqlDataService _sqlDataService;
@@ -32,27 +48,100 @@ namespace KalshiBotAPI.Websockets
 
         private CancellationToken _globalCancellationToken => _statusTrackerService.GetCancellationToken();
 
+        /// <summary>
+        /// Event raised when order book data is received from the WebSocket.
+        /// </summary>
         public event EventHandler<OrderBookEventArgs>? OrderBookReceived;
+
+        /// <summary>
+        /// Event raised when ticker data is received from the WebSocket.
+        /// </summary>
         public event EventHandler<TickerEventArgs>? TickerReceived;
+
+        /// <summary>
+        /// Event raised when trade data is received from the WebSocket.
+        /// </summary>
         public event EventHandler<TradeEventArgs>? TradeReceived;
+
+        /// <summary>
+        /// Event raised when fill data is received from the WebSocket.
+        /// </summary>
         public event EventHandler<FillEventArgs>? FillReceived;
+
+        /// <summary>
+        /// Event raised when market lifecycle events are received from the WebSocket.
+        /// </summary>
         public event EventHandler<MarketLifecycleEventArgs>? MarketLifecycleReceived;
+
+        /// <summary>
+        /// Event raised when event lifecycle events are received from the WebSocket.
+        /// </summary>
         public event EventHandler<EventLifecycleEventArgs>? EventLifecycleReceived;
+
+        /// <summary>
+        /// Event raised when any WebSocket message is received, providing the timestamp.
+        /// </summary>
         public event EventHandler<DateTime>? MessageReceived;
 
+        /// <summary>
+        /// Gets or sets whether trading operations are currently active.
+        /// When false, the client may still receive data but trading actions are disabled.
+        /// </summary>
         public bool IsTradingActive { get; set; } = true;
 
-        // Public properties for monitoring
+        /// <summary>
+        /// Gets the current event counts for different message types processed by the subscription manager.
+        /// </summary>
         public ConcurrentDictionary<string, long> EventCounts => _subscriptionManager.EventCounts;
+
+        /// <summary>
+        /// Gets the current count of the connection semaphore, indicating connection operation status.
+        /// </summary>
         public int ConnectSemaphoreCount => _connectionManager.ConnectSemaphoreCount;
+
+        /// <summary>
+        /// Gets the current count of the subscription update semaphore.
+        /// </summary>
         public int SubscriptionUpdateSemaphoreCount => _subscriptionManager.SubscriptionUpdateSemaphoreCount;
+
+        /// <summary>
+        /// Gets the current count of the channel subscription semaphore.
+        /// </summary>
         public int ChannelSubscriptionSemaphoreCount => _subscriptionManager.ChannelSubscriptionSemaphoreCount;
+
+        /// <summary>
+        /// Gets the count of queued subscription updates waiting to be processed.
+        /// </summary>
         public int QueuedSubscriptionUpdatesCount => _subscriptionManager.QueuedSubscriptionUpdatesCount;
+
+        /// <summary>
+        /// Gets the count of order book messages currently in the processing queue.
+        /// </summary>
         public int OrderBookMessageQueueCount => _messageProcessor.OrderBookMessageQueueCount;
+
+        /// <summary>
+        /// Gets the count of pending subscription confirmations.
+        /// </summary>
         public int PendingConfirmsCount => _messageProcessor.PendingConfirmsCount;
 
+        /// <summary>
+        /// Gets whether market data should be written to SQL database.
+        /// </summary>
         public bool WriteToSQL { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the KalshiWebSocketClient class.
+        /// </summary>
+        /// <param name="kalshiConfig">Configuration options for Kalshi API connection.</param>
+        /// <param name="logger">Logger instance for recording operations and errors.</param>
+        /// <param name="statusTrackerService">Service for tracking bot status and cancellation tokens.</param>
+        /// <param name="readyStatus">Service for tracking bot readiness state.</param>
+        /// <param name="sqlDataService">Service for SQL database operations.</param>
+        /// <param name="connectionManager">Manager for WebSocket connection lifecycle.</param>
+        /// <param name="subscriptionManager">Manager for channel subscriptions and states.</param>
+        /// <param name="messageProcessor">Processor for incoming WebSocket messages.</param>
+        /// <param name="dataCache">Cache for storing watched markets and other data.</param>
+        /// <param name="writeToSql">Whether to write market data to SQL database.</param>
         public KalshiWebSocketClient(
             IOptions<KalshiConfig> kalshiConfig,
             ILogger<IKalshiWebSocketClient> logger,
@@ -73,12 +162,10 @@ namespace KalshiBotAPI.Websockets
             _connectionManager = connectionManager;
             _subscriptionManager = subscriptionManager;
             _messageProcessor = messageProcessor;
-            // Note: MessageProcessor is injected, but we need to ensure it has the correct WriteToSQL setting
-            // This might need to be passed during construction or set via a method
             _dataCache = dataCache;
             WriteToSQL = writeToSql;
 
-            // Wire up events
+            // Wire up events from MessageProcessor to expose them publicly
             _messageProcessor.OrderBookReceived += (sender, args) => OrderBookReceived?.Invoke(sender, args);
             _messageProcessor.TickerReceived += (sender, args) => TickerReceived?.Invoke(sender, args);
             _messageProcessor.TradeReceived += (sender, args) => TradeReceived?.Invoke(sender, args);
@@ -87,45 +174,62 @@ namespace KalshiBotAPI.Websockets
             _messageProcessor.EventLifecycleReceived += (sender, args) => EventLifecycleReceived?.Invoke(sender, args);
             _messageProcessor.MessageReceived += (sender, timestamp) => MessageReceived?.Invoke(sender, timestamp);
 
-            // Set WriteToSQL in MessageProcessor
+            // Configure MessageProcessor with SQL writing setting
             _messageProcessor.SetWriteToSql(WriteToSQL);
 
             // Initialize all channels as enabled by default
             InitializeChannelStates();
         }
 
+        /// <summary>
+        /// Gets the last sequence number processed from WebSocket messages.
+        /// Used for tracking message ordering and detecting missed messages.
+        /// </summary>
         public long LastSequenceNumber => _messageProcessor.LastSequenceNumber;
 
-
-
-        public async Task StopServicesAsync()
+        /// <summary>
+        /// Shuts down the WebSocket client and all associated services gracefully.
+        /// This includes unsubscribing from all channels, stopping message processing,
+        /// and closing the WebSocket connection.
+        /// </summary>
+        /// <returns>A task representing the asynchronous shutdown operation.</returns>
+        public async Task ShutdownAsync()
         {
-            _logger.LogDebug("KalshiWebSocketClient.StopServicesAsync called at {0}, CancellationToken.IsCancellationRequested={IsRequested}"
-                , DateTime.UtcNow, _globalCancellationToken.IsCancellationRequested);
+            _logger.LogInformation("Shutting down KalshiWebSocketClient at {Timestamp}, CancellationToken.IsCancellationRequested={IsRequested}",
+                DateTime.UtcNow, _globalCancellationToken.IsCancellationRequested);
             _allowReconnect = false;
             try
             {
                 await _subscriptionManager.UnsubscribeFromAllAsync();
                 await _connectionManager.StopAsync();
                 await _messageProcessor.StopProcessingAsync();
-                _logger.LogDebug("All components stopped successfully");
+                _logger.LogInformation("All WebSocket components stopped successfully");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error stopping KalshiWebSocketClient");
+                _logger.LogError(ex, "Error shutting down KalshiWebSocketClient");
             }
             finally
             {
-                _logger.LogDebug("KalshiWebSocketClient.StopAsync completed at {0}", DateTime.UtcNow);
+                _logger.LogDebug("KalshiWebSocketClient.ShutdownAsync completed at {Timestamp}", DateTime.UtcNow);
             }
         }
 
 
+        /// <summary>
+        /// Unsubscribes from a specific WebSocket channel.
+        /// </summary>
+        /// <param name="action">The channel action to unsubscribe from (e.g., "orderbook", "ticker").</param>
+        /// <returns>A task representing the asynchronous unsubscription operation.</returns>
         public async Task UnsubscribeFromChannelAsync(string action)
         {
             await _subscriptionManager.UnsubscribeFromChannelAsync(action);
         }
 
+        /// <summary>
+        /// Gets or sets the collection of market tickers that are being watched.
+        /// Markets in this collection will receive WebSocket subscriptions for enabled channels.
+        /// </summary>
         public HashSet<string> WatchedMarkets
         {
             get => _subscriptionManager.WatchedMarkets;
@@ -133,10 +237,28 @@ namespace KalshiBotAPI.Websockets
         }
 
 
+        /// <summary>
+        /// Determines whether a market is currently subscribed to a specific channel.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to check.</param>
+        /// <param name="action">The channel action to check (e.g., "orderbook", "ticker").</param>
+        /// <returns>True if the market is subscribed to the channel, false otherwise.</returns>
         public bool IsSubscribed(string marketTicker, string action) => _subscriptionManager.IsSubscribed(marketTicker, action);
 
+        /// <summary>
+        /// Determines whether a market can be subscribed to a specific channel.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to check.</param>
+        /// <param name="channel">The channel name to check.</param>
+        /// <returns>True if the market can be subscribed to the channel, false otherwise.</returns>
         public bool CanSubscribeToMarket(string marketTicker, string channel) => _subscriptionManager.CanSubscribeToMarket(marketTicker, channel);
 
+        /// <summary>
+        /// Sets the subscription state for a market and channel combination.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker.</param>
+        /// <param name="channel">The channel name.</param>
+        /// <param name="state">The new subscription state.</param>
         public void SetSubscriptionState(string marketTicker, string channel, SubscriptionState state) => _subscriptionManager.SetSubscriptionState(marketTicker, channel, state);
 
         public async Task UpdateSubscriptionAsync(string action, string[] marketTickers, string channelAction)
@@ -176,7 +298,7 @@ namespace KalshiBotAPI.Websockets
                     _logger.LogDebug("Subscribed to enabled channel {Channel}", channel);
                 }
 
-                // Note: Market-specific channels will be subscribed individually as each market completes initialization
+                // Market-specific channels will be subscribed individually as each market completes initialization
                 // This allows for per-market subscription timing rather than bulk subscription
 
 
@@ -377,75 +499,74 @@ namespace KalshiBotAPI.Websockets
         }
 
         public async Task StartReceivingAsync()
-{
-    _logger.LogDebug("Starting WebSocket message receiving");
-    try
-    {
-        // Start the receiving loop in a background task
-        _ = Task.Run(async () =>
         {
-            var buffer = new byte[1024 * 16];
-            var messageBuilder = new StringBuilder();
-
-            while (!_globalCancellationToken.IsCancellationRequested)
+            _logger.LogInformation("Starting WebSocket message receiving loop");
+            try
             {
-                try
+                // Start the receiving loop in a background task
+                _ = Task.Run(async () =>
                 {
-                    var webSocket = _connectionManager.GetWebSocket();
-                    if (webSocket == null || webSocket.State != WebSocketState.Open)
-                    {
-                        await Task.Delay(1000, _globalCancellationToken);
-                        continue;
-                    }
+                    var buffer = new byte[1024 * 16];
+                    var messageBuilder = new StringBuilder();
 
-                    var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                    if (result.MessageType == WebSocketMessageType.Close)
+                    while (!_globalCancellationToken.IsCancellationRequested)
                     {
-                        _logger.LogError("WebSocket closed by server: Code={Code}, Reason={Reason}", result.CloseStatus, result.CloseStatusDescription);
-                        break;
-                    }
-
-                    if (result.MessageType == WebSocketMessageType.Text)
-                    {
-                        var messagePart = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                        messageBuilder.Append(messagePart);
-
-                        if (result.EndOfMessage)
+                        try
                         {
-                            var fullMessage = messageBuilder.ToString();
-                            _logger.LogDebug("Received complete WebSocket message: Length={Length}", fullMessage.Length);
-                            await _messageProcessor.ProcessMessageAsync(fullMessage);
-                            messageBuilder.Clear();
+                            var webSocket = _connectionManager.GetWebSocket();
+                            if (webSocket == null || webSocket.State != WebSocketState.Open)
+                            {
+                                await Task.Delay(1000, _globalCancellationToken);
+                                continue;
+                            }
+
+                            var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                            if (result.MessageType == WebSocketMessageType.Close)
+                            {
+                                _logger.LogError("WebSocket closed by server: Code={Code}, Reason={Reason}", result.CloseStatus, result.CloseStatusDescription);
+                                break;
+                            }
+
+                            if (result.MessageType == WebSocketMessageType.Text)
+                            {
+                                var messagePart = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                                messageBuilder.Append(messagePart);
+
+                                if (result.EndOfMessage)
+                                {
+                                    var fullMessage = messageBuilder.ToString();
+                                    await _messageProcessor.ProcessMessageAsync(fullMessage);
+                                    messageBuilder.Clear();
+                                }
+                            }
+                            else
+                            {
+                                _logger.LogError("Unexpected WebSocket message type: {MessageType}", result.MessageType);
+                            }
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            _logger.LogDebug("WebSocket receiving cancelled");
+                            break;
+                        }
+                        catch (WebSocketException ex) when (ex.Message.Contains("without completing the close handshake"))
+                        {
+                            _logger.LogWarning("WebSocket connection lost, will attempt to reconnect");
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error in WebSocket receiving loop");
+                            await Task.Delay(5000, _globalCancellationToken);
                         }
                     }
-                    else
-                    {
-                        _logger.LogError("Unexpected WebSocket message type: {MessageType}", result.MessageType);
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    _logger.LogDebug("WebSocket receiving cancelled");
-                    break;
-                }
-                catch (WebSocketException ex) when (ex.Message.Contains("without completing the close handshake"))
-                {
-                    _logger.LogWarning("WebSocket connection lost, will attempt to reconnect");
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error in WebSocket receiving loop");
-                    await Task.Delay(5000, _globalCancellationToken);
-                }
+                }, _globalCancellationToken);
             }
-        }, _globalCancellationToken);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error starting WebSocket message receiving");
-    }
-}
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error starting WebSocket message receiving");
+            }
+        }
 
 
 }

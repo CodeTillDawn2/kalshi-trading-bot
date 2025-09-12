@@ -744,7 +744,7 @@ namespace TradingSimulator.Tests
         }
 
         [Test]
-        public async Task StopServicesAsync_AllComponentsStopped()
+        public async Task ShutdownAsync_AllComponentsStopped()
         {
             // Arrange
             _subscriptionManagerMock.Setup(sm => sm.UnsubscribeFromAllAsync()).Returns(Task.CompletedTask);
@@ -755,7 +755,7 @@ namespace TradingSimulator.Tests
             Console.WriteLine("   Expected: All components (SubscriptionManager, ConnectionManager, MessageProcessor) should be stopped");
 
             // Act
-            await _client.StopServicesAsync();
+            await _client.ShutdownAsync();
 
             // Assert
             _subscriptionManagerMock.Verify(sm => sm.UnsubscribeFromAllAsync(), Times.Once);

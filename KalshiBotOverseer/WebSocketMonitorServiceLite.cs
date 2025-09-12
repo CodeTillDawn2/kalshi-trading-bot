@@ -56,7 +56,7 @@ namespace KalshiBotOverseer
             _logger.LogDebug("WebSocketMonitorServiceLite started.");
         }
 
-        public async Task StopServicesAsync(CancellationToken cancellationToken)
+        public async Task ShutdownAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("WebSocketMonitorServiceLite.StopAsync called at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow,
                 CancellationToken.IsCancellationRequested);
@@ -67,7 +67,7 @@ namespace KalshiBotOverseer
                 {
                     try
                     {
-                        await _webSocketClient.StopServicesAsync();
+                        await _webSocketClient.ShutdownAsync();
                         _isConnected = false;
                         _logger.LogDebug("WebSocket connection closed.");
                     }

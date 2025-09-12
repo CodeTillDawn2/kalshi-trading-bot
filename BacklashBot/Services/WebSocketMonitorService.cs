@@ -100,7 +100,7 @@ namespace BacklashBot.Services
         /// - Waiting for the monitoring task to complete or be cancelled
         /// - Handling any errors during shutdown gracefully
         /// </remarks>
-        public async Task StopServicesAsync(CancellationToken cancellationToken)
+        public async Task ShutdownAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("WebSocketMonitorService.StopAsync called at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, _statusTrackerService.GetCancellationToken().IsCancellationRequested);
             try
@@ -109,7 +109,7 @@ namespace BacklashBot.Services
                 {
                     try
                     {
-                        await _serviceFactory.GetKalshiWebSocketClient().StopServicesAsync();
+                        await _serviceFactory.GetKalshiWebSocketClient().ShutdownAsync();
                         _isWebSocketConnected = false;
                         _logger.LogInformation("WebSocket connection closed.");
                     }

@@ -365,7 +365,7 @@ namespace BacklashBot.Management
                 if (_servicesStopped && IsWebSocketServiceRunning())
                 {
                     _logger.LogDebug("BRAIN: Stopping WebSocketHostedService for restart...");
-                    await webSocketService.StopServicesAsync(CancellationToken.None);
+                    await webSocketService.ShutdownAsync(CancellationToken.None);
                     _logger.LogInformation("BRAIN: WebSocketHostedService stopped for restart");
                 }
 
@@ -526,7 +526,7 @@ namespace BacklashBot.Management
 
                 var webSocketService = _serviceFactory.GetWebSocketHostedService();
                 _logger.LogDebug("Stopping WebSocketHostedService...");
-                await webSocketService.StopServicesAsync(CancellationToken.None);
+                await webSocketService.ShutdownAsync(CancellationToken.None);
                 _logger.LogDebug("WebSocketHostedService stopped");
 
                 _logger.LogDebug("Stopping MarketRefreshService...");
