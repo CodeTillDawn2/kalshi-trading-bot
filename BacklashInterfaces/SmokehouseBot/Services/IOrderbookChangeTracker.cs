@@ -13,9 +13,9 @@ namespace BacklashBot.Services.Interfaces
         DateTime LastMarketOpenTime { get; set; }
         void UpdateMarketStatus(bool isExchangeActive, bool isTradingActive);
         void Stop();
-        void LogOrderbookSnapshot(List<OrderbookData> originalOrderbook, List<OrderbookData> newOrderbook);
-        void LogChange(string side, int price, int deltaContracts);
-        void LogTrade(string takerSide, int yesPrice, int noPrice, int count, DateTime timestamp);
+        void ProcessOrderbookSnapshot(List<OrderbookData> originalOrderbook, List<OrderbookData> newOrderbook);
+        void RecordOrderbookChange(string side, int price, int deltaContracts);
+        void RecordTrade(string takerSide, int yesPrice, int noPrice, int count, DateTime timestamp);
         (double Volume, int Levels) GetBottomNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, int threshold);
         (double Volume, int Levels) GetBottomYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, int threshold);
         (double Volume, int Levels) GetTopNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, int threshold);

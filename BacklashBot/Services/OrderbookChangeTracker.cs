@@ -10,6 +10,21 @@ using TradingStrategies.Configuration;
 
 namespace BacklashBot.Services
 {
+    /// <summary>
+    /// Tracks and analyzes orderbook changes for a specific market in the Kalshi trading system.
+    /// This class is responsible for processing orderbook snapshots, recording individual changes,
+    /// matching trades to orderbook changes, calculating various market metrics (velocity, volume, rates),
+    /// and maintaining a rolling window of orderbook events for analysis. It implements the
+    /// IOrderbookChangeTracker interface and integrates with the broader trading bot ecosystem
+    /// to provide real-time market data analysis and metrics calculation.
+    /// </summary>
+    /// <remarks>
+    /// The tracker maintains concurrent queues for orderbook changes and trade events, using
+    /// timers for periodic metric recalculation and cleanup of old events. It employs locking
+    /// mechanisms to ensure thread safety during matching operations and supports cancellation
+    /// tokens for graceful shutdown. Metrics are calculated over configurable time windows and
+    /// include velocity per minute, trade rates, average trade sizes, and order volume analysis.
+    /// </remarks>
     public class OrderbookChangeTracker : IOrderbookChangeTracker
     {
         private readonly ILogger<IOrderbookChangeTracker> _logger;
@@ -28,10 +43,20 @@ namespace BacklashBot.Services
         private readonly System.Timers.Timer _recalculationTimer;
         private readonly System.Timers.Timer _logOutputTimer;
         private long _lastSequence = 0;
+        /// <summary>
+        /// Gets or sets the timestamp when the market last opened for trading.
+        /// This is used to determine market maturity and calculate elapsed trading time.
+        /// </summary>
+        /// <value>The UTC timestamp of the last market open, or DateTime.MinValue if never opened</value>
         public DateTime LastMarketOpenTime { get; set; } = DateTime.MinValue;
         private DateTime _lastEventTime = DateTime.MinValue;
 
         #region Properties
+        /// <summary>
+        /// Gets the market data object associated with this tracker.
+        /// Returns null if the market is not found in the cache or if cancellation is requested.
+        /// </summary>
+        /// <value>The market data object, or null if unavailable</value>
         public IMarketData Market
         {
             get
@@ -42,8 +67,17 @@ namespace BacklashBot.Services
             }
         }
 
-        private bool FirstSnapshotReceived { get; set; } = false;
+        private bool IsFirstSnapshotProcessed { get; set; } = false;
 
+        /// <summary>
+        /// Gets a value indicating whether the market has been open long enough to have mature metrics.
+        /// Maturity is determined by comparing the elapsed time since market open to the configured change window duration.
+        /// </summary>
+        /// <value>true if the market has been open for at least the change window duration, false otherwise</value>
+        /// <remarks>
+        /// Mature markets have sufficient historical data for reliable metric calculations.
+        /// This property is used to determine when metrics are ready for analysis.
+        /// </remarks>
         public bool IsMature
         {
             get
@@ -57,18 +91,45 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Gets the duration of the change window used for metric calculations.
+        /// This determines how far back in time to consider orderbook changes and trades.
+        /// </summary>
+        /// <value>The change window duration from configuration</value>
         public TimeSpan ChangeWindowDuration => _config.Value.ChangeWindowDuration;
 
+        /// <summary>
+        /// Gets the time window used for matching trades to orderbook changes.
+        /// This determines how far back and forward to look when correlating trades with orderbook activity.
+        /// </summary>
+        /// <value>The trade matching window duration from configuration</value>
         public TimeSpan TradeMatchingWindow => _config.Value.TradeMatchingWindow;
 
+        /// <summary>
+        /// Gets the time window used for detecting orderbook change cancellations.
+        /// This determines how far back to look when checking if opposing orderbook changes cancel each other out.
+        /// </summary>
+        /// <value>The orderbook cancel window duration from configuration</value>
         public TimeSpan OrderbookCancelWindow => _config.Value.OrderbookCancelWindow;
         #endregion
 
         #region Constructor and Initialization
-        private bool CalculationsDirty = true;
+        private bool MetricsNeedRecalculation = true;
 
-        private readonly object _matchingLock = new object();
+        private readonly object _orderbookMatchingLock = new object();
 
+        /// <summary>
+        /// Initializes a new instance of the OrderbookChangeTracker for the specified market.
+        /// Sets up timers for periodic metric recalculation and log output, initializes event queues,
+        /// and prepares the tracker for processing orderbook changes and trades.
+        /// </summary>
+        /// <param name="marketTicker">The ticker symbol of the market to track</param>
+        /// <param name="logger">Logger instance for recording operations and errors</param>
+        /// <param name="cache">Shared data cache containing market data and system state</param>
+        /// <param name="config">Trading configuration containing time windows and thresholds</param>
+        /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
+        /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens</param>
+        /// <exception cref="ArgumentNullException">Thrown when marketTicker, logger, config, or statusTrackerService is null</exception>
         public OrderbookChangeTracker(
             string marketTicker,
             ILogger<IOrderbookChangeTracker> logger,
@@ -98,6 +159,14 @@ namespace BacklashBot.Services
             _recalculationTimer.Start();
         }
 
+        /// <summary>
+        /// Performs complete shutdown of the OrderbookChangeTracker, stopping timers,
+        /// clearing all event queues, resetting state, and disposing resources.
+        /// </summary>
+        /// <remarks>
+        /// This method should be called when the tracker is no longer needed.
+        /// It ensures clean shutdown and prevents resource leaks.
+        /// </remarks>
         public void Shutdown()
         {
             _logger.LogDebug("Initiating shutdown for OrderbookChangeTracker associated with market {MarketTicker}", _marketTicker);
@@ -114,8 +183,8 @@ namespace BacklashBot.Services
             _lastSequence = 0;
             LastMarketOpenTime = DateTime.MinValue;
             _lastEventTime = DateTime.MinValue;
-            FirstSnapshotReceived = false;
-            CalculationsDirty = false;
+            IsFirstSnapshotProcessed = false;
+            MetricsNeedRecalculation = false;
 
             // Dispose of timer resources
             _recalculationTimer.Dispose();
@@ -143,6 +212,17 @@ namespace BacklashBot.Services
         #endregion
 
         #region Market Status
+        /// <summary>
+        /// Updates the market status and handles market opening/closing transitions.
+        /// When the market opens, it starts the recalculation timer and sets the open time.
+        /// When the market closes, it clears event queues and stops the timer.
+        /// </summary>
+        /// <param name="isExchangeActive">Whether the exchange is currently active</param>
+        /// <param name="isTradingActive">Whether trading is currently active for this market</param>
+        /// <remarks>
+        /// This method is called when market status changes are detected. It manages
+        /// the lifecycle of the tracker's processing based on market availability.
+        /// </remarks>
         public void UpdateMarketStatus(bool isExchangeActive, bool isTradingActive)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -154,7 +234,7 @@ namespace BacklashBot.Services
             if (isTradingActive && isExchangeActive && LastMarketOpenTime == DateTime.MinValue)
             {
                 LastMarketOpenTime = DateTime.UtcNow;
-                _logger.LogDebug("Market {MarketTicker} opened at {Time}", _marketTicker, LastMarketOpenTime);
+                _logger.LogInformation("Market {MarketTicker} opened at {Time}", _marketTicker, LastMarketOpenTime);
                 _recalculationTimer.Start();
             }
             else if ((!isTradingActive || !isExchangeActive) && LastMarketOpenTime != DateTime.MinValue)
@@ -164,11 +244,18 @@ namespace BacklashBot.Services
                 _tradeEvents.Clear();
                 _lastSequence = 0;
                 _recalculationTimer.Stop();
-                _logger.LogDebug("Market {MarketTicker} closed, queues and timer reset", _marketTicker);
+                _logger.LogInformation("Market {MarketTicker} closed, queues and timer reset", _marketTicker);
             }
         }
         #endregion
 
+        /// <summary>
+        /// Stops the periodic timers used for metric recalculation and log output.
+        /// This method halts background processing without clearing data or disposing resources.
+        /// </summary>
+        /// <remarks>
+        /// Use this method to temporarily pause processing. Call Shutdown() for complete cleanup.
+        /// </remarks>
         public void Stop()
         {
             _recalculationTimer.Stop();
@@ -177,7 +264,21 @@ namespace BacklashBot.Services
         }
 
         #region Event Logging and Matching
-        public void LogOrderbookSnapshot(List<OrderbookData> originalOrderbook, List<OrderbookData> newOrderbook)
+        /// <summary>
+        /// Processes a complete orderbook snapshot by comparing it with the previous state.
+        /// Calculates deltas for each price level, records individual orderbook changes,
+        /// and triggers metric recalculation. Handles market reset scenarios when snapshots
+        /// are empty or when significant time gaps are detected.
+        /// </summary>
+        /// <param name="originalOrderbook">The previous orderbook state, or null for initial snapshot</param>
+        /// <param name="newOrderbook">The current orderbook state to process</param>
+        /// <remarks>
+        /// This method is called periodically with full orderbook data. It compares the new
+        /// snapshot against the previous one to identify changes, then records each change
+        /// individually. If the original orderbook is null or a 2-minute gap is detected,
+        /// it resets the event queues and recalculates metrics to ensure data consistency.
+        /// </remarks>
+        public void ProcessOrderbookSnapshot(List<OrderbookData> originalOrderbook, List<OrderbookData> newOrderbook)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -193,7 +294,7 @@ namespace BacklashBot.Services
             if (shouldResetAndRecalculate)
             {
                 _logger.LogDebug("DELTA-Resetting events and recalculating metrics for {MarketTicker} due to empty original or 2-minute inactivity", _marketTicker);
-                ResetEvents();
+                ClearEventQueues();
                 RecalculateMetrics();
             }
             else
@@ -207,7 +308,7 @@ namespace BacklashBot.Services
                 .ToDictionary(g => g.Key, g => g.First().RestingContracts);
 
 
-            if (FirstSnapshotReceived)
+            if (IsFirstSnapshotProcessed)
             {
                 var allKeys = originalBySideAndPrice.Keys.Union(newBySideAndPrice.Keys).ToList();
 
@@ -221,19 +322,33 @@ namespace BacklashBot.Services
                     {
                         _logger.LogDebug("DELTA-Converted change for {MarketTicker} from snapshot: Side={Side}, Price={Price}, DeltaContracts={DeltaContracts}",
                             _marketTicker, side, price, deltaContracts);
-                        LogChange(side, price, deltaContracts);
+                        RecordOrderbookChange(side, price, deltaContracts);
                     }
 
                 }
             }
 
 
-            FirstSnapshotReceived = true;
+            IsFirstSnapshotProcessed = true;
 
             _logger.LogDebug("Completed orderbook snapshot processing for {MarketTicker}", _marketTicker);
         }
 
-        public void LogChange(string side, int price, int deltaContracts)
+        /// <summary>
+        /// Records an individual orderbook change event with the specified parameters.
+        /// Creates a new OrderbookChange object, attempts to match it with existing trades,
+        /// checks for canceling orderbook changes, and enqueues the change for processing.
+        /// </summary>
+        /// <param name="side">The side of the orderbook ("yes" or "no")</param>
+        /// <param name="price">The price level of the change</param>
+        /// <param name="deltaContracts">The change in contract count (positive for additions, negative for reductions)</param>
+        /// <remarks>
+        /// This method is called for each individual orderbook change detected. It creates
+        /// a timestamped change record, attempts to correlate it with trade events, and
+        /// checks for order cancellations. The change is added to the processing queue
+        /// and metrics are marked as needing recalculation.
+        /// </remarks>
+        public void RecordOrderbookChange(string side, int price, int deltaContracts)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -255,7 +370,7 @@ namespace BacklashBot.Services
 
                 _lastEventTime = change.Timestamp;
 
-                lock (_matchingLock)
+                lock (_orderbookMatchingLock)
                 {
                     var expectedRollOffTime = change.Timestamp + _config.Value.ChangeWindowDuration;
                     _logger.LogDebug(
@@ -263,19 +378,35 @@ namespace BacklashBot.Services
                         _marketTicker, change.Id, change.Side, change.Price, change.DeltaContracts, change.Timestamp, expectedRollOffTime);
 
                     if (deltaContracts < 0)
-                        CheckForMatchingTrade(change);
+                        FindMatchingTrade(change);
 
                     _orderbookChanges.Enqueue(change);
-                    CheckForCancelingOrderbookChange(change);
+                    DetectCancelingOrderbookChange(change);
                 }
 
                 _logger.LogDebug("Logged change for {MarketTicker}: ChangeID={ChangeID}, Side={Side}, Price={Price}, Delta={Delta}, Sequence={Sequence}, IsTradeRelated={IsTradeRelated}, IsCanceled={IsCanceled}",
                     _marketTicker, change.Id, side, price, deltaContracts, change.Sequence, change.IsTradeRelated, change.IsCanceled);
-                CalculationsDirty = true;
+                MetricsNeedRecalculation = true;
             }
         }
 
-        public void LogTrade(string takerSide, int yesPrice, int noPrice, int count, DateTime timestamp)
+        /// <summary>
+        /// Records a trade event with the specified parameters and attempts to match it
+        /// with corresponding orderbook changes. The trade is enqueued for processing
+        /// and metrics are marked for recalculation.
+        /// </summary>
+        /// <param name="takerSide">The side of the taker in the trade ("yes" or "no")</param>
+        /// <param name="yesPrice">The price on the yes side of the trade</param>
+        /// <param name="noPrice">The price on the no side of the trade</param>
+        /// <param name="count">The number of contracts traded</param>
+        /// <param name="timestamp">The timestamp when the trade occurred</param>
+        /// <remarks>
+        /// This method processes incoming trade data, creates a TradeEvent object,
+        /// and attempts to correlate it with orderbook changes that may have caused
+        /// the trade. Successful matches help distinguish between market-making
+        /// activity and actual trading volume.
+        /// </remarks>
+        public void RecordTrade(string takerSide, int yesPrice, int noPrice, int count, DateTime timestamp)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -298,7 +429,7 @@ namespace BacklashBot.Services
                 "Received trade for {MarketTicker}: TradeID={TradeID}, TakerSide={TakerSide}, YesPrice={YesPrice}, NoPrice={NoPrice}, Count={Count}, Timestamp={Timestamp}, ExpectedRollOffTime={ExpectedRollOffTime}",
                 _marketTicker, trade.Id, trade.TakerSide, trade.YesPrice, trade.NoPrice, trade.Count, trade.Timestamp, expectedRollOffTime);
 
-            CheckForMatchingOrderbookChange(trade);
+            FindMatchingOrderbookChange(trade);
 
             if (trade.HasMatchingOrderbookChange)
             {
@@ -322,12 +453,12 @@ namespace BacklashBot.Services
             _logger.LogDebug("Logged trade for {MarketTicker}: TakerSide={TakerSide}, YesPrice={YesPrice}, NoPrice={NoPrice}, Count={Count}, Timestamp={Timestamp}, HasMatchingOrderbookChange={HasMatchingOrderbookChange}, EventId={EventId}",
                 _marketTicker, takerSide, yesPrice, noPrice, count, timestamp, trade.HasMatchingOrderbookChange, trade.Id);
 
-            CalculationsDirty = true;
+            MetricsNeedRecalculation = true;
         }
 
-        private bool CheckForMatchingOrderbookChange(TradeEvent trade)
+        private bool FindMatchingOrderbookChange(TradeEvent trade)
         {
-            lock (_matchingLock)
+            lock (_orderbookMatchingLock)
             {
                 if (_cancellationToken.IsCancellationRequested || trade.HasMatchingOrderbookChange)
                 {
@@ -404,9 +535,9 @@ namespace BacklashBot.Services
             }
         }
 
-        private bool CheckForMatchingTrade(OrderbookChange change)
+        private bool FindMatchingTrade(OrderbookChange change)
         {
-            lock (_matchingLock)
+            lock (_orderbookMatchingLock)
             {
                 if (_cancellationToken.IsCancellationRequested || change.DeltaContracts >= 0)
                     return false;
@@ -439,7 +570,7 @@ namespace BacklashBot.Services
             }
         }
 
-        private void CheckForCancelingOrderbookChange(OrderbookChange newChange)
+        private void DetectCancelingOrderbookChange(OrderbookChange newChange)
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -454,7 +585,7 @@ namespace BacklashBot.Services
             }
 
             var cutoff = newChange.Timestamp - _config.Value.OrderbookCancelWindow;
-            lock (_matchingLock)
+            lock (_orderbookMatchingLock)
             {
                 foreach (var existingChange in _orderbookChanges)
                 {
@@ -487,7 +618,7 @@ namespace BacklashBot.Services
                         _logger.LogDebug(
                             "TRADEMON-Matched canceling orderbook changes in {MarketTicker}: Change1Id={Change1Id}, Change2Id={Change2Id}, Side={Side}, Price={Price}, Delta1={Delta1}, Delta2={Delta2}, Timestamp1={Timestamp1}, Timestamp2={Timestamp2}",
                             _marketTicker, existingChange.Id, newChange.Id, newChange.Side, newChange.Price, existingChange.DeltaContracts, newChange.DeltaContracts, existingChange.Timestamp, newChange.Timestamp);
-                        CalculationsDirty = true;
+                        MetricsNeedRecalculation = true;
                     }
                 }
             }
@@ -507,6 +638,14 @@ namespace BacklashBot.Services
             RecalculateAllMetrics();
         }
 
+        /// <summary>
+        /// Triggers a complete recalculation of all market metrics including cleanup of old events.
+        /// This method performs standard metrics recalculation and updates current snapshot metrics.
+        /// </summary>
+        /// <remarks>
+        /// This method is called periodically by the recalculation timer and also on-demand
+        /// when significant changes occur. It ensures all metrics remain current and accurate.
+        /// </remarks>
         public void RecalculateAllMetrics()
         {
             // Do not run if cancellation has been requested.
@@ -546,8 +685,8 @@ namespace BacklashBot.Services
             CleanupOldEvents();
             CleanupOldTrades();
 
-            if (!CalculationsDirty) return;
-            CalculationsDirty = false;
+            if (!MetricsNeedRecalculation) return;
+            MetricsNeedRecalculation = false;
 
             foreach (var trade in _tradeEvents.Where(x => x.HasMatchingOrderbookChange == false))
             {
@@ -556,7 +695,7 @@ namespace BacklashBot.Services
                     _logger.LogDebug("Trade matching in recalculation cancelled for {MarketTicker}", _marketTicker);
                     return;
                 }
-                CheckForMatchingOrderbookChange(trade);
+                FindMatchingOrderbookChange(trade);
                 if (trade.HasMatchingOrderbookChange)
                 {
                     _logger.LogDebug(
@@ -567,7 +706,7 @@ namespace BacklashBot.Services
 
             var stopwatch = Stopwatch.StartNew();
             OrderbookChange[] orderbookChanges;
-            lock (_matchingLock)
+            lock (_orderbookMatchingLock)
             {
                 orderbookChanges = _orderbookChanges.ToArray();
             }
@@ -785,7 +924,7 @@ namespace BacklashBot.Services
         #endregion
 
         #region Cleanup and Utility Methods
-        private void ResetEvents()
+        private void ClearEventQueues()
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -798,7 +937,7 @@ namespace BacklashBot.Services
             _orderbookChanges.Clear();
             _tradeEvents.Clear();
             _lastSequence = 0;
-            CalculationsDirty = true;
+            MetricsNeedRecalculation = true;
             _logger.LogDebug("TRADEMON-{MarketTicker} Events reset, all queues cleared, sequence reset at {Time}",
                 _marketTicker, LastMarketOpenTime);
         }
@@ -831,7 +970,7 @@ namespace BacklashBot.Services
             }
             if (removedCount > 0)
             {
-                CalculationsDirty = true;
+                MetricsNeedRecalculation = true;
                 _logger.LogDebug("Cleaned up {Count} old order book events for {MarketTicker}", removedCount, _marketTicker);
             }
         }
@@ -935,7 +1074,7 @@ namespace BacklashBot.Services
                             trade.HasMatchingOrderbookChange = true;
                             matchingChange.IsTradeRelated = true;
                             matchingChange.MatchedTradeId = trade.Id;
-                            CalculationsDirty = true;  // Trigger recalculation due to new match
+                            MetricsNeedRecalculation = true;  // Trigger recalculation due to new match
                             _logger.LogDebug(
                                 "Found matching orderbook change during cleanup for TradeID={TradeID}: ChangeID={ChangeID}, Side={Side}, Price={Price}, Delta={Delta}",
                                 trade.Id, matchingChange.Id, matchingChange.Side, matchingChange.Price, matchingChange.DeltaContracts);
@@ -954,7 +1093,7 @@ namespace BacklashBot.Services
                                 _marketTicker, isGracePeriodOver, LastMarketOpenTime, gracePeriodEnd, _config.Value.ChangeWindowDuration, DateTime.UtcNow);
                         }
                     }
-                    CalculationsDirty = true;
+                    MetricsNeedRecalculation = true;
                     removedCount++;
                 }
             }
@@ -968,7 +1107,7 @@ namespace BacklashBot.Services
 
         private OrderbookChange FindMatchingOrderbookChangeForTrade(TradeEvent trade)
         {
-            lock (_matchingLock)
+            lock (_orderbookMatchingLock)
             {
                 var cutoff = trade.Timestamp - _config.Value.TradeMatchingWindow;
                 var futureCutoff = trade.Timestamp + _config.Value.TradeMatchingWindow;
@@ -1002,26 +1141,6 @@ namespace BacklashBot.Services
                 return null;
             }
         }
-
-        //private double GetChangeWindowDuration.TotalMinutes()
-        //{
-        //    if (_cancellationToken.IsCancellationRequested)
-        //    {
-        //        _logger.LogDebug("Elapsed minutes calculation cancelled for {MarketTicker}", _marketTicker);
-        //        return 0;
-        //    }
-
-        //    if (LastMarketOpenTime == DateTime.MinValue)
-        //    {
-        //        return 0;
-        //    }
-        //    TimeSpan elapsed = DateTime.UtcNow - LastMarketOpenTime;
-        //    double minutes = Math.Min(elapsed.TotalMinutes, _config.Value.ChangeWindowDuration.TotalMinutes);
-        //    _logger.LogDebug("Calculated elapsed minutes for {MarketTicker}: {ChangeWindowDuration.TotalMinutes} minutes (capped at ChangeWindowDuration={ChangeWindowDuration} minutes)",
-        //        _marketTicker, minutes, _config.Value.ChangeWindowDuration.TotalMinutes);
-        //    return minutes;
-        //}
-
 
         #endregion
 
@@ -1510,7 +1629,7 @@ namespace BacklashBot.Services
             // Obtain a consistent snapshot of orderbook changes under lock to avoid
             // enumerating the concurrent queue during updates.
             OrderbookChange[] snapshot;
-            lock (_matchingLock)
+            lock (_orderbookMatchingLock)
             {
                 snapshot = _orderbookChanges.ToArray();
             }

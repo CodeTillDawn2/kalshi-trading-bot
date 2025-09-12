@@ -64,7 +64,6 @@ namespace BacklashBot.Services
             _scopeFactory = scopeFactory;
             _tradingConfig = tradingConfig.Value;
             _updateInterval = TimeSpan.FromMinutes(_tradingConfig.RefreshIntervalMinutes);
-            _hasRunInitialRefresh = false;
         }
 
         /// <summary>

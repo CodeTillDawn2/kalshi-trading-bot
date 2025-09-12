@@ -345,7 +345,7 @@ namespace BacklashBot.Services
 
             if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
             {
-                marketData.ChangeTracker.LogTrade(takerSide, yesPrice, noPrice, count, loggedDate);
+                marketData.ChangeTracker.RecordTrade(takerSide, yesPrice, noPrice, count, loggedDate);
             }
             else
             {
@@ -721,7 +721,7 @@ namespace BacklashBot.Services
                         }
                         List<OrderbookData>? originalOrderbook =
                             new List<OrderbookData>(orderbook);
-                        marketData.ChangeTracker.LogOrderbookSnapshot(originalOrderbook, updatedOrderbook);
+                        marketData.ChangeTracker.ProcessOrderbookSnapshot(originalOrderbook, updatedOrderbook);
                         _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData = updatedOrderbook;
                         marketData.OrderbookData = updatedOrderbook;
 
@@ -790,7 +790,7 @@ namespace BacklashBot.Services
                     {
                         _logger.LogDebug("TRADEMON-Logging orderbook delta for {0}... Side={1}, Price={2}, Delta={3}",
                             marketData.MarketTicker, message.Side, message.Price.Value, message.Delta.Value);
-                        marketData.ChangeTracker.LogChange(message.Side, message.Price.Value, message.Delta.Value);
+                        marketData.ChangeTracker.RecordOrderbookChange(message.Side, message.Price.Value, message.Delta.Value);
                     }
                     else
                     {
