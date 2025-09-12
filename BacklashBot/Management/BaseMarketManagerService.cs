@@ -293,7 +293,7 @@ namespace BacklashBot.Management
             try
             {
                 var marketDataService = _serviceFactory.GetMarketDataService();
-                var interestScoreHelper = _serviceFactory.GetMarketInterestScoreHelper();
+                var interestScoreHelper = _serviceFactory.GetInterestScoreService();
                 if (marketDataService is null || interestScoreHelper is null) return 0;
 
                 var myWatches = await context.GetMarketWatches_cached(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock });
@@ -385,7 +385,7 @@ namespace BacklashBot.Management
             List<string> marketsAddedList = new List<string>();
             try
             {
-                var interestScoreHelper = _serviceFactory.GetMarketInterestScoreHelper();
+                var interestScoreHelper = _serviceFactory.GetInterestScoreService();
                 var marketDataService = _serviceFactory.GetMarketDataService();
                 var dataCache = _serviceFactory.GetDataCache();
                 if (interestScoreHelper is null || marketDataService is null || dataCache is null) return new List<string>();
@@ -523,7 +523,7 @@ namespace BacklashBot.Management
             int removed = 0;
             try
             {
-                var interestScoreHelper = _serviceFactory.GetMarketInterestScoreHelper();
+                var interestScoreHelper = _serviceFactory.GetInterestScoreService();
                 var marketDataService = _serviceFactory.GetMarketDataService();
                 if (interestScoreHelper is null || marketDataService is null) return 0;
 

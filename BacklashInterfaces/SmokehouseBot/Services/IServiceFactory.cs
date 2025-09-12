@@ -9,7 +9,7 @@ namespace BacklashBot.Services.Interfaces
     public interface IServiceFactory : IDisposable
     {
         IKalshiWebSocketClient? GetKalshiWebSocketClient();
-        IInterestScoreService? GetMarketInterestScoreHelper();
+        IInterestScoreService? GetInterestScoreService();
         ISqlDataService? GetSqlDataService();
         ITradingSnapshotService? GetTradingSnapshotService();
         IMarketDataService? GetMarketDataService();

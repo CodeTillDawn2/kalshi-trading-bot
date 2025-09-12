@@ -330,7 +330,7 @@ namespace BacklashBot.Management
                 {
                     if (watch.InterestScore == null || watch.InterestScoreDate <= DateTime.Now.AddHours(-12))
                     {
-                        List<(string Ticker, double Score)> scores = await _serviceFactory.GetMarketInterestScoreHelper().GetMarketInterestScores(_scopeFactory, new HashSet<string> { watch.market_ticker });
+                        List<(string Ticker, double Score)> scores = await _serviceFactory.GetInterestScoreService().GetMarketInterestScores(_scopeFactory, new HashSet<string> { watch.market_ticker });
                         if (scores.Count > 0)
                         {
                             watch.InterestScore = scores[0].Score;
