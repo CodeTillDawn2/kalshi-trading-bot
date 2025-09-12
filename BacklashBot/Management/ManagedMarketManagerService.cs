@@ -12,9 +12,28 @@ using TradingStrategies.Configuration;
 
 namespace BacklashBot.Management
 {
+    /// <summary>
+    /// Implements managed market management strategy for the Kalshi trading bot.
+    /// Uses dynamic target calculation based on performance metrics rather than fixed counts.
+    /// Automatically adjusts market watch counts based on system usage, queue depths, and
+    /// performance indicators to optimize resource utilization and market coverage.
+    /// </summary>
     public class ManagedMarketManagerService : BaseMarketManagerService
     {
 
+        /// <summary>
+        /// Initializes a new instance of the ManagedMarketManagerService class.
+        /// Sets up the managed market management strategy with all required dependencies.
+        /// </summary>
+        /// <param name="serviceFactory">Factory for accessing various bot services</param>
+        /// <param name="logger">Logger for recording market management operations</param>
+        /// <param name="scopeFactory">Factory for creating service scopes</param>
+        /// <param name="performanceMonitor">Monitor for tracking system performance metrics</param>
+        /// <param name="executionConfig">Configuration options for execution parameters</param>
+        /// <param name="tradingConfig">Configuration options for trading parameters</param>
+        /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
+        /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
+        /// <param name="brainStatus">Service providing brain instance status information</param>
         public ManagedMarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
@@ -31,6 +50,15 @@ namespace BacklashBot.Management
 
 
 
+        /// <summary>
+        /// Monitors and manages the watch list using managed strategy with dynamic target calculation.
+        /// Uses performance metrics to dynamically calculate optimal market counts rather than fixed targets.
+        /// Automatically adjusts market watch counts based on system usage patterns, queue depths,
+        /// and performance indicators to maintain optimal resource utilization and market coverage.
+        /// </summary>
+        /// <param name="brain">The brain instance configuration containing usage limits and settings</param>
+        /// <param name="metrics">Current performance metrics for dynamic target calculation</param>
+        /// <returns>A task representing the asynchronous monitoring operation</returns>
         public override async Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics metrics)
         {
             if (MonitoringWatchList) return;

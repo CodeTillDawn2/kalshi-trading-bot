@@ -12,9 +12,28 @@ using TradingStrategies.Configuration;
 
 namespace BacklashBot.Management
 {
+    /// <summary>
+    /// Implements unmanaged market management strategy for the Kalshi trading bot.
+    /// Uses fixed target watch counts rather than dynamic calculation based on performance metrics.
+    /// Focuses on maintaining a stable number of markets while removing ended markets and
+    /// replacing uninteresting markets with higher-interest alternatives.
+    /// </summary>
     public class UnmanagedMarketManagerService : BaseMarketManagerService
     {
 
+        /// <summary>
+        /// Initializes a new instance of the UnmanagedMarketManagerService class.
+        /// Sets up the unmanaged market management strategy with all required dependencies.
+        /// </summary>
+        /// <param name="serviceFactory">Factory for accessing various bot services</param>
+        /// <param name="logger">Logger for recording market management operations</param>
+        /// <param name="scopeFactory">Factory for creating service scopes</param>
+        /// <param name="performanceMonitor">Monitor for tracking system performance metrics</param>
+        /// <param name="executionConfig">Configuration options for execution parameters</param>
+        /// <param name="tradingConfig">Configuration options for trading parameters</param>
+        /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
+        /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
+        /// <param name="brainStatus">Service providing brain instance status information</param>
         public UnmanagedMarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
@@ -29,6 +48,16 @@ namespace BacklashBot.Management
         }
 
 
+        /// <summary>
+        /// Monitors and manages the watch list using unmanaged strategy with fixed target counts.
+        /// Performs comprehensive market management including removing ended markets, checking for
+        /// market settlement stability, and adjusting market counts based on fixed targets rather
+        /// than dynamic performance calculations. Handles both adding high-interest markets and
+        /// removing uninteresting ones to maintain optimal market coverage.
+        /// </summary>
+        /// <param name="brain">The brain instance configuration containing target watch counts and settings</param>
+        /// <param name="metrics">Current performance metrics for decision making</param>
+        /// <returns>A task representing the asynchronous monitoring operation</returns>
         public override async Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics metrics)
         {
             if (MonitoringWatchList) return;

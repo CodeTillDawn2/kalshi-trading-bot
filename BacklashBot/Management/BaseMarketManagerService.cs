@@ -12,6 +12,12 @@ using TradingStrategies.Configuration;
 
 namespace BacklashBot.Management
 {
+    /// <summary>
+    /// Abstract base class providing common market management functionality for the Kalshi trading bot.
+    /// Handles market reset operations, interest score calculations, and provides protected methods
+    /// for adding/removing markets based on various criteria. Serves as the foundation for both
+    /// managed and unmanaged market management implementations.
+    /// </summary>
     public abstract class BaseMarketManagerService : IMarketManagerService
     {
         protected readonly IServiceFactory _serviceFactory;
@@ -30,6 +36,20 @@ namespace BacklashBot.Management
         protected bool MonitoringWatchList = false;
         protected readonly object _resetLock = new();
 
+        /// <summary>
+        /// Initializes a new instance of the BaseMarketManagerService class.
+        /// Sets up all required dependencies for market management operations including
+        /// service factory, logging, performance monitoring, and configuration options.
+        /// </summary>
+        /// <param name="serviceFactory">Factory for accessing various bot services</param>
+        /// <param name="logger">Logger for recording market management operations</param>
+        /// <param name="scopeFactory">Factory for creating service scopes</param>
+        /// <param name="performanceMonitor">Monitor for tracking system performance metrics</param>
+        /// <param name="executionConfig">Configuration options for execution parameters</param>
+        /// <param name="tradingConfig">Configuration options for trading parameters</param>
+        /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
+        /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
+        /// <param name="brainStatus">Service providing brain instance status information</param>
         protected BaseMarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
@@ -51,6 +71,11 @@ namespace BacklashBot.Management
             _brainStatus = brainStatus;
         }
 
+        /// <summary>
+        /// Clears all pending market reset operations and associated queues.
+        /// Resets the lists of markets scheduled for reset and markets to be added after reset.
+        /// This method is thread-safe and should be called when resetting the market management state.
+        /// </summary>
         public void ClearMarketsToReset()
         {
             lock (_resetLock)
@@ -60,6 +85,13 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Handles all pending market reset operations by refreshing market data and resetting markets.
+        /// This method coordinates the two-phase process of market reset: first refreshing market data
+        /// from the API, then resetting markets that have been flagged for reset. Handles cancellation
+        /// and logs appropriate warnings for any failures.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation</returns>
         public async Task HandleMarketResets()
         {
             try
@@ -77,6 +109,12 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Adds a market to the reset queue for later processing.
+        /// Markets in this queue will be removed from the watch list and potentially re-added
+        /// after their data has been refreshed. This method is thread-safe.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker symbol to reset</param>
         public void TriggerMarketReset(string marketTicker)
         {
             lock (_resetLock)
@@ -85,8 +123,24 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Monitors the current watch list and makes adjustments based on performance metrics and brain configuration.
+        /// This abstract method must be implemented by derived classes to provide specific watch list management logic.
+        /// Handles adding/removing markets, checking for ended markets, and maintaining optimal market counts.
+        /// </summary>
+        /// <param name="brain">The brain instance configuration containing watch list settings</param>
+        /// <param name="metrics">Current performance metrics for decision making</param>
+        /// <returns>A task representing the asynchronous monitoring operation</returns>
         public abstract Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics metrics);
 
+        /// <summary>
+        /// Calculates the optimal target number of markets to watch based on current performance metrics.
+        /// Uses multiple factors including usage targets, queue sizes, and notification patterns to
+        /// determine the ideal market count. Returns the minimum valid target from all calculated options.
+        /// </summary>
+        /// <param name="metrics">Current performance metrics including usage, counts, and queue sizes</param>
+        /// <param name="brain">Brain instance configuration containing usage limits and targets</param>
+        /// <returns>The calculated target number of markets to watch</returns>
         public int CalculateTarget(PerformanceMetrics metrics, BrainInstanceDTO brain)
         {
             const int MaxValidValue = int.MaxValue;
@@ -134,7 +188,7 @@ namespace BacklashBot.Management
             // Final target: Use minimum of valid targets, or start with 10 if none are valid
             int actualTarget = validTargets.Any() ? validTargets.Min() : 10;
 
-            _logger.LogInformation("Final target: Usage={Usage}, Notification={Notification}, Orderbook={Orderbook}, Event={Event}, Ticker={Ticker}, Selected={Selected}",
+            _logger.LogInformation("Calculated market targets - Usage: {Usage}, Notification: {Notification}, Orderbook: {Orderbook}, Event: {Event}, Ticker: {Ticker}, Final: {Selected}",
                 targetCountUsage, targetCountNotificationQueue, targetCountOrderbookQueue, targetCountEventQueue, targetCountTickerQueue, actualTarget);
 
             return actualTarget;
@@ -156,9 +210,9 @@ namespace BacklashBot.Management
                     marketDataService.MarketsToRefresh.Clear();
                     break;
                 }
-                _logger.LogDebug("API: refreshing market {0}... refetching from API", market);
+                _logger.LogInformation("Refreshing market data for {Market} from API", market);
                 await apiService.FetchMarketsAsync(tickers: new string[] { market });
-                _logger.LogDebug("BRAIN: Resetting market {0} due to RefreshMarkets", market);
+                _logger.LogInformation("Market {Market} queued for reset due to data refresh", market);
                 TriggerMarketReset(market);
                 marketDataService.MarketsToRefresh.RemoveAll(x => x == market);
             }
@@ -195,7 +249,7 @@ namespace BacklashBot.Management
                     MarketDTO? mkt = mkts.FirstOrDefault();
                     if (mkt != null && !KalshiConstants.MarketIsEnded(mkt.status))
                     {
-                        _logger.LogInformation("Stats: Adding back {market} after reset, with status {status}", market, mkt.status);
+                        _logger.LogInformation("Re-adding market {Market} after reset (status: {Status})", market, mkt.status);
                         await marketDataService.AddMarketToWatchList(market);
                     }
                 }
@@ -224,7 +278,7 @@ namespace BacklashBot.Management
 
                 if (dataCache.WatchedMarkets.Contains(market))
                 {
-                    _logger.LogInformation("Stats: Removing {market} for reset", market);
+                    _logger.LogInformation("Removing market {Market} for reset operation", market);
                     await marketDataService.UnwatchMarket(market);
                     lock (_resetLock) { MarketsToAddAfterReset.Add(market); }
                 }
@@ -281,7 +335,7 @@ namespace BacklashBot.Management
                 {
                     await marketDataService.UnwatchMarket(ticker);
                     removed++;
-                    _logger.LogDebug("Stats: Removed market {MarketTicker}.", ticker);
+                    _logger.LogInformation("Removed market {MarketTicker} due to low interest", ticker);
                 }
             }
             catch (OperationCanceledException)
@@ -363,7 +417,7 @@ namespace BacklashBot.Management
                             watch.LastWatched = DateTime.Now;
                             await context.AddOrUpdateMarketWatch(watch);
                             await marketDataService.AddMarketToWatchList(watch.market_ticker);
-                            _logger.LogDebug("BRAIN: Locked existing high-interest market {MarketTicker}. Interest: {interest}", watch.market_ticker, watch.InterestScore);
+                            _logger.LogInformation("Added existing high-interest market {MarketTicker} (score: {Score})", watch.market_ticker, watch.InterestScore);
                             marketsAdded++;
                             marketsAddedList.Add(watch.market_ticker);
                             dataCache.WatchedMarkets.Add(watch.market_ticker);
@@ -436,14 +490,14 @@ namespace BacklashBot.Management
 
                                 if (market.Score < minimumInterest)
                                 {
-                                    _logger.LogInformation("BRAIN: Added market {market} to market watches but score too low to watch. Interest: {score}", market.Ticker, market.Score);
+                                    _logger.LogInformation("Market {Market} added to watch list but score too low to activate (score: {Score})", market.Ticker, market.Score);
                                     continue;
                                 }
 
                                 marketsAddedList.Add(market.Ticker);
                                 dataCache.WatchedMarkets.Add(newWatch.market_ticker);
                                 marketsAdded++;
-                                _logger.LogInformation("BRAIN: Added and locked market {MarketTicker} due to high interest. Interest: {score}", market.Ticker, market.Score);
+                                _logger.LogInformation("Added new high-interest market {MarketTicker} (score: {Score})", market.Ticker, market.Score);
                             }
                         }
                     }
@@ -533,8 +587,7 @@ namespace BacklashBot.Management
                 {
                     if ((watch.InterestScore ?? double.MinValue) <= minimumInterest)
                     {
-                        _logger.LogInformation("Stats: Removing market {MarketTicker} due to low interest. Interest={InterestScore}",
-                            watch.market_ticker, watch.InterestScore);
+                        _logger.LogInformation("Removing market {MarketTicker} due to low interest score ({Score})", watch.market_ticker, watch.InterestScore);
                         await marketDataService.UnwatchMarket(watch.market_ticker);
                         removed++;
                     }
