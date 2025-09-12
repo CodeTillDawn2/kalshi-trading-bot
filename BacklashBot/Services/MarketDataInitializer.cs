@@ -4,6 +4,12 @@ using System.Threading;
 
 namespace BacklashBot.Services
 {
+    /// <summary>
+    /// Service responsible for initializing market data during application startup.
+    /// This service fetches watched markets, subscribes to WebSocket channels for new markets,
+    /// synchronizes market data, and sets up positions and account balance. It ensures
+    /// that all necessary market data is available before the application becomes fully operational.
+    /// </summary>
     public class MarketDataInitializer : IMarketDataInitializer
     {
         private readonly ILogger<IMarketDataInitializer> _logger;
@@ -11,6 +17,14 @@ namespace BacklashBot.Services
         private readonly IStatusTrackerService _statusTracker;
         private readonly IBotReadyStatus _readyStatus;
         private readonly IScopeManagerService _scopeManagerService;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MarketDataInitializer"/> class.
+        /// </summary>
+        /// <param name="logger">Logger for recording initialization operations and errors.</param>
+        /// <param name="serviceFactory">Factory for accessing other services in the application.</param>
+        /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
+        /// <param name="readyStatus">Service tracking the application's readiness status.</param>
+        /// <param name="statusTracker">Service for tracking application status and cancellation tokens.</param>
         public MarketDataInitializer(ILogger<IMarketDataInitializer> logger, IServiceFactory serviceFactory, IScopeManagerService scopeManagerService, IBotReadyStatus readyStatus,
             IStatusTrackerService statusTracker)
         {
@@ -21,6 +35,13 @@ namespace BacklashBot.Services
             _serviceFactory = serviceFactory;
         }
 
+        /// <summary>
+        /// Performs the complete market data initialization sequence.
+        /// This method fetches watched markets, subscribes to WebSocket channels, synchronizes market data,
+        /// retrieves positions, and updates account balance. It runs operations sequentially on a low-priority
+        /// thread to avoid interfering with other system processes.
+        /// </summary>
+        /// <returns>A task representing the asynchronous initialization operation.</returns>
         public async Task SetupAsync()
         {
             _logger.LogDebug("MarketDataInitializer.SetupAsync started at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, _statusTracker.GetCancellationToken().IsCancellationRequested);
@@ -123,6 +144,13 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Waits for initial market data to become available after subscribing to a market channel.
+        /// This method polls for market data availability with a timeout to ensure WebSocket data
+        /// has been received before proceeding with initialization.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker symbol to wait for data on.</param>
+        /// <returns>A task representing the asynchronous wait operation.</returns>
         private async Task WaitForInitialDataAsync(string marketTicker)
         {
             const int maxWaitSeconds = 3;

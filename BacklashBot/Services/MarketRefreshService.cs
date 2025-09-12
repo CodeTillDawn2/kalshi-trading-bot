@@ -8,6 +8,12 @@ using TradingStrategies.Configuration;
 
 namespace BacklashBot.Services
 {
+    /// <summary>
+    /// Service responsible for managing periodic market data refresh operations for watched markets.
+    /// This service runs a background task that checks trading status, determines which markets need data synchronization,
+    /// and performs refresh operations at configured intervals. It provides metrics on refresh performance and supports
+    /// immediate refresh triggers for specific markets.
+    /// </summary>
     public class MarketRefreshService : IMarketRefreshService
     {
         private readonly IServiceScopeFactory _scopeFactory;
@@ -16,16 +22,33 @@ namespace BacklashBot.Services
         private readonly ILogger<IMarketRefreshService> _logger;
         private readonly TimeSpan _updateInterval;
         private readonly TradingConfig _tradingConfig;
-        private bool _hubIsReady;
         private DateTime? _lastRefreshTime;
         private bool _hasRunInitialRefresh;
         private Task _executeTask;
+        /// <summary>
+        /// Event raised when a market's data has been updated.
+        /// </summary>
         public event EventHandler<string> OnMarketUpdated;
+        /// <summary>
+        /// Gets the duration of the last market refresh operation.
+        /// </summary>
         public TimeSpan LastWorkDuration { get; private set; }
+        /// <summary>
+        /// Gets the number of markets processed in the last refresh operation.
+        /// </summary>
         public int LastWorkMarketCount { get; private set; }
         private TimeSpan RefreshInterval => _updateInterval;
         private readonly IScopeManagerService _scopeManagerService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MarketRefreshService"/> class.
+        /// </summary>
+        /// <param name="scopeFactory">Factory for creating service scopes for dependency injection.</param>
+        /// <param name="logger">Logger for recording service operations and errors.</param>
+        /// <param name="tradingConfig">Configuration options for trading parameters including refresh intervals.</param>
+        /// <param name="serviceFactory">Factory for accessing other services in the application.</param>
+        /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
+        /// <param name="statusTrackerService">Service for tracking application status and cancellation tokens.</param>
         public MarketRefreshService(
             IServiceScopeFactory scopeFactory,
             ILogger<IMarketRefreshService> logger,
@@ -45,6 +68,12 @@ namespace BacklashBot.Services
             _hasRunInitialRefresh = false;
         }
 
+        /// <summary>
+        /// Starts the periodic market refresh service that runs in the background.
+        /// This method initiates a long-running task that continuously monitors trading status and refreshes market data
+        /// for watched markets at configured intervals. The service respects cancellation tokens and handles errors gracefully.
+        /// </summary>
+        /// <param name="stoppingToken">Cancellation token to stop the service operation.</param>
         public void ExecuteServicesAsync(CancellationToken stoppingToken)
         {
             try
@@ -114,6 +143,12 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Triggers an immediate refresh of market data for a specific market ticker.
+        /// This method performs a synchronous data update for the specified market and raises the market updated event.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker symbol to refresh.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task TriggerImmediateRefreshAsync(string marketTicker)
         {
             try
@@ -135,11 +170,21 @@ namespace BacklashBot.Services
         }
 
 
+        /// <summary>
+        /// Determines whether the market refresh service is currently running.
+        /// </summary>
+        /// <returns>True if the background refresh task is active and not completed; otherwise, false.</returns>
         public bool IsRunning()
         {
             return _executeTask != null && !_executeTask.IsCompleted;
         }
 
+        /// <summary>
+        /// Stops the market refresh service gracefully.
+        /// This method waits for the background refresh task to complete and ensures proper cleanup.
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token for the stop operation.</param>
+        /// <returns>A task representing the asynchronous stop operation.</returns>
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("MarketRefreshService stopping...");
@@ -165,6 +210,13 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Performs a comprehensive refresh of all watched markets.
+        /// This method fetches the current list of watched markets, determines which ones need data synchronization
+        /// based on sync timestamps and trading activity, and performs the necessary updates. It includes
+        /// an additional pass for markets that haven't been refreshed recently if the overall refresh ratio is low.
+        /// </summary>
+        /// <returns>A task representing the asynchronous refresh operation.</returns>
         private async Task RefreshAllWatchedMarketsAsync()
         {
             _logger.LogDebug("Updating all watched markets...");
@@ -289,6 +341,13 @@ namespace BacklashBot.Services
 
 
 
+        /// <summary>
+        /// Shuffles the elements of a list using the Fisher-Yates algorithm.
+        /// This method randomizes the order of elements in the provided list.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the list.</typeparam>
+        /// <param name="list">The list to shuffle.</param>
+        /// <returns>A new list containing the shuffled elements.</returns>
         public static List<T> ShuffleList<T>(List<T> list)
         {
             Random random = new Random();
