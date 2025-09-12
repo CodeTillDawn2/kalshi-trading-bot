@@ -13,6 +13,7 @@ using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
+using BacklashBot.Helpers;
 using BacklashDTOs;
 using BacklashBot.State.Interfaces;
 using System.Text.Json;
@@ -24,12 +25,17 @@ using TradingStrategies.Configuration;
 
 namespace TradingSimulator.Executable
 {
+    /// <summary>
+    /// Test fixture class for executing and validating trading simulator tasks.
+    /// This class provides comprehensive testing capabilities for overnight activities,
+    /// snapshot processing, market data validation, and discrepancy reporting.
+    /// It serves as an integration test suite for the trading bot's core operational workflows.
+    /// </summary>
     [TestFixture]
     public class ExecutableTasks
     {
         private TradingSnapshotService _snapshotService;
         private OvernightActivitiesHelper _overnightService;
-        private SnapshotPeriodHelper _snapshotPeriodAnalyzer;
         private IInterestScoreService _interestScoreService;
         private SnapshotPeriodHelper _snapshotPeriodHelper;
         private IOptions<ExecutionConfig> _executionConfig;
@@ -50,39 +56,125 @@ namespace TradingSimulator.Executable
         private IServiceScopeFactory _scopeFactory;
         private SqlDataService _sqlDataService;
 
+        /// <summary>
+        /// Metadata container for tracking price discrepancies in market snapshots.
+        /// Used to record and report instances where expected bid prices differ from actual values.
+        /// </summary>
         private class DiscrepancyMetadata
         {
+            /// <summary>
+            /// The market ticker symbol where the discrepancy was detected.
+            /// </summary>
             public string MarketTicker { get; set; }
+
+            /// <summary>
+            /// The timestamp when the snapshot was taken.
+            /// </summary>
             public DateTime SnapshotDate { get; set; }
+
+            /// <summary>
+            /// The expected bid price for the Yes position.
+            /// </summary>
             public int ExpectedYesBid { get; set; }
+
+            /// <summary>
+            /// The actual bid price for the Yes position found in the snapshot.
+            /// </summary>
             public int ActualYesBid { get; set; }
+
+            /// <summary>
+            /// The expected bid price for the No position.
+            /// </summary>
             public int ExpectedNoBid { get; set; }
+
+            /// <summary>
+            /// The actual bid price for the No position found in the snapshot.
+            /// </summary>
             public int ActualNoBid { get; set; }
         }
 
+        /// <summary>
+        /// Metadata container for tracking snapshots with missing orderbook data.
+        /// Used to identify and report market snapshots that lack essential orderbook information.
+        /// </summary>
         private class MissingOrderbookMetadata
         {
+            /// <summary>
+            /// The market ticker symbol where the missing orderbook was detected.
+            /// </summary>
             public string MarketTicker { get; set; }
+
+            /// <summary>
+            /// The timestamp when the snapshot was taken.
+            /// </summary>
             public DateTime SnapshotDate { get; set; }
+
+            /// <summary>
+            /// The snapshot version number, if available.
+            /// </summary>
             public int? SnapshotVersion { get; set; }
         }
 
+        /// <summary>
+        /// Metadata container for tracking price overlaps in market snapshots.
+        /// Used to identify instances where Yes and No bid prices are identical, indicating potential data issues.
+        /// </summary>
         private class OverlappingPriceMetadata
         {
+            /// <summary>
+            /// The market ticker symbol where the price overlap was detected.
+            /// </summary>
             public string MarketTicker { get; set; }
+
+            /// <summary>
+            /// The timestamp when the snapshot was taken.
+            /// </summary>
             public DateTime SnapshotDate { get; set; }
+
+            /// <summary>
+            /// The overlapping price value where BestYesBid equals BestNoBid.
+            /// </summary>
             public int OverlappingPrice { get; set; }
         }
 
-        private class RateDiscrepancyMetadata // New metadata class
+        /// <summary>
+        /// Metadata container for tracking rate discrepancies in market snapshots.
+        /// Used to identify inconsistencies between velocity and rate calculations for trading activity.
+        /// </summary>
+        private class RateDiscrepancyMetadata
         {
+            /// <summary>
+            /// The market ticker symbol where the rate discrepancy was detected.
+            /// </summary>
             public string MarketTicker { get; set; }
+
+            /// <summary>
+            /// The timestamp when the snapshot was taken.
+            /// </summary>
             public DateTime SnapshotDate { get; set; }
+
+            /// <summary>
+            /// The sum of velocity values for Yes and No bid positions.
+            /// </summary>
             public double VelocitySum { get; set; }
+
+            /// <summary>
+            /// The sum of order and trade volume rates.
+            /// </summary>
             public double RateSum { get; set; }
+
+            /// <summary>
+            /// The absolute difference between velocity sum and rate sum.
+            /// </summary>
             public double Difference { get; set; }
         }
 
+        /// <summary>
+        /// Initializes the test fixture by setting up dependency injection services,
+        /// configuring application settings, and preparing mock objects for testing.
+        /// This method creates a comprehensive service provider with all required dependencies
+        /// for executing trading simulator tasks and overnight activities.
+        /// </summary>
         [SetUp]
         public void Setup()
         {
@@ -109,8 +201,6 @@ namespace TradingSimulator.Executable
             // Add mocks for missing dependencies
             var scopeManagerMock = new Mock<IScopeManagerService>();
             var statusTrackerMock = new Mock<IStatusTrackerService>();
-
-            _snapshotPeriodHelper = new SnapshotPeriodHelper();
 
             var services = new ServiceCollection();
             services.AddScoped<IKalshiBotContext>(provider => new KalshiBotContext(config));
@@ -140,7 +230,6 @@ namespace TradingSimulator.Executable
             _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, marketAnalysisLoggerMock.Object);
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _marketAnalysisHelper, _executionConfig, _sqlDataService);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _snapshotOptions, Options.Create(tradingConfig), _scopeFactory);
-            _snapshotPeriodAnalyzer = new SnapshotPeriodHelper();
 
             _dbContext = new KalshiBotContext(config);
             _priceOffCount_major = 0;
@@ -150,6 +239,11 @@ namespace TradingSimulator.Executable
         }
 
 
+        /// <summary>
+        /// Test method that executes the complete overnight task workflow.
+        /// This includes market data refresh, interest score calculations, snapshot imports,
+        /// market cleanup, and snapshot group generation.
+        /// </summary>
         [Test]
         public async Task ExecuteOvernightTasks()
         {
@@ -157,12 +251,22 @@ namespace TradingSimulator.Executable
             await _overnightService.RunOvernightTasks(scopeFactory);
         }
 
+        /// <summary>
+        /// Test method that generates snapshot groups from raw market data.
+        /// This process organizes snapshots into valid time periods for analysis,
+        /// filtering out invalid data and creating structured groups for trading evaluation.
+        /// </summary>
         [Test]
         public async Task GenerateSnapshotGroups()
         {
             await _marketAnalysisHelper.GenerateSnapshotGroups();
         }
 
+        /// <summary>
+        /// Test method that removes markets from the database that have ended
+        /// but were never recorded with snapshot data. This cleanup operation
+        /// helps maintain database integrity by removing stale market entries.
+        /// </summary>
         [Test]
         public async Task DeleteUnrecordedMarkets()
         {
@@ -170,6 +274,11 @@ namespace TradingSimulator.Executable
         }
 
 
+        /// <summary>
+        /// Test method that removes processed snapshot data from disk storage.
+        /// This cleanup operation deletes candlestick data files for markets that have
+        /// completed their processing lifecycle, freeing up storage space.
+        /// </summary>
         [Test]
         public async Task DeleteProcessedSnapshots()
         {
@@ -177,70 +286,89 @@ namespace TradingSimulator.Executable
         }
 
 
+        /// <summary>
+        /// Test method that performs comprehensive snapshot upgrade and validation processing.
+        /// This method processes unvalidated snapshots in batches, performs schema upgrades,
+        /// validates data integrity, and generates discrepancy reports. It handles market
+        /// categorization, JSON serialization updates, and comprehensive error tracking.
+        /// </summary>
         [Test]
         public async Task UpgradeSnapshots()
         {
-            bool SaveUpdatedJSON = true;
+            bool performValidation = false; // Flag to enable/disable validation
+            bool saveUpdatedJson = true;
             var startTime = DateTime.UtcNow;
-            int RecordsReturned = -1;
+            int batchSize = 2000;
+            int totalProcessed = 0;
+            int totalValidated = 0;
+            int totalErrors = 0;
 
-            while (RecordsReturned != 0)
+            TestContext.WriteLine($"Starting snapshot upgrade process at {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+
+            while (true)
             {
-                var allUnvalidatedSnapshots = await _dbContext.GetSnapshots(isValidated: false, endDate: startTime,
-                    MaxRecords: 2000);
-                RecordsReturned = allUnvalidatedSnapshots.Count;
+                var allUnvalidatedSnapshots = await _dbContext.GetSnapshots(isValidated: false, endDate: startTime, MaxRecords: batchSize);
+                int recordsReturned = allUnvalidatedSnapshots.Count;
 
-                foreach (var marketName in allUnvalidatedSnapshots.Select(x => x.MarketTicker).Distinct().OrderBy(m => m))
+                if (recordsReturned == 0)
                 {
-                    int validCount = 0;
-                    int orderbookMissingCount = 0;
-                    int overlappingPriceCount = 0;
-                    int rateDiscrepancyCount = 0; // New counter
-                    int errorCount = 0;
-                    var majorDiscrepancies = new List<DiscrepancyMetadata>();
-                    var missingOrderbooks = new List<MissingOrderbookMetadata>();
-                    var overlappingPrices = new List<OverlappingPriceMetadata>();
-                    var rateDiscrepancies = new List<RateDiscrepancyMetadata>(); // New list
+                    TestContext.WriteLine("No more unvalidated snapshots found. Upgrade process complete.");
+                    break;
+                }
+
+                TestContext.WriteLine($"Processing batch of {recordsReturned} snapshots...");
+
+                var marketGroups = allUnvalidatedSnapshots
+                    .GroupBy(x => x.MarketTicker)
+                    .OrderBy(g => g.Key)
+                    .ToList();
+
+                foreach (var marketGroup in marketGroups)
+                {
+                    string marketName = marketGroup.Key;
+                    var snapshots = marketGroup.OrderBy(x => x.SnapshotDate).ToList();
+
+                    TestContext.WriteLine($"Processing market: {marketName} ({snapshots.Count} snapshots)");
 
                     try
                     {
                         using var dbContext = new KalshiBotContext(config);
-                        var snapshotData = allUnvalidatedSnapshots.Where(x => x.MarketTicker == marketName).OrderBy(x => x.SnapshotDate).ToList();
-                        var snapshots = snapshotData.ToList();
 
-                        if (!snapshots.Any())
+                        // Get market info for category
+                        string? marketCategory = null;
+                        var market = await dbContext.GetMarketByTicker_cached(marketName);
+                        if (market?.Event == null)
                         {
+                            TestContext.WriteLine($"Warning: Market {marketName} has no associated event. Skipping.");
+                            totalErrors += snapshots.Count;
                             continue;
                         }
 
-                        var cacheSnapshotDict = await _snapshotService.LoadManySnapshots(snapshots, true);
-                        Assert.That(cacheSnapshotDict, Is.Not.Null);
+                        marketCategory = market.Event.category;
+                        if (string.IsNullOrEmpty(market.category))
+                        {
+                            market.category = marketCategory;
+                            await dbContext.AddOrUpdateMarket(market);
+                        }
 
-                        var options = new JsonSerializerOptions
+                        // Load snapshots into cache
+                        var cacheSnapshotDict = await _snapshotService.LoadManySnapshots(snapshots, true);
+                        if (cacheSnapshotDict == null)
+                        {
+                            TestContext.WriteLine($"Error: Failed to load snapshots for market {marketName}");
+                            totalErrors += snapshots.Count;
+                            continue;
+                        }
+
+                        // JSON serialization options for schema upgrade
+                        var jsonOptions = new JsonSerializerOptions
                         {
                             WriteIndented = false,
                             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                             Converters = { new SimplifiedTupleConverter() }
                         };
 
-                        string? marketCategory = null;
-                        var market = await dbContext.GetMarketByTicker_cached(marketName);
-                        if (market.Event == null)
-                        {
-                            errorCount++;
-                            continue;
-                        }
-                        if (market != null && market.Event != null)
-                        {
-                            marketCategory = market.Event.category;
-                            if (market.category == "")
-                            {
-                                market.category = marketCategory;
-                                await dbContext.AddOrUpdateMarket(market);
-                            }
-
-
-                        }
+                        var validatedSnapshots = new List<BacklashDTOs.Data.SnapshotDTO>();
 
                         foreach (var snapshotList in cacheSnapshotDict.Values)
                         {
@@ -248,122 +376,121 @@ namespace TradingSimulator.Executable
                             {
                                 if (cacheSnapshot == null)
                                 {
+                                    TestContext.WriteLine($"Warning: Null snapshot found for market {marketName}");
+                                    totalErrors++;
                                     continue;
                                 }
 
                                 try
                                 {
-                                    //var result = SnapshotDiscrepancyValidator.ValidateDiscrepancies(cacheSnapshot);
+                                    bool isValid = true;
 
-                                    //if (result.IsOrderbookMissing)
-                                    //{
-                                    //    orderbookMissingCount++;
-                                    //    LogMissingOrderbook(cacheSnapshot.MarketTicker, cacheSnapshot.Timestamp);
-                                    //    missingOrderbooks.Add(new MissingOrderbookMetadata
-                                    //    {
-                                    //        MarketTicker = cacheSnapshot.MarketTicker,
-                                    //        SnapshotDate = cacheSnapshot.Timestamp
-                                    //    });
-                                    //}
-
-                                    //if (result.DoPricesOverlap)
-                                    //{
-                                    //    overlappingPriceCount++;
-                                    //    LogOverlappingPrice(cacheSnapshot.MarketTicker, cacheSnapshot.Timestamp, cacheSnapshot.BestYesBid);
-                                    //    overlappingPrices.Add(new OverlappingPriceMetadata
-                                    //    {
-                                    //        MarketTicker = cacheSnapshot.MarketTicker,
-                                    //        SnapshotDate = cacheSnapshot.Timestamp,
-                                    //        OverlappingPrice = cacheSnapshot.BestYesBid
-                                    //    });
-                                    //}
-
-                                    //if (result.IsRateDiscrepancy)
-                                    //{
-                                    //    rateDiscrepancyCount++;
-                                    //    double velocitySum = (cacheSnapshot.VelocityPerMinute_Top_Yes_Bid) + (cacheSnapshot.VelocityPerMinute_Bottom_Yes_Bid);
-                                    //    double rateSum = (cacheSnapshot.OrderVolumePerMinute_YesBid) + (cacheSnapshot.TradeVolumePerMinute_Yes);
-                                    //    double diff = Math.Abs(velocitySum - rateSum);
-                                    //    LogRateDiscrepancy(cacheSnapshot.MarketTicker, cacheSnapshot.Timestamp, velocitySum, rateSum, diff);
-                                    //    rateDiscrepancies.Add(new RateDiscrepancyMetadata
-                                    //    {
-                                    //        MarketTicker = cacheSnapshot.MarketTicker,
-                                    //        SnapshotDate = cacheSnapshot.Timestamp,
-                                    //        VelocitySum = velocitySum,
-                                    //        RateSum = rateSum,
-                                    //        Difference = diff
-                                    //    });
-                                    //}
-
-
-
-                                    //if (result.IsValid)
-                                    //{
-                                    var snapshotToUpdate = snapshots.FirstOrDefault(x => x.MarketTicker == cacheSnapshot.MarketTicker && x.SnapshotDate == cacheSnapshot.Timestamp);
-                                    if (snapshotToUpdate != null)
+                                    if (performValidation)
                                     {
-                                        snapshotToUpdate.IsValidated = true;
-                                        if (SaveUpdatedJSON)
+                                        var validationResult = SnapshotDiscrepancyValidator.ValidateDiscrepancies(cacheSnapshot);
+
+                                        if (!validationResult.IsValid)
                                         {
-                                            cacheSnapshot.MarketCategory = marketCategory;
-                                            snapshotToUpdate.RawJSON = JsonSerializer.Serialize(cacheSnapshot, options);
+                                            TestContext.WriteLine($"Snapshot {cacheSnapshot.MarketTicker} at {cacheSnapshot.Timestamp:yyyy-MM-dd HH:mm:ss} failed validation:");
+                                            if (validationResult.IsOrderbookMissing)
+                                            {
+                                                TestContext.WriteLine("  - Missing orderbook data");
+                                                LogMissingOrderbook(cacheSnapshot.MarketTicker, cacheSnapshot.Timestamp);
+                                            }
+                                            if (validationResult.DoPricesOverlap)
+                                            {
+                                                TestContext.WriteLine("  - Overlapping prices");
+                                                LogOverlappingPrice(cacheSnapshot.MarketTicker, cacheSnapshot.Timestamp, cacheSnapshot.BestYesBid);
+                                            }
+                                            if (validationResult.IsRateDiscrepancy)
+                                            {
+                                                double velocitySum = cacheSnapshot.VelocityPerMinute_Top_Yes_Bid + cacheSnapshot.VelocityPerMinute_Bottom_Yes_Bid;
+                                                double rateSum = cacheSnapshot.OrderVolumePerMinute_YesBid + cacheSnapshot.TradeVolumePerMinute_Yes;
+                                                double diff = Math.Abs(velocitySum - rateSum);
+                                                TestContext.WriteLine($"  - Rate discrepancy: Velocity={velocitySum:F2}, Rate={rateSum:F2}, Diff={diff:F2}");
+                                                LogRateDiscrepancy(cacheSnapshot.MarketTicker, cacheSnapshot.Timestamp, velocitySum, rateSum, diff);
+                                            }
+                                            isValid = false;
                                         }
                                     }
-                                    validCount++;
-                                    //}
+
+                                    if (isValid)
+                                    {
+                                        var snapshotToUpdate = snapshots.FirstOrDefault(x =>
+                                            x.MarketTicker == cacheSnapshot.MarketTicker &&
+                                            x.SnapshotDate == cacheSnapshot.Timestamp);
+
+                                        if (snapshotToUpdate != null)
+                                        {
+                                            snapshotToUpdate.IsValidated = true;
+                                            if (saveUpdatedJson)
+                                            {
+                                                // Schema upgrade: re-serialize to clean JSON and add market category
+                                                cacheSnapshot.MarketCategory = marketCategory;
+                                                snapshotToUpdate.RawJSON = JsonSerializer.Serialize(cacheSnapshot, jsonOptions);
+                                            }
+                                            validatedSnapshots.Add(snapshotToUpdate);
+                                            totalValidated++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        totalErrors++;
+                                    }
                                 }
-                                catch
+                                catch (Exception ex)
                                 {
-                                    errorCount++;
+                                    TestContext.WriteLine($"Error processing snapshot for {marketName} at {cacheSnapshot.Timestamp}: {ex.Message}");
+                                    totalErrors++;
                                 }
                             }
                         }
 
-                        if (snapshots.Any(x => x.IsValidated == true))
+                        // Bulk update validated snapshots
+                        if (validatedSnapshots.Any())
                         {
-                            snapshots = snapshots.Where(x => x.IsValidated == true).ToList();
-                            await _dbContext.AddOrUpdateSnapshots(snapshots);
-
-                            //foreach (var snapshotToUpdate in snapshots.Where(x => x.IsValidated == true))
-                            //{
-                            //    try
-                            //    {
-                            //        await _dbContext.AddOrUpdateSnapshot(snapshotToUpdate);
-                            //    }
-                            //    catch (Exception ex)
-                            //    {
-                            //        errorCount++;
-                            //    }
-                            //}
-
+                            await _dbContext.AddOrUpdateSnapshots(validatedSnapshots);
+                            TestContext.WriteLine($"Updated {validatedSnapshots.Count} snapshots for market {marketName}");
                         }
 
-                        //await ExportDiscrepancyReportForMarket(
-                        //    marketName,
-                        //    validCount,
-                        //    orderbookMissingCount,
-                        //    overlappingPriceCount,
-                        //    rateDiscrepancyCount, // Add new parameter
-                        //    errorCount,
-                        //    majorDiscrepancies,
-                        //    missingOrderbooks,
-                        //    overlappingPrices,
-                        //    rateDiscrepancies // Add new parameter
-                        //);
+                        totalProcessed += snapshots.Count;
                     }
                     catch (Exception ex)
                     {
-                        errorCount++;
+                        TestContext.WriteLine($"Error processing market {marketName}: {ex.Message}");
+                        totalErrors += snapshots.Count;
                     }
                 }
+
+                TestContext.WriteLine($"Batch complete. Total processed: {totalProcessed}, Validated: {totalValidated}, Errors: {totalErrors}");
             }
 
+            TestContext.WriteLine($"Snapshot upgrade complete. Final stats - Processed: {totalProcessed}, Validated: {totalValidated}, Errors: {totalErrors}");
 
-
-            await ExportDiscrepancyReport(); // Update global report
+            // Export discrepancy reports if validation was performed
+            if (performValidation)
+            {
+                await ExportDiscrepancyReport();
+            }
         }
 
-        private async Task ExportDiscrepancyReportForMarket(
+        /// <summary>
+        /// Generates a detailed discrepancy report for a specific market.
+        /// This method creates a comprehensive text file containing validation results,
+        /// including major price discrepancies, overlapping prices, rate discrepancies,
+        /// and missing orderbook data with detailed breakdowns by date and type.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker symbol for the report.</param>
+        /// <param name="validCount">Number of valid snapshots processed.</param>
+        /// <param name="orderbookMissingCount">Number of snapshots with missing orderbook data.</param>
+        /// <param name="overlappingPriceCount">Number of snapshots with overlapping prices.</param>
+        /// <param name="rateDiscrepancyCount">Number of snapshots with rate discrepancies.</param>
+        /// <param name="errorCount">Number of snapshots that failed processing.</param>
+        /// <param name="majorDiscrepancies">List of major price discrepancy metadata.</param>
+        /// <param name="missingOrderbooks">List of missing orderbook metadata.</param>
+        /// <param name="overlappingPrices">List of overlapping price metadata.</param>
+        /// <param name="rateDiscrepancies">List of rate discrepancy metadata.</param>
+        private async Task GenerateMarketDiscrepancyReport(
             string marketTicker,
             int validCount,
             int orderbookMissingCount,
@@ -525,6 +652,18 @@ namespace TradingSimulator.Executable
             await writer.WriteLineAsync(new string('-', 50));
         }
 
+        /// <summary>
+        /// Logs a major price discrepancy detected during snapshot validation.
+        /// Records the expected vs actual bid prices for both Yes and No positions
+        /// and stores the metadata for later reporting.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker where the discrepancy occurred.</param>
+        /// <param name="snapshotDate">The timestamp of the snapshot.</param>
+        /// <param name="snapshotVersion">The snapshot version number (currently unused).</param>
+        /// <param name="expectedYesBid">The expected bid price for Yes position.</param>
+        /// <param name="actualYesBid">The actual bid price for Yes position found in snapshot.</param>
+        /// <param name="expectedNoBid">The expected bid price for No position.</param>
+        /// <param name="actualNoBid">The actual bid price for No position found in snapshot.</param>
         private void LogMajorDiscrepancy(string marketTicker, DateTime snapshotDate, int? snapshotVersion,
             int expectedYesBid, int actualYesBid, int expectedNoBid, int actualNoBid)
         {
@@ -548,6 +687,13 @@ namespace TradingSimulator.Executable
             _priceOffCount_major++;
         }
 
+        /// <summary>
+        /// Logs an overlapping price issue where Yes and No bid prices are identical.
+        /// This indicates a potential data integrity problem in the market snapshot.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker where the overlap occurred.</param>
+        /// <param name="snapshotDate">The timestamp of the snapshot.</param>
+        /// <param name="overlappingPrice">The price value that is identical for both Yes and No bids.</param>
         private void LogOverlappingPrice(string marketTicker, DateTime snapshotDate, int overlappingPrice)
         {
             var metadata = new OverlappingPriceMetadata
@@ -567,6 +713,12 @@ namespace TradingSimulator.Executable
             _overlappingPriceCount++;
         }
 
+        /// <summary>
+        /// Logs a snapshot that is missing essential orderbook data.
+        /// This indicates incomplete market data that cannot be properly analyzed.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker with missing orderbook data.</param>
+        /// <param name="snapshotDate">The timestamp of the incomplete snapshot.</param>
         private void LogMissingOrderbook(string marketTicker, DateTime snapshotDate)
         {
             var metadata = new MissingOrderbookMetadata
@@ -585,7 +737,16 @@ namespace TradingSimulator.Executable
             _orderbookMissingCount++;
         }
 
-        private void LogRateDiscrepancy(string marketTicker, DateTime snapshotDate, double velocitySum, double rateSum, double difference) // New method
+        /// <summary>
+        /// Logs a rate discrepancy between velocity and volume calculations.
+        /// This indicates potential inconsistencies in the trading activity metrics.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker where the discrepancy occurred.</param>
+        /// <param name="snapshotDate">The timestamp of the snapshot.</param>
+        /// <param name="velocitySum">The sum of velocity values for bid positions.</param>
+        /// <param name="rateSum">The sum of order and trade volume rates.</param>
+        /// <param name="difference">The absolute difference between velocity and rate sums.</param>
+        private void LogRateDiscrepancy(string marketTicker, DateTime snapshotDate, double velocitySum, double rateSum, double difference)
         {
             var metadata = new RateDiscrepancyMetadata
             {
@@ -606,6 +767,12 @@ namespace TradingSimulator.Executable
             _rateDiscrepancyCount++;
         }
 
+        /// <summary>
+        /// Exports a comprehensive discrepancy report to file system.
+        /// This method generates detailed reports for all markets with validation issues,
+        /// including price discrepancies, overlapping prices, rate discrepancies, and missing orderbooks.
+        /// Reports are saved as text files in the test directory for analysis.
+        /// </summary>
         private async Task ExportDiscrepancyReport()
         {
             var priceReportPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "DiscrepancyReport.txt");
@@ -793,6 +960,11 @@ namespace TradingSimulator.Executable
             }
         }
 
+        /// <summary>
+        /// Cleans up resources after test execution.
+        /// Disposes of database contexts and service providers to prevent resource leaks
+        /// and ensure proper cleanup between test runs.
+        /// </summary>
         [TearDown]
         public void TearDown()
         {
