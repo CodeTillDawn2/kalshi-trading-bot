@@ -1,4 +1,26 @@
-// TradingStrategies.Models/MarketData.cs
+/// <summary>
+/// Represents the comprehensive data model for a specific Kalshi market, aggregating real-time and historical market data
+/// from WebSocket feeds, API responses, and calculated metrics. This class serves as the central hub for all market-related
+/// information used in trading decisions, technical analysis, and snapshot creation.
+///
+/// The MarketData class maintains:
+/// - Current order book state with bid/ask prices and depths
+/// - Historical candlestick data across multiple timeframes (minute, hour, day)
+/// - Real-time ticker updates and price movements
+/// - Position information and P&L calculations
+/// - Technical indicators (RSI, MACD, Bollinger Bands, etc.)
+/// - Order book change velocities and trade metrics
+/// - Support/resistance levels and market metadata
+///
+/// Data is updated through various mechanisms:
+/// - WebSocket events for real-time order book and ticker updates
+/// - Periodic API calls for position and market information
+/// - Background calculations for technical indicators and metrics
+/// - Historical data loading from candlestick storage
+///
+/// This class implements the IMarketData interface and is used throughout the trading bot
+/// for market analysis, strategy execution, and data persistence via MarketSnapshot serialization.
+/// </summary>
 using Microsoft.Extensions.Options;
 using BacklashBot.Helpers;
 using BacklashBot.Services;
@@ -59,10 +81,10 @@ namespace BacklashBot.State
         private (int Bid, DateTime When) _recentLowYesBid = (0, DateTime.MinValue);
         private (int Bid, DateTime When) _recentLowNoBid = (0, DateTime.MinValue);
 
-        private string _goodBadPriceYes = "test1";
-        private string _goodBadPriceNo = "test2";
-        private string _marketBehaviorYes = "yest2";
-        private string _marketBehaviorNo = "not2";
+        private string _goodBadPriceYes = "";
+        private string _goodBadPriceNo = "";
+        private string _marketBehaviorYes = "";
+        private string _marketBehaviorNo = "";
 
         private DateTime? _mostRecentCandlestick = null;
         private DateTime? _mostRecentTicker = null;
@@ -95,6 +117,16 @@ namespace BacklashBot.State
 
         public bool ChangeMetricsMature => _changeTracker.IsMature;
 
+        /// <summary>
+        /// Initializes a new instance of the MarketData class for a specific market.
+        /// Sets up all data collections, dependencies, and initial state for market data tracking.
+        /// </summary>
+        /// <param name="market">The market DTO containing basic market information (ticker, category, status).</param>
+        /// <param name="logger">Logger instance for recording market data operations and events.</param>
+        /// <param name="tradingCalculator">Calculator service for technical indicators and trading metrics.</param>
+        /// <param name="changeTracker">Tracker for monitoring order book changes and velocities.</param>
+        /// <param name="calculationConfig">Configuration options for calculation parameters and thresholds.</param>
+        /// <exception cref="ArgumentNullException">Thrown when any required dependency is null.</exception>
         public MarketData(
             MarketDTO market,
             ILogger<IMarketData> logger,
@@ -124,6 +156,11 @@ namespace BacklashBot.State
             _logger.LogDebug("MarketData initialized for ticker {MarketTicker}", _marketTicker);
         }
 
+        /// <summary>
+        /// Retrieves order book bid data filtered by side.
+        /// </summary>
+        /// <param name="side">The side to filter by ("yes", "no", or empty string for all).</param>
+        /// <returns>A list of OrderbookData objects matching the specified side criteria.</returns>
         public List<OrderbookData> GetBids(string side = "")
         {
             if (_orderbookData == null) return new List<OrderbookData>();
@@ -470,12 +507,6 @@ namespace BacklashBot.State
             _minutePseudoCandlesticks = BuildPseudoCandlesticks("minute");
             _hourPseudoCandlesticks = BuildPseudoCandlesticks("hour");
             _dayPseudoCandlesticks = BuildPseudoCandlesticks("day");
-            _logger.LogDebug("MinutePseudoCandlesticks: [{MidCloses}]",
-                string.Join(", ", _minutePseudoCandlesticks.Select(pc => pc.MidClose)));
-            _logger.LogDebug("HourPseudoCandlesticks: [{MidCloses}]",
-                string.Join(", ", _hourPseudoCandlesticks.Select(pc => pc.MidClose)));
-            _logger.LogDebug("DayPseudoCandlesticks: [{MidCloses}]",
-                string.Join(", ", _dayPseudoCandlesticks.Select(pc => pc.MidClose)));
             var minuteCopy = _minutePseudoCandlesticks.ToList();
             var hourCopy = _hourPseudoCandlesticks.ToList();
             var dayCopy = _dayPseudoCandlesticks.ToList();

@@ -4,6 +4,22 @@ using System.Text.Json.Serialization;
 
 namespace BacklashDTOs
 {
+    /// <summary>
+    /// Represents a complete snapshot of market data at a specific point in time, used for historical record storage
+    /// and trading strategy analysis. This DTO captures all relevant market state including order book, positions,
+    /// technical indicators, and calculated metrics.
+    ///
+    /// MarketSnapshot is created from MarketData instances and serialized for persistence. It includes:
+    /// - Market identification and metadata (ticker, category, status)
+    /// - Current order book state with bid/ask prices and depths
+    /// - Position information and P&L calculations
+    /// - Technical indicators and trading metrics
+    /// - Historical price data and support/resistance levels
+    /// - Calculated velocities, spreads, and market statistics
+    ///
+    /// The snapshot schema evolves over time, with version tracking to ensure backward compatibility
+    /// during upgrades and data migration.
+    /// </summary>
     public class MarketSnapshot
     {
         public MarketSnapshot()
