@@ -1,24 +1,39 @@
-// CHART RENDERING AND DATA VISUALIZATION MODULE
-//
-// This file handles all chart rendering, data visualization, and technical analysis
-// display for the Kalshi Trading Bot Dashboard. It provides interactive charts
-// for market data analysis and real-time price visualization.
-//
-// RATIONALE FOR SEPARATION:
-// - Isolates chart-specific logic from general UI rendering
-// - Enables easy integration of different charting libraries
-// - Provides centralized chart configuration and theming
-// - Makes chart updates and technical indicators modular
-// - Allows for performance optimizations specific to charting
-//
-// CONTENTS:
-// - Main price chart rendering with time series data
-// - Secondary indicator charts (RSI, MACD, Bollinger Bands, Volume)
-// - Chart modal management and controls
-// - Technical indicator calculations and display
-// - Mini charts for brain performance metrics
-// - Chart data formatting and preprocessing
+/**
+ * CHART RENDERING AND DATA VISUALIZATION MODULE
+ *
+ * This file handles all chart rendering, data visualization, and technical analysis
+ * display for the Kalshi Trading Bot Dashboard. It provides interactive charts
+ * for market data analysis, real-time price visualization, and performance monitoring.
+ *
+ * RATIONALE FOR SEPARATION:
+ * - Isolates chart-specific logic from general UI rendering components
+ * - Enables easy integration and swapping of different charting libraries (Chart.js)
+ * - Provides centralized chart configuration, theming, and styling
+ * - Makes chart updates and technical indicators modular and reusable
+ * - Allows for performance optimizations specific to charting operations
+ * - Separates data preprocessing from visualization logic
+ *
+ * ARCHITECTURAL ROLE:
+ * - Primary interface for all chart rendering in the dashboard
+ * - Handles both main market charts and mini performance charts
+ * - Manages chart lifecycle (creation, updates, destruction)
+ * - Provides consistent theming and user interaction patterns
+ * - Integrates with real-time data updates from SignalR
+ *
+ * CONTENTS:
+ * - Main price chart rendering with time series data and technical indicators
+ * - Secondary indicator charts (RSI, MACD, Bollinger Bands, Volume)
+ * - Chart modal management and user controls
+ * - Technical indicator calculations and overlay display
+ * - Mini performance charts for brain instance metrics
+ * - Chart data formatting, preprocessing, and validation
+ * - Real-time chart updates and animation handling
+ */
 
+/**
+ * Renders the main market chart with price data and technical indicators
+ * Handles chart initialization, data loading, and user interactions
+ */
 function renderChart() {
     const titleElement = document.getElementById('chartTitle');
     const canvas = document.getElementById('marketChart');
@@ -305,46 +320,57 @@ function closeChartModal() {
     }
 }
 
-// Render performance charts for brain cards
-function renderBrainCharts(brainStatusMessage) {
+/**
+ * Renders performance charts for brain instance cards
+ * Creates mini charts showing CPU usage, queue depths, and error metrics
+ * @param {Object} brainStatusMessage - Brain status data from SignalR
+ */
+function renderPerformanceChartsForBrains(brainStatusMessage) {
     try {
         const brainInstanceName = brainStatusMessage.BrainInstanceName;
         if (!brainInstanceName) {
-            console.warn('[renderBrainCharts] Missing brain instance name');
+            console.warn('[renderPerformanceChartsForBrains] Missing brain instance name');
             return;
         }
 
         const safeName = brainInstanceName.replace(/[^a-zA-Z0-9]/g, '_');
 
-        // CPU Usage Chart
+        // CPU Usage Performance Chart
         if (brainStatusMessage.CpuUsageHistory && Array.isArray(brainStatusMessage.CpuUsageHistory) && brainStatusMessage.CpuUsageHistory.length > 0) {
-            renderMiniChart(`cpu-chart-${safeName}`, brainStatusMessage.CpuUsageHistory, 'CPU %', '#28a745');
+            renderPerformanceMiniChart(`cpu-chart-${safeName}`, brainStatusMessage.CpuUsageHistory, 'CPU %', '#28a745');
         }
 
-        // Event Queue Chart
+        // Event Queue Depth Chart
         if (brainStatusMessage.EventQueueHistory && Array.isArray(brainStatusMessage.EventQueueHistory) && brainStatusMessage.EventQueueHistory.length > 0) {
-            renderMiniChart(`event-chart-${safeName}`, brainStatusMessage.EventQueueHistory, 'Events', '#ffc107');
+            renderPerformanceMiniChart(`event-chart-${safeName}`, brainStatusMessage.EventQueueHistory, 'Events', '#ffc107');
         }
 
-        // Orderbook Queue Chart
+        // Orderbook Queue Depth Chart
         if (brainStatusMessage.OrderbookQueueHistory && Array.isArray(brainStatusMessage.OrderbookQueueHistory) && brainStatusMessage.OrderbookQueueHistory.length > 0) {
-            renderMiniChart(`orderbook-chart-${safeName}`, brainStatusMessage.OrderbookQueueHistory, 'Orders', '#dc3545');
+            renderPerformanceMiniChart(`orderbook-chart-${safeName}`, brainStatusMessage.OrderbookQueueHistory, 'Orders', '#dc3545');
         }
 
-        // Error Chart
+        // Error Rate Chart
         if (brainStatusMessage.ErrorHistory && Array.isArray(brainStatusMessage.ErrorHistory) && brainStatusMessage.ErrorHistory.length > 0) {
-            renderMiniChart(`error-chart-${safeName}`, brainStatusMessage.ErrorHistory, 'Errors', '#ff6b6b');
+            renderPerformanceMiniChart(`error-chart-${safeName}`, brainStatusMessage.ErrorHistory, 'Errors', '#ff6b6b');
         } else if (brainStatusMessage.NotificationQueueHistory && Array.isArray(brainStatusMessage.NotificationQueueHistory) && brainStatusMessage.NotificationQueueHistory.length > 0) {
             // Fallback to NotificationQueueHistory if ErrorHistory is not available
-            renderMiniChart(`error-chart-${safeName}`, brainStatusMessage.NotificationQueueHistory, 'Errors', '#ff6b6b');
+            renderPerformanceMiniChart(`error-chart-${safeName}`, brainStatusMessage.NotificationQueueHistory, 'Errors', '#ff6b6b');
         }
     } catch (error) {
-        console.error('[renderBrainCharts] Error rendering charts:', error);
+        console.error('[renderPerformanceChartsForBrains] Error rendering performance charts:', error);
     }
 }
 
-// Render mini chart for brain metrics
-function renderMiniChart(canvasId, historyData, label, color) {
+/**
+ * Renders a mini chart for brain performance metrics
+ * Creates small, efficient charts for displaying time-series performance data
+ * @param {string} canvasId - ID of the canvas element to render into
+ * @param {Array} historyData - Array of metric data points with timestamp and value
+ * @param {string} label - Label for the chart data series
+ * @param {string} color - Hex color code for the chart line
+ */
+function renderPerformanceMiniChart(canvasId, historyData, label, color) {
     try {
         const canvas = document.getElementById(canvasId);
         if (!canvas) {

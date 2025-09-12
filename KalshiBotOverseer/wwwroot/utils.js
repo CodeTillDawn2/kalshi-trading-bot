@@ -100,16 +100,17 @@ async function logToBackend(message, level = 'info') {
 
 /**
  * Console logging utility with consistent formatting and timestamp
- * @param {string} level - Console method to use (log, warn, error, etc.)
- * @param {string} msg - Log message
- * @param {*} obj - Optional object to log alongside the message
+ * Provides structured logging with timestamps for debugging and monitoring
+ * @param {string} level - Console method to use (log, warn, error, info, debug, etc.)
+ * @param {string} msg - Log message to display
+ * @param {*} obj - Optional object/data to log alongside the message
  */
-function mwLog(level, msg, obj) {
+function logWithTimestamp(level, msg, obj) {
     try {
-        console[level](`[MW][${new Date().toISOString()}] ${msg}`, obj ?? '');
+        console[level](`[DASHBOARD][${new Date().toISOString()}] ${msg}`, obj ?? '');
     } catch (_) {
         // Fallback if console method doesn't exist
-        console.log(`[MW][${new Date().toISOString()}] ${msg}`, obj ?? '');
+        console.log(`[DASHBOARD][${new Date().toISOString()}] ${msg}`, obj ?? '');
     }
 }
 

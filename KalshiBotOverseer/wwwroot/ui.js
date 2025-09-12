@@ -253,7 +253,7 @@ function renderBrains() {
     }
 
     try {
-        mwLog('debug', 'renderBrains: keys present in checkInData',
+        logWithTimestamp('debug', 'renderBrains: keys present in checkInData',
             { keys: Object.keys(checkInData || {}) });
 
         // Backend has already filtered the data, just use what's provided

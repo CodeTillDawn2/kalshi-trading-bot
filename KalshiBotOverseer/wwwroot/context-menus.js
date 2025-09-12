@@ -1,22 +1,33 @@
-// CONTEXT MENU MANAGEMENT MODULE
-//
-// This file handles all right-click context menus throughout the application.
-// Context menus provide quick access to actions specific to different data types
-// (markets, brains, positions, orders, snapshots) without cluttering the main UI.
-//
-// RATIONALE FOR SEPARATION:
-// - Isolates context menu logic from main UI components
-// - Enables consistent menu behavior across different data types
-// - Makes it easy to add/modify menu options per component type
-// - Provides centralized menu positioning and event handling
-// - Allows for easy menu theming and accessibility features
-//
-// CONTENTS:
-// - Context menu display and positioning logic
-// - Menu item handlers for different actions
-// - Menu state management and cleanup
-// - Event handling for menu triggers and clicks
-// - Menu option filtering based on data state
+/**
+ * CONTEXT MENU MANAGEMENT MODULE
+ *
+ * This file handles all right-click context menus throughout the Kalshi Trading Bot Dashboard.
+ * Context menus provide quick access to actions specific to different data types
+ * (markets, brains, positions, orders, snapshots) without cluttering the main UI.
+ *
+ * RATIONALE FOR SEPARATION:
+ * - Isolates context menu logic from main UI rendering components
+ * - Enables consistent menu behavior and styling across different data types
+ * - Makes it easy to add/modify menu options per component type
+ * - Provides centralized menu positioning, event handling, and state management
+ * - Allows for easy menu theming, accessibility features, and future enhancements
+ * - Separates user interaction logic from data display logic
+ *
+ * ARCHITECTURAL ROLE:
+ * - Manages all right-click context menu interactions
+ * - Coordinates between UI events and backend actions
+ * - Handles menu state, positioning, and cleanup
+ * - Provides consistent user experience across different data views
+ * - Integrates with SignalR for real-time command execution
+ *
+ * CONTENTS:
+ * - Context menu display, positioning, and lifecycle management
+ * - Menu item handlers for different trading and monitoring actions
+ * - Menu state management and automatic cleanup
+ * - Event handling for menu triggers, selections, and external clicks
+ * - Menu option filtering based on data state and permissions
+ * - Integration with backend APIs for action execution
+ */
 
 let currentBrainInstance = '';
 let currentMode = 'Autonomous';

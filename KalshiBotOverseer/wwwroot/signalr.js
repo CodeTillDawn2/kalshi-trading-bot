@@ -45,7 +45,7 @@ async function initializeSignalR() {
      * Updates brain data, check-in information, and triggers UI refreshes
      */
     connection.on('BrainStatusUpdate', (m) => {
-        mwLog('debug', '[BrainCards] BrainStatusUpdate received', { keys: Object.keys(m || {}), sample: m });
+        logWithTimestamp('debug', '[BrainCards] BrainStatusUpdate received', { keys: Object.keys(m || {}), sample: m });
         handleBrainStatusUpdate(m);
     });
 
@@ -142,10 +142,10 @@ function handleBrainStatusUpdate(msg) {
     const pas = msg && msg.BrainInstanceName;
     const name = cam || pas || null;
 
-    mwLog('debug', '[BrainCards] handleBrainStatusUpdate: entry', { name, hasCamel: !!cam, hasPascal: !!pas });
+    logWithTimestamp('debug', '[BrainCards] handleBrainStatusUpdate: entry', { name, hasCamel: !!cam, hasPascal: !!pas });
 
     if (!name) {
-        mwLog('warn', '[BrainCards] handleBrainStatusUpdate: missing brain name; aborting', { keys: Object.keys(msg || {}) });
+        logWithTimestamp('warn', '[BrainCards] handleBrainStatusUpdate: missing brain name; aborting', { keys: Object.keys(msg || {}) });
         return;
     }
 
@@ -161,7 +161,7 @@ function handleBrainStatusUpdate(msg) {
             ...msg, // Override with SignalR real-time data
             brainInstanceName: name // Preserve original casing for display
         };
-        mwLog('debug', '[BrainCards] handleBrainStatusUpdate: brainData merged - DB data preserved', {
+        logWithTimestamp('debug', '[BrainCards] handleBrainStatusUpdate: brainData merged - DB data preserved', {
             name,
             normalizedName,
             originalMarketCount: originalDBData.marketCount || 0,
@@ -176,9 +176,9 @@ function handleBrainStatusUpdate(msg) {
             ...msg,
             brainInstanceName: name // Preserve original casing for display
         };
-        mwLog('warning', '[BrainCards] handleBrainStatusUpdate: brain not found in DB, using SignalR data only', { name, normalizedName });
+        logWithTimestamp('warning', '[BrainCards] handleBrainStatusUpdate: brain not found in DB, using SignalR data only', { name, normalizedName });
     }
-    mwLog('debug', '[BrainCards] handleBrainStatusUpdate: brainData merged', { name, normalizedName, storedKeys: Object.keys(brainData[normalizedName] || {}) });
+    logWithTimestamp('debug', '[BrainCards] handleBrainStatusUpdate: brainData merged', { name, normalizedName, storedKeys: Object.keys(brainData[normalizedName] || {}) });
 
     // Derive check-in badge fields for the brain lock card
     const lastCheckIn = msg.lastCheckIn ?? msg.LastCheckIn ?? null;
@@ -197,18 +197,18 @@ function handleBrainStatusUpdate(msg) {
         isStartingUp: isStartingUp,
         isShuttingDown: isShuttingDown
     };
-    mwLog('debug', '[BrainCards] handleBrainStatusUpdate: checkInData updated', checkInData[normalizedName]);
+    logWithTimestamp('debug', '[BrainCards] handleBrainStatusUpdate: checkInData updated', checkInData[normalizedName]);
 
     // Update the UI that depends on this status
-    try { updateBrainStatusUI(msg); } catch (e) { mwLog('error', '[BrainCards] updateBrainStatusUI failed', e); }
-    try { renderBrainCharts(msg); } catch (e) { mwLog('error', '[BrainCards] renderBrainCharts failed', e); }
+    try { updateBrainStatusUI(msg); } catch (e) { logWithTimestamp('error', '[BrainCards] updateBrainStatusUI failed', e); }
+    try { renderPerformanceChartsForBrains(msg); } catch (e) { logWithTimestamp('error', '[BrainCards] renderPerformanceChartsForBrains failed', e); }
 
     // Re-render brain cards so badges/timestamps change immediately
     try {
         renderBrains();
-        mwLog('debug', '[BrainCards] handleBrainStatusUpdate: renderBrains done', { name, hasCheckIn: !!checkInData[name] });
+        logWithTimestamp('debug', '[BrainCards] handleBrainStatusUpdate: renderBrains done', { name, hasCheckIn: !!checkInData[name] });
     } catch (e) {
-        mwLog('error', '[BrainCards] renderBrains failed', e);
+        logWithTimestamp('error', '[BrainCards] renderBrains failed', e);
     }
 }
 
@@ -285,7 +285,7 @@ function updateBrainStatusUI(msg) {
         status: document.getElementById(ids.status)
     };
 
-    mwLog('debug', 'updateBrainStatusUI: mapping + presence', {
+    logWithTimestamp('debug', 'updateBrainStatusUI: mapping + presence', {
         casing, name, safe, ids,
         present: Object.fromEntries(Object.entries(els).map(([k, v]) => [k, !!v]))
     });
