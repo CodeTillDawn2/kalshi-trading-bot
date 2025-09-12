@@ -10,6 +10,12 @@ using System.Text.Json;
 
 namespace BacklashBot.Services
 {
+    /// <summary>
+    /// Service responsible for managing order book data for Kalshi markets.
+    /// Handles WebSocket order book events, processes snapshots and deltas asynchronously,
+    /// maintains thread-safe access to order book data, and provides synchronization capabilities.
+    /// Integrates with the broader trading bot ecosystem to ensure real-time order book updates.
+    /// </summary>
     public class OrderBookService : IOrderBookService
     {
         private readonly ILogger<IOrderBookService> _logger;
@@ -19,8 +25,8 @@ namespace BacklashBot.Services
         private readonly IServiceFactory _serviceFactory;
         private BlockingCollection<(JsonElement Data, string OfferType, long Seq, Guid EventId)> _eventQueue = new();
         private BlockingCollection<string> _tickerQueue = new();
-        private readonly ConcurrentDictionary<string, SemaphoreSlim> _orderBookUpdateLocks = new();
-        private readonly ConcurrentDictionary<string, object> _orderbookLocks = new();
+        private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketUpdateSemaphores = new();
+        private readonly ConcurrentDictionary<string, object> _marketOrderBookLocks = new();
         private Task _eventProcessor;
         private Task _tickerProcessor;
         private BlockingCollection<string> _notificationQueue = new();
@@ -29,12 +35,25 @@ namespace BacklashBot.Services
         private bool _eventQueueDisposed = false;
         private bool _tickerQueueDisposed = false;
         private readonly object _queueLock = new();
-        private OrderBookEventArgs? _currentOrderBookEventArgs;
-        private readonly ConcurrentDictionary<string, List<long>> _lockWaitTimes = new();
+        private OrderBookEventArgs? _lastProcessedOrderBookEvent;
+        private readonly ConcurrentDictionary<string, List<long>> _marketLockWaitDurations = new();
         private const int MaxWaitTimeSamples = 100;
 
+        /// <summary>
+        /// Event raised when an order book is updated for a market.
+        /// The string parameter contains the market ticker that was updated.
+        /// </summary>
         public event EventHandler<string> OrderBookUpdated;
 
+        /// <summary>
+        /// Initializes a new instance of the OrderBookService class.
+        /// Sets up dependencies, initializes queues and locks, and starts background processors.
+        /// </summary>
+        /// <param name="logger">Logger for recording service operations and errors.</param>
+        /// <param name="scopeFactory">Factory for creating service scopes.</param>
+        /// <param name="serviceFactory">Factory for accessing other services.</param>
+        /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
+        /// <param name="statusTrackerService">Service for tracking cancellation tokens and status.</param>
         public OrderBookService(
             ILogger<IOrderBookService> logger,
             IServiceScopeFactory scopeFactory,
@@ -54,6 +73,11 @@ namespace BacklashBot.Services
                 _eventProcessor.Status, _tickerProcessor.Status, _notificationProcessor.Status);
         }
 
+        /// <summary>
+        /// Starts the order book service by initializing queues, configuring WebSocket event handlers,
+        /// and starting background processors for handling order book updates.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public Task StartServicesAsync()
         {
             _logger.LogDebug("OrderBookService StartAsync starting...");
@@ -75,6 +99,10 @@ namespace BacklashBot.Services
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Configures WebSocket event handlers for order book and trade events.
+        /// Ensures proper event subscription to receive real-time market data updates.
+        /// </summary>
         public void ConfigureWebSocketEventHandlers()
         {
             _serviceFactory.GetKalshiWebSocketClient().OrderBookReceived -= HandleOrderBookReceived;
@@ -83,20 +111,32 @@ namespace BacklashBot.Services
             _serviceFactory.GetKalshiWebSocketClient().TradeReceived += HandleTradeReceived;
         }
 
+        /// <summary>
+        /// Retrieves the current order book data for the specified market ticker.
+        /// Returns an empty list if the market is not found in the cache.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to retrieve order book data for.</param>
+        /// <returns>A list of OrderbookData sorted by price.</returns>
         public List<OrderbookData> GetCurrentOrderBook(string marketTicker)
         {
             if (!_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker)) return new List<OrderbookData>();
             var orderbook = _serviceFactory.GetDataCache().Markets[marketTicker]?.OrderbookData;
             if (orderbook == null) return new List<OrderbookData>();
-            var lockObj = _orderbookLocks.GetOrAdd(marketTicker, _ => new object());
+            var lockObj = _marketOrderBookLocks.GetOrAdd(marketTicker, _ => new object());
             lock (lockObj) { return orderbook.OrderBy(x => x.Price).ToList(); }
         }
 
+        /// <summary>
+        /// Synchronizes the order book for the specified market ticker.
+        /// Attempts to acquire a semaphore lock and notifies listeners if the WebSocket is connected and has data.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to synchronize.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task SyncOrderBookAsync(string marketTicker)
         {
             if (!_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker)) return;
 
-            var semaphore = _orderBookUpdateLocks.GetOrAdd(marketTicker, _ => new SemaphoreSlim(1, 1));
+            var semaphore = _marketUpdateSemaphores.GetOrAdd(marketTicker, _ => new SemaphoreSlim(1, 1));
             bool lockAcquired = false;
             var startTime = DateTime.UtcNow;
             try
@@ -117,7 +157,7 @@ namespace BacklashBot.Services
                     orderbook = new List<OrderbookData>();
                 }
                 var waitTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                _lockWaitTimes.AddOrUpdate(
+                _marketLockWaitDurations.AddOrUpdate(
                     marketTicker,
                     _ => new List<long> { (long)waitTimeMs },
                     (_, list) => { list.Add((long)waitTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
@@ -144,6 +184,11 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Clears all queues and resources associated with the specified market ticker.
+        /// Removes pending events, tickers, and notifications, disposes semaphores, and removes market data from cache.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to clear resources for.</param>
         public void ClearQueueForMarketAsync(string marketTicker)
         {
             _logger.LogDebug("Clearing data for market {MarketTicker}", marketTicker);
@@ -154,7 +199,7 @@ namespace BacklashBot.Services
                 ClearMarketFromQueue(_tickerQueue, marketTicker, t => t == marketTicker);
                 ClearMarketFromQueue(_notificationQueue, marketTicker, n => n == marketTicker);
 
-                if (_orderBookUpdateLocks.TryRemove(marketTicker, out var semaphore))
+                if (_marketUpdateSemaphores.TryRemove(marketTicker, out var semaphore))
                 {
                     try
                     {
@@ -165,7 +210,7 @@ namespace BacklashBot.Services
                         _logger.LogDebug("Semaphore for {MarketTicker} already disposed", marketTicker);
                     }
                 }
-                _lockWaitTimes.TryRemove(marketTicker, out _);
+                _marketLockWaitDurations.TryRemove(marketTicker, out _);
 
                 lock (_serviceFactory.GetDataCache().Markets)
                 {
@@ -181,12 +226,23 @@ namespace BacklashBot.Services
         }
 
 
+        /// <summary>
+        /// Checks if the event queue count is under the specified limit.
+        /// Used to prevent queue overflow and manage processing load.
+        /// </summary>
+        /// <param name="limit">The maximum allowed queue count.</param>
+        /// <returns>True if the event queue count is less than the limit.</returns>
         public bool IsEventQueueUnderLimit(int limit)
         {
             bool queuesUnderLimit = _eventQueue.Count < limit;
             return queuesUnderLimit;
         }
 
+        /// <summary>
+        /// Stops the order book service by unsubscribing from WebSocket events,
+        /// completing queues, waiting for processors to finish, and disposing resources.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task StopServicesAsync()
         {
             _logger.LogDebug("OrderBookService stopping...");
@@ -265,7 +321,7 @@ namespace BacklashBot.Services
 
             lock (_queueLock)
             {
-                foreach (var semaphore in _orderBookUpdateLocks.Values)
+                foreach (var semaphore in _marketUpdateSemaphores.Values)
                 {
                     try
                     {
@@ -276,8 +332,8 @@ namespace BacklashBot.Services
                         _logger.LogDebug("Semaphore already disposed");
                     }
                 }
-                _orderBookUpdateLocks.Clear();
-                _orderbookLocks.Clear();
+                _marketUpdateSemaphores.Clear();
+                _marketOrderBookLocks.Clear();
 
                 if (!_eventQueueDisposed)
                 {
@@ -325,6 +381,11 @@ namespace BacklashBot.Services
             _logger.LogDebug("OrderBookService stopped.");
         }
 
+        /// <summary>
+        /// Gets the current count of items in each processing queue.
+        /// Used for monitoring and diagnostics.
+        /// </summary>
+        /// <returns>A tuple containing the count of items in the event, ticker, and notification queues.</returns>
         public (int EventQueueCount, int TickerQueueCount, int NotificationQueueCount) GetQueueCounts()
         {
             return (_eventQueue.Count, _tickerQueue.Count, _notificationQueue.Count);
@@ -359,7 +420,7 @@ namespace BacklashBot.Services
             var marketTicker = args.Data.GetProperty("msg").GetProperty("market_ticker").GetString() ?? "Unknown";
             _logger.LogDebug("HandleOrderBookReceived called for offer type: {OfferType}, market: {MarketTicker}",
                 args.OfferType, marketTicker);
-            _currentOrderBookEventArgs = args;
+            _lastProcessedOrderBookEvent = args;
             QueueOrderBookUpdateAsync(args);
         }
 
@@ -462,7 +523,7 @@ namespace BacklashBot.Services
                     marketTicker = data.GetProperty("msg").GetProperty("market_ticker").GetString() ?? "Unknown";
                     _logger.LogDebug("Processing orderbook event for {MarketTicker}, Seq: {Seq}, EventId: {EventId}", marketTicker, seq, eventId);
 
-                    var semaphore = _orderBookUpdateLocks.GetOrAdd(marketTicker, _ => new SemaphoreSlim(1, 1));
+                    var semaphore = _marketUpdateSemaphores.GetOrAdd(marketTicker, _ => new SemaphoreSlim(1, 1));
                     _logger.LogDebug("Acquiring semaphore for {MarketTicker}, Seq: {Seq}, ThreadId: {ThreadId}",
                         marketTicker, seq, Thread.CurrentThread.ManagedThreadId);
                     var startTime = DateTime.UtcNow;
@@ -604,7 +665,7 @@ namespace BacklashBot.Services
 
             try
             {
-                var lockObj = _orderbookLocks.GetOrAdd(marketTicker, _ => new object());
+                var lockObj = _marketOrderBookLocks.GetOrAdd(marketTicker, _ => new object());
                 bool priceChanged = false;
 
                 if (offerType == "snapshot")
@@ -678,7 +739,7 @@ namespace BacklashBot.Services
             }
             finally
             {
-                _currentOrderBookEventArgs = null;
+                _lastProcessedOrderBookEvent = null;
             }
         }
 
@@ -691,7 +752,7 @@ namespace BacklashBot.Services
 
             try
             {
-                var lockObj = _orderbookLocks.GetOrAdd(marketTicker, _ => new object());
+                var lockObj = _marketOrderBookLocks.GetOrAdd(marketTicker, _ => new object());
                 lock (lockObj)
                 {
                     var orderbook = _serviceFactory.GetDataCache().Markets[marketTicker]?.OrderbookData;
@@ -704,10 +765,7 @@ namespace BacklashBot.Services
                     var yesOrders = (message.YesOrders ?? new List<PriceLevel>()).Select(o => (o.Price, o.RestingContracts));
                     var noOrders = (message.NoOrders ?? new List<PriceLevel>()).Select(o => (o.Price, o.RestingContracts));
 
-                    _logger.LogDebug("DELTA-Raw Snapshot for {MarketTicker}: YesOrders=[{YesOrders}], NoOrders=[{NoOrders}]",
-                        marketTicker,
-                        string.Join("; ", yesOrders.Select(o => $"Price={o.Price},Contracts={o.RestingContracts}")),
-                        string.Join("; ", noOrders.Select(o => $"Price={o.Price},Contracts={o.RestingContracts}")));
+                    // Raw snapshot data logging removed for reduced noise
 
                     if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
                     {
@@ -725,9 +783,7 @@ namespace BacklashBot.Services
                         _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData = updatedOrderbook;
                         marketData.OrderbookData = updatedOrderbook;
 
-                        _logger.LogDebug("Stored OrderbookData for {MarketTicker}: [{Entries}]",
-                            marketTicker,
-                            string.Join("; ", updatedOrderbook.Select(o => $"Price={o.Price},Side={o.Side},Contracts={o.RestingContracts}")));
+                        // Orderbook storage logging removed for reduced noise
 
                         marketData.ReceivedFirstSnapshot = true;
                     }
@@ -765,31 +821,21 @@ namespace BacklashBot.Services
             {
                 OrderbookData? orderData;
 
-                var lockObj = _orderbookLocks.GetOrAdd(marketTicker, _ => new object());
+                var lockObj = _marketOrderBookLocks.GetOrAdd(marketTicker, _ => new object());
                 lock (lockObj)
                 {
-                    _logger.LogDebug("DELTA-Processing delta for {MarketTicker}, Price: {Price}, Side: {Side}, Delta: {Delta}, CurrentOrderBookCount: {Count}, Kalshi SeqID: {0}",
-                        marketTicker, message.Price.Value, message.Side, message.Delta.Value, orderbook.Count, message.Seq);
+                    // Delta processing details removed for reduced noise
 
                     orderData = orderbook.FirstOrDefault(o => o.Price == message.Price && o.Side == message.Side);
 
                     if (orderData != null)
                     {
-                        _logger.LogDebug("DELTA-Found existing orderData for {MarketTicker}, Price: {Price}, Side: {Side}, RestingContracts: {RestingContracts}",
-                            marketTicker, orderData.Price, orderData.Side, orderData.RestingContracts);
                         orderbook.Remove(orderData);
                         _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData = orderbook;
-                    }
-                    else
-                    {
-                        _logger.LogDebug("DELTA-No existing orderData found for {MarketTicker}, Price: {Price}, Side: {Side}",
-                            marketTicker, message.Price.Value, message.Side);
                     }
 
                     if (_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
                     {
-                        _logger.LogDebug("TRADEMON-Logging orderbook delta for {0}... Side={1}, Price={2}, Delta={3}",
-                            marketData.MarketTicker, message.Side, message.Price.Value, message.Delta.Value);
                         marketData.ChangeTracker.RecordOrderbookChange(message.Side, message.Price.Value, message.Delta.Value);
                     }
                     else
@@ -810,31 +856,21 @@ namespace BacklashBot.Services
                         if (orderData == null)
                         {
                             orderData = new OrderbookData(marketTicker, message.Price.Value, message.Side, message.Delta.Value);
-                            _logger.LogDebug("Created new orderData for {MarketTicker}, Price: {Price}, Side: {Side}, RestingContracts: {RestingContracts}",
-                                marketTicker, orderData.Price, orderData.Side, orderData.RestingContracts);
                         }
                         else
                         {
                             orderData = new OrderbookData(marketTicker, message.Price.Value, message.Side, orderData.RestingContracts + message.Delta.Value);
-                            _logger.LogDebug("Updated existing orderData for {MarketTicker}, Price: {Price}, Side: {Side}, OldRestingContracts: {OldRestingContracts}, Delta: {Delta}, NewRestingContracts: {NewRestingContracts}",
-                                marketTicker, orderData.Price, orderData.Side, orderData.RestingContracts - message.Delta.Value, message.Delta.Value, orderData.RestingContracts);
                         }
                         orderbook.Add(orderData);
-                        _logger.LogDebug("Added orderData to orderbook for {MarketTicker}, Price: {Price}, Side: {Side}, RestingContracts: {RestingContracts}, NewOrderBookCount: {Count}",
-                            marketTicker, orderData.Price, orderData.Side, orderData.RestingContracts, orderbook.Count);
                     }
                     else
                     {
-                        _logger.LogDebug("Skipping add for {MarketTicker}, Price: {Price}, Side: {Side}, Delta: {Delta}, ExistingRestingContracts: {ExistingRestingContracts}, WouldBeZeroOrNegative: {WouldBe}",
-                            marketTicker, message.Price.Value, message.Side, message.Delta.Value, orderData?.RestingContracts ?? 0, orderData != null ? orderData.RestingContracts + message.Delta.Value : 0);
+                        // Skipping add as delta would result in zero or negative contracts
                     }
 
                     orderbook = orderbook.OrderBy(x => x.Price).ToList();
                     _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData = orderbook;
 
-                    _logger.LogDebug("Delta Update for {MarketTicker}: FinalOrderBook=[{OrderBook}]",
-                        marketTicker,
-                        string.Join("; ", orderbook.Select(o => $"Price={o.Price},Side={o.Side},Contracts={o.RestingContracts}")));
                     var yesBid = orderbook.LastOrDefault(x => x.Side == "yes")?.Price;
                     var noBid = orderbook.LastOrDefault(x => x.Side == "no")?.Price;
                     if (yesBid == null) yesBid = 0;
@@ -843,8 +879,6 @@ namespace BacklashBot.Services
                     {
                         _logger.LogWarning("Invalid order book state for {MarketTicker}: YesBid={YesBid}, NoBid={NoBid}", marketTicker, yesBid, noBid);
                     }
-                    _logger.LogDebug("Updated cache for {MarketTicker}, FinalOrderBook: {OrderBook}",
-                        marketTicker, string.Join("; ", orderbook.Select(o => $"Price={o.Price},Side={o.Side},Contracts={o.RestingContracts}")));
                 }
 
 
