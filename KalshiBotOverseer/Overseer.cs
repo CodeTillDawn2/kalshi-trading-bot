@@ -98,13 +98,13 @@ namespace KalshiBotOverseer
                     // Send CheckInUpdate to all connected clients
                     await _hubContext.Clients.All.SendAsync("CheckInUpdate", new
                     {
-                        brainInstanceName = checkInData.BrainInstanceName,
-                        marketCount = checkInData.Markets?.Count ?? 0,
-                        errorCount = checkInData.ErrorCount,
-                        lastSnapshot = checkInData.LastSnapshot,
-                        lastCheckIn = DateTime.UtcNow,
-                        isStartingUp = checkInData.IsStartingUp,
-                        isShuttingDown = checkInData.IsShuttingDown
+                        BrainInstanceName = checkInData.BrainInstanceName,
+                        MarketCount = checkInData.Markets?.Count ?? 0,
+                        ErrorCount = checkInData.ErrorCount,
+                        LastSnapshot = checkInData.LastSnapshot,
+                        LastCheckIn = DateTime.UtcNow,
+                        IsStartingUp = checkInData.IsStartingUp,
+                        IsShuttingDown = checkInData.IsShuttingDown
                     });
 
                     _logger?.LogInformation("Sent CheckInUpdate for bot with {MarketCount} markets", checkInData.Markets?.Count ?? 0);

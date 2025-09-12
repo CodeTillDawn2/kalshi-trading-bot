@@ -294,51 +294,51 @@ namespace KalshiBotOverseer
                 // Create comprehensive brain status data
                 var brainStatus = new BrainStatusData
                 {
-                    brainInstanceName = checkInData.BrainInstanceName,
+                    BrainInstanceName = checkInData.BrainInstanceName,
 
                     // Basic market data
-                    markets = checkInData.Markets,
-                    errorCount = checkInData.ErrorCount,
-                    lastSnapshot = checkInData.LastSnapshot,
-                    lastCheckIn = DateTime.UtcNow, // Add lastCheckIn timestamp
-                    isStartingUp = checkInData.IsStartingUp,
-                    isShuttingDown = checkInData.IsShuttingDown,
+                    Markets = checkInData.Markets,
+                    ErrorCount = checkInData.ErrorCount,
+                    LastSnapshot = checkInData.LastSnapshot,
+                    LastCheckIn = DateTime.UtcNow, // Add lastCheckIn timestamp
+                    IsStartingUp = checkInData.IsStartingUp,
+                    IsShuttingDown = checkInData.IsShuttingDown,
 
                     // Brain configuration
-                    watchPositions = checkInData.WatchPositions,
-                    watchOrders = checkInData.WatchOrders,
-                    managedWatchList = checkInData.ManagedWatchList,
-                    captureSnapshots = checkInData.CaptureSnapshots,
-                    targetWatches = checkInData.TargetWatches,
-                    minimumInterest = checkInData.MinimumInterest,
-                    usageMin = checkInData.UsageMin,
-                    usageMax = checkInData.UsageMax,
+                    WatchPositions = checkInData.WatchPositions,
+                    WatchOrders = checkInData.WatchOrders,
+                    ManagedWatchList = checkInData.ManagedWatchList,
+                    CaptureSnapshots = checkInData.CaptureSnapshots,
+                    TargetWatches = checkInData.TargetWatches,
+                    MinimumInterest = checkInData.MinimumInterest,
+                    UsageMin = checkInData.UsageMin,
+                    UsageMax = checkInData.UsageMax,
 
                     // Performance metrics
-                    currentCpuUsage = checkInData.CurrentCpuUsage,
-                    eventQueueAvg = checkInData.EventQueueAvg,
-                    tickerQueueAvg = checkInData.TickerQueueAvg,
-                    notificationQueueAvg = checkInData.NotificationQueueAvg,
-                    orderbookQueueAvg = checkInData.OrderbookQueueAvg,
-                    lastRefreshCycleSeconds = checkInData.LastRefreshCycleSeconds,
-                    lastRefreshCycleInterval = checkInData.LastRefreshCycleInterval,
-                    lastRefreshMarketCount = checkInData.LastRefreshMarketCount,
-                    lastRefreshUsagePercentage = checkInData.LastRefreshUsagePercentage,
-                    lastRefreshTimeAcceptable = checkInData.LastRefreshTimeAcceptable,
-                    lastPerformanceSampleDate = checkInData.LastPerformanceSampleDate,
+                    CurrentCpuUsage = checkInData.CurrentCpuUsage,
+                    EventQueueAvg = checkInData.EventQueueAvg,
+                    TickerQueueAvg = checkInData.TickerQueueAvg,
+                    NotificationQueueAvg = checkInData.NotificationQueueAvg,
+                    OrderbookQueueAvg = checkInData.OrderbookQueueAvg,
+                    LastRefreshCycleSeconds = checkInData.LastRefreshCycleSeconds,
+                    LastRefreshCycleInterval = checkInData.LastRefreshCycleInterval,
+                    LastRefreshMarketCount = checkInData.LastRefreshMarketCount,
+                    LastRefreshUsagePercentage = checkInData.LastRefreshUsagePercentage,
+                    LastRefreshTimeAcceptable = checkInData.LastRefreshTimeAcceptable,
+                    LastPerformanceSampleDate = checkInData.LastPerformanceSampleDate,
 
                     // Connection status
-                    isWebSocketConnected = checkInData.IsWebSocketConnected,
+                    IsWebSocketConnected = checkInData.IsWebSocketConnected,
 
                     // Market watch data
-                    watchedMarkets = checkInData.WatchedMarkets
+                    WatchedMarkets = checkInData.WatchedMarkets
                 };
 
                 // Broadcast comprehensive brain status to all connected clients (including web UI)
                 // (A) log how many clients are connected on this hub instance
                 var connections = _connectedClients.Count;
                 _logger.LogInformation("[ChartHub] Broadcasting BrainStatusUpdate for {Brain} to {Count} connections",
-                    brainStatus.brainInstanceName, connections);
+                    brainStatus.BrainInstanceName, connections);
 
                 // (B) send the real payload
                 await Clients.All.SendAsync("BrainStatusUpdate", brainStatus);
@@ -347,8 +347,8 @@ namespace KalshiBotOverseer
                 await Clients.All.SendAsync("BroadcastTrace", new
                 {
                     kind = "BrainStatusUpdate",
-                    brain = brainStatus.brainInstanceName,
-                    marketCount = brainStatus.markets?.Count ?? 0,
+                    brain = brainStatus.BrainInstanceName,
+                    marketCount = brainStatus.Markets?.Count ?? 0,
                     serverUtc = DateTime.UtcNow
                 });
 

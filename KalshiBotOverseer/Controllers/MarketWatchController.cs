@@ -519,7 +519,7 @@ namespace KalshiBotOverseer.Controllers
                     // to avoid JSON property collisions due to camelCase naming policy.
                     brainData.Add(new
                     {
-                        brainInstanceName = brainName,
+                        BrainInstanceName = brainName,
                         // Expose BrainLock and other fields under their original names
                         brainInstance.BrainLock,
                         brainInstance.LastSeen,
