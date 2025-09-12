@@ -17,24 +17,89 @@ using BacklashInterfaces.Constants;
 
 namespace TradingSimulator.Tests
 {
+    /// <summary>
+    /// Comprehensive NUnit test fixture for validating the KalshiAPIService functionality.
+    /// This test class provides integration testing for all Kalshi API service methods including
+    /// market data retrieval, series information, event details, position management, candlestick data,
+    /// account balance, exchange status, order operations, announcements, and various other API endpoints.
+    /// The tests use a combination of mocked dependencies and real database context for dynamic test data
+    /// to ensure comprehensive coverage while maintaining test isolation and reliability.
+    /// </summary>
     [TestFixture]
     public class KalshiAPIServiceTests
     {
+        /// <summary>
+        /// Mock logger for testing logging behavior in the API service.
+        /// </summary>
         private Mock<ILogger<IKalshiAPIService>> _loggerMock;
-        private IConfiguration _configuration;
-        private Mock<IServiceScopeFactory> _scopeFactoryMock;
-        private Mock<IStatusTrackerService> _statusTrackerMock;
-        private IOptions<KalshiConfig> _kalshiConfigOptions;
-        private KalshiAPIService _apiService;
-        private Mock<IKalshiBotContext> _contextMock;
-        private KalshiBotContext _realContext; // Real context for querying test data
 
+        /// <summary>
+        /// Configuration instance loaded from appsettings.local.json for real API credentials.
+        /// </summary>
+        private IConfiguration _configuration;
+
+        /// <summary>
+        /// Mock service scope factory for dependency injection in tests.
+        /// </summary>
+        private Mock<IServiceScopeFactory> _scopeFactoryMock;
+
+        /// <summary>
+        /// Mock status tracker service for managing cancellation tokens and operation status.
+        /// </summary>
+        private Mock<IStatusTrackerService> _statusTrackerMock;
+
+        /// <summary>
+        /// Options wrapper for Kalshi configuration settings.
+        /// </summary>
+        private IOptions<KalshiConfig> _kalshiConfigOptions;
+
+        /// <summary>
+        /// The actual KalshiAPIService instance being tested with mocked dependencies.
+        /// </summary>
+        private KalshiAPIService _apiService;
+
+        /// <summary>
+        /// Mock database context for isolating database operations during testing.
+        /// </summary>
+        private Mock<IKalshiBotContext> _contextMock;
+
+        /// <summary>
+        /// Real database context for querying dynamic test data from the actual database.
+        /// Used to obtain real market, series, and event tickers for testing.
+        /// </summary>
+        private KalshiBotContext _realContext;
+
+        /// <summary>
+        /// Market ticker obtained from the database for use in tests requiring a specific market.
+        /// </summary>
         private string _testMarketTicker;
+
+        /// <summary>
+        /// Series ticker obtained from the database for use in tests requiring a specific series.
+        /// </summary>
         private string _testSeriesTicker;
+
+        /// <summary>
+        /// Event ticker obtained from the database for use in tests requiring a specific event.
+        /// </summary>
         private string _testEventTicker;
+
+        /// <summary>
+        /// Time interval constant used for candlestick testing ("minute").
+        /// </summary>
         private const string TestInterval = "minute";
+
+        /// <summary>
+        /// Start timestamp for candlestick data testing (24 hours ago from test execution).
+        /// </summary>
         private long _testStartTs;
 
+        /// <summary>
+        /// Performs one-time setup for the entire test fixture.
+        /// Loads real configuration from appsettings.local.json, initializes a real database context,
+        /// and queries for active market data to use in tests. This setup runs once before all tests
+        /// in the fixture to provide consistent test data across all test methods.
+        /// </summary>
         [OneTimeSetUp]
         public async Task OneTimeSetUp()
         {
@@ -68,12 +133,22 @@ namespace TradingSimulator.Tests
             _testStartTs = UnixHelper.ConvertToUnixTimestamp(DateTime.UtcNow.AddDays(-1)); // 24 hours ago
         }
 
+        /// <summary>
+        /// Performs cleanup after all tests in the fixture have completed.
+        /// Disposes of the real database context to ensure proper resource cleanup.
+        /// </summary>
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
             _realContext.Dispose();
         }
 
+        /// <summary>
+        /// Sets up the test environment before each individual test method.
+        /// Loads configuration, validates required settings, creates mocks for all dependencies,
+        /// sets up the service scope factory with mocked context, and instantiates the API service
+        /// with real configuration but mocked dependencies for isolated testing.
+        /// </summary>
         [SetUp]
         public void Setup()
         {
@@ -126,6 +201,11 @@ namespace TradingSimulator.Tests
             );
         }
 
+        /// <summary>
+        /// Tests the FetchMarketsAsync method with status filter set to "open".
+        /// Verifies that the API service can successfully retrieve and process markets
+        /// with open status, ensuring proper data handling and error management.
+        /// </summary>
         [Test]
         public async Task FetchMarketsAsync_WithStatusOpen_ReturnsProcessedMarkets()
         {
@@ -146,6 +226,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Markets fetched successfully with open status");
         }
 
+        /// <summary>
+        /// Tests the FetchMarketsAsync method with a specific market ticker filter.
+        /// Verifies that the API service can retrieve and process a single market
+        /// when provided with a specific ticker, ensuring accurate filtering and processing.
+        /// </summary>
         [Test]
         public async Task FetchMarketsAsync_WithSpecificTicker_ReturnsProcessedMarket()
         {
@@ -166,6 +251,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Specific market fetched successfully");
         }
 
+        /// <summary>
+        /// Tests the FetchSeriesAsync method with a valid series ticker.
+        /// Verifies that the API service can successfully retrieve series information
+        /// including metadata, tags, and settlement sources for a given series ticker.
+        /// </summary>
         [Test]
         public async Task FetchSeriesAsync_WithValidTicker_ReturnsSeriesData()
         {
@@ -189,6 +279,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Series data fetched successfully");
         }
 
+        /// <summary>
+        /// Tests the FetchEventAsync method with a valid event ticker and nested markets enabled.
+        /// Verifies that the API service can retrieve comprehensive event information
+        /// including nested market data, ensuring proper relationship handling and data integrity.
+        /// </summary>
         [Test]
         public async Task FetchEventAsync_WithValidTicker_ReturnsEventData()
         {
@@ -212,6 +307,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Event data with nested markets fetched successfully");
         }
 
+        /// <summary>
+        /// Tests the FetchPositionsAsync method to retrieve user's current positions.
+        /// Verifies that the API service can successfully fetch and process position data,
+        /// including proper handling of empty position sets and error conditions.
+        /// </summary>
         [Test]
         public async Task FetchPositionsAsync_ReturnsPositions()
         {
@@ -232,6 +332,12 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Portfolio positions fetched successfully");
         }
 
+        /// <summary>
+        /// Tests the FetchCandlesticksAsync method with valid parameters.
+        /// Verifies that the API service can successfully retrieve and process candlestick data
+        /// for a specific market, series, and time interval, ensuring proper data handling
+        /// and database persistence of technical analysis data.
+        /// </summary>
         [Test]
         public async Task FetchCandlesticksAsync_WithValidParams_ReturnsCandlesticks()
         {
@@ -253,6 +359,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Candlestick data fetched successfully");
         }
 
+        /// <summary>
+        /// Tests the GetBalanceAsync method to retrieve account balance.
+        /// Verifies that the API service can successfully fetch the current account balance
+        /// and that it returns a non-negative value, ensuring proper authentication and data retrieval.
+        /// </summary>
         [Test]
         public async Task GetBalanceAsync_ReturnsPositiveBalance()
         {
@@ -272,6 +383,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Account balance retrieved successfully");
         }
 
+        /// <summary>
+        /// Tests the GetExchangeStatusAsync method to retrieve exchange operational status.
+        /// Verifies that the API service can successfully fetch exchange status information
+        /// including trading availability and operational state, ensuring proper system monitoring.
+        /// </summary>
         [Test]
         public async Task GetExchangeStatusAsync_ReturnsStatus()
         {
@@ -294,6 +410,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Exchange status retrieved successfully");
         }
 
+        /// <summary>
+        /// Tests the FetchOrdersAsync method with status filter.
+        /// Verifies that the API service can successfully retrieve and process order data
+        /// with filtering capabilities, ensuring proper handling of order history and status tracking.
+        /// </summary>
         [Test]
         public async Task FetchOrdersAsync_ReturnsOrders()
         {
@@ -314,6 +435,13 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Orders fetched successfully");
         }
 
+        /// <summary>
+        /// Tests the CreateOrderAsync method - intentionally skipped for safety.
+        /// This test validates the order creation functionality but is skipped to prevent
+        /// accidental placement of real orders during testing, which could result in
+        /// unintended financial transactions. The test serves as a placeholder for
+        /// future implementation when safe testing mechanisms are available.
+        /// </summary>
         [Test]
         public async Task CreateOrderAsync_OrderPlacement_SkippedForSafety()
         {
@@ -326,6 +454,11 @@ namespace TradingSimulator.Tests
             Assert.Pass("Order placement test skipped for safety - prevents accidental real money orders");
         }
 
+        /// <summary>
+        /// Tests the GetExchangeScheduleAsync method to retrieve trading schedule information.
+        /// Verifies that the API service can successfully fetch exchange operating hours,
+        /// maintenance windows, and trading schedule data for operational planning.
+        /// </summary>
         [Test]
         public async Task GetExchangeScheduleAsync_ReturnsSchedule()
         {
@@ -349,6 +482,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Exchange schedule retrieved successfully");
         }
 
+        /// <summary>
+        /// Tests the FetchAnnouncementsAsync method to retrieve exchange announcements.
+        /// Verifies that the API service can successfully fetch and process important
+        /// notifications and updates from the Kalshi exchange platform.
+        /// </summary>
         [Test]
         public async Task FetchAnnouncementsAsync_ReturnsAnnouncements()
         {
@@ -369,6 +507,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Announcements fetched successfully");
         }
 
+        /// <summary>
+        /// Tests the GetTotalRestingOrderValueAsync method to retrieve total resting order value.
+        /// Verifies that the API service can successfully calculate and return the total value
+        /// of all resting orders in the account, providing insight into current exposure.
+        /// </summary>
         [Test]
         public async Task GetTotalRestingOrderValueAsync_ReturnsValue()
         {
@@ -392,6 +535,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Total resting order value retrieved successfully");
         }
 
+        /// <summary>
+        /// Tests the GetOrdersQueuePositionsAsync method to retrieve order queue positions.
+        /// Verifies that the API service can successfully fetch queue position information
+        /// for orders, providing insights into order execution priority and status.
+        /// </summary>
         [Test]
         public async Task GetOrdersQueuePositionsAsync_ReturnsQueuePositions()
         {
@@ -415,6 +563,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Orders queue positions retrieved successfully");
         }
 
+        /// <summary>
+        /// Tests the GetSettlementsAsync method to retrieve settlement information.
+        /// Verifies that the API service can successfully fetch settlement data for completed markets,
+        /// including payout amounts and settlement dates with proper pagination support.
+        /// </summary>
         [Test]
         public async Task GetSettlementsAsync_ReturnsSettlements()
         {
@@ -438,6 +591,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Settlements retrieved successfully");
         }
 
+        /// <summary>
+        /// Tests the GetFillsAsync method to retrieve fill information for executed orders.
+        /// Verifies that the API service can successfully fetch execution data including
+        /// prices, quantities, and timestamps for completed order fills with pagination support.
+        /// </summary>
         [Test]
         public async Task GetFillsAsync_ReturnsFills()
         {
@@ -461,6 +619,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Fills retrieved successfully");
         }
 
+        /// <summary>
+        /// Tests the GetIncentiveProgramsAsync method to retrieve incentive program information.
+        /// Verifies that the API service can successfully fetch details about trading incentives,
+        /// rewards, and promotional programs offered by the Kalshi exchange with pagination support.
+        /// </summary>
         [Test]
         public async Task GetIncentiveProgramsAsync_ReturnsIncentivePrograms()
         {
@@ -484,6 +647,11 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Incentive programs retrieved successfully");
         }
 
+        /// <summary>
+        /// Tests the GetEventMetadataAsync method with a valid event ticker.
+        /// Verifies that the API service can successfully retrieve detailed metadata
+        /// for a specific event including competition details and settlement sources.
+        /// </summary>
         [Test]
         public async Task GetEventMetadataAsync_WithValidEventTicker_ReturnsMetadata()
         {
@@ -507,7 +675,12 @@ namespace TradingSimulator.Tests
             Console.WriteLine("✅ PASSED: Event metadata retrieved successfully");
         }
 
-        // Order-related tests - leaving as unimplemented but passing
+        /// <summary>
+        /// Tests the GetOrderQueuePositionAsync method - intentionally skipped.
+        /// This test is skipped because it requires an existing order ID to function properly.
+        /// The test serves as a placeholder for future implementation when order testing
+        /// infrastructure is available, ensuring the method signature remains testable.
+        /// </summary>
         [Test]
         public async Task GetOrderQueuePositionAsync_OrderRelated_Skipped()
         {
@@ -515,6 +688,12 @@ namespace TradingSimulator.Tests
             Assert.Pass("Order-related test skipped - requires existing order");
         }
 
+        /// <summary>
+        /// Tests the GetOrderDetailsAsync method - intentionally skipped.
+        /// This test is skipped because it requires an existing order ID to function properly.
+        /// The test serves as a placeholder for future implementation when order testing
+        /// infrastructure is available, ensuring the method signature remains testable.
+        /// </summary>
         [Test]
         public async Task GetOrderDetailsAsync_OrderRelated_Skipped()
         {
@@ -522,6 +701,12 @@ namespace TradingSimulator.Tests
             Assert.Pass("Order-related test skipped - requires existing order");
         }
 
+        /// <summary>
+        /// Tests the CreateOrdersBatchAsync method - intentionally skipped.
+        /// This test is skipped because it involves placing orders which could result
+        /// in real financial transactions. The test serves as a placeholder for future
+        /// implementation when safe batch order testing mechanisms are available.
+        /// </summary>
         [Test]
         public async Task CreateOrdersBatchAsync_OrderRelated_Skipped()
         {
@@ -529,6 +714,12 @@ namespace TradingSimulator.Tests
             Assert.Pass("Order-related test skipped - involves placing orders");
         }
 
+        /// <summary>
+        /// Tests the DeleteOrdersBatchAsync method - intentionally skipped.
+        /// This test is skipped because it involves deleting orders which could affect
+        /// real trading operations. The test serves as a placeholder for future
+        /// implementation when safe batch order deletion testing mechanisms are available.
+        /// </summary>
         [Test]
         public async Task DeleteOrdersBatchAsync_OrderRelated_Skipped()
         {
@@ -536,6 +727,12 @@ namespace TradingSimulator.Tests
             Assert.Pass("Order-related test skipped - involves deleting orders");
         }
 
+        /// <summary>
+        /// Tests the ResetOrderGroupAsync method - intentionally skipped.
+        /// This test is skipped because it involves order group operations which could affect
+        /// real trading operations. The test serves as a placeholder for future implementation
+        /// when safe order group testing mechanisms are available.
+        /// </summary>
         [Test]
         public async Task ResetOrderGroupAsync_OrderRelated_Skipped()
         {
@@ -543,6 +740,12 @@ namespace TradingSimulator.Tests
             Assert.Pass("Order-related test skipped - involves order group operations");
         }
 
+        /// <summary>
+        /// Tests the DeleteOrderGroupAsync method - intentionally skipped.
+        /// This test is skipped because it involves order group operations which could affect
+        /// real trading operations. The test serves as a placeholder for future implementation
+        /// when safe order group testing mechanisms are available.
+        /// </summary>
         [Test]
         public async Task DeleteOrderGroupAsync_OrderRelated_Skipped()
         {
