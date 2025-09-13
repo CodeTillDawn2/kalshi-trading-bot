@@ -4,6 +4,11 @@
     "title": "Welcome to Kalshi Trading Bot Documentation | Kalshi Trading Bot Documentation",
     "summary": "Welcome to Kalshi Trading Bot Documentation This documentation provides information about the Kalshi Trading Bot project, including API references and additional resources."
   },
+  "index.html": {
+    "href": "index.html",
+    "title": "Kalshi Trading Bot Docs | Kalshi Trading Bot Documentation",
+    "summary": "Kalshi Trading Bot API Reference → API Guides → Articles"
+  },
   "obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.html": {
     "href": "obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.html",
     "title": "Class SnapshotDiscrepancyValidator.ValidationResult | Kalshi Trading Bot Documentation",

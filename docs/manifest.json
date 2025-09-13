@@ -21,6 +21,16 @@
       "version": ""
     },
     {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
       "type": "ManagedReference",
       "source_relative_path": "obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.yml",
       "output": {
@@ -6805,6 +6815,19 @@
         },
         ".html": {
           "relative_path": "obj/api/toc.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".json": {
+          "relative_path": "toc.json"
+        },
+        ".html": {
+          "relative_path": "toc.html"
         }
       },
       "version": ""
