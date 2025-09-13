@@ -13,31 +13,31 @@ namespace BacklashBot.Helpers
         /// Represents the result of a snapshot validation operation, containing flags for specific discrepancy types
         /// and an overall validity indicator.
         /// </summary>
-        public class ValidationResult
+        public record ValidationResult
         {
             /// <summary>
-            /// Gets or sets a value indicating whether the snapshot passed all validation checks.
+            /// Gets a value indicating whether the snapshot passed all validation checks.
             /// True if no discrepancies were found; false otherwise.
             /// </summary>
-            public bool IsValid { get; set; }
+            public bool IsValid { get; init; }
 
             /// <summary>
-            /// Gets or sets a value indicating whether the orderbook data is missing or empty.
+            /// Gets a value indicating whether the orderbook data is missing or empty.
             /// This is a critical issue as orderbook data is essential for trading decisions.
             /// </summary>
-            public bool IsOrderbookMissing { get; set; }
+            public bool IsOrderbookMissing { get; init; }
 
             /// <summary>
-            /// Gets or sets a value indicating whether the best bid and ask prices overlap, which is an invalid state.
+            /// Gets a value indicating whether the best bid and ask prices overlap, which is an invalid state.
             /// In a properly functioning market, the best bid should be less than the best ask.
             /// </summary>
-            public bool DoPricesOverlap { get; set; }
+            public bool DoPricesOverlap { get; init; }
 
             /// <summary>
-            /// Gets or sets a value indicating whether there are significant discrepancies between velocity metrics
+            /// Gets a value indicating whether there are significant discrepancies between velocity metrics
             /// and actual trade/order volumes, suggesting potential data corruption or calculation errors.
             /// </summary>
-            public bool IsRateDiscrepancy { get; set; }
+            public bool IsRateDiscrepancy { get; init; }
         }
 
         /// <summary>
@@ -46,6 +46,7 @@ namespace BacklashBot.Helpers
         /// price overlap detection, and rate consistency validation.
         /// </summary>
         /// <param name="snapshot">The market snapshot to validate.</param>
+        /// <param name="threshold">The discrepancy threshold for rate validation. Default is 0.1.</param>
         /// <returns>A ValidationResult containing the validation outcome and specific discrepancy flags.</returns>
         /// <remarks>
         /// The validation process includes:
@@ -53,16 +54,19 @@ namespace BacklashBot.Helpers
         /// - Detecting overlapping bid and ask prices
         /// - Validating consistency between velocity metrics and actual volumes when change metrics are mature
         ///
+        /// The default 0.1 threshold is considered significant as per user specification.
+        ///
         /// This method is designed to be fast and lightweight, suitable for real-time snapshot processing.
         /// Invalid snapshots are logged as warnings in the calling service for monitoring purposes.
         /// </remarks>
-        public static ValidationResult ValidateDiscrepancies(MarketSnapshot snapshot)
+        public static ValidationResult ValidateDiscrepancies(MarketSnapshot snapshot, double threshold = 0.1)
         {
             var result = new ValidationResult
             {
                 IsValid = true,
                 IsOrderbookMissing = false,
-                DoPricesOverlap = false
+                DoPricesOverlap = false,
+                IsRateDiscrepancy = false
             };
 
             // Check if orderbook data is missing or empty
@@ -104,7 +108,7 @@ namespace BacklashBot.Helpers
                 double diff4 = Math.Abs(velocityNoSum - (orderNoVolume + tradeNoVolume));
 
                 // If any discrepancy exceeds the threshold, flag it
-                if (diff > 0.1 || diff2 > 0.1 || diff3 > 0.1 || diff4 > 0.1)
+                if (diff > threshold || diff2 > threshold || diff3 > threshold || diff4 > threshold)
                 {
                     result.IsRateDiscrepancy = true;
                     result.IsValid = false;
