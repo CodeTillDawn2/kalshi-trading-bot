@@ -138,7 +138,12 @@ namespace TradingSimulator
 
             // Initialize helper classes
             _dataLoader = new DataLoader(_snapshotService);
-            _marketProcessor = new MarketProcessor(_overseer, _scopeFactory, _processedMarkets, _cacheDirectory, _simulatorReporting, _simulatorOptions.Value.ProcessingTimeoutSeconds);
+            var marketProcessorConfig = new MarketProcessorConfig
+            {
+                CacheDirectory = _cacheDirectory,
+                ProcessingTimeoutSeconds = _simulatorOptions.Value.ProcessingTimeoutSeconds
+            };
+            _marketProcessor = new MarketProcessor(_overseer, _scopeFactory, _processedMarkets, marketProcessorConfig, _simulatorReporting);
             _marketProcessor.OnTestProgress += msg => OnTestProgress?.Invoke(msg);
             _strategyResolver = new StrategyResolver();
 
@@ -299,7 +304,7 @@ namespace TradingSimulator
                     await _marketProcessor.ProcessMarketAsync(
                         market, marketSnapshots, strategies,
                         progressPrefix: $"[{label}/{dto.StrategyName}] ",
-                        writeToFile: writeToFile, detectVelocityDiscrepancies: true, group: groupForId,
+                        writeToFile: writeToFile, group: groupForId,
                         ignoreProcessedCache: true);
 
                 totalDiscrepancies += disc?.Count ?? 0;
@@ -546,7 +551,6 @@ ResolveFamily(StrategyFamily family)
                         market, marketSnapshots, strategies,
                         progressPrefix: "",
                         writeToFile: false,
-                        detectVelocityDiscrepancies: true,
                         group: groupForId,
                         ignoreProcessedCache: true);
 
@@ -703,11 +707,11 @@ ResolveFamily(StrategyFamily family)
 
                     OnTestProgress?.Invoke($"[{label}/{dto.StrategyName}] market {market} ({mIdx + 1}/{marketList.Count}) set {setIdx + 1}/{strategiesList.Count}");
 
-                    var (finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort, pos, avgCost, rest, disc, patterns) =
+                    (double finalPnL, int finalPosition, double finalAverageCost, List<PricePoint> bid, List<PricePoint> ask, List<PricePoint> buy, List<PricePoint> sell, List<PricePoint> exit, List<PricePoint> ev, List<PricePoint> il, List<PricePoint> ishort, List<PricePoint> pos, List<PricePoint> avgCost, List<PricePoint> rest, List<PricePoint> disc, List<PricePoint> patterns) =
                         await _marketProcessor.ProcessMarketAsync(
                             market, marketSnapshots, strategies,
                             progressPrefix: $"[{label}/{dto.StrategyName}] ",
-                            writeToFile: writeToFile, detectVelocityDiscrepancies: false, group: groupForId,
+                            writeToFile: writeToFile, group: groupForId,
                             ignoreProcessedCache: true);
 
                     totalDiscrepancies += disc?.Count ?? 0;
