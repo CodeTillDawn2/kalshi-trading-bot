@@ -7,11 +7,49 @@ using TradingStrategies.Trading.Helpers;
 
 namespace TradingStrategies.Classification
 {
+    /// <summary>
+    /// Provides functionality for processing and grouping market snapshots into valid analysis periods.
+    /// This class implements the core logic for identifying continuous market periods based on time gaps
+    /// and price stability, ensuring that only stable market conditions are used for trading strategy
+    /// evaluation and backtesting. It handles the serialization of snapshot groups to disk and their
+    /// subsequent loading for analysis.
+    /// </summary>
+    /// <remarks>
+    /// The class uses configurable thresholds for time gaps (smallGapMinutes and maxActiveGapHours)
+    /// to determine period boundaries. Snapshots are grouped when they are temporally close and
+    /// price changes are minimal, allowing for meaningful analysis of market behavior during
+    /// stable periods.
+    /// </remarks>
     public class SnapshotPeriodHelper : ISnapshotPeriodHelper
     {
+        /// <summary>
+        /// The maximum time gap in minutes between snapshots that allows them to be considered
+        /// part of the same continuous period without requiring price stability checks.
+        /// </summary>
         private double smallGapMinutes = 10.0;
+
+        /// <summary>
+        /// The maximum time gap in hours for active market periods. Gaps exceeding this threshold
+        /// will cause a period break regardless of price stability.
+        /// </summary>
         private double maxActiveGapHours = 1.0;
 
+        /// <summary>
+        /// Splits a sequence of market snapshots into valid analysis periods based on time continuity
+        /// and price stability criteria. Snapshots are grouped together when they represent a
+        /// continuous market period without significant price changes or excessive time gaps.
+        /// </summary>
+        /// <param name="snapshots">The ordered list of market snapshots to process. Must be sorted by timestamp.</param>
+        /// <param name="snapshotDirectory">The directory path where snapshot group files will be saved.</param>
+        /// <returns>A list of snapshot groups, each representing a valid analysis period with aggregated data.</returns>
+        /// <remarks>
+        /// The method processes snapshots sequentially, starting a new group when:
+        /// - Time gaps exceed the maximum active gap threshold, or
+        /// - Price changes exceed the threshold (unless within the small gap tolerance)
+        ///
+        /// Each group is saved as a JSON file and returned as a SnapshotGroupDTO containing
+        /// start/end times, price ranges, liquidity metrics, and file path information.
+        /// </remarks>
         public List<SnapshotGroupDTO> SplitIntoValidGroups(List<SnapshotDTO> snapshots, string snapshotDirectory)
         {
             if (snapshots == null || snapshots.Count == 0)
@@ -19,14 +57,13 @@ namespace TradingStrategies.Classification
 
             var validPeriods = new List<SnapshotGroupDTO>();
             var currentPeriod = new List<SnapshotDTO> { snapshots[0] };
-            int GroupNumber = 1;
+            int groupNumber = 1;
 
             for (int i = 1; i < snapshots.Count; i++)
             {
                 var t1 = snapshots[i - 1].SnapshotDate;
                 var t2 = snapshots[i].SnapshotDate;
 
-                // Extract price data from RawJSON (now a MarketSnapshot)
                 var json1 = JObject.Parse(snapshots[i - 1].RawJSON);
                 var json2 = JObject.Parse(snapshots[i].RawJSON);
                 var yb1 = json1["BestYesBid"]?.Value<int>() ?? 0;
@@ -41,8 +78,8 @@ namespace TradingStrategies.Classification
                 }
                 else
                 {
-                    var snapshotGroup = CreateSnapshotGroup(currentPeriod, GroupNumber, snapshotDirectory);
-                    GroupNumber = GroupNumber + 1;
+                    var snapshotGroup = CreateSnapshotGroup(currentPeriod, groupNumber, snapshotDirectory);
+                    groupNumber = groupNumber + 1;
                     if (snapshotGroup != null)
                         validPeriods.Add(snapshotGroup);
                     currentPeriod = new List<SnapshotDTO> { snapshots[i] };
@@ -51,8 +88,8 @@ namespace TradingStrategies.Classification
 
             if (currentPeriod.Count > 0)
             {
-                var snapshotGroup = CreateSnapshotGroup(currentPeriod, GroupNumber, snapshotDirectory);
-                GroupNumber = GroupNumber + 1;
+                var snapshotGroup = CreateSnapshotGroup(currentPeriod, groupNumber, snapshotDirectory);
+                groupNumber = groupNumber + 1;
                 if (snapshotGroup != null)
                     validPeriods.Add(snapshotGroup);
             }
@@ -60,6 +97,25 @@ namespace TradingStrategies.Classification
             return validPeriods;
         }
 
+        /// <summary>
+        /// Creates a snapshot group DTO from a collection of related snapshots, aggregating
+        /// their data and saving the flattened representation to a JSON file.
+        /// </summary>
+        /// <param name="snapshots">The list of snapshots to include in this group. Must contain at least one snapshot.</param>
+        /// <param name="groupNumber">The sequential number identifying this group within the market.</param>
+        /// <param name="snapshotDirectory">The directory where the group's JSON file will be saved.</param>
+        /// <returns>A SnapshotGroupDTO containing aggregated group information, or null if no snapshots provided.</returns>
+        /// <remarks>
+        /// This method performs the following operations:
+        /// 1. Extracts start/end times and prices from the first and last snapshots
+        /// 2. Calculates average liquidity across all snapshots
+        /// 3. Flattens the nested JSON structure of each snapshot for analysis
+        /// 4. Saves the flattened data to a uniquely named JSON file
+        /// 5. Returns a DTO with all aggregated information
+        ///
+        /// The flattening process preserves the Orderbook structure while converting all other
+        /// nested properties to a flat key-value format suitable for data analysis.
+        /// </remarks>
         private SnapshotGroupDTO CreateSnapshotGroup(List<SnapshotDTO> snapshots, int groupNumber, string snapshotDirectory)
         {
             if (snapshots == null || !snapshots.Any())
@@ -68,7 +124,6 @@ namespace TradingStrategies.Classification
             var firstSnapshot = snapshots.First();
             var lastSnapshot = snapshots.Last();
 
-            // Parse JSON to get price data (now a MarketSnapshot)
             var firstJson = JObject.Parse(firstSnapshot.RawJSON);
             var lastJson = JObject.Parse(lastSnapshot.RawJSON);
 
@@ -80,7 +135,6 @@ namespace TradingStrategies.Classification
                        (json["CumulativeNoBidDepth"]?.Value<double>() ?? 0);
             });
 
-            // Flatten MarketSnapshot data
             var flattenedRows = new List<Dictionary<string, string>>();
             foreach (var snapshot in snapshots)
             {
@@ -114,6 +168,25 @@ namespace TradingStrategies.Classification
             };
         }
 
+        /// <summary>
+        /// Recursively flattens a nested object structure into a flat dictionary of string key-value pairs.
+        /// This method handles complex JSON structures by converting nested objects, arrays, and JObject/JArray
+        /// instances into a flattened format suitable for data analysis and serialization.
+        /// </summary>
+        /// <param name="data">The object to flatten. Can be a dictionary, list, JObject, JArray, or primitive value.</param>
+        /// <param name="prefix">The prefix to prepend to keys for nested structures, building the full key path.</param>
+        /// <returns>A dictionary containing all flattened key-value pairs from the input data structure.</returns>
+        /// <remarks>
+        /// The flattening process:
+        /// - Preserves Orderbook structures as JSON strings to maintain their complex nested format
+        /// - Converts nested dictionaries and objects to flattened key paths (e.g., "Parent_Child_Property")
+        /// - Handles arrays by indexing elements (e.g., "Array_0", "Array_1")
+        /// - Converts all values to strings for consistent storage
+        /// - Recursively processes JObject and JArray instances from JSON parsing
+        ///
+        /// This allows complex market snapshot data to be stored in a format suitable for analysis
+        /// while preserving the essential structure of order book information.
+        /// </remarks>
         private Dictionary<string, string> FlattenDictionary(object data, string prefix)
         {
             var result = new Dictionary<string, string>();
@@ -196,6 +269,24 @@ namespace TradingStrategies.Classification
             return result;
         }
 
+        /// <summary>
+        /// Loads a snapshot group from a JSON file and reconstructs the original snapshot DTOs.
+        /// This method reverses the flattening process performed during group creation, converting
+        /// the stored flat data back into structured SnapshotDTO objects with proper JSON formatting.
+        /// </summary>
+        /// <param name="filePath">The full path to the JSON file containing the flattened snapshot group data.</param>
+        /// <returns>A list of reconstructed SnapshotDTO objects, ordered by snapshot date.</returns>
+        /// <remarks>
+        /// The loading process:
+        /// 1. Reads the JSON file containing flattened snapshot data
+        /// 2. Deserializes into a list of flattened dictionaries
+        /// 3. Reconstructs each snapshot's RawJSON by mapping flattened fields back to MarketSnapshot structure
+        /// 4. Orders snapshots by timestamp for consistency
+        /// 5. Enhances snapshots with market type information for downstream processing
+        ///
+        /// Error handling ensures that file reading or parsing failures don't crash the application,
+        /// with errors logged for debugging while returning any successfully processed snapshots.
+        /// </remarks>
         public List<SnapshotDTO> LoadSnapshotGroup(string filePath)
         {
             var snapshotDTOs = new List<SnapshotDTO>();
@@ -242,19 +333,34 @@ namespace TradingStrategies.Classification
 
             var orderedSnapshots = snapshotDTOs.OrderBy(s => s.SnapshotDate).ToList();
 
-            // NEW: Convert to MarketSnapshot and compute MarketType (if needed here; otherwise skip if handled downstream)
+            // Convert to MarketSnapshot and compute MarketType for downstream processing
             var helper = new MarketTypeHelper();
             foreach (var dto in orderedSnapshots)
             {
-                // Assuming you parse RawJSON to MarketSnapshot here; replace with your parsing logic
+                // Parse RawJSON to MarketSnapshot and determine market type
                 var marketSnapshot = JsonConvert.DeserializeObject<MarketSnapshot>(dto.RawJSON);
                 marketSnapshot.MarketType = helper.GetMarketType(marketSnapshot).ToString();
-                // If needed, update dto.RawJSON or handle accordingly
+                // Market type information is now available in the snapshot for analysis
             }
 
             return orderedSnapshots;
         }
 
+        /// <summary>
+        /// Saves the JSON content of a snapshot group to a uniquely named file in the specified directory.
+        /// Creates the directory if it doesn't exist and handles file I/O errors gracefully.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker symbol used in the filename.</param>
+        /// <param name="groupNumber">The group number used in the filename for uniqueness.</param>
+        /// <param name="jsonContent">The JSON string content to write to the file.</param>
+        /// <param name="snapshotDirectory">The directory where the file should be saved.</param>
+        /// <returns>The full path to the saved file, or an empty string if saving failed.</returns>
+        /// <remarks>
+        /// File naming convention: {MarketTicker}_{GroupNumber}.json
+        /// This ensures unique filenames for each snapshot group within a market.
+        /// Directory creation is handled automatically, and exceptions during file operations
+        /// are caught to prevent application crashes, with empty string returned as failure indicator.
+        /// </remarks>
         private string SaveSnapshotGroupJsonToFile(string marketTicker, int groupNumber, string jsonContent, string snapshotDirectory)
         {
             try
@@ -266,7 +372,7 @@ namespace TradingStrategies.Classification
                     Directory.CreateDirectory(snapshotDirectory);
                 }
 
-                // Generate unique file name using MarketTicker and timestamp
+                // Generate unique file name using MarketTicker and group number
                 string fileName = $"{marketTicker}_{groupNumber}.json";
                 string filePath = Path.Combine(snapshotDirectory, fileName);
 
@@ -282,12 +388,42 @@ namespace TradingStrategies.Classification
             }
         }
 
+        /// <summary>
+        /// Determines if the price has changed significantly between two snapshots.
+        /// Compares the best bid prices for both Yes and No positions against a threshold.
+        /// </summary>
+        /// <param name="yb1">The BestYesBid price from the first snapshot.</param>
+        /// <param name="nb1">The BestNoBid price from the first snapshot.</param>
+        /// <param name="yb2">The BestYesBid price from the second snapshot.</param>
+        /// <param name="nb2">The BestNoBid price from the second snapshot.</param>
+        /// <returns>True if any price difference exceeds the threshold, indicating significant change.</returns>
+        /// <remarks>
+        /// Uses a 3-point threshold to allow for minor price fluctuations while detecting
+        /// meaningful market movements that should break snapshot group continuity.
+        /// This helps ensure that analysis periods contain relatively stable market conditions.
+        /// </remarks>
         private bool PriceChanged(int yb1, int nb1, int yb2, int nb2)
         {
             const int threshold = 3; // 3-point flat change margin
             return Math.Abs(yb1 - yb2) > threshold || Math.Abs(nb1 - nb2) > threshold;
         }
 
+        /// <summary>
+        /// Determines if the time gap between two snapshots is acceptable for maintaining
+        /// group continuity. Considers both small gaps (always acceptable) and larger gaps
+        /// within the active market threshold.
+        /// </summary>
+        /// <param name="t1">The timestamp of the first snapshot.</param>
+        /// <param name="t2">The timestamp of the second snapshot.</param>
+        /// <returns>True if the gap is acceptable and snapshots can remain in the same group.</returns>
+        /// <remarks>
+        /// Gap acceptability rules:
+        /// - Gaps of smallGapMinutes (10 minutes) or less are always acceptable
+        /// - Larger gaps are acceptable if within maxActiveGapHours (1 hour) of active trading
+        /// - Invalid time sequences (t2 <= t1) are not acceptable
+        ///
+        /// This allows for brief interruptions while preventing analysis of disconnected market periods.
+        /// </remarks>
         private bool IsAcceptableGap(DateTime t1, DateTime t2)
         {
             if (t2 <= t1) return false;
@@ -297,9 +433,9 @@ namespace TradingStrategies.Classification
             if (diffMinutes <= smallGapMinutes) return true;
 
             double totalTimeHours = timediff.TotalHours;
-            bool GapLessThanMaxActiveGap = totalTimeHours <= maxActiveGapHours;
+            bool gapLessThanMaxActiveGap = totalTimeHours <= maxActiveGapHours;
 
-            return GapLessThanMaxActiveGap;
+            return gapLessThanMaxActiveGap;
         }
 
 
