@@ -6,8 +6,11 @@ using System.Text.Json;
 using TradingStrategies.Extensions;
 using static BacklashInterfaces.Enums.StrategyEnums;
 
-namespace TradingStrategies.Strategies.Strats
+namespace TradingStrategies.Strategies.Strategies.Strats
 {
+    /// <summary>
+    /// A trading strategy implementation for TryAgainStrat.
+    /// </summary>
     public class TryAgainStrat : Strat
     {
         public string Name { get; private set; }

@@ -9,6 +9,11 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="ScottPlot.WinForms" Version="4.1.67" />
     <PackageReference Include="System.Management" Version="9.0.8" />
