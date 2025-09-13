@@ -13,33 +13,19 @@
             "KalshiBotLogging/KalshiBotLogging.csproj",
             "KalshiBotContext/KalshiBotData.csproj",
             "TradingStrategies/TradingStrategies.csproj",
-            "TradingSimulator/TradingSimulator.csproj",
-            "KalshiBotTasks/KalshiBotTasks.csproj",
-            "BacklashPatterns/BacklashPatterns.csproj"
-          ],
-          "exclude": [
-            "TradingGUI/**",
-            "**/*Tests.csproj",
-            "**/*.sln"
+            "TradingSimulator/TradingSimulator.csproj"
           ]
         }
       ],
       "dest": "api",
-      "properties": {
-        "TargetFramework": "net8.0",
-        "EnableWindowsTargeting": "true"
-      }
+      "properties": { "TargetFramework": "net8.0", "EnableWindowsTargeting": "true" }
     }
   ],
   "build": {
     "content": [
       { "files": [ "api/**.yml" ] },
-      { "files": [ "index.md", "toc.yml" ] },
       { "files": [ "api/index.md", "api/toc.yml" ] },
-      { "files": [ "articles/**.md", "articles/**.html" ] }
-    ],
-    "resource": [
-      { "files": [ "articles/**.js", "articles/**.css" ] }
+      { "files": [ "index.md", "toc.yml", "articles/**.md", "articles/**.html" ] }
     ],
     "dest": "../docs",
     "globalMetadata": {
