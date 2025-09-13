@@ -54,22 +54,24 @@ jobs:
         run: |
           set -e
           mkdir -p docfx_project/api
-          # collect top-level namespace YAMLs emitted by docfx metadata
-          ns_files=$(find docfx_project/api -path "*/namespace/*.yml" -type f | sort)
-          # flat TOC (every namespace as an entry)
-          {
-            echo "items:"
-            # first 'uid:' in each namespace file is the namespace uid
-            while IFS= read -r f; do
-              uid=$(awk '/^uid: /{print $2; exit}' "$f")
-              [ -n "$uid" ] && echo "  - uid: $uid"
-            done <<< "$ns_files"
-          } > docfx_project/api/toc.yml
+          if [ ! -f docfx_project/api/toc.yml ]; then
+            # collect top-level namespace YAMLs emitted by docfx metadata
+            ns_files=$(find docfx_project/api -name "*.yml" | grep -v toc.yml | sort)
+            # flat TOC (every namespace as an entry)
+            {
+              echo "items:"
+              # first 'uid:' in each namespace file is the namespace uid
+              while IFS= read -r f; do
+                uid=$(awk '/^uid: /{print $2; exit}' "$f")
+                [ -n "$uid" ] && echo "  - href: $uid.html"
+              done <<< "$ns_files"
+            } > docfx_project/api/toc.yml
+          fi
 
           # minimal landing page so /api/index.html exists
           printf "# API Reference\n\nBrowse namespaces and types.\n" > docfx_project/api/index.md
 
-          echo "Generated toc.yml:"
+          echo "Using toc.yml:"
           cat docfx_project/api/toc.yml
 
       - name: Build site
