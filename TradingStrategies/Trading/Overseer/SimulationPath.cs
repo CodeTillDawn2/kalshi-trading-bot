@@ -1,6 +1,7 @@
 using BacklashDTOs;
 using TradingStrategies.Strategies;
 using static BacklashInterfaces.Enums.StrategyEnums;
+using static TradingStrategies.Trading.Overseer.ReportGenerator;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -109,13 +110,13 @@ namespace TradingStrategies.Trading.Overseer
         /// <summary>
         /// Gets or sets the list of events that occurred during the simulation.
         /// </summary>
-        /// <value>A list of <see cref="ReportGenerator.EventLog"/> entries recording simulation events.</value>
+        /// <value>A list of <see cref="ReportGenerator.SimulationEventLog"/> entries recording simulation events.</value>
         /// <remarks>
         /// Events capture significant occurrences during simulation such as trades, strategy
         /// decisions, market condition changes, and errors. This log is used for performance
         /// analysis, debugging, and generating detailed simulation reports.
         /// </remarks>
-        public List<ReportGenerator.EventLog> Events { get; set; }
+        public List<SimulationEventLog> Events { get; set; }
 
         /// <summary>
         /// Gets or sets the simulated order book representing current market liquidity.

@@ -4,7 +4,7 @@ namespace TradingStrategies.Trading.Overseer
 {
     /// <summary>
     /// Provides static methods for generating comprehensive performance reports from trading simulation event logs.
-    /// This class processes collections of EventLog objects to produce detailed CSV-formatted reports that analyze
+    /// This class processes collections of SimulationEventLog objects to produce detailed CSV-formatted reports that analyze
     /// trading performance, market statistics, strategy effectiveness, and simulation outcomes. It serves as the
     /// core reporting engine for the trading overseer system, enabling detailed analysis of backtesting results
     /// and strategy evaluation through structured data exports.
@@ -17,7 +17,7 @@ namespace TradingStrategies.Trading.Overseer
         /// and analyze the progression of trading activities, market conditions, and strategy decisions
         /// throughout a simulation run.
         /// </summary>
-        public class EventLog
+        public class SimulationEventLog
         {
             /// <summary>
             /// The timestamp when this event occurred during the simulation.
@@ -197,7 +197,7 @@ namespace TradingStrategies.Trading.Overseer
 
         /// <summary>
         /// Represents a grouped collection of related event logs that share the same market type and action.
-        /// This class aggregates multiple EventLog entries into summary statistics for analysis and reporting,
+        /// This class aggregates multiple SimulationEventLog entries into summary statistics for analysis and reporting,
         /// providing averaged metrics and position changes over a time period.
         /// </summary>
         public class EventGroup
@@ -401,7 +401,7 @@ namespace TradingStrategies.Trading.Overseer
 
         /// <summary>
         /// Generates a comprehensive detailed performance report from trading simulation event logs.
-        /// This method processes a collection of EventLog entries to create a multi-section CSV report
+        /// This method processes a collection of SimulationEventLog entries to create a multi-section CSV report
         /// containing summary statistics, market distribution analysis, order book summaries, full event logs,
         /// summarized event timelines, and path definitions. The report provides detailed insights into
         /// trading performance, market conditions, and strategy effectiveness.
@@ -413,7 +413,7 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="writeToFile">Whether to write the report to a file in addition to returning it as a string.</param>
         /// <param name="outputDir">The directory path where the report file should be written.</param>
         /// <returns>A string containing the complete CSV-formatted performance report.</returns>
-        public string GenerateDetailedPerformanceReport(string? marketId, List<EventLog> events, double initialCash, Dictionary<string, PathInfo> paths, bool writeToFile, string outputDir = @"C:\Users\Peter\Documents\GitHub\TestingOutput")
+        public string GenerateDetailedPerformanceReport(string? marketId, List<SimulationEventLog> events, double initialCash, Dictionary<string, PathInfo> paths, bool writeToFile, string outputDir = @"C:\Users\Peter\Documents\GitHub\TestingOutput")
         {
             if (events == null || events.Count == 0) return "No events to report.";
 
@@ -623,7 +623,7 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         /// <param name="ev">The event log entry containing position and market data.</param>
         /// <returns>The calculated equity value including cash and position valuations.</returns>
-        private double CalculateEquity(EventLog ev)
+        private double CalculateEquity(SimulationEventLog ev)
         {
             if (ev.Position > 0)
             {
@@ -643,12 +643,12 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         /// <param name="events">The list of event logs to group.</param>
         /// <returns>A list of EventGroup objects representing consolidated event periods.</returns>
-        private List<EventGroup> GroupEvents(List<EventLog> events)
+        private List<EventGroup> GroupEvents(List<SimulationEventLog> events)
         {
             var groups = new List<EventGroup>();
             if (events.Count == 0) return groups;
 
-            EventLog current = events[0];
+            SimulationEventLog current = events[0];
             var group = new EventGroup
             {
                 MarketType = current.MarketType,

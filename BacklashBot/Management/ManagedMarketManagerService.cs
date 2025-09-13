@@ -17,6 +17,7 @@ namespace BacklashBot.Management
     /// Uses dynamic target calculation based on performance metrics rather than fixed counts.
     /// Automatically adjusts market watch counts based on system usage, queue depths, and
     /// performance indicators to optimize resource utilization and market coverage.
+    /// Includes input validation for brain configuration parameters with warning logs for invalid values.
     /// </summary>
     public class ManagedMarketManagerService : BaseMarketManagerService
     {
@@ -34,6 +35,7 @@ namespace BacklashBot.Management
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
         /// <param name="brainStatus">Service providing brain instance status information</param>
+        /// <param name="targetCalculationService">Service for calculating optimal market targets</param>
         public ManagedMarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
@@ -42,8 +44,9 @@ namespace BacklashBot.Management
             IOptions<TradingConfig> tradingConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
-            IBrainStatusService brainStatus)
-            : base(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, tradingConfig, scopeManagerService, statusTrackerService, brainStatus)
+            IBrainStatusService brainStatus,
+            ITargetCalculationService targetCalculationService)
+            : base(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, tradingConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
         {
         }
 
@@ -61,6 +64,28 @@ namespace BacklashBot.Management
         /// <returns>A task representing the asynchronous monitoring operation</returns>
         public override async Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics metrics)
         {
+            // Validate brain configuration parameters
+            if (brain == null)
+            {
+                _logger.LogWarning("Brain configuration is null, skipping watch list monitoring");
+                MonitoringWatchList = false;
+                return;
+            }
+
+            if (brain.UsageTarget <= 0)
+            {
+                _logger.LogWarning("Invalid UsageTarget in brain configuration: {UsageTarget}. Must be positive", brain.UsageTarget);
+                MonitoringWatchList = false;
+                return;
+            }
+
+            if (brain.UsageMin < 0 || brain.UsageMax <= brain.UsageMin)
+            {
+                _logger.LogWarning("Invalid UsageMin/UsageMax in brain configuration: Min={UsageMin}, Max={UsageMax}. Min must be non-negative and Max must be greater than Min", brain.UsageMin, brain.UsageMax);
+                MonitoringWatchList = false;
+                return;
+            }
+
             if (MonitoringWatchList) return;
             MonitoringWatchList = true;
             try

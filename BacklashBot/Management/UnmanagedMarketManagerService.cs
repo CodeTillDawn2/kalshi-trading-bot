@@ -16,7 +16,8 @@ namespace BacklashBot.Management
     /// Implements unmanaged market management strategy for the Kalshi trading bot.
     /// Uses fixed target watch counts rather than dynamic calculation based on performance metrics.
     /// Focuses on maintaining a stable number of markets while removing ended markets and
-    /// replacing uninteresting markets with higher-interest alternatives.
+    /// replacing uninteresting markets with higher-interest alternatives. Includes input validation
+    /// for brain configuration parameters with warning logs for invalid values.
     /// </summary>
     public class UnmanagedMarketManagerService : BaseMarketManagerService
     {
@@ -34,6 +35,7 @@ namespace BacklashBot.Management
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
         /// <param name="brainStatus">Service providing brain instance status information</param>
+        /// <param name="targetCalculationService">Service for calculating optimal market targets</param>
         public UnmanagedMarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
@@ -42,8 +44,9 @@ namespace BacklashBot.Management
             IOptions<TradingConfig> tradingConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
-            IBrainStatusService brainStatus)
-            : base(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, tradingConfig, scopeManagerService, statusTrackerService, brainStatus)
+            IBrainStatusService brainStatus,
+            ITargetCalculationService targetCalculationService)
+            : base(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, tradingConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
         {
         }
 
@@ -60,6 +63,28 @@ namespace BacklashBot.Management
         /// <returns>A task representing the asynchronous monitoring operation</returns>
         public override async Task MonitorWatchList(BrainInstanceDTO brain, PerformanceMetrics metrics)
         {
+            // Validate brain configuration parameters
+            if (brain == null)
+            {
+                _logger.LogWarning("Brain configuration is null, skipping watch list monitoring");
+                MonitoringWatchList = false;
+                return;
+            }
+
+            if (brain.TargetWatches < 0)
+            {
+                _logger.LogWarning("Invalid TargetWatches in brain configuration: {TargetWatches}. Must be non-negative", brain.TargetWatches);
+                MonitoringWatchList = false;
+                return;
+            }
+
+            if (brain.UsageTarget <= 0)
+            {
+                _logger.LogWarning("Invalid UsageTarget in brain configuration: {UsageTarget}. Must be positive", brain.UsageTarget);
+                MonitoringWatchList = false;
+                return;
+            }
+
             if (MonitoringWatchList) return;
             MonitoringWatchList = true;
             try

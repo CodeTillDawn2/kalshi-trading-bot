@@ -9,6 +9,7 @@ using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashBot.State.Interfaces;
 using TradingStrategies.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Management
 {
@@ -16,7 +17,8 @@ namespace BacklashBot.Management
     /// Abstract base class providing common market management functionality for the Kalshi trading bot.
     /// Handles market reset operations, interest score calculations, and provides protected methods
     /// for adding/removing markets based on various criteria. Serves as the foundation for both
-    /// managed and unmanaged market management implementations.
+    /// managed and unmanaged market management implementations. Now includes configurable queue limits
+    /// and extracted target calculation service for improved testability.
     /// </summary>
     public abstract class BaseMarketManagerService : IMarketManagerService
     {
@@ -26,6 +28,7 @@ namespace BacklashBot.Management
         protected readonly IServiceScopeFactory _scopeFactory;
         protected readonly IBrainStatusService _brainStatus;
         protected readonly ICentralPerformanceMonitor _performanceMonitor;
+        protected readonly ITargetCalculationService _targetCalculationService;
         protected List<string> MarketsToReset = new List<string>();
         protected List<string> MarketsToAddAfterReset = new List<string>();
         protected bool _recentMarketAdjustment = false;
@@ -50,6 +53,7 @@ namespace BacklashBot.Management
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
         /// <param name="brainStatus">Service providing brain instance status information</param>
+        /// <param name="targetCalculationService">Service for calculating optimal market targets</param>
         protected BaseMarketManagerService(IServiceFactory serviceFactory,
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
@@ -58,7 +62,8 @@ namespace BacklashBot.Management
             IOptions<TradingConfig> tradingConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
-            IBrainStatusService brainStatus)
+            IBrainStatusService brainStatus,
+            ITargetCalculationService targetCalculationService)
         {
             _serviceFactory = serviceFactory;
             _scopeManagerService = scopeManagerService;
@@ -69,6 +74,7 @@ namespace BacklashBot.Management
             _executionConfig = executionConfig.Value;
             _performanceMonitor = performanceMonitor;
             _brainStatus = brainStatus;
+            _targetCalculationService = targetCalculationService;
         }
 
         /// <summary>
@@ -135,65 +141,22 @@ namespace BacklashBot.Management
 
         /// <summary>
         /// Calculates the optimal target number of markets to watch based on current performance metrics.
-        /// Uses multiple factors including usage targets, queue sizes, and notification patterns to
-        /// determine the ideal market count. Returns the minimum valid target from all calculated options.
+        /// Delegates to the target calculation service for improved testability and separation of concerns.
         /// </summary>
         /// <param name="metrics">Current performance metrics including usage, counts, and queue sizes</param>
         /// <param name="brain">Brain instance configuration containing usage limits and targets</param>
         /// <returns>The calculated target number of markets to watch</returns>
         public int CalculateTarget(PerformanceMetrics metrics, BrainInstanceDTO brain)
         {
-            const int MaxValidValue = int.MaxValue;
-            const int MinValidValue = 0; // Assuming non-negative targets
-
-            // Helper function to calculate target and validate result
-            int CalculateAndValidateTarget(double limit, double avg, int count)
-            {
-                if (count == 0 || avg == 0) return MaxValidValue; // Skip invalid cases
-                double perEachUsage = avg / count;
-                if (perEachUsage == 0) return MaxValidValue; // Avoid division by zero
-                double result = limit / perEachUsage;
-                int target = (int)Math.Floor(result);
-                if (target <= MinValidValue || target == int.MinValue) return MaxValidValue; // Skip overflow/invalid
-                return target;
-            }
-
-            // Target count by usage
-            int targetCountUsage = CalculateAndValidateTarget(brain.UsageTarget, metrics.CurrentUsage, metrics.CurrentCount);
-
-            // Target count by Notification Queue
-            int notificationQueueLimit = 50;
-            int targetCountNotificationQueue = CalculateAndValidateTarget(notificationQueueLimit, metrics.NotificationQueueAvg, metrics.CurrentCount);
-
-            // Target count by Orderbook Queue
-            int orderbookQueueLimit = 50;
-            int targetCountOrderbookQueue = CalculateAndValidateTarget(orderbookQueueLimit, metrics.OrderbookQueueAvg, metrics.CurrentCount);
-
-            // Target count by Event Queue
-            int eventQueueLimit = 50;
-            int targetCountEventQueue = CalculateAndValidateTarget(eventQueueLimit, metrics.EventQueueAvg, metrics.CurrentCount);
-
-            // Target count by Ticker Queue
-            int tickerQueueLimit = 50;
-            int targetCountTickerQueue = CalculateAndValidateTarget(tickerQueueLimit, metrics.TickerQueueAvg, metrics.CurrentCount);
-
-            // Collect valid targets
-            var validTargets = new List<int>();
-            if (targetCountUsage < MaxValidValue) validTargets.Add(targetCountUsage);
-            if (targetCountNotificationQueue < MaxValidValue) validTargets.Add(targetCountNotificationQueue);
-            if (targetCountOrderbookQueue < MaxValidValue) validTargets.Add(targetCountOrderbookQueue);
-            if (targetCountEventQueue < MaxValidValue) validTargets.Add(targetCountEventQueue);
-            if (targetCountTickerQueue < MaxValidValue) validTargets.Add(targetCountTickerQueue);
-
-            // Final target: Use minimum of valid targets, or start with 10 if none are valid
-            int actualTarget = validTargets.Any() ? validTargets.Min() : 10;
-
-            _logger.LogInformation("Calculated market targets - Usage: {Usage}, Notification: {Notification}, Orderbook: {Orderbook}, Event: {Event}, Ticker: {Ticker}, Final: {Selected}",
-                targetCountUsage, targetCountNotificationQueue, targetCountOrderbookQueue, targetCountEventQueue, targetCountTickerQueue, actualTarget);
-
-            return actualTarget;
+            return _targetCalculationService.CalculateTarget(metrics, brain);
         }
 
+        /// <summary>
+        /// Refreshes market data from the API for all markets that have been flagged for refresh.
+        /// This method processes the MarketsToRefresh queue, fetches updated market data from the API,
+        /// and triggers market reset operations for each refreshed market. Handles cancellation
+        /// and ensures thread-safe access to the refresh queue.
+        /// </summary>
         protected async Task RefreshMarkets()
         {
             var marketDataService = _serviceFactory.GetMarketDataService();
@@ -218,6 +181,12 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Processes all markets that have been flagged for reset operations.
+        /// This method handles two phases: first re-adding markets that were temporarily removed
+        /// and are ready to be watched again, then removing markets that need to be reset.
+        /// Ensures thread-safe access to reset queues and handles cancellation gracefully.
+        /// </summary>
         protected async Task ResetMarkets()
         {
             var marketDataService = _serviceFactory.GetMarketDataService();
@@ -286,6 +255,18 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Removes the specified number of markets with the lowest interest scores from the watch list.
+        /// This method identifies markets with low interest scores, ensures they don't have active positions
+        /// or orders (if configured to watch them), and removes them from the watch list. Markets with
+        /// missing interest scores are calculated on-demand before removal.
+        /// </summary>
+        /// <param name="context">Database context for accessing market watch and position data</param>
+        /// <param name="apiService">API service for market operations</param>
+        /// <param name="brain">Brain instance configuration containing watch settings</param>
+        /// <param name="marketsToRemoveCount">Number of markets to remove</param>
+        /// <param name="token">Cancellation token for the operation</param>
+        /// <returns>The number of markets successfully removed</returns>
         protected async Task<int> RemoveLowestInterestMarkets(IKalshiBotContext context, IKalshiAPIService apiService, BrainInstanceDTO brain,
             int marketsToRemoveCount, CancellationToken token)
         {
@@ -349,6 +330,14 @@ namespace BacklashBot.Management
             return removed;
         }
 
+        /// <summary>
+        /// Removes all markets that have ended from the watch list.
+        /// This method queries for finalized market watches (ended markets) associated with the current
+        /// brain instance, removes them from the watch list if they're still being watched, and cleans
+        /// up the database records. Markets that are no longer in the watch list are simply cleaned up.
+        /// </summary>
+        /// <param name="context">Database context for accessing market watch data</param>
+        /// <returns>The number of markets successfully removed</returns>
         protected async Task<int> RemoveEndedMarkets(IKalshiBotContext context)
         {
             int marketsRemoved = 0;
@@ -378,6 +367,18 @@ namespace BacklashBot.Management
             return marketsRemoved;
         }
 
+        /// <summary>
+        /// Adds the specified number of high-interest markets to the watch list.
+        /// This method prioritizes existing market watches with high interest scores, then discovers
+        /// new markets from active markets ordered by trading volume. Markets are added to the watch
+        /// list only if they meet the minimum interest threshold. Handles both existing watches that
+        /// need to be locked and new markets that need to be created.
+        /// </summary>
+        /// <param name="context">Database context for accessing market and watch data</param>
+        /// <param name="apiService">API service for market operations</param>
+        /// <param name="marketsToAddCount">Number of markets to add to the watch list</param>
+        /// <param name="minimumInterest">Minimum interest score required for a market to be added</param>
+        /// <returns>List of market tickers that were successfully added to the watch list</returns>
         protected async Task<List<string>> AddHighInterestMarkets(IKalshiBotContext context, IKalshiAPIService apiService, int marketsToAddCount, double minimumInterest)
         {
             if (marketsToAddCount == 0) return new List<string>();
@@ -518,6 +519,17 @@ namespace BacklashBot.Management
             return marketsAddedList;
         }
 
+        /// <summary>
+        /// Removes markets with interest scores below the minimum threshold from the watch list.
+        /// This method identifies markets with low interest scores that are locked to the current brain,
+        /// ensures they don't have active positions or orders (if configured to watch them), and removes
+        /// them from the watch list. Interest scores are recalculated if they're stale (older than 3 hours).
+        /// </summary>
+        /// <param name="context">Database context for accessing market watch and position data</param>
+        /// <param name="apiService">API service for market operations</param>
+        /// <param name="brain">Brain instance configuration containing watch settings</param>
+        /// <param name="minimumInterest">Minimum interest score threshold for market retention</param>
+        /// <returns>The number of markets successfully removed</returns>
         protected async Task<int> RemoveUninterestingMarkets(IKalshiBotContext context, IKalshiAPIService apiService, BrainInstanceDTO brain, double minimumInterest)
         {
             int removed = 0;
