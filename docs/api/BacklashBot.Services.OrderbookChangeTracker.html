@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class OrderbookChangeTracker | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class OrderbookChangeTracker | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Tracks and analyzes orderbook changes for a specific market in the Kalshi trading system. This class is responsible for processing orderbook snapshots, recording individual changes, matching trades to orderbook changes, calculating various market metrics (velocity, volume, rates), and maintaining a rolling window of orderbook events for analysis. It implements the IOrderbookChangeTracker interface and integrates with the broader trading bot ecosystem to provide real-time market data analysis and metrics calculation.">
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BacklashBot.Services.OrderbookChangeTracker">
+
+
+
+  <h1 id="BacklashBot_Services_OrderbookChangeTracker" data-uid="BacklashBot.Services.OrderbookChangeTracker" class="text-break">Class OrderbookChangeTracker</h1>
+  <div class="markdown level0 summary"><p>Tracks and analyzes orderbook changes for a specific market in the Kalshi trading system.
+This class is responsible for processing orderbook snapshots, recording individual changes,
+matching trades to orderbook changes, calculating various market metrics (velocity, volume, rates),
+and maintaining a rolling window of orderbook events for analysis. It implements the
+IOrderbookChangeTracker interface and integrates with the broader trading bot ecosystem
+to provide real-time market data analysis and metrics calculation.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">OrderbookChangeTracker</span></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="BacklashBot.Services.Interfaces.IOrderbookChangeTracker.html">IOrderbookChangeTracker</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="BacklashBot.html">BacklashBot</a>.<a class="xref" href="BacklashBot.Services.html">Services</a></h6>
+  <h6><strong>Assembly</strong>: BacklashBot.dll</h6>
+  <h5 id="BacklashBot_Services_OrderbookChangeTracker_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class OrderbookChangeTracker : IOrderbookChangeTracker, IDisposable</code></pre>
+  </div>
+  <h5 id="BacklashBot_Services_OrderbookChangeTracker_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>The tracker maintains concurrent queues for orderbook changes and trade events, using
+timers for periodic metric recalculation and cleanup of old events. It employs locking
+mechanisms to ensure thread safety during matching operations and supports cancellation
+tokens for graceful shutdown. Metrics are calculated over configurable time windows and
+include velocity per minute, trade rates, average trade sizes, and order volume analysis.</p>
+</div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker__ctor_System_String_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IOrderbookChangeTracker__BacklashBot_State_Interfaces_IDataCache_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_TradingConfig__BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.%23ctor(System.String%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.IOrderbookChangeTracker%7D%2CBacklashBot.State.Interfaces.IDataCache%2CMicrosoft.Extensions.Options.IOptions%7BTradingStrategies.Configuration.TradingConfig%7D%2CBacklashBot.Services.Interfaces.IScopeManagerService%2CBacklashBot.State.Interfaces.IStatusTrackerService)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L133">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker__ctor_" data-uid="BacklashBot.Services.OrderbookChangeTracker.#ctor*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker__ctor_System_String_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IOrderbookChangeTracker__BacklashBot_State_Interfaces_IDataCache_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_TradingConfig__BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_" data-uid="BacklashBot.Services.OrderbookChangeTracker.#ctor(System.String,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IOrderbookChangeTracker},BacklashBot.State.Interfaces.IDataCache,Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.TradingConfig},BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IStatusTrackerService)">OrderbookChangeTracker(string, ILogger&lt;IOrderbookChangeTracker&gt;, IDataCache, IOptions&lt;TradingConfig&gt;, IScopeManagerService, IStatusTrackerService)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the OrderbookChangeTracker for the specified market.
+Sets up timers for periodic metric recalculation and log output, initializes event queues,
+and prepares the tracker for processing orderbook changes and trades.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public OrderbookChangeTracker(string marketTicker, ILogger&lt;IOrderbookChangeTracker&gt; logger, IDataCache cache, IOptions&lt;TradingConfig&gt; config, IScopeManagerService scopeManagerService, IStatusTrackerService statusTrackerService)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">marketTicker</span></td>
+        <td><p>The ticker symbol of the market to track</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="BacklashBot.Services.Interfaces.IOrderbookChangeTracker.html">IOrderbookChangeTracker</a>&gt;</td>
+        <td><span class="parametername">logger</span></td>
+        <td><p>Logger instance for recording operations and errors</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BacklashBot.State.Interfaces.IDataCache.html">IDataCache</a></td>
+        <td><span class="parametername">cache</span></td>
+        <td><p>Shared data cache containing market data and system state</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="TradingStrategies.Configuration.TradingConfig.html">TradingConfig</a>&gt;</td>
+        <td><span class="parametername">config</span></td>
+        <td><p>Trading configuration containing time windows and thresholds</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BacklashBot.Services.Interfaces.IScopeManagerService.html">IScopeManagerService</a></td>
+        <td><span class="parametername">scopeManagerService</span></td>
+        <td><p>Service for managing dependency injection scopes</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BacklashBot.State.Interfaces.IStatusTrackerService.html">IStatusTrackerService</a></td>
+        <td><span class="parametername">statusTrackerService</span></td>
+        <td><p>Service for tracking system status and cancellation tokens</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when marketTicker, logger, config, or statusTrackerService is null</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_ChangeWindowDuration.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.ChangeWindowDuration%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L99">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_ChangeWindowDuration_" data-uid="BacklashBot.Services.OrderbookChangeTracker.ChangeWindowDuration*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_ChangeWindowDuration" data-uid="BacklashBot.Services.OrderbookChangeTracker.ChangeWindowDuration">ChangeWindowDuration</h4>
+  <div class="markdown level1 summary"><p>Gets the duration of the change window used for metric calculations.
+This determines how far back in time to consider orderbook changes and trades.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan ChangeWindowDuration { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td><p>The change window duration from configuration</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_IsMature.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.IsMature%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L81">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_IsMature_" data-uid="BacklashBot.Services.OrderbookChangeTracker.IsMature*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_IsMature" data-uid="BacklashBot.Services.OrderbookChangeTracker.IsMature">IsMature</h4>
+  <div class="markdown level1 summary"><p>Gets a value indicating whether the market has been open long enough to have mature metrics.
+Maturity is determined by comparing the elapsed time since market open to the configured change window duration.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsMature { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p>true if the market has been open for at least the change window duration, false otherwise</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="BacklashBot_Services_OrderbookChangeTracker_IsMature_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Mature markets have sufficient historical data for reliable metric calculations.
+This property is used to determine when metrics are ready for analysis.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_LastMarketOpenTime.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.LastMarketOpenTime%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L51">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_LastMarketOpenTime_" data-uid="BacklashBot.Services.OrderbookChangeTracker.LastMarketOpenTime*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_LastMarketOpenTime" data-uid="BacklashBot.Services.OrderbookChangeTracker.LastMarketOpenTime">LastMarketOpenTime</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the timestamp when the market last opened for trading.
+This is used to determine market maturity and calculate elapsed trading time.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DateTime LastMarketOpenTime { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><p>The UTC timestamp of the last market open, or DateTime.MinValue if never opened</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_Market.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.Market%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L60">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_Market_" data-uid="BacklashBot.Services.OrderbookChangeTracker.Market*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_Market" data-uid="BacklashBot.Services.OrderbookChangeTracker.Market">Market</h4>
+  <div class="markdown level1 summary"><p>Gets the market data object associated with this tracker.
+Returns null if the market is not found in the cache or if cancellation is requested.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IMarketData Market { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashBot.State.Interfaces.IMarketData.html">IMarketData</a></td>
+        <td><p>The market data object, or null if unavailable</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_OrderbookCancelWindow.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.OrderbookCancelWindow%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L113">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_OrderbookCancelWindow_" data-uid="BacklashBot.Services.OrderbookChangeTracker.OrderbookCancelWindow*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_OrderbookCancelWindow" data-uid="BacklashBot.Services.OrderbookChangeTracker.OrderbookCancelWindow">OrderbookCancelWindow</h4>
+  <div class="markdown level1 summary"><p>Gets the time window used for detecting orderbook change cancellations.
+This determines how far back to look when checking if opposing orderbook changes cancel each other out.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan OrderbookCancelWindow { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td><p>The orderbook cancel window duration from configuration</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_TradeMatchingWindow.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.TradeMatchingWindow%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L106">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_TradeMatchingWindow_" data-uid="BacklashBot.Services.OrderbookChangeTracker.TradeMatchingWindow*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_TradeMatchingWindow" data-uid="BacklashBot.Services.OrderbookChangeTracker.TradeMatchingWindow">TradeMatchingWindow</h4>
+  <div class="markdown level1 summary"><p>Gets the time window used for matching trades to orderbook changes.
+This determines how far back and forward to look when correlating trades with orderbook activity.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan TradeMatchingWindow { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td><p>The trade matching window duration from configuration</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_Dispose.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1718">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_Dispose_" data-uid="BacklashBot.Services.OrderbookChangeTracker.Dispose*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_Dispose" data-uid="BacklashBot.Services.OrderbookChangeTracker.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"><p>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetAverageTradeSize_MakerNo_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetAverageTradeSize_MakerNo(System.Collections.Generic.List%7BBacklashDTOs.OrderbookChange%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1534">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetAverageTradeSize_MakerNo_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetAverageTradeSize_MakerNo*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetAverageTradeSize_MakerNo_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetAverageTradeSize_MakerNo(System.Collections.Generic.List{BacklashDTOs.OrderbookChange})">GetAverageTradeSize_MakerNo(List&lt;OrderbookChange&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double GetAverageTradeSize_MakerNo(List&lt;OrderbookChange&gt; tradeEvents)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookChange.html">OrderbookChange</a>&gt;</td>
+        <td><span class="parametername">tradeEvents</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetAverageTradeSize_MakerYes_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetAverageTradeSize_MakerYes(System.Collections.Generic.List%7BBacklashDTOs.OrderbookChange%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1506">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetAverageTradeSize_MakerYes_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetAverageTradeSize_MakerYes*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetAverageTradeSize_MakerYes_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetAverageTradeSize_MakerYes(System.Collections.Generic.List{BacklashDTOs.OrderbookChange})">GetAverageTradeSize_MakerYes(List&lt;OrderbookChange&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double GetAverageTradeSize_MakerYes(List&lt;OrderbookChange&gt; tradeEvents)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookChange.html">OrderbookChange</a>&gt;</td>
+        <td><span class="parametername">tradeEvents</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetBottomLevels_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetBottomLevels(System.Collections.Generic.List%7BBacklashDTOs.OrderbookData%7D%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1211">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetBottomLevels_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetBottomLevels*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetBottomLevels_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Int32_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetBottomLevels(System.Collections.Generic.List{BacklashDTOs.OrderbookData},System.Int32)">GetBottomLevels(List&lt;OrderbookData&gt;, int)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int GetBottomLevels(List&lt;OrderbookData&gt; Bids, int upperBound)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookData.html">OrderbookData</a>&gt;</td>
+        <td><span class="parametername">Bids</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">upperBound</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetBottomNoVelocityPerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Collections_Generic_List_BacklashDTOs_OrderbookChange__System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetBottomNoVelocityPerMinute(System.Collections.Generic.List%7BBacklashDTOs.OrderbookData%7D%2CSystem.Collections.Generic.List%7BBacklashDTOs.OrderbookChange%7D%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1149">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetBottomNoVelocityPerMinute_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetBottomNoVelocityPerMinute*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetBottomNoVelocityPerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Collections_Generic_List_BacklashDTOs_OrderbookChange__System_Int32_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetBottomNoVelocityPerMinute(System.Collections.Generic.List{BacklashDTOs.OrderbookData},System.Collections.Generic.List{BacklashDTOs.OrderbookChange},System.Int32)">GetBottomNoVelocityPerMinute(List&lt;OrderbookData&gt;, List&lt;OrderbookChange&gt;, int)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double Volume, int Levels) GetBottomNoVelocityPerMinute(List&lt;OrderbookData&gt; noBids, List&lt;OrderbookChange&gt; orderbookChanges, int threshold)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookData.html">OrderbookData</a>&gt;</td>
+        <td><span class="parametername">noBids</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookChange.html">OrderbookChange</a>&gt;</td>
+        <td><span class="parametername">orderbookChanges</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">threshold</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.volume">Volume</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.levels">Levels</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetBottomYesVelocityPerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Collections_Generic_List_BacklashDTOs_OrderbookChange__System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetBottomYesVelocityPerMinute(System.Collections.Generic.List%7BBacklashDTOs.OrderbookData%7D%2CSystem.Collections.Generic.List%7BBacklashDTOs.OrderbookChange%7D%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1222">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetBottomYesVelocityPerMinute_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetBottomYesVelocityPerMinute*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetBottomYesVelocityPerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Collections_Generic_List_BacklashDTOs_OrderbookChange__System_Int32_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetBottomYesVelocityPerMinute(System.Collections.Generic.List{BacklashDTOs.OrderbookData},System.Collections.Generic.List{BacklashDTOs.OrderbookChange},System.Int32)">GetBottomYesVelocityPerMinute(List&lt;OrderbookData&gt;, List&lt;OrderbookChange&gt;, int)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double Volume, int Levels) GetBottomYesVelocityPerMinute(List&lt;OrderbookData&gt; yesBids, List&lt;OrderbookChange&gt; orderbookChanges, int threshold)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookData.html">OrderbookData</a>&gt;</td>
+        <td><span class="parametername">yesBids</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookChange.html">OrderbookChange</a>&gt;</td>
+        <td><span class="parametername">orderbookChanges</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">threshold</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.volume">Volume</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.levels">Levels</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetNoNetOrderVolumePerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetNoNetOrderVolumePerMinute(System.Collections.Generic.List%7BBacklashDTOs.OrderbookChange%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1406">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetNoNetOrderVolumePerMinute_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetNoNetOrderVolumePerMinute*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetNoNetOrderVolumePerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetNoNetOrderVolumePerMinute(System.Collections.Generic.List{BacklashDTOs.OrderbookChange})">GetNoNetOrderVolumePerMinute(List&lt;OrderbookChange&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double Volume, int Count) GetNoNetOrderVolumePerMinute(List&lt;OrderbookChange&gt; noBidChanges)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookChange.html">OrderbookChange</a>&gt;</td>
+        <td><span class="parametername">noBidChanges</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.volume">Volume</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.levels">Levels</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetTopLevels_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetTopLevels(System.Collections.Generic.List%7BBacklashDTOs.OrderbookData%7D%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1201">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetTopLevels_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTopLevels*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetTopLevels_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Int32_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTopLevels(System.Collections.Generic.List{BacklashDTOs.OrderbookData},System.Int32)">GetTopLevels(List&lt;OrderbookData&gt;, int)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int GetTopLevels(List&lt;OrderbookData&gt; Bids, int lowerBound)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookData.html">OrderbookData</a>&gt;</td>
+        <td><span class="parametername">Bids</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">lowerBound</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetTopNoVelocityPerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Collections_Generic_List_BacklashDTOs_OrderbookChange__System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetTopNoVelocityPerMinute(System.Collections.Generic.List%7BBacklashDTOs.OrderbookData%7D%2CSystem.Collections.Generic.List%7BBacklashDTOs.OrderbookChange%7D%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1274">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetTopNoVelocityPerMinute_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTopNoVelocityPerMinute*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetTopNoVelocityPerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Collections_Generic_List_BacklashDTOs_OrderbookChange__System_Int32_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTopNoVelocityPerMinute(System.Collections.Generic.List{BacklashDTOs.OrderbookData},System.Collections.Generic.List{BacklashDTOs.OrderbookChange},System.Int32)">GetTopNoVelocityPerMinute(List&lt;OrderbookData&gt;, List&lt;OrderbookChange&gt;, int)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double Volume, int Levels) GetTopNoVelocityPerMinute(List&lt;OrderbookData&gt; noBids, List&lt;OrderbookChange&gt; orderbookChanges, int threshold)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookData.html">OrderbookData</a>&gt;</td>
+        <td><span class="parametername">noBids</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookChange.html">OrderbookChange</a>&gt;</td>
+        <td><span class="parametername">orderbookChanges</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">threshold</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.volume">Volume</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.levels">Levels</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetTopYesVelocityPerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Collections_Generic_List_BacklashDTOs_OrderbookChange__System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetTopYesVelocityPerMinute(System.Collections.Generic.List%7BBacklashDTOs.OrderbookData%7D%2CSystem.Collections.Generic.List%7BBacklashDTOs.OrderbookChange%7D%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1326">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetTopYesVelocityPerMinute_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTopYesVelocityPerMinute*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetTopYesVelocityPerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Collections_Generic_List_BacklashDTOs_OrderbookChange__System_Int32_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTopYesVelocityPerMinute(System.Collections.Generic.List{BacklashDTOs.OrderbookData},System.Collections.Generic.List{BacklashDTOs.OrderbookChange},System.Int32)">GetTopYesVelocityPerMinute(List&lt;OrderbookData&gt;, List&lt;OrderbookChange&gt;, int)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double Volume, int Levels) GetTopYesVelocityPerMinute(List&lt;OrderbookData&gt; yesBids, List&lt;OrderbookChange&gt; orderbookChanges, int threshold)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookData.html">OrderbookData</a>&gt;</td>
+        <td><span class="parametername">yesBids</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookChange.html">OrderbookChange</a>&gt;</td>
+        <td><span class="parametername">orderbookChanges</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">threshold</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.volume">Volume</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.levels">Levels</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetTradeCount_MakerNo.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetTradeCount_MakerNo%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1586">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetTradeCount_MakerNo_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTradeCount_MakerNo*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetTradeCount_MakerNo" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTradeCount_MakerNo">GetTradeCount_MakerNo()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int GetTradeCount_MakerNo()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetTradeCount_MakerYes.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetTradeCount_MakerYes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1562">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetTradeCount_MakerYes_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTradeCount_MakerYes*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetTradeCount_MakerYes" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTradeCount_MakerYes">GetTradeCount_MakerYes()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int GetTradeCount_MakerYes()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetTradeRatePerMinute_MakerNo_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetTradeRatePerMinute_MakerNo(System.Collections.Generic.List%7BBacklashDTOs.OrderbookChange%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1470">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetTradeRatePerMinute_MakerNo_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTradeRatePerMinute_MakerNo*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetTradeRatePerMinute_MakerNo_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTradeRatePerMinute_MakerNo(System.Collections.Generic.List{BacklashDTOs.OrderbookChange})">GetTradeRatePerMinute_MakerNo(List&lt;OrderbookChange&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double rate, double volume) GetTradeRatePerMinute_MakerNo(List&lt;OrderbookChange&gt; noTradeRelatedChanges)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookChange.html">OrderbookChange</a>&gt;</td>
+        <td><span class="parametername">noTradeRelatedChanges</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.accuracy">Accuracy</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.avgscore">AvgScore</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetTradeRatePerMinute_MakerYes_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetTradeRatePerMinute_MakerYes(System.Collections.Generic.List%7BBacklashDTOs.OrderbookChange%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1434">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetTradeRatePerMinute_MakerYes_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTradeRatePerMinute_MakerYes*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetTradeRatePerMinute_MakerYes_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetTradeRatePerMinute_MakerYes(System.Collections.Generic.List{BacklashDTOs.OrderbookChange})">GetTradeRatePerMinute_MakerYes(List&lt;OrderbookChange&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double rate, double volume) GetTradeRatePerMinute_MakerYes(List&lt;OrderbookChange&gt; yesTradeRelatedChanges)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookChange.html">OrderbookChange</a>&gt;</td>
+        <td><span class="parametername">yesTradeRelatedChanges</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.accuracy">Accuracy</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.avgscore">AvgScore</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_GetYesNetOrderVolumePerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.GetYesNetOrderVolumePerMinute(System.Collections.Generic.List%7BBacklashDTOs.OrderbookChange%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L1378">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_GetYesNetOrderVolumePerMinute_" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetYesNetOrderVolumePerMinute*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_GetYesNetOrderVolumePerMinute_System_Collections_Generic_List_BacklashDTOs_OrderbookChange__" data-uid="BacklashBot.Services.OrderbookChangeTracker.GetYesNetOrderVolumePerMinute(System.Collections.Generic.List{BacklashDTOs.OrderbookChange})">GetYesNetOrderVolumePerMinute(List&lt;OrderbookChange&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double Volume, int Count) GetYesNetOrderVolumePerMinute(List&lt;OrderbookChange&gt; yesBidChanges)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookChange.html">OrderbookChange</a>&gt;</td>
+        <td><span class="parametername">yesBidChanges</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.volume">Volume</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.levels">Levels</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_ProcessOrderbookSnapshot_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Collections_Generic_List_BacklashDTOs_OrderbookData__.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.ProcessOrderbookSnapshot(System.Collections.Generic.List%7BBacklashDTOs.OrderbookData%7D%2CSystem.Collections.Generic.List%7BBacklashDTOs.OrderbookData%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L281">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_ProcessOrderbookSnapshot_" data-uid="BacklashBot.Services.OrderbookChangeTracker.ProcessOrderbookSnapshot*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_ProcessOrderbookSnapshot_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Collections_Generic_List_BacklashDTOs_OrderbookData__" data-uid="BacklashBot.Services.OrderbookChangeTracker.ProcessOrderbookSnapshot(System.Collections.Generic.List{BacklashDTOs.OrderbookData},System.Collections.Generic.List{BacklashDTOs.OrderbookData})">ProcessOrderbookSnapshot(List&lt;OrderbookData&gt;, List&lt;OrderbookData&gt;)</h4>
+  <div class="markdown level1 summary"><p>Processes a complete orderbook snapshot by comparing it with the previous state.
+Calculates deltas for each price level, records individual orderbook changes,
+and triggers metric recalculation. Handles market reset scenarios when snapshots
+are empty or when significant time gaps are detected.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ProcessOrderbookSnapshot(List&lt;OrderbookData&gt; originalOrderbook, List&lt;OrderbookData&gt; newOrderbook)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookData.html">OrderbookData</a>&gt;</td>
+        <td><span class="parametername">originalOrderbook</span></td>
+        <td><p>The previous orderbook state, or null for initial snapshot</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.OrderbookData.html">OrderbookData</a>&gt;</td>
+        <td><span class="parametername">newOrderbook</span></td>
+        <td><p>The current orderbook state to process</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="BacklashBot_Services_OrderbookChangeTracker_ProcessOrderbookSnapshot_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Collections_Generic_List_BacklashDTOs_OrderbookData___remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method is called periodically with full orderbook data. It compares the new
+snapshot against the previous one to identify changes, then records each change
+individually. If the original orderbook is null or a 2-minute gap is detected,
+it resets the event queues and recalculates metrics to ensure data consistency.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_RecalculateAllMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.RecalculateAllMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L649">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_RecalculateAllMetrics_" data-uid="BacklashBot.Services.OrderbookChangeTracker.RecalculateAllMetrics*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_RecalculateAllMetrics" data-uid="BacklashBot.Services.OrderbookChangeTracker.RecalculateAllMetrics">RecalculateAllMetrics()</h4>
+  <div class="markdown level1 summary"><p>Triggers a complete recalculation of all market metrics including cleanup of old events.
+This method performs standard metrics recalculation and updates current snapshot metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RecalculateAllMetrics()</code></pre>
+  </div>
+  <h5 id="BacklashBot_Services_OrderbookChangeTracker_RecalculateAllMetrics_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method is called periodically by the recalculation timer and also on-demand
+when significant changes occur. It ensures all metrics remain current and accurate.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_RecordOrderbookChange_System_String_System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.RecordOrderbookChange(System.String%2CSystem.Int32%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L351">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_RecordOrderbookChange_" data-uid="BacklashBot.Services.OrderbookChangeTracker.RecordOrderbookChange*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_RecordOrderbookChange_System_String_System_Int32_System_Int32_" data-uid="BacklashBot.Services.OrderbookChangeTracker.RecordOrderbookChange(System.String,System.Int32,System.Int32)">RecordOrderbookChange(string, int, int)</h4>
+  <div class="markdown level1 summary"><p>Records an individual orderbook change event with the specified parameters.
+Creates a new OrderbookChange object, attempts to match it with existing trades,
+checks for canceling orderbook changes, and enqueues the change for processing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RecordOrderbookChange(string side, int price, int deltaContracts)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">side</span></td>
+        <td><p>The side of the orderbook (&quot;yes&quot; or &quot;no&quot;)</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">price</span></td>
+        <td><p>The price level of the change</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">deltaContracts</span></td>
+        <td><p>The change in contract count (positive for additions, negative for reductions)</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="BacklashBot_Services_OrderbookChangeTracker_RecordOrderbookChange_System_String_System_Int32_System_Int32__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method is called for each individual orderbook change detected. It creates
+a timestamped change record, attempts to correlate it with trade events, and
+checks for order cancellations. The change is added to the processing queue
+and metrics are marked as needing recalculation.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_RecordTrade_System_String_System_Int32_System_Int32_System_Int32_System_DateTime_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.RecordTrade(System.String%2CSystem.Int32%2CSystem.Int32%2CSystem.Int32%2CSystem.DateTime)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L409">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_RecordTrade_" data-uid="BacklashBot.Services.OrderbookChangeTracker.RecordTrade*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_RecordTrade_System_String_System_Int32_System_Int32_System_Int32_System_DateTime_" data-uid="BacklashBot.Services.OrderbookChangeTracker.RecordTrade(System.String,System.Int32,System.Int32,System.Int32,System.DateTime)">RecordTrade(string, int, int, int, DateTime)</h4>
+  <div class="markdown level1 summary"><p>Records a trade event with the specified parameters and attempts to match it
+with corresponding orderbook changes. The trade is enqueued for processing
+and metrics are marked for recalculation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RecordTrade(string takerSide, int yesPrice, int noPrice, int count, DateTime timestamp)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">takerSide</span></td>
+        <td><p>The side of the taker in the trade (&quot;yes&quot; or &quot;no&quot;)</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">yesPrice</span></td>
+        <td><p>The price on the yes side of the trade</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">noPrice</span></td>
+        <td><p>The price on the no side of the trade</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">count</span></td>
+        <td><p>The number of contracts traded</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">timestamp</span></td>
+        <td><p>The timestamp when the trade occurred</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="BacklashBot_Services_OrderbookChangeTracker_RecordTrade_System_String_System_Int32_System_Int32_System_Int32_System_DateTime__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method processes incoming trade data, creates a TradeEvent object,
+and attempts to correlate it with orderbook changes that may have caused
+the trade. Successful matches help distinguish between market-making
+activity and actual trading volume.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_Shutdown.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.Shutdown%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L170">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_Shutdown_" data-uid="BacklashBot.Services.OrderbookChangeTracker.Shutdown*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_Shutdown" data-uid="BacklashBot.Services.OrderbookChangeTracker.Shutdown">Shutdown()</h4>
+  <div class="markdown level1 summary"><p>Performs complete shutdown of the OrderbookChangeTracker, stopping timers,
+clearing all event queues, resetting state, and disposing resources.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Shutdown()</code></pre>
+  </div>
+  <h5 id="BacklashBot_Services_OrderbookChangeTracker_Shutdown_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method should be called when the tracker is no longer needed.
+It ensures clean shutdown and prevents resource leaks.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_Stop.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.Stop%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L259">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_Stop_" data-uid="BacklashBot.Services.OrderbookChangeTracker.Stop*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_Stop" data-uid="BacklashBot.Services.OrderbookChangeTracker.Stop">Stop()</h4>
+  <div class="markdown level1 summary"><p>Stops the periodic timers used for metric recalculation and log output.
+This method halts background processing without clearing data or disposing resources.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Stop()</code></pre>
+  </div>
+  <h5 id="BacklashBot_Services_OrderbookChangeTracker_Stop_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Use this method to temporarily pause processing. Call Shutdown() for complete cleanup.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker_UpdateMarketStatus_System_Boolean_System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker.UpdateMarketStatus(System.Boolean%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L226">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderbookChangeTracker_UpdateMarketStatus_" data-uid="BacklashBot.Services.OrderbookChangeTracker.UpdateMarketStatus*"></a>
+  <h4 id="BacklashBot_Services_OrderbookChangeTracker_UpdateMarketStatus_System_Boolean_System_Boolean_" data-uid="BacklashBot.Services.OrderbookChangeTracker.UpdateMarketStatus(System.Boolean,System.Boolean)">UpdateMarketStatus(bool, bool)</h4>
+  <div class="markdown level1 summary"><p>Updates the market status and handles market opening/closing transitions.
+When the market opens, it starts the recalculation timer and sets the open time.
+When the market closes, it clears event queues and stops the timer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void UpdateMarketStatus(bool isExchangeActive, bool isTradingActive)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">isExchangeActive</span></td>
+        <td><p>Whether the exchange is currently active</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">isTradingActive</span></td>
+        <td><p>Whether trading is currently active for this market</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="BacklashBot_Services_OrderbookChangeTracker_UpdateMarketStatus_System_Boolean_System_Boolean__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method is called when market status changes are detected. It manages
+the lifecycle of the tracker's processing based on market availability.</p>
+</div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="BacklashBot.Services.Interfaces.IOrderbookChangeTracker.html">IOrderbookChangeTracker</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderbookChangeTracker.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderbookChangeTracker%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderbookChangeTracker.cs/#L28" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class StrategySelectionHelper | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class StrategySelectionHelper | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Centralized configuration utility for trading strategy parameter sets and instance creation. Provides predefined parameter configurations for various trading strategies including BollingerBreakout, Breakout2, FlowMomentumStrat, NothingEverHappensStrat, and MomentumTrading. Serves as a factory for creating strategy instances with different parameter combinations for backtesting and optimization.">
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper">
+
+
+
+  <h1 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper" class="text-break">Class StrategySelectionHelper</h1>
+  <div class="markdown level0 summary"><p>Centralized configuration utility for trading strategy parameter sets and instance creation.
+Provides predefined parameter configurations for various trading strategies including BollingerBreakout,
+Breakout2, FlowMomentumStrat, NothingEverHappensStrat, and MomentumTrading. Serves as a factory
+for creating strategy instances with different parameter combinations for backtesting and optimization.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">StrategySelectionHelper</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="TradingStrategies.html">TradingStrategies</a>.<a class="xref" href="TradingStrategies.Trading.html">Trading</a>.<a class="xref" href="TradingStrategies.Trading.Helpers.html">Helpers</a></h6>
+  <h6><strong>Assembly</strong>: TradingStrategies.dll</h6>
+  <h5 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class StrategySelectionHelper</code></pre>
+  </div>
+  <h5 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>This class maintains static readonly collections of parameter sets that correspond to the ParamKey
+enums defined in each strategy implementation. The parameter sets are organized by strategy type
+and provide variations for different market conditions and risk profiles.</p>
+</div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper__ctor.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L29">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper__ctor_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.#ctor*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper__ctor" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.#ctor">StrategySelectionHelper()</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the StrategySelectionHelper class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StrategySelectionHelper()</code></pre>
+  </div>
+  <h5 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper__ctor_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Strategy configuration is now centralized in the StrategyConfiguration class.
+This constructor is primarily for consistency and potential future initialization needs.</p>
+</div>
+  <h3 id="fields">Fields
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_BollingerParameterSets.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.BollingerParameterSets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L46">View Source</a>
+  </span>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_BollingerParameterSets" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.BollingerParameterSets">BollingerParameterSets</h4>
+  <div class="markdown level1 summary"><p>Predefined parameter sets for BollingerBreakout strategy configurations.
+Each set contains tuned parameters for different market conditions and risk profiles,
+including variations in squeeze thresholds, absorption levels, signal strength requirements,
+and velocity thresholds for both Bollinger and standalone signals.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly List&lt;(string Name, Dictionary&lt;BollingerBreakout.ParamKey, double&gt; Parameters)&gt; BollingerParameterSets</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.collections.generic.dictionary-tradingstrategies.strategies.strats.bollingerbreakout.paramkey,system.double--.name">Name</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strats.BollingerBreakout.html">BollingerBreakout</a>.<a class="xref" href="TradingStrategies.Strategies.Strats.BollingerBreakout.ParamKey.html">ParamKey</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt; <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.collections.generic.dictionary-tradingstrategies.strategies.strats.bollingerbreakout.paramkey,system.double--.parameters">Parameters</a>)&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_BollingerParameterSets_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>These parameter sets correspond to the BollingerBreakout.ParamKey enum and are used
+to create strategy instances with different behavioral characteristics for backtesting
+and optimization across various market scenarios.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_BreakoutParameterSets.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.BreakoutParameterSets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L452">View Source</a>
+  </span>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_BreakoutParameterSets" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.BreakoutParameterSets">BreakoutParameterSets</h4>
+  <div class="markdown level1 summary"><p>Predefined parameter sets for Breakout2 strategy configurations.
+Contains comprehensive parameter variations for the advanced breakout strategy,
+including controls for absorption thresholds, velocity ratios, spike detection,
+trade rate/event share confirmations, and exit conditions based on RSI flattening.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly List&lt;(string Name, Dictionary&lt;Breakout2.ParamKey, double&gt; Parameters)&gt; BreakoutParameterSets</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.collections.generic.dictionary-tradingstrategies.strategies.strats.breakout2.paramkey,system.double--.name">Name</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strats.Breakout2.html">Breakout2</a>.<a class="xref" href="TradingStrategies.Strategies.Strats.Breakout2.ParamKey.html">ParamKey</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt; <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.collections.generic.dictionary-tradingstrategies.strategies.strats.breakout2.paramkey,system.double--.parameters">Parameters</a>)&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_BreakoutParameterSets_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>These parameter sets correspond to the Breakout2.ParamKey enum and provide
+extensive configuration options for different market conditions, from tight controls
+to extreme edge cases, enabling thorough strategy optimization and testing.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_FlowMomentumParameterSets.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.FlowMomentumParameterSets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L1093">View Source</a>
+  </span>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_FlowMomentumParameterSets" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.FlowMomentumParameterSets">FlowMomentumParameterSets</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly List&lt;(string Name, Dictionary&lt;FlowMomentumStrat.ParamKey, double&gt; Parameters)&gt; FlowMomentumParameterSets</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.collections.generic.dictionary-tradingstrategies.strategies.strats.flowmomentumstrat.paramkey,system.double--.name">Name</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strats.FlowMomentumStrat.html">FlowMomentumStrat</a>.<a class="xref" href="TradingStrategies.Strategies.Strats.FlowMomentumStrat.ParamKey.html">ParamKey</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt; <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.collections.generic.dictionary-tradingstrategies.strategies.strats.flowmomentumstrat.paramkey,system.double--.parameters">Parameters</a>)&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_MomentumTradingParameterSets.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.MomentumTradingParameterSets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2032">View Source</a>
+  </span>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_MomentumTradingParameterSets" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.MomentumTradingParameterSets">MomentumTradingParameterSets</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly List&lt;(string Name, Dictionary&lt;MomentumTrading.ParamKey, double&gt; Parameters)&gt; MomentumTradingParameterSets</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.collections.generic.dictionary-tradingstrategies.strategies.strats.momentumtrading.paramkey,system.double--.name">Name</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strats.MomentumTrading.html">MomentumTrading</a>.<a class="xref" href="TradingStrategies.Strategies.Strats.MomentumTrading.ParamKey.html">ParamKey</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt; <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.collections.generic.dictionary-tradingstrategies.strategies.strats.momentumtrading.paramkey,system.double--.parameters">Parameters</a>)&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_NothingEverHappensParameterSets.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.NothingEverHappensParameterSets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L1563">View Source</a>
+  </span>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_NothingEverHappensParameterSets" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.NothingEverHappensParameterSets">NothingEverHappensParameterSets</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly List&lt;(string Name, Dictionary&lt;NothingEverHappensStrat.ParamKey, double&gt; Parameters)&gt; NothingEverHappensParameterSets</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.collections.generic.dictionary-tradingstrategies.strategies.strats.nothingeverhappensstrat.paramkey,system.double--.name">Name</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strats.NothingEverHappensStrat.html">NothingEverHappensStrat</a>.<a class="xref" href="TradingStrategies.Strategies.Strats.NothingEverHappensStrat.ParamKey.html">ParamKey</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt; <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.collections.generic.dictionary-tradingstrategies.strategies.strats.nothingeverhappensstrat.paramkey,system.double--.parameters">Parameters</a>)&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_CreateStrategyInstance_System_String_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.CreateStrategyInstance(System.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2313">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_CreateStrategyInstance_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.CreateStrategyInstance*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_CreateStrategyInstance_System_String_System_String_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.CreateStrategyInstance(System.String,System.String)">CreateStrategyInstance(string, string)</h4>
+  <div class="markdown level1 summary"><p>Creates a strategy instance with the specified parameter set for all applicable market types.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; CreateStrategyInstance(string setKey, string weightName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">setKey</span></td>
+        <td><p>The strategy type identifier (e.g., &quot;Bollinger&quot;, &quot;Breakout2&quot;).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">weightName</span></td>
+        <td><p>The name of the parameter set to use for strategy configuration.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td><p>A dictionary mapping market types to their corresponding strategy instances.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_CreateStrategyInstance_System_String_System_String__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method uses the StrategyConfiguration factory pattern to create strategy instances
+with the specified parameter configuration. The returned dictionary provides strategies
+tailored for different market conditions (LowLiquidity, Bouncing, Trending, etc.).</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_CreateTrainingStrategyInstances_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.CreateTrainingStrategyInstances(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2329">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_CreateTrainingStrategyInstances_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.CreateTrainingStrategyInstances*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_CreateTrainingStrategyInstances_System_String_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.CreateTrainingStrategyInstances(System.String)">CreateTrainingStrategyInstances(string)</h4>
+  <div class="markdown level1 summary"><p>Creates strategy instances for all available parameter sets of a strategy type for training purposes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt; CreateTrainingStrategyInstances(string setKey)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">setKey</span></td>
+        <td><p>The strategy type identifier (e.g., &quot;Bollinger&quot;, &quot;Breakout2&quot;).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;</td>
+        <td><p>A list of dictionaries, each mapping market types to strategy instances for different parameter sets.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_CreateTrainingStrategyInstances_System_String__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method generates strategy instances for every parameter configuration available for the specified
+strategy type, enabling comprehensive backtesting and optimization across all parameter combinations.
+Each dictionary in the returned list represents one parameter set applied across all market types.</p>
+</div>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown when the specified setKey is not recognized.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBollingerBreakoutStrategiesForTraining.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBollingerBreakoutStrategiesForTraining%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2610">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBollingerBreakoutStrategiesForTraining_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBollingerBreakoutStrategiesForTraining*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBollingerBreakoutStrategiesForTraining" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBollingerBreakoutStrategiesForTraining">GetBollingerBreakoutStrategiesForTraining()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt; GetBollingerBreakoutStrategiesForTraining()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBollingerBreakoutStrategy_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBollingerBreakoutStrategy(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2449">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBollingerBreakoutStrategy_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBollingerBreakoutStrategy*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBollingerBreakoutStrategy_System_String_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBollingerBreakoutStrategy(System.String)">GetBollingerBreakoutStrategy(string)</h4>
+  <div class="markdown level1 summary"><p>Creates a BollingerBreakout strategy instance with the specified parameter set.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; GetBollingerBreakoutStrategy(string weightName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">weightName</span></td>
+        <td><p>The name of the parameter set to use for the BollingerBreakout strategy.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td><p>A dictionary mapping market types to BollingerBreakout strategy instances.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBollingerBreakoutStrategy_System_String__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method instantiates a BollingerBreakout strategy with the specified parameter configuration
+and maps it to all applicable market types using the standard market strategy mapping.
+The strategy detects breakouts from Bollinger Band squeezes with velocity and volume confirmations.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBreakoutStrategiesForTraining.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBreakoutStrategiesForTraining%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2645">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBreakoutStrategiesForTraining_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBreakoutStrategiesForTraining*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBreakoutStrategiesForTraining" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBreakoutStrategiesForTraining">GetBreakoutStrategiesForTraining()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt; GetBreakoutStrategiesForTraining()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBreakoutStrategy.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBreakoutStrategy%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2632">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBreakoutStrategy_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBreakoutStrategy*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBreakoutStrategy" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBreakoutStrategy">GetBreakoutStrategy()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; GetBreakoutStrategy()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBreakoutStrategy_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBreakoutStrategy(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2462">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBreakoutStrategy_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBreakoutStrategy*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetBreakoutStrategy_System_String_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetBreakoutStrategy(System.String)">GetBreakoutStrategy(string)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; GetBreakoutStrategy(string weightName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">weightName</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetFlowMomentumStrategiesForTraining.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetFlowMomentumStrategiesForTraining%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2552">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetFlowMomentumStrategiesForTraining_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetFlowMomentumStrategiesForTraining*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetFlowMomentumStrategiesForTraining" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetFlowMomentumStrategiesForTraining">GetFlowMomentumStrategiesForTraining()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt; GetFlowMomentumStrategiesForTraining()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetFlowMomentumStrategy.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetFlowMomentumStrategy%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2665">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetFlowMomentumStrategy_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetFlowMomentumStrategy*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetFlowMomentumStrategy" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetFlowMomentumStrategy">GetFlowMomentumStrategy()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; GetFlowMomentumStrategy()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetFlowMomentumStrategy_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetFlowMomentumStrategy(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2486">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetFlowMomentumStrategy_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetFlowMomentumStrategy*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetFlowMomentumStrategy_System_String_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetFlowMomentumStrategy(System.String)">GetFlowMomentumStrategy(string)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; GetFlowMomentumStrategy(string weightName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">weightName</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMLSharedStrategiesForTraining.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMLSharedStrategiesForTraining%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2368">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMLSharedStrategiesForTraining_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMLSharedStrategiesForTraining*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMLSharedStrategiesForTraining" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMLSharedStrategiesForTraining">GetMLSharedStrategiesForTraining()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt; GetMLSharedStrategiesForTraining()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMLSharedStrategy_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMLSharedStrategy(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2352">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMLSharedStrategy_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMLSharedStrategy*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMLSharedStrategy_System_String_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMLSharedStrategy(System.String)">GetMLSharedStrategy(string)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; GetMLSharedStrategy(string weightName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">weightName</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMomentumTradingStrategiesForTraining.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMomentumTradingStrategiesForTraining%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2533">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMomentumTradingStrategiesForTraining_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMomentumTradingStrategiesForTraining*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMomentumTradingStrategiesForTraining" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMomentumTradingStrategiesForTraining">GetMomentumTradingStrategiesForTraining()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt; GetMomentumTradingStrategiesForTraining()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMomentumTradingStrategy_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMomentumTradingStrategy(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2521">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMomentumTradingStrategy_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMomentumTradingStrategy*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetMomentumTradingStrategy_System_String_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetMomentumTradingStrategy(System.String)">GetMomentumTradingStrategy(string)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; GetMomentumTradingStrategy(string weightName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">weightName</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetNothingEverHappensStrategiesForTraining.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetNothingEverHappensStrategiesForTraining%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2688">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetNothingEverHappensStrategiesForTraining_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetNothingEverHappensStrategiesForTraining*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetNothingEverHappensStrategiesForTraining" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetNothingEverHappensStrategiesForTraining">GetNothingEverHappensStrategiesForTraining()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt; GetNothingEverHappensStrategiesForTraining()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetNothingEverHappensStrategy.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetNothingEverHappensStrategy%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2678">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetNothingEverHappensStrategy_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetNothingEverHappensStrategy*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetNothingEverHappensStrategy" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetNothingEverHappensStrategy">GetNothingEverHappensStrategy()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; GetNothingEverHappensStrategy()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetNothingEverHappensStrategy_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetNothingEverHappensStrategy(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2474">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetNothingEverHappensStrategy_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetNothingEverHappensStrategy*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetNothingEverHappensStrategy_System_String_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetNothingEverHappensStrategy(System.String)">GetNothingEverHappensStrategy(string)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; GetNothingEverHappensStrategy(string weightName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">weightName</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetParameterSetNames_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetParameterSetNames(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2290">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetParameterSetNames_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetParameterSetNames*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetParameterSetNames_System_String_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetParameterSetNames(System.String)">GetParameterSetNames(string)</h4>
+  <div class="markdown level1 summary"><p>Retrieves the names of all available parameter sets for a specific strategy type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;string&gt; GetParameterSetNames(string setKey)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">setKey</span></td>
+        <td><p>The strategy type identifier (e.g., &quot;Bollinger&quot;, &quot;Breakout2&quot;, &quot;FlowMo&quot;).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><p>An enumerable collection of parameter set names for the specified strategy type.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetParameterSetNames_System_String__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method provides access to all predefined parameter configurations for a given strategy,
+enabling selection of different parameter combinations for backtesting and optimization.
+Returns an empty collection if the strategy type is not recognized.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetSlopeMomentumStrategiesForTraining.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetSlopeMomentumStrategiesForTraining%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2571">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetSlopeMomentumStrategiesForTraining_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetSlopeMomentumStrategiesForTraining*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetSlopeMomentumStrategiesForTraining" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetSlopeMomentumStrategiesForTraining">GetSlopeMomentumStrategiesForTraining()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt; GetSlopeMomentumStrategiesForTraining()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetSlopeMomentumStrategy_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetSlopeMomentumStrategy(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2509">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetSlopeMomentumStrategy_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetSlopeMomentumStrategy*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetSlopeMomentumStrategy_System_String_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetSlopeMomentumStrategy(System.String)">GetSlopeMomentumStrategy(string)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; GetSlopeMomentumStrategy(string weightName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">weightName</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetStrategyNames.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetStrategyNames%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2279">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetStrategyNames_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetStrategyNames*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetStrategyNames" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetStrategyNames">GetStrategyNames()</h4>
+  <div class="markdown level1 summary"><p>Retrieves the names of all available trading strategies.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;string&gt; GetStrategyNames()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><p>An enumerable collection of strategy names supported by the system.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetStrategyNames_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method delegates to StrategyConfiguration.GetStrategyNames() to provide
+a centralized way to discover available strategy types for configuration and instantiation.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetTryAgainStrategiesForTraining.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetTryAgainStrategiesForTraining%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2590">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetTryAgainStrategiesForTraining_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetTryAgainStrategiesForTraining*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetTryAgainStrategiesForTraining" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetTryAgainStrategiesForTraining">GetTryAgainStrategiesForTraining()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt; GetTryAgainStrategiesForTraining()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetTryAgainStrategy_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetTryAgainStrategy(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L2498">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetTryAgainStrategy_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetTryAgainStrategy*"></a>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetTryAgainStrategy_System_String_" data-uid="TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetTryAgainStrategy(System.String)">GetTryAgainStrategy(string)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt; GetTryAgainStrategy(string weightName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">weightName</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategySelectionHelper.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategySelectionHelper%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategySelectionHelper.cs/#L20" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

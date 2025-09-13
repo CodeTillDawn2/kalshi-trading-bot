@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Namespace BacklashPatterns.PatternDefinitions | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Namespace BacklashPatterns.PatternDefinitions | Kalshi Trading Bot Documentation ">
+    
+    
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BacklashPatterns.PatternDefinitions">
+
+  <h1 id="BacklashPatterns_PatternDefinitions" data-uid="BacklashPatterns.PatternDefinitions" class="text-break">Namespace BacklashPatterns.PatternDefinitions</h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="markdown level0 remarks"></div>
+    <h3 id="classes">
+Classes
+</h3>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.AbandonedBabyPattern.html">AbandonedBabyPattern</a></h4>
+      <section><p>Represents an Abandoned Baby candlestick pattern, a rare 3-candle reversal pattern.
+Bullish: Indicates a potential reversal from a downtrend to an uptrend.
+Bearish: Indicates a potential reversal from an uptrend to a downtrend.
+Requirements (Source: Investopedia, BabyPips):</p>
+<ul>
+<li>First candle: Strong directional move (bullish for bearish pattern, bearish for bullish).</li>
+<li>Middle candle: Doji (small body, shows indecision), gapped from first candle.</li>
+<li>Third candle: Opposite direction of first, gapped from Doji, confirms reversal.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.BeltHoldPattern.html">BeltHoldPattern</a></h4>
+      <section><p>Represents a Belt Hold candlestick pattern, a single-candle reversal pattern.
+Bullish: Indicates a potential reversal from a downtrend to an uptrend.
+Bearish: Indicates a potential reversal from an uptrend to a downtrend.
+Requirements (Source: BabyPips, TradingView, Investopedia, with refinements):</p>
+<ul>
+<li>Single candle with a large body dominating the range.</li>
+<li>Minimal wick on the opening side (lower for bullish, upper for bearish).</li>
+<li>Occurs after a clear, consistent prior trend (downtrend for bullish, uptrend for bearish).</li>
+<li>Significant reversal relative to the prior trend and recent volatility.
+Optimized for: A 0-100 fixed-range market with loose thresholds to maximize detection.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.BeltHoldPattern_old.html">BeltHoldPattern_old</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.BreakawayPattern.html">BreakawayPattern</a></h4>
+      <section><p>Represents a Breakaway candlestick pattern, a five-candle reversal pattern.
+Bullish: Indicates a potential reversal from a downtrend to an uptrend.
+Bearish: Indicates a potential reversal from an uptrend to a downtrend.
+Requirements (Source: BabyPips, TradingView, Investopedia):</p>
+<ul>
+<li>First candle: Strong move in the prior trend direction (bearish for bullish pattern, bullish for bearish pattern).</li>
+<li>Middle three candles: Consolidation with small bodies and tight range.</li>
+<li>Fifth candle: Strong breakout in the reversal direction, closing beyond the consolidation range.</li>
+<li>Occurs after a clear trend (downtrend for bullish, uptrend for bearish), measured via TrendDirectionRatio.
+Optimized for ML: Relative scaling based on lookback average range, gap relaxed to 0 for markets without gaps.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.BreakawayPattern_old.html">BreakawayPattern_old</a></h4>
+      <section><p>Represents a Breakaway candlestick pattern, a 5-candle reversal pattern.
+Bullish: Indicates a reversal from a downtrend to an uptrend after consolidation.
+Bearish: Indicates a reversal from an uptrend to a downtrend after consolidation.
+Requirements (Source: Investopedia, TradingView):</p>
+<ul>
+<li>First candle: Strong move in trend direction (bearish for bullish pattern, bullish for bearish).</li>
+<li>Middle 3 candles: Consolidation with small bodies and ranges.</li>
+<li>Fifth candle: Strong move opposite to first, breaks out of consolidation with a gap.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ClosingMarubozuPattern.html">ClosingMarubozuPattern</a></h4>
+      <section><p>Represents a Closing Marubozu candlestick pattern, a single-candle pattern indicating strong momentum.
+Bullish Continuation: Strong buying pressure in an uptrend, potential continuation.
+Bullish Reversal: Strong buying pressure after a downtrend, potential reversal.
+Bearish Continuation: Strong selling pressure in a downtrend, potential continuation.
+Bearish Reversal: Strong selling pressure after an uptrend, potential reversal.
+Requirements (Source: Investopedia, DailyFX):</p>
+<ul>
+<li>Single candle with no shadows (open equals low and close equals high for bullish;
+open equals high and close equals low for bearish).</li>
+<li>Significant body size relative to lookback average range, showing decisive movement.</li>
+<li>Continuation or reversal determined by prior trend via TrendDirectionRatio.
+Optimized for ML: Relative scaling based on lookback average range, no gap reliance.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ClosingMarubozuPattern_old.html">ClosingMarubozuPattern_old</a></h4>
+      <section><p>Represents a Closing Marubozu candlestick pattern, a single-candle pattern indicating strong momentum.
+Bullish: Strong buying pressure, potential continuation or reversal in a downtrend.
+Bearish: Strong selling pressure, potential continuation or reversal in an uptrend.
+Requirements (Source: Investopedia, DailyFX):</p>
+<ul>
+<li>Single candle with no shadows (open equals low and close equals high for bullish;
+open equals high and close equals low for bearish).</li>
+<li>Significant body size, showing decisive movement.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ConcealingBabySwallowPattern.html">ConcealingBabySwallowPattern</a></h4>
+      <section><p>Represents a Concealing Baby Swallow candlestick pattern, a 4-candle bullish reversal pattern.
+Indicates a potential reversal from a downtrend to an uptrend.
+Requirements (Source: BabyPips, TradingView):</p>
+<ul>
+<li>Occurs in a downtrend.</li>
+<li>First two candles: Strong bearish (near Marubozu) with small wicks, small gap between.</li>
+<li>Third candle: Bearish with upper wick overlapping second, slowing momentum.</li>
+<li>Fourth candle: Bearish, engulfs third, closes below second low, signals reversal.
+Optimized for ML: Relative scaling based on lookback average range, gap relaxed to 0.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ConcealingBabySwallowPattern_old.html">ConcealingBabySwallowPattern_old</a></h4>
+      <section><p>Represents a Concealing Baby Swallow candlestick pattern, a 4-candle bullish reversal pattern.
+Indicates a potential reversal from a downtrend to an uptrend.
+Requirements (Source: BabyPips, TradingView):</p>
+<ul>
+<li>Occurs in a downtrend.</li>
+<li>First two candles: Strong bearish (near Marubozu) with small wicks, small gap between.</li>
+<li>Third candle: Bearish with upper wick overlapping second, slowing momentum.</li>
+<li>Fourth candle: Bearish, engulfs third, closes below second low, signals reversal.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.CounterattackPattern.html">CounterattackPattern</a></h4>
+      <section><p>Represents a Counterattack candlestick pattern, a 2-candle reversal pattern.
+Bullish: Indicates a potential reversal from a downtrend to an uptrend.
+Bearish: Indicates a potential reversal from an uptrend to a downtrend.
+Requirements (Source: TradingView, BabyPips):</p>
+<ul>
+<li>Occurs after a strong trend (downtrend for bullish, uptrend for bearish).</li>
+<li>First candle: Strong move in trend direction (bearish for bullish, bullish for bearish).</li>
+<li>Second candle: Opposite direction, similar size, closes near first open, not engulfing.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.CounterattackPattern2.html">CounterattackPattern2</a></h4>
+      <section><p>Represents a Counterattack candlestick pattern, a two-candle reversal pattern.
+Bullish: Indicates a potential reversal from a downtrend to an uptrend.
+Bearish: Indicates a potential reversal from an uptrend to a downtrend.
+Requirements (Source: TradingView, BabyPips):</p>
+<ul>
+<li>Occurs after a clear trend (downtrend for bullish, uptrend for bearish), measured via TrendDirectionRatio.</li>
+<li>First candle: Strong move in trend direction (bearish for bullish, bullish for bearish).</li>
+<li>Second candle: Opposite direction, similar size, closes near first open, not engulfing.
+Optimized for ML: Relative scaling based on lookback average range, loosened for broader detection across timeframes.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.DarkCloudCoverPattern.html">DarkCloudCoverPattern</a></h4>
+      <section><p>Represents a Dark Cloud Cover candlestick pattern, a 2-candle bearish reversal pattern.
+Indicates a potential reversal from an uptrend to a downtrend.
+Requirements (Source: Investopedia, BabyPips):</p>
+<ul>
+<li>Occurs after an uptrend.</li>
+<li>First candle: Bullish, showing strong buying.</li>
+<li>Second candle: Bearish, opens above first close (often gapped up), closes significantly into first candle s body (typically below midpoint but above open).</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.DojiPattern.html">DojiPattern</a></h4>
+      <section><p>Represents a Doji candlestick pattern, a single-candle pattern indicating indecision.
+Suggests potential reversal or continuation depending on prior trend.
+Requirements (Source: Investopedia, DailyFX):</p>
+<ul>
+<li>Single candle with a very small body (open and close nearly equal).</li>
+<li>Shadows can vary, but total range should be significant relative to prior volatility.</li>
+<li>Meaningful only after a clear trend, measured via TrendDirectionRatio.
+Optimized for ML: Relative scaling based on lookback average range, no volume dependency.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.EveningDojiStarPattern.html">EveningDojiStarPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.HangingManPattern.html">HangingManPattern</a></h4>
+      <section><p>The Hanging Man is a single-candle bearish reversal pattern appearing after an uptrend.</p>
+<ul>
+<li>Small body, long lower wick, minimal upper wick.</li>
+<li>Suggests selling pressure after a rise, potential top.
+Indicates: Bearish reversal if confirmed by subsequent decline.
+Source: <a href="https://www.investopedia.com/terms/h/hangingman.asp">https://www.investopedia.com/terms/h/hangingman.asp</a></li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.HaramiPattern.html">HaramiPattern</a></h4>
+      <section><p>The Harami pattern is a two-candle reversal pattern indicating a potential trend change.
+Requirements:</p>
+<ul>
+<li>First candle: Large body in the direction of the prevailing trend (bullish in uptrend, bearish in downtrend).</li>
+<li>Second candle: Smaller body fully contained within the first candle s body, opposite direction.</li>
+<li>Trend: Occurs after a defined trend (downtrend for Bullish Harami, uptrend for Bearish Harami).
+Indicates:</li>
+<li>Bullish Harami: Potential reversal from downtrend to uptrend.</li>
+<li>Bearish Harami: Potential reversal from uptrend to downtrend.
+Source: <a href="https://www.investopedia.com/terms/h/harami.asp">https://www.investopedia.com/terms/h/harami.asp</a></li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.HighWaveCandlePattern.html">HighWaveCandlePattern</a></h4>
+      <section><p>The High Wave Candle is a single-candle pattern indicating indecision in the market.</p>
+<ul>
+<li>Large total range with a small body and long upper and lower wicks.</li>
+<li>Suggests volatility and potential reversal or continuation depending on context.
+Indicates: Uncertainty; often appears at tops or bottoms.
+Source: <a href="https://www.babypips.com/learn/forex/high-wave-candlestick">https://www.babypips.com/learn/forex/high-wave-candlestick</a></li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.HikkakePattern.html">HikkakePattern</a></h4>
+      <section><p>The Hikkake pattern is a three-candle reversal pattern used to identify potential reversals after a false breakout.</p>
+<ul>
+<li>First candle: Establishes the range.</li>
+<li>Second candle: An inside bar followed by a breakout (bearish) or breakdown (bullish).</li>
+<li>Third candle: Reverses the breakout direction, signaling a trap for traders.
+Indicates: Bullish Hikkake suggests a reversal from downtrend to uptrend; Bearish suggests uptrend to downtrend.
+Source: <a href="https://www.investopedia.com/terms/h/hikkake-pattern.asp">https://www.investopedia.com/terms/h/hikkake-pattern.asp</a></li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.HomingPigeonPattern.html">HomingPigeonPattern</a></h4>
+      <section><p>The Homing Pigeon is a two-candle bullish reversal pattern occurring after a downtrend.</p>
+<ul>
+<li>Two bearish candles where the second is smaller and contained within the first s range.</li>
+<li>Indicates slowing bearish momentum and potential reversal to the upside.
+Source: <a href="https://www.babypips.com/learn/forex/homing-pigeon">https://www.babypips.com/learn/forex/homing-pigeon</a></li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.IdenticalThreeCrowsPattern.html">IdenticalThreeCrowsPattern</a></h4>
+      <section><p>The Identical Three Crows is a three-candle bearish reversal pattern occurring after an uptrend.</p>
+<ul>
+<li>Three similar-sized bearish candles with descending closes and opens near the previous close.</li>
+<li>Indicates strong selling pressure and a potential trend reversal to the downside.
+Source: <a href="https://www.investopedia.com/terms/t/three_black_crows.asp">https://www.investopedia.com/terms/t/three_black_crows.asp</a> (similar but stricter variant)</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.InNeckPattern.html">InNeckPattern</a></h4>
+      <section><p>The In Neck Pattern is a two-candle continuation pattern in a downtrend.</p>
+<ul>
+<li>First candle bearish, second bullish with close near first close.</li>
+<li>Indicates temporary pause in downtrend, likely to continue downward.
+Source: <a href="https://www.babypips.com/learn/forex/in-neck-pattern">https://www.babypips.com/learn/forex/in-neck-pattern</a></li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.InvertedHammerPattern.html">InvertedHammerPattern</a></h4>
+      <section><p>The Inverted Hammer is a single-candle bullish reversal pattern after a downtrend.</p>
+<ul>
+<li>Small body, long upper wick, minimal lower wick, bullish direction.</li>
+<li>Indicates potential buying pressure and reversal to the upside.
+Source: <a href="https://www.investopedia.com/terms/i/invertedhammer.asp">https://www.investopedia.com/terms/i/invertedhammer.asp</a></li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.KickingByLengthPattern.html">KickingByLengthPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.KickingPattern.html">KickingPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.LadderBottomPattern.html">LadderBottomPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.LongLeggedDojiPattern.html">LongLeggedDojiPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.LongLineCandlePattern.html">LongLineCandlePattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.MarubozuPattern.html">MarubozuPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.MatHoldPattern.html">MatHoldPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ModifiedHikkakePattern.html">ModifiedHikkakePattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.MorningDojiStarPattern.html">MorningDojiStarPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.MorningStarPattern.html">MorningStarPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.OnNeckPattern.html">OnNeckPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.PatternDefinition.html">PatternDefinition</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.PiercingPattern.html">PiercingPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.RickshawManPattern.html">RickshawManPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.RisingFallingThreeMethodsPattern.html">RisingFallingThreeMethodsPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.SeparatingLinesPattern.html">SeparatingLinesPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ShootingStarPattern.html">ShootingStarPattern</a></h4>
+      <section><p>Identifies a Shooting Star pattern, a single bearish reversal candlestick with a small body
+and long upper wick, signaling rejection of higher prices after an uptrend.</p>
+<p>Requirements (Source: Investopedia, &quot;Shooting Star&quot;):</p>
+<ul>
+<li>Small body near the low of the candle (bearish).</li>
+<li>Long upper wick, typically at least twice the body size.</li>
+<li>Minimal or no lower wick.</li>
+<li>Occurs after an uptrend.</li>
+<li>Indicates potential reversal to the downside.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ShortLineCandlePattern.html">ShortLineCandlePattern</a></h4>
+      <section><p>Identifies a Short Line Candle pattern, a single candlestick with a small body and range,
+indicating indecision or a potential reversal after a strong trend.</p>
+<p>Requirements (Source: Investopedia, &quot;Short Line Candle&quot;):</p>
+<ul>
+<li>Small body (close near open), typically less than average candle size.</li>
+<li>Small total range (high to low), showing low volatility.</li>
+<li>Occurs after a defined trend (bullish after downtrend, bearish after uptrend).</li>
+<li>Indicates potential reversal or continuation depending on context.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.SpinningTopPattern.html">SpinningTopPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.StalledPattern.html">StalledPattern</a></h4>
+      <section><p>Identifies a Stalled Pattern, a three-candle reversal pattern signaling a weakening uptrend,
+often indicating a potential top or pause in bullish momentum.</p>
+<p>Requirements (Source: BabyPips, &quot;Stalled Pattern&quot;):</p>
+<ul>
+<li>First candle: Strong bullish candle with a large body.</li>
+<li>Second candle: Bullish candle with a smaller body, closing above the first.</li>
+<li>Third candle: Small body (bullish or bearish), closing below the second but near the first,
+showing momentum stalling.</li>
+<li>Occurs in an established uptrend.</li>
+<li>Suggests a potential reversal or consolidation.</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.StickSandwichPattern.html">StickSandwichPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.TakuriPattern.html">TakuriPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.TasukiGapPattern.html">TasukiGapPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ThreeAdvancingWhiteSoldiersPattern.html">ThreeAdvancingWhiteSoldiersPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ThreeBlackCrowsPattern.html">ThreeBlackCrowsPattern</a></h4>
+      <section><p>Represents a Three Black Crows pattern.</p>
+<ul>
+<li>A bearish reversal pattern with three consecutive bearish candles, each opening near the previous close and closing lower, with small wicks, signaling a strong downtrend after an uptrend.
+Source: Investopedia (<a href="https://www.investopedia.com/terms/t/three_black_crows.asp">https://www.investopedia.com/terms/t/three_black_crows.asp</a>)</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ThreeInsidePattern.html">ThreeInsidePattern</a></h4>
+      <section><p>Represents a Three Inside pattern (Up or Down).</p>
+<ul>
+<li>Three Inside Up: A bullish reversal pattern with a long bearish candle, followed by a smaller bullish candle contained within its body, and a third bullish candle closing above the first candle's open, indicating a potential uptrend after a downtrend.</li>
+<li>Three Inside Down: A bearish reversal pattern with a long bullish candle, followed by a smaller bearish candle contained within its body, and a third bearish candle closing below the first candle's open, signaling a potential downtrend after an uptrend.
+Source: Investopedia (<a href="https://www.investopedia.com/terms/t/three-inside-up.asp">https://www.investopedia.com/terms/t/three-inside-up.asp</a>, <a href="https://www.investopedia.com/terms/t/three-inside-down.asp">https://www.investopedia.com/terms/t/three-inside-down.asp</a>)</li>
+</ul>
+</section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ThreeLineStrikePattern.html">ThreeLineStrikePattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ThreeOutsidePattern.html">ThreeOutsidePattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ThreeStarsInTheSouthPattern.html">ThreeStarsInTheSouthPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.ThrustingPattern.html">ThrustingPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.TristarPattern.html">TristarPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.TwoCrowsPattern.html">TwoCrowsPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.Unique3RiverPattern.html">Unique3RiverPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.UpDownGapSideBySideWhiteLinesPattern.html">UpDownGapSideBySideWhiteLinesPattern</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BacklashPatterns.PatternDefinitions.UpsideGapTwoCrowsPattern.html">UpsideGapTwoCrowsPattern</a></h4>
+      <section></section>
+
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

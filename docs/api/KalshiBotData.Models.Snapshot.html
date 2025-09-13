@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class Snapshot | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class Snapshot | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Represents a comprehensive snapshot of market state and trading activity at a specific point in time. This entity captures detailed market data including pricing, volume, velocity metrics, and order book information for analysis, backtesting, and trading strategy evaluation. Snapshots serve as the primary data structure for understanding market behavior and making informed trading decisions.">
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="KalshiBotData.Models.Snapshot">
+
+
+
+  <h1 id="KalshiBotData_Models_Snapshot" data-uid="KalshiBotData.Models.Snapshot" class="text-break">Class Snapshot</h1>
+  <div class="markdown level0 summary"><p>Represents a comprehensive snapshot of market state and trading activity at a specific point in time.
+This entity captures detailed market data including pricing, volume, velocity metrics, and order book
+information for analysis, backtesting, and trading strategy evaluation. Snapshots serve as the
+primary data structure for understanding market behavior and making informed trading decisions.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">Snapshot</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="KalshiBotData.html">KalshiBotData</a>.<a class="xref" href="KalshiBotData.Models.html">Models</a></h6>
+  <h6><strong>Assembly</strong>: KalshiBotData.dll</h6>
+  <h5 id="KalshiBotData_Models_Snapshot_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class Snapshot</code></pre>
+  </div>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_AverageTradeSize_No.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.AverageTradeSize_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L103">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_AverageTradeSize_No_" data-uid="KalshiBotData.Models.Snapshot.AverageTradeSize_No*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_AverageTradeSize_No" data-uid="KalshiBotData.Models.Snapshot.AverageTradeSize_No">AverageTradeSize_No</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the average trade size for no positions.
+This represents the typical number of contracts per no trade.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? AverageTradeSize_No { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_AverageTradeSize_Yes.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.AverageTradeSize_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L97">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_AverageTradeSize_Yes_" data-uid="KalshiBotData.Models.Snapshot.AverageTradeSize_Yes*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_AverageTradeSize_Yes" data-uid="KalshiBotData.Models.Snapshot.AverageTradeSize_Yes">AverageTradeSize_Yes</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the average trade size for yes positions.
+This represents the typical number of contracts per yes trade.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? AverageTradeSize_Yes { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_BrainInstance.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.BrainInstance%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L129">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_BrainInstance_" data-uid="KalshiBotData.Models.Snapshot.BrainInstance*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_BrainInstance" data-uid="KalshiBotData.Models.Snapshot.BrainInstance">BrainInstance</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the brain instance that captured this snapshot.
+This identifies which trading bot instance created this snapshot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string? BrainInstance { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_ChangeMetricsMature.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.ChangeMetricsMature%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L37">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_ChangeMetricsMature_" data-uid="KalshiBotData.Models.Snapshot.ChangeMetricsMature*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_ChangeMetricsMature" data-uid="KalshiBotData.Models.Snapshot.ChangeMetricsMature">ChangeMetricsMature</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether the change metrics in this snapshot are considered mature.
+Mature metrics indicate that the snapshot has sufficient historical data for reliable analysis.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ChangeMetricsMature { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_IsValidated.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.IsValidated%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L115">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_IsValidated_" data-uid="KalshiBotData.Models.Snapshot.IsValidated*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_IsValidated" data-uid="KalshiBotData.Models.Snapshot.IsValidated">IsValidated</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether this snapshot has been validated for data integrity.
+Validated snapshots are considered reliable for analysis and trading decisions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool? IsValidated { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_JSONSchemaVersion.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.JSONSchemaVersion%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L31">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_JSONSchemaVersion_" data-uid="KalshiBotData.Models.Snapshot.JSONSchemaVersion*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_JSONSchemaVersion" data-uid="KalshiBotData.Models.Snapshot.JSONSchemaVersion">JSONSchemaVersion</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the version of the JSON schema used for this snapshot.
+This ensures compatibility and proper deserialization of snapshot data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int JSONSchemaVersion { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_Market.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.Market%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L135">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_Market_" data-uid="KalshiBotData.Models.Snapshot.Market*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_Market" data-uid="KalshiBotData.Models.Snapshot.Market">Market</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the navigation property to the associated Market entity.
+This provides access to the market details and related trading information.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Market Market { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.Market.html">Market</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_MarketTicker.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.MarketTicker%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L19">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_MarketTicker_" data-uid="KalshiBotData.Models.Snapshot.MarketTicker*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_MarketTicker" data-uid="KalshiBotData.Models.Snapshot.MarketTicker">MarketTicker</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the market ticker identifier for this snapshot.
+This identifies the specific market contract that this snapshot represents.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string MarketTicker { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_MarketType.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.MarketType%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L141">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_MarketType_" data-uid="KalshiBotData.Models.Snapshot.MarketType*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_MarketType" data-uid="KalshiBotData.Models.Snapshot.MarketType">MarketType</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the navigation property to the associated MarketType entity.
+This provides access to the market type classification and related data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MarketType MarketType { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.MarketType.html">MarketType</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_MarketTypeID.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.MarketTypeID%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L109">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_MarketTypeID_" data-uid="KalshiBotData.Models.Snapshot.MarketTypeID*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_MarketTypeID" data-uid="KalshiBotData.Models.Snapshot.MarketTypeID">MarketTypeID</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the market type identifier for this snapshot.
+This categorizes the market (e.g., binary outcome, range, etc.).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int? MarketTypeID { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_OrderVolume_No_Bid.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.OrderVolume_No_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L79">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_OrderVolume_No_Bid_" data-uid="KalshiBotData.Models.Snapshot.OrderVolume_No_Bid*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_OrderVolume_No_Bid" data-uid="KalshiBotData.Models.Snapshot.OrderVolume_No_Bid">OrderVolume_No_Bid</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the order volume for no bids in the recent period.
+This represents the total number of no orders placed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? OrderVolume_No_Bid { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_OrderVolume_Yes_Bid.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.OrderVolume_Yes_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L73">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_OrderVolume_Yes_Bid_" data-uid="KalshiBotData.Models.Snapshot.OrderVolume_Yes_Bid*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_OrderVolume_Yes_Bid" data-uid="KalshiBotData.Models.Snapshot.OrderVolume_Yes_Bid">OrderVolume_Yes_Bid</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the order volume for yes bids in the recent period.
+This represents the total number of yes orders placed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? OrderVolume_Yes_Bid { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_PositionSize.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.PositionSize%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L43">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_PositionSize_" data-uid="KalshiBotData.Models.Snapshot.PositionSize*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_PositionSize" data-uid="KalshiBotData.Models.Snapshot.PositionSize">PositionSize</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the size of the trading position at the time of this snapshot.
+This represents the net exposure in the market contract.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int PositionSize { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_RawJSON.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.RawJSON%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L121">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_RawJSON_" data-uid="KalshiBotData.Models.Snapshot.RawJSON*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_RawJSON" data-uid="KalshiBotData.Models.Snapshot.RawJSON">RawJSON</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the raw JSON data containing the complete snapshot information.
+This field uses a custom JSON converter to preserve the original data format.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;r&quot;)]
+[JsonConverter(typeof(RawJsonStringConverter))]
+public string RawJSON { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_SnapshotDate.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.SnapshotDate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L25">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_SnapshotDate_" data-uid="KalshiBotData.Models.Snapshot.SnapshotDate*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_SnapshotDate" data-uid="KalshiBotData.Models.Snapshot.SnapshotDate">SnapshotDate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the timestamp when this snapshot was captured.
+This provides the exact point in time that this market state represents.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DateTime SnapshotDate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_TradeVolume_No.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.TradeVolume_No%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L91">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_TradeVolume_No_" data-uid="KalshiBotData.Models.Snapshot.TradeVolume_No*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_TradeVolume_No" data-uid="KalshiBotData.Models.Snapshot.TradeVolume_No">TradeVolume_No</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the trade volume for no positions in the recent period.
+This represents the total number of no contracts traded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? TradeVolume_No { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_TradeVolume_Yes.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.TradeVolume_Yes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L85">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_TradeVolume_Yes_" data-uid="KalshiBotData.Models.Snapshot.TradeVolume_Yes*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_TradeVolume_Yes" data-uid="KalshiBotData.Models.Snapshot.TradeVolume_Yes">TradeVolume_Yes</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the trade volume for yes positions in the recent period.
+This represents the total number of yes contracts traded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? TradeVolume_Yes { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_VelocityPerMinute_Bottom_No_Bid.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.VelocityPerMinute_Bottom_No_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L67">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_VelocityPerMinute_Bottom_No_Bid_" data-uid="KalshiBotData.Models.Snapshot.VelocityPerMinute_Bottom_No_Bid*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_VelocityPerMinute_Bottom_No_Bid" data-uid="KalshiBotData.Models.Snapshot.VelocityPerMinute_Bottom_No_Bid">VelocityPerMinute_Bottom_No_Bid</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the velocity (rate of change) of the bottom no bid price per minute.
+This measures how quickly the worst no bid is changing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? VelocityPerMinute_Bottom_No_Bid { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_VelocityPerMinute_Bottom_Yes_Bid.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.VelocityPerMinute_Bottom_Yes_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L61">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_VelocityPerMinute_Bottom_Yes_Bid_" data-uid="KalshiBotData.Models.Snapshot.VelocityPerMinute_Bottom_Yes_Bid*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_VelocityPerMinute_Bottom_Yes_Bid" data-uid="KalshiBotData.Models.Snapshot.VelocityPerMinute_Bottom_Yes_Bid">VelocityPerMinute_Bottom_Yes_Bid</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the velocity (rate of change) of the bottom yes bid price per minute.
+This measures how quickly the worst yes bid is changing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? VelocityPerMinute_Bottom_Yes_Bid { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_VelocityPerMinute_Top_No_Bid.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.VelocityPerMinute_Top_No_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L55">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_VelocityPerMinute_Top_No_Bid_" data-uid="KalshiBotData.Models.Snapshot.VelocityPerMinute_Top_No_Bid*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_VelocityPerMinute_Top_No_Bid" data-uid="KalshiBotData.Models.Snapshot.VelocityPerMinute_Top_No_Bid">VelocityPerMinute_Top_No_Bid</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the velocity (rate of change) of the top no bid price per minute.
+This measures how quickly the best no bid is changing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? VelocityPerMinute_Top_No_Bid { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot_VelocityPerMinute_Top_Yes_Bid.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot.VelocityPerMinute_Top_Yes_Bid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L49">View Source</a>
+  </span>
+  <a id="KalshiBotData_Models_Snapshot_VelocityPerMinute_Top_Yes_Bid_" data-uid="KalshiBotData.Models.Snapshot.VelocityPerMinute_Top_Yes_Bid*"></a>
+  <h4 id="KalshiBotData_Models_Snapshot_VelocityPerMinute_Top_Yes_Bid" data-uid="KalshiBotData.Models.Snapshot.VelocityPerMinute_Top_Yes_Bid">VelocityPerMinute_Top_Yes_Bid</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the velocity (rate of change) of the top yes bid price per minute.
+This measures how quickly the best yes bid is changing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double? VelocityPerMinute_Top_Yes_Bid { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_ToSnapshotDTO_KalshiBotData_Models_Snapshot_">SnapshotExtensions.ToSnapshotDTO(Snapshot)</a>
+  </div>
+  <div>
+      <a class="xref" href="KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_UpdateSnapshot_KalshiBotData_Models_Snapshot_BacklashDTOs_Data_SnapshotDTO_">SnapshotExtensions.UpdateSnapshot(Snapshot, SnapshotDTO)</a>
+  </div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Models_Snapshot.md&amp;value=---%0Auid%3A%20KalshiBotData.Models.Snapshot%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Models/Snapshot.cs/#L13" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

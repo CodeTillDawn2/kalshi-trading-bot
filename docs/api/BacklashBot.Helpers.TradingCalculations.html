@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class TradingCalculations | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class TradingCalculations | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Provides static utility methods for various trading calculations, including technical indicators, position metrics, and mathematical operations. This class is used throughout the trading bot for computing EMA, liquidation prices, fees, ROI, and other essential calculations. All methods are designed to be thread-safe and efficient for real-time trading operations.">
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BacklashBot.Helpers.TradingCalculations">
+
+
+
+  <h1 id="BacklashBot_Helpers_TradingCalculations" data-uid="BacklashBot.Helpers.TradingCalculations" class="text-break">Class TradingCalculations</h1>
+  <div class="markdown level0 summary"><p>Provides static utility methods for various trading calculations, including technical indicators, position metrics, and mathematical operations.
+This class is used throughout the trading bot for computing EMA, liquidation prices, fees, ROI, and other essential calculations.
+All methods are designed to be thread-safe and efficient for real-time trading operations.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">TradingCalculations</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="BacklashBot.html">BacklashBot</a>.<a class="xref" href="BacklashBot.Helpers.html">Helpers</a></h6>
+  <h6><strong>Assembly</strong>: BacklashBot.dll</h6>
+  <h5 id="BacklashBot_Helpers_TradingCalculations_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class TradingCalculations</code></pre>
+  </div>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_CalculateBuyinPrice_System_Double_System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.CalculateBuyinPrice(System.Double%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L286">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_CalculateBuyinPrice_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateBuyinPrice*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_CalculateBuyinPrice_System_Double_System_Int32_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateBuyinPrice(System.Double,System.Int32)">CalculateBuyinPrice(double, int)</h4>
+  <div class="markdown level1 summary"><p>Calculates the buy-in price from market exposure and position size.
+Includes validation for positionSize and logging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double CalculateBuyinPrice(double marketExposure, int positionSize)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">marketExposure</span></td>
+        <td><p>Total market exposure in dollars. Can be negative.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">positionSize</span></td>
+        <td><p>Number of contracts (positive for Yes, negative for No). Must not be zero.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>Buy-in price per contract, rounded to 2 decimal places. Returns 0 if positionSize is zero.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown if positionSize is zero.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_CalculateEMA_System_Collections_Generic_List_System_Double__System_Int32_System_Nullable_System_Double__.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.CalculateEMA(System.Collections.Generic.List%7BSystem.Double%7D%2CSystem.Int32%2CSystem.Nullable%7BSystem.Double%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L23">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_CalculateEMA_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateEMA*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_CalculateEMA_System_Collections_Generic_List_System_Double__System_Int32_System_Nullable_System_Double__" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateEMA(System.Collections.Generic.List{System.Double},System.Int32,System.Nullable{System.Double})">CalculateEMA(List&lt;double&gt;, int, double?)</h4>
+  <div class="markdown level1 summary"><p>Calculates the Exponential Moving Average (EMA) for a list of prices over a specified period.
+EMA gives more weight to recent prices, making it responsive to price changes.
+Includes validation for null prices, invalid period, and NaN/Infinity values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double? CalculateEMA(List&lt;double&gt; prices, int period, double? previousEMA = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</td>
+        <td><span class="parametername">prices</span></td>
+        <td><p>The list of price values. Must not be null, contain at least 'period' elements, and not contain NaN or Infinity.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">period</span></td>
+        <td><p>The period for the EMA calculation. Must be at least 1.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">previousEMA</span></td>
+        <td><p>Optional previous EMA value for incremental calculation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><p>The calculated EMA value or null if insufficient data, invalid inputs, or invalid result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_CalculateEMAAsync_System_Collections_Generic_List_System_Double__System_Int32_System_Nullable_System_Double__.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.CalculateEMAAsync(System.Collections.Generic.List%7BSystem.Double%7D%2CSystem.Int32%2CSystem.Nullable%7BSystem.Double%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L71">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_CalculateEMAAsync_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateEMAAsync*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_CalculateEMAAsync_System_Collections_Generic_List_System_Double__System_Int32_System_Nullable_System_Double__" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateEMAAsync(System.Collections.Generic.List{System.Double},System.Int32,System.Nullable{System.Double})">CalculateEMAAsync(List&lt;double&gt;, int, double?)</h4>
+  <div class="markdown level1 summary"><p>Asynchronously calculates the Exponential Moving Average (EMA) for a list of prices over a specified period.
+Useful for high-frequency scenarios where computation can be offloaded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;double?&gt; CalculateEMAAsync(List&lt;double&gt; prices, int period, double? previousEMA = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</td>
+        <td><span class="parametername">prices</span></td>
+        <td><p>The list of price values.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">period</span></td>
+        <td><p>The period for the EMA calculation.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">previousEMA</span></td>
+        <td><p>Optional previous EMA value for incremental calculation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?&gt;</td>
+        <td><p>A task that represents the asynchronous operation, containing the EMA value or null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_CalculateExpectedFees_System_Int32_System_Collections_Generic_List_System_ValueTuple_System_Int32_System_Int32___.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.CalculateExpectedFees(System.Int32%2CSystem.Collections.Generic.List%7BSystem.ValueTuple%7BSystem.Int32%2CSystem.Int32%7D%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L374">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_CalculateExpectedFees_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateExpectedFees*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_CalculateExpectedFees_System_Int32_System_Collections_Generic_List_System_ValueTuple_System_Int32_System_Int32___" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateExpectedFees(System.Int32,System.Collections.Generic.List{System.ValueTuple{System.Int32,System.Int32}})">CalculateExpectedFees(int, List&lt;(int Price, int Quantity)&gt;)</h4>
+  <div class="markdown level1 summary"><p>Calculates the expected fees for liquidating a position.
+Includes validation for null orderbook and invalid values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double CalculateExpectedFees(int positionSize, List&lt;(int Price, int Quantity)&gt; orderbookLevels)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">positionSize</span></td>
+        <td><p>Number of contracts to liquidate.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.price">Price</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.quantity">Quantity</a>)&gt;</td>
+        <td><span class="parametername">orderbookLevels</span></td>
+        <td><p>List of (Price, Quantity) tuples, sorted by price descending. Must not be null, prices and quantities must be positive.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>Total expected fees in dollars, rounded to 2 decimal places. Returns 0 if positionSize is zero or orderbook is empty/invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown if orderbookLevels contain invalid values.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_CalculateIterativeEMA_System_Collections_Generic_List_System_Double__System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.CalculateIterativeEMA(System.Collections.Generic.List%7BSystem.Double%7D%2CSystem.Int32%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L86">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_CalculateIterativeEMA_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateIterativeEMA*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_CalculateIterativeEMA_System_Collections_Generic_List_System_Double__System_Int32_System_Int32_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateIterativeEMA(System.Collections.Generic.List{System.Double},System.Int32,System.Int32)">CalculateIterativeEMA(List&lt;double&gt;, int, int)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double CalculateIterativeEMA(List&lt;double&gt; prices, int period, int endIndex)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</td>
+        <td><span class="parametername">prices</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">period</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">endIndex</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_CalculateIterativeEMAAsync_System_Collections_Generic_List_System_Double__System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.CalculateIterativeEMAAsync(System.Collections.Generic.List%7BSystem.Double%7D%2CSystem.Int32%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L127">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_CalculateIterativeEMAAsync_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateIterativeEMAAsync*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_CalculateIterativeEMAAsync_System_Collections_Generic_List_System_Double__System_Int32_System_Int32_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateIterativeEMAAsync(System.Collections.Generic.List{System.Double},System.Int32,System.Int32)">CalculateIterativeEMAAsync(List&lt;double&gt;, int, int)</h4>
+  <div class="markdown level1 summary"><p>Asynchronously calculates the Exponential Moving Average (EMA) iteratively up to a specified end index.
+Useful for high-frequency scenarios where computation can be offloaded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;double&gt; CalculateIterativeEMAAsync(List&lt;double&gt; prices, int period, int endIndex)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</td>
+        <td><span class="parametername">prices</span></td>
+        <td><p>The list of price values.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">period</span></td>
+        <td><p>The period for the EMA calculation.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">endIndex</span></td>
+        <td><p>The end index in the prices list to calculate EMA up to.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</td>
+        <td><p>A task that represents the asynchronous operation, containing the EMA value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_CalculateLiquidationPrice_System_Int32_System_Collections_Generic_List_System_ValueTuple_System_Int32_System_Int32___.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.CalculateLiquidationPrice(System.Int32%2CSystem.Collections.Generic.List%7BSystem.ValueTuple%7BSystem.Int32%2CSystem.Int32%7D%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L308">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_CalculateLiquidationPrice_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateLiquidationPrice*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_CalculateLiquidationPrice_System_Int32_System_Collections_Generic_List_System_ValueTuple_System_Int32_System_Int32___" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateLiquidationPrice(System.Int32,System.Collections.Generic.List{System.ValueTuple{System.Int32,System.Int32}})">CalculateLiquidationPrice(int, List&lt;(int Price, int Quantity)&gt;)</h4>
+  <div class="markdown level1 summary"><p>Calculates the liquidation price for a position based on orderbook levels.
+Includes validation for null orderbook and invalid prices/quantities.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double CalculateLiquidationPrice(int positionSize, List&lt;(int Price, int Quantity)&gt; orderbookLevels)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">positionSize</span></td>
+        <td><p>Number of contracts to liquidate (positive for Yes, negative for No).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.price">Price</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.quantity">Quantity</a>)&gt;</td>
+        <td><span class="parametername">orderbookLevels</span></td>
+        <td><p>List of (Price, Quantity) tuples, sorted by price descending. Must not be null, prices and quantities must be positive.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>Liquidation price per contract in dollars. Returns 0 if positionSize is zero or orderbook is empty/invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown if orderbookLevels contain invalid values.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_CalculateROI_System_Int32_System_Double_System_Double_System_Double_.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.CalculateROI(System.Int32%2CSystem.Double%2CSystem.Double%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L419">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_CalculateROI_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateROI*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_CalculateROI_System_Int32_System_Double_System_Double_System_Double_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateROI(System.Int32,System.Double,System.Double,System.Double)">CalculateROI(int, double, double, double)</h4>
+  <div class="markdown level1 summary"><p>Calculates the ROI amount and percentage for a position.
+Includes validation for prices and fees.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static (double ROIAmount, double ROIPercentage) CalculateROI(int positionSize, double liquidationPrice, double buyinPrice, double expectedFees)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">positionSize</span></td>
+        <td><p>Number of contracts.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">liquidationPrice</span></td>
+        <td><p>Price at which the position can be liquidated (in dollars). Must be finite.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">buyinPrice</span></td>
+        <td><p>Buy-in price per contract (in dollars). Must be positive and finite.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">expectedFees</span></td>
+        <td><p>Total expected fees in dollars. Must be finite.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.accuracy">Accuracy</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.avgscore">AvgScore</a>)</td>
+        <td><p>(ROI Amount, ROI Percentage) tuple, both rounded to 2 decimal places. Returns (0,0) if positionSize is zero.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown if inputs are invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_CalculateTradingFees_System_Int32_System_Double_.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.CalculateTradingFees(System.Int32%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L351">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_CalculateTradingFees_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateTradingFees*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_CalculateTradingFees_System_Int32_System_Double_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateTradingFees(System.Int32,System.Double)">CalculateTradingFees(int, double)</h4>
+  <div class="markdown level1 summary"><p>Calculates trading fees for a given number of contracts at a price.
+Includes validation for inputs and logging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double CalculateTradingFees(int contracts, double priceInDollars)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">contracts</span></td>
+        <td><p>Number of contracts. Must be positive.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">priceInDollars</span></td>
+        <td><p>Price per contract in dollars. Must be between 0 and 1.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>Fees in dollars, rounded up to the next cent.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown if inputs are invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_CalculateUpsideDownside_System_Int32_System_Double_System_Double_.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.CalculateUpsideDownside(System.Int32%2CSystem.Double%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L449">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_CalculateUpsideDownside_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateUpsideDownside*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_CalculateUpsideDownside_System_Int32_System_Double_System_Double_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateUpsideDownside(System.Int32,System.Double,System.Double)">CalculateUpsideDownside(int, double, double)</h4>
+  <div class="markdown level1 summary"><p>Calculates the upside and downside potential for a position.
+Includes validation for prices and fees.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static (double Upside, double Downside) CalculateUpsideDownside(int positionSize, double liquidationPrice, double expectedFees)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">positionSize</span></td>
+        <td><p>Number of contracts (positive for Yes, negative for No).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">liquidationPrice</span></td>
+        <td><p>Price at which the position can be liquidated (in dollars). Must be finite.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">expectedFees</span></td>
+        <td><p>Total expected fees in dollars. Must be finite.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.accuracy">Accuracy</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.avgscore">AvgScore</a>)</td>
+        <td><p>(Upside, Downside) tuple, both rounded to 2 decimal places. Returns (0,0) if positionSize is zero.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown if inputs are invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_Convolve_System_Double___System_Double___.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.Convolve(System.Double%5B%5D%2CSystem.Double%5B%5D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L187">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_Convolve_" data-uid="BacklashBot.Helpers.TradingCalculations.Convolve*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_Convolve_System_Double___System_Double___" data-uid="BacklashBot.Helpers.TradingCalculations.Convolve(System.Double[],System.Double[])">Convolve(double[], double[])</h4>
+  <div class="markdown level1 summary"><p>Convolves the input array with a kernel to produce a smoothed output.
+Includes validation for null arrays and invalid values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double[] Convolve(double[] input, double[] kernel)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</td>
+        <td><span class="parametername">input</span></td>
+        <td><p>The input array to be smoothed (e.g., price frequencies). Must not be null or empty, and not contain NaN or Infinity.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</td>
+        <td><span class="parametername">kernel</span></td>
+        <td><p>The convolution kernel (e.g., Gaussian kernel). Must not be null or empty, and not contain NaN or Infinity.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</td>
+        <td><p>The smoothed array of the same length as the input.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown if inputs are invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_ConvolveAsync_System_Double___System_Double___.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.ConvolveAsync(System.Double%5B%5D%2CSystem.Double%5B%5D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L234">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_ConvolveAsync_" data-uid="BacklashBot.Helpers.TradingCalculations.ConvolveAsync*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_ConvolveAsync_System_Double___System_Double___" data-uid="BacklashBot.Helpers.TradingCalculations.ConvolveAsync(System.Double[],System.Double[])">ConvolveAsync(double[], double[])</h4>
+  <div class="markdown level1 summary"><p>Asynchronously convolves the input array with a kernel to produce a smoothed output.
+Useful for high-frequency scenarios where computation can be offloaded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;double[]&gt; ConvolveAsync(double[] input, double[] kernel)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</td>
+        <td><span class="parametername">input</span></td>
+        <td><p>The input array to be smoothed.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</td>
+        <td><span class="parametername">kernel</span></td>
+        <td><p>The convolution kernel.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]&gt;</td>
+        <td><p>A task that represents the asynchronous operation, containing the smoothed array.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_FindLocalMaxima_System_Double___.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.FindLocalMaxima(System.Double%5B%5D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L246">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_FindLocalMaxima_" data-uid="BacklashBot.Helpers.TradingCalculations.FindLocalMaxima*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_FindLocalMaxima_System_Double___" data-uid="BacklashBot.Helpers.TradingCalculations.FindLocalMaxima(System.Double[])">FindLocalMaxima(double[])</h4>
+  <div class="markdown level1 summary"><p>Identifies indices of local maxima in the input array.
+Includes validation for null array and invalid values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;int&gt; FindLocalMaxima(double[] data)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</td>
+        <td><span class="parametername">data</span></td>
+        <td><p>The input array to search for maxima. Must not be null or empty, and not contain NaN or Infinity.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</td>
+        <td><p>A list of indices where the array has local maxima.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown if data is invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_FindLocalMaximaAsync_System_Double___.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.FindLocalMaximaAsync(System.Double%5B%5D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L273">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_FindLocalMaximaAsync_" data-uid="BacklashBot.Helpers.TradingCalculations.FindLocalMaximaAsync*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_FindLocalMaximaAsync_System_Double___" data-uid="BacklashBot.Helpers.TradingCalculations.FindLocalMaximaAsync(System.Double[])">FindLocalMaximaAsync(double[])</h4>
+  <div class="markdown level1 summary"><p>Asynchronously identifies indices of local maxima in the input array.
+Useful for high-frequency scenarios where computation can be offloaded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;List&lt;int&gt;&gt; FindLocalMaximaAsync(double[] data)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</td>
+        <td><span class="parametername">data</span></td>
+        <td><p>The input array to search for maxima.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;&gt;</td>
+        <td><p>A task that represents the asynchronous operation, containing the list of indices.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_GenerateGaussianKernel_System_Double_.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.GenerateGaussianKernel(System.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L156">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_GenerateGaussianKernel_" data-uid="BacklashBot.Helpers.TradingCalculations.GenerateGaussianKernel*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_GenerateGaussianKernel_System_Double_" data-uid="BacklashBot.Helpers.TradingCalculations.GenerateGaussianKernel(System.Double)">GenerateGaussianKernel(double)</h4>
+  <div class="markdown level1 summary"><p>Generates a Gaussian kernel for smoothing the price frequency distribution.
+Includes validation for sigma to ensure positive value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double[] GenerateGaussianKernel(double sigma)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">sigma</span></td>
+        <td><p>Standard deviation of the Gaussian function, in cents. Must be positive.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</td>
+        <td><p>An array representing the normalized Gaussian kernel.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown if sigma is not positive.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations_TruncateDateTimeToMinute_System_DateTime_.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations.TruncateDateTimeToMinute(System.DateTime)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L139">View Source</a>
+  </span>
+  <a id="BacklashBot_Helpers_TradingCalculations_TruncateDateTimeToMinute_" data-uid="BacklashBot.Helpers.TradingCalculations.TruncateDateTimeToMinute*"></a>
+  <h4 id="BacklashBot_Helpers_TradingCalculations_TruncateDateTimeToMinute_System_DateTime_" data-uid="BacklashBot.Helpers.TradingCalculations.TruncateDateTimeToMinute(System.DateTime)">TruncateDateTimeToMinute(DateTime)</h4>
+  <div class="markdown level1 summary"><p>Truncates a DateTime to the minute level, setting seconds and milliseconds to zero.
+Includes validation to ensure the DateTime is valid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static DateTime TruncateDateTimeToMinute(DateTime dt)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">dt</span></td>
+        <td><p>The DateTime to truncate. Must be a valid DateTime.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><p>A new DateTime with seconds and milliseconds set to zero, in UTC.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown if the DateTime is invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Helpers_TradingCalculations.md&amp;value=---%0Auid%3A%20BacklashBot.Helpers.TradingCalculations%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Helpers/TradingCalculations.cs/#L11" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
