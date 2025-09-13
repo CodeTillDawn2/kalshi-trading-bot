@@ -1,5 +1,6 @@
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using System.Diagnostics;
 using System.Threading;
 
 namespace BacklashBot.Services
@@ -17,6 +18,38 @@ namespace BacklashBot.Services
         private readonly IStatusTrackerService _statusTracker;
         private readonly IBotReadyStatus _readyStatus;
         private readonly IScopeManagerService _scopeManagerService;
+        /// <summary>
+        /// Gets the duration of the last market data initialization operation.
+        /// </summary>
+        public TimeSpan LastInitializationDuration { get; private set; }
+        /// <summary>
+        /// Gets the number of markets processed during the last initialization.
+        /// </summary>
+        public int LastInitializationMarketCount { get; private set; }
+
+        /// <summary>
+        /// Validates a market ticker for basic format requirements.
+        /// Logs a warning if the ticker is invalid but does not throw an exception.
+        /// </summary>
+        /// <param name="ticker">The market ticker to validate.</param>
+        /// <returns>True if the ticker is valid; otherwise, false.</returns>
+        private bool ValidateMarketTicker(string ticker)
+        {
+            if (string.IsNullOrWhiteSpace(ticker))
+            {
+                _logger.LogWarning("Invalid market ticker: ticker is null or empty");
+                return false;
+            }
+
+            // Basic validation: alphanumeric, dashes, underscores, reasonable length
+            if (!System.Text.RegularExpressions.Regex.IsMatch(ticker, @"^[a-zA-Z0-9_-]{1,50}$"))
+            {
+                _logger.LogWarning("Invalid market ticker format: {Ticker}", ticker);
+                return false;
+            }
+
+            return true;
+        }
         /// <summary>
         /// Initializes a new instance of the <see cref="MarketDataInitializer"/> class.
         /// </summary>
@@ -44,6 +77,10 @@ namespace BacklashBot.Services
         /// <returns>A task representing the asynchronous initialization operation.</returns>
         public async Task SetupAsync()
         {
+            var initializationStartTime = DateTime.UtcNow;
+            var stopwatch = Stopwatch.StartNew();
+            List<string> watchedMarkets = null;
+
             _logger.LogDebug("MarketDataInitializer.SetupAsync started at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, _statusTracker.GetCancellationToken().IsCancellationRequested);
             try
             {
@@ -51,7 +88,7 @@ namespace BacklashBot.Services
 
                 _logger.LogDebug("Fetching watched markets...");
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                var watchedMarkets = await _serviceFactory.GetMarketDataService().FetchWatchedMarketsAsync();
+                watchedMarkets = await _serviceFactory.GetMarketDataService().FetchWatchedMarketsAsync();
                 _logger.LogDebug("Found {Count} watched markets: {Markets}", watchedMarkets.Count, string.Join(", ", watchedMarkets));
 
                 if (!watchedMarkets.Any())
@@ -76,6 +113,12 @@ namespace BacklashBot.Services
                         foreach (var ticker in watchedMarkets)
                         {
                             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+
+                            if (!ValidateMarketTicker(ticker))
+                            {
+                                _logger.LogWarning("Skipping initialization for invalid ticker: {Ticker}", ticker);
+                                continue;
+                            }
 
                             _logger.LogDebug("Initializing market {MarketTicker} on low-priority thread", ticker);
                             if (!_serviceFactory.GetDataCache().Markets.ContainsKey(ticker))
@@ -122,6 +165,12 @@ namespace BacklashBot.Services
 
                 _readyStatus.InitializationCompleted.SetResult(true);
                 _logger.LogInformation("Initialization set to completed");
+
+                // Collect performance metrics
+                LastInitializationDuration = DateTime.UtcNow - initializationStartTime;
+                LastInitializationMarketCount = watchedMarkets?.Count ?? 0;
+                stopwatch.Stop();
+                _logger.LogInformation("Market data initialization completed in {Duration} for {Count} markets", LastInitializationDuration, LastInitializationMarketCount);
             }
             catch (OperationCanceledException)
             {
@@ -129,6 +178,11 @@ namespace BacklashBot.Services
                 _readyStatus.InitializationCompleted.TrySetResult(false);
                 _readyStatus.BrowserReady.TrySetResult(false);
                 _logger.LogDebug("Market Data initialization canceled.");
+
+                // Collect metrics even on cancellation
+                LastInitializationDuration = DateTime.UtcNow - initializationStartTime;
+                LastInitializationMarketCount = watchedMarkets?.Count ?? 0;
+                stopwatch.Stop();
             }
             catch (Exception ex)
             {
@@ -136,6 +190,11 @@ namespace BacklashBot.Services
                 _readyStatus.InitializationCompleted.TrySetResult(false);
                 _readyStatus.BrowserReady.TrySetResult(false);
                 _logger.LogDebug("Set InitializationCompleted and BrowserReady tasks to false due to error");
+
+                // Collect metrics even on error
+                LastInitializationDuration = DateTime.UtcNow - initializationStartTime;
+                LastInitializationMarketCount = watchedMarkets?.Count ?? 0;
+                stopwatch.Stop();
                 throw;
             }
             finally

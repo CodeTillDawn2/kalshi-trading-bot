@@ -36,6 +36,18 @@ namespace BacklashBot.Services
         /// Gets the number of markets processed in the last refresh operation.
         /// </summary>
         public int LastWorkMarketCount { get; private set; }
+        /// <summary>
+        /// Gets the total number of refresh operations performed.
+        /// </summary>
+        public long TotalRefreshOperations { get; private set; }
+        /// <summary>
+        /// Gets the average time spent per market refresh in the last operation.
+        /// </summary>
+        public TimeSpan AverageRefreshTimePerMarket { get; private set; }
+        /// <summary>
+        /// Gets the total number of markets refreshed in the last operation.
+        /// </summary>
+        public int LastRefreshCount { get; private set; }
         private TimeSpan RefreshInterval => _updateInterval;
         private readonly IScopeManagerService _scopeManagerService;
 
@@ -151,6 +163,13 @@ namespace BacklashBot.Services
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
+
+                if (!ValidateMarketTicker(marketTicker))
+                {
+                    _logger.LogWarning("Skipping immediate refresh for invalid ticker: {MarketTicker}", marketTicker);
+                    return;
+                }
+
                 _logger.LogInformation("Triggering immediate refresh for {MarketTicker}", marketTicker);
                 await _serviceFactory.GetMarketDataService().SyncMarketDataAsync(marketTicker);
                 if (OnMarketUpdated != null)
@@ -230,6 +249,12 @@ namespace BacklashBot.Services
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                 if (marketTicker == null) continue;
 
+                if (!ValidateMarketTicker(marketTicker))
+                {
+                    _logger.LogWarning("Skipping refresh for invalid ticker: {MarketTicker}", marketTicker);
+                    continue;
+                }
+
                 var marketData = _serviceFactory.GetMarketDataService().GetMarketDetails(marketTicker);
                 if (marketData == null)
                 {
@@ -280,18 +305,18 @@ namespace BacklashBot.Services
             _logger.LogInformation("Refresh - Refreshed {Refreshed} markets in {Minutes} minutes",
                 $"{MarketsRefreshed}/{watchedMarkets.Count}", Math.Round(stopwatch.Elapsed.TotalMinutes, 2));
 
-            // --- Additional pass: only if <25% refreshed, and stay within a time budget ---
+            // --- Additional pass: only if <threshold% refreshed, and stay within a time budget ---
             if (watchedMarkets.Count > 0)
             {
                 double refreshRatio = (double)MarketsRefreshed / watchedMarkets.Count; // FIX: ensure double division
-                if (refreshRatio < 0.25)
+                if (refreshRatio < _tradingConfig.RefreshThresholdRatio)
                 {
-                    int targetForceTotal = (int)Math.Round(watchedMarkets.Count * 0.25);
+                    int targetForceTotal = (int)Math.Round(watchedMarkets.Count * _tradingConfig.RefreshThresholdRatio);
                     int remainingToForce = Math.Max(0, targetForceTotal - MarketsRefreshed);
                     int ForcedRefreshCount = 0;
 
-                    // Simple time budget: stop forced pass if =60% of the interval has elapsed
-                    TimeSpan forcedBudget = TimeSpan.FromTicks((long)(_updateInterval.Ticks * 0.60));
+                    // Simple time budget: stop forced pass if =timeBudgetRatio% of the interval has elapsed
+                    TimeSpan forcedBudget = TimeSpan.FromTicks((long)(_updateInterval.Ticks * _tradingConfig.TimeBudgetRatio));
 
                     foreach (var marketTicker in ShuffleList(watchedMarkets))
                     {
@@ -333,10 +358,37 @@ namespace BacklashBot.Services
             await _serviceFactory.GetMarketDataService().RetrieveAndUpdatePositionsAsync();
             LastWorkDuration = DateTime.UtcNow - workStartTime;
             LastWorkMarketCount = watchedMarkets.Count;
+            LastRefreshCount = MarketsRefreshed;
+            TotalRefreshOperations++;
+            AverageRefreshTimePerMarket = LastWorkMarketCount > 0 ? TimeSpan.FromTicks(LastWorkDuration.Ticks / LastWorkMarketCount) : TimeSpan.Zero;
             stopwatch.Stop();
         }
 
 
+
+        /// <summary>
+        /// Validates a market ticker for basic format requirements.
+        /// Logs a warning if the ticker is invalid but does not throw an exception.
+        /// </summary>
+        /// <param name="ticker">The market ticker to validate.</param>
+        /// <returns>True if the ticker is valid; otherwise, false.</returns>
+        private bool ValidateMarketTicker(string ticker)
+        {
+            if (string.IsNullOrWhiteSpace(ticker))
+            {
+                _logger.LogWarning("Invalid market ticker: ticker is null or empty");
+                return false;
+            }
+
+            // Basic validation: alphanumeric, dashes, underscores, reasonable length
+            if (!System.Text.RegularExpressions.Regex.IsMatch(ticker, @"^[a-zA-Z0-9_-]{1,50}$"))
+            {
+                _logger.LogWarning("Invalid market ticker format: {Ticker}", ticker);
+                return false;
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Shuffles the elements of a list using the Fisher-Yates algorithm.
