@@ -42,6 +42,15 @@ namespace BacklashPatterns
         }
 
         /// <summary>
+        /// Gets the current configuration for TrendCalcs.
+        /// </summary>
+        /// <returns>The current TrendCalculationConfig instance.</returns>
+        public static TrendCalculationConfig GetConfig()
+        {
+            return _config;
+        }
+
+        /// <summary>
         /// Calculates the strength of the prior trend before a pattern.
         /// Purpose: Measures the net price change over the lookback period, adjusted for expected direction.
         /// Behavior: Returns a positive value for uptrends (bearish Belt Hold) and a negative value for downtrends (bullish Belt Hold).

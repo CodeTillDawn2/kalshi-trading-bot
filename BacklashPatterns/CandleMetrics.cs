@@ -24,6 +24,10 @@ namespace BacklashPatterns
         public double[] BullishRatio { get; set; }
         public double[] BearishRatio { get; set; }
         public int IntervalType { get; set; }
+        /// <summary>
+        /// Time taken to calculate these metrics in milliseconds.
+        /// </summary>
+        public long CalculationTimeMs { get; set; }
 
         public double GetLookbackMeanTrend(int patternLength)
         {

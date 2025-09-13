@@ -1,5 +1,7 @@
 using BacklashDTOs;
 using static BacklashPatterns.TrendCalcs;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace BacklashPatterns
 {
@@ -30,47 +32,34 @@ namespace BacklashPatterns
             int trendLookback,
             bool loadLookbackMetrics)
         {
+            var config = GetConfig();
+            var stopwatch = Stopwatch.StartNew();
+
             if (!metricsCache.TryGetValue(index, out CandleMetrics metrics))
             {
                 var candle = prices[index];
-                double[] meanTrend = new double[5];
-                double[] lookbackAvgRange = new double[5];
-                double[] trendConsistency = new double[5];
-                double[] AvgVolumeVsLookback = new double[5];
-                double[] bullishRatio = new double[5];
-                double[] bearishRatio = new double[5];
+                int periodCount = config.LookbackPeriodCount;
+                double[] meanTrend = new double[periodCount];
+                double[] lookbackAvgRange = new double[periodCount];
+                double[] trendConsistency = new double[periodCount];
+                double[] AvgVolumeVsLookback = new double[periodCount];
+                double[] bullishRatio = new double[periodCount];
+                double[] bearishRatio = new double[periodCount];
                 if (loadLookbackMetrics)
                 {
-                    if (index >= 2) trendConsistency[0] = CalculateTrendConsistencyRatio(index, trendLookback, prices, 1);
-                    if (index >= 3) trendConsistency[1] = CalculateTrendConsistencyRatio(index, trendLookback, prices, 2);
-                    if (index >= 4) trendConsistency[2] = CalculateTrendConsistencyRatio(index, trendLookback, prices, 3);
-                    if (index >= 5) trendConsistency[3] = CalculateTrendConsistencyRatio(index, trendLookback, prices, 4);
-                    if (index >= 6) trendConsistency[4] = CalculateTrendConsistencyRatio(index, trendLookback, prices, 5);
-                    if (index >= 2) lookbackAvgRange[0] = CalculateAverageRangeOverLookbackPeriod(index, trendLookback, prices, 1);
-                    if (index >= 3) lookbackAvgRange[1] = CalculateAverageRangeOverLookbackPeriod(index, trendLookback, prices, 2);
-                    if (index >= 4) lookbackAvgRange[2] = CalculateAverageRangeOverLookbackPeriod(index, trendLookback, prices, 3);
-                    if (index >= 5) lookbackAvgRange[3] = CalculateAverageRangeOverLookbackPeriod(index, trendLookback, prices, 4);
-                    if (index >= 6) lookbackAvgRange[4] = CalculateAverageRangeOverLookbackPeriod(index, trendLookback, prices, 5);
-                    if (index >= 2) meanTrend[0] = CalculateAverageTrendOverLookbackPeriod(prices, index, trendLookback, 1);
-                    if (index >= 3) meanTrend[1] = CalculateAverageTrendOverLookbackPeriod(prices, index, trendLookback, 2);
-                    if (index >= 4) meanTrend[2] = CalculateAverageTrendOverLookbackPeriod(prices, index, trendLookback, 3);
-                    if (index >= 5) meanTrend[3] = CalculateAverageTrendOverLookbackPeriod(prices, index, trendLookback, 4);
-                    if (index >= 6) meanTrend[4] = CalculateAverageTrendOverLookbackPeriod(prices, index, trendLookback, 5);
-                    if (index >= 2) AvgVolumeVsLookback[0] = CalculateVolumeRatioToHistoricalAverage(prices, index, trendLookback, 1);
-                    if (index >= 3) AvgVolumeVsLookback[1] = CalculateVolumeRatioToHistoricalAverage(prices, index, trendLookback, 2);
-                    if (index >= 4) AvgVolumeVsLookback[2] = CalculateVolumeRatioToHistoricalAverage(prices, index, trendLookback, 3);
-                    if (index >= 5) AvgVolumeVsLookback[3] = CalculateVolumeRatioToHistoricalAverage(prices, index, trendLookback, 4);
-                    if (index >= 6) AvgVolumeVsLookback[4] = CalculateVolumeRatioToHistoricalAverage(prices, index, trendLookback, 5);
-                    if (index >= 2) bullishRatio[0] = CalculateTrendDirectionRatio(index, trendLookback, prices, 1, true);
-                    if (index >= 3) bullishRatio[1] = CalculateTrendDirectionRatio(index, trendLookback, prices, 2, true);
-                    if (index >= 4) bullishRatio[2] = CalculateTrendDirectionRatio(index, trendLookback, prices, 3, true);
-                    if (index >= 5) bullishRatio[3] = CalculateTrendDirectionRatio(index, trendLookback, prices, 4, true);
-                    if (index >= 6) bullishRatio[4] = CalculateTrendDirectionRatio(index, trendLookback, prices, 5, true);
-                    if (index >= 2) bearishRatio[0] = CalculateTrendDirectionRatio(index, trendLookback, prices, 1, false);
-                    if (index >= 3) bearishRatio[1] = CalculateTrendDirectionRatio(index, trendLookback, prices, 2, false);
-                    if (index >= 4) bearishRatio[2] = CalculateTrendDirectionRatio(index, trendLookback, prices, 3, false);
-                    if (index >= 5) bearishRatio[3] = CalculateTrendDirectionRatio(index, trendLookback, prices, 4, false);
-                    if (index >= 6) bearishRatio[4] = CalculateTrendDirectionRatio(index, trendLookback, prices, 5, false);
+                    for (int i = 0; i < periodCount; i++)
+                    {
+                        int patternSize = config.LookbackPeriods[i];
+                        if (index >= patternSize + 1)
+                        {
+                            trendConsistency[i] = CalculateTrendConsistencyRatio(index, trendLookback, prices, patternSize);
+                            lookbackAvgRange[i] = CalculateAverageRangeOverLookbackPeriod(index, trendLookback, prices, patternSize);
+                            meanTrend[i] = CalculateAverageTrendOverLookbackPeriod(prices, index, trendLookback, patternSize);
+                            AvgVolumeVsLookback[i] = CalculateVolumeRatioToHistoricalAverage(prices, index, trendLookback, patternSize);
+                            bullishRatio[i] = CalculateTrendDirectionRatio(index, trendLookback, prices, patternSize, true);
+                            bearishRatio[i] = CalculateTrendDirectionRatio(index, trendLookback, prices, patternSize, false);
+                        }
+                    }
                 }
 
                 // Calculate intervalType based on timestamp difference
@@ -107,6 +96,99 @@ namespace BacklashPatterns
                     IntervalType = intervalType,
                     IsBullish = candle.Close > candle.Open,
                     IsBearish = candle.Open > candle.Close,
+                    CalculationTimeMs = stopwatch.ElapsedMilliseconds
+                };
+                metricsCache[index] = metrics;
+            }
+
+            return metrics;
+        }
+
+        /// <summary>
+        /// Computes comprehensive metrics for a specific candle at the given index, utilizing caching for performance.
+        /// This method aggregates basic candle properties (body size, wicks, range) with advanced trend analysis
+        /// including mean trends, consistency measures, volume ratios, and directional ratios across multiple
+        /// lookback periods. The metrics are cached to avoid redundant calculations during pattern scanning.
+        /// Uses async calculations for better performance in high-volume scenarios.
+        /// </summary>
+        /// <param name="metricsCache">Reference to the cache dictionary for storing computed metrics by index.</param>
+        /// <param name="index">The index of the candle in the prices array to analyze.</param>
+        /// <param name="prices">Array of candle data containing OHLC and volume information.</param>
+        /// <param name="trendLookback">Number of candles to look back for trend calculations.</param>
+        /// <param name="loadLookbackMetrics">Whether to compute expensive lookback-based metrics or skip them for performance.</param>
+        /// <returns>A CandleMetrics struct containing all computed metrics for the specified candle.</returns>
+        public static async Task<CandleMetrics> GetCandleMetricsAsync(
+            Dictionary<int, CandleMetrics> metricsCache,
+            int index,
+            CandleMids[] prices,
+            int trendLookback,
+            bool loadLookbackMetrics)
+        {
+            var config = GetConfig();
+            var stopwatch = Stopwatch.StartNew();
+
+            if (!metricsCache.TryGetValue(index, out CandleMetrics metrics))
+            {
+                var candle = prices[index];
+                int periodCount = config.LookbackPeriodCount;
+                double[] meanTrend = new double[periodCount];
+                double[] lookbackAvgRange = new double[periodCount];
+                double[] trendConsistency = new double[periodCount];
+                double[] AvgVolumeVsLookback = new double[periodCount];
+                double[] bullishRatio = new double[periodCount];
+                double[] bearishRatio = new double[periodCount];
+                if (loadLookbackMetrics)
+                {
+                    for (int i = 0; i < periodCount; i++)
+                    {
+                        int patternSize = config.LookbackPeriods[i];
+                        if (index >= patternSize + 1)
+                        {
+                            trendConsistency[i] = await CalculateTrendConsistencyRatioAsync(index, trendLookback, prices, patternSize);
+                            lookbackAvgRange[i] = await CalculateAverageRangeOverLookbackPeriodAsync(index, trendLookback, prices, patternSize);
+                            meanTrend[i] = await CalculateAverageTrendOverLookbackPeriodAsync(prices, index, trendLookback, patternSize);
+                            AvgVolumeVsLookback[i] = await CalculateVolumeRatioToHistoricalAverageAsync(prices, index, trendLookback, patternSize);
+                            bullishRatio[i] = await CalculateTrendDirectionRatioAsync(index, trendLookback, prices, patternSize, true);
+                            bearishRatio[i] = await CalculateTrendDirectionRatioAsync(index, trendLookback, prices, patternSize, false);
+                        }
+                    }
+                }
+
+                // Calculate intervalType based on timestamp difference
+                int intervalType = 0; // Default value
+                if (index > 0) // Ensure there s a previous candle to compare
+                {
+                    double timeDiff = (prices[index].Timestamp - prices[index - 1].Timestamp).TotalSeconds;
+                    // Assuming Timestamp is in milliseconds (adjust if it's in seconds or another unit)
+                    if (timeDiff == 60 * 1000) // 1 minute in milliseconds
+                        intervalType = 1;
+                    else if (timeDiff == 60 * 60 * 1000) // 1 hour in milliseconds
+                        intervalType = 2;
+                    else if (timeDiff == 24 * 60 * 60 * 1000) // 1 day in milliseconds
+                        intervalType = 3;
+                }
+
+                metrics = new CandleMetrics
+                {
+                    BodySize = Math.Abs(candle.Close - candle.Open),
+                    UpperWick = candle.High - Math.Max(candle.Open, candle.Close),
+                    LowerWick = Math.Min(candle.Open, candle.Close) - candle.Low,
+                    TotalRange = candle.High - candle.Low,
+                    BodyToRangeRatio = candle.High != candle.Low ? Math.Abs(candle.Close - candle.Open) / (candle.High - candle.Low) : 0,
+                    MidPoint = (candle.Open + candle.Close) / 2.0,
+                    HasNoUpperWick = candle.High == Math.Max(candle.Open, candle.Close),
+                    HasNoLowerWick = candle.Low == Math.Min(candle.Open, candle.Close),
+                    BodyMidPoint = (candle.Open + candle.Close) / 2.0,
+                    LookbackMeanTrend = meanTrend,
+                    LookbackAvgRange = lookbackAvgRange,
+                    LookbackTrendConsistency = trendConsistency,
+                    AvgVolumeVsLookback = AvgVolumeVsLookback,
+                    BullishRatio = bullishRatio,
+                    BearishRatio = bearishRatio,
+                    IntervalType = intervalType,
+                    IsBullish = candle.Close > candle.Open,
+                    IsBearish = candle.Open > candle.Close,
+                    CalculationTimeMs = stopwatch.ElapsedMilliseconds
                 };
                 metricsCache[index] = metrics;
             }
