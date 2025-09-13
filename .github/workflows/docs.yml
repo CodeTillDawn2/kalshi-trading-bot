@@ -22,7 +22,9 @@ jobs:
         run: dotnet tool install -g xmldocmd
 
       - name: Build Project
-        run: dotnet build BacklashBot/BacklashBot.sln
+        run: dotnet build BacklashBot/BacklashBot.sln /p:EnableWindowsTargeting=true
+        env:
+          DOTNET_CLI_ENABLE_WINDOWS_TARGETING: true
 
       - name: Generate Documentation
         run: xmldocmd KalshiBotAPI/bin/Debug/net8.0/ docs/markdown --toc
