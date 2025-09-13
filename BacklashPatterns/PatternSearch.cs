@@ -135,6 +135,7 @@ namespace BacklashPatterns
         public static void SetLogger(ILogger logger)
         {
             _logger = logger;
+            CandleMetrics.SetLogger(logger);
         }
 
         /// <summary>
