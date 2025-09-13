@@ -12,17 +12,57 @@ using static TradingStrategies.Trading.Overseer.ReportGenerator;
 
 namespace TradingStrategies.Trading.Overseer
 {
+    /// <summary>
+    /// Core engine for executing trading strategy simulations against historical market data.
+    /// This class orchestrates the complete simulation lifecycle, processing market snapshots sequentially,
+    /// applying trading strategies, simulating order execution and fills, managing position and cash flow,
+    /// and generating detailed event logs for backtesting and performance analysis.
+    /// </summary>
+    /// <remarks>
+    /// The SimulationEngine serves as the central component in the trading simulation pipeline,
+    /// bridging raw market data with strategy logic to produce realistic trading outcomes.
+    /// It handles complex scenarios including multi-strategy execution, order book simulation,
+    /// resting order management, and risk controls.
+    /// </remarks>
     public class SimulationEngine
     {
         private readonly MarketTypeService _marketTypeService;
         private readonly PatternDetectionService _patternDetectionService;
 
+        /// <summary>
+        /// Initializes a new instance of the SimulationEngine with required services.
+        /// </summary>
+        /// <remarks>
+        /// Creates instances of MarketTypeService and PatternDetectionService for
+        /// market classification and pattern recognition during simulation.
+        /// </remarks>
         public SimulationEngine()
         {
             _marketTypeService = new MarketTypeService();
             _patternDetectionService = new PatternDetectionService();
         }
 
+        /// <summary>
+        /// Executes a complete trading simulation against a sequence of market snapshots.
+        /// </summary>
+        /// <param name="scenario">The trading scenario containing strategies organized by market conditions.</param>
+        /// <param name="snapshots">The sequence of market snapshots to simulate against, in chronological order.</param>
+        /// <param name="isSingleStrategy">Whether to run in single-strategy mode (modifies paths in-place) or multi-strategy mode (creates new path branches).</param>
+        /// <returns>A list of completed simulation paths, each representing a possible outcome of the trading scenario.</returns>
+        /// <remarks>
+        /// This method orchestrates the entire simulation process:
+        /// 1. Initializes simulation paths with starting conditions
+        /// 2. Processes each snapshot sequentially, applying market changes and strategy decisions
+        /// 3. Manages order book state, position tracking, and cash flow
+        /// 4. Generates detailed event logs for analysis
+        /// 5. Handles strategy branching in multi-strategy mode
+        ///
+        /// The simulation supports realistic trading mechanics including:
+        /// - Order book depth changes and fill simulation
+        /// - Resting order management and expiration
+        /// - Risk controls and position limits
+        /// - Multiple concurrent strategy paths
+        /// </remarks>
         public List<SimulationPath> RunSimulation(Scenario scenario, List<MarketSnapshot> snapshots, bool isSingleStrategy)
         {
             if (snapshots == null || snapshots.Count == 0) return new List<SimulationPath>();
@@ -46,23 +86,23 @@ namespace TradingStrategies.Trading.Overseer
             {
                 SetMarketType(snapshot);
 
-                var (yesDeltas, noDeltas) = ComputeDeltasIfApplicable(prevSnapshot, snapshot);
-                ApplyDeltasAndSimulateFills(activePaths, yesDeltas, noDeltas, snapshot.Timestamp);
+                var (yesDeltas, noDeltas) = ComputeOrderBookDeltasIfPreviousSnapshotExists(prevSnapshot, snapshot);
+                ApplyOrderBookDeltasAndSimulateFills(activePaths, yesDeltas, noDeltas, snapshot.Timestamp);
 
                 var newPaths = new List<SimulationPath>();
 
                 foreach (var path in activePaths)
                 {
                     ExpireRestingOrders(path, snapshot.Timestamp);
-                    var book = GetOrInitializeBook(path, snapshot);
+                    var book = GetOrCreateSimulatedOrderBook(path, snapshot);
 
                     var effectiveSnapshot = CreateEffectiveSnapshot(snapshot, book, path);
 
-                    var currentMarketConditions = ParseMarketConditions(effectiveSnapshot.MarketType);
+                    var currentMarketConditions = ParseMarketTypeFromString(effectiveSnapshot.MarketType);
 
                     if (!path.StrategiesByMarketConditions.TryGetValue(currentMarketConditions, out var activeStrategies) || !activeStrategies.Any())
                     {
-                        var newPath = HandleNoStrategies(path, effectiveSnapshot, currentMarketConditions, book, isSingleStrategy);
+                        var newPath = HandleScenarioWithNoActiveStrategies(path, effectiveSnapshot, currentMarketConditions, book, isSingleStrategy);
                         newPaths.Add(newPath);
                         continue;
                     }
@@ -71,7 +111,7 @@ namespace TradingStrategies.Trading.Overseer
 
                     foreach (var kvp in actionGroups)
                     {
-                        var newPath = HandleActionGroup(path, kvp.Key, kvp.Value, effectiveSnapshot, prevSnapshot,
+                        var newPath = ProcessStrategyActionGroup(path, kvp.Key, kvp.Value, effectiveSnapshot, prevSnapshot,
                             currentMarketConditions, book, maxRisk, isSingleStrategy);
                         if (newPath != null)
                         {
@@ -87,24 +127,56 @@ namespace TradingStrategies.Trading.Overseer
             return activePaths;
         }
 
+        /// <summary>
+        /// Assigns a market type classification to the given snapshot using the market type service.
+        /// </summary>
+        /// <param name="snapshot">The market snapshot to classify.</param>
+        /// <remarks>
+        /// This method delegates to the MarketTypeService to determine the appropriate market type
+        /// (e.g., trending, ranging, volatile) based on the snapshot's characteristics.
+        /// The market type influences which trading strategies are activated.
+        /// </remarks>
         private void SetMarketType(MarketSnapshot snapshot)
         {
-            _marketTypeService.SetMarketType(snapshot);
+            _marketTypeService.AssignMarketTypeToSnapshot(snapshot);
         }
 
-        private (Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas) ComputeDeltasIfApplicable(MarketSnapshot prevSnapshot, MarketSnapshot snapshot)
+        /// <summary>
+        /// Computes order book deltas between consecutive snapshots when a previous snapshot exists.
+        /// </summary>
+        /// <param name="prevSnapshot">The previous market snapshot for comparison.</param>
+        /// <param name="snapshot">The current market snapshot.</param>
+        /// <returns>A tuple containing delta dictionaries for Yes and No sides of the order book.</returns>
+        /// <remarks>
+        /// Deltas represent changes in order book depth at each price level between snapshots.
+        /// Positive deltas indicate increased depth, negative indicate decreased depth.
+        /// These deltas are used to simulate realistic order book changes during simulation.
+        /// </remarks>
+        private (Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas) ComputeOrderBookDeltasIfPreviousSnapshotExists(MarketSnapshot prevSnapshot, MarketSnapshot snapshot)
         {
             Dictionary<int, int> yesDeltas = new Dictionary<int, int>();
             Dictionary<int, int> noDeltas = new Dictionary<int, int>();
             if (prevSnapshot != null)
             {
-                yesDeltas = ComputeDeltas(prevSnapshot.GetYesBids(), snapshot.GetYesBids());
-                noDeltas = ComputeDeltas(prevSnapshot.GetNoBids(), snapshot.GetNoBids());
+                yesDeltas = CalculateOrderBookDepthChanges(prevSnapshot.GetYesBids(), snapshot.GetYesBids());
+                noDeltas = CalculateOrderBookDepthChanges(prevSnapshot.GetNoBids(), snapshot.GetNoBids());
             }
             return (yesDeltas, noDeltas);
         }
 
-        private void ApplyDeltasAndSimulateFills(List<SimulationPath> activePaths, Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas, DateTime timestamp)
+        /// <summary>
+        /// Applies order book deltas to all active simulation paths and simulates resulting fills.
+        /// </summary>
+        /// <param name="activePaths">The list of currently active simulation paths.</param>
+        /// <param name="yesDeltas">Delta changes for the Yes side of the order book.</param>
+        /// <param name="noDeltas">Delta changes for the No side of the order book.</param>
+        /// <param name="timestamp">The timestamp of the current snapshot.</param>
+        /// <remarks>
+        /// This method updates each path's simulated order book with the computed deltas,
+        /// then simulates any fills that occur due to the order book changes.
+        /// This creates realistic order book dynamics during simulation.
+        /// </remarks>
+        private void ApplyOrderBookDeltasAndSimulateFills(List<SimulationPath> activePaths, Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas, DateTime timestamp)
         {
             if (yesDeltas == null || noDeltas == null) return;
 
@@ -113,11 +185,21 @@ namespace TradingStrategies.Trading.Overseer
                 if (path.SimulatedBook != null)
                 {
                     path.SimulatedBook.ApplyDeltas(yesDeltas, noDeltas);
-                    SimulateFillsFromDeltas(path, yesDeltas, noDeltas, timestamp);
+                    SimulateOrderFillsFromOrderBookDeltas(path, yesDeltas, noDeltas, timestamp);
                 }
             }
         }
 
+        /// <summary>
+        /// Removes expired resting orders from the simulation path and updates the order book accordingly.
+        /// </summary>
+        /// <param name="path">The simulation path containing resting orders to check.</param>
+        /// <param name="timestamp">The current timestamp for expiration comparison.</param>
+        /// <remarks>
+        /// Iterates through resting orders in reverse to safely remove expired orders.
+        /// When an order expires, its depth is removed from the simulated order book
+        /// to maintain accurate book state.
+        /// </remarks>
         private void ExpireRestingOrders(SimulationPath path, DateTime timestamp)
         {
             for (int i = path.SimulatedRestingOrders.Count - 1; i >= 0; i--)
@@ -132,7 +214,18 @@ namespace TradingStrategies.Trading.Overseer
             }
         }
 
-        private SimulatedOrderbook GetOrInitializeBook(SimulationPath path, MarketSnapshot snapshot)
+        /// <summary>
+        /// Retrieves or initializes the simulated order book for a simulation path.
+        /// </summary>
+        /// <param name="path">The simulation path that may need an order book.</param>
+        /// <param name="snapshot">The market snapshot to initialize the book from if needed.</param>
+        /// <returns>The simulated order book for the path, either existing or newly initialized.</returns>
+        /// <remarks>
+        /// If the path doesn't have a simulated book yet, creates one and initializes it
+        /// with the current snapshot's order book data. This ensures each path has
+        /// its own independent order book state for accurate simulation.
+        /// </remarks>
+        private SimulatedOrderbook GetOrCreateSimulatedOrderBook(SimulationPath path, MarketSnapshot snapshot)
         {
             if (path.SimulatedBook == null)
             {
@@ -143,6 +236,18 @@ namespace TradingStrategies.Trading.Overseer
             return path.SimulatedBook;
         }
 
+        /// <summary>
+        /// Creates an effective market snapshot that combines raw snapshot data with simulated state.
+        /// </summary>
+        /// <param name="snapshot">The base market snapshot from the data source.</param>
+        /// <param name="book">The simulated order book with current state.</param>
+        /// <param name="path">The simulation path containing position and resting order information.</param>
+        /// <returns>A cloned snapshot updated with simulated metrics and position data.</returns>
+        /// <remarks>
+        /// The effective snapshot represents the market state as seen by the strategy,
+        /// including simulated order book changes, current position, and resting orders.
+        /// This provides strategies with accurate information for decision making.
+        /// </remarks>
         private MarketSnapshot CreateEffectiveSnapshot(MarketSnapshot snapshot, SimulatedOrderbook book, SimulationPath path)
         {
             var effectiveSnapshot = snapshot.Clone();
@@ -152,12 +257,37 @@ namespace TradingStrategies.Trading.Overseer
             return effectiveSnapshot;
         }
 
-        private MarketType ParseMarketConditions(string marketType)
+        /// <summary>
+        /// Parses a market type string into the corresponding MarketType enum value.
+        /// </summary>
+        /// <param name="marketType">The string representation of the market type.</param>
+        /// <returns>The parsed MarketType enum value.</returns>
+        /// <remarks>
+        /// Delegates to the MarketTypeService for consistent parsing logic.
+        /// This ensures market type classification is handled uniformly across the system.
+        /// </remarks>
+        private MarketType ParseMarketTypeFromString(string marketType)
         {
-            return _marketTypeService.ParseMarketConditions(marketType);
+            return _marketTypeService.ConvertStringToMarketType(marketType);
         }
 
-        private SimulationPath HandleNoStrategies(SimulationPath path, MarketSnapshot effectiveSnapshot, MarketType currentMarketConditions, SimulatedOrderbook book, bool isSingleStrategy)
+        /// <summary>
+        /// Handles the case where no strategies are available for the current market conditions.
+        /// </summary>
+        /// <param name="path">The current simulation path.</param>
+        /// <param name="effectiveSnapshot">The effective market snapshot with simulated state.</param>
+        /// <param name="currentMarketConditions">The current market type classification.</param>
+        /// <param name="book">The simulated order book.</param>
+        /// <param name="isSingleStrategy">Whether running in single-strategy mode.</param>
+        /// <returns>A new or modified simulation path with no-action event logged.</returns>
+        /// <remarks>
+        /// When no strategies match the current market conditions, this method:
+        /// - Maintains the existing path state
+        /// - Logs a "None" action event with current market metrics
+        /// - Detects and includes any candlestick patterns
+        /// - Preserves resting orders and position information
+        /// </remarks>
+        private SimulationPath HandleScenarioWithNoActiveStrategies(SimulationPath path, MarketSnapshot effectiveSnapshot, MarketType currentMarketConditions, SimulatedOrderbook book, bool isSingleStrategy)
         {
             Dictionary<MarketType, HashSet<Strategy>> newStrategiesByMarketConditions;
             SimulatedOrderbook actionBook;
@@ -243,6 +373,19 @@ namespace TradingStrategies.Trading.Overseer
             }
         }
 
+        /// <summary>
+        /// Groups active strategies by their recommended actions for the current market conditions.
+        /// </summary>
+        /// <param name="activeStrategies">The set of strategies available for the current market type.</param>
+        /// <param name="effectiveSnapshot">The effective market snapshot with simulated state.</param>
+        /// <param name="previousEffectiveSnapshot">The previous effective snapshot for trend analysis.</param>
+        /// <param name="simulationPosition">The current position in the simulation.</param>
+        /// <returns>A dictionary mapping action types to lists of strategies and their decisions.</returns>
+        /// <remarks>
+        /// This method queries each active strategy for its recommended action given the current
+        /// market state and position. Strategies are grouped by action type to handle conflicts
+        /// and execute related actions together.
+        /// </remarks>
         private Dictionary<ActionType, List<(Strategy strategy, ActionDecision decision)>> GroupStrategiesByAction(
             HashSet<Strategy> activeStrategies,
             MarketSnapshot effectiveSnapshot,
@@ -263,9 +406,30 @@ namespace TradingStrategies.Trading.Overseer
             return actionGroups;
         }
 
-        private SimulationPath HandleActionGroup(SimulationPath path, ActionType action, List<(Strategy strategy, ActionDecision decision)> strategiesWithDecisions,
-      MarketSnapshot effectiveSnapshot, MarketSnapshot? previousEffectiveSnapshot,
-      MarketType currentMarketConditions, SimulatedOrderbook book, double maxRisk, bool isSingleStrategy)
+        /// <summary>
+        /// Processes a group of strategies that recommend the same action type.
+        /// </summary>
+        /// <param name="path">The current simulation path.</param>
+        /// <param name="action">The action type being executed.</param>
+        /// <param name="strategiesWithDecisions">The strategies and their decisions for this action.</param>
+        /// <param name="effectiveSnapshot">The effective market snapshot with simulated state.</param>
+        /// <param name="previousEffectiveSnapshot">The previous effective snapshot for trend analysis.</param>
+        /// <param name="currentMarketConditions">The current market type classification.</param>
+        /// <param name="book">The simulated order book.</param>
+        /// <param name="maxRisk">The maximum risk limit for the simulation.</param>
+        /// <param name="isSingleStrategy">Whether running in single-strategy mode.</param>
+        /// <returns>A new simulation path with the action executed, or null if the action was skipped.</returns>
+        /// <remarks>
+        /// This method handles the execution of a specific action type across multiple strategies:
+        /// - Manages position flipping if needed (e.g., going from short to long)
+        /// - Executes the specific action using HandleSpecificAction
+        /// - Updates strategy sets for the current market conditions
+        /// - Logs the action event with comprehensive market metrics
+        /// - Returns null if the action execution was skipped due to constraints
+        /// </remarks>
+        private SimulationPath ProcessStrategyActionGroup(SimulationPath path, ActionType action, List<(Strategy strategy, ActionDecision decision)> strategiesWithDecisions,
+       MarketSnapshot effectiveSnapshot, MarketSnapshot? previousEffectiveSnapshot,
+       MarketType currentMarketConditions, SimulatedOrderbook book, double maxRisk, bool isSingleStrategy)
         {
             var decision = strategiesWithDecisions.First().decision;
 
@@ -304,13 +468,13 @@ namespace TradingStrategies.Trading.Overseer
             bool skipAdd = false;
             if (needsFlip)
             {
-                skipAdd = HandleSpecificAction(ActionType.Exit, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)),
+                skipAdd = ExecuteSpecificTradingAction(ActionType.Exit, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)),
                     effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk, path.Position);
                 if (skipAdd || newPosition == path.Position) return null;
             }
             else
             {
-                skipAdd = HandleSpecificAction(action, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)),
+                skipAdd = ExecuteSpecificTradingAction(action, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)),
                     effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk, path.Position);
                 if (skipAdd) return null;
             }
@@ -369,26 +533,54 @@ namespace TradingStrategies.Trading.Overseer
             }
         }
 
-        private bool HandleSpecificAction(
-    ActionType action,
-    HashSet<Strategy> strategiesForAction,
-    MarketSnapshot effectiveSnapshot,
-    MarketSnapshot? previousEffectiveSnapshot,
-    SimulatedOrderbook actionBook,
-    List<(string action, string side, string type, int count, int price, DateTime? expiration)> actionResting,
-    ref int newPosition,
-    ref double newCash,
-    ref double newRisk,
-    SimulationPath path,
-    DateTime timestamp,
-    double maxRisk,
-    int simulationPosition)
+        /// <summary>
+        /// Executes a specific trading action with realistic order book simulation and risk management.
+        /// </summary>
+        /// <param name="action">The type of action to execute (Long, Short, Exit, PostYes, PostAsk, etc.).</param>
+        /// <param name="strategiesForAction">The strategies recommending this action.</param>
+        /// <param name="effectiveSnapshot">The effective market snapshot with simulated state.</param>
+        /// <param name="previousEffectiveSnapshot">The previous effective snapshot for trend analysis.</param>
+        /// <param name="actionBook">The simulated order book for this action execution.</param>
+        /// <param name="actionResting">The list of resting orders for this action.</param>
+        /// <param name="newPosition">Reference to the position that will be updated by the action.</param>
+        /// <param name="newCash">Reference to the cash balance that will be updated by the action.</param>
+        /// <param name="newRisk">Reference to the risk level that will be updated by the action.</param>
+        /// <param name="path">The original simulation path for context and totals tracking.</param>
+        /// <param name="timestamp">The timestamp of the action execution.</param>
+        /// <param name="maxRisk">The maximum risk limit for the simulation.</param>
+        /// <param name="simulationPosition">The current position at the time of decision.</param>
+        /// <returns>True if the action should be skipped, false if it was executed.</returns>
+        /// <remarks>
+        /// This method handles the detailed execution of various trading actions:
+        /// - Market orders (Long, Short, Exit) with realistic order book traversal
+        /// - Limit orders (PostYes, PostAsk) for resting orders
+        /// - Combo actions (LongPostAsk, ShortPostYes) combining market and limit orders
+        /// - Order cancellation
+        ///
+        /// The method includes risk management (cash and risk limits), realistic pricing,
+        /// taker fees, and proper position tracking. It simulates fills by traversing
+        /// the order book from best prices outward, respecting available depth and limits.
+        /// </remarks>
+        private bool ExecuteSpecificTradingAction(
+     ActionType action,
+     HashSet<Strategy> strategiesForAction,
+     MarketSnapshot effectiveSnapshot,
+     MarketSnapshot? previousEffectiveSnapshot,
+     SimulatedOrderbook actionBook,
+     List<(string action, string side, string type, int count, int price, DateTime? expiration)> actionResting,
+     ref int newPosition,
+     ref double newCash,
+     ref double newRisk,
+     SimulationPath path,
+     DateTime timestamp,
+     double maxRisk,
+     int simulationPosition)
         {
             // Combo actions: execute market take first, then replace resting with 100% of current position
             if (action == ActionType.LongPostAsk || action == ActionType.ShortPostYes)
             {
                 var takeAction = (action == ActionType.LongPostAsk) ? ActionType.Long : ActionType.Short;
-                HandleSpecificAction(takeAction, strategiesForAction, effectiveSnapshot, previousEffectiveSnapshot,
+                ExecuteSpecificTradingAction(takeAction, strategiesForAction, effectiveSnapshot, previousEffectiveSnapshot,
                     actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, timestamp, maxRisk, simulationPosition);
 
                 int desiredQty = Math.Abs(newPosition);
@@ -483,7 +675,7 @@ namespace TradingStrategies.Trading.Overseer
                     }
 
                     int effectiveTradePrice = isPaying ? (100 - p) : p;
-                    SimulateFillsFromTrade(actionResting, longSide ? "no" : "yes", effectiveTradePrice, fill, ref newPosition, ref newCash, timestamp);
+                    SimulateOrderFillsFromMarketTrade(actionResting, longSide ? "no" : "yes", effectiveTradePrice, fill, ref newPosition, ref newCash, timestamp);
                 }
 
                 int filled = qty - remainingQty;
@@ -545,6 +737,16 @@ namespace TradingStrategies.Trading.Overseer
             return false;
         }
 
+        /// <summary>
+        /// Creates a summary string of resting orders grouped by price level for reporting.
+        /// </summary>
+        /// <param name="restingOrders">The list of resting orders to summarize.</param>
+        /// <returns>A tuple containing summary strings for Yes and No side resting orders.</returns>
+        /// <remarks>
+        /// Groups limit orders by price level and aggregates quantities.
+        /// Returns formatted strings like "50:100, 51:50" representing price:quantity pairs.
+        /// Used for logging and reporting resting order state in event logs.
+        /// </remarks>
         private (string, string) SummarizeRestingOrders(List<(string action, string side, string type, int count, int price, DateTime? expiration)> restingOrders)
         {
             var yesBidsSummary = new Dictionary<int, int>();
@@ -569,7 +771,19 @@ namespace TradingStrategies.Trading.Overseer
             return (restingYes, restingNo);
         }
 
-        private void SimulateFillsFromDeltas(SimulationPath path, Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas, DateTime currentTime)
+        /// <summary>
+        /// Simulates fills for resting orders based on order book deltas from market changes.
+        /// </summary>
+        /// <param name="path">The simulation path containing resting orders and position state.</param>
+        /// <param name="yesDeltas">Delta changes for the Yes side order book.</param>
+        /// <param name="noDeltas">Delta changes for the No side order book.</param>
+        /// <param name="currentTime">The current timestamp for expiration checks.</param>
+        /// <remarks>
+        /// Processes resting orders to simulate fills when order book depth decreases at their price levels.
+        /// Handles order expiration, updates position and cash balances, and removes or updates filled orders.
+        /// This creates realistic order execution based on market depth changes.
+        /// </remarks>
+        private void SimulateOrderFillsFromOrderBookDeltas(SimulationPath path, Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas, DateTime currentTime)
         {
             var resting = path.SimulatedRestingOrders;
             for (int i = resting.Count - 1; i >= 0; i--)
@@ -614,7 +828,22 @@ namespace TradingStrategies.Trading.Overseer
             }
         }
 
-        private void SimulateFillsFromTrade(List<(string action, string side, string type, int count, int price, DateTime? expiration)> resting, string tradeSide, int tradePrice, int tradeQty, ref int position, ref double cash, DateTime timestamp)
+        /// <summary>
+        /// Simulates fills for resting orders when a market trade occurs at a specific price.
+        /// </summary>
+        /// <param name="resting">The list of resting orders to check for fills.</param>
+        /// <param name="tradeSide">The side of the market trade ("yes" or "no").</param>
+        /// <param name="tradePrice">The price at which the trade occurred.</param>
+        /// <param name="tradeQty">The quantity of the market trade.</param>
+        /// <param name="position">Reference to the position to update with fills.</param>
+        /// <param name="cash">Reference to the cash balance to update with fills.</param>
+        /// <param name="timestamp">The timestamp of the trade (unused in current implementation).</param>
+        /// <remarks>
+        /// Matches resting limit orders against market trades at the same price level.
+        /// Updates position and cash for filled orders, and removes or reduces order quantities.
+        /// Processes orders in reverse to safely modify the list during iteration.
+        /// </remarks>
+        private void SimulateOrderFillsFromMarketTrade(List<(string action, string side, string type, int count, int price, DateTime? expiration)> resting, string tradeSide, int tradePrice, int tradeQty, ref int position, ref double cash, DateTime timestamp)
         {
             for (int i = resting.Count - 1; i >= 0; i--)
             {
@@ -652,7 +881,18 @@ namespace TradingStrategies.Trading.Overseer
             }
         }
 
-        private Dictionary<int, int> ComputeDeltas(Dictionary<int, int> prev, Dictionary<int, int> curr)
+        /// <summary>
+        /// Computes the differences (deltas) between two order book depth dictionaries.
+        /// </summary>
+        /// <param name="prev">The previous order book depth dictionary.</param>
+        /// <param name="curr">The current order book depth dictionary.</param>
+        /// <returns>A dictionary containing only price levels with non-zero deltas.</returns>
+        /// <remarks>
+        /// Calculates depth changes at each price level between snapshots.
+        /// Only includes price levels where depth actually changed to optimize storage and processing.
+        /// Used to simulate realistic order book evolution during simulation.
+        /// </remarks>
+        private Dictionary<int, int> CalculateOrderBookDepthChanges(Dictionary<int, int> prev, Dictionary<int, int> curr)
         {
             var deltas = new Dictionary<int, int>();
             var allPrices = new HashSet<int>(prev.Keys.Concat(curr.Keys));
@@ -669,6 +909,16 @@ namespace TradingStrategies.Trading.Overseer
             return deltas;
         }
 
+        /// <summary>
+        /// Detects candlestick patterns in the market snapshot using the pattern detection service.
+        /// </summary>
+        /// <param name="snapshot">The market snapshot to analyze for patterns.</param>
+        /// <returns>A list of detected pattern definitions.</returns>
+        /// <remarks>
+        /// Delegates pattern detection to the specialized PatternDetectionService.
+        /// Patterns are used in strategy decision making and logged in event records
+        /// for analysis of pattern-based trading signals.
+        /// </remarks>
         private List<BacklashPatterns.PatternDefinitions.PatternDefinition> DetectPatterns(MarketSnapshot snapshot)
         {
             return _patternDetectionService.DetectPatterns(snapshot);
