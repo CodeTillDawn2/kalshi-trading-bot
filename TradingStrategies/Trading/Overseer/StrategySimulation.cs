@@ -9,10 +9,19 @@ namespace TradingStrategies.Trading.Overseer
     /// Simulates trading strategies against historical market snapshots, managing position, cash, and order book state.
     /// This class processes market data sequentially, applies trading decisions from strategies, and tracks performance metrics.
     /// It maintains a simulated order book and resting orders to accurately model market interactions during backtesting.
+    /// As a developer, this class is the core execution engine for strategy evaluation, handling the complex interplay
+    /// between market data, strategy decisions, order book dynamics, and position management.
     /// </summary>
     /// <remarks>
     /// The simulation handles various action types including market orders, limit orders, and position exits.
     /// It applies realistic trading fees and ensures FIFO order matching for accurate simulation results.
+    /// Key simulation mechanics include:
+    /// - Delta-based order book updates for efficiency
+    /// - Realistic fee calculation (0.07% taker fees)
+    /// - Position and cash tracking with proper accounting
+    /// - Resting order management with expiration handling
+    /// - Combo actions (take then rest) for advanced strategies
+    /// - Order book depth reduction and fill simulation
     /// </remarks>
     public class StrategySimulation
     {
@@ -63,12 +72,23 @@ namespace TradingStrategies.Trading.Overseer
 
         /// <summary>
         /// Processes a market snapshot by applying deltas, updating the order book, and executing trading decisions.
+        /// This is the main entry point for advancing the simulation state with new market data.
         /// </summary>
-        /// <param name="snapshot">The current market snapshot to process.</param>
-        /// <param name="prevSnapshot">The previous market snapshot for delta calculation (optional).</param>
+        /// <param name="snapshot">The current market snapshot to process, containing order book, position, and market data.</param>
+        /// <param name="prevSnapshot">The previous market snapshot for delta calculation (optional). If provided, enables efficient delta-based updates.</param>
         /// <remarks>
-        /// This method handles the core simulation loop: updating the order book with deltas, getting strategy decisions,
-        /// and applying those decisions to the simulated state. It ensures the simulated order book reflects current market conditions.
+        /// This method handles the core simulation loop with the following steps:
+        /// 1. Compute and apply order book deltas if previous snapshot exists (for efficiency)
+        /// 2. Simulate fills from those deltas on resting orders
+        /// 3. Initialize order book from snapshot if this is the first snapshot
+        /// 4. Create effective snapshot with simulated state overlay
+        /// 5. Get trading decision from strategy
+        /// 6. Apply the decision to update position, cash, and order book
+        ///
+        /// As a developer, this method orchestrates the entire simulation step, ensuring proper sequencing
+        /// of market updates, strategy evaluation, and state changes. The effective snapshot approach
+        /// allows strategies to see the current simulated state while maintaining separation between
+        /// real market data and simulation artifacts.
         /// </remarks>
         public void ProcessSnapshot(MarketSnapshot snapshot, MarketSnapshot? prevSnapshot)
         {
@@ -77,8 +97,8 @@ namespace TradingStrategies.Trading.Overseer
             Dictionary<int, int> noDeltas = new Dictionary<int, int>();
             if (prevSnapshot != null)
             {
-                yesDeltas = ComputeDeltas(prevSnapshot.GetYesBids(), snapshot.GetYesBids());
-                noDeltas = ComputeDeltas(prevSnapshot.GetNoBids(), snapshot.GetNoBids());
+                yesDeltas = CalculateOrderBookDepthChanges(prevSnapshot.GetYesBids(), snapshot.GetYesBids());
+                noDeltas = CalculateOrderBookDepthChanges(prevSnapshot.GetNoBids(), snapshot.GetNoBids());
                 // FIFO: append deltas with the *snapshot* time
                 SimulatedBook.ApplyDeltas(yesDeltas, noDeltas);
                 SimulateFillsFromDeltas(yesDeltas, noDeltas, snapshot.Timestamp);
@@ -103,13 +123,26 @@ namespace TradingStrategies.Trading.Overseer
 
 
         /// <summary>
-        /// Applies a trading action decision to the simulation state.
+        /// Applies a trading action decision to the simulation state, updating position, cash, and order book.
+        /// This method is the central execution point for strategy decisions, handling all action types with proper accounting.
         /// </summary>
-        /// <param name="decision">The action decision to apply.</param>
-        /// <param name="effectiveSnapshot">The market snapshot with simulated order book state.</param>
+        /// <param name="decision">The action decision to apply, containing type, price, quantity, and expiration details.</param>
+        /// <param name="effectiveSnapshot">The market snapshot with simulated order book state, used for price reference and timestamp.</param>
         /// <remarks>
-        /// Handles different action types: market orders, limit orders, cancellations, and exits.
-        /// Updates position, cash, and order book accordingly. Applies trading fees and ensures proper order matching.
+        /// Handles different action types with specific logic:
+        /// - Market orders (Long/Short): Execute immediately against order book, update position/cash
+        /// - Limit orders (PostYes/PostAsk): Add to simulated order book and resting orders list
+        /// - Cancel: Remove all resting orders from order book
+        /// - Exit: Close entire position using current order book prices
+        /// - Combo actions (LongPostAsk/ShortPostYes): Execute market order then place resting limit order
+        ///
+        /// Key implementation details for developers:
+        /// - Uses FIFO order matching for realistic fill simulation
+        /// - Applies 0.07% taker fees on all market executions
+        /// - Handles position direction (positive = long, negative = short)
+        /// - Manages resting orders with expiration and proper cleanup
+        /// - Prevents invalid states (insufficient cash, invalid prices)
+        /// - Updates both temporary and committed state variables
         /// </remarks>
         private void ApplyAction(ActionDecision decision, MarketSnapshot effectiveSnapshot)
         {
@@ -240,14 +273,20 @@ namespace TradingStrategies.Trading.Overseer
 
 
         /// <summary>
-        /// Handles limit order actions (posting or canceling orders).
+        /// Handles limit order actions (posting or canceling orders) in the simulated environment.
+        /// This method manages the lifecycle of resting orders, ensuring proper integration with the simulated order book.
         /// </summary>
-        /// <param name="decision">The action decision containing order details.</param>
-        /// <param name="effectiveSnapshot">The market snapshot for timestamp reference.</param>
+        /// <param name="decision">The action decision containing order details (price, quantity, expiration).</param>
+        /// <param name="effectiveSnapshot">The market snapshot for timestamp reference when posting new orders.</param>
         /// <remarks>
-        /// Processes PostYes/PostAsk actions by adding orders to the simulated order book and resting orders list.
-        /// Handles Cancel actions by removing orders from both the order book and resting orders list.
-        /// Ensures proper price validation and order book updates.
+        /// Implementation details for developers:
+        /// - PostYes: Places bid for YES at specified price, rests on YES bids side
+        /// - PostAsk: Places ask for YES at specified price, rests on NO bids side (100 - price)
+        /// - Cancel: Removes ALL resting orders from order book, clearing the resting list
+        /// - Validates price ranges (1-99) and quantity (>0) before processing
+        /// - Uses reverse iteration for cancellation to handle removals safely
+        /// - Maintains FIFO order in resting orders list by appending new orders
+        /// - Updates both SimulatedOrderbook and SimulatedRestingOrders collections
         /// </remarks>
         private void HandleLimitAction(ActionDecision decision, MarketSnapshot effectiveSnapshot)
         {
@@ -319,13 +358,20 @@ namespace TradingStrategies.Trading.Overseer
 
 
         /// <summary>
-        /// Calculates the final equity value at the end of simulation.
+        /// Calculates the final equity value at the end of simulation by liquidating the current position.
+        /// This method provides the total portfolio value for performance evaluation and reporting.
         /// </summary>
-        /// <param name="lastSnapshot">The final market snapshot for valuation.</param>
-        /// <returns>The total equity value including cash and position value.</returns>
+        /// <param name="lastSnapshot">The final market snapshot for valuation, though not directly used in current implementation.</param>
+        /// <returns>The total equity value including cash and position value, representing the final portfolio worth.</returns>
         /// <remarks>
-        /// Computes the liquidation value of the current position using the best available bid prices
-        /// and adds it to the remaining cash balance.
+        /// Implementation computes liquidation value as follows:
+        /// - For long positions (Position > 0): Uses best YES bid price from simulated order book
+        /// - For short positions (Position < 0): Uses best NO bid price from simulated order book
+        /// - Adds remaining cash balance to position value
+        /// - Returns 0 if no valid bid prices available for position liquidation
+        ///
+        /// Note: Currently uses simulated order book rather than snapshot prices for consistency with simulation state.
+        /// This ensures the final valuation reflects the actual simulated market conditions.
         /// </remarks>
         public double GetFinalEquity(MarketSnapshot lastSnapshot)
         {
@@ -345,14 +391,27 @@ namespace TradingStrategies.Trading.Overseer
         }
 
         /// <summary>
-        /// Simulates order fills resulting from market order book deltas.
+        /// Simulates order fills resulting from market order book deltas, processing resting orders against market movements.
+        /// This method handles the complex interaction between resting limit orders and incoming market activity.
         /// </summary>
-        /// <param name="yesDeltas">Price deltas for YES side orders.</param>
-        /// <param name="noDeltas">Price deltas for NO side orders.</param>
-        /// <param name="currentTime">The current timestamp for processing.</param>
+        /// <param name="yesDeltas">Price deltas for YES side orders, where positive indicates added volume and negative indicates removed volume.</param>
+        /// <param name="noDeltas">Price deltas for NO side orders, with same positive/negative convention as yesDeltas.</param>
+        /// <param name="currentTime">The current timestamp for processing, used for expiration checks.</param>
         /// <remarks>
-        /// Processes resting orders to determine if they get filled by market movements.
-        /// Handles order expiration and ensures FIFO matching. Updates cash and position accordingly.
+        /// Implementation processes each resting order with the following logic:
+        /// 1. Check for order expiration and remove expired orders from both order book and resting list
+        /// 2. For each price level with negative delta (volume reduction), check if resting orders at that price get filled
+        /// 3. Use FIFO matching: only orders ahead in the queue can be filled before current order
+        /// 4. Calculate fill quantity based on available depth and position in queue
+        /// 5. Update cash and position based on fill (buy orders add position, sell orders add cash)
+        /// 6. Remove filled orders from resting list and reduce order book depth
+        ///
+        /// Key developer considerations:
+        /// - Reverse iteration prevents index issues during removals
+        /// - Handles both bid and ask sides with proper price conversions
+        /// - Maintains order book integrity by reducing depth after fills
+        /// - Supports partial fills (order.count can be reduced without full removal)
+        /// - No fees applied here as these are maker fills (fees only on taker actions)
         /// </remarks>
         private void SimulateFillsFromDeltas(Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas, DateTime currentTime)
         {
@@ -485,7 +544,7 @@ namespace TradingStrategies.Trading.Overseer
         }
 
         /// <summary>
-        /// Computes the differences between previous and current order book depths.
+        /// Calculates the differences between previous and current order book depths.
         /// </summary>
         /// <param name="prev">The previous order book depths by price.</param>
         /// <param name="curr">The current order book depths by price.</param>
@@ -494,7 +553,7 @@ namespace TradingStrategies.Trading.Overseer
         /// Calculates the change in order book depth at each price level.
         /// Positive delta indicates volume added, negative indicates volume removed.
         /// </remarks>
-        private Dictionary<int, int> ComputeDeltas(Dictionary<int, int> prev, Dictionary<int, int> curr)
+        private Dictionary<int, int> CalculateOrderBookDepthChanges(Dictionary<int, int> prev, Dictionary<int, int> curr)
         {
             var deltas = new Dictionary<int, int>();
             var allPrices = new HashSet<int>(prev.Keys.Concat(curr.Keys));
