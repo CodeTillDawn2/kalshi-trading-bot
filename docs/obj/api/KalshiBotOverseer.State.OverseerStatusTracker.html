@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class OverseerStatusTracker | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class OverseerStatusTracker | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Manages the global cancellation state for the Kalshi overseer system. This class provides a centralized CancellationTokenSource that can be used to coordinate graceful shutdown and cancellation across all components of the overseer.">
+      <link rel="shortcut icon" href="../../favicon.ico">
+      <link rel="stylesheet" href="../../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../../styles/docfx.css">
+      <link rel="stylesheet" href="../../styles/main.css">
+      <meta property="docfx:navrel" content="">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="KalshiBotOverseer.State.OverseerStatusTracker">
+
+
+
+  <h1 id="KalshiBotOverseer_State_OverseerStatusTracker" data-uid="KalshiBotOverseer.State.OverseerStatusTracker" class="text-break">Class OverseerStatusTracker</h1>
+  <div class="markdown level0 summary"><p>Manages the global cancellation state for the Kalshi overseer system.
+This class provides a centralized CancellationTokenSource that can be used to coordinate
+graceful shutdown and cancellation across all components of the overseer.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">OverseerStatusTracker</span></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="BacklashBot.State.Interfaces.IStatusTrackerService.html">IStatusTrackerService</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="KalshiBotOverseer.html">KalshiBotOverseer</a>.<a class="xref" href="KalshiBotOverseer.State.html">State</a></h6>
+  <h6><strong>Assembly</strong>: KalshiBotOverseer.dll</h6>
+  <h5 id="KalshiBotOverseer_State_OverseerStatusTracker_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class OverseerStatusTracker : IStatusTrackerService, IDisposable</code></pre>
+  </div>
+  <h5 id="KalshiBotOverseer_State_OverseerStatusTracker_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>The status tracker ensures thread-safe access to the global cancellation token and provides:</p>
+<ul>
+<li>A single CancellationToken that all components can monitor for shutdown signals</li>
+<li>Thread-safe cancellation operations</li>
+<li>Proper resource cleanup through IDisposable implementation</li>
+<li>Reset capability for restarting the cancellation state</li>
+</ul>
+<p>This is registered as a singleton service to ensure all components share the same cancellation state.</p>
+</div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker__ctor.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L35">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_State_OverseerStatusTracker__ctor_" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.#ctor*"></a>
+  <h4 id="KalshiBotOverseer_State_OverseerStatusTracker__ctor" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.#ctor">OverseerStatusTracker()</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the OverseerStatusTracker class.
+Creates the initial CancellationTokenSource and sets up the cancellation state.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public OverseerStatusTracker()</code></pre>
+  </div>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker_CancelAll.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.CancelAll%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L65">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_State_OverseerStatusTracker_CancelAll_" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.CancelAll*"></a>
+  <h4 id="KalshiBotOverseer_State_OverseerStatusTracker_CancelAll" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.CancelAll">CancelAll()</h4>
+  <div class="markdown level1 summary"><p>Cancels all operations by triggering the global cancellation token.
+This signals all components that are monitoring the cancellation token to stop their operations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void CancelAll()</code></pre>
+  </div>
+  <h5 id="KalshiBotOverseer_State_OverseerStatusTracker_CancelAll_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method is thread-safe and should be called when the overseer needs to shut down.
+After calling this method, the cancellation token will be in a cancelled state.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker_Dispose.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L101">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_State_OverseerStatusTracker_Dispose_" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.Dispose*"></a>
+  <h4 id="KalshiBotOverseer_State_OverseerStatusTracker_Dispose" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"><p>Disposes of the resources used by the status tracker.
+This cancels any pending operations and disposes of the CancellationTokenSource.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+  <h5 id="KalshiBotOverseer_State_OverseerStatusTracker_Dispose_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method should be called when the status tracker is no longer needed,
+typically during application shutdown. It ensures proper cleanup of unmanaged resources.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker_GetCancellationToken.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.GetCancellationToken%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L49">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_State_OverseerStatusTracker_GetCancellationToken_" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.GetCancellationToken*"></a>
+  <h4 id="KalshiBotOverseer_State_OverseerStatusTracker_GetCancellationToken" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.GetCancellationToken">GetCancellationToken()</h4>
+  <div class="markdown level1 summary"><p>Gets the global CancellationToken that all components should monitor for shutdown signals.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CancellationToken GetCancellationToken()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></td>
+        <td><p>The CancellationToken that can be used to monitor for cancellation requests.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="KalshiBotOverseer_State_OverseerStatusTracker_GetCancellationToken_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method provides thread-safe access to the cancellation token.
+Components should regularly check this token or use it in async operations
+to respond to shutdown requests gracefully.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker_ResetAll.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.ResetAll%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L81">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_State_OverseerStatusTracker_ResetAll_" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.ResetAll*"></a>
+  <h4 id="KalshiBotOverseer_State_OverseerStatusTracker_ResetAll" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.ResetAll">ResetAll()</h4>
+  <div class="markdown level1 summary"><p>Resets the cancellation state by creating a new CancellationTokenSource.
+This clears any previous cancellation state and allows the overseer to restart operations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ResetAll()</code></pre>
+  </div>
+  <h5 id="KalshiBotOverseer_State_OverseerStatusTracker_ResetAll_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method properly disposes of the old CancellationTokenSource before creating a new one.
+It should be called when restarting the overseer or when a fresh cancellation state is needed.</p>
+</div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="BacklashBot.State.Interfaces.IStatusTrackerService.html">IStatusTrackerService</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L19" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

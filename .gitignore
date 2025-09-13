@@ -108,3 +108,4 @@ BacklashBot/Logs/shutodown.log
 /KalshiBotTasks/obj
 /KalshiBotTests/bin
 /KalshiBotTests/obj
+!docs/**
