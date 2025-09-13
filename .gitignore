@@ -111,3 +111,4 @@ BacklashBot/Logs/shutodown.log
 !docs/**
 docfx_project/api/
 !docs/**
+!docs/**
