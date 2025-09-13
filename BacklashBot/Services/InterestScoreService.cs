@@ -2,6 +2,8 @@ using KalshiBotData.Data.Interfaces;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashInterfaces.Constants;
+using BacklashDTOs.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Services
 {
@@ -9,37 +11,180 @@ namespace BacklashBot.Services
     /// Service responsible for calculating interest scores for Kalshi markets based on various trading metrics.
     /// This service evaluates market attractiveness by analyzing spread characteristics, trading volume,
     /// liquidity patterns, and market continuity to provide quantitative scores for market selection.
+    ///
+    /// Features:
+    /// - Configurable cache duration for performance optimization
+    /// - Comprehensive performance metrics collection and monitoring
+    /// - Input validation for market tickers and weight parameters
+    /// - Thread-safe operations for concurrent access
+    /// - Automatic metrics logging with configurable intervals
     /// </summary>
     public class InterestScoreService : IInterestScoreService
     {
         private readonly ILogger<IInterestScoreService> _logger;
+        private readonly InterestScoreConfig _config;
         private Dictionary<string, (double P90, double P95, double P99, double MaxValue, DateTime LastUpdated)> percentileThresholdsCache = new();
         private (double MaxBidSum, double MaxVolume, DateTime LastUpdated) maxMarketValuesCache;
-        private readonly TimeSpan CacheDuration = TimeSpan.FromHours(6);
+
+        // Performance metrics
+        private int _cacheHits = 0;
+        private int _cacheMisses = 0;
+        private List<TimeSpan> _scoringOperationTimes = new();
+        private DateTime _lastMetricsLog = DateTime.UtcNow;
+
+        /// <summary>
+        /// Records a cache hit for performance metrics.
+        /// Increments the cache hit counter in a thread-safe manner when performance metrics are enabled.
+        /// Cache hits indicate successful reuse of cached percentile thresholds and market values.
+        /// </summary>
+        private void RecordCacheHit()
+        {
+            if (_config.EnablePerformanceMetrics)
+            {
+                Interlocked.Increment(ref _cacheHits);
+                LogMetricsIfNeeded();
+            }
+        }
+
+        /// <summary>
+        /// Records a cache miss for performance metrics.
+        /// Increments the cache miss counter in a thread-safe manner when performance metrics are enabled.
+        /// Cache misses indicate that percentile thresholds and market values needed to be recalculated.
+        /// </summary>
+        private void RecordCacheMiss()
+        {
+            if (_config.EnablePerformanceMetrics)
+            {
+                Interlocked.Increment(ref _cacheMisses);
+                LogMetricsIfNeeded();
+            }
+        }
+
+        /// <summary>
+        /// Records the duration of a scoring operation for performance metrics.
+        /// Stores the operation timing in a thread-safe collection for performance analysis.
+        /// Maintains a rolling history of operation times with automatic cleanup of old entries.
+        /// </summary>
+        /// <param name="duration">The time taken for the scoring operation.</param>
+        private void RecordScoringOperationTime(TimeSpan duration)
+        {
+            if (_config.EnablePerformanceMetrics)
+            {
+                lock (_scoringOperationTimes)
+                {
+                    _scoringOperationTimes.Add(duration);
+                    if (_scoringOperationTimes.Count > _config.MaxPerformanceMetricsHistory)
+                    {
+                        _scoringOperationTimes.RemoveAt(0);
+                    }
+                }
+                LogMetricsIfNeeded();
+            }
+        }
+
+        /// <summary>
+        /// Validates market ticker symbols for null, empty, or invalid values.
+        /// Ensures all ticker symbols are non-null, non-empty, and contain meaningful content.
+        /// </summary>
+        /// <param name="tickers">Collection of ticker symbols to validate.</param>
+        /// <exception cref="ArgumentException">Thrown when tickers contain invalid values.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the tickers collection is null.</exception>
+        private void ValidateTickers(IEnumerable<string> tickers)
+        {
+            if (tickers == null)
+            {
+                throw new ArgumentNullException(nameof(tickers), "Tickers collection cannot be null.");
+            }
+
+            var invalidTickers = tickers.Where(t => string.IsNullOrWhiteSpace(t)).ToList();
+            if (invalidTickers.Any())
+            {
+                throw new ArgumentException($"Invalid ticker symbols found: {string.Join(", ", invalidTickers)}", nameof(tickers));
+            }
+        }
+
+        /// <summary>
+        /// Validates weight parameters to ensure they are within valid ranges (0.0 to 1.0).
+        /// Weight parameters control the relative importance of different scoring factors and must
+        /// be normalized to prevent invalid scoring calculations.
+        /// </summary>
+        /// <param name="weights">Dictionary of weight parameter names and values to validate.</param>
+        /// <exception cref="ArgumentException">Thrown when any weight parameter is outside the 0.0-1.0 range.</exception>
+        private void ValidateWeights(Dictionary<string, double> weights)
+        {
+            foreach (var (name, value) in weights)
+            {
+                if (value < 0.0 || value > 1.0)
+                {
+                    throw new ArgumentException($"Weight parameter '{name}' must be between 0.0 and 1.0, but was {value}.", name);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Logs performance metrics if enough time has passed since the last log.
+        /// Periodically outputs cache hit rates, average operation times, and request counts
+        /// to provide insights into system performance and cache efficiency.
+        /// Logging occurs every 5 minutes when performance metrics are enabled.
+        /// </summary>
+        private void LogMetricsIfNeeded()
+        {
+            if (_config.EnablePerformanceMetrics && DateTime.UtcNow - _lastMetricsLog > TimeSpan.FromMinutes(5))
+            {
+                var hits = _cacheHits;
+                var misses = _cacheMisses;
+                var totalRequests = hits + misses;
+                var hitRate = totalRequests > 0 ? (double)hits / totalRequests * 100 : 0;
+
+                double avgOperationTime = 0;
+                lock (_scoringOperationTimes)
+                {
+                    if (_scoringOperationTimes.Count > 0)
+                    {
+                        avgOperationTime = _scoringOperationTimes.Average(t => t.TotalMilliseconds);
+                    }
+                }
+
+                _logger.LogInformation("InterestScoreService Performance Metrics - Cache Hit Rate: {HitRate:F2}%, Avg Operation Time: {AvgTime:F2}ms, Total Requests: {TotalRequests}",
+                    hitRate, avgOperationTime, totalRequests);
+
+                _lastMetricsLog = DateTime.UtcNow;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InterestScoreService"/> class.
         /// </summary>
         /// <param name="logger">The logger instance for recording service operations and errors.</param>
-        public InterestScoreService(ILogger<IInterestScoreService> logger)
+        /// <param name="config">The configuration options for the interest score service, including cache duration and performance metrics settings.</param>
+        public InterestScoreService(ILogger<IInterestScoreService> logger, IOptions<InterestScoreConfig> config)
         {
             _logger = logger;
+            _config = config.Value;
         }
 
         /// <summary>
         /// Calculates interest scores for a collection of market tickers using configurable weighting factors.
         /// This method fetches current market data from the API and computes scores for each ticker,
         /// handling errors gracefully by assigning default scores to failed calculations.
+        ///
+        /// Features:
+        /// - Input validation for tickers and weight parameters
+        /// - Performance metrics collection for operation timing
+        /// - Thread-safe processing with cancellation support
+        /// - Comprehensive error handling with detailed logging
         /// </summary>
         /// <param name="scopeFactory">Factory for creating service scopes to access dependencies.</param>
-        /// <param name="tickers">Collection of market ticker symbols to score.</param>
-        /// <param name="spreadTightnessWeight">Weight factor for spread tightness component (0.0-1.0).</param>
-        /// <param name="spreadWidthWeight">Weight factor for spread width component (0.0-1.0).</param>
-        /// <param name="volumeWeight">Weight factor for volume component (0.0-1.0).</param>
-        /// <param name="volumePercentileWeight">Weight factor for volume percentile component (0.0-1.0).</param>
-        /// <param name="liquidityPercentileWeight">Weight factor for liquidity percentile component (0.0-1.0).</param>
-        /// <param name="openInterestPercentileWeight">Weight factor for open interest percentile component (0.0-1.0).</param>
+        /// <param name="tickers">Collection of market ticker symbols to score. Must not be null or contain empty/whitespace values.</param>
+        /// <param name="spreadTightnessWeight">Weight factor for spread tightness component (0.0-1.0). Must be within valid range.</param>
+        /// <param name="spreadWidthWeight">Weight factor for spread width component (0.0-1.0). Must be within valid range.</param>
+        /// <param name="volumeWeight">Weight factor for volume component (0.0-1.0). Must be within valid range.</param>
+        /// <param name="volumePercentileWeight">Weight factor for volume percentile component (0.0-1.0). Must be within valid range.</param>
+        /// <param name="liquidityPercentileWeight">Weight factor for liquidity percentile component (0.0-1.0). Must be within valid range.</param>
+        /// <param name="openInterestPercentileWeight">Weight factor for open interest percentile component (0.0-1.0). Must be within valid range.</param>
         /// <returns>A list of tuples containing ticker symbols and their calculated interest scores.</returns>
+        /// <exception cref="ArgumentException">Thrown when tickers are invalid or weights are outside the 0.0-1.0 range.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the tickers collection is null.</exception>
         public async Task<List<(string Ticker, double Score)>> GetMarketInterestScores(
             IServiceScopeFactory scopeFactory,
             IEnumerable<string> tickers,
@@ -50,6 +195,17 @@ namespace BacklashBot.Services
             double liquidityPercentileWeight = 0.06,
             double openInterestPercentileWeight = 0.06)
         {
+            // Input validation
+            ValidateTickers(tickers);
+            ValidateWeights(new Dictionary<string, double>
+            {
+                ["spreadTightnessWeight"] = spreadTightnessWeight,
+                ["spreadWidthWeight"] = spreadWidthWeight,
+                ["volumeWeight"] = volumeWeight,
+                ["volumePercentileWeight"] = volumePercentileWeight,
+                ["liquidityPercentileWeight"] = liquidityPercentileWeight,
+                ["openInterestPercentileWeight"] = openInterestPercentileWeight
+            });
 
             var uniqueTickers = tickers.Distinct().ToArray();
             var marketScores = new List<(string Ticker, double Score)>();
@@ -105,18 +261,27 @@ namespace BacklashBot.Services
         /// Calculates a comprehensive interest score for a specific market ticker.
         /// The score is computed using multiple weighted factors including spread characteristics,
         /// trading volume, liquidity, open interest, and market continuity. Thresholds and
-        /// maximum values are cached for performance and recalculated periodically.
+        /// maximum values are cached for performance and recalculated periodically based on
+        /// configurable cache duration settings.
+        ///
+        /// Features:
+        /// - Input validation for ticker and weight parameters
+        /// - Configurable cache duration for performance optimization
+        /// - Performance metrics collection for operation timing
+        /// - Cache hit/miss tracking for monitoring efficiency
+        /// - Comprehensive error handling with detailed logging
         /// </summary>
         /// <param name="dbContext">Database context for accessing market data.</param>
-        /// <param name="marketTicker">The market ticker symbol to score.</param>
-        /// <param name="spreadTightnessWeight">Weight for spread tightness factor.</param>
-        /// <param name="spreadWidthWeight">Weight for spread width factor.</param>
-        /// <param name="volumeWeight">Weight for volume factor.</param>
-        /// <param name="volumePercentileWeight">Weight for volume percentile factor.</param>
-        /// <param name="liquidityPercentileWeight">Weight for liquidity percentile factor.</param>
-        /// <param name="openInterestPercentileWeight">Weight for open interest percentile factor.</param>
-        /// <param name="continuityWeight">Weight for market continuity factor.</param>
+        /// <param name="marketTicker">The market ticker symbol to score. Must not be null or empty.</param>
+        /// <param name="spreadTightnessWeight">Weight for spread tightness factor (0.0-1.0). Must be within valid range.</param>
+        /// <param name="spreadWidthWeight">Weight for spread width factor (0.0-1.0). Must be within valid range.</param>
+        /// <param name="volumeWeight">Weight for volume factor (0.0-1.0). Must be within valid range.</param>
+        /// <param name="volumePercentileWeight">Weight for volume percentile factor (0.0-1.0). Must be within valid range.</param>
+        /// <param name="liquidityPercentileWeight">Weight for liquidity percentile factor (0.0-1.0). Must be within valid range.</param>
+        /// <param name="openInterestPercentileWeight">Weight for open interest percentile factor (0.0-1.0). Must be within valid range.</param>
+        /// <param name="continuityWeight">Weight for market continuity factor (0.0-1.0). Must be within valid range.</param>
         /// <returns>A tuple containing the final score and detailed score components.</returns>
+        /// <exception cref="ArgumentException">Thrown when ticker is invalid or weights are outside the 0.0-1.0 range.</exception>
         public async Task<(double score,
     (double spreadTightness, double spreadWidth, double volume, double volumePercentile, double liquidityPercentile, double openInterestPercentile, double continuity) scoreParts)>
 CalculateMarketInterestScoreAsync(
@@ -130,8 +295,26 @@ CalculateMarketInterestScoreAsync(
     double openInterestPercentileWeight = 0.065,
     double continuityWeight = 0.145)
         {
+            var startTime = DateTime.UtcNow;
             try
             {
+                // Input validation
+                if (string.IsNullOrWhiteSpace(marketTicker))
+                {
+                    throw new ArgumentException("Market ticker cannot be null or empty.", nameof(marketTicker));
+                }
+
+                ValidateWeights(new Dictionary<string, double>
+                {
+                    ["spreadTightnessWeight"] = spreadTightnessWeight,
+                    ["spreadWidthWeight"] = spreadWidthWeight,
+                    ["volumeWeight"] = volumeWeight,
+                    ["volumePercentileWeight"] = volumePercentileWeight,
+                    ["liquidityPercentileWeight"] = liquidityPercentileWeight,
+                    ["openInterestPercentileWeight"] = openInterestPercentileWeight,
+                    ["continuityWeight"] = continuityWeight
+                });
+
                 // Threshold and max values calculation
                 async Task ComputePercentileThresholdsAndMaxValuesAsync()
                 {
@@ -174,12 +357,17 @@ CalculateMarketInterestScoreAsync(
 
                 // Check if thresholds and max values need recalculation
                 bool needsRecalculation = !percentileThresholdsCache.Any() ||
-                    percentileThresholdsCache.Values.Any(t => DateTime.UtcNow - t.LastUpdated > CacheDuration) ||
-                    DateTime.UtcNow - maxMarketValuesCache.LastUpdated > CacheDuration;
+                    percentileThresholdsCache.Values.Any(t => DateTime.UtcNow - t.LastUpdated > TimeSpan.FromHours(_config.CacheDurationHours)) ||
+                    DateTime.UtcNow - maxMarketValuesCache.LastUpdated > TimeSpan.FromHours(_config.CacheDurationHours);
 
                 if (needsRecalculation)
                 {
+                    RecordCacheMiss();
                     await ComputePercentileThresholdsAndMaxValuesAsync();
+                }
+                else
+                {
+                    RecordCacheHit();
                 }
 
                 // Get market data
@@ -260,10 +448,12 @@ CalculateMarketInterestScoreAsync(
                 );
 
                 _logger.LogInformation("Calculated interest score {Score} for market {MarketTicker}.", finalScore, marketTicker);
+                RecordScoringOperationTime(DateTime.UtcNow - startTime);
                 return (finalScore, scoreParts);
             }
             catch (Exception ex)
             {
+                RecordScoringOperationTime(DateTime.UtcNow - startTime);
                 _logger.LogError(ex, "Failed to calculate MarketInterestScore for {MarketTicker}.", marketTicker);
                 throw;
             }
