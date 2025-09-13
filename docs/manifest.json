@@ -58,7 +58,7 @@
       "source_relative_path": "obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.html"
+          "relative_path": "api/obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.html"
         }
       },
       "version": "",
@@ -72,7 +72,7 @@
       "source_relative_path": "obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.html"
+          "relative_path": "api/obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.html"
         }
       },
       "version": "",
@@ -86,7 +86,7 @@
       "source_relative_path": "obj/api/BacklashBot.Helpers.TradingCalculations.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Helpers.TradingCalculations.html"
+          "relative_path": "api/obj/api/BacklashBot.Helpers.TradingCalculations.html"
         }
       },
       "version": "",
@@ -100,7 +100,7 @@
       "source_relative_path": "obj/api/BacklashBot.Helpers.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Helpers.html"
+          "relative_path": "api/obj/api/BacklashBot.Helpers.html"
         }
       },
       "version": "",
@@ -114,7 +114,7 @@
       "source_relative_path": "obj/api/BacklashBot.Hubs.ChartHub.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Hubs.ChartHub.html"
+          "relative_path": "api/obj/api/BacklashBot.Hubs.ChartHub.html"
         }
       },
       "version": "",
@@ -128,7 +128,7 @@
       "source_relative_path": "obj/api/BacklashBot.Hubs.CheckInData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Hubs.CheckInData.html"
+          "relative_path": "api/obj/api/BacklashBot.Hubs.CheckInData.html"
         }
       },
       "version": "",
@@ -142,7 +142,7 @@
       "source_relative_path": "obj/api/BacklashBot.Hubs.CheckInResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Hubs.CheckInResponse.html"
+          "relative_path": "api/obj/api/BacklashBot.Hubs.CheckInResponse.html"
         }
       },
       "version": "",
@@ -156,7 +156,7 @@
       "source_relative_path": "obj/api/BacklashBot.Hubs.TargetTickersConfirmationResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Hubs.TargetTickersConfirmationResponse.html"
+          "relative_path": "api/obj/api/BacklashBot.Hubs.TargetTickersConfirmationResponse.html"
         }
       },
       "version": "",
@@ -170,7 +170,7 @@
       "source_relative_path": "obj/api/BacklashBot.Hubs.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Hubs.html"
+          "relative_path": "api/obj/api/BacklashBot.Hubs.html"
         }
       },
       "version": "",
@@ -184,7 +184,7 @@
       "source_relative_path": "obj/api/BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.html"
+          "relative_path": "api/obj/api/BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.html"
         }
       },
       "version": "",
@@ -198,7 +198,7 @@
       "source_relative_path": "obj/api/BacklashBot.KalshiAPI.Interfaces.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.KalshiAPI.Interfaces.html"
+          "relative_path": "api/obj/api/BacklashBot.KalshiAPI.Interfaces.html"
         }
       },
       "version": "",
@@ -212,7 +212,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.BaseMarketManagerService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.BaseMarketManagerService.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.BaseMarketManagerService.html"
         }
       },
       "version": "",
@@ -226,7 +226,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.BrainStatusService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.BrainStatusService.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.BrainStatusService.html"
         }
       },
       "version": "",
@@ -240,7 +240,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.CentralBrain.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.CentralBrain.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.CentralBrain.html"
         }
       },
       "version": "",
@@ -254,7 +254,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.CentralErrorHandler.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.CentralErrorHandler.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.CentralErrorHandler.html"
         }
       },
       "version": "",
@@ -268,7 +268,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.CentralPerformanceMonitor.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.CentralPerformanceMonitor.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.CentralPerformanceMonitor.html"
         }
       },
       "version": "",
@@ -282,7 +282,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.Interfaces.IBrainStatusService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.Interfaces.IBrainStatusService.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.Interfaces.IBrainStatusService.html"
         }
       },
       "version": "",
@@ -296,7 +296,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.Interfaces.ICentralBrain.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.Interfaces.ICentralBrain.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.Interfaces.ICentralBrain.html"
         }
       },
       "version": "",
@@ -310,7 +310,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.Interfaces.ICentralErrorHandler.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.Interfaces.ICentralErrorHandler.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.Interfaces.ICentralErrorHandler.html"
         }
       },
       "version": "",
@@ -324,7 +324,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.html"
         }
       },
       "version": "",
@@ -338,7 +338,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.Interfaces.IInterestScoreService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.Interfaces.IInterestScoreService.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.Interfaces.IInterestScoreService.html"
         }
       },
       "version": "",
@@ -352,7 +352,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.Interfaces.IMarketAnalysisHelper.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.Interfaces.IMarketAnalysisHelper.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.Interfaces.IMarketAnalysisHelper.html"
         }
       },
       "version": "",
@@ -366,7 +366,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.Interfaces.IMarketManagerService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.Interfaces.IMarketManagerService.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.Interfaces.IMarketManagerService.html"
         }
       },
       "version": "",
@@ -380,7 +380,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.Interfaces.IOvernightActivitiesHelper.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.Interfaces.IOvernightActivitiesHelper.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.Interfaces.IOvernightActivitiesHelper.html"
         }
       },
       "version": "",
@@ -394,7 +394,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.Interfaces.ITargetCalculationService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.Interfaces.ITargetCalculationService.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.Interfaces.ITargetCalculationService.html"
         }
       },
       "version": "",
@@ -408,7 +408,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.Interfaces.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.Interfaces.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.Interfaces.html"
         }
       },
       "version": "",
@@ -422,7 +422,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.ManagedMarketManagerService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.ManagedMarketManagerService.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.ManagedMarketManagerService.html"
         }
       },
       "version": "",
@@ -436,7 +436,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.MarketAnalysisHelper.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.MarketAnalysisHelper.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.MarketAnalysisHelper.html"
         }
       },
       "version": "",
@@ -450,7 +450,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.MarketManagerService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.MarketManagerService.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.MarketManagerService.html"
         }
       },
       "version": "",
@@ -464,7 +464,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.OvernightActivitiesHelper.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.OvernightActivitiesHelper.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.OvernightActivitiesHelper.html"
         }
       },
       "version": "",
@@ -478,7 +478,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.TargetCalculationService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.TargetCalculationService.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.TargetCalculationService.html"
         }
       },
       "version": "",
@@ -492,7 +492,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.UnmanagedMarketManagerService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.UnmanagedMarketManagerService.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.UnmanagedMarketManagerService.html"
         }
       },
       "version": "",
@@ -506,7 +506,7 @@
       "source_relative_path": "obj/api/BacklashBot.Management.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Management.html"
+          "relative_path": "api/obj/api/BacklashBot.Management.html"
         }
       },
       "version": "",
@@ -520,7 +520,7 @@
       "source_relative_path": "obj/api/BacklashBot.MarketDataTests.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.MarketDataTests.html"
+          "relative_path": "api/obj/api/BacklashBot.MarketDataTests.html"
         }
       },
       "version": "",
@@ -534,7 +534,7 @@
       "source_relative_path": "obj/api/BacklashBot.Middleware.SignalRAuthenticationMiddleware.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Middleware.SignalRAuthenticationMiddleware.html"
+          "relative_path": "api/obj/api/BacklashBot.Middleware.SignalRAuthenticationMiddleware.html"
         }
       },
       "version": "",
@@ -548,7 +548,7 @@
       "source_relative_path": "obj/api/BacklashBot.Middleware.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Middleware.html"
+          "relative_path": "api/obj/api/BacklashBot.Middleware.html"
         }
       },
       "version": "",
@@ -562,7 +562,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.BroadcastService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.BroadcastService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.BroadcastService.html"
         }
       },
       "version": "",
@@ -576,7 +576,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.CandlestickService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.CandlestickService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.CandlestickService.html"
         }
       },
       "version": "",
@@ -590,7 +590,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.HealthCheckService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.HealthCheckService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.HealthCheckService.html"
         }
       },
       "version": "",
@@ -604,7 +604,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.InterestScoreService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.InterestScoreService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.InterestScoreService.html"
         }
       },
       "version": "",
@@ -618,7 +618,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.IBroadcastService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.IBroadcastService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.IBroadcastService.html"
         }
       },
       "version": "",
@@ -632,7 +632,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.ICandlestickService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.ICandlestickService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.ICandlestickService.html"
         }
       },
       "version": "",
@@ -646,7 +646,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.IMarketDataInitializer.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.IMarketDataInitializer.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.IMarketDataInitializer.html"
         }
       },
       "version": "",
@@ -660,7 +660,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.IMarketDataService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.IMarketDataService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.IMarketDataService.html"
         }
       },
       "version": "",
@@ -674,7 +674,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.IMarketRefreshService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.IMarketRefreshService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.IMarketRefreshService.html"
         }
       },
       "version": "",
@@ -688,7 +688,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.IOrderBookService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.IOrderBookService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.IOrderBookService.html"
         }
       },
       "version": "",
@@ -702,7 +702,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.IOrderbookChangeTracker.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.IOrderbookChangeTracker.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.IOrderbookChangeTracker.html"
         }
       },
       "version": "",
@@ -716,7 +716,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.IScopeManagerService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.IScopeManagerService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.IScopeManagerService.html"
         }
       },
       "version": "",
@@ -730,7 +730,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.IServiceFactory.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.IServiceFactory.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.IServiceFactory.html"
         }
       },
       "version": "",
@@ -744,7 +744,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.ISqlDataService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.ISqlDataService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.ISqlDataService.html"
         }
       },
       "version": "",
@@ -758,7 +758,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.ITradingSnapshotService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.ITradingSnapshotService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.ITradingSnapshotService.html"
         }
       },
       "version": "",
@@ -772,7 +772,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.IWebSocketMonitorService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.IWebSocketMonitorService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.IWebSocketMonitorService.html"
         }
       },
       "version": "",
@@ -786,7 +786,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.Interfaces.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.Interfaces.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.Interfaces.html"
         }
       },
       "version": "",
@@ -800,7 +800,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.KaslhiBotScopeManagerService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.KaslhiBotScopeManagerService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.KaslhiBotScopeManagerService.html"
         }
       },
       "version": "",
@@ -814,7 +814,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.MarketDataInitializer.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.MarketDataInitializer.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.MarketDataInitializer.html"
         }
       },
       "version": "",
@@ -828,7 +828,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.MarketDataService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.MarketDataService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.MarketDataService.html"
         }
       },
       "version": "",
@@ -842,7 +842,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.MarketRefreshService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.MarketRefreshService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.MarketRefreshService.html"
         }
       },
       "version": "",
@@ -856,7 +856,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.OrderBookService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.OrderBookService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.OrderBookService.html"
         }
       },
       "version": "",
@@ -870,7 +870,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.OrderbookChangeTracker.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.OrderbookChangeTracker.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.OrderbookChangeTracker.html"
         }
       },
       "version": "",
@@ -884,7 +884,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.OverseerClientService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.OverseerClientService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.OverseerClientService.html"
         }
       },
       "version": "",
@@ -898,7 +898,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.ServiceFactory.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.ServiceFactory.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.ServiceFactory.html"
         }
       },
       "version": "",
@@ -912,7 +912,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.TradingCalculator.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.TradingCalculator.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.TradingCalculator.html"
         }
       },
       "version": "",
@@ -926,7 +926,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.TradingSnapshotService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.TradingSnapshotService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.TradingSnapshotService.html"
         }
       },
       "version": "",
@@ -940,7 +940,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.WebSocketMonitorService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.WebSocketMonitorService.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.WebSocketMonitorService.html"
         }
       },
       "version": "",
@@ -954,7 +954,7 @@
       "source_relative_path": "obj/api/BacklashBot.Services.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Services.html"
+          "relative_path": "api/obj/api/BacklashBot.Services.html"
         }
       },
       "version": "",
@@ -968,7 +968,7 @@
       "source_relative_path": "obj/api/BacklashBot.State.DataCache.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.State.DataCache.html"
+          "relative_path": "api/obj/api/BacklashBot.State.DataCache.html"
         }
       },
       "version": "",
@@ -982,7 +982,7 @@
       "source_relative_path": "obj/api/BacklashBot.State.Interfaces.IBotReadyStatus.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.State.Interfaces.IBotReadyStatus.html"
+          "relative_path": "api/obj/api/BacklashBot.State.Interfaces.IBotReadyStatus.html"
         }
       },
       "version": "",
@@ -996,7 +996,7 @@
       "source_relative_path": "obj/api/BacklashBot.State.Interfaces.IDataCache.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.State.Interfaces.IDataCache.html"
+          "relative_path": "api/obj/api/BacklashBot.State.Interfaces.IDataCache.html"
         }
       },
       "version": "",
@@ -1010,7 +1010,7 @@
       "source_relative_path": "obj/api/BacklashBot.State.Interfaces.IMarketData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.State.Interfaces.IMarketData.html"
+          "relative_path": "api/obj/api/BacklashBot.State.Interfaces.IMarketData.html"
         }
       },
       "version": "",
@@ -1024,7 +1024,7 @@
       "source_relative_path": "obj/api/BacklashBot.State.Interfaces.IStatusTrackerService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.State.Interfaces.IStatusTrackerService.html"
+          "relative_path": "api/obj/api/BacklashBot.State.Interfaces.IStatusTrackerService.html"
         }
       },
       "version": "",
@@ -1038,7 +1038,7 @@
       "source_relative_path": "obj/api/BacklashBot.State.Interfaces.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.State.Interfaces.html"
+          "relative_path": "api/obj/api/BacklashBot.State.Interfaces.html"
         }
       },
       "version": "",
@@ -1052,7 +1052,7 @@
       "source_relative_path": "obj/api/BacklashBot.State.KalshiBotReadyStatus.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.State.KalshiBotReadyStatus.html"
+          "relative_path": "api/obj/api/BacklashBot.State.KalshiBotReadyStatus.html"
         }
       },
       "version": "",
@@ -1066,7 +1066,7 @@
       "source_relative_path": "obj/api/BacklashBot.State.KalshiBotStatusTracker.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.State.KalshiBotStatusTracker.html"
+          "relative_path": "api/obj/api/BacklashBot.State.KalshiBotStatusTracker.html"
         }
       },
       "version": "",
@@ -1080,7 +1080,7 @@
       "source_relative_path": "obj/api/BacklashBot.State.MarketData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.State.MarketData.html"
+          "relative_path": "api/obj/api/BacklashBot.State.MarketData.html"
         }
       },
       "version": "",
@@ -1094,7 +1094,7 @@
       "source_relative_path": "obj/api/BacklashBot.State.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.State.html"
+          "relative_path": "api/obj/api/BacklashBot.State.html"
         }
       },
       "version": "",
@@ -1108,7 +1108,7 @@
       "source_relative_path": "obj/api/BacklashBot.Timers.SystemTimer.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Timers.SystemTimer.html"
+          "relative_path": "api/obj/api/BacklashBot.Timers.SystemTimer.html"
         }
       },
       "version": "",
@@ -1122,7 +1122,7 @@
       "source_relative_path": "obj/api/BacklashBot.Timers.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.Timers.html"
+          "relative_path": "api/obj/api/BacklashBot.Timers.html"
         }
       },
       "version": "",
@@ -1136,7 +1136,7 @@
       "source_relative_path": "obj/api/BacklashBot.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashBot.html"
+          "relative_path": "api/obj/api/BacklashBot.html"
         }
       },
       "version": "",
@@ -1150,7 +1150,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.BollingerBandsConverter.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.BollingerBandsConverter.html"
+          "relative_path": "api/obj/api/BacklashDTOs.BollingerBandsConverter.html"
         }
       },
       "version": "",
@@ -1164,7 +1164,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.CacheSnapshot.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.CacheSnapshot.html"
+          "relative_path": "api/obj/api/BacklashDTOs.CacheSnapshot.html"
         }
       },
       "version": "",
@@ -1178,7 +1178,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.CandleMids.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.CandleMids.html"
+          "relative_path": "api/obj/api/BacklashDTOs.CandleMids.html"
         }
       },
       "version": "",
@@ -1192,7 +1192,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.CandlestickData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.CandlestickData.html"
+          "relative_path": "api/obj/api/BacklashDTOs.CandlestickData.html"
         }
       },
       "version": "",
@@ -1206,7 +1206,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Configuration.CentralBrainConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Configuration.CentralBrainConfig.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Configuration.CentralBrainConfig.html"
         }
       },
       "version": "",
@@ -1220,7 +1220,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Configuration.ExecutionConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Configuration.ExecutionConfig.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Configuration.ExecutionConfig.html"
         }
       },
       "version": "",
@@ -1234,7 +1234,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Configuration.LoggingConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Configuration.LoggingConfig.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Configuration.LoggingConfig.html"
         }
       },
       "version": "",
@@ -1248,7 +1248,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Configuration.MarketDataConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Configuration.MarketDataConfig.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Configuration.MarketDataConfig.html"
         }
       },
       "version": "",
@@ -1262,7 +1262,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Configuration.SimulatorConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Configuration.SimulatorConfig.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Configuration.SimulatorConfig.html"
         }
       },
       "version": "",
@@ -1276,7 +1276,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Configuration.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Configuration.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Configuration.html"
         }
       },
       "version": "",
@@ -1290,7 +1290,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Converters.MarketSnapshotSlimConverter.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Converters.MarketSnapshotSlimConverter.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Converters.MarketSnapshotSlimConverter.html"
         }
       },
       "version": "",
@@ -1304,7 +1304,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Converters.OrderbookSlimConverter.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Converters.OrderbookSlimConverter.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Converters.OrderbookSlimConverter.html"
         }
       },
       "version": "",
@@ -1318,7 +1318,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Converters.RawJsonStringConverter.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Converters.RawJsonStringConverter.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Converters.RawJsonStringConverter.html"
         }
       },
       "version": "",
@@ -1332,7 +1332,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Converters.ShortIsoDateTimeConverter.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Converters.ShortIsoDateTimeConverter.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Converters.ShortIsoDateTimeConverter.html"
         }
       },
       "version": "",
@@ -1346,7 +1346,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Converters.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Converters.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Converters.html"
         }
       },
       "version": "",
@@ -1360,7 +1360,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.AnnouncementDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.AnnouncementDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.AnnouncementDTO.html"
         }
       },
       "version": "",
@@ -1374,7 +1374,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.BrainInstanceDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.BrainInstanceDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.BrainInstanceDTO.html"
         }
       },
       "version": "",
@@ -1388,7 +1388,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.CandlestickDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.CandlestickDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.CandlestickDTO.html"
         }
       },
       "version": "",
@@ -1402,7 +1402,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.EventDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.EventDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.EventDTO.html"
         }
       },
       "version": "",
@@ -1416,7 +1416,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.ExchangeScheduleDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.ExchangeScheduleDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.ExchangeScheduleDTO.html"
         }
       },
       "version": "",
@@ -1430,7 +1430,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.LogEntryDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.LogEntryDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.LogEntryDTO.html"
         }
       },
       "version": "",
@@ -1444,7 +1444,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.MaintenanceWindowDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.MaintenanceWindowDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.MaintenanceWindowDTO.html"
         }
       },
       "version": "",
@@ -1458,7 +1458,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.MarketDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.MarketDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.MarketDTO.html"
         }
       },
       "version": "",
@@ -1472,7 +1472,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.MarketPositionDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.MarketPositionDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.MarketPositionDTO.html"
         }
       },
       "version": "",
@@ -1486,7 +1486,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.MarketWatchDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.MarketWatchDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.MarketWatchDTO.html"
         }
       },
       "version": "",
@@ -1500,7 +1500,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.OrderDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.OrderDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.OrderDTO.html"
         }
       },
       "version": "",
@@ -1514,7 +1514,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.OverseerInfo.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.OverseerInfo.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.OverseerInfo.html"
         }
       },
       "version": "",
@@ -1528,7 +1528,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.SeriesDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.SeriesDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.SeriesDTO.html"
         }
       },
       "version": "",
@@ -1542,7 +1542,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.SeriesSettlementSourceDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.SeriesSettlementSourceDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.SeriesSettlementSourceDTO.html"
         }
       },
       "version": "",
@@ -1556,7 +1556,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.SeriesTagDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.SeriesTagDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.SeriesTagDTO.html"
         }
       },
       "version": "",
@@ -1570,7 +1570,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.SnapshotDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.SnapshotDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.SnapshotDTO.html"
         }
       },
       "version": "",
@@ -1584,7 +1584,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.SnapshotGroupDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.SnapshotGroupDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.SnapshotGroupDTO.html"
         }
       },
       "version": "",
@@ -1598,7 +1598,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.SnapshotSchemaDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.SnapshotSchemaDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.SnapshotSchemaDTO.html"
         }
       },
       "version": "",
@@ -1612,7 +1612,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.StandardHoursDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.StandardHoursDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.StandardHoursDTO.html"
         }
       },
       "version": "",
@@ -1626,7 +1626,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.StandardHoursSessionDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.StandardHoursSessionDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.StandardHoursSessionDTO.html"
         }
       },
       "version": "",
@@ -1640,7 +1640,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.TickerDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.TickerDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.TickerDTO.html"
         }
       },
       "version": "",
@@ -1654,7 +1654,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.WeightSetDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.WeightSetDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.WeightSetDTO.html"
         }
       },
       "version": "",
@@ -1668,7 +1668,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.WeightSetMarketDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.WeightSetMarketDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.WeightSetMarketDTO.html"
         }
       },
       "version": "",
@@ -1682,7 +1682,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Data.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Data.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Data.html"
         }
       },
       "version": "",
@@ -1696,7 +1696,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.ErrorHandlerTaskInfo.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.ErrorHandlerTaskInfo.html"
+          "relative_path": "api/obj/api/BacklashDTOs.ErrorHandlerTaskInfo.html"
         }
       },
       "version": "",
@@ -1710,7 +1710,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.EventLifecycleEventArgs.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.EventLifecycleEventArgs.html"
+          "relative_path": "api/obj/api/BacklashDTOs.EventLifecycleEventArgs.html"
         }
       },
       "version": "",
@@ -1724,7 +1724,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.CandlestickFetchException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.CandlestickFetchException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.CandlestickFetchException.html"
         }
       },
       "version": "",
@@ -1738,7 +1738,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.CandlestickTransientFailureException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.CandlestickTransientFailureException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.CandlestickTransientFailureException.html"
         }
       },
       "version": "",
@@ -1752,7 +1752,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.ConnectionDisruptionException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.ConnectionDisruptionException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.ConnectionDisruptionException.html"
         }
       },
       "version": "",
@@ -1766,7 +1766,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.DeadLockException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.DeadLockException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.DeadLockException.html"
         }
       },
       "version": "",
@@ -1780,7 +1780,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.IBacklashBotException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.IBacklashBotException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.IBacklashBotException.html"
         }
       },
       "version": "",
@@ -1794,7 +1794,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.KalshiKeyFileNotFoundException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.KalshiKeyFileNotFoundException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.KalshiKeyFileNotFoundException.html"
         }
       },
       "version": "",
@@ -1808,7 +1808,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.KnownDuplicateInsertException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.KnownDuplicateInsertException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.KnownDuplicateInsertException.html"
         }
       },
       "version": "",
@@ -1822,7 +1822,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.MarketInterestScoreDeadlockException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.MarketInterestScoreDeadlockException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.MarketInterestScoreDeadlockException.html"
         }
       },
       "version": "",
@@ -1836,7 +1836,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.MarketInvalidException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.MarketInvalidException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.MarketInvalidException.html"
         }
       },
       "version": "",
@@ -1850,7 +1850,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.MarketTransientFailureException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.MarketTransientFailureException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.MarketTransientFailureException.html"
         }
       },
       "version": "",
@@ -1864,7 +1864,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.NotInCacheException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.NotInCacheException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.NotInCacheException.html"
         }
       },
       "version": "",
@@ -1878,7 +1878,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.OrderbookTransientFailureException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.OrderbookTransientFailureException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.OrderbookTransientFailureException.html"
         }
       },
       "version": "",
@@ -1892,7 +1892,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.ProcessingThresholdExceededException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.ProcessingThresholdExceededException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.ProcessingThresholdExceededException.html"
         }
       },
       "version": "",
@@ -1906,7 +1906,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.SnapshotInvalidException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.SnapshotInvalidException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.SnapshotInvalidException.html"
         }
       },
       "version": "",
@@ -1920,7 +1920,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.TradeMissedException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.TradeMissedException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.TradeMissedException.html"
         }
       },
       "version": "",
@@ -1934,7 +1934,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.UnhandledSmokehouseException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.UnhandledSmokehouseException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.UnhandledSmokehouseException.html"
         }
       },
       "version": "",
@@ -1948,7 +1948,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.WebSocketRetryFailedException.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.WebSocketRetryFailedException.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.WebSocketRetryFailedException.html"
         }
       },
       "version": "",
@@ -1962,7 +1962,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Exceptions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Exceptions.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Exceptions.html"
         }
       },
       "version": "",
@@ -1976,7 +1976,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.FillEventArgs.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.FillEventArgs.html"
+          "relative_path": "api/obj/api/BacklashDTOs.FillEventArgs.html"
         }
       },
       "version": "",
@@ -1990,7 +1990,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Helpers.UnixHelper.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Helpers.UnixHelper.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Helpers.UnixHelper.html"
         }
       },
       "version": "",
@@ -2004,7 +2004,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.Helpers.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.Helpers.html"
+          "relative_path": "api/obj/api/BacklashDTOs.Helpers.html"
         }
       },
       "version": "",
@@ -2018,7 +2018,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.APICandlestick.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.APICandlestick.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.APICandlestick.html"
         }
       },
       "version": "",
@@ -2032,7 +2032,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.AnnouncementApi.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.AnnouncementApi.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.AnnouncementApi.html"
         }
       },
       "version": "",
@@ -2046,7 +2046,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.AnnouncementResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.AnnouncementResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.AnnouncementResponse.html"
         }
       },
       "version": "",
@@ -2060,7 +2060,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.ApiError.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.ApiError.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.ApiError.html"
         }
       },
       "version": "",
@@ -2074,7 +2074,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.BalanceResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.BalanceResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.BalanceResponse.html"
         }
       },
       "version": "",
@@ -2088,7 +2088,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.BatchOrderResponseItem.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.BatchOrderResponseItem.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.BatchOrderResponseItem.html"
         }
       },
       "version": "",
@@ -2102,7 +2102,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.BatchOrdersRequest.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.BatchOrdersRequest.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.BatchOrdersRequest.html"
         }
       },
       "version": "",
@@ -2116,7 +2116,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.BatchOrdersResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.BatchOrdersResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.BatchOrdersResponse.html"
         }
       },
       "version": "",
@@ -2130,7 +2130,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.CancelOrderResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.CancelOrderResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.CancelOrderResponse.html"
         }
       },
       "version": "",
@@ -2144,7 +2144,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.CandlestickResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.CandlestickResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.CandlestickResponse.html"
         }
       },
       "version": "",
@@ -2158,7 +2158,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.CreateOrderRequest.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.CreateOrderRequest.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.CreateOrderRequest.html"
         }
       },
       "version": "",
@@ -2172,7 +2172,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.CreateOrderResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.CreateOrderResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.CreateOrderResponse.html"
         }
       },
       "version": "",
@@ -2186,7 +2186,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.DeleteBatchOrderResponseItem.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.DeleteBatchOrderResponseItem.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.DeleteBatchOrderResponseItem.html"
         }
       },
       "version": "",
@@ -2200,7 +2200,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.DeleteOrdersBatchRequest.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.DeleteOrdersBatchRequest.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.DeleteOrdersBatchRequest.html"
         }
       },
       "version": "",
@@ -2214,7 +2214,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.DeleteOrdersBatchResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.DeleteOrdersBatchResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.DeleteOrdersBatchResponse.html"
         }
       },
       "version": "",
@@ -2228,7 +2228,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.EventMetadataResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.EventMetadataResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.EventMetadataResponse.html"
         }
       },
       "version": "",
@@ -2242,7 +2242,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.EventPosition.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.EventPosition.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.EventPosition.html"
         }
       },
       "version": "",
@@ -2256,7 +2256,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.EventResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.EventResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.EventResponse.html"
         }
       },
       "version": "",
@@ -2270,7 +2270,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.ExchangeSchedule.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.ExchangeSchedule.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.ExchangeSchedule.html"
         }
       },
       "version": "",
@@ -2284,7 +2284,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.ExchangeScheduleResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.ExchangeScheduleResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.ExchangeScheduleResponse.html"
         }
       },
       "version": "",
@@ -2298,7 +2298,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.ExchangeStatus.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.ExchangeStatus.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.ExchangeStatus.html"
         }
       },
       "version": "",
@@ -2312,7 +2312,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.Fill.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.Fill.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.Fill.html"
         }
       },
       "version": "",
@@ -2326,7 +2326,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.FillsResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.FillsResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.FillsResponse.html"
         }
       },
       "version": "",
@@ -2340,7 +2340,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.IncentiveProgram.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.IncentiveProgram.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.IncentiveProgram.html"
         }
       },
       "version": "",
@@ -2354,7 +2354,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.IncentiveProgramsResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.IncentiveProgramsResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.IncentiveProgramsResponse.html"
         }
       },
       "version": "",
@@ -2368,7 +2368,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.KalshiEvent.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.KalshiEvent.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.KalshiEvent.html"
         }
       },
       "version": "",
@@ -2382,7 +2382,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.KalshiMarket.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.KalshiMarket.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.KalshiMarket.html"
         }
       },
       "version": "",
@@ -2396,7 +2396,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.KalshiSeries.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.KalshiSeries.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.KalshiSeries.html"
         }
       },
       "version": "",
@@ -2410,7 +2410,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.MaintenanceWindowApi.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.MaintenanceWindowApi.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.MaintenanceWindowApi.html"
         }
       },
       "version": "",
@@ -2424,7 +2424,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.MarketPositionApi.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.MarketPositionApi.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.MarketPositionApi.html"
         }
       },
       "version": "",
@@ -2438,7 +2438,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.MarketResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.MarketResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.MarketResponse.html"
         }
       },
       "version": "",
@@ -2452,7 +2452,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrderApi.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrderApi.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.OrderApi.html"
         }
       },
       "version": "",
@@ -2466,7 +2466,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrderDetails.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrderDetails.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.OrderDetails.html"
         }
       },
       "version": "",
@@ -2480,7 +2480,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrderQueuePositionResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrderQueuePositionResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.OrderQueuePositionResponse.html"
         }
       },
       "version": "",
@@ -2494,7 +2494,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrderResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrderResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.OrderResponse.html"
         }
       },
       "version": "",
@@ -2508,7 +2508,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrderbookMessage.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrderbookMessage.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.OrderbookMessage.html"
         }
       },
       "version": "",
@@ -2522,7 +2522,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrdersResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.OrdersResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.OrdersResponse.html"
         }
       },
       "version": "",
@@ -2536,7 +2536,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.PositionsResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.PositionsResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.PositionsResponse.html"
         }
       },
       "version": "",
@@ -2550,7 +2550,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.PriceData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.PriceData.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.PriceData.html"
         }
       },
       "version": "",
@@ -2564,7 +2564,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.PriceLevel.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.PriceLevel.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.PriceLevel.html"
         }
       },
       "version": "",
@@ -2578,7 +2578,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.QueuePositionItem.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.QueuePositionItem.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.QueuePositionItem.html"
         }
       },
       "version": "",
@@ -2592,7 +2592,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.QueuePositionsResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.QueuePositionsResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.QueuePositionsResponse.html"
         }
       },
       "version": "",
@@ -2606,7 +2606,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.ScheduleData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.ScheduleData.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.ScheduleData.html"
         }
       },
       "version": "",
@@ -2620,7 +2620,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.SeriesResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.SeriesResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.SeriesResponse.html"
         }
       },
       "version": "",
@@ -2634,7 +2634,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.Settlement.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.Settlement.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.Settlement.html"
         }
       },
       "version": "",
@@ -2648,7 +2648,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.SettlementSource.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.SettlementSource.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.SettlementSource.html"
         }
       },
       "version": "",
@@ -2662,7 +2662,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.SettlementsResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.SettlementsResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.SettlementsResponse.html"
         }
       },
       "version": "",
@@ -2676,7 +2676,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.StandardHours.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.StandardHours.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.StandardHours.html"
         }
       },
       "version": "",
@@ -2690,7 +2690,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.StandardHoursApi.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.StandardHoursApi.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.StandardHoursApi.html"
         }
       },
       "version": "",
@@ -2704,7 +2704,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.TotalRestingOrderValueResponse.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.TotalRestingOrderValueResponse.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.TotalRestingOrderValueResponse.html"
         }
       },
       "version": "",
@@ -2718,7 +2718,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.TradingPeriod.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.TradingPeriod.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.TradingPeriod.html"
         }
       },
       "version": "",
@@ -2732,7 +2732,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.TradingSession.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.TradingSession.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.TradingSession.html"
         }
       },
       "version": "",
@@ -2746,7 +2746,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.KalshiAPI.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.KalshiAPI.html"
+          "relative_path": "api/obj/api/BacklashDTOs.KalshiAPI.html"
         }
       },
       "version": "",
@@ -2760,7 +2760,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.MACDConverter.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.MACDConverter.html"
+          "relative_path": "api/obj/api/BacklashDTOs.MACDConverter.html"
         }
       },
       "version": "",
@@ -2774,7 +2774,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.MarketLifecycleEventArgs.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.MarketLifecycleEventArgs.html"
+          "relative_path": "api/obj/api/BacklashDTOs.MarketLifecycleEventArgs.html"
         }
       },
       "version": "",
@@ -2788,7 +2788,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.MarketLiquidityStatsDTO.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.MarketLiquidityStatsDTO.html"
+          "relative_path": "api/obj/api/BacklashDTOs.MarketLiquidityStatsDTO.html"
         }
       },
       "version": "",
@@ -2802,7 +2802,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.MarketSnapshot.Difference.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.MarketSnapshot.Difference.html"
+          "relative_path": "api/obj/api/BacklashDTOs.MarketSnapshot.Difference.html"
         }
       },
       "version": "",
@@ -2816,7 +2816,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.MarketSnapshot.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.MarketSnapshot.html"
+          "relative_path": "api/obj/api/BacklashDTOs.MarketSnapshot.html"
         }
       },
       "version": "",
@@ -2830,7 +2830,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.MarketSnapshotDelta.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.MarketSnapshotDelta.html"
+          "relative_path": "api/obj/api/BacklashDTOs.MarketSnapshotDelta.html"
         }
       },
       "version": "",
@@ -2844,7 +2844,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.OrderBookEventArgs.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.OrderBookEventArgs.html"
+          "relative_path": "api/obj/api/BacklashDTOs.OrderBookEventArgs.html"
         }
       },
       "version": "",
@@ -2858,7 +2858,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.OrderbookChange.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.OrderbookChange.html"
+          "relative_path": "api/obj/api/BacklashDTOs.OrderbookChange.html"
         }
       },
       "version": "",
@@ -2872,7 +2872,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.OrderbookData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.OrderbookData.html"
+          "relative_path": "api/obj/api/BacklashDTOs.OrderbookData.html"
         }
       },
       "version": "",
@@ -2886,7 +2886,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.PerformanceMetrics.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.PerformanceMetrics.html"
+          "relative_path": "api/obj/api/BacklashDTOs.PerformanceMetrics.html"
         }
       },
       "version": "",
@@ -2900,7 +2900,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.PseudoCandlestick.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.PseudoCandlestick.html"
+          "relative_path": "api/obj/api/BacklashDTOs.PseudoCandlestick.html"
         }
       },
       "version": "",
@@ -2914,7 +2914,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.SignalRClient.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.SignalRClient.html"
+          "relative_path": "api/obj/api/BacklashDTOs.SignalRClient.html"
         }
       },
       "version": "",
@@ -2928,7 +2928,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.SimplifiedTupleConverter.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.SimplifiedTupleConverter.html"
+          "relative_path": "api/obj/api/BacklashDTOs.SimplifiedTupleConverter.html"
         }
       },
       "version": "",
@@ -2942,7 +2942,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.SimulatedOrderbook.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.SimulatedOrderbook.html"
+          "relative_path": "api/obj/api/BacklashDTOs.SimulatedOrderbook.html"
         }
       },
       "version": "",
@@ -2956,7 +2956,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.StatusChangedEventArgs.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.StatusChangedEventArgs.html"
+          "relative_path": "api/obj/api/BacklashDTOs.StatusChangedEventArgs.html"
         }
       },
       "version": "",
@@ -2970,7 +2970,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.StochasticOscillatorConverter.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.StochasticOscillatorConverter.html"
+          "relative_path": "api/obj/api/BacklashDTOs.StochasticOscillatorConverter.html"
         }
       },
       "version": "",
@@ -2984,7 +2984,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.SupportResistanceLevel.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.SupportResistanceLevel.html"
+          "relative_path": "api/obj/api/BacklashDTOs.SupportResistanceLevel.html"
         }
       },
       "version": "",
@@ -2998,7 +2998,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.TickerEventArgs.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.TickerEventArgs.html"
+          "relative_path": "api/obj/api/BacklashDTOs.TickerEventArgs.html"
         }
       },
       "version": "",
@@ -3012,7 +3012,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.TradeEvent.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.TradeEvent.html"
+          "relative_path": "api/obj/api/BacklashDTOs.TradeEvent.html"
         }
       },
       "version": "",
@@ -3026,7 +3026,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.TradeEventArgs.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.TradeEventArgs.html"
+          "relative_path": "api/obj/api/BacklashDTOs.TradeEventArgs.html"
         }
       },
       "version": "",
@@ -3040,7 +3040,7 @@
       "source_relative_path": "obj/api/BacklashDTOs.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashDTOs.html"
+          "relative_path": "api/obj/api/BacklashDTOs.html"
         }
       },
       "version": "",
@@ -3054,7 +3054,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Constants.KalshiConstants.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Constants.KalshiConstants.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Constants.KalshiConstants.html"
         }
       },
       "version": "",
@@ -3068,7 +3068,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Constants.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Constants.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Constants.html"
         }
       },
       "version": "",
@@ -3082,7 +3082,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.ActionType.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.ActionType.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.StrategyEnums.ActionType.html"
         }
       },
       "version": "",
@@ -3096,7 +3096,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.html"
         }
       },
       "version": "",
@@ -3110,7 +3110,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_ActivityLevel.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_ActivityLevel.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_ActivityLevel.html"
         }
       },
       "version": "",
@@ -3124,7 +3124,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_ClosingTime.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_ClosingTime.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_ClosingTime.html"
         }
       },
       "version": "",
@@ -3138,7 +3138,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_Liquidity.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_Liquidity.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_Liquidity.html"
         }
       },
       "version": "",
@@ -3152,7 +3152,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_MarketCategory.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_MarketCategory.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_MarketCategory.html"
         }
       },
       "version": "",
@@ -3166,7 +3166,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_PriceMovement.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_PriceMovement.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_PriceMovement.html"
         }
       },
       "version": "",
@@ -3180,7 +3180,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_UncertaintySignal.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_UncertaintySignal.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.StrategyEnums.Conditions_UncertaintySignal.html"
         }
       },
       "version": "",
@@ -3194,7 +3194,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.MarketType.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.MarketType.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.StrategyEnums.MarketType.html"
         }
       },
       "version": "",
@@ -3208,7 +3208,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.StrategyEnums.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.StrategyEnums.html"
         }
       },
       "version": "",
@@ -3222,7 +3222,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.SubscriptionState.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.SubscriptionState.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.SubscriptionState.html"
         }
       },
       "version": "",
@@ -3236,7 +3236,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.Enums.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.Enums.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.Enums.html"
         }
       },
       "version": "",
@@ -3250,7 +3250,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.SmokehouseBot.Services.IHealthCheckService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.SmokehouseBot.Services.IHealthCheckService.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.SmokehouseBot.Services.IHealthCheckService.html"
         }
       },
       "version": "",
@@ -3264,7 +3264,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.SmokehouseBot.Services.IOverseerClientService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.SmokehouseBot.Services.IOverseerClientService.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.SmokehouseBot.Services.IOverseerClientService.html"
         }
       },
       "version": "",
@@ -3278,7 +3278,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.SmokehouseBot.Services.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.SmokehouseBot.Services.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.SmokehouseBot.Services.html"
         }
       },
       "version": "",
@@ -3292,7 +3292,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.SmokehouseBot.Timers.ITimer.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.SmokehouseBot.Timers.ITimer.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.SmokehouseBot.Timers.ITimer.html"
         }
       },
       "version": "",
@@ -3306,7 +3306,7 @@
       "source_relative_path": "obj/api/BacklashInterfaces.SmokehouseBot.Timers.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashInterfaces.SmokehouseBot.Timers.html"
+          "relative_path": "api/obj/api/BacklashInterfaces.SmokehouseBot.Timers.html"
         }
       },
       "version": "",
@@ -3320,7 +3320,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.CandleMetrics.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.CandleMetrics.html"
+          "relative_path": "api/obj/api/BacklashPatterns.CandleMetrics.html"
         }
       },
       "version": "",
@@ -3334,7 +3334,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.AbandonedBabyPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.AbandonedBabyPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.AbandonedBabyPattern.html"
         }
       },
       "version": "",
@@ -3348,7 +3348,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.BeltHoldPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.BeltHoldPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.BeltHoldPattern.html"
         }
       },
       "version": "",
@@ -3362,7 +3362,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.BeltHoldPattern_old.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.BeltHoldPattern_old.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.BeltHoldPattern_old.html"
         }
       },
       "version": "",
@@ -3376,7 +3376,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.BreakawayPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.BreakawayPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.BreakawayPattern.html"
         }
       },
       "version": "",
@@ -3390,7 +3390,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.BreakawayPattern_old.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.BreakawayPattern_old.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.BreakawayPattern_old.html"
         }
       },
       "version": "",
@@ -3404,7 +3404,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ClosingMarubozuPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ClosingMarubozuPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ClosingMarubozuPattern.html"
         }
       },
       "version": "",
@@ -3418,7 +3418,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ClosingMarubozuPattern_old.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ClosingMarubozuPattern_old.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ClosingMarubozuPattern_old.html"
         }
       },
       "version": "",
@@ -3432,7 +3432,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ConcealingBabySwallowPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ConcealingBabySwallowPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ConcealingBabySwallowPattern.html"
         }
       },
       "version": "",
@@ -3446,7 +3446,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ConcealingBabySwallowPattern_old.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ConcealingBabySwallowPattern_old.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ConcealingBabySwallowPattern_old.html"
         }
       },
       "version": "",
@@ -3460,7 +3460,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.CounterattackPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.CounterattackPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.CounterattackPattern.html"
         }
       },
       "version": "",
@@ -3474,7 +3474,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.CounterattackPattern2.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.CounterattackPattern2.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.CounterattackPattern2.html"
         }
       },
       "version": "",
@@ -3488,7 +3488,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.DarkCloudCoverPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.DarkCloudCoverPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.DarkCloudCoverPattern.html"
         }
       },
       "version": "",
@@ -3502,7 +3502,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.DojiPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.DojiPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.DojiPattern.html"
         }
       },
       "version": "",
@@ -3516,7 +3516,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.EveningDojiStarPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.EveningDojiStarPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.EveningDojiStarPattern.html"
         }
       },
       "version": "",
@@ -3530,7 +3530,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.HangingManPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.HangingManPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.HangingManPattern.html"
         }
       },
       "version": "",
@@ -3544,7 +3544,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.HaramiPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.HaramiPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.HaramiPattern.html"
         }
       },
       "version": "",
@@ -3558,7 +3558,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.HighWaveCandlePattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.HighWaveCandlePattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.HighWaveCandlePattern.html"
         }
       },
       "version": "",
@@ -3572,7 +3572,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.HikkakePattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.HikkakePattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.HikkakePattern.html"
         }
       },
       "version": "",
@@ -3586,7 +3586,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.HomingPigeonPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.HomingPigeonPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.HomingPigeonPattern.html"
         }
       },
       "version": "",
@@ -3600,7 +3600,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.IdenticalThreeCrowsPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.IdenticalThreeCrowsPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.IdenticalThreeCrowsPattern.html"
         }
       },
       "version": "",
@@ -3614,7 +3614,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.InNeckPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.InNeckPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.InNeckPattern.html"
         }
       },
       "version": "",
@@ -3628,7 +3628,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.InvertedHammerPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.InvertedHammerPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.InvertedHammerPattern.html"
         }
       },
       "version": "",
@@ -3642,7 +3642,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.KickingByLengthPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.KickingByLengthPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.KickingByLengthPattern.html"
         }
       },
       "version": "",
@@ -3656,7 +3656,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.KickingPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.KickingPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.KickingPattern.html"
         }
       },
       "version": "",
@@ -3670,7 +3670,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.LadderBottomPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.LadderBottomPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.LadderBottomPattern.html"
         }
       },
       "version": "",
@@ -3684,7 +3684,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.LongLeggedDojiPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.LongLeggedDojiPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.LongLeggedDojiPattern.html"
         }
       },
       "version": "",
@@ -3698,7 +3698,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.LongLineCandlePattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.LongLineCandlePattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.LongLineCandlePattern.html"
         }
       },
       "version": "",
@@ -3712,7 +3712,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.MarubozuPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.MarubozuPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.MarubozuPattern.html"
         }
       },
       "version": "",
@@ -3726,7 +3726,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.MatHoldPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.MatHoldPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.MatHoldPattern.html"
         }
       },
       "version": "",
@@ -3740,7 +3740,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ModifiedHikkakePattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ModifiedHikkakePattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ModifiedHikkakePattern.html"
         }
       },
       "version": "",
@@ -3754,7 +3754,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.MorningDojiStarPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.MorningDojiStarPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.MorningDojiStarPattern.html"
         }
       },
       "version": "",
@@ -3768,7 +3768,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.MorningStarPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.MorningStarPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.MorningStarPattern.html"
         }
       },
       "version": "",
@@ -3782,7 +3782,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.OnNeckPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.OnNeckPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.OnNeckPattern.html"
         }
       },
       "version": "",
@@ -3796,7 +3796,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.PatternDefinition.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.PatternDefinition.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.PatternDefinition.html"
         }
       },
       "version": "",
@@ -3810,7 +3810,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.PiercingPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.PiercingPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.PiercingPattern.html"
         }
       },
       "version": "",
@@ -3824,7 +3824,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.RickshawManPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.RickshawManPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.RickshawManPattern.html"
         }
       },
       "version": "",
@@ -3838,7 +3838,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.RisingFallingThreeMethodsPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.RisingFallingThreeMethodsPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.RisingFallingThreeMethodsPattern.html"
         }
       },
       "version": "",
@@ -3852,7 +3852,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.SeparatingLinesPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.SeparatingLinesPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.SeparatingLinesPattern.html"
         }
       },
       "version": "",
@@ -3866,7 +3866,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ShootingStarPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ShootingStarPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ShootingStarPattern.html"
         }
       },
       "version": "",
@@ -3880,7 +3880,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ShortLineCandlePattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ShortLineCandlePattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ShortLineCandlePattern.html"
         }
       },
       "version": "",
@@ -3894,7 +3894,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.SpinningTopPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.SpinningTopPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.SpinningTopPattern.html"
         }
       },
       "version": "",
@@ -3908,7 +3908,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.StalledPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.StalledPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.StalledPattern.html"
         }
       },
       "version": "",
@@ -3922,7 +3922,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.StickSandwichPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.StickSandwichPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.StickSandwichPattern.html"
         }
       },
       "version": "",
@@ -3936,7 +3936,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.TakuriPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.TakuriPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.TakuriPattern.html"
         }
       },
       "version": "",
@@ -3950,7 +3950,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.TasukiGapPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.TasukiGapPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.TasukiGapPattern.html"
         }
       },
       "version": "",
@@ -3964,7 +3964,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeAdvancingWhiteSoldiersPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeAdvancingWhiteSoldiersPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ThreeAdvancingWhiteSoldiersPattern.html"
         }
       },
       "version": "",
@@ -3978,7 +3978,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeBlackCrowsPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeBlackCrowsPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ThreeBlackCrowsPattern.html"
         }
       },
       "version": "",
@@ -3992,7 +3992,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeInsidePattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeInsidePattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ThreeInsidePattern.html"
         }
       },
       "version": "",
@@ -4006,7 +4006,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeLineStrikePattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeLineStrikePattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ThreeLineStrikePattern.html"
         }
       },
       "version": "",
@@ -4020,7 +4020,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeOutsidePattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeOutsidePattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ThreeOutsidePattern.html"
         }
       },
       "version": "",
@@ -4034,7 +4034,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeStarsInTheSouthPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThreeStarsInTheSouthPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ThreeStarsInTheSouthPattern.html"
         }
       },
       "version": "",
@@ -4048,7 +4048,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThrustingPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.ThrustingPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.ThrustingPattern.html"
         }
       },
       "version": "",
@@ -4062,7 +4062,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.TristarPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.TristarPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.TristarPattern.html"
         }
       },
       "version": "",
@@ -4076,7 +4076,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.TwoCrowsPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.TwoCrowsPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.TwoCrowsPattern.html"
         }
       },
       "version": "",
@@ -4090,7 +4090,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.Unique3RiverPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.Unique3RiverPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.Unique3RiverPattern.html"
         }
       },
       "version": "",
@@ -4104,7 +4104,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.UpDownGapSideBySideWhiteLinesPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.UpDownGapSideBySideWhiteLinesPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.UpDownGapSideBySideWhiteLinesPattern.html"
         }
       },
       "version": "",
@@ -4118,7 +4118,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.UpsideGapTwoCrowsPattern.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.UpsideGapTwoCrowsPattern.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.UpsideGapTwoCrowsPattern.html"
         }
       },
       "version": "",
@@ -4132,7 +4132,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternDefinitions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternDefinitions.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternDefinitions.html"
         }
       },
       "version": "",
@@ -4146,7 +4146,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternSearch.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternSearch.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternSearch.html"
         }
       },
       "version": "",
@@ -4160,7 +4160,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.PatternUtils.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.PatternUtils.html"
+          "relative_path": "api/obj/api/BacklashPatterns.PatternUtils.html"
         }
       },
       "version": "",
@@ -4174,7 +4174,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.TrendCalcs.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.TrendCalcs.html"
+          "relative_path": "api/obj/api/BacklashPatterns.TrendCalcs.html"
         }
       },
       "version": "",
@@ -4188,7 +4188,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.TrendCalculationConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.TrendCalculationConfig.html"
+          "relative_path": "api/obj/api/BacklashPatterns.TrendCalculationConfig.html"
         }
       },
       "version": "",
@@ -4202,7 +4202,7 @@
       "source_relative_path": "obj/api/BacklashPatterns.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/BacklashPatterns.html"
+          "relative_path": "api/obj/api/BacklashPatterns.html"
         }
       },
       "version": "",
@@ -4216,7 +4216,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.Configuration.KalshiConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.Configuration.KalshiConfig.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.Configuration.KalshiConfig.html"
         }
       },
       "version": "",
@@ -4230,7 +4230,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.Configuration.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.Configuration.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.Configuration.html"
         }
       },
       "version": "",
@@ -4244,7 +4244,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.KalshiAPI.KalshiAPIService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html"
         }
       },
       "version": "",
@@ -4258,7 +4258,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.KalshiAPI.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.KalshiAPI.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.KalshiAPI.html"
         }
       },
       "version": "",
@@ -4272,7 +4272,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient.html"
         }
       },
       "version": "",
@@ -4286,7 +4286,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.html"
         }
       },
       "version": "",
@@ -4300,7 +4300,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.WebSockets.Interfaces.ISubscriptionManager.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.WebSockets.Interfaces.ISubscriptionManager.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.WebSockets.Interfaces.ISubscriptionManager.html"
         }
       },
       "version": "",
@@ -4314,7 +4314,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.WebSockets.Interfaces.IWebSocketConnectionManager.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.WebSockets.Interfaces.IWebSocketConnectionManager.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.WebSockets.Interfaces.IWebSocketConnectionManager.html"
         }
       },
       "version": "",
@@ -4328,7 +4328,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.WebSockets.Interfaces.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.WebSockets.Interfaces.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.WebSockets.Interfaces.html"
         }
       },
       "version": "",
@@ -4342,7 +4342,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.Websockets.KalshiWebSocketClient.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.Websockets.KalshiWebSocketClient.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.Websockets.KalshiWebSocketClient.html"
         }
       },
       "version": "",
@@ -4356,7 +4356,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.Websockets.MessageProcessor.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.Websockets.MessageProcessor.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.Websockets.MessageProcessor.html"
         }
       },
       "version": "",
@@ -4370,7 +4370,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.Websockets.SubscriptionManager.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.Websockets.SubscriptionManager.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.Websockets.SubscriptionManager.html"
         }
       },
       "version": "",
@@ -4384,7 +4384,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.Websockets.WebSocketConnectionManager.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html"
         }
       },
       "version": "",
@@ -4398,7 +4398,7 @@
       "source_relative_path": "obj/api/KalshiBotAPI.Websockets.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotAPI.Websockets.html"
+          "relative_path": "api/obj/api/KalshiBotAPI.Websockets.html"
         }
       },
       "version": "",
@@ -4412,7 +4412,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Data.Interfaces.IKalshiBotContext.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Data.Interfaces.IKalshiBotContext.html"
+          "relative_path": "api/obj/api/KalshiBotData.Data.Interfaces.IKalshiBotContext.html"
         }
       },
       "version": "",
@@ -4426,7 +4426,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Data.Interfaces.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Data.Interfaces.html"
+          "relative_path": "api/obj/api/KalshiBotData.Data.Interfaces.html"
         }
       },
       "version": "",
@@ -4440,7 +4440,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Data.KalshiBotContext.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Data.KalshiBotContext.html"
+          "relative_path": "api/obj/api/KalshiBotData.Data.KalshiBotContext.html"
         }
       },
       "version": "",
@@ -4454,7 +4454,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Data.SqlDataService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Data.SqlDataService.html"
+          "relative_path": "api/obj/api/KalshiBotData.Data.SqlDataService.html"
         }
       },
       "version": "",
@@ -4468,7 +4468,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Data.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Data.html"
+          "relative_path": "api/obj/api/KalshiBotData.Data.html"
         }
       },
       "version": "",
@@ -4482,7 +4482,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.AnnouncementExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.AnnouncementExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.AnnouncementExtensions.html"
         }
       },
       "version": "",
@@ -4496,7 +4496,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.BrainInstanceExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.BrainInstanceExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.BrainInstanceExtensions.html"
         }
       },
       "version": "",
@@ -4510,7 +4510,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.CandlestickExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.CandlestickExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.CandlestickExtensions.html"
         }
       },
       "version": "",
@@ -4524,7 +4524,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.EventExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.EventExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.EventExtensions.html"
         }
       },
       "version": "",
@@ -4538,7 +4538,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.ExchangeScheduleExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html"
         }
       },
       "version": "",
@@ -4552,7 +4552,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.LogEntryExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.LogEntryExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.LogEntryExtensions.html"
         }
       },
       "version": "",
@@ -4566,7 +4566,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.MaintenanceWindowExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html"
         }
       },
       "version": "",
@@ -4580,7 +4580,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.MarketExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.MarketExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.MarketExtensions.html"
         }
       },
       "version": "",
@@ -4594,7 +4594,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.MarketPositionExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.MarketPositionExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.MarketPositionExtensions.html"
         }
       },
       "version": "",
@@ -4608,7 +4608,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.MarketWatchExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.MarketWatchExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.MarketWatchExtensions.html"
         }
       },
       "version": "",
@@ -4622,7 +4622,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.OrderExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.OrderExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.OrderExtensions.html"
         }
       },
       "version": "",
@@ -4636,7 +4636,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.SeriesExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.SeriesExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.SeriesExtensions.html"
         }
       },
       "version": "",
@@ -4650,7 +4650,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html"
         }
       },
       "version": "",
@@ -4664,7 +4664,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.SeriesTagExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.SeriesTagExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.SeriesTagExtensions.html"
         }
       },
       "version": "",
@@ -4678,7 +4678,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.SnapshotExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.SnapshotExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.SnapshotExtensions.html"
         }
       },
       "version": "",
@@ -4692,7 +4692,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.SnapshotGroupExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.SnapshotGroupExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.SnapshotGroupExtensions.html"
         }
       },
       "version": "",
@@ -4706,7 +4706,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.SnapshotSchemaExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html"
         }
       },
       "version": "",
@@ -4720,7 +4720,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.StandardHoursExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.StandardHoursExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.StandardHoursExtensions.html"
         }
       },
       "version": "",
@@ -4734,7 +4734,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.StandardHoursSessionExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html"
         }
       },
       "version": "",
@@ -4748,7 +4748,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.TickerExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.TickerExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.TickerExtensions.html"
         }
       },
       "version": "",
@@ -4762,7 +4762,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.WeightSetExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.WeightSetExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.WeightSetExtensions.html"
         }
       },
       "version": "",
@@ -4776,7 +4776,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.WeightSetMarketExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.WeightSetMarketExtensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.WeightSetMarketExtensions.html"
         }
       },
       "version": "",
@@ -4790,7 +4790,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Extensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Extensions.html"
+          "relative_path": "api/obj/api/KalshiBotData.Extensions.html"
         }
       },
       "version": "",
@@ -4804,7 +4804,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.Announcement.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.Announcement.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.Announcement.html"
         }
       },
       "version": "",
@@ -4818,7 +4818,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.BrainInstance.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.BrainInstance.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.BrainInstance.html"
         }
       },
       "version": "",
@@ -4832,7 +4832,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.Candlestick.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.Candlestick.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.Candlestick.html"
         }
       },
       "version": "",
@@ -4846,7 +4846,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.Event.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.Event.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.Event.html"
         }
       },
       "version": "",
@@ -4860,7 +4860,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.EventLifecycle.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.EventLifecycle.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.EventLifecycle.html"
         }
       },
       "version": "",
@@ -4874,7 +4874,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.ExchangeSchedule.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.ExchangeSchedule.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.ExchangeSchedule.html"
         }
       },
       "version": "",
@@ -4888,7 +4888,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.Fill.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.Fill.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.Fill.html"
         }
       },
       "version": "",
@@ -4902,7 +4902,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.LogEntry.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.LogEntry.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.LogEntry.html"
         }
       },
       "version": "",
@@ -4916,7 +4916,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.MaintenanceWindow.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.MaintenanceWindow.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.MaintenanceWindow.html"
         }
       },
       "version": "",
@@ -4930,7 +4930,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.Market.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.Market.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.Market.html"
         }
       },
       "version": "",
@@ -4944,7 +4944,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.MarketPosition.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.MarketPosition.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.MarketPosition.html"
         }
       },
       "version": "",
@@ -4958,7 +4958,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.MarketType.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.MarketType.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.MarketType.html"
         }
       },
       "version": "",
@@ -4972,7 +4972,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.MarketWatch.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.MarketWatch.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.MarketWatch.html"
         }
       },
       "version": "",
@@ -4986,7 +4986,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.Order.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.Order.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.Order.html"
         }
       },
       "version": "",
@@ -5000,7 +5000,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.OverseerLogEntry.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.OverseerLogEntry.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.OverseerLogEntry.html"
         }
       },
       "version": "",
@@ -5014,7 +5014,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.Series.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.Series.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.Series.html"
         }
       },
       "version": "",
@@ -5028,7 +5028,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.SeriesSettlementSource.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.SeriesSettlementSource.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.SeriesSettlementSource.html"
         }
       },
       "version": "",
@@ -5042,7 +5042,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.SeriesTag.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.SeriesTag.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.SeriesTag.html"
         }
       },
       "version": "",
@@ -5056,7 +5056,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.SignalRClient.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.SignalRClient.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.SignalRClient.html"
         }
       },
       "version": "",
@@ -5070,7 +5070,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.Snapshot.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.Snapshot.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.Snapshot.html"
         }
       },
       "version": "",
@@ -5084,7 +5084,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.SnapshotGroup.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.SnapshotGroup.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.SnapshotGroup.html"
         }
       },
       "version": "",
@@ -5098,7 +5098,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.SnapshotSchema.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.SnapshotSchema.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.SnapshotSchema.html"
         }
       },
       "version": "",
@@ -5112,7 +5112,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.StandardHours.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.StandardHours.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.StandardHours.html"
         }
       },
       "version": "",
@@ -5126,7 +5126,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.StandardHoursSession.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.StandardHoursSession.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.StandardHoursSession.html"
         }
       },
       "version": "",
@@ -5140,7 +5140,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.StratData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.StratData.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.StratData.html"
         }
       },
       "version": "",
@@ -5154,7 +5154,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.Ticker.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.Ticker.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.Ticker.html"
         }
       },
       "version": "",
@@ -5168,7 +5168,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.Trade.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.Trade.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.Trade.html"
         }
       },
       "version": "",
@@ -5182,7 +5182,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.WeightSet.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.WeightSet.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.WeightSet.html"
         }
       },
       "version": "",
@@ -5196,7 +5196,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.WeightSetMarket.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.WeightSetMarket.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.WeightSetMarket.html"
         }
       },
       "version": "",
@@ -5210,7 +5210,7 @@
       "source_relative_path": "obj/api/KalshiBotData.Models.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotData.Models.html"
+          "relative_path": "api/obj/api/KalshiBotData.Models.html"
         }
       },
       "version": "",
@@ -5224,7 +5224,7 @@
       "source_relative_path": "obj/api/KalshiBotLogging.DatabaseLogger.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotLogging.DatabaseLogger.html"
+          "relative_path": "api/obj/api/KalshiBotLogging.DatabaseLogger.html"
         }
       },
       "version": "",
@@ -5238,7 +5238,7 @@
       "source_relative_path": "obj/api/KalshiBotLogging.DatabaseLoggerProvider.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotLogging.DatabaseLoggerProvider.html"
+          "relative_path": "api/obj/api/KalshiBotLogging.DatabaseLoggerProvider.html"
         }
       },
       "version": "",
@@ -5252,7 +5252,7 @@
       "source_relative_path": "obj/api/KalshiBotLogging.DatabaseLoggingQueue.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotLogging.DatabaseLoggingQueue.html"
+          "relative_path": "api/obj/api/KalshiBotLogging.DatabaseLoggingQueue.html"
         }
       },
       "version": "",
@@ -5266,7 +5266,7 @@
       "source_relative_path": "obj/api/KalshiBotLogging.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotLogging.html"
+          "relative_path": "api/obj/api/KalshiBotLogging.html"
         }
       },
       "version": "",
@@ -5280,7 +5280,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.ChartHub.ClientInfo.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.ChartHub.ClientInfo.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.ChartHub.ClientInfo.html"
         }
       },
       "version": "",
@@ -5294,7 +5294,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.ChartHub.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.ChartHub.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.ChartHub.html"
         }
       },
       "version": "",
@@ -5308,7 +5308,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.CheckInData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.CheckInData.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.CheckInData.html"
         }
       },
       "version": "",
@@ -5322,7 +5322,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Controllers.MarketWatchController.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Controllers.MarketWatchController.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Controllers.MarketWatchController.html"
         }
       },
       "version": "",
@@ -5336,7 +5336,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Controllers.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Controllers.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Controllers.html"
         }
       },
       "version": "",
@@ -5350,7 +5350,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Models.BrainPersistence.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Models.BrainPersistence.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Models.BrainPersistence.html"
         }
       },
       "version": "",
@@ -5364,7 +5364,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Models.BrainStatusData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Models.BrainStatusData.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Models.BrainStatusData.html"
         }
       },
       "version": "",
@@ -5378,7 +5378,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Models.MarketWatchData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Models.MarketWatchData.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Models.MarketWatchData.html"
         }
       },
       "version": "",
@@ -5392,7 +5392,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Models.MetricHistory.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Models.MetricHistory.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Models.MetricHistory.html"
         }
       },
       "version": "",
@@ -5406,7 +5406,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Models.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Models.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Models.html"
         }
       },
       "version": "",
@@ -5420,7 +5420,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.OvernightActivitiesHelper.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.OvernightActivitiesHelper.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.OvernightActivitiesHelper.html"
         }
       },
       "version": "",
@@ -5434,7 +5434,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Overseer.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Overseer.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Overseer.html"
         }
       },
       "version": "",
@@ -5448,7 +5448,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.OverseerHub.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.OverseerHub.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.OverseerHub.html"
         }
       },
       "version": "",
@@ -5462,7 +5462,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Services.BrainPersistenceService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Services.BrainPersistenceService.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Services.BrainPersistenceService.html"
         }
       },
       "version": "",
@@ -5476,7 +5476,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Services.SnapshotService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Services.SnapshotService.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Services.SnapshotService.html"
         }
       },
       "version": "",
@@ -5490,7 +5490,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Services.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Services.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Services.html"
         }
       },
       "version": "",
@@ -5504,7 +5504,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.Startup.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.Startup.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.Startup.html"
         }
       },
       "version": "",
@@ -5518,7 +5518,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.State.OverseerReadyStatus.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.State.OverseerReadyStatus.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.State.OverseerReadyStatus.html"
         }
       },
       "version": "",
@@ -5532,7 +5532,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.State.OverseerStatusTracker.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.State.OverseerStatusTracker.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.State.OverseerStatusTracker.html"
         }
       },
       "version": "",
@@ -5546,7 +5546,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.State.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.State.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.State.html"
         }
       },
       "version": "",
@@ -5560,7 +5560,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.WebSocketMonitorServiceLite.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.WebSocketMonitorServiceLite.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.WebSocketMonitorServiceLite.html"
         }
       },
       "version": "",
@@ -5574,7 +5574,7 @@
       "source_relative_path": "obj/api/KalshiBotOverseer.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotOverseer.html"
+          "relative_path": "api/obj/api/KalshiBotOverseer.html"
         }
       },
       "version": "",
@@ -5588,7 +5588,7 @@
       "source_relative_path": "obj/api/KalshiBotTasks.ExecutableTasks.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotTasks.ExecutableTasks.html"
+          "relative_path": "api/obj/api/KalshiBotTasks.ExecutableTasks.html"
         }
       },
       "version": "",
@@ -5602,7 +5602,7 @@
       "source_relative_path": "obj/api/KalshiBotTasks.SchemaDeployment.SchemaDeploymentObj.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotTasks.SchemaDeployment.SchemaDeploymentObj.html"
+          "relative_path": "api/obj/api/KalshiBotTasks.SchemaDeployment.SchemaDeploymentObj.html"
         }
       },
       "version": "",
@@ -5616,7 +5616,7 @@
       "source_relative_path": "obj/api/KalshiBotTasks.SchemaDeployment.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotTasks.SchemaDeployment.html"
+          "relative_path": "api/obj/api/KalshiBotTasks.SchemaDeployment.html"
         }
       },
       "version": "",
@@ -5630,7 +5630,7 @@
       "source_relative_path": "obj/api/KalshiBotTasks.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/KalshiBotTasks.html"
+          "relative_path": "api/obj/api/KalshiBotTasks.html"
         }
       },
       "version": "",
@@ -5644,7 +5644,7 @@
       "source_relative_path": "obj/api/TradingSimulator.CachedMarketData.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.CachedMarketData.html"
+          "relative_path": "api/obj/api/TradingSimulator.CachedMarketData.html"
         }
       },
       "version": "",
@@ -5658,7 +5658,7 @@
       "source_relative_path": "obj/api/TradingSimulator.DataLoader.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.DataLoader.html"
+          "relative_path": "api/obj/api/TradingSimulator.DataLoader.html"
         }
       },
       "version": "",
@@ -5672,7 +5672,7 @@
       "source_relative_path": "obj/api/TradingSimulator.ML.FlattenPrediction.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.ML.FlattenPrediction.html"
+          "relative_path": "api/obj/api/TradingSimulator.ML.FlattenPrediction.html"
         }
       },
       "version": "",
@@ -5686,7 +5686,7 @@
       "source_relative_path": "obj/api/TradingSimulator.ML.FlattenPriceConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.ML.FlattenPriceConfig.html"
+          "relative_path": "api/obj/api/TradingSimulator.ML.FlattenPriceConfig.html"
         }
       },
       "version": "",
@@ -5700,7 +5700,7 @@
       "source_relative_path": "obj/api/TradingSimulator.ML.FlattenPriceQuickstart.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.ML.FlattenPriceQuickstart.html"
+          "relative_path": "api/obj/api/TradingSimulator.ML.FlattenPriceQuickstart.html"
         }
       },
       "version": "",
@@ -5714,7 +5714,7 @@
       "source_relative_path": "obj/api/TradingSimulator.ML.RegressionSummary.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.ML.RegressionSummary.html"
+          "relative_path": "api/obj/api/TradingSimulator.ML.RegressionSummary.html"
         }
       },
       "version": "",
@@ -5728,7 +5728,7 @@
       "source_relative_path": "obj/api/TradingSimulator.ML.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.ML.html"
+          "relative_path": "api/obj/api/TradingSimulator.ML.html"
         }
       },
       "version": "",
@@ -5742,7 +5742,7 @@
       "source_relative_path": "obj/api/TradingSimulator.MarketProcessor.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.MarketProcessor.html"
+          "relative_path": "api/obj/api/TradingSimulator.MarketProcessor.html"
         }
       },
       "version": "",
@@ -5756,7 +5756,7 @@
       "source_relative_path": "obj/api/TradingSimulator.PricePoint.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.PricePoint.html"
+          "relative_path": "api/obj/api/TradingSimulator.PricePoint.html"
         }
       },
       "version": "",
@@ -5770,7 +5770,7 @@
       "source_relative_path": "obj/api/TradingSimulator.Simulator.SimulatorReporting.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.Simulator.SimulatorReporting.html"
+          "relative_path": "api/obj/api/TradingSimulator.Simulator.SimulatorReporting.html"
         }
       },
       "version": "",
@@ -5784,7 +5784,7 @@
       "source_relative_path": "obj/api/TradingSimulator.Simulator.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.Simulator.html"
+          "relative_path": "api/obj/api/TradingSimulator.Simulator.html"
         }
       },
       "version": "",
@@ -5798,7 +5798,7 @@
       "source_relative_path": "obj/api/TradingSimulator.Strategies.TradingDecision.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.Strategies.TradingDecision.html"
+          "relative_path": "api/obj/api/TradingSimulator.Strategies.TradingDecision.html"
         }
       },
       "version": "",
@@ -5812,7 +5812,7 @@
       "source_relative_path": "obj/api/TradingSimulator.Strategies.TradingDecisionEnum.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.Strategies.TradingDecisionEnum.html"
+          "relative_path": "api/obj/api/TradingSimulator.Strategies.TradingDecisionEnum.html"
         }
       },
       "version": "",
@@ -5826,7 +5826,7 @@
       "source_relative_path": "obj/api/TradingSimulator.Strategies.TradingStrategy-1.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.Strategies.TradingStrategy-1.html"
+          "relative_path": "api/obj/api/TradingSimulator.Strategies.TradingStrategy-1.html"
         }
       },
       "version": "",
@@ -5840,7 +5840,7 @@
       "source_relative_path": "obj/api/TradingSimulator.Strategies.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.Strategies.html"
+          "relative_path": "api/obj/api/TradingSimulator.Strategies.html"
         }
       },
       "version": "",
@@ -5854,7 +5854,7 @@
       "source_relative_path": "obj/api/TradingSimulator.StrategyResolver.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.StrategyResolver.html"
+          "relative_path": "api/obj/api/TradingSimulator.StrategyResolver.html"
         }
       },
       "version": "",
@@ -5868,7 +5868,7 @@
       "source_relative_path": "obj/api/TradingSimulator.TradePoint.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.TradePoint.html"
+          "relative_path": "api/obj/api/TradingSimulator.TradePoint.html"
         }
       },
       "version": "",
@@ -5882,7 +5882,7 @@
       "source_relative_path": "obj/api/TradingSimulator.TradingContext.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.TradingContext.html"
+          "relative_path": "api/obj/api/TradingSimulator.TradingContext.html"
         }
       },
       "version": "",
@@ -5896,7 +5896,7 @@
       "source_relative_path": "obj/api/TradingSimulator.TradingSimulatorService.StrategyFamily.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.TradingSimulatorService.StrategyFamily.html"
+          "relative_path": "api/obj/api/TradingSimulator.TradingSimulatorService.StrategyFamily.html"
         }
       },
       "version": "",
@@ -5910,7 +5910,7 @@
       "source_relative_path": "obj/api/TradingSimulator.TradingSimulatorService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.TradingSimulatorService.html"
+          "relative_path": "api/obj/api/TradingSimulator.TradingSimulatorService.html"
         }
       },
       "version": "",
@@ -5924,7 +5924,7 @@
       "source_relative_path": "obj/api/TradingSimulator.TradingStrategyFunc-1.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.TradingStrategyFunc-1.html"
+          "relative_path": "api/obj/api/TradingSimulator.TradingStrategyFunc-1.html"
         }
       },
       "version": "",
@@ -5938,7 +5938,7 @@
       "source_relative_path": "obj/api/TradingSimulator.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingSimulator.html"
+          "relative_path": "api/obj/api/TradingSimulator.html"
         }
       },
       "version": "",
@@ -5952,7 +5952,7 @@
       "source_relative_path": "obj/api/TradingStrategies.ActionDecision.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.ActionDecision.html"
+          "relative_path": "api/obj/api/TradingStrategies.ActionDecision.html"
         }
       },
       "version": "",
@@ -5966,7 +5966,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Classification.Interfaces.ISnapshotPeriodHelper.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Classification.Interfaces.ISnapshotPeriodHelper.html"
+          "relative_path": "api/obj/api/TradingStrategies.Classification.Interfaces.ISnapshotPeriodHelper.html"
         }
       },
       "version": "",
@@ -5980,7 +5980,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Classification.Interfaces.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Classification.Interfaces.html"
+          "relative_path": "api/obj/api/TradingStrategies.Classification.Interfaces.html"
         }
       },
       "version": "",
@@ -5994,7 +5994,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Classification.SnapshotPeriodHelper.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Classification.SnapshotPeriodHelper.html"
+          "relative_path": "api/obj/api/TradingStrategies.Classification.SnapshotPeriodHelper.html"
         }
       },
       "version": "",
@@ -6008,7 +6008,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Classification.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Classification.html"
+          "relative_path": "api/obj/api/TradingStrategies.Classification.html"
         }
       },
       "version": "",
@@ -6022,7 +6022,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Configuration.CalculationConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Configuration.CalculationConfig.html"
+          "relative_path": "api/obj/api/TradingStrategies.Configuration.CalculationConfig.html"
         }
       },
       "version": "",
@@ -6036,7 +6036,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Configuration.SnapshotConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Configuration.SnapshotConfig.html"
+          "relative_path": "api/obj/api/TradingStrategies.Configuration.SnapshotConfig.html"
         }
       },
       "version": "",
@@ -6050,7 +6050,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Configuration.TradingConfig.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Configuration.TradingConfig.html"
+          "relative_path": "api/obj/api/TradingStrategies.Configuration.TradingConfig.html"
         }
       },
       "version": "",
@@ -6064,7 +6064,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Configuration.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Configuration.html"
+          "relative_path": "api/obj/api/TradingStrategies.Configuration.html"
         }
       },
       "version": "",
@@ -6078,7 +6078,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Extensions.MarketSnapshotExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Extensions.MarketSnapshotExtensions.html"
+          "relative_path": "api/obj/api/TradingStrategies.Extensions.MarketSnapshotExtensions.html"
         }
       },
       "version": "",
@@ -6092,7 +6092,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Extensions.PseudoCandlestickExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Extensions.PseudoCandlestickExtensions.html"
+          "relative_path": "api/obj/api/TradingStrategies.Extensions.PseudoCandlestickExtensions.html"
         }
       },
       "version": "",
@@ -6106,7 +6106,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Extensions.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Extensions.html"
+          "relative_path": "api/obj/api/TradingStrategies.Extensions.html"
         }
       },
       "version": "",
@@ -6120,7 +6120,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Helpers.Interfaces.ITradingCalculator.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Helpers.Interfaces.ITradingCalculator.html"
+          "relative_path": "api/obj/api/TradingStrategies.Helpers.Interfaces.ITradingCalculator.html"
         }
       },
       "version": "",
@@ -6134,7 +6134,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Helpers.Interfaces.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Helpers.Interfaces.html"
+          "relative_path": "api/obj/api/TradingStrategies.Helpers.Interfaces.html"
         }
       },
       "version": "",
@@ -6148,7 +6148,7 @@
       "source_relative_path": "obj/api/TradingStrategies.ML.ResearchBus.EntryResearch.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.ML.ResearchBus.EntryResearch.html"
+          "relative_path": "api/obj/api/TradingStrategies.ML.ResearchBus.EntryResearch.html"
         }
       },
       "version": "",
@@ -6162,7 +6162,7 @@
       "source_relative_path": "obj/api/TradingStrategies.ML.ResearchBus.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.ML.ResearchBus.html"
+          "relative_path": "api/obj/api/TradingStrategies.ML.ResearchBus.html"
         }
       },
       "version": "",
@@ -6176,7 +6176,7 @@
       "source_relative_path": "obj/api/TradingStrategies.ML.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.ML.html"
+          "relative_path": "api/obj/api/TradingStrategies.ML.html"
         }
       },
       "version": "",
@@ -6190,7 +6190,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Scenario.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Scenario.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Scenario.html"
         }
       },
       "version": "",
@@ -6204,7 +6204,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Signal.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Signal.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Signal.html"
         }
       },
       "version": "",
@@ -6218,7 +6218,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.SignalCondition.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.SignalCondition.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.SignalCondition.html"
         }
       },
       "version": "",
@@ -6232,7 +6232,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strat.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strat.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strat.html"
         }
       },
       "version": "",
@@ -6246,7 +6246,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strategies.Strats.TryAgainStrat.ParamKey.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strategies.Strats.TryAgainStrat.ParamKey.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strategies.Strats.TryAgainStrat.ParamKey.html"
         }
       },
       "version": "",
@@ -6260,7 +6260,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strategies.Strats.TryAgainStrat.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strategies.Strats.TryAgainStrat.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strategies.Strats.TryAgainStrat.html"
         }
       },
       "version": "",
@@ -6274,7 +6274,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strategies.Strats.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strategies.Strats.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strategies.Strats.html"
         }
       },
       "version": "",
@@ -6288,7 +6288,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strategy.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strategy.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strategy.html"
         }
       },
       "version": "",
@@ -6302,7 +6302,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.BollingerBreakout.ParamKey.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.BollingerBreakout.ParamKey.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.BollingerBreakout.ParamKey.html"
         }
       },
       "version": "",
@@ -6316,7 +6316,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.BollingerBreakout.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.BollingerBreakout.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.BollingerBreakout.html"
         }
       },
       "version": "",
@@ -6330,7 +6330,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.Breakout.ParamKey.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.Breakout.ParamKey.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.Breakout.ParamKey.html"
         }
       },
       "version": "",
@@ -6344,7 +6344,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.Breakout.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.Breakout.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.Breakout.html"
         }
       },
       "version": "",
@@ -6358,7 +6358,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.Breakout2.ParamKey.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.Breakout2.ParamKey.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.Breakout2.ParamKey.html"
         }
       },
       "version": "",
@@ -6372,7 +6372,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.Breakout2.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.Breakout2.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.Breakout2.html"
         }
       },
       "version": "",
@@ -6386,7 +6386,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.FlowMomentumStrat.ParamKey.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.FlowMomentumStrat.ParamKey.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.FlowMomentumStrat.ParamKey.html"
         }
       },
       "version": "",
@@ -6400,7 +6400,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.FlowMomentumStrat.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.FlowMomentumStrat.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.FlowMomentumStrat.html"
         }
       },
       "version": "",
@@ -6414,7 +6414,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.LowLiquidityExitExec.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.LowLiquidityExitExec.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.LowLiquidityExitExec.html"
         }
       },
       "version": "",
@@ -6428,7 +6428,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.MLEntrySeekerShared.ParamKey.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.MLEntrySeekerShared.ParamKey.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.MLEntrySeekerShared.ParamKey.html"
         }
       },
       "version": "",
@@ -6442,7 +6442,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.MLEntrySeekerShared.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.MLEntrySeekerShared.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.MLEntrySeekerShared.html"
         }
       },
       "version": "",
@@ -6456,7 +6456,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.MomentumTrading.ParamKey.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.MomentumTrading.ParamKey.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.MomentumTrading.ParamKey.html"
         }
       },
       "version": "",
@@ -6470,7 +6470,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.MomentumTrading.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.MomentumTrading.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.MomentumTrading.html"
         }
       },
       "version": "",
@@ -6484,7 +6484,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.NothingEverHappensStrat.ParamKey.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.NothingEverHappensStrat.ParamKey.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.NothingEverHappensStrat.ParamKey.html"
         }
       },
       "version": "",
@@ -6498,7 +6498,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.NothingEverHappensStrat.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.NothingEverHappensStrat.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.NothingEverHappensStrat.html"
         }
       },
       "version": "",
@@ -6512,7 +6512,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.SlopeMomentumStrat.ParamKey.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.SlopeMomentumStrat.ParamKey.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.SlopeMomentumStrat.ParamKey.html"
         }
       },
       "version": "",
@@ -6526,7 +6526,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.SlopeMomentumStrat.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.SlopeMomentumStrat.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.SlopeMomentumStrat.html"
         }
       },
       "version": "",
@@ -6540,7 +6540,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.Strats.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.Strats.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.Strats.html"
         }
       },
       "version": "",
@@ -6554,7 +6554,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Strategies.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Strategies.html"
+          "relative_path": "api/obj/api/TradingStrategies.Strategies.html"
         }
       },
       "version": "",
@@ -6568,7 +6568,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Helpers.MarketTypeHelper.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Helpers.MarketTypeHelper.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Helpers.MarketTypeHelper.html"
         }
       },
       "version": "",
@@ -6582,7 +6582,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.html"
         }
       },
       "version": "",
@@ -6596,7 +6596,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Helpers.StrategyConfiguration.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Helpers.StrategyConfiguration.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Helpers.StrategyConfiguration.html"
         }
       },
       "version": "",
@@ -6610,7 +6610,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.html"
         }
       },
       "version": "",
@@ -6624,7 +6624,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Helpers.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Helpers.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Helpers.html"
         }
       },
       "version": "",
@@ -6638,7 +6638,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.EquityCalculator.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.EquityCalculator.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.EquityCalculator.html"
         }
       },
       "version": "",
@@ -6652,7 +6652,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.MarketTypeService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.MarketTypeService.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.MarketTypeService.html"
         }
       },
       "version": "",
@@ -6666,7 +6666,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.PatternDetectionService.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.PatternDetectionService.html"
         }
       },
       "version": "",
@@ -6680,7 +6680,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.EventGroup.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.EventGroup.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.EventGroup.html"
         }
       },
       "version": "",
@@ -6694,7 +6694,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.PathInfo.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.PathInfo.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.PathInfo.html"
         }
       },
       "version": "",
@@ -6708,7 +6708,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.PathPerformance.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.PathPerformance.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.PathPerformance.html"
         }
       },
       "version": "",
@@ -6722,7 +6722,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.SimulationEventLog.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.SimulationEventLog.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.SimulationEventLog.html"
         }
       },
       "version": "",
@@ -6736,7 +6736,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.ReportGenerator.html"
         }
       },
       "version": "",
@@ -6750,7 +6750,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.SimulationEngine.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.SimulationEngine.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.SimulationEngine.html"
         }
       },
       "version": "",
@@ -6764,7 +6764,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.SimulationPath.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.SimulationPath.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.SimulationPath.html"
         }
       },
       "version": "",
@@ -6778,7 +6778,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.StrategySimulation.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.StrategySimulation.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.StrategySimulation.html"
         }
       },
       "version": "",
@@ -6792,7 +6792,7 @@
       "source_relative_path": "obj/api/TradingStrategies.Trading.Overseer.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.Trading.Overseer.html"
+          "relative_path": "api/obj/api/TradingStrategies.Trading.Overseer.html"
         }
       },
       "version": "",
@@ -6806,7 +6806,7 @@
       "source_relative_path": "obj/api/TradingStrategies.TradingOverseer.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.TradingOverseer.html"
+          "relative_path": "api/obj/api/TradingStrategies.TradingOverseer.html"
         }
       },
       "version": "",
@@ -6820,7 +6820,7 @@
       "source_relative_path": "obj/api/TradingStrategies.yml",
       "output": {
         ".html": {
-          "relative_path": "obj/api/TradingStrategies.html"
+          "relative_path": "api/obj/api/TradingStrategies.html"
         }
       },
       "version": "",
@@ -6834,10 +6834,10 @@
       "source_relative_path": "obj/api/toc.yml",
       "output": {
         ".json": {
-          "relative_path": "obj/api/toc.json"
+          "relative_path": "api/obj/api/toc.json"
         },
         ".html": {
-          "relative_path": "obj/api/toc.html"
+          "relative_path": "api/obj/api/toc.html"
         }
       },
       "version": ""

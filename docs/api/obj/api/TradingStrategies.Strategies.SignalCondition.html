@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class SignalCondition | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class SignalCondition | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Defines a condition based on a trading signal that triggers a specific trading action. This class combines a signal (technical indicator or market condition), a comparison operator, a threshold value, and the resulting action type to create rule-based trading logic. Signal conditions are used by strategies to evaluate market states and determine appropriate responses.">
+      <link rel="shortcut icon" href="../../../favicon.ico">
+      <link rel="stylesheet" href="../../../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../../../styles/docfx.css">
+      <link rel="stylesheet" href="../../../styles/main.css">
+      <meta property="docfx:navrel" content="../../../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../../../index.html">
+                <img id="logo" class="svg" src="../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="TradingStrategies.Strategies.SignalCondition">
+
+
+
+  <h1 id="TradingStrategies_Strategies_SignalCondition" data-uid="TradingStrategies.Strategies.SignalCondition" class="text-break">Class SignalCondition</h1>
+  <div class="markdown level0 summary"><p>Defines a condition based on a trading signal that triggers a specific trading action.
+This class combines a signal (technical indicator or market condition), a comparison operator,
+a threshold value, and the resulting action type to create rule-based trading logic.
+Signal conditions are used by strategies to evaluate market states and determine appropriate responses.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">SignalCondition</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="TradingStrategies.html">TradingStrategies</a>.<a class="xref" href="TradingStrategies.Strategies.html">Strategies</a></h6>
+  <h6><strong>Assembly</strong>: TradingStrategies.dll</h6>
+  <h5 id="TradingStrategies_Strategies_SignalCondition_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class SignalCondition</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Strategies_SignalCondition__ctor_TradingStrategies_Strategies_Signal_BacklashInterfaces_Enums_StrategyEnums_ComparisonOperator_System_Int32_BacklashInterfaces_Enums_StrategyEnums_ActionType_.md&amp;value=---%0Auid%3A%20TradingStrategies.Strategies.SignalCondition.%23ctor(TradingStrategies.Strategies.Signal%2CBacklashInterfaces.Enums.StrategyEnums.ComparisonOperator%2CSystem.Int32%2CBacklashInterfaces.Enums.StrategyEnums.ActionType)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Strategies/SignalCondition.cs/#L40">View Source</a>
+  </span>
+  <a id="TradingStrategies_Strategies_SignalCondition__ctor_" data-uid="TradingStrategies.Strategies.SignalCondition.#ctor*"></a>
+  <h4 id="TradingStrategies_Strategies_SignalCondition__ctor_TradingStrategies_Strategies_Signal_BacklashInterfaces_Enums_StrategyEnums_ComparisonOperator_System_Int32_BacklashInterfaces_Enums_StrategyEnums_ActionType_" data-uid="TradingStrategies.Strategies.SignalCondition.#ctor(TradingStrategies.Strategies.Signal,BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator,System.Int32,BacklashInterfaces.Enums.StrategyEnums.ActionType)">SignalCondition(Signal, ComparisonOperator, int, ActionType)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the SignalCondition class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SignalCondition(Signal signal, StrategyEnums.ComparisonOperator op, int threshold, StrategyEnums.ActionType action)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="TradingStrategies.Strategies.Signal.html">Signal</a></td>
+        <td><span class="parametername">signal</span></td>
+        <td><p>The trading signal to evaluate.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.html">ComparisonOperator</a></td>
+        <td><span class="parametername">op</span></td>
+        <td><p>The comparison operator for the evaluation.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">threshold</span></td>
+        <td><p>The threshold value for the comparison.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.ActionType.html">ActionType</a></td>
+        <td><span class="parametername">action</span></td>
+        <td><p>The trading action to take when the condition is met.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Strategies_SignalCondition_ActionType.md&amp;value=---%0Auid%3A%20TradingStrategies.Strategies.SignalCondition.ActionType%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Strategies/SignalCondition.cs/#L31">View Source</a>
+  </span>
+  <a id="TradingStrategies_Strategies_SignalCondition_ActionType_" data-uid="TradingStrategies.Strategies.SignalCondition.ActionType*"></a>
+  <h4 id="TradingStrategies_Strategies_SignalCondition_ActionType" data-uid="TradingStrategies.Strategies.SignalCondition.ActionType">ActionType</h4>
+  <div class="markdown level1 summary"><p>Gets the trading action that should be taken when this condition is met.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StrategyEnums.ActionType ActionType { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.ActionType.html">ActionType</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Strategies_SignalCondition_Operator.md&amp;value=---%0Auid%3A%20TradingStrategies.Strategies.SignalCondition.Operator%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Strategies/SignalCondition.cs/#L21">View Source</a>
+  </span>
+  <a id="TradingStrategies_Strategies_SignalCondition_Operator_" data-uid="TradingStrategies.Strategies.SignalCondition.Operator*"></a>
+  <h4 id="TradingStrategies_Strategies_SignalCondition_Operator" data-uid="TradingStrategies.Strategies.SignalCondition.Operator">Operator</h4>
+  <div class="markdown level1 summary"><p>Gets the comparison operator used to evaluate the signal against the threshold.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StrategyEnums.ComparisonOperator Operator { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.html">ComparisonOperator</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Strategies_SignalCondition_Signal.md&amp;value=---%0Auid%3A%20TradingStrategies.Strategies.SignalCondition.Signal%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Strategies/SignalCondition.cs/#L16">View Source</a>
+  </span>
+  <a id="TradingStrategies_Strategies_SignalCondition_Signal_" data-uid="TradingStrategies.Strategies.SignalCondition.Signal*"></a>
+  <h4 id="TradingStrategies_Strategies_SignalCondition_Signal" data-uid="TradingStrategies.Strategies.SignalCondition.Signal">Signal</h4>
+  <div class="markdown level1 summary"><p>Gets the trading signal that this condition evaluates.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Signal Signal { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="TradingStrategies.Strategies.Signal.html">Signal</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Strategies_SignalCondition_Threshold.md&amp;value=---%0Auid%3A%20TradingStrategies.Strategies.SignalCondition.Threshold%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Strategies/SignalCondition.cs/#L26">View Source</a>
+  </span>
+  <a id="TradingStrategies_Strategies_SignalCondition_Threshold_" data-uid="TradingStrategies.Strategies.SignalCondition.Threshold*"></a>
+  <h4 id="TradingStrategies_Strategies_SignalCondition_Threshold" data-uid="TradingStrategies.Strategies.SignalCondition.Threshold">Threshold</h4>
+  <div class="markdown level1 summary"><p>Gets the threshold value used in the comparison with the signal.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Threshold { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Strategies_SignalCondition.md&amp;value=---%0Auid%3A%20TradingStrategies.Strategies.SignalCondition%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Strategies/SignalCondition.cs/#L11" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../../../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../styles/main.js"></script>
+  </body>
+</html>

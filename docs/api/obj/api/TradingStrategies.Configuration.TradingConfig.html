@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class TradingConfig | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class TradingConfig | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Configuration class containing timing parameters for trading operations in the Kalshi trading bot system. These settings control decision frequency, change detection windows, trade matching tolerances, and refresh intervals used throughout the trading strategy execution pipeline. Values are injected via dependency injection and consumed by TradingStrategy, TradingSnapshotService, and related components for consistent timing behavior.">
+      <link rel="shortcut icon" href="../../../favicon.ico">
+      <link rel="stylesheet" href="../../../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../../../styles/docfx.css">
+      <link rel="stylesheet" href="../../../styles/main.css">
+      <meta property="docfx:navrel" content="../../../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../../../index.html">
+                <img id="logo" class="svg" src="../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="TradingStrategies.Configuration.TradingConfig">
+
+
+
+  <h1 id="TradingStrategies_Configuration_TradingConfig" data-uid="TradingStrategies.Configuration.TradingConfig" class="text-break">Class TradingConfig</h1>
+  <div class="markdown level0 summary"><p>Configuration class containing timing parameters for trading operations in the Kalshi trading bot system.
+These settings control decision frequency, change detection windows, trade matching tolerances, and refresh intervals
+used throughout the trading strategy execution pipeline. Values are injected via dependency injection
+and consumed by TradingStrategy, TradingSnapshotService, and related components for consistent timing behavior.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">TradingConfig</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="TradingStrategies.html">TradingStrategies</a>.<a class="xref" href="TradingStrategies.Configuration.html">Configuration</a></h6>
+  <h6><strong>Assembly</strong>: TradingStrategies.dll</h6>
+  <h5 id="TradingStrategies_Configuration_TradingConfig_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class TradingConfig</code></pre>
+  </div>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_TradingConfig_ChangeWindowDuration.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.TradingConfig.ChangeWindowDuration%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/TradingConfig.cs/#L52">View Source</a>
+  </span>
+  <a id="TradingStrategies_Configuration_TradingConfig_ChangeWindowDuration_" data-uid="TradingStrategies.Configuration.TradingConfig.ChangeWindowDuration*"></a>
+  <h4 id="TradingStrategies_Configuration_TradingConfig_ChangeWindowDuration" data-uid="TradingStrategies.Configuration.TradingConfig.ChangeWindowDuration">ChangeWindowDuration</h4>
+  <div class="markdown level1 summary"><p>Computed TimeSpan representation of the change window duration for use in time-based calculations.
+Provides convenient TimeSpan format for operations requiring duration arithmetic.
+Automatically converts ChangeWindowDurationMinutes to TimeSpan for consistent time handling.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan ChangeWindowDuration { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_TradingConfig_ChangeWindowDurationMinutes.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.TradingConfig.ChangeWindowDurationMinutes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/TradingConfig.cs/#L27">View Source</a>
+  </span>
+  <a id="TradingStrategies_Configuration_TradingConfig_ChangeWindowDurationMinutes_" data-uid="TradingStrategies.Configuration.TradingConfig.ChangeWindowDurationMinutes*"></a>
+  <h4 id="TradingStrategies_Configuration_TradingConfig_ChangeWindowDurationMinutes" data-uid="TradingStrategies.Configuration.TradingConfig.ChangeWindowDurationMinutes">ChangeWindowDurationMinutes</h4>
+  <div class="markdown level1 summary"><p>Duration in minutes over which price changes are analyzed for trend detection and momentum calculations.
+This window defines the lookback period for identifying significant price movements and volatility patterns.
+Longer windows provide more stable trend analysis but may miss short-term opportunities.
+Typical values: 5-60 minutes depending on trading timeframe and market characteristics.
+Used by MarketData and TradingCalculator for change-over-time metrics and technical indicators.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double ChangeWindowDurationMinutes { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_TradingConfig_DecisionFrequencySeconds.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.TradingConfig.DecisionFrequencySeconds%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/TradingConfig.cs/#L18">View Source</a>
+  </span>
+  <a id="TradingStrategies_Configuration_TradingConfig_DecisionFrequencySeconds_" data-uid="TradingStrategies.Configuration.TradingConfig.DecisionFrequencySeconds*"></a>
+  <h4 id="TradingStrategies_Configuration_TradingConfig_DecisionFrequencySeconds" data-uid="TradingStrategies.Configuration.TradingConfig.DecisionFrequencySeconds">DecisionFrequencySeconds</h4>
+  <div class="markdown level1 summary"><p>Frequency in seconds at which trading decisions are evaluated and executed.
+This controls how often the trading strategy analyzes market conditions and makes buy/sell/hold decisions.
+Lower values provide more responsive trading but increase computational load and potential for overtrading.
+Typical values: 30-300 seconds depending on strategy requirements and market volatility.
+Used by TradingStrategy to determine snapshot intervals and decision timing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int DecisionFrequencySeconds { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_TradingConfig_OrderbookCancelWindow.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.TradingConfig.OrderbookCancelWindow%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/TradingConfig.cs/#L66">View Source</a>
+  </span>
+  <a id="TradingStrategies_Configuration_TradingConfig_OrderbookCancelWindow_" data-uid="TradingStrategies.Configuration.TradingConfig.OrderbookCancelWindow*"></a>
+  <h4 id="TradingStrategies_Configuration_TradingConfig_OrderbookCancelWindow" data-uid="TradingStrategies.Configuration.TradingConfig.OrderbookCancelWindow">OrderbookCancelWindow</h4>
+  <div class="markdown level1 summary"><p>Computed TimeSpan representation of the orderbook cancel window for use in cancellation detection.
+Provides convenient TimeSpan format for orderbook analysis and cancellation rate calculations.
+Automatically converts OrderbookCancelWindowSeconds to TimeSpan for consistent time handling.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan OrderbookCancelWindow { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_TradingConfig_OrderbookCancelWindowSeconds.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.TradingConfig.OrderbookCancelWindowSeconds%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/TradingConfig.cs/#L45">View Source</a>
+  </span>
+  <a id="TradingStrategies_Configuration_TradingConfig_OrderbookCancelWindowSeconds_" data-uid="TradingStrategies.Configuration.TradingConfig.OrderbookCancelWindowSeconds*"></a>
+  <h4 id="TradingStrategies_Configuration_TradingConfig_OrderbookCancelWindowSeconds" data-uid="TradingStrategies.Configuration.TradingConfig.OrderbookCancelWindowSeconds">OrderbookCancelWindowSeconds</h4>
+  <div class="markdown level1 summary"><p>Time window in seconds for detecting order cancellations in the orderbook.
+This defines how long to wait before considering an orderbook level change as a cancellation rather than a fill.
+Helps distinguish between actual cancellations and rapid fill-and-replace order patterns.
+Typical values: 5-30 seconds depending on market speed and order book dynamics.
+Used by OrderbookChangeTracker for cancellation rate calculations and order flow analysis.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double OrderbookCancelWindowSeconds { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_TradingConfig_RefreshIntervalMinutes.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.TradingConfig.RefreshIntervalMinutes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/TradingConfig.cs/#L75">View Source</a>
+  </span>
+  <a id="TradingStrategies_Configuration_TradingConfig_RefreshIntervalMinutes_" data-uid="TradingStrategies.Configuration.TradingConfig.RefreshIntervalMinutes*"></a>
+  <h4 id="TradingStrategies_Configuration_TradingConfig_RefreshIntervalMinutes" data-uid="TradingStrategies.Configuration.TradingConfig.RefreshIntervalMinutes">RefreshIntervalMinutes</h4>
+  <div class="markdown level1 summary"><p>Interval in minutes for refreshing market data and recalculating trading metrics.
+This controls how often the system updates cached market information and technical indicators.
+Longer intervals reduce API load but may delay response to market changes.
+Typical values: 1-15 minutes depending on data freshness requirements and API rate limits.
+Used by MarketRefreshService and MarketData for periodic data synchronization.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int RefreshIntervalMinutes { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_TradingConfig_TradeMatchingWindow.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.TradingConfig.TradeMatchingWindow%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/TradingConfig.cs/#L59">View Source</a>
+  </span>
+  <a id="TradingStrategies_Configuration_TradingConfig_TradeMatchingWindow_" data-uid="TradingStrategies.Configuration.TradingConfig.TradeMatchingWindow*"></a>
+  <h4 id="TradingStrategies_Configuration_TradingConfig_TradeMatchingWindow" data-uid="TradingStrategies.Configuration.TradingConfig.TradeMatchingWindow">TradeMatchingWindow</h4>
+  <div class="markdown level1 summary"><p>Computed TimeSpan representation of the trade matching window for use in timing comparisons.
+Provides convenient TimeSpan format for trade correlation and timing validation operations.
+Automatically converts TradeMatchingWindowSeconds to TimeSpan for consistent time handling.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan TradeMatchingWindow { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_TradingConfig_TradeMatchingWindowSeconds.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.TradingConfig.TradeMatchingWindowSeconds%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/TradingConfig.cs/#L36">View Source</a>
+  </span>
+  <a id="TradingStrategies_Configuration_TradingConfig_TradeMatchingWindowSeconds_" data-uid="TradingStrategies.Configuration.TradingConfig.TradeMatchingWindowSeconds*"></a>
+  <h4 id="TradingStrategies_Configuration_TradingConfig_TradeMatchingWindowSeconds" data-uid="TradingStrategies.Configuration.TradingConfig.TradeMatchingWindowSeconds">TradeMatchingWindowSeconds</h4>
+  <div class="markdown level1 summary"><p>Time window in seconds for matching trades to orderbook changes during analysis.
+This tolerance allows for slight timing discrepancies between trade execution and orderbook updates.
+Used to correlate trade events with corresponding orderbook modifications for accurate position tracking.
+Typical values: 1-10 seconds depending on market latency and data feed quality.
+Used by OrderbookChangeTracker for trade-orderbook correlation and position reconciliation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double TradeMatchingWindowSeconds { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_TradingConfig.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.TradingConfig%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/TradingConfig.cs/#L9" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../../../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../styles/main.js"></script>
+  </body>
+</html>

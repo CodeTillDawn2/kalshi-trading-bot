@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class SimulationPath | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class SimulationPath | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Represents the complete state of a single trading simulation path in the Kalshi trading bot system. This class encapsulates all the essential data needed to track the evolution of a trading strategy simulation over time, including position, cash balance, risk metrics, and order book state.">
+      <link rel="shortcut icon" href="../../../favicon.ico">
+      <link rel="stylesheet" href="../../../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../../../styles/docfx.css">
+      <link rel="stylesheet" href="../../../styles/main.css">
+      <meta property="docfx:navrel" content="../../../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../../../index.html">
+                <img id="logo" class="svg" src="../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="TradingStrategies.Trading.Overseer.SimulationPath">
+
+
+
+  <h1 id="TradingStrategies_Trading_Overseer_SimulationPath" data-uid="TradingStrategies.Trading.Overseer.SimulationPath" class="text-break">Class SimulationPath</h1>
+  <div class="markdown level0 summary"><p>Represents the complete state of a single trading simulation path in the Kalshi trading bot system.
+This class encapsulates all the essential data needed to track the evolution of a trading strategy
+simulation over time, including position, cash balance, risk metrics, and order book state.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">SimulationPath</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="TradingStrategies.html">TradingStrategies</a>.<a class="xref" href="TradingStrategies.Trading.html">Trading</a>.<a class="xref" href="TradingStrategies.Trading.Overseer.html">Overseer</a></h6>
+  <h6><strong>Assembly</strong>: TradingStrategies.dll</h6>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class SimulationPath</code></pre>
+  </div>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>
+SimulationPath serves as the core data container for the trading simulation engine, maintaining
+the state that evolves as strategies are executed against historical market data. It provides
+a snapshot of the trading account at any point during the simulation, enabling accurate
+performance evaluation and risk assessment.
+</p>
+<p>
+Key responsibilities include:
+- Tracking current position (positive for long, negative for short)
+- Maintaining cash balance and cumulative trading costs
+- Storing strategy configurations by market conditions
+- Managing simulated order book and resting orders
+- Recording simulation events for analysis
+- Calculating derived metrics like average entry price
+</p>
+<p>
+This class is used extensively by the SimulationEngine for branching simulations,
+by EquityCalculator for portfolio valuation, and by TradingOverseer for performance reporting.
+The immutable StrategiesByMarketConditions ensures consistent strategy application throughout
+the simulation lifecycle.
+</p>
+</div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath__ctor_System_Collections_Generic_Dictionary_BacklashInterfaces_Enums_StrategyEnums_MarketType_System_Collections_Generic_HashSet_TradingStrategies_Strategies_Strategy___System_Int32_System_Double_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath.%23ctor(System.Collections.Generic.Dictionary%7BBacklashInterfaces.Enums.StrategyEnums.MarketType%2CSystem.Collections.Generic.HashSet%7BTradingStrategies.Strategies.Strategy%7D%7D%2CSystem.Int32%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L168">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationPath__ctor_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.#ctor*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationPath__ctor_System_Collections_Generic_Dictionary_BacklashInterfaces_Enums_StrategyEnums_MarketType_System_Collections_Generic_HashSet_TradingStrategies_Strategies_Strategy___System_Int32_System_Double_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.#ctor(System.Collections.Generic.Dictionary{BacklashInterfaces.Enums.StrategyEnums.MarketType,System.Collections.Generic.HashSet{TradingStrategies.Strategies.Strategy}},System.Int32,System.Double)">SimulationPath(Dictionary&lt;MarketType, HashSet&lt;Strategy&gt;&gt;, int, double)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="TradingStrategies.Trading.Overseer.SimulationPath.html">SimulationPath</a> class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SimulationPath(Dictionary&lt;StrategyEnums.MarketType, HashSet&lt;Strategy&gt;&gt; strategiesByMarketConditions, int position, double cash)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.hashset-1">HashSet</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td><span class="parametername">strategiesByMarketConditions</span></td>
+        <td><p>The mapping of market conditions to available strategies that will be used throughout the simulation.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">position</span></td>
+        <td><p>The initial position size (positive for long, negative for short).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">cash</span></td>
+        <td><p>The initial cash balance in dollars.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath__ctor_System_Collections_Generic_Dictionary_BacklashInterfaces_Enums_StrategyEnums_MarketType_System_Collections_Generic_HashSet_TradingStrategies_Strategies_Strategy___System_Int32_System_Double__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Creates a new simulation path with the specified strategy configuration and starting conditions.
+The strategy mapping is stored as read-only to ensure consistency throughout the simulation.
+Other properties are initialized to default values and will be updated as the simulation progresses.</p>
+</div>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath_AverageCost.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath.AverageCost%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L201">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationPath_AverageCost_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.AverageCost*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationPath_AverageCost" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.AverageCost">AverageCost</h4>
+  <div class="markdown level1 summary"><p>Gets the average entry price for the current position, regardless of direction.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double AverageCost { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The average price paid/received per contract for the current position.
+Returns 0.0 if no position is held.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_AverageCost_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+This calculated property provides the average cost basis for the current position,
+which is essential for performance analysis and risk management. The calculation
+differs based on position direction:
+</p>
+<p>
+For long positions (positive): Returns TotalPaid divided by position size,
+representing the average price paid to acquire the contracts.
+</p>
+<p>
+For short positions (negative): Returns TotalReceived divided by absolute position size,
+representing the average price received when selling the contracts (entry price for shorts).
+</p>
+<p>
+This metric is used by trading strategies and performance reports to assess
+entry efficiency and calculate unrealized gains/losses relative to entry price.
+</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath_Cash.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath.Cash%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L75">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationPath_Cash_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.Cash*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationPath_Cash" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.Cash">Cash</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the current cash balance available for trading.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double Cash { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The cash balance in dollars, updated after each trade execution.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_Cash_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Cash is reduced when buying positions and increased when selling. Trading fees
+are also deducted from this balance. This value is critical for determining
+buying power and overall portfolio value.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath_CurrentRisk.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath.CurrentRisk%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L86">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationPath_CurrentRisk_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.CurrentRisk*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationPath_CurrentRisk" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.CurrentRisk">CurrentRisk</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the current risk level of the position.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double CurrentRisk { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The risk metric, defaulting to 0.0. Higher values indicate greater exposure.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_CurrentRisk_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This property tracks the risk associated with the current position. It may be
+calculated based on position size, volatility, or other risk factors. Used by
+risk management components to enforce position limits.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath_Events.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath.Events%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L119">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationPath_Events_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.Events*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationPath_Events" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.Events">Events</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the list of events that occurred during the simulation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;ReportGenerator.SimulationEventLog&gt; Events { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.html">ReportGenerator</a>.<a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.SimulationEventLog.html">SimulationEventLog</a>&gt;</td>
+        <td><p>A list of <a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.SimulationEventLog.html">ReportGenerator.SimulationEventLog</a> entries recording simulation events.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_Events_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Events capture significant occurrences during simulation such as trades, strategy
+decisions, market condition changes, and errors. This log is used for performance
+analysis, debugging, and generating detailed simulation reports.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath_Position.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath.Position%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L64">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationPath_Position_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.Position*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationPath_Position" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.Position">Position</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the current position size in the simulated market.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Position { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><p>Positive values indicate long positions, negative values indicate short positions.
+Zero indicates no position. The magnitude represents the number of contracts held.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_Position_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This value is updated by the simulation engine as trades are executed. It directly
+affects equity calculations and risk assessments throughout the simulation.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath_SimulatedBook.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath.SimulatedBook%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L134">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationPath_SimulatedBook_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.SimulatedBook*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationPath_SimulatedBook" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.SimulatedBook">SimulatedBook</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the simulated order book representing current market liquidity.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SimulatedOrderbook? SimulatedBook { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.SimulatedOrderbook.html">SimulatedOrderbook</a></td>
+        <td><p>A <a class="xref" href="BacklashDTOs.SimulatedOrderbook.html">SimulatedOrderbook</a> instance containing bid/ask levels, or null if
+no order book has been initialized for this simulation path.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_SimulatedBook_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>The simulated order book tracks available liquidity at different price levels.
+It evolves during simulation as orders are placed, filled, and cancelled.
+Used by the simulation engine for realistic trade execution and by equity
+calculator for position valuation.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath_SimulatedRestingOrders.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath.SimulatedRestingOrders%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L153">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationPath_SimulatedRestingOrders_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.SimulatedRestingOrders*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationPath_SimulatedRestingOrders" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.SimulatedRestingOrders">SimulatedRestingOrders</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the list of resting orders currently active in the simulation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;(string action, string side, string type, int count, int price, DateTime? expiration)&gt; SimulatedRestingOrders { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.string,system.string,system.int32,system.int32,system.nullable-system.datetime--.action">action</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.string,system.string,system.int32,system.int32,system.nullable-system.datetime--.side">side</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.string,system.string,system.int32,system.int32,system.nullable-system.datetime--.type">type</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.string,system.string,system.int32,system.int32,system.nullable-system.datetime--.count">count</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.string,system.string,system.int32,system.int32,system.nullable-system.datetime--.price">price</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a>? <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.string,system.string,system.int32,system.int32,system.nullable-system.datetime--.expiration">expiration</a>)&gt;</td>
+        <td><p>A list of tuples representing resting limit orders, where each tuple contains:</p>
+<ul>
+<li>action: &quot;buy&quot; or &quot;sell&quot;</li>
+<li>side: &quot;yes&quot; or &quot;no&quot;</li>
+<li>type: order type (typically &quot;limit&quot;)</li>
+<li>count: number of contracts</li>
+<li>price: limit price (1-99)</li>
+<li>expiration: optional expiration timestamp</li>
+</ul>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_SimulatedRestingOrders_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Resting orders represent unfilled limit orders that remain in the order book.
+They can be filled by market movements or cancelled by strategy decisions.
+This list is maintained in parallel with the simulated order book for consistency.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath_StrategiesByMarketConditions.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath.StrategiesByMarketConditions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L51">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationPath_StrategiesByMarketConditions_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.StrategiesByMarketConditions*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationPath_StrategiesByMarketConditions" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.StrategiesByMarketConditions">StrategiesByMarketConditions</h4>
+  <div class="markdown level1 summary"><p>Gets the mapping of market conditions to available trading strategies.
+This dictionary determines which strategies are eligible for execution based on current market type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;StrategyEnums.MarketType, HashSet&lt;Strategy&gt;&gt; StrategiesByMarketConditions { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.hashset-1">HashSet</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;</td>
+        <td><p>A read-only dictionary where keys are <a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">StrategyEnums.MarketType</a> values and values are
+sets of <a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a> objects that can be applied in those market conditions.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_StrategiesByMarketConditions_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This mapping is established at simulation initialization and remains constant throughout
+the simulation. It enables the simulation engine to select appropriate strategies
+based on detected market conditions, supporting adaptive trading behavior.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath_TotalPaid.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath.TotalPaid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L97">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationPath_TotalPaid_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.TotalPaid*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationPath_TotalPaid" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.TotalPaid">TotalPaid</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the cumulative amount paid for establishing long positions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double TotalPaid { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The total dollars paid for buying contracts in long positions.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_TotalPaid_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This accumulator tracks all cash outflows for position entries. Combined with
+<a class="xref" href="TradingStrategies.Trading.Overseer.SimulationPath.html#TradingStrategies_Trading_Overseer_SimulationPath_TotalReceived">TotalReceived</a>, it enables calculation of net trading costs and
+average entry prices for performance analysis.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath_TotalReceived.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath.TotalReceived%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L108">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationPath_TotalReceived_" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.TotalReceived*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationPath_TotalReceived" data-uid="TradingStrategies.Trading.Overseer.SimulationPath.TotalReceived">TotalReceived</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the cumulative amount received from establishing short positions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double TotalReceived { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The total dollars received from selling contracts in short positions.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationPath_TotalReceived_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This accumulator tracks all cash inflows from position entries. For short positions,
+this represents the entry price received when selling. Used alongside
+<a class="xref" href="TradingStrategies.Trading.Overseer.SimulationPath.html#TradingStrategies_Trading_Overseer_SimulationPath_TotalPaid">TotalPaid</a> for comprehensive cost tracking.</p>
+</div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationPath.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationPath%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationPath.cs/#L36" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../../../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../styles/main.js"></script>
+  </body>
+</html>

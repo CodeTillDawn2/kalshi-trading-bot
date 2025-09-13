@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class KalshiAPIService | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class KalshiAPIService | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Provides a comprehensive service for interacting with the Kalshi trading API. This service handles authentication, market data retrieval, order management, position tracking, and various other API operations required for automated trading on the Kalshi platform. It implements the IKalshiAPIService interface and uses RSA-based authentication with API keys. The service maintains execution time tracking for performance monitoring and includes robust error handling with cancellation token support throughout all operations.">
+      <link rel="shortcut icon" href="../../../favicon.ico">
+      <link rel="stylesheet" href="../../../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../../../styles/docfx.css">
+      <link rel="stylesheet" href="../../../styles/main.css">
+      <meta property="docfx:navrel" content="../../../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../../../index.html">
+                <img id="logo" class="svg" src="../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService">
+
+
+
+  <h1 id="KalshiBotAPI_KalshiAPI_KalshiAPIService" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService" class="text-break">Class KalshiAPIService</h1>
+  <div class="markdown level0 summary"><p>Provides a comprehensive service for interacting with the Kalshi trading API.
+This service handles authentication, market data retrieval, order management, position tracking,
+and various other API operations required for automated trading on the Kalshi platform.
+It implements the IKalshiAPIService interface and uses RSA-based authentication with API keys.
+The service maintains execution time tracking for performance monitoring and includes
+robust error handling with cancellation token support throughout all operations.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">KalshiAPIService</span></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.html">IKalshiAPIService</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="KalshiBotAPI.html">KalshiBotAPI</a>.<a class="xref" href="KalshiBotAPI.KalshiAPI.html">KalshiAPI</a></h6>
+  <h6><strong>Assembly</strong>: KalshiBotAPI.dll</h6>
+  <h5 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class KalshiAPIService : IKalshiAPIService</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService__Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_KalshiConfig__.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.%23ctor(Microsoft.Extensions.Logging.ILogger%7BBacklashBot.KalshiAPI.Interfaces.IKalshiAPIService%7D%2CMicrosoft.Extensions.Configuration.IConfiguration%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.State.Interfaces.IStatusTrackerService%2CMicrosoft.Extensions.Options.IOptions%7BKalshiBotAPI.Configuration.KalshiConfig%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L55">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService__ctor_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.#ctor*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService__Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_KalshiConfig__" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.State.Interfaces.IStatusTrackerService,Microsoft.Extensions.Options.IOptions{KalshiBotAPI.Configuration.KalshiConfig})">KalshiAPIService(ILogger&lt;IKalshiAPIService&gt;, IConfiguration, IServiceScopeFactory, IStatusTrackerService, IOptions&lt;KalshiConfig&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public KalshiAPIService(ILogger&lt;IKalshiAPIService&gt; logger, IConfiguration config, IServiceScopeFactory scopeFactory, IStatusTrackerService statusTrackerService, IOptions&lt;KalshiConfig&gt; kalshiConfig)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.html">IKalshiAPIService</a>&gt;</td>
+        <td><span class="parametername">logger</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.configuration.iconfiguration">IConfiguration</a></td>
+        <td><span class="parametername">config</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.dependencyinjection.iservicescopefactory">IServiceScopeFactory</a></td>
+        <td><span class="parametername">scopeFactory</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BacklashBot.State.Interfaces.IStatusTrackerService.html">IStatusTrackerService</a></td>
+        <td><span class="parametername">statusTrackerService</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="KalshiBotAPI.Configuration.KalshiConfig.html">KalshiConfig</a>&gt;</td>
+        <td><span class="parametername">kalshiConfig</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_CancelOrderAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.CancelOrderAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L474">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_CancelOrderAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.CancelOrderAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_CancelOrderAsync_System_String_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.CancelOrderAsync(System.String)">CancelOrderAsync(string)</h4>
+  <div class="markdown level1 summary"><p>Cancels an existing order on the Kalshi platform.
+Sends a DELETE request to the API to cancel the specified order by its ID.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;CancelOrderResponse?&gt; CancelOrderAsync(string orderId)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">orderId</span></td>
+        <td><p>The unique identifier of the order to cancel.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.CancelOrderResponse.html">CancelOrderResponse</a>&gt;</td>
+        <td><p>The API response containing cancellation details if successful, null if the operation fails or is cancelled.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_CreateOrderAsync_System_String_BacklashDTOs_KalshiAPI_CreateOrderRequest_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.CreateOrderAsync(System.String%2CBacklashDTOs.KalshiAPI.CreateOrderRequest)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L399">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_CreateOrderAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.CreateOrderAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_CreateOrderAsync_System_String_BacklashDTOs_KalshiAPI_CreateOrderRequest_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.CreateOrderAsync(System.String,BacklashDTOs.KalshiAPI.CreateOrderRequest)">CreateOrderAsync(string, CreateOrderRequest)</h4>
+  <div class="markdown level1 summary"><p>Creates a new order on the Kalshi platform for the specified market.
+Validates the order request parameters and sends the order to the API.
+Supports both market and limit orders with appropriate validation for each type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;CreateOrderResponse?&gt; CreateOrderAsync(string marketTicker, CreateOrderRequest orderRequest)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">marketTicker</span></td>
+        <td><p>The ticker symbol of the market for which to create the order.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.KalshiAPI.CreateOrderRequest.html">CreateOrderRequest</a></td>
+        <td><span class="parametername">orderRequest</span></td>
+        <td><p>The order details including action, type, side, count, and pricing information.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.CreateOrderResponse.html">CreateOrderResponse</a>&gt;</td>
+        <td><p>The API response containing order details if successful, null if the operation fails or is cancelled.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_CreateOrdersBatchAsync_BacklashDTOs_KalshiAPI_BatchOrdersRequest_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.CreateOrdersBatchAsync(BacklashDTOs.KalshiAPI.BatchOrdersRequest)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1818">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_CreateOrdersBatchAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.CreateOrdersBatchAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_CreateOrdersBatchAsync_BacklashDTOs_KalshiAPI_BatchOrdersRequest_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.CreateOrdersBatchAsync(BacklashDTOs.KalshiAPI.BatchOrdersRequest)">CreateOrdersBatchAsync(BatchOrdersRequest)</h4>
+  <div class="markdown level1 summary"><p>Creates multiple orders in a single batch operation.
+Allows efficient submission of multiple orders to reduce API round trips.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;BatchOrdersResponse?&gt; CreateOrdersBatchAsync(BatchOrdersRequest request)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.KalshiAPI.BatchOrdersRequest.html">BatchOrdersRequest</a></td>
+        <td><span class="parametername">request</span></td>
+        <td><p>The batch order request containing the list of orders to create.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.BatchOrdersResponse.html">BatchOrdersResponse</a>&gt;</td>
+        <td><p>The batch order response containing results for each order, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_DeleteOrderGroupAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.DeleteOrderGroupAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1980">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_DeleteOrderGroupAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.DeleteOrderGroupAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_DeleteOrderGroupAsync_System_String_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.DeleteOrderGroupAsync(System.String)">DeleteOrderGroupAsync(string)</h4>
+  <div class="markdown level1 summary"><p>Deletes an order group and all associated orders.
+This permanently removes the order group and cancels any remaining orders in it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;bool&gt; DeleteOrderGroupAsync(string orderGroupId)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">orderGroupId</span></td>
+        <td><p>The unique identifier of the order group to delete.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</td>
+        <td><p>True if the delete operation was successful, false otherwise.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_DeleteOrdersBatchAsync_BacklashDTOs_KalshiAPI_DeleteOrdersBatchRequest_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.DeleteOrdersBatchAsync(BacklashDTOs.KalshiAPI.DeleteOrdersBatchRequest)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1876">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_DeleteOrdersBatchAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.DeleteOrdersBatchAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_DeleteOrdersBatchAsync_BacklashDTOs_KalshiAPI_DeleteOrdersBatchRequest_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.DeleteOrdersBatchAsync(BacklashDTOs.KalshiAPI.DeleteOrdersBatchRequest)">DeleteOrdersBatchAsync(DeleteOrdersBatchRequest)</h4>
+  <div class="markdown level1 summary"><p>Cancels multiple orders in a single batch operation.
+Allows efficient cancellation of multiple orders to reduce API round trips.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;DeleteOrdersBatchResponse?&gt; DeleteOrdersBatchAsync(DeleteOrdersBatchRequest request)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.KalshiAPI.DeleteOrdersBatchRequest.html">DeleteOrdersBatchRequest</a></td>
+        <td><span class="parametername">request</span></td>
+        <td><p>The batch delete request containing the list of order IDs to cancel.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.DeleteOrdersBatchResponse.html">DeleteOrdersBatchResponse</a>&gt;</td>
+        <td><p>The batch delete response containing results for each order cancellation, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchAnnouncementsAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchAnnouncementsAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1365">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchAnnouncementsAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchAnnouncementsAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchAnnouncementsAsync" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchAnnouncementsAsync">FetchAnnouncementsAsync()</h4>
+  <div class="markdown level1 summary"><p>Fetches the latest announcements from the Kalshi exchange.
+Retrieves important notifications and updates from the platform and stores them in the database.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;(int ProcessedCount, int ErrorCount)&gt; FetchAnnouncementsAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.processedcount">ProcessedCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.errorcount">ErrorCount</a>)&gt;</td>
+        <td><p>A tuple containing the count of successfully processed announcements and the count of errors encountered.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchCandlesticksAsync_System_String_System_String_System_String_System_Int64_System_Nullable_System_Int64__System_Boolean_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchCandlesticksAsync(System.String%2CSystem.String%2CSystem.String%2CSystem.Int64%2CSystem.Nullable%7BSystem.Int64%7D%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L916">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchCandlesticksAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchCandlesticksAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchCandlesticksAsync_System_String_System_String_System_String_System_Int64_System_Nullable_System_Int64__System_Boolean_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchCandlesticksAsync(System.String,System.String,System.String,System.Int64,System.Nullable{System.Int64},System.Boolean)">FetchCandlesticksAsync(string, string, string, long, long?, bool)</h4>
+  <div class="markdown level1 summary"><p>Fetches candlestick data for a specific market and time interval from the Kalshi API.
+Supports minute, hour, and day intervals with automatic pagination and rate limiting handling.
+Processes the data into candlestick DTOs and persists them to the database.
+Optionally updates the market's last candlestick timestamp for tracking purposes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;(int ProcessedCount, int ErrorCount)&gt; FetchCandlesticksAsync(string seriesTicker, string marketTicker, string interval, long startTs, long? endTs = null, bool updateLastCandlestick = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">seriesTicker</span></td>
+        <td><p>The ticker symbol of the series containing the market.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">marketTicker</span></td>
+        <td><p>The ticker symbol of the market for which to retrieve candlesticks.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">interval</span></td>
+        <td><p>The time interval for candlesticks (&quot;minute&quot;, &quot;hour&quot;, or &quot;day&quot;).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td><span class="parametername">startTs</span></td>
+        <td><p>The starting timestamp for the data range (Unix timestamp).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</td>
+        <td><span class="parametername">endTs</span></td>
+        <td><p>Optional ending timestamp for the data range. If not provided, calculated based on interval.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">updateLastCandlestick</span></td>
+        <td><p>If true and interval is &quot;minute&quot;, updates the market's last candlestick timestamp.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.processedcount">ProcessedCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.errorcount">ErrorCount</a>)&gt;</td>
+        <td><p>A tuple containing the count of successfully processed candlesticks and the count of errors encountered.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchEventAsync_System_String_System_Boolean_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchEventAsync(System.String%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L619">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchEventAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchEventAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchEventAsync_System_String_System_Boolean_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchEventAsync(System.String,System.Boolean)">FetchEventAsync(string, bool)</h4>
+  <div class="markdown level1 summary"><p>Fetches detailed information about a specific event from the Kalshi API.
+Optionally includes nested market data if requested. Processes the event data into DTOs
+and persists both event and market information to the database.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;EventResponse?&gt; FetchEventAsync(string eventTicker, bool withNestedMarkets = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">eventTicker</span></td>
+        <td><p>The ticker symbol of the event to retrieve.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">withNestedMarkets</span></td>
+        <td><p>If true, includes detailed market data nested within the event response.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.EventResponse.html">EventResponse</a>&gt;</td>
+        <td><p>The API response containing event details if successful, null if the operation fails or is cancelled.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchExchangeScheduleAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchExchangeScheduleAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1438">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchExchangeScheduleAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchExchangeScheduleAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchExchangeScheduleAsync" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchExchangeScheduleAsync">FetchExchangeScheduleAsync()</h4>
+  <div class="markdown level1 summary"><p>Fetches the complete exchange schedule including trading hours and maintenance windows.
+Processes the schedule data into DTOs and persists the information to the database for operational planning.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;(int ProcessedCount, int ErrorCount)&gt; FetchExchangeScheduleAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.processedcount">ProcessedCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.errorcount">ErrorCount</a>)&gt;</td>
+        <td><p>A tuple containing the count of successfully processed schedule items and the count of errors encountered.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchMarketsAsync_System_String_System_String_System_String_System_String_System_String_System_String___System_Boolean_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchMarketsAsync(System.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.String%2CSystem.String%5B%5D%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L129">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchMarketsAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchMarketsAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchMarketsAsync_System_String_System_String_System_String_System_String_System_String_System_String___System_Boolean_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchMarketsAsync(System.String,System.String,System.String,System.String,System.String,System.String[],System.Boolean)">FetchMarketsAsync(string?, string?, string?, string?, string?, string[]?, bool)</h4>
+  <div class="markdown level1 summary"><p>Fetches market data from the Kalshi API based on the provided filters.
+This method retrieves market information in batches if tickers are specified, processes the API responses into MarketDTO objects,
+and persists them to the database. It handles pagination automatically and supports filtering by various market attributes.
+If specific tickers are requested and updateNotFoundToClosed is true, any tickers not returned by the API will be marked as closed in the database.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;(int ProcessedCount, int ErrorCount)&gt; FetchMarketsAsync(string? eventTicker = null, string? seriesTicker = null, string? maxCloseTs = null, string? minCloseTs = null, string? status = null, string[]? tickers = null, bool updateNotFoundToClosed = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">eventTicker</span></td>
+        <td><p>Optional filter to retrieve markets for a specific event ticker.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">seriesTicker</span></td>
+        <td><p>Optional filter to retrieve markets for a specific series ticker.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">maxCloseTs</span></td>
+        <td><p>Optional filter for markets with close time before this timestamp.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">minCloseTs</span></td>
+        <td><p>Optional filter for markets with close time after this timestamp.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">status</span></td>
+        <td><p>Optional filter for market status (e.g., &quot;active&quot;, &quot;closed&quot;).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</td>
+        <td><span class="parametername">tickers</span></td>
+        <td><p>Optional array of specific market tickers to retrieve. If provided, markets are fetched in batches of up to 20.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">updateNotFoundToClosed</span></td>
+        <td><p>If true and tickers are specified, marks any requested tickers not found in API responses as closed.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.processedcount">ProcessedCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.errorcount">ErrorCount</a>)&gt;</td>
+        <td><p>A tuple containing the count of successfully processed markets and the count of errors encountered.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchOrdersAsync_System_String_System_String_System_Nullable_System_Int64__System_Nullable_System_Int64__System_String_System_String_System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchOrdersAsync(System.String%2CSystem.String%2CSystem.Nullable%7BSystem.Int64%7D%2CSystem.Nullable%7BSystem.Int64%7D%2CSystem.String%2CSystem.String%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1223">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchOrdersAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchOrdersAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchOrdersAsync_System_String_System_String_System_Nullable_System_Int64__System_Nullable_System_Int64__System_String_System_String_System_Nullable_System_Int32__" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchOrdersAsync(System.String,System.String,System.Nullable{System.Int64},System.Nullable{System.Int64},System.String,System.String,System.Nullable{System.Int32})">FetchOrdersAsync(string?, string?, long?, long?, string?, string?, int?)</h4>
+  <div class="markdown level1 summary"><p>Fetches order data from the Kalshi API with support for various filters and pagination.
+Retrieves orders based on ticker, event ticker, timestamp ranges, status, and other criteria.
+Processes the API responses into order DTOs and persists them to the database.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;(int ProcessedCount, int ErrorCount)&gt; FetchOrdersAsync(string? ticker = null, string? eventTicker = null, long? minTs = null, long? maxTs = null, string? status = null, string? cursor = null, int? limit = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">ticker</span></td>
+        <td><p>Optional filter for orders by market ticker.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">eventTicker</span></td>
+        <td><p>Optional filter for orders by event ticker.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</td>
+        <td><span class="parametername">minTs</span></td>
+        <td><p>Optional minimum timestamp filter for order creation time.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</td>
+        <td><span class="parametername">maxTs</span></td>
+        <td><p>Optional maximum timestamp filter for order creation time.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">status</span></td>
+        <td><p>Optional filter for order status (e.g., &quot;pending&quot;, &quot;filled&quot;).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">cursor</span></td>
+        <td><p>Optional pagination cursor for retrieving subsequent pages of orders.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</td>
+        <td><span class="parametername">limit</span></td>
+        <td><p>Optional limit on the number of orders to retrieve per request.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.processedcount">ProcessedCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.errorcount">ErrorCount</a>)&gt;</td>
+        <td><p>A tuple containing the count of successfully processed orders and the count of errors encountered.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchPositionsAsync_System_String_System_Nullable_System_Int32__System_String_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchPositionsAsync(System.String%2CSystem.Nullable%7BSystem.Int32%7D%2CSystem.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L763">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchPositionsAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchPositionsAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchPositionsAsync_System_String_System_Nullable_System_Int32__System_String_System_String_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchPositionsAsync(System.String,System.Nullable{System.Int32},System.String,System.String)">FetchPositionsAsync(string?, int?, string?, string?)</h4>
+  <div class="markdown level1 summary"><p>Fetches the user's current positions from the Kalshi API.
+Retrieves position data with support for pagination, filtering, and settlement status.
+Processes the API responses into position DTOs and updates the database, removing positions
+that are no longer present in the API response.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;(int ProcessedCount, int ErrorCount)&gt; FetchPositionsAsync(string? cursor = null, int? limit = null, string? countFilter = null, string? settlementStatus = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">cursor</span></td>
+        <td><p>Optional pagination cursor for retrieving subsequent pages of positions.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</td>
+        <td><span class="parametername">limit</span></td>
+        <td><p>Optional limit on the number of positions to retrieve per request.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">countFilter</span></td>
+        <td><p>Optional filter for positions based on count (e.g., &quot;gt:0&quot; for positions greater than 0).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">settlementStatus</span></td>
+        <td><p>Optional filter for positions by settlement status.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.processedcount">ProcessedCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32-.errorcount">ErrorCount</a>)&gt;</td>
+        <td><p>A tuple containing the count of successfully processed positions and the count of errors encountered.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchSeriesAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchSeriesAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L530">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchSeriesAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchSeriesAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_FetchSeriesAsync_System_String_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.FetchSeriesAsync(System.String)">FetchSeriesAsync(string)</h4>
+  <div class="markdown level1 summary"><p>Fetches detailed information about a specific series from the Kalshi API.
+Retrieves series metadata including tags and settlement sources, processes the data into DTOs,
+and persists the information to the database for future reference.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;SeriesResponse?&gt; FetchSeriesAsync(string seriesTicker)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">seriesTicker</span></td>
+        <td><p>The ticker symbol of the series to retrieve.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.SeriesResponse.html">SeriesResponse</a>&gt;</td>
+        <td><p>The API response containing series details if successful, null if the operation fails or is cancelled.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetBalanceAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetBalanceAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1118">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetBalanceAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetBalanceAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetBalanceAsync" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetBalanceAsync">GetBalanceAsync()</h4>
+  <div class="markdown level1 summary"><p>Retrieves the current account balance from the Kalshi API.
+Returns the balance in cents as a long integer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;long&gt; GetBalanceAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>&gt;</td>
+        <td><p>The current account balance in cents, or 0 if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetEventMetadataAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetEventMetadataAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L2182">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetEventMetadataAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetEventMetadataAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetEventMetadataAsync_System_String_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetEventMetadataAsync(System.String)">GetEventMetadataAsync(string)</h4>
+  <div class="markdown level1 summary"><p>Retrieves detailed metadata for a specific event.
+Provides additional information about the event including competition details and settlement sources.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;EventMetadataResponse?&gt; GetEventMetadataAsync(string eventTicker)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">eventTicker</span></td>
+        <td><p>The ticker symbol of the event to retrieve metadata for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.EventMetadataResponse.html">EventMetadataResponse</a>&gt;</td>
+        <td><p>The event metadata response containing additional event information, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetExchangeScheduleAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetExchangeScheduleAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L353">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetExchangeScheduleAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetExchangeScheduleAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetExchangeScheduleAsync" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetExchangeScheduleAsync">GetExchangeScheduleAsync()</h4>
+  <div class="markdown level1 summary"><p>Retrieves the current exchange schedule from the Kalshi API.
+This includes trading hours, maintenance windows, and other operational schedule information for the exchange.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;ExchangeScheduleResponse&gt; GetExchangeScheduleAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.ExchangeScheduleResponse.html">ExchangeScheduleResponse</a>&gt;</td>
+        <td><p>The exchange schedule response containing schedule details, or an empty response if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetExchangeStatusAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetExchangeStatusAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1168">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetExchangeStatusAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetExchangeStatusAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetExchangeStatusAsync" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetExchangeStatusAsync">GetExchangeStatusAsync()</h4>
+  <div class="markdown level1 summary"><p>Retrieves the current operational status of the Kalshi exchange.
+This includes information about whether the exchange is open for trading, in maintenance, or closed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;ExchangeStatus?&gt; GetExchangeStatusAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.ExchangeStatus.html">ExchangeStatus</a>&gt;</td>
+        <td><p>The exchange status information, or an empty status object if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetFillsAsync_System_String_System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetFillsAsync(System.String%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L2079">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetFillsAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetFillsAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetFillsAsync_System_String_System_Nullable_System_Int32__" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetFillsAsync(System.String,System.Nullable{System.Int32})">GetFillsAsync(string?, int?)</h4>
+  <div class="markdown level1 summary"><p>Retrieves fill information for executed orders.
+Provides details about order executions including prices, quantities, and timestamps.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;FillsResponse?&gt; GetFillsAsync(string? cursor = null, int? limit = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">cursor</span></td>
+        <td><p>Optional pagination cursor for retrieving subsequent pages of fills.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</td>
+        <td><span class="parametername">limit</span></td>
+        <td><p>Optional limit on the number of fills to retrieve per request.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.FillsResponse.html">FillsResponse</a>&gt;</td>
+        <td><p>The fills response containing execution data, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetIncentiveProgramsAsync_System_String_System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetIncentiveProgramsAsync(System.String%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L2131">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetIncentiveProgramsAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetIncentiveProgramsAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetIncentiveProgramsAsync_System_String_System_Nullable_System_Int32__" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetIncentiveProgramsAsync(System.String,System.Nullable{System.Int32})">GetIncentiveProgramsAsync(string?, int?)</h4>
+  <div class="markdown level1 summary"><p>Retrieves information about available incentive programs.
+Provides details about trading incentives, rewards, and promotional programs offered by the exchange.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;IncentiveProgramsResponse?&gt; GetIncentiveProgramsAsync(string? cursor = null, int? limit = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">cursor</span></td>
+        <td><p>Optional pagination cursor for retrieving subsequent pages of incentive programs.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</td>
+        <td><span class="parametername">limit</span></td>
+        <td><p>Optional limit on the number of incentive programs to retrieve per request.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.IncentiveProgramsResponse.html">IncentiveProgramsResponse</a>&gt;</td>
+        <td><p>The incentive programs response containing program data, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetOrderDetailsAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetOrderDetailsAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1712">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetOrderDetailsAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetOrderDetailsAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetOrderDetailsAsync_System_String_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetOrderDetailsAsync(System.String)">GetOrderDetailsAsync(string)</h4>
+  <div class="markdown level1 summary"><p>Retrieves detailed information about a specific order.
+Provides comprehensive order data including status, fills, and execution details.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;OrderResponse?&gt; GetOrderDetailsAsync(string orderId)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">orderId</span></td>
+        <td><p>The unique identifier of the order to retrieve details for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.OrderResponse.html">OrderResponse</a>&gt;</td>
+        <td><p>The order details response, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetOrderQueuePositionAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetOrderQueuePositionAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1660">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetOrderQueuePositionAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetOrderQueuePositionAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetOrderQueuePositionAsync_System_String_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetOrderQueuePositionAsync(System.String)">GetOrderQueuePositionAsync(string)</h4>
+  <div class="markdown level1 summary"><p>Retrieves the queue position information for a specific order.
+This provides insight into where the order stands in the matching queue.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;OrderQueuePositionResponse?&gt; GetOrderQueuePositionAsync(string orderId)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">orderId</span></td>
+        <td><p>The unique identifier of the order to check.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.OrderQueuePositionResponse.html">OrderQueuePositionResponse</a>&gt;</td>
+        <td><p>The order queue position response, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetOrdersQueuePositionsAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetOrdersQueuePositionsAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1765">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetOrdersQueuePositionsAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetOrdersQueuePositionsAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetOrdersQueuePositionsAsync_System_String_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetOrdersQueuePositionsAsync(System.String)">GetOrdersQueuePositionsAsync(string?)</h4>
+  <div class="markdown level1 summary"><p>Retrieves queue position information for orders in specified markets.
+Provides insights into order queue status across multiple markets.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;QueuePositionsResponse?&gt; GetOrdersQueuePositionsAsync(string? marketTickers = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">marketTickers</span></td>
+        <td><p>Optional comma-separated list of market tickers to filter the results.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.QueuePositionsResponse.html">QueuePositionsResponse</a>&gt;</td>
+        <td><p>The queue positions response containing position data for the specified markets, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetSettlementsAsync_System_String_System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetSettlementsAsync(System.String%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L2027">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetSettlementsAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetSettlementsAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetSettlementsAsync_System_String_System_Nullable_System_Int32__" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetSettlementsAsync(System.String,System.Nullable{System.Int32})">GetSettlementsAsync(string?, int?)</h4>
+  <div class="markdown level1 summary"><p>Retrieves settlement information for completed markets.
+Provides details about market settlements including payout amounts and settlement dates.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;SettlementsResponse?&gt; GetSettlementsAsync(string? cursor = null, int? limit = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">cursor</span></td>
+        <td><p>Optional pagination cursor for retrieving subsequent pages of settlements.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</td>
+        <td><span class="parametername">limit</span></td>
+        <td><p>Optional limit on the number of settlements to retrieve per request.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.SettlementsResponse.html">SettlementsResponse</a>&gt;</td>
+        <td><p>The settlements response containing settlement data, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetTotalRestingOrderValueAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetTotalRestingOrderValueAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1614">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetTotalRestingOrderValueAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetTotalRestingOrderValueAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetTotalRestingOrderValueAsync" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetTotalRestingOrderValueAsync">GetTotalRestingOrderValueAsync()</h4>
+  <div class="markdown level1 summary"><p>Retrieves the total value of all resting orders in the user's account.
+This provides insight into the current exposure from open orders.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;TotalRestingOrderValueResponse?&gt; GetTotalRestingOrderValueAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.TotalRestingOrderValueResponse.html">TotalRestingOrderValueResponse</a>&gt;</td>
+        <td><p>The total resting order value response, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_ResetOrderGroupAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.ResetOrderGroupAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L1934">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_ResetOrderGroupAsync_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.ResetOrderGroupAsync*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_ResetOrderGroupAsync_System_String_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.ResetOrderGroupAsync(System.String)">ResetOrderGroupAsync(string)</h4>
+  <div class="markdown level1 summary"><p>Resets an order group, clearing its state and allowing it to be reused.
+This operation resets the order group's execution state without deleting it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;bool&gt; ResetOrderGroupAsync(string orderGroupId)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">orderGroupId</span></td>
+        <td><p>The unique identifier of the order group to reset.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</td>
+        <td><p>True if the reset operation was successful, false otherwise.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.html">IKalshiAPIService</a>
+  </div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L34" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../../../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../styles/main.js"></script>
+  </body>
+</html>

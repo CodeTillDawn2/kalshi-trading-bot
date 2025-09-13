@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Namespace BacklashBot.Services | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Namespace BacklashBot.Services | Kalshi Trading Bot Documentation ">
+    
+    
+      <link rel="shortcut icon" href="../../../favicon.ico">
+      <link rel="stylesheet" href="../../../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../../../styles/docfx.css">
+      <link rel="stylesheet" href="../../../styles/main.css">
+      <meta property="docfx:navrel" content="../../../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../../../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../../../index.html">
+                <img id="logo" class="svg" src="../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BacklashBot.Services">
+
+  <h1 id="BacklashBot_Services" data-uid="BacklashBot.Services" class="text-break">Namespace BacklashBot.Services</h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="markdown level0 remarks"></div>
+    <h3 id="classes">
+Classes
+</h3>
+      <h4><a class="xref" href="BacklashBot.Services.BroadcastService.html">BroadcastService</a></h4>
+      <section><p>Implements the broadcast service for real-time system status communication.
+Handles periodic broadcasting of comprehensive system health data to connected clients
+including performance metrics, market information, and operational status.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.CandlestickService.html">CandlestickService</a></h4>
+      <section><p>Service responsible for managing candlestick data for trading markets.
+Handles loading, processing, and persistence of historical price data from both
+Parquet files and SQL database, including forward filling and deduplication.
+Provides market data population and candlestick synchronization functionality.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.HealthCheckService.html">HealthCheckService</a></h4>
+      <section><p>Implementation of IHealthCheckService to verify dependent services are operational.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.InterestScoreService.html">InterestScoreService</a></h4>
+      <section><p>Service responsible for calculating interest scores for Kalshi markets based on various trading metrics.
+This service evaluates market attractiveness by analyzing spread characteristics, trading volume,
+liquidity patterns, and market continuity to provide quantitative scores for market selection.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.KaslhiBotScopeManagerService.html">KaslhiBotScopeManagerService</a></h4>
+      <section><p>Service for managing dependency injection scopes in the Kalshi trading bot system.
+This service handles the creation, initialization, and disposal of service scopes,
+ensuring proper resource management and access to scoped services throughout the application.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.MarketDataInitializer.html">MarketDataInitializer</a></h4>
+      <section><p>Service responsible for initializing market data during application startup.
+This service fetches watched markets, subscribes to WebSocket channels for new markets,
+synchronizes market data, and sets up positions and account balance. It ensures
+that all necessary market data is available before the application becomes fully operational.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.MarketDataService.html">MarketDataService</a></h4>
+      <section><p>Core service responsible for managing market data operations, WebSocket event handling,
+market watchlist management, and real-time data synchronization for the Kalshi trading bot.
+Supports configurable timeouts and batch sizes via MarketDataConfig, data validation for WebSocket messages,
+and retry logic with Polly for resilient API calls.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.MarketRefreshService.html">MarketRefreshService</a></h4>
+      <section><p>Service responsible for managing periodic market data refresh operations for watched markets.
+This service runs a background task that checks trading status, determines which markets need data synchronization,
+and performs refresh operations at configured intervals. It provides metrics on refresh performance and supports
+immediate refresh triggers for specific markets.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.OrderBookService.html">OrderBookService</a></h4>
+      <section><p>Service responsible for managing order book data for Kalshi markets.
+Handles WebSocket order book events, processes snapshots and deltas asynchronously,
+maintains thread-safe access to order book data, and provides synchronization capabilities.
+Integrates with the broader trading bot ecosystem to ensure real-time order book updates.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.OrderbookChangeTracker.html">OrderbookChangeTracker</a></h4>
+      <section><p>Tracks and analyzes orderbook changes for a specific market in the Kalshi trading system.
+This class is responsible for processing orderbook snapshots, recording individual changes,
+matching trades to orderbook changes, calculating various market metrics (velocity, volume, rates),
+and maintaining a rolling window of orderbook events for analysis. It implements the
+IOrderbookChangeTracker interface and integrates with the broader trading bot ecosystem
+to provide real-time market data analysis and metrics calculation.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.OverseerClientService.html">OverseerClientService</a></h4>
+      <section><p>Manages the client-side connection to an Overseer server for monitoring and oversight of the trading bot.
+This service establishes and maintains a SignalR connection to an Overseer instance, handles periodic check-ins
+with system status information, and automatically discovers and switches to better overseer servers when available.
+It provides resilience through automatic reconnection, connection validation, and failover mechanisms.
+The service integrates with the broader bot ecosystem to report market data, error counts, and performance metrics.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.ServiceFactory.html">ServiceFactory</a></h4>
+      <section><p>Provides centralized access to various services within the Kalshi trading bot system through dependency injection scopes.
+This factory implements the service locator pattern to manage service initialization, configuration validation,
+and thread-safe access to scoped services. It acts as a bridge between the application's dependency injection
+container and service consumers, ensuring proper scope management and resource cleanup.
+Services are cached per scope to improve performance by avoiding repeated dependency injection resolution.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.TradingCalculator.html">TradingCalculator</a></h4>
+      <section><p>Provides calculations for various technical indicators used in trading strategies for the Kalshi marketplace.
+This class implements the ITradingCalculator interface and computes indicators such as RSI, MACD, Bollinger Bands,
+Stochastic Oscillator, ATR, VWAP, OBV, support/resistance levels, PSAR, and ADX based on pseudo-candlestick data.
+All calculations are designed for event-driven contracts with prices bounded between 1 and 99 cents.
+Depends on CalculationConfig for indicator parameters, includes async methods for performance in high-frequency scenarios,
+and incorporates comprehensive input validation including null checks, empty list handling, and data integrity checks with warnings.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.TradingSnapshotService.html">TradingSnapshotService</a></h4>
+      <section><p>Service responsible for managing trading snapshot operations, including saving market data snapshots to disk
+and loading them for analysis. This service handles snapshot validation, timing controls, and schema management
+to ensure reliable data persistence and retrieval for trading strategy evaluation.</p>
+</section>
+      <h4><a class="xref" href="BacklashBot.Services.WebSocketMonitorService.html">WebSocketMonitorService</a></h4>
+      <section><p>Service responsible for monitoring the Kalshi exchange status and managing WebSocket connection lifecycle.
+This service periodically checks the exchange's operational status and automatically connects/disconnects
+the WebSocket client based on exchange availability and bot initialization state. It ensures reliable
+real-time data streaming while handling connection failures and exchange downtime gracefully.</p>
+</section>
+
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../../../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../styles/main.js"></script>
+  </body>
+</html>
