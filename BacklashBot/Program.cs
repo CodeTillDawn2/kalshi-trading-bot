@@ -7,6 +7,7 @@ using KalshiBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
+using BacklashBot.Services;
 using BacklashBot.Hubs;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management;
@@ -59,6 +60,7 @@ builder.Services.Configure<CalculationConfig>(builder.Configuration.GetSection("
 builder.Services.Configure<ExecutionConfig>(builder.Configuration.GetSection("Execution"));
 builder.Services.Configure<MarketDataConfig>(builder.Configuration.GetSection("MarketData"));
 builder.Services.Configure<CentralBrainConfig>(builder.Configuration.GetSection("CentralBrain"));
+builder.Services.Configure<InterestScoreConfig>(builder.Configuration.GetSection("InterestScore"));
 
 // Increase shutdown timeout
 builder.Services.Configure<HostOptions>(options =>

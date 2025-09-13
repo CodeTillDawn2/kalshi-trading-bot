@@ -171,7 +171,16 @@ namespace KalshiBotTasks
             services.AddScoped<CentralPerformanceMonitor>();
             services.AddSingleton<IConfiguration>(config);
 
-            _interestScoreService = new InterestScoreService(interestLoggerMock.Object);
+            // Create InterestScoreConfig options for testing
+            var interestScoreConfig = new InterestScoreConfig
+            {
+                CacheDurationHours = 6,
+                EnablePerformanceMetrics = true,
+                MaxPerformanceMetricsHistory = 1000
+            };
+            var interestScoreOptions = Options.Create(interestScoreConfig);
+
+            _interestScoreService = new InterestScoreService(interestLoggerMock.Object, interestScoreOptions);
 
             // Register the mocks and options required by KalshiAPIService
             services.AddScoped(p => apiLoggerMock.Object);
