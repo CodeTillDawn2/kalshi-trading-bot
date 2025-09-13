@@ -38,7 +38,7 @@ namespace TradingStrategies.Strategies.Strats
             SpikeWeightCap,
             SpikeVolumeWeightScale,
 
-            // Confirmations (share of total) — single thresholds for both sides
+            // Confirmations (share of total) ï¿½ single thresholds for both sides
             TradeRateShareMin,
             TradeEventShareMin,
 
@@ -92,7 +92,7 @@ namespace TradingStrategies.Strategies.Strats
         public override ActionDecision GetAction(MarketSnapshot snapshot, MarketSnapshot? previousSnapshot, int simulationPosition = 0)
         {
             if (!snapshot.ChangeMetricsMature)
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 1, Memo = "reason not_mature" };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Quantity = 1, Memo = "reason not_mature" };
 
             var inv = CultureInfo.InvariantCulture;
             string F(double d)
@@ -375,7 +375,7 @@ namespace TradingStrategies.Strategies.Strats
                     {
                         Type = ActionType.Exit,
                         Price = exitPrice,
-                        Qty = Math.Abs(simulationPosition),
+                        Quantity = Math.Abs(simulationPosition),
                         Memo = actionMemo
                     };
                 }
@@ -384,13 +384,13 @@ namespace TradingStrategies.Strategies.Strats
                 {
                     pathTaken.Add("Hold: avoid weak flip");
                     string actionMemo = BuildActionMemo();
-                    return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = actionMemo };
+                    return new ActionDecision { Type = ActionType.None, Price = 0, Quantity = 0, Memo = actionMemo };
                 }
                 if (simulationPosition < 0 && candidateAction == ActionType.Long && signalStrength < exitOppStrength)
                 {
                     pathTaken.Add("Hold: avoid weak flip");
                     string actionMemo = BuildActionMemo();
-                    return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = actionMemo };
+                    return new ActionDecision { Type = ActionType.None, Price = 0, Quantity = 0, Memo = actionMemo };
                 }
             }
 
@@ -398,7 +398,7 @@ namespace TradingStrategies.Strategies.Strats
             {
                 pathTaken.Add(candidateAction == ActionType.None ? "Gate: None" : "Gate: weak");
                 string actionMemo = BuildActionMemo();
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = actionMemo };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Quantity = 0, Memo = actionMemo };
             }
 
             int pricePoint =
@@ -414,7 +414,7 @@ namespace TradingStrategies.Strategies.Strats
                 {
                     Type = candidateAction,
                     Price = pricePoint,
-                    Qty = 1,
+                    Quantity = 1,
                     Memo = actionMemo
                 };
             }

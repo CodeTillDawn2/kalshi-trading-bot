@@ -349,7 +349,7 @@ namespace TradingStrategies.Strategies.Strats
         }
 
         private static ActionDecision AD(ActionType t, int p, int q, string memo)
-            => new ActionDecision { Type = t, Price = p, Qty = q, Memo = memo };
+            => new ActionDecision { Type = t, Price = p, Quantity = q, Memo = memo };
 
 
         public override string ToJson()

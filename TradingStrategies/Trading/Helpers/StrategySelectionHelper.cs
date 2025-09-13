@@ -5,13 +5,42 @@ using static TradingStrategies.Strategies.Strats.BollingerBreakout;
 
 namespace TradingStrategies.Trading.Helpers
 {
+    /// <summary>
+    /// Centralized configuration utility for trading strategy parameter sets and instance creation.
+    /// Provides predefined parameter configurations for various trading strategies including BollingerBreakout,
+    /// Breakout2, FlowMomentumStrat, NothingEverHappensStrat, and MomentumTrading. Serves as a factory
+    /// for creating strategy instances with different parameter combinations for backtesting and optimization.
+    /// </summary>
+    /// <remarks>
+    /// This class maintains static readonly collections of parameter sets that correspond to the ParamKey
+    /// enums defined in each strategy implementation. The parameter sets are organized by strategy type
+    /// and provide variations for different market conditions and risk profiles.
+    /// </remarks>
     public class StrategySelectionHelper
     {
+        /// <summary>
+        /// Initializes a new instance of the StrategySelectionHelper class.
+        /// </summary>
+        /// <remarks>
+        /// Strategy configuration is now centralized in the StrategyConfiguration class.
+        /// This constructor is primarily for consistency and potential future initialization needs.
+        /// </remarks>
         public StrategySelectionHelper()
         {
             // Strategy configuration is now centralized in StrategyConfiguration class
         }
 
+        /// <summary>
+        /// Predefined parameter sets for BollingerBreakout strategy configurations.
+        /// Each set contains tuned parameters for different market conditions and risk profiles,
+        /// including variations in squeeze thresholds, absorption levels, signal strength requirements,
+        /// and velocity thresholds for both Bollinger and standalone signals.
+        /// </summary>
+        /// <remarks>
+        /// These parameter sets correspond to the BollingerBreakout.ParamKey enum and are used
+        /// to create strategy instances with different behavioral characteristics for backtesting
+        /// and optimization across various market scenarios.
+        /// </remarks>
         public static readonly List<(string Name, Dictionary<BollingerBreakout.ParamKey, double> Parameters)>
             BollingerParameterSets = new List<(string, Dictionary<ParamKey, double>)>
         {
@@ -407,6 +436,17 @@ namespace TradingStrategies.Trading.Helpers
             )
         };
 
+        /// <summary>
+        /// Predefined parameter sets for Breakout2 strategy configurations.
+        /// Contains comprehensive parameter variations for the advanced breakout strategy,
+        /// including controls for absorption thresholds, velocity ratios, spike detection,
+        /// trade rate/event share confirmations, and exit conditions based on RSI flattening.
+        /// </summary>
+        /// <remarks>
+        /// These parameter sets correspond to the Breakout2.ParamKey enum and provide
+        /// extensive configuration options for different market conditions, from tight controls
+        /// to extreme edge cases, enabling thorough strategy optimization and testing.
+        /// </remarks>
         public static readonly List<(string Name, Dictionary<Breakout2.ParamKey, double> Parameters)>
             BreakoutParameterSets = new List<(string, Dictionary<Breakout2.ParamKey, double>)>
 {
@@ -2227,8 +2267,26 @@ namespace TradingStrategies.Trading.Helpers
 
 
 
-        public IEnumerable<string> GetSetKeys() => StrategyConfiguration.GetStrategyNames();
-        public IEnumerable<string> GetWeightNames(string setKey) =>
+        /// <summary>
+        /// Retrieves the names of all available trading strategies.
+        /// </summary>
+        /// <returns>An enumerable collection of strategy names supported by the system.</returns>
+        /// <remarks>
+        /// This method delegates to StrategyConfiguration.GetStrategyNames() to provide
+        /// a centralized way to discover available strategy types for configuration and instantiation.
+        /// </remarks>
+        public IEnumerable<string> GetStrategyNames() => StrategyConfiguration.GetStrategyNames();
+        /// <summary>
+        /// Retrieves the names of all available parameter sets for a specific strategy type.
+        /// </summary>
+        /// <param name="setKey">The strategy type identifier (e.g., "Bollinger", "Breakout2", "FlowMo").</param>
+        /// <returns>An enumerable collection of parameter set names for the specified strategy type.</returns>
+        /// <remarks>
+        /// This method provides access to all predefined parameter configurations for a given strategy,
+        /// enabling selection of different parameter combinations for backtesting and optimization.
+        /// Returns an empty collection if the strategy type is not recognized.
+        /// </remarks>
+        public IEnumerable<string> GetParameterSetNames(string setKey) =>
             setKey switch
             {
                 "Bollinger" => BollingerParameterSets.Select(x => x.Name),
@@ -2240,12 +2298,34 @@ namespace TradingStrategies.Trading.Helpers
                 "MLShared" => MLEntrySeekerShared.MLSharedParameterSets.Select(x => x.Name),
                 _ => Enumerable.Empty<string>()
             };
-        public Dictionary<MarketType, List<Strategy>> GetMapping(string setKey, string weightName)
+        /// <summary>
+        /// Creates a strategy instance with the specified parameter set for all applicable market types.
+        /// </summary>
+        /// <param name="setKey">The strategy type identifier (e.g., "Bollinger", "Breakout2").</param>
+        /// <param name="weightName">The name of the parameter set to use for strategy configuration.</param>
+        /// <returns>A dictionary mapping market types to their corresponding strategy instances.</returns>
+        /// <remarks>
+        /// This method uses the StrategyConfiguration factory pattern to create strategy instances
+        /// with the specified parameter configuration. The returned dictionary provides strategies
+        /// tailored for different market conditions (LowLiquidity, Bouncing, Trending, etc.).
+        /// </remarks>
+        public Dictionary<MarketType, List<Strategy>> CreateStrategyInstance(string setKey, string weightName)
         {
             var factory = StrategyConfiguration.GetStrategyFactory(setKey);
             return factory(weightName);
         }
-        public List<Dictionary<MarketType, List<Strategy>>> GetTrainingMappings(string setKey)
+        /// <summary>
+        /// Creates strategy instances for all available parameter sets of a strategy type for training purposes.
+        /// </summary>
+        /// <param name="setKey">The strategy type identifier (e.g., "Bollinger", "Breakout2").</param>
+        /// <returns>A list of dictionaries, each mapping market types to strategy instances for different parameter sets.</returns>
+        /// <remarks>
+        /// This method generates strategy instances for every parameter configuration available for the specified
+        /// strategy type, enabling comprehensive backtesting and optimization across all parameter combinations.
+        /// Each dictionary in the returned list represents one parameter set applied across all market types.
+        /// </remarks>
+        /// <exception cref="ArgumentException">Thrown when the specified setKey is not recognized.</exception>
+        public List<Dictionary<MarketType, List<Strategy>>> CreateTrainingStrategyInstances(string setKey)
         {
             return setKey switch
             {
@@ -2307,7 +2387,19 @@ namespace TradingStrategies.Trading.Helpers
         }
 
 
-        // Define the market-to-strategy mapping as a static method
+        /// <summary>
+        /// Creates a standardized mapping of market types to strategy instances.
+        /// </summary>
+        /// <param name="bollingerStrategy">The strategy instance to apply to most market types.</param>
+        /// <returns>A dictionary mapping each market type to its appropriate strategy list.</returns>
+        /// <remarks>
+        /// This method provides a consistent market-to-strategy mapping across the system:
+        /// - LowLiquidity markets use a specialized LowLiquidityStrategy
+        /// - All other market types use the provided strategy instance
+        ///
+        /// This ensures that strategies are appropriately matched to different market conditions
+        /// while maintaining a simple and predictable configuration structure.
+        /// </remarks>
         private static Dictionary<MarketType, List<Strategy>> CreateMarketStrategyMapping(Strategy bollingerStrategy)
         {
             var strategiesDict = new Dictionary<MarketType, List<Strategy>>();
@@ -2343,6 +2435,16 @@ namespace TradingStrategies.Trading.Helpers
             return strategiesDict;
         }
 
+        /// <summary>
+        /// Creates a BollingerBreakout strategy instance with the specified parameter set.
+        /// </summary>
+        /// <param name="weightName">The name of the parameter set to use for the BollingerBreakout strategy.</param>
+        /// <returns>A dictionary mapping market types to BollingerBreakout strategy instances.</returns>
+        /// <remarks>
+        /// This method instantiates a BollingerBreakout strategy with the specified parameter configuration
+        /// and maps it to all applicable market types using the standard market strategy mapping.
+        /// The strategy detects breakouts from Bollinger Band squeezes with velocity and volume confirmations.
+        /// </remarks>
         public Dictionary<MarketType, List<Strategy>> GetBollingerBreakoutStrategy(string weightName)
         {
             // Use the first (default) parameter set for the standard strategy

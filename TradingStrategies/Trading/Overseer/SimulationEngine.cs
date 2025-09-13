@@ -501,7 +501,7 @@ namespace TradingStrategies.Trading.Overseer
             {
                 var decision = strategiesForAction.First().GetAction(effectiveSnapshot, previousEffectiveSnapshot, simulationPosition);
                 int limitPrice = decision.Price;
-                int postQty = decision.Qty;
+                int postQty = decision.Quantity;
                 DateTime? exp = decision.Expiration;
                 if (limitPrice > 0 && postQty > 0)
                 {
@@ -514,7 +514,7 @@ namespace TradingStrategies.Trading.Overseer
                 var decision = strategiesForAction.First().GetAction(effectiveSnapshot, previousEffectiveSnapshot, simulationPosition);
                 int sellPrice = decision.Price;
                 int bidPrice = 100 - sellPrice;
-                int postQty = decision.Qty;
+                int postQty = decision.Quantity;
                 DateTime? exp = decision.Expiration;
                 if (bidPrice > 0 && postQty > 0)
                 {

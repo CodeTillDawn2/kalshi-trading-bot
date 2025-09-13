@@ -91,7 +91,7 @@ namespace TradingStrategies.Strategies.Strats
 
                 if (_evaluationOnly || side == ActionType.None)
                     return new ActionDecision { Type = ActionType.None, Memo = memo };
-                return new ActionDecision { Type = side, Qty = 1, Memo = memo };
+                return new ActionDecision { Type = side, Quantity = 1, Memo = memo };
             }
             catch (Exception ex)
             {

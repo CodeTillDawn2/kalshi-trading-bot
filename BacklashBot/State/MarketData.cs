@@ -236,14 +236,16 @@ namespace BacklashBot.State
         {
             foreach (var ticker in tickers)
             {
+                int no_bid = 100 - ticker.yes_bid;
+                int no_ask = 100 - ticker.yes_ask;
                 bool hasInvalidPrice = ticker.yes_bid < 0 || ticker.yes_bid > 100 ||
-                                       ticker.yes_ask < 0 || ticker.yes_ask > 100 ||
-                                       ticker.no_bid < 0 || ticker.no_bid > 100 ||
-                                       ticker.no_ask < 0 || ticker.no_ask > 100;
+                                        ticker.yes_ask < 0 || ticker.yes_ask > 100 ||
+                                        no_bid < 0 || no_bid > 100 ||
+                                        no_ask < 0 || no_ask > 100;
                 if (hasInvalidPrice)
                 {
                     _logger.LogWarning("Invalid ticker data for {MarketTicker}: prices out of range (0-100). yes_bid={yes_bid}, yes_ask={yes_ask}, no_bid={no_bid}, no_ask={no_ask}",
-                        _marketTicker, ticker.yes_bid, ticker.yes_ask, ticker.no_bid, ticker.no_ask);
+                        _marketTicker, ticker.yes_bid, ticker.yes_ask, no_bid, no_ask);
                 }
                 if (ticker.volume < 0)
                 {
@@ -307,13 +309,13 @@ namespace BacklashBot.State
                 {
                     _logger.LogWarning("Invalid position data for {MarketTicker}: negative total traded {TotalTraded}", _marketTicker, position.TotalTraded);
                 }
-                if (position.LastUpdatedUTC.HasValue && position.LastUpdatedUTC.Value > DateTime.UtcNow.AddMinutes(1))
+                if (position.LastUpdatedUTC > DateTime.UtcNow.AddMinutes(1))
                 {
-                    _logger.LogWarning("Invalid position data for {MarketTicker}: future last updated timestamp {Timestamp}", _marketTicker, position.LastUpdatedUTC.Value);
+                    _logger.LogWarning("Invalid position data for {MarketTicker}: future last updated timestamp {Timestamp}", _marketTicker, position.LastUpdatedUTC);
                 }
-                if (position.LastUpdatedUTC.HasValue && position.LastUpdatedUTC.Value < DateTime.UtcNow.AddYears(-10))
+                if (position.LastUpdatedUTC < DateTime.UtcNow.AddYears(-10))
                 {
-                    _logger.LogWarning("Invalid position data for {MarketTicker}: unreasonably old last updated timestamp {Timestamp}", _marketTicker, position.LastUpdatedUTC.Value);
+                    _logger.LogWarning("Invalid position data for {MarketTicker}: unreasonably old last updated timestamp {Timestamp}", _marketTicker, position.LastUpdatedUTC);
                 }
             }
         }

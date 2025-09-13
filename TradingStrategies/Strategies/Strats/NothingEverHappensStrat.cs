@@ -50,7 +50,7 @@ namespace TradingStrategies.Strategies.Strats
         public override ActionDecision GetAction(MarketSnapshot snapshot, MarketSnapshot? previousSnapshot, int simulationPosition = 0)
         {
             if (!snapshot.ChangeMetricsMature)
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 1, Memo = "Change metrics not mature" };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Quantity = 1, Memo = "Change metrics not mature" };
 
             string actionMemo = "";
 
@@ -127,7 +127,7 @@ namespace TradingStrategies.Strategies.Strats
 
                     if (signalStrength >= minSignalStrengthEntry)
                     {
-                        return new ActionDecision { Type = candidateAction, Price = 0, Qty = 1, Memo = actionMemo };
+                        return new ActionDecision { Type = candidateAction, Price = 0, Quantity = 1, Memo = actionMemo };
                     }
                 }
             }
@@ -184,17 +184,17 @@ namespace TradingStrategies.Strategies.Strats
                     // Decide based on signal strength
                     if (signalStrength >= minSignalStrengthExit)
                     {
-                        return new ActionDecision { Type = candidateAction, Price = 0, Qty = 1, Memo = actionMemo };
+                        return new ActionDecision { Type = candidateAction, Price = 0, Quantity = 1, Memo = actionMemo };
                     }
                 }
             }
             else if (simulationPosition > 0)
             {
                 // If somehow long, exit (this strat doesn't enter long)
-                return new ActionDecision { Type = ActionType.Exit, Price = 0, Qty = 1, Memo = "Unexpected long position; exiting" };
+                return new ActionDecision { Type = ActionType.Exit, Price = 0, Quantity = 1, Memo = "Unexpected long position; exiting" };
             }
 
-            return new ActionDecision { Type = _defaultAction, Price = 0, Qty = 1, Memo = actionMemo };
+            return new ActionDecision { Type = _defaultAction, Price = 0, Quantity = 1, Memo = actionMemo };
         }
 
         public override string ToJson()
