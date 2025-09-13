@@ -30,6 +30,11 @@ jobs:
       - name: Install DocFX
         run: dotnet tool update -g docfx
 
+      - name: Clean previous site
+        run: |
+          rm -rf docs
+          rm -rf docfx_project/obj
+
       - name: Show tree (quick sanity)
         run: |
           ls -la
@@ -58,6 +63,12 @@ jobs:
 
       - name: Build site
         run: docfx build docfx_project/docfx.json --logLevel Verbose
+
+      - name: Sanity check API pages
+        run: |
+          echo "Count of API html pages under docs/api:"
+          find docs/api -type f -name "*.html" | wc -l
+          find docs/api -maxdepth 2 -name "index.html" -print | head
 
       - name: Commit Updated Documentation
         run: |
