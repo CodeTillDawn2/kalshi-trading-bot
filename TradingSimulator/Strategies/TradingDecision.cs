@@ -41,8 +41,15 @@ namespace TradingSimulator.Strategies
         /// signal data during strategy evaluation.
         /// </summary>
         /// <param name="key">The name of the signal (e.g., "PriceRise").</param>
-        /// <param name="value">The strength or value of the signal.</param>
-        public void AddSignal(string key, double value) => Signals[key] = value;
+        /// <param name="value">The strength or value of the signal (0.0 to 1.0).</param>
+        public void AddSignal(string key, double value)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentException("Key cannot be null or empty.", nameof(key));
+            if (value < 0.0 || value > 1.0)
+                throw new ArgumentOutOfRangeException(nameof(value), "Signal value must be between 0.0 and 1.0.");
+            Signals[key] = value;
+        }
 
         /// <summary>
         /// Adds or updates metadata in the Metadata collection.
@@ -51,6 +58,43 @@ namespace TradingSimulator.Strategies
         /// </summary>
         /// <param name="key">The name of the metadata item.</param>
         /// <param name="value">The value of the metadata item.</param>
-        public void AddMetadata(string key, object value) => Metadata[key] = value;
+        public void AddMetadata(string key, object value)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentException("Key cannot be null or empty.", nameof(key));
+            if (value == null)
+                throw new ArgumentNullException(nameof(value), "Value cannot be null.");
+            Metadata[key] = value;
+        }
+
+        /// <summary>
+        /// Creates a deep copy of the TradingDecision instance.
+        /// </summary>
+        /// <returns>A new TradingDecision with copied signals and metadata.</returns>
+        public TradingDecision Clone()
+        {
+            var clone = new TradingDecision
+            {
+                IsFinal = this.IsFinal,
+                Signals = new Dictionary<string, double>(this.Signals),
+                Metadata = new Dictionary<string, object>(this.Metadata)
+            };
+            return clone;
+        }
+
+        /// <summary>
+        /// Normalizes all signal values to be within the 0.0 to 1.0 range.
+        /// Values below 0.0 are set to 0.0, values above 1.0 are set to 1.0.
+        /// </summary>
+        public void NormalizeSignals()
+        {
+            foreach (var key in Signals.Keys.ToList())
+            {
+                double value = Signals[key];
+                if (value < 0.0) value = 0.0;
+                else if (value > 1.0) value = 1.0;
+                Signals[key] = value;
+            }
+        }
     }
 }
