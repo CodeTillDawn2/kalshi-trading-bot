@@ -84,5 +84,36 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         /// <value>Default is 5 minutes.</value>
         public int OverseerCircuitBreakerTimeoutMinutes { get; set; } = 5;
+
+        /// <summary>
+        /// Gets or sets the batch size for overnight market refresh operations.
+        /// </summary>
+        /// <value>Default is 20 markets per batch.</value>
+        public int OvernightBatchSize { get; set; } = 20;
+
+        /// <summary>
+        /// Gets or sets the retry delay in minutes for overnight market refresh operations.
+        /// </summary>
+        /// <value>Default is 30 minutes.</value>
+        public int OvernightRetryDelayMinutes { get; set; } = 30;
+
+        /// <summary>
+        /// Gets or sets the age threshold in hours for interest score calculations.
+        /// Markets with interest scores older than this will be recalculated.
+        /// </summary>
+        /// <value>Default is 12 hours.</value>
+        public int InterestScoreAgeThresholdHours { get; set; } = 12;
+
+        /// <summary>
+        /// Gets or sets the failure threshold for the market refresh circuit breaker.
+        /// </summary>
+        /// <value>Default is 5 failures.</value>
+        public int MarketRefreshCircuitBreakerFailureThreshold { get; set; } = 5;
+
+        /// <summary>
+        /// Gets or sets the timeout in minutes for the market refresh circuit breaker to reset.
+        /// </summary>
+        /// <value>Default is 5 minutes.</value>
+        public int MarketRefreshCircuitBreakerTimeoutMinutes { get; set; } = 5;
     }
 }
