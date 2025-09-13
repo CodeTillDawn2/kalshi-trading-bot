@@ -18,11 +18,15 @@ using System.Data;
 using System.Diagnostics;
 using TradingStrategies.Configuration;
 
+using Polly;
+using Polly.Retry;
 namespace BacklashBot.Services
 {
     /// <summary>
     /// Core service responsible for managing market data operations, WebSocket event handling,
     /// market watchlist management, and real-time data synchronization for the Kalshi trading bot.
+    /// Supports configurable timeouts and batch sizes via MarketDataConfig, data validation for WebSocket messages,
+    /// and retry logic with Polly for resilient API calls.
     /// </summary>
     /// <remarks>
     /// This service handles:
@@ -47,6 +51,7 @@ namespace BacklashBot.Services
         private readonly SnapshotConfig _snapshotConfig;
         private readonly CalculationConfig _calculationConfig;
         private readonly LoggingConfig _loggingConfig;
+        private readonly MarketDataConfig _marketDataConfig;
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketLocks = new();
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _marketInitializationLocks = new();
         private SemaphoreSlim _watchedMarketsSemaphore = new SemaphoreSlim(1, 1);
@@ -59,6 +64,7 @@ namespace BacklashBot.Services
         public event EventHandler<string> AccountBalanceUpdated;
         private readonly ConcurrentBag<TickerDTO> _preppedTickers = new ConcurrentBag<TickerDTO>();
         private readonly ConcurrentDictionary<(DateTime, string), TickerDTO> _tickerDeduplication = new ConcurrentDictionary<(DateTime, string), TickerDTO>();
+        private readonly AsyncRetryPolicy _retryPolicy;
         private readonly System.Timers.Timer _tickerUpdateTimer;
         public List<string> MarketsToRefresh { get; set; } = new List<string>();
 
@@ -72,6 +78,7 @@ namespace BacklashBot.Services
             IOptions<LoggingConfig> loggingConfig,
             Func<MarketDTO, MarketData> marketDataFactory,
             IOptions<CalculationConfig> calculationConfig,
+            IOptions<MarketDataConfig> marketDataConfigOptions,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTracker,
             IBotReadyStatus readyStatus,
@@ -85,6 +92,7 @@ namespace BacklashBot.Services
             _snapshotConfig = snapshotConfig.Value;
             _loggingConfig = loggingConfig.Value;
             _calculationConfig = calculationConfig.Value;
+            _marketDataConfig = marketDataConfigOptions?.Value ?? new MarketDataConfig();
             _marketDataFactory = marketDataFactory;
             _statusTracker = statusTracker;
             _readyStatus = readyStatus;
@@ -93,6 +101,7 @@ namespace BacklashBot.Services
             _tickerUpdateTimer.Elapsed += async (sender, e) => await MassUpdateTickers();
             _tickerUpdateTimer.AutoReset = true;
             _tickerUpdateTimer.Start();
+            _retryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (exception, timeSpan, retryCount, context) => _logger.LogWarning(exception, "Retry {RetryCount} for market data fetch after {TimeSpan}", retryCount, timeSpan));
 
             _serviceFactory.GetDataCache().ExchangeStatusChanged += HandleExchangeStatusChanged;
             _brainStatus = brainStatus;
@@ -205,23 +214,28 @@ namespace BacklashBot.Services
                     msgElement.TryGetProperty("status", out var statusElement))
                 {
                     string marketTicker = tickerElement.GetString();
-                    if (!string.IsNullOrEmpty(marketTicker))
+                    string status = statusElement.GetString();
+
+                    if (string.IsNullOrWhiteSpace(marketTicker) || string.IsNullOrWhiteSpace(status))
                     {
-                        _logger.LogDebug("Processing lifecycle event for market: {MarketTicker}, status={MarketStatus}",
-                            marketTicker, statusElement.GetString());
+                        _logger.LogWarning("Invalid market lifecycle data: marketTicker='{MarketTicker}', status='{Status}'", marketTicker, status);
+                        return;
+                    }
 
-                        using var scope = _scopeFactory.CreateScope();
-                        var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
+                    _logger.LogDebug("Processing lifecycle event for market: {MarketTicker}, status={MarketStatus}",
+                        marketTicker, status);
 
-                        if (_serviceFactory.GetDataCache().WatchedMarkets.Contains(marketTicker))
+                    using var scope = _scopeFactory.CreateScope();
+                    var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
+
+                    if (_serviceFactory.GetDataCache().WatchedMarkets.Contains(marketTicker))
+                    {
+                        MarketsToRefresh.Add(marketTicker);
+                        lock (_serviceFactory.GetDataCache().Markets)
                         {
-                            MarketsToRefresh.Add(marketTicker);
-                            lock (_serviceFactory.GetDataCache().Markets)
-                            {
-                                _serviceFactory.GetDataCache().Markets.First(x => x.Key == marketTicker).Value.MarketStatus = statusElement.GetString();
-                            }
-                            _logger.LogInformation("Lifecycle event updated market status for {MarketTicker} to {MarketStatus}", marketTicker, statusElement.GetString());
+                            _serviceFactory.GetDataCache().Markets.First(x => x.Key == marketTicker).Value.MarketStatus = status;
                         }
+                        _logger.LogInformation("Lifecycle event updated market status for {MarketTicker} to {MarketStatus}", marketTicker, status);
                     }
                 }
             }
@@ -347,10 +361,10 @@ namespace BacklashBot.Services
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                lockAcquired = await initSemaphore.WaitAsync(5000, _statusTracker.GetCancellationToken());
+                lockAcquired = await initSemaphore.WaitAsync(_marketDataConfig.SemaphoreTimeoutMs, _statusTracker.GetCancellationToken());
                 if (!lockAcquired)
                 {
-                    _logger.LogError("Failed to acquire initialization lock for {MarketTicker} within 5000 ms", marketTicker);
+                    _logger.LogError("Failed to acquire initialization lock for {MarketTicker} within {Timeout} ms", marketTicker, _marketDataConfig.SemaphoreTimeoutMs);
                     return;
                 }
                 using var scope = _scopeFactory.CreateScope();
@@ -546,10 +560,10 @@ namespace BacklashBot.Services
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                lockAcquired = await initSemaphore.WaitAsync(5000, _statusTracker.GetCancellationToken());
+                lockAcquired = await initSemaphore.WaitAsync(_marketDataConfig.SemaphoreTimeoutMs, _statusTracker.GetCancellationToken());
                 if (!lockAcquired)
                 {
-                    _logger.LogError("Failed to acquire initialization lock for {MarketTicker} within 5000 ms", marketTicker);
+                    _logger.LogError("Failed to acquire initialization lock for {MarketTicker} within {Timeout} ms", marketTicker, _marketDataConfig.SemaphoreTimeoutMs);
                     return;
                 }
                 using var scope = _scopeFactory.CreateScope();
@@ -751,6 +765,9 @@ namespace BacklashBot.Services
             _logger.LogDebug("MarketDataService stopped successfully");
         }
 
+        /// <summary>
+        /// Synchronizes market data including candlesticks, order book, and positions with retry logic using Polly.
+        /// </summary>
         public async Task SyncMarketDataAsync(string marketTicker)
         {
             _logger.LogInformation("Sync-Sync needed for: {MarketTicker}", marketTicker);
@@ -760,11 +777,11 @@ namespace BacklashBot.Services
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
-                lockAcquired = await semaphore.WaitAsync(60000, _statusTracker.GetCancellationToken());
+                lockAcquired = await semaphore.WaitAsync(_marketDataConfig.SemaphoreTimeoutMs, _statusTracker.GetCancellationToken());
                 stopwatch.Stop();
                 if (!lockAcquired)
                 {
-                    _logger.LogError("Sync-Failed to acquire sync lock for {MarketTicker} within 60000 ms.", marketTicker);
+                    _logger.LogError("Sync-Failed to acquire sync lock for {MarketTicker} within {Timeout} ms.", marketTicker, _marketDataConfig.SemaphoreTimeoutMs);
                     return;
                 }
                 _logger.LogInformation("Sync-Syncing market data for: {MarketTicker}", marketTicker);
@@ -775,10 +792,10 @@ namespace BacklashBot.Services
                     return;
                 }
                 _logger.LogInformation("Sync-Began market data sync for {MarketTicker}", marketTicker);
-                await _serviceFactory.GetCandlestickService().UpdateCandlesticksAsync(marketTicker);
-                await _serviceFactory.GetCandlestickService().PopulateMarketDataAsync(marketTicker);
+                await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetCandlestickService().UpdateCandlesticksAsync(marketTicker));
+                await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetCandlestickService().PopulateMarketDataAsync(marketTicker));
                 _logger.LogInformation("Sync-Populated market data for {MarketTicker}", marketTicker);
-                await _serviceFactory.GetOrderBookService().SyncOrderBookAsync(marketTicker);
+                await _retryPolicy.ExecuteAsync(() => _serviceFactory.GetOrderBookService().SyncOrderBookAsync(marketTicker));
                 List<OrderbookData> orderbook = new List<OrderbookData>();
                 if (_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker))
                 {
@@ -820,6 +837,9 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Ensures market data is loaded and up-to-date, fetching from API if necessary with retry logic using Polly.
+        /// </summary>
         public async Task<MarketDTO?> EnsureMarketDataAsync(string marketTicker)
         {
             try
@@ -838,7 +858,7 @@ namespace BacklashBot.Services
 
                 if (!marketStatus.MarketFound)
                 {
-                    await marketService.FetchMarketsAsync(marketTicker);
+                    await _retryPolicy.ExecuteAsync(() => marketService.FetchMarketsAsync(marketTicker));
                 }
                 thisMarket = await context.GetMarketByTicker(marketTicker);
 
@@ -852,7 +872,7 @@ namespace BacklashBot.Services
 
                 if (!marketStatus.EventFound || thisMarket.category == "")
                 {
-                    await marketService.FetchEventAsync(thisMarket.event_ticker);
+                    await _retryPolicy.ExecuteAsync(() => marketService.FetchEventAsync(thisMarket.event_ticker));
                     thisMarket.Event = await context.GetEventByTicker(thisMarket.event_ticker);
                     if (thisMarket.Event != null)
                         thisMarket.category = thisMarket.Event.category;
@@ -860,7 +880,7 @@ namespace BacklashBot.Services
 
                 if (!marketStatus.SeriesFound)
                 {
-                    await marketService.FetchSeriesAsync(thisMarket.Event.series_ticker);
+                    await _retryPolicy.ExecuteAsync(() => marketService.FetchSeriesAsync(thisMarket.Event.series_ticker));
                     thisMarket.Event.Series = await context.GetSeriesByTicker(thisMarket.Event.series_ticker);
                 }
 
@@ -869,7 +889,7 @@ namespace BacklashBot.Services
                     (thisMarket.close_time <= DateTime.UtcNow && !KalshiConstants.IsMarketStatusEnded(thisMarket.status))))
                 {
                     _logger.LogInformation("Market {MarketTicker} has incomplete data, refetching from API", marketTicker);
-                    await marketService.FetchMarketsAsync(tickers: new[] { marketTicker });
+                    await _retryPolicy.ExecuteAsync(() => marketService.FetchMarketsAsync(tickers: new[] { marketTicker }));
                     marketLoadedFromAPI = true;
                     thisMarket = await context.GetMarketByTicker(marketTicker);
                 }
@@ -926,10 +946,10 @@ namespace BacklashBot.Services
                     return;
                 }
 
-                semaphoreAcquired = await _watchedMarketsSemaphore.WaitAsync(10000, _statusTracker.GetCancellationToken());
+                semaphoreAcquired = await _watchedMarketsSemaphore.WaitAsync(_marketDataConfig.SemaphoreTimeoutMs, _statusTracker.GetCancellationToken());
                 if (!semaphoreAcquired)
                 {
-                    _logger.LogError("Failed to acquire watched markets semaphore within 10000ms");
+                    _logger.LogError("Failed to acquire watched markets semaphore within {Timeout}ms", _marketDataConfig.SemaphoreTimeoutMs);
                     return;
                 }
                 _logger.LogDebug("Acquired watched markets semaphore");
@@ -1146,7 +1166,10 @@ namespace BacklashBot.Services
                 {
                     using var scope = _scopeFactory.CreateScope();
                     var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                    await context.AddOrUpdateTickers(tickers);
+                    foreach (var batch in tickers.Chunk(_marketDataConfig.TickerBatchSize))
+                    {
+                        await context.AddOrUpdateTickers(batch.ToList());
+                    }
                 }
             }
             catch (Exception ex)
@@ -1155,8 +1178,16 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Processes ticker updates from WebSocket messages, including data validation and deduplication.
+        /// </summary>
         public void ProcessTickerUpdate(string marketTicker, Guid marketId, int price, int yesBid, int yesAsk, int volume, int openInterest, int dollarVolume, int dollarOpenInterest, long ts, DateTime loggedDate, DateTime? processedDate = null)
         {
+            if (!ValidateTickerData(marketTicker, price, yesBid, yesAsk, volume, openInterest, dollarVolume, dollarOpenInterest, ts, loggedDate, processedDate))
+            {
+                return;
+            }
+
             var ticker = new TickerDTO
             {
                 market_id = marketId,
@@ -1257,6 +1288,33 @@ namespace BacklashBot.Services
             {
                 _logger.LogError(ex, "Failed to save ticker for {MarketTicker}", marketTicker);
             }
+        }
+
+        /// <summary>
+        /// Validates ticker data parameters to ensure data integrity before processing.
+        /// </summary>
+        private bool ValidateTickerData(string marketTicker, int price, int yesBid, int yesAsk, int volume, int openInterest, int dollarVolume, int dollarOpenInterest, long ts, DateTime loggedDate, DateTime? processedDate)
+        {
+            var errors = new List<string>();
+
+            if (price <= 0) errors.Add($"price <= 0 ({price})");
+            if (yesBid < 0) errors.Add($"yesBid < 0 ({yesBid})");
+            if (yesAsk <= yesBid) errors.Add($"yesAsk <= yesBid ({yesAsk} <= {yesBid})");
+            if (volume < 0) errors.Add($"volume < 0 ({volume})");
+            if (openInterest < 0) errors.Add($"openInterest < 0 ({openInterest})");
+            if (dollarVolume < 0) errors.Add($"dollarVolume < 0 ({dollarVolume})");
+            if (dollarOpenInterest < 0) errors.Add($"dollarOpenInterest < 0 ({dollarOpenInterest})");
+            if (ts <= 0) errors.Add($"ts <= 0 ({ts})");
+            if (loggedDate == default(DateTime)) errors.Add($"loggedDate is default ({loggedDate})");
+            if (processedDate == default(DateTime?)) errors.Add($"processedDate is default ({processedDate})");
+
+            if (errors.Any())
+            {
+                _logger.LogWarning("Invalid ticker data for {MarketTicker}: {Errors}", marketTicker, string.Join(", ", errors));
+                return false;
+            }
+
+            return true;
         }
 
         public void NotifyMarketDataUpdated(string marketTicker)

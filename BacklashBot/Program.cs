@@ -57,6 +57,7 @@ builder.Services.Configure<SnapshotConfig>(builder.Configuration.GetSection("Sna
 builder.Services.Configure<TradingConfig>(builder.Configuration.GetSection("TradingConfig"));
 builder.Services.Configure<CalculationConfig>(builder.Configuration.GetSection("CalculationConfig"));
 builder.Services.Configure<ExecutionConfig>(builder.Configuration.GetSection("Execution"));
+builder.Services.Configure<MarketDataConfig>(builder.Configuration.GetSection("MarketData"));
 
 // Increase shutdown timeout
 builder.Services.Configure<HostOptions>(options =>
