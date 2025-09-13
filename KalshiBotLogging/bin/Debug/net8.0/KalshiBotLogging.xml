@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>KalshiBotLogging</name>
+    </assembly>
+    <members>
+        <member name="T:KalshiBotLogging.DatabaseLogger">
+            <summary>
+            Custom logger implementation that integrates with the KalshiBot logging infrastructure.
+            This logger provides comprehensive logging functionality by:
+            - Formatting log messages and outputting them to the console for immediate developer visibility (configurable verbosity)
+            - Enqueuing log entries for asynchronous database storage via the DatabaseLoggingQueue with batching support
+            - Forwarding warnings and errors to the error handler for centralized error management
+            - Supporting dynamic configuration for environment-specific settings including min log levels
+            - Maintaining structured logging with consistent metadata across all log entries
+            - Providing metrics and monitoring for queue depth and processing performance
+            </summary>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLogger.#ctor(System.String,KalshiBotLogging.DatabaseLoggingQueue,Microsoft.Extensions.Logging.LogLevel,BacklashDTOs.Configuration.LoggingConfig,BacklashDTOs.Configuration.ExecutionConfig,BacklashBot.Management.Interfaces.IBrainStatusService,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the DatabaseLogger class with the specified parameters.
+            </summary>
+            <param name="categoryName">The category name for this logger instance, typically the fully qualified name of the logging class.</param>
+            <param name="loggingQueue">The queue responsible for handling database logging operations asynchronously.</param>
+            <param name="minLevel">The minimum log level that this logger will process; logs below this level are ignored.</param>
+            <param name="loggingConfig">Optional logging configuration for dynamic environment settings including min log levels.</param>
+            <param name="executionConfig">Optional execution configuration for brain instance settings.</param>
+            <param name="brainStatus">Optional brain status service for session identifier retrieval.</param>
+            <param name="defaultEnvironment">Default environment name if not specified in config.</param>
+            <param name="defaultInstance">Default instance name if not specified in config.</param>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLogger.BeginScope``1(``0)">
+            <summary>
+            Begins a logical operation scope. This implementation returns null as scoped logging is not supported.
+            </summary>
+            <typeparam name="TState">The type of the state object associated with the scope.</typeparam>
+            <param name="state">The state object for the scope.</param>
+            <returns>A disposable object that ends the scope, or null if not supported.</returns>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLogger.IsEnabled(Microsoft.Extensions.Logging.LogLevel)">
+            <summary>
+            Determines whether logging is enabled for the specified log level.
+            </summary>
+            <param name="logLevel">The log level to check.</param>
+            <returns>True if logging is enabled for the level; otherwise, false.</returns>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLogger.Log``1(Microsoft.Extensions.Logging.LogLevel,Microsoft.Extensions.Logging.EventId,``0,System.Exception,System.Func{``0,System.Exception,System.String})">
+            <summary>
+            Logs a message with the specified log level, event ID, state, and optional exception.
+            The message is formatted, logged to console if above min console level, enqueued asynchronously for database storage if appropriate,
+            and forwarded to the error handler for centralized error management.
+            </summary>
+            <typeparam name="TState">The type of the state object.</typeparam>
+            <param name="logLevel">The severity level of the log message.</param>
+            <param name="eventId">The event ID associated with the log message.</param>
+            <param name="state">The state object containing additional information.</param>
+            <param name="exception">The exception associated with the log message, if any.</param>
+            <param name="formatter">A function to format the state and exception into a string message.</param>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLogger.GetSessionIdentifier">
+            <summary>
+            Retrieves the current session identifier from the brain status service.
+            Returns "DEF" as a fallback if the service is unavailable or the identifier cannot be retrieved.
+            </summary>
+            <returns>The session identifier string, or "DEF" if unavailable.</returns>
+        </member>
+        <member name="T:KalshiBotLogging.DatabaseLoggingQueue">
+            <summary>
+            Background service that asynchronously processes log entries from a concurrent queue
+            and persists them to the database with batching support for improved performance.
+            Also manages error handler queues for warnings and errors.
+            Supports both regular application logging and overseer-specific logging contexts.
+            Provides metrics and monitoring for queue depth and processing performance.
+            </summary>
+        </member>
+        <member name="P:KalshiBotLogging.DatabaseLoggingQueue.Warnings">
+            <summary>
+            Queue for warning-level log entries that need to be processed by the error handler.
+            </summary>
+        </member>
+        <member name="P:KalshiBotLogging.DatabaseLoggingQueue.Errors">
+            <summary>
+            Queue for error and critical-level log entries that need to be processed by the error handler.
+            </summary>
+        </member>
+        <member name="P:KalshiBotLogging.DatabaseLoggingQueue.QueueDepth">
+            <summary>
+            Gets the current depth of the database log queue for monitoring purposes.
+            </summary>
+        </member>
+        <member name="P:KalshiBotLogging.DatabaseLoggingQueue.TotalProcessedLogs">
+            <summary>
+            Gets the total number of logs processed since startup.
+            </summary>
+        </member>
+        <member name="P:KalshiBotLogging.DatabaseLoggingQueue.AverageProcessingTimeMs">
+            <summary>
+            Gets the average processing time per log entry in milliseconds.
+            </summary>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLoggingQueue.#ctor(System.IServiceProvider,System.Boolean)">
+            <summary>
+            Initializes a new instance of the DatabaseLoggingQueue.
+            </summary>
+            <param name="serviceProvider">The service provider for dependency injection.</param>
+            <param name="isOverseer">Indicates whether this queue is for overseer-specific logging.</param>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLoggingQueue.EnqueueDBLogsAsync(BacklashDTOs.Data.LogEntryDTO)">
+            <summary>
+            Enqueues a log entry for asynchronous database storage with batching support.
+            </summary>
+            <param name="logEntry">The log entry to be stored in the database.</param>
+            <returns>A task representing the asynchronous enqueue operation.</returns>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLoggingQueue.EnqueueErrorHandlerLogs(System.String,System.String,Microsoft.Extensions.Logging.LogLevel,System.Exception,System.Nullable{System.DateTime})">
+            <summary>
+            Enqueues log entries for processing by the error handler based on severity level.
+            Warnings are queued separately from errors for different processing priorities.
+            </summary>
+            <param name="formattedMessage">The formatted log message.</param>
+            <param name="logSourceCategory">The source category of the log entry.</param>
+            <param name="severity">The severity level of the log entry.</param>
+            <param name="originalException">The original exception if available.</param>
+            <param name="timestamp">The timestamp of the log entry, defaults to current time.</param>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLoggingQueue.ExecuteAsync(System.Threading.CancellationToken)">
+            <summary>
+            Executes the background processing loop for database logging with batching support.
+            Continuously processes log entries from the queue in batches and saves them to the database for improved performance.
+            Tracks processing metrics including queue depth and processing times.
+            </summary>
+            <param name="stoppingToken">Cancellation token to stop the background processing.</param>
+            <returns>A task representing the background operation.</returns>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLoggingQueue.StartAsync(System.Threading.CancellationToken)">
+            <summary>
+            Starts the background service and logs the startup event.
+            </summary>
+            <param name="cancellationToken">Cancellation token for the startup operation.</param>
+            <returns>A task representing the startup operation.</returns>
+        </member>
+    </members>
+</doc>

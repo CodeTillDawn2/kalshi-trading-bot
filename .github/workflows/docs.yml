@@ -1,0 +1,40 @@
+name: Update Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install XmlDocMarkdown
+        run: dotnet tool install -g xmldocmd
+
+      - name: Build Project
+        run: dotnet build
+
+      - name: Generate Documentation
+        run: xmldocmd KalshiBotAPI/bin/Debug/net8.0/KalshiBotAPI.xml docs/markdown --toc
+
+      - name: Commit Updated Documentation
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/markdown/
+          if [ -n "$(git status --porcelain docs/markdown/)" ]; then
+            git commit -m "Update documentation"
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

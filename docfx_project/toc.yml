@@ -1,0 +1,12 @@
+- name: Home
+  href: index.md
+- name: API Documentation
+  href: api/
+  items:
+  - name: Kalshi
+    href: api/Kalshi.yml
+- name: Additional Resources
+  href: articles/
+  items:
+  - name: Custom HTML Page
+    href: articles/custom.html

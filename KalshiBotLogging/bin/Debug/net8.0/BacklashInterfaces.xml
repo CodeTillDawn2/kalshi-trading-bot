@@ -1,0 +1,571 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BacklashInterfaces</name>
+    </assembly>
+    <members>
+        <member name="T:BacklashInterfaces.Constants.KalshiConstants">
+            <summary>
+            Contains constant values used throughout the Kalshi trading bot system for API interactions,
+            WebSocket communication, and data processing. This centralizes magic strings to improve
+            maintainability and reduce the risk of typos in hardcoded values.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Status_Finalized">
+            <summary>
+            Represents a market that has been finalized and is no longer active.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Status_Active">
+            <summary>
+            Represents an actively trading market where orders can be placed.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Status_Bad">
+            <summary>
+            Represents a market that has been marked as bad or invalid.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Status_Open">
+            <summary>
+            Represents a market that is open for trading but not yet active.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Status_Closed">
+            <summary>
+            Represents a market that has been closed and is no longer accepting orders.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Status_Determined">
+            <summary>
+            Represents a market where the outcome has been determined.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Status_Inactive">
+            <summary>
+            Represents a market that is inactive and not available for trading.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Status_Initialized">
+            <summary>
+            Represents a market that has been initialized but not yet open.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Status_Settled">
+            <summary>
+            Represents a market that has been settled and payouts distributed.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Status_Unopened">
+            <summary>
+            Represents a market that has not yet opened for trading.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Interval_Minute">
+            <summary>
+            Represents a one-minute time interval for candlestick data.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Interval_Hour">
+            <summary>
+            Represents a one-hour time interval for candlestick data.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Interval_Day">
+            <summary>
+            Represents a one-day time interval for candlestick data.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Action">
+            <summary>
+            Parameter name for specifying the action in API requests (e.g., buy/sell).
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Series_Ticker">
+            <summary>
+            Parameter name for specifying a series ticker in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Market_Ticker">
+            <summary>
+            Parameter name for specifying a market ticker in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Event_Ticker">
+            <summary>
+            Parameter name for specifying an event ticker in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Interval">
+            <summary>
+            Parameter name for specifying a time interval in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts">
+            <summary>
+            Parameter name for specifying a start timestamp in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts_m">
+            <summary>
+            Parameter name for specifying a start timestamp in minutes in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts_h">
+            <summary>
+            Parameter name for specifying a start timestamp in hours in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts_d">
+            <summary>
+            Parameter name for specifying a start timestamp in days in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_End_Ts">
+            <summary>
+            Parameter name for specifying an end timestamp in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Status">
+            <summary>
+            Parameter name for specifying market status in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_With_Nested_Markets">
+            <summary>
+            Parameter name for including nested markets in API responses.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Max_Close_TS">
+            <summary>
+            Parameter name for specifying maximum close timestamp in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Min_Close_TS">
+            <summary>
+            Parameter name for specifying minimum close timestamp in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Parameter_Tickers">
+            <summary>
+            Parameter name for specifying multiple tickers in API requests.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Ticker">
+            <summary>
+            Feed type for ticker updates containing price and volume information.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Orderbook">
+            <summary>
+            Feed type for orderbook updates containing bid/ask price changes.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Fill">
+            <summary>
+            Feed type for fill updates containing executed trade information.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Lifecycle">
+            <summary>
+            Feed type for lifecycle updates containing market status changes.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Trade">
+            <summary>
+            Feed type for trade updates containing individual trade executions.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Event_Lifecycle">
+            <summary>
+            Feed type for event lifecycle updates containing event-level status changes.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Channel_Orderbook_Delta">
+            <summary>
+            Channel name for orderbook delta updates (incremental changes).
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.Channel_Market_Lifecycle_V2">
+            <summary>
+            Channel name for market lifecycle v2 updates.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.AllChannels">
+            <summary>
+            Array of all available WebSocket feed channels for subscription.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.MarketChannels">
+            <summary>
+            Array of market-specific WebSocket feed channels (excluding event-level feeds).
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.MarketChannelsDelta">
+            <summary>
+            Array of market-specific WebSocket channels for delta updates.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.ScriptType_Market">
+            <summary>
+            Script type identifier for market-related API endpoints.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.ScriptType_Event">
+            <summary>
+            Script type identifier for event-related API endpoints.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.ScriptType_Series">
+            <summary>
+            Script type identifier for series-related API endpoints.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.ScriptType_Candlestick">
+            <summary>
+            Script type identifier for candlestick data API endpoints.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Constants.KalshiConstants.ScriptType_ChartCandlesticks">
+            <summary>
+            Script type identifier for chart candlestick data API endpoints.
+            </summary>
+        </member>
+        <member name="M:BacklashInterfaces.Constants.KalshiConstants.TruncateDateTimeToMinute(System.DateTime)">
+            <summary>
+            Truncates a DateTime to the nearest minute boundary, setting seconds and milliseconds to zero.
+            This is useful for aligning timestamps for candlestick data and time-based calculations.
+            </summary>
+            <param name="dt">The DateTime to truncate.</param>
+            <returns>A new DateTime truncated to the minute.</returns>
+        </member>
+        <member name="M:BacklashInterfaces.Constants.KalshiConstants.IsMarketStatusEnded(System.String)">
+            <summary>
+            Determines whether a market status indicates that the market has ended and is no longer active.
+            Ended markets include those that are finalized, bad, closed, settled, determined, or inactive.
+            </summary>
+            <param name="status">The market status string to evaluate.</param>
+            <returns>True if the market has ended, false otherwise.</returns>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.Undefined">
+            <summary>
+            Default for unmapped or undefined market conditions
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.LowLiquidity">
+            <summary>
+            Market with low liquidity, difficult to trade without impacting prices
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.Bouncing">
+            <summary>
+            Market with prices oscillating within a range, suitable for mean-reversion strategies
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.Trending">
+            <summary>
+            Market with consistent price movement in one direction, suitable for momentum strategies
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.Volatile">
+            <summary>
+            Market is experiencing significant fluctuations
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.Stagnant">
+            <summary>
+            Market with minimal price movement, low activity, and stable conditions
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.HighUncertainty">
+            <summary>
+            Market with high uncertainty, often in balanced or unclear outcomes
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.TrendingActive">
+            <summary>
+            Trending market with high activity levels
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.VolatileEvents">
+            <summary>
+            Volatile market driven by specific events
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.StableMacro">
+            <summary>
+            Stable market influenced by macroeconomic factors
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.SeasonalVolatile">
+            <summary>
+            Volatile market with seasonal or predictable patterns
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.NewsDriven">
+            <summary>
+            Market driven by news and sentiment
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.TechTrend">
+            <summary>
+            Trending market in technology or innovation sectors
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.FinancialMomentum">
+            <summary>
+            Momentum-driven market in financial assets
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.ImminentCloseVolatile">
+            <summary>
+            Market close to resolution with high volatility
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.FarStable">
+            <summary>
+            Long-term stable market
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.MarketType.EventDriven">
+            <summary>
+            Event-specific market like awards or launches
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ActionType.None">
+            <summary>
+            No action to be taken
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ActionType.Exit">
+            <summary>
+            Exit an existing position
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ActionType.Long">
+            <summary>
+            Enter a long position (buy)
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ActionType.Short">
+            <summary>
+            Enter a short position (sell)
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ActionType.PostYes">
+            <summary>
+            Limit buy yes (or equiv)
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ActionType.PostAsk">
+            <summary>
+            Limit sell yes
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ActionType.Cancel">
+            <summary>
+            Cancel resting
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ActionType.LongPostAsk">
+            <summary>Market long, then immediately post a YES ask (resting sell) for what you just bought</summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ActionType.ShortPostYes">
+            <summary>Market short, then immediately post a YES bid (resting buy) for what you just sold</summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.GreaterThan">
+            <summary>
+            Condition where value is greater than a threshold
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.LessThan">
+            <summary>
+            Condition where value is less than a threshold
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.EqualTo">
+            <summary>
+            Condition where value is equal to a threshold
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.GreaterThanOrEqual">
+            <summary>
+            Condition where value is greater than or equal to a threshold
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.LessThanOrEqual">
+            <summary>
+            Condition where value is less than or equal to a threshold
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.Exists">
+            <summary>
+            Condition where a value exists
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.NotExists">
+            <summary>
+            Condition where a value does not exist
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_PriceMovement.Trending">
+            <summary>
+            Price is consistently moving in one direction (up or down)
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_PriceMovement.Bouncing">
+            <summary>
+            Price is oscillating within a defined range without a clear trend
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_PriceMovement.Volatile">
+            <summary>
+            Price is experiencing significant fluctuations
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_PriceMovement.Stable">
+            <summary>
+            Price is relatively steady with minimal movement
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_Liquidity.High">
+            <summary>
+            Easy to trade without significantly affecting prices
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_Liquidity.Low">
+            <summary>
+            Difficult to trade without affecting prices
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_Liquidity.Moderate">
+            <summary>
+            Average liquidity, neither particularly high nor low
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_ClosingTime.Far">
+            <summary>
+            A long time remains until expiry (e.g., weeks or months)
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_ClosingTime.Near">
+            <summary>
+            Close to expiry (e.g., days or hours)
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_ClosingTime.Imminent">
+            <summary>
+            Very close to expiry (e.g., minutes or hours)
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_ActivityLevel.High">
+            <summary>
+            Lots of trading activity (e.g., high volume or frequent trades)
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_ActivityLevel.Low">
+            <summary>
+            Little trading activity (e.g., low volume or infrequent trades)
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_ActivityLevel.Moderate">
+            <summary>
+            Average trading activity, neither particularly high nor low
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_UncertaintySignal.High">
+            <summary>
+            Outcome is unclear or highly uncertain
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.StrategyEnums.Conditions_UncertaintySignal.Low">
+            <summary>
+            Outcome is relatively clear or certain
+            </summary>
+        </member>
+        <member name="T:BacklashInterfaces.Enums.SubscriptionState">
+            <summary>
+            Represents the current state of a subscription to a specific market data channel via WebSocket.
+            This enum is used by the SubscriptionManager to track and manage the lifecycle of subscriptions,
+            ensuring proper handling of connection states and preventing duplicate or invalid operations.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.SubscriptionState.Unsubscribed">
+            <summary>
+            The subscription is not active. This is the initial state before any subscription attempt,
+            or after a successful unsubscription. In this state, no data is being received for the channel.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.SubscriptionState.Subscribing">
+            <summary>
+            A subscription request has been sent to the server, but confirmation has not yet been received.
+            This transitional state prevents multiple concurrent subscription attempts for the same channel.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.SubscriptionState.Subscribed">
+            <summary>
+            The subscription is active and confirmed. Data for the channel is being received and processed.
+            This state indicates a successful connection and ongoing data flow.
+            </summary>
+        </member>
+        <member name="F:BacklashInterfaces.Enums.SubscriptionState.Unsubscribing">
+            <summary>
+            An unsubscription request has been sent to the server, but confirmation has not yet been received.
+            This transitional state ensures clean disconnection and prevents new subscription attempts during teardown.
+            </summary>
+        </member>
+        <member name="T:BacklashInterfaces.SmokehouseBot.Services.IHealthCheckService">
+            <summary>
+            Interface for health check services to verify dependent services are operational.
+            </summary>
+        </member>
+        <member name="M:BacklashInterfaces.SmokehouseBot.Services.IHealthCheckService.CheckHealthAsync">
+            <summary>
+            Performs health checks on dependent services.
+            </summary>
+            <returns>True if all health checks pass, false otherwise.</returns>
+        </member>
+        <member name="T:BacklashInterfaces.SmokehouseBot.Timers.ITimer">
+            <summary>
+            Interface for timer functionality, allowing dependency injection of timer implementations.
+            </summary>
+        </member>
+        <member name="E:BacklashInterfaces.SmokehouseBot.Timers.ITimer.Elapsed">
+            <summary>
+            Occurs when the interval elapses.
+            </summary>
+        </member>
+        <member name="P:BacklashInterfaces.SmokehouseBot.Timers.ITimer.Interval">
+            <summary>
+            Gets or sets the interval at which to raise the Elapsed event.
+            </summary>
+        </member>
+        <member name="P:BacklashInterfaces.SmokehouseBot.Timers.ITimer.AutoReset">
+            <summary>
+            Gets or sets a value indicating whether the Timer should raise the Elapsed event each time the specified interval elapses or only after the first time.
+            </summary>
+        </member>
+        <member name="P:BacklashInterfaces.SmokehouseBot.Timers.ITimer.Enabled">
+            <summary>
+            Gets or sets a value indicating whether the Timer should raise the Elapsed event.
+            </summary>
+        </member>
+        <member name="M:BacklashInterfaces.SmokehouseBot.Timers.ITimer.Start">
+            <summary>
+            Starts the timer.
+            </summary>
+        </member>
+        <member name="M:BacklashInterfaces.SmokehouseBot.Timers.ITimer.Stop">
+            <summary>
+            Stops the timer.
+            </summary>
+        </member>
+        <member name="M:BacklashInterfaces.SmokehouseBot.Timers.ITimer.Change(System.Int32,System.Int32)">
+            <summary>
+            Changes the start time and the interval between method invocations for a timer, using 32-bit signed integers to measure time intervals.
+            </summary>
+            <param name="dueTime">The amount of time to delay before the invoking the callback method specified when the Timer was constructed, in milliseconds. Specify Timeout.Infinite to prevent the timer from restarting. Specify zero (0) to restart the timer immediately.</param>
+            <param name="period">The time interval between invocations of the callback method specified when the Timer was constructed, in milliseconds. Specify Timeout.Infinite to disable periodic signaling.</param>
+        </member>
+    </members>
+</doc>

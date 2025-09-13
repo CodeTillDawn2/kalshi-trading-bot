@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TradingStrategies.Strategies;
+using TradingStrategies.Strategies.Strategies.Strats;
 using TradingStrategies.Strategies.Strats;
 using static BacklashInterfaces.Enums.StrategyEnums;
 
