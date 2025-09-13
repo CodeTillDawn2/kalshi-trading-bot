@@ -7,6 +7,60 @@ namespace BacklashInterfaces.Constants
     /// </summary>
     public static class KalshiConstants
     {
+        #region Enums
+        /// <summary>
+        /// Enum representing the possible statuses of a market.
+        /// </summary>
+        public enum MarketStatus
+        {
+            Finalized,
+            Active,
+            Bad,
+            Open,
+            Closed,
+            Determined,
+            Inactive,
+            Initialized,
+            Settled,
+            Unopened
+        }
+
+        /// <summary>
+        /// Enum representing time intervals for candlestick data.
+        /// </summary>
+        public enum TimeInterval
+        {
+            Minute,
+            Hour,
+            Day
+        }
+
+        /// <summary>
+        /// Enum representing WebSocket feed types.
+        /// </summary>
+        public enum FeedType
+        {
+            Ticker,
+            Orderbook,
+            Fill,
+            Lifecycle,
+            Trade,
+            Event_Lifecycle
+        }
+
+        /// <summary>
+        /// Enum representing script types for API endpoints.
+        /// </summary>
+        public enum ScriptType
+        {
+            Market,
+            Event,
+            Series,
+            Candlestick,
+            ChartCandlesticks
+        }
+        #endregion
+
         #region Market Status Constants
         /// <summary>
         /// Represents a market that has been finalized and is no longer active.
@@ -200,6 +254,8 @@ namespace BacklashInterfaces.Constants
         #region Channel Arrays
         /// <summary>
         /// Array of all available WebSocket feed channels for subscription.
+        /// Note: These arrays are static readonly for performance, initialized once at runtime.
+        /// For frequent access, consider caching if lookups are needed.
         /// </summary>
         public static readonly string[] AllChannels = {
             ScriptType_Feed_Ticker,
@@ -212,6 +268,8 @@ namespace BacklashInterfaces.Constants
 
         /// <summary>
         /// Array of market-specific WebSocket feed channels (excluding event-level feeds).
+        /// Note: These arrays are static readonly for performance, initialized once at runtime.
+        /// For frequent access, consider caching if lookups are needed.
         /// </summary>
         public static readonly string[] MarketChannels = {
             ScriptType_Feed_Ticker,
@@ -221,6 +279,8 @@ namespace BacklashInterfaces.Constants
 
         /// <summary>
         /// Array of market-specific WebSocket channels for delta updates.
+        /// Note: These arrays are static readonly for performance, initialized once at runtime.
+        /// For frequent access, consider caching if lookups are needed.
         /// </summary>
         public static readonly string[] MarketChannelsDelta = {
             Channel_Orderbook_Delta,
@@ -269,6 +329,34 @@ namespace BacklashInterfaces.Constants
         }
 
         /// <summary>
+        /// HashSet of market statuses that indicate the market has ended.
+        /// Used for efficient lookup in IsMarketStatusEnded.
+        /// </summary>
+        private static readonly HashSet<string> EndedStatuses = new HashSet<string>
+        {
+            Status_Finalized,
+            Status_Bad,
+            Status_Closed,
+            Status_Settled,
+            Status_Determined,
+            Status_Inactive
+        };
+
+        /// <summary>
+        /// HashSet of market status enums that indicate the market has ended.
+        /// Used for efficient lookup in IsMarketStatusEnded.
+        /// </summary>
+        private static readonly HashSet<MarketStatus> EndedStatusEnums = new HashSet<MarketStatus>
+        {
+            MarketStatus.Finalized,
+            MarketStatus.Bad,
+            MarketStatus.Closed,
+            MarketStatus.Settled,
+            MarketStatus.Determined,
+            MarketStatus.Inactive
+        };
+
+        /// <summary>
         /// Determines whether a market status indicates that the market has ended and is no longer active.
         /// Ended markets include those that are finalized, bad, closed, settled, determined, or inactive.
         /// </summary>
@@ -276,10 +364,17 @@ namespace BacklashInterfaces.Constants
         /// <returns>True if the market has ended, false otherwise.</returns>
         public static bool IsMarketStatusEnded(string status)
         {
-            if (status == Status_Finalized || status == Status_Bad || status == Status_Closed || status == Status_Settled
-                || status == Status_Determined || status == Status_Inactive)
-                return true;
-            return false;
+            return !string.IsNullOrEmpty(status) && EndedStatuses.Contains(status);
+        }
+
+        /// <summary>
+        /// Determines whether a market status indicates that the market has ended and is no longer active.
+        /// </summary>
+        /// <param name="status">The market status enum to evaluate.</param>
+        /// <returns>True if the market has ended, false otherwise.</returns>
+        public static bool IsMarketStatusEnded(MarketStatus status)
+        {
+            return EndedStatusEnums.Contains(status);
         }
         #endregion
     }
