@@ -38,7 +38,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Identifies a Stick Sandwich pattern, a three-candle reversal pattern.
         /// Bullish: Occurs in a downtrend; two bearish candles sandwich a bullish candle, with c1 and c3 closes nearly equal.
         /// Bearish: Occurs in an uptrend; two bullish candles sandwich a bearish candle, with c1 and c3 closes nearly equal.
-        /// Indicates a potential reversal as the middle candle�s move is rejected.
+        /// Indicates a potential reversal as the middle candle s move is rejected.
         /// Source: https://www.tradingview.com/education/stick-sandwich/
         /// </summary>
         public static StickSandwichPattern? IsPattern(
@@ -71,7 +71,7 @@ namespace BacklashPatterns.PatternDefinitions
                 bool closesMatch = Math.Abs(prices[c3].Close - prices[c1].Close) <= MaxCloseDifference;
                 if (!closesMatch) return null;
 
-                // Second candle exceeds first candle�s range
+                // Second candle exceeds first candle s range
                 if (prices[c2].High < prices[c1].High || prices[c2].Low > prices[c1].Low) return null;
 
                 // Significant bodies
@@ -89,7 +89,7 @@ namespace BacklashPatterns.PatternDefinitions
                 bool closesMatch = Math.Abs(prices[c3].Close - prices[c1].Close) <= MaxCloseDifference;
                 if (!closesMatch) return null;
 
-                // Second candle exceeds first candle�s range
+                // Second candle exceeds first candle s range
                 if (prices[c2].High < prices[c1].High || prices[c2].Low > prices[c1].Low) return null;
 
                 // Significant bodies

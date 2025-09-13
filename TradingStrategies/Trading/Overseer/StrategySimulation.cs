@@ -209,7 +209,7 @@ namespace TradingStrategies.Trading.Overseer
                 SimulatedRestingOrders.Clear();
             }
 
-            // Combo �take then rest� sized to 100% of current position
+            // Combo  take then rest  sized to 100% of current position
             if (isComboLongPostAsk && Position > 0)
             {
                 int sellYesPrice = decision.Price;   // 1..99 (YES ask)

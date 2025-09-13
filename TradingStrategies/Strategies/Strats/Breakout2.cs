@@ -38,7 +38,7 @@ namespace TradingStrategies.Strategies.Strats
             SpikeWeightCap,
             SpikeVolumeWeightScale,
 
-            // Confirmations (share of total) � single thresholds for both sides
+            // Confirmations (share of total)   single thresholds for both sides
             TradeRateShareMin,
             TradeEventShareMin,
 

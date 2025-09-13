@@ -1353,7 +1353,7 @@ namespace TradingStrategies.Trading.Helpers
         { FlowMomentumStrat.ParamKey.ExitRsiDevThreshold, 5.0 },
     }),
 
-    // Spike gate variants (to ensure �unusual� not noise)
+    // Spike gate variants (to ensure  unusual  not noise)
     ("FM_SpikeGate_01", new()
     {
         { FlowMomentumStrat.ParamKey.MinDistanceFromBounds, 6 },

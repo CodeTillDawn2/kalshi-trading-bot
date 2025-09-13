@@ -110,7 +110,7 @@ namespace BacklashPatterns.PatternDefinitions
             return null;
         }
 
-        // Keeping CalculateStrength as it�s an addition, not in original
+        // Keeping CalculateStrength as its an addition, not in original
         public void CalculateStrength(
             Dictionary<int, CandleMetrics> metricsCache,
             CandleMids[] prices,

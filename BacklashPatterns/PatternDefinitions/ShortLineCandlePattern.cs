@@ -57,7 +57,7 @@ namespace BacklashPatterns.PatternDefinitions
             Dictionary<int, CandleMetrics> metricsCache,
             CandleMids[] prices)
         {
-            // Early exit if there aren�t enough prior candles
+            // Early exit if there aren t enough prior candles
             if (index < 1) return null;
 
             // Retrieve metrics for the current candle
@@ -72,7 +72,7 @@ namespace BacklashPatterns.PatternDefinitions
             // Confirm the candle direction matches the specified trend (original logic)
             bool direction = isBullish ? metrics.IsBullish : metrics.IsBearish;
 
-            // If any condition fails, it�s not the pattern
+            // If any condition fails, it s not the pattern
             if (!isShort || !smallRange || !direction) return null;
 
             // Adjusted trend conditions from original: Use CandleMetrics methods
@@ -80,7 +80,7 @@ namespace BacklashPatterns.PatternDefinitions
                 ? (metrics.GetLookbackMeanTrend(1) <= -TrendThreshold && metrics.GetLookbackTrendConsistency(1) <= -TrendConsistencyThreshold) // Consistent downtrend
                 : (metrics.GetLookbackMeanTrend(1) >= TrendThreshold && metrics.GetLookbackTrendConsistency(1) >= TrendConsistencyThreshold);   // Consistent uptrend
 
-            // If the trend condition isn�t met, return null
+            // If the trend condition isn t met, return null
             if (!priorTrend) return null;
 
             // Define the candle indices for the pattern (single candle in this case)

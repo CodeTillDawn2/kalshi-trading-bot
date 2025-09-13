@@ -21,7 +21,7 @@ public class GravestoneDojiPattern : PatternDefinition
 
     /// <summary>
     /// Maximum ratio of body size to total range.
-    /// Purpose: Ensures the body remains small relative to the candle�s range.
+    /// Purpose: Ensures the body remains small relative to the candle s range.
     /// Strictest: 0.05 (extremely small body), Loosest: 0.25 (larger body allowed per loose standards).
     /// </summary>
     public static double BodyRangeRatio { get; set; } = 0.1;

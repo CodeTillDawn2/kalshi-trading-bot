@@ -27,7 +27,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum body size for both candles relative to the lookback average range, varies by timeframe.
         /// Purpose: Ensures significant movement compared to prior volatility, adjusted for minute, hour, day.
         /// Default: 0.25 (minute), 0.35 (hour), 0.45 (day)
-        /// Range: 0.2�0.5 (0.2 for very loose significance, 0.5 for stronger signals).
+        /// Range: 0.2 0.5 (0.2 for very loose significance, 0.5 for stronger signals).
         /// </summary>
         /// Note: Tightened to eliminate FP in backtesting.
         public static double GetMinBodyToAvgRangeRatio(int intervalType)
@@ -54,22 +54,22 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum ratio of body size to total candle range for both candles.
         /// Purpose: Ensures notable bodies relative to range (per TradingView), loosened for flexibility.
         /// Default: 0.3 (adjusted from 0.4 for broader detection)
-        /// Range: 0.2�0.5 (0.2 for very loose, 0.5 for stricter).
+        /// Range: 0.2 0.5 (0.2 for very loose, 0.5 for stricter).
         /// </summary>
         public static double BodyToRangeRatio { get; set; } = 0.2;
 
         /// <summary>
-        /// Gets or sets the maximum distance between the second candle�s close and the first candle�s open, 
+        /// Gets or sets the maximum distance between the second candle s close and the first candle s open, 
         /// relative to the lookback average range, for the Counterattack pattern.
         /// </summary>
         /// <remarks>
-        /// This property defines how close the second candle�s close must be to the first candle�s open to qualify 
+        /// This property defines how close the second candle s close must be to the first candle s open to qualify 
         /// as a Counterattack pattern, ensuring the reversal intent is clear without engulfing the first candle. 
         /// The value is multiplied by the lookback average range to scale with volatility, but an absolute minimum 
         /// (e.g., 2.0 units) may be applied to accommodate patterns in low-volatility contexts. 
         /// The default value of 3.0 allows flexibility for broader detection across timeframes, increased from 1.5 
         /// to capture true positives with slightly larger distances (e.g., up to 3 times the average range). 
-        /// Range: 1.0�3.0 (1.0 for stricter proximity, 3.0 for looser, broader detection).
+        /// Range: 1.0 3.0 (1.0 for stricter proximity, 3.0 for looser, broader detection).
         /// </remarks>
         /// <value>The default value is 3.0, representing 3 times the lookback average range.</value>
         public static double NearOpenCloseToAvgRange { get; set; } = 4;
@@ -78,7 +78,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum trend strength threshold relative to the lookback average range.
         /// Purpose: Confirms a mild preceding trend.
         /// Default: 0.1 (10% of average range, loosened for flexibility)
-        /// Range: 0.05�0.2 (0.05 for very mild trends, 0.2 for stronger trends).
+        /// Range: 0.05 0.2 (0.05 for very mild trends, 0.2 for stronger trends).
         /// </summary>
         public static double TrendThresholdToAvgRange { get; set; } = 0.0025;
 
@@ -86,7 +86,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum trend consistency over the lookback period.
         /// Purpose: Ensures a mildly consistent trend before the pattern, loosened for broader detection.
         /// Default: 0.2 (20% consistency, reduced from 0.3)
-        /// Range: 0.1�0.4 (0.1 for very loose, 0.4 for stricter).
+        /// Range: 0.1 0.4 (0.1 for very loose, 0.4 for stricter).
         /// </summary>
         public static double TrendConsistencyMin { get; set; } = 0.05;
 
@@ -94,7 +94,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum trend direction ratio in the lookback period to confirm a prior trend.
         /// Purpose: Ensures a consistent prior trend (downtrend for bullish, uptrend for bearish) before the pattern.
         /// Default: 0.5 (50% of candles in trend direction, loosened for flexibility)
-        /// Range: 0.4�0.7 (0.4 for very loose consistency, 0.7 for stronger trends).
+        /// Range: 0.4 0.7 (0.4 for very loose consistency, 0.7 for stronger trends).
         /// </summary>
         public static double TrendDirectionRatioMin { get; set; } = 0.05;
 
@@ -109,11 +109,11 @@ namespace BacklashPatterns.PatternDefinitions
         /// bullish move; for a bullish pattern, it ensures the bullish reversal matches the prior bearish move. 
         /// A higher value (e.g., 0.75) demands a stronger reversal, potentially reducing false positives but missing subtler patterns. 
         /// A lower value (e.g., 0.25) allows weaker reversals, increasing detection but risking noise. 
-        /// The default of 0.5 strikes a balance, suitable for a 0�100 price scale where significant moves are expected.
+        /// The default of 0.5 strikes a balance, suitable for a 0 100 price scale where significant moves are expected.
         /// </remarks>
         /// <value>
-        /// The default value is 0.5, meaning the second candle�s body must be at least 50% of the first candle�s body size.
-        /// Range: 0.1�1.0 (0.1 for very loose balance, 1.0 for near-equal bodies).
+        /// The default value is 0.5, meaning the second candle s body must be at least 50% of the first candle s body size.
+        /// Range: 0.1 1.0 (0.1 for very loose balance, 1.0 for near-equal bodies).
         /// </value>
         public static double MinBodyBalanceRatio { get; set; } = 0.3;
 

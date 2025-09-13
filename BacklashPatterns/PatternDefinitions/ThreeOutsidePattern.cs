@@ -24,7 +24,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double BearishEngulfFactor { get; set; } = 0.8;
 
         /// <summary>
-        /// Threshold for determining the preceding trend strength (� value).
+        /// Threshold for determining the preceding trend strength (  value).
         /// Strictest: 0.5 (strong trend), Loosest: 0.1 (very weak trend still identifiable).
         /// </summary>
         public static double TrendThreshold { get; set; } = 0.3;

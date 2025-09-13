@@ -435,10 +435,10 @@ namespace TradingSimulator.Simulator
                 "WinMin",
                 "Your Rolling Yes ($/min)",
                 "Orderbook Flow Yes (inst $/min)",
-                "YesDepth(�)",
+                "YesDepth( )",
                 "Your Rolling No ($/min)",
                 "Orderbook Flow No (inst $/min)",
-                "NoDepth(�)");
+                "NoDepth( )");
             sb.AppendLine("    " + header);
 
             string rowFormat = "{0,-35} {1,8:0.##} {2,28:0.##} {3,32:0.##} {4,12:0.##} {5,28:0.##} {6,32:0.##} {7,12:0.##}";
@@ -475,14 +475,14 @@ namespace TradingSimulator.Simulator
             }
 
             sb.AppendLine("Rolling math (end snapshot - orderbook flow):");
-            sb.AppendLine($"  Window: ?Yes(�)={windowDy:0.##} ? {rollObsYes5m:0.##} $/min, ?No(�)={windowDn:0.##} ? {rollObsNo5m:0.##} $/min (Sdt={windowDt:0.##} min)");
+            sb.AppendLine($"  Window: ?Yes( )={windowDy:0.##} ? {rollObsYes5m:0.##} $/min, ?No( )={windowDn:0.##} ? {rollObsNo5m:0.##} $/min (Sdt={windowDt:0.##} min)");
 
             sb.AppendLine($"  Detection Expected: Yes={expYesRateWin:0.##} $/min, No={expNoRateWin:0.##} $/min (ExpScale={scale:0.##})");
 
             sb.AppendLine("Computation details:");
             sb.AppendLine($"    Short-Window Scale = (Window Minutes<{averagingWindowMin:0.##}? ( {averagingWindowMin:0.##}/Window Minutes )^{shortIntervalExponent:0.###} : 1) = {scale:0.######}");
-            sb.AppendLine($"    Expected ?Depth (�) = S(Expected Flow�min)�100 = {(expYesRateWin * windowDt):0.######}*100 = {expDepthYesC:0.##} c");
-            sb.AppendLine($"    Observed ?Depth (�) = window? = {windowDy:0.##}");
+            sb.AppendLine($"    Expected ?Depth ( ) = S(Expected Flow min) 100 = {(expYesRateWin * windowDt):0.######}*100 = {expDepthYesC:0.##} c");
+            sb.AppendLine($"    Observed ?Depth ( ) = window? = {windowDy:0.##}");
             sb.AppendLine($"    Edge Tolerance (Leakage Factor={leakageFactor:0.###}): Yes={toleranceYes:0.##} $/min, No={toleranceNo:0.##} $/min");
             sb.AppendLine($"MID={(curr.BestYesBid + curr.BestYesAsk) / 2.0:0.##}");
 

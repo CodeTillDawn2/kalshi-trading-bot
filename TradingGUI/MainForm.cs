@@ -624,7 +624,7 @@ namespace SimulatorWinForms
 
             if (e.Button == MouseButtons.Right)
             {
-                // prevent ScottPlot�s default right-drag zoom from fighting our pan (if available)
+                // prevent ScottPlot s default right-drag zoom from fighting our pan (if available)
                 try { formsPlot1.Configuration.RightClickDragZoom = false; } catch { /* ignore if not supported */ }
 
                 var lim = formsPlot1.Plot.GetAxisLimits();

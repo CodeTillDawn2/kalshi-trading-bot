@@ -55,7 +55,7 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache)
         {
-            // Early exit if there aren�t enough prior candles for a three-candle pattern
+            // Early exit if there aren t enough prior candles for a three-candle pattern
             if (index < 2) return null;
 
             // Define candle indices

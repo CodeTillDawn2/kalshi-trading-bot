@@ -12,7 +12,7 @@ public class EveningStarPattern : PatternDefinition
     public static double MinBodySize { get; set; } = 1.0;
 
     /// <summary>
-    /// Maximum body size for the second candle to ensure it�s small.
+    /// Maximum body size for the second candle to ensure it s small.
     /// Strictest: 0.5 (very small); Loosest: 1.5 (moderate size).
     /// </summary>
     public static double SmallBodyMax { get; set; } = 1.0;

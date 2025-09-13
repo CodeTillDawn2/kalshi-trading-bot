@@ -6,9 +6,9 @@ namespace BacklashPatterns.PatternDefinitions
     public class ModifiedHikkakePattern : PatternDefinition
     {
         /// <summary>
-        /// Minimum directional move required for the second candle�s breakout or breakdown from the first candle�s close.
+        /// Minimum directional move required for the second candle s breakout or breakdown from the first candle s close.
         /// - Strictest: 0.5 (noticeable breakout/breakdown).
-        /// - Loosest: 0.0 (any move qualifies, per your original loose definition and Investopedia�s flexibility).
+        /// - Loosest: 0.0 (any move qualifies, per your original loose definition and Investopedia s flexibility).
         /// </summary>
         public static double BreakoutThreshold { get; } = 0;
         public const string BaseName = "ModifiedHikkake";
@@ -27,8 +27,8 @@ namespace BacklashPatterns.PatternDefinitions
         /// Identifies a Modified Hikkake pattern, a three-candle reversal pattern.
         /// Requirements (sourced from Investopedia and adapted to your logic):
         /// - A three-candle pattern where the first candle sets a reference point.
-        /// - Second candle shows a slight breakout (bullish) or breakdown (bearish) from the first candle�s close.
-        /// - Third candle reverses the second candle�s direction, continuing the trend loosely.
+        /// - Second candle shows a slight breakout (bullish) or breakdown (bearish) from the first candle s close.
+        /// - Third candle reverses the second candle s direction, continuing the trend loosely.
         /// - Indicates a potential reversal with minimal trend confirmation.
         /// Your original logic uses a very loose definition compared to the standard Hikkake.
         /// </summary>
