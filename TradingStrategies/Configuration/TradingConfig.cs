@@ -154,6 +154,15 @@ public class TradingConfig
     /// </summary>
     public double MaxDrawdownPercent { get; set; } = 0.20;
 
+    [Range(0, 10)]
+    /// <summary>
+    /// Number of decimal places to round volume values when converting to double.
+    /// This controls precision handling for volume data in candlestick conversions.
+    /// Typical values: 0-4 depending on required precision and data source.
+    /// Used by PseudoCandlestickExtensions for volume precision in ToCandleMids method.
+    /// </summary>
+    public int VolumePrecisionDigits { get; set; } = 2;
+
     /// <summary>
     /// Validates the configuration parameters to ensure they are within acceptable ranges and prevent invalid combinations.
     /// This method should be called during application startup to catch misconfigurations early.
@@ -190,6 +199,8 @@ public class TradingConfig
             throw new ArgumentException("MaxConcurrentPositions must be between 1 and 100.");
         if (MaxDrawdownPercent <= 0 || MaxDrawdownPercent > 1)
             throw new ArgumentException("MaxDrawdownPercent must be between 0.01 and 1.0.");
+        if (VolumePrecisionDigits < 0 || VolumePrecisionDigits > 10)
+            throw new ArgumentException("VolumePrecisionDigits must be between 0 and 10.");
         // Add any invalid combination checks here, e.g., if (DecisionFrequencySeconds > RefreshIntervalMinutes * 60) ...
     }
 }

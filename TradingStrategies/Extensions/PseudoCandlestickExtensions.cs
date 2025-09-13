@@ -1,4 +1,8 @@
 using BacklashDTOs;
+using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using TradingStrategies.Configuration;
+using System;
 
 namespace TradingStrategies.Extensions
 {
@@ -17,20 +21,30 @@ namespace TradingStrategies.Extensions
         /// </summary>
         /// <param name="candles">The sequence of PseudoCandlesticks to convert. Must contain at least 2 elements.</param>
         /// <param name="marketTicker">The market ticker identifier to assign to each resulting CandleMids.</param>
+        /// <param name="config">Optional trading configuration for volume precision handling.</param>
+        /// <param name="logger">Optional logger for performance metrics collection.</param>
         /// <returns>An array of CandleMids representing the price movements between consecutive input candlesticks.</returns>
         /// <exception cref="ArgumentNullException">Thrown when candles is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when candles contains fewer than 2 elements.</exception>
+        /// <exception cref="ArgumentException">Thrown when candles contains fewer than 2 elements or marketTicker is null/empty.</exception>
         /// <remarks>
         /// This method creates n-1 candlesticks from n input PseudoCandlesticks, where each output candlestick
         /// represents the transition from one time period to the next. The volume is cast from decimal to double
-        /// to match the CandleMids data type expectations.
+        /// to match the CandleMids data type expectations, with optional precision rounding based on config.
+        /// Performance metrics are logged if the conversion takes longer than 100ms for large sequences.
         /// </remarks>
         public static CandleMids[] ToCandleMids(
             this IList<PseudoCandlestick> candles,
-            string marketTicker)
+            string marketTicker,
+            TradingConfig config = null,
+            ILogger logger = null)
         {
             if (candles == null || candles.Count < 2)
                 return Array.Empty<CandleMids>();
+
+            if (string.IsNullOrEmpty(marketTicker))
+                throw new ArgumentException("Market ticker cannot be null or empty.", nameof(marketTicker));
+
+            var stopwatch = Stopwatch.StartNew();
 
             var result = new List<CandleMids>(candles.Count - 1);
 
@@ -47,8 +61,14 @@ namespace TradingStrategies.Extensions
                     Close = curr.MidClose,
                     High = curr.MidHigh,
                     Low = curr.MidLow,
-                    Volume = (double)curr.Volume
+                    Volume = config != null ? Math.Round((double)curr.Volume, config.VolumePrecisionDigits) : (double)curr.Volume
                 });
+            }
+
+            stopwatch.Stop();
+            if (logger != null && stopwatch.ElapsedMilliseconds > 100)
+            {
+                logger.LogInformation($"PseudoCandlestick to CandleMids conversion took {stopwatch.ElapsedMilliseconds} ms for {candles.Count} candlesticks.");
             }
 
             return result.ToArray();
