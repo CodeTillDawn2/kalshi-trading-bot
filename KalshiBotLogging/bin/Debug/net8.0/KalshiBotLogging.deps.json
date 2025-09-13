@@ -266,14 +266,14 @@
           }
         }
       },
-      "Microsoft.Extensions.Configuration.Binder/9.0.1": {
+      "Microsoft.Extensions.Configuration.Binder/9.0.3": {
         "dependencies": {
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.3"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Configuration.Binder.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.124.61010"
+            "fileVersion": "9.0.325.11113"
           }
         }
       },
@@ -368,7 +368,7 @@
         "dependencies": {
           "Microsoft.Extensions.Configuration": "9.0.1",
           "Microsoft.Extensions.Diagnostics.Abstractions": "9.0.1",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "9.0.1"
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "9.0.3"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Diagnostics.dll": {
@@ -426,7 +426,7 @@
         "dependencies": {
           "Microsoft.Extensions.Configuration": "9.0.1",
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.3",
-          "Microsoft.Extensions.Configuration.Binder": "9.0.1",
+          "Microsoft.Extensions.Configuration.Binder": "9.0.3",
           "Microsoft.Extensions.Configuration.CommandLine": "9.0.1",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "9.0.1",
           "Microsoft.Extensions.Configuration.FileExtensions": "9.0.1",
@@ -498,12 +498,12 @@
         "dependencies": {
           "Microsoft.Extensions.Configuration": "9.0.1",
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.3",
-          "Microsoft.Extensions.Configuration.Binder": "9.0.1",
+          "Microsoft.Extensions.Configuration.Binder": "9.0.3",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.6",
           "Microsoft.Extensions.Logging": "9.0.3",
           "Microsoft.Extensions.Logging.Abstractions": "9.0.6",
           "Microsoft.Extensions.Options": "9.0.3",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "9.0.1"
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "9.0.3"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Logging.Configuration.dll": {
@@ -584,10 +584,10 @@
           }
         }
       },
-      "Microsoft.Extensions.Options.ConfigurationExtensions/9.0.1": {
+      "Microsoft.Extensions.Options.ConfigurationExtensions/9.0.3": {
         "dependencies": {
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.3",
-          "Microsoft.Extensions.Configuration.Binder": "9.0.1",
+          "Microsoft.Extensions.Configuration.Binder": "9.0.3",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.6",
           "Microsoft.Extensions.Options": "9.0.3",
           "Microsoft.Extensions.Primitives": "9.0.3"
@@ -595,7 +595,7 @@
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Options.ConfigurationExtensions.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.124.61010"
+            "fileVersion": "9.0.325.11113"
           }
         }
       },
@@ -932,7 +932,8 @@
       "System.Threading.Tasks.Extensions/4.5.4": {},
       "BacklashDTOs/1.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.6"
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.6",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "9.0.3"
         },
         "runtime": {
           "BacklashDTOs.dll": {
@@ -1083,12 +1084,12 @@
       "path": "microsoft.extensions.configuration.abstractions/9.0.3",
       "hashPath": "microsoft.extensions.configuration.abstractions.9.0.3.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.Binder/9.0.1": {
+    "Microsoft.Extensions.Configuration.Binder/9.0.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-w7kAyu1Mm7eParRV6WvGNNwA8flPTub16fwH49h7b/yqJZFTgYxnOVCuiah3G2bgseJMEq4DLjjsyQRvsdzRgA==",
-      "path": "microsoft.extensions.configuration.binder/9.0.1",
-      "hashPath": "microsoft.extensions.configuration.binder.9.0.1.nupkg.sha512"
+      "sha512": "sha512-ad82pYBUSQbd3WIboxsS1HzFdRuHKRa2CpYwie/o6dZAxUjt62yFwjoVdM7Iw2VO5fHV1rJwa7jJZBNZin0E7Q==",
+      "path": "microsoft.extensions.configuration.binder/9.0.3",
+      "hashPath": "microsoft.extensions.configuration.binder.9.0.3.nupkg.sha512"
     },
     "Microsoft.Extensions.Configuration.CommandLine/9.0.1": {
       "type": "package",
@@ -1244,12 +1245,12 @@
       "path": "microsoft.extensions.options/9.0.3",
       "hashPath": "microsoft.extensions.options.9.0.3.nupkg.sha512"
     },
-    "Microsoft.Extensions.Options.ConfigurationExtensions/9.0.1": {
+    "Microsoft.Extensions.Options.ConfigurationExtensions/9.0.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-8RRKWtuU4fR+8MQLR/8CqZwZ9yc2xCpllw/WPRY7kskIqEq0hMcEI4AfUJO72yGiK2QJkrsDcUvgB5Yc+3+lyg==",
-      "path": "microsoft.extensions.options.configurationextensions/9.0.1",
-      "hashPath": "microsoft.extensions.options.configurationextensions.9.0.1.nupkg.sha512"
+      "sha512": "sha512-PcyYHQglKnWVZHSPaL6v2qnfsIuFw8tSq7cyXHg3OeuDVn/CqmdWUjRiZomCF/Gi+qCi+ksz0lFphg2cNvB8zQ==",
+      "path": "microsoft.extensions.options.configurationextensions/9.0.3",
+      "hashPath": "microsoft.extensions.options.configurationextensions.9.0.3.nupkg.sha512"
     },
     "Microsoft.Extensions.Primitives/9.0.3": {
       "type": "package",
