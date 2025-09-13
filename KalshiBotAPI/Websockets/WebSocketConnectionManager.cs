@@ -36,10 +36,12 @@ namespace KalshiBotAPI.Websockets
     /// Key features include:
     /// - Configurable retry logic with customizable delays and maximum attempts
     /// - Performance metrics collection (connection success rates, latency, message throughput)
-    /// - Signature caching for reduced computational overhead
-    /// - Configurable WebSocket buffer sizes
+    /// - Signature caching for reduced computational overhead with hit rate tracking
+    /// - Configurable WebSocket buffer sizes with utilization monitoring
     /// - Semaphore-based synchronization to prevent concurrent connection attempts
     /// - Configurable reconnection behavior (can be disabled/enabled)
+    /// - Connection failure reason tracking and diagnostics
+    /// - Sliding window throughput calculation for accurate real-time metrics
     /// - Comprehensive logging for operational visibility
     /// - Proper resource cleanup and disposal
     /// </para>
@@ -63,11 +65,21 @@ namespace KalshiBotAPI.Websockets
         private int _messagesReceived = 0;
         private DateTime _lastMessageTime = DateTime.UtcNow;
         private double _messageThroughput = 0; // messages per second
+        private readonly Queue<(DateTime timestamp, int count)> _throughputWindow = new Queue<(DateTime, int)>();
+        private int _connectionFailures = 0;
+        private readonly Dictionary<string, int> _connectionFailureReasons = new Dictionary<string, int>();
+        private int _signatureCacheHits = 0;
+        private int _signatureCacheMisses = 0;
+        private long _totalBytesReceived = 0;
+        private int _bufferUtilizationCount = 0;
+        private double _averageBufferUtilization = 0;
 
         // Configuration options
         private readonly int _maxRetryAttempts;
         private readonly int[] _retryDelays;
         private readonly int _bufferSize;
+        private readonly int _resetDelayMs;
+        private readonly int _semaphoreTimeoutMs;
 
         // Signature caching
         private readonly ConcurrentDictionary<string, (string timestamp, string signature, DateTime expiry)> _signatureCache = new ConcurrentDictionary<string, (string, string, DateTime)>();
@@ -81,7 +93,8 @@ namespace KalshiBotAPI.Websockets
         /// <remarks>
         /// The constructor sets up the RSA private key for authentication by loading it from the
         /// configured key file. This key is used to generate signatures for WebSocket connection
-        /// authentication with Kalshi's servers.
+        /// authentication with Kalshi's servers. It also initializes all configurable parameters
+        /// including retry delays, buffer sizes, timeouts, and cache durations for optimal performance.
         /// </remarks>
         public WebSocketConnectionManager(
             IOptions<KalshiConfig> kalshiConfig,
@@ -96,6 +109,8 @@ namespace KalshiBotAPI.Websockets
             _maxRetryAttempts = _kalshiConfig.WebSocketMaxRetryAttempts;
             _retryDelays = _kalshiConfig.WebSocketRetryDelays ?? new int[] { 1000, 2000, 4000, 8000, 16000 };
             _bufferSize = _kalshiConfig.WebSocketBufferSize;
+            _resetDelayMs = _kalshiConfig.WebSocketResetDelayMs;
+            _semaphoreTimeoutMs = _kalshiConfig.WebSocketSemaphoreTimeoutMs;
             _signatureCacheDuration = TimeSpan.FromMinutes(_kalshiConfig.WebSocketSignatureCacheDurationMinutes);
         }
 
@@ -140,10 +155,11 @@ namespace KalshiBotAPI.Websockets
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                semaphoreAcquired = await _connectSemaphore.WaitAsync(60000);
+                semaphoreAcquired = await _connectSemaphore.WaitAsync(_semaphoreTimeoutMs);
                 if (!semaphoreAcquired)
                 {
-                    _logger.LogError("Failed to acquire connect semaphore within 60000ms");
+                    _logger.LogError("Failed to acquire connect semaphore within {Timeout}ms", _semaphoreTimeoutMs);
+                    TrackConnectionFailure("SemaphoreTimeout");
                     return;
                 }
 
@@ -190,10 +206,12 @@ namespace KalshiBotAPI.Websockets
             catch (WebSocketException ex) when (ex.Message.Contains("Failed to connect WebSocket on retry"))
             {
                 _logger.LogWarning(new WebSocketRetryFailedException(ex.Message, ex), "Failed to connect to a websocket");
+                TrackConnectionFailure("WebSocketException");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to connect WebSocket on retry {RetryCount}", retryCount);
+                TrackConnectionFailure(ex.GetType().Name);
                 if (retryCount < _maxRetryAttempts && _allowReconnect)
                 {
                     int delay = retryCount < _retryDelays.Length ? _retryDelays[retryCount] : _retryDelays[_retryDelays.Length - 1];
@@ -267,8 +285,8 @@ namespace KalshiBotAPI.Websockets
 
                 if (_allowReconnect)
                 {
-                    _logger.LogDebug("Waiting 5 seconds");
-                    await Task.Delay(5000);
+                    _logger.LogDebug("Waiting {Delay}ms before reconnecting", _resetDelayMs);
+                    await Task.Delay(_resetDelayMs);
                     await ConnectAsync();
                 }
                 else
@@ -452,13 +470,23 @@ namespace KalshiBotAPI.Websockets
                             var fullMessage = messageBuilder.ToString();
                             _messagesReceived++;
                             var now = DateTime.UtcNow;
-                            var timeDiff = (now - _lastMessageTime).TotalSeconds;
-                            if (timeDiff > 0)
+                            var messageLength = fullMessage.Length;
+
+                            // Track buffer utilization
+                            _totalBytesReceived += messageLength;
+                            _bufferUtilizationCount++;
+                            _averageBufferUtilization = (_averageBufferUtilization * (_bufferUtilizationCount - 1) + (double)messageLength / _bufferSize) / _bufferUtilizationCount;
+
+                            // Update throughput with sliding window
+                            _throughputWindow.Enqueue((now, 1));
+                            while (_throughputWindow.Count > 0 && (now - _throughputWindow.Peek().timestamp).TotalSeconds > 60)
                             {
-                                _messageThroughput = _messagesReceived / timeDiff;
+                                _throughputWindow.Dequeue();
                             }
+                            _messageThroughput = _throughputWindow.Count / 60.0; // messages per second over last 60 seconds
+
                             _lastMessageTime = now;
-                            _logger.LogDebug("Received complete WebSocket message: Length={Length}", fullMessage.Length);
+                            _logger.LogDebug("Received complete WebSocket message: Length={Length}", messageLength);
                             // Note: In the refactored design, message processing should be handled by MessageProcessor
                             // This method should be called from the main client which has access to MessageProcessor
                             messageBuilder.Clear();
@@ -600,7 +628,73 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Gets the current message throughput (messages per second).
         /// </summary>
+        /// <remarks>
+        /// Calculated using a sliding window approach over the last 60 seconds
+        /// for more accurate real-time throughput measurement.
+        /// </remarks>
         public double MessageThroughput => _messageThroughput;
+
+        /// <summary>
+        /// Gets the total number of connection failures.
+        /// </summary>
+        /// <remarks>
+        /// Tracks all connection failures for monitoring connection reliability
+        /// and identifying potential network or configuration issues.
+        /// </remarks>
+        public int ConnectionFailures => _connectionFailures;
+
+        /// <summary>
+        /// Gets the connection failure reasons and their counts.
+        /// </summary>
+        /// <remarks>
+        /// Provides detailed breakdown of failure types (e.g., "WebSocketException", "TimeoutException")
+        /// to help diagnose connection issues and optimize retry strategies.
+        /// </remarks>
+        public IReadOnlyDictionary<string, int> ConnectionFailureReasons => _connectionFailureReasons;
+
+        /// <summary>
+        /// Gets the signature cache hit rate (0.0 to 1.0).
+        /// </summary>
+        /// <remarks>
+        /// Indicates the effectiveness of signature caching in reducing computational overhead.
+        /// Higher values suggest better cache performance and reduced CPU usage for authentication.
+        /// </remarks>
+        public double SignatureCacheHitRate => (_signatureCacheHits + _signatureCacheMisses) > 0 ? (double)_signatureCacheHits / (_signatureCacheHits + _signatureCacheMisses) : 0;
+
+        /// <summary>
+        /// Gets the total number of signature cache hits.
+        /// </summary>
+        /// <remarks>
+        /// Tracks successful cache lookups that avoided expensive signature generation.
+        /// </remarks>
+        public int SignatureCacheHits => _signatureCacheHits;
+
+        /// <summary>
+        /// Gets the total number of signature cache misses.
+        /// </summary>
+        /// <remarks>
+        /// Tracks cache misses that required new signature generation.
+        /// </remarks>
+        public int SignatureCacheMisses => _signatureCacheMisses;
+
+        /// <summary>
+        /// Gets the total bytes received.
+        /// </summary>
+        /// <remarks>
+        /// Cumulative count of all data received through the WebSocket connection.
+        /// Useful for monitoring data transfer volumes and connection efficiency.
+        /// </remarks>
+        public long TotalBytesReceived => _totalBytesReceived;
+
+        /// <summary>
+        /// Gets the average buffer utilization (0.0 to 1.0).
+        /// </summary>
+        /// <remarks>
+        /// Indicates how efficiently the WebSocket buffer is being used.
+        /// Values closer to 1.0 suggest the buffer size is appropriate for the message sizes.
+        /// Values much lower than 1.0 might indicate the buffer is oversized.
+        /// </remarks>
+        public double AverageBufferUtilization => _averageBufferUtilization;
 
         /// <summary>
         /// Generates authentication headers required for WebSocket connection to Kalshi's platform.
@@ -628,8 +722,10 @@ namespace KalshiBotAPI.Websockets
             if (_signatureCache.TryGetValue(cacheKey, out var cached) && cached.expiry > DateTime.UtcNow)
             {
                 _logger.LogDebug("Using cached auth headers for {Method} {Path}", method, path);
+                _signatureCacheHits++;
                 return (cached.timestamp, cached.signature);
             }
+            _signatureCacheMisses++;
 
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
             var message = $"{timestamp}{method}{path.Split('?')[0]}";
@@ -643,5 +739,26 @@ namespace KalshiBotAPI.Websockets
         }
 
         private bool _isReconnecting = false;
+
+        /// <summary>
+        /// Tracks connection failure reasons for monitoring and diagnostics.
+        /// </summary>
+        /// <param name="reason">The reason for the connection failure (e.g., exception type name).</param>
+        /// <remarks>
+        /// This method maintains a dictionary of failure reasons and their occurrence counts,
+        /// enabling detailed analysis of connection reliability issues and troubleshooting.
+        /// </remarks>
+        private void TrackConnectionFailure(string reason)
+        {
+            _connectionFailures++;
+            if (_connectionFailureReasons.ContainsKey(reason))
+            {
+                _connectionFailureReasons[reason]++;
+            }
+            else
+            {
+                _connectionFailureReasons[reason] = 1;
+            }
+        }
     }
 }

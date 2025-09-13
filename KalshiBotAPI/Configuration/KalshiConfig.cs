@@ -43,6 +43,18 @@ public class KalshiConfig
     public int WebSocketSignatureCacheDurationMinutes { get; set; } = 5;
 
     /// <summary>
+    /// Gets or sets the delay in milliseconds before resetting WebSocket connection.
+    /// Defaults to 5000 (5 seconds).
+    /// </summary>
+    public int WebSocketResetDelayMs { get; set; } = 5000;
+
+    /// <summary>
+    /// Gets or sets the timeout in milliseconds for acquiring the connection semaphore.
+    /// Defaults to 60000 (60 seconds).
+    /// </summary>
+    public int WebSocketSemaphoreTimeoutMs { get; set; } = 60000;
+
+    /// <summary>
     /// Gets or sets the configuration for candlestick lookback periods in days.
     /// Controls how far back in time to fetch candlestick data for different intervals.
     /// </summary>
