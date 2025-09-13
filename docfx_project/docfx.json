@@ -5,7 +5,7 @@
         {
           "src": ".",
           "files": [
-            "BacklashBot/bin/Debug/net8.0/BacklashBot.dll"
+            "**/bin/Debug/net8.0/*.*"
           ]
         }
       ],
