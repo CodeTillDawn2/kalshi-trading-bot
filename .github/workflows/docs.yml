@@ -22,7 +22,7 @@ jobs:
         run: dotnet tool install -g docfx
 
       - name: Build Project
-        run: dotnet build BacklashBot/BacklashBot.sln /p:EnableWindowsTargeting=true
+        run: cd BacklashBot && dotnet build BacklashBot.sln /p:EnableWindowsTargeting=true
         env:
           DOTNET_CLI_ENABLE_WINDOWS_TARGETING: true
 
