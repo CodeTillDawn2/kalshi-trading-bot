@@ -7,7 +7,7 @@
   "index.html": {
     "href": "index.html",
     "title": "Kalshi Trading Bot Docs | Kalshi Trading Bot Documentation",
-    "summary": "Kalshi Trading Bot API Reference → API Guides → Articles"
+    "summary": "Kalshi Trading Bot [!include[](obj/api/index.md)] API Reference → API Guides → Articles"
   },
   "obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.html": {
     "href": "obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.html",
