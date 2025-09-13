@@ -30,10 +30,11 @@ jobs:
       - name: Install DocFX
         run: dotnet tool update -g docfx
 
-      - name: Clean previous site
+      - name: Clean previous outputs
         run: |
-          rm -rf docs
+          rm -rf docfx_project/api
           rm -rf docfx_project/obj
+          rm -rf docs
 
       - name: Show tree (quick sanity)
         run: |
@@ -49,16 +50,16 @@ jobs:
           ls -R docfx_project/obj || true
           test -f docfx_project/obj/api/index.yaml || true
 
-      - name: Generate API TOC from metadata
+      - name: Generate API TOC
         run: |
           mkdir -p docfx_project/api
           {
             echo "items:"
-            find docfx_project/obj/api -path "*/namespace/*.yml" -type f -print0 \
+            find docfx_project/api -path "*/namespace/*.yml" -type f -print0 \
               | xargs -0 -I{} awk '/^uid: /{print "  - uid: "$2; exit }' "{}" \
               | sort -u
           } > docfx_project/api/toc.yml
-          printf "# API landing\n# (Optional extra content)\n\n# API Reference\n" > docfx_project/api/index.md
+          printf "# API Reference\n" > docfx_project/api/index.md
           cat docfx_project/api/toc.yml
 
       - name: Build site

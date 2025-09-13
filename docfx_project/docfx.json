@@ -24,7 +24,7 @@
           ]
         }
       ],
-      "dest": "obj/api",
+      "dest": "api",
       "properties": {
         "TargetFramework": "net8.0",
         "EnableWindowsTargeting": "true"
@@ -33,7 +33,7 @@
   ],
   "build": {
     "content": [
-      { "files": [ "obj/api/**.yml" ], "dest": "api" },
+      { "files": [ "api/**.yml" ] },
       { "files": [ "index.md", "toc.yml" ] },
       { "files": [ "api/index.md", "api/toc.yml" ] },
       { "files": [ "articles/**.md", "articles/**.html" ] }
