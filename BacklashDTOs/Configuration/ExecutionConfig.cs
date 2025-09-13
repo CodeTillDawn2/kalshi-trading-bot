@@ -41,5 +41,11 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         /// <value>Default is 5000 milliseconds (5 seconds).</value>
         public int RetryDelayMs { get; set; } = 5000;
+
+        /// <summary>
+        /// Gets or sets the length of the session identifier string.
+        /// </summary>
+        /// <value>Default is 5 characters.</value>
+        public int SessionIdLength { get; set; } = 5;
     }
 }

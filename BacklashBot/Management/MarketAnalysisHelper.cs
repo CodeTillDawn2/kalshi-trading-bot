@@ -43,6 +43,12 @@ namespace BacklashBot.Management
             _scopeFactory = scopeFactory;
             _snapshotPeriodHelper = snapshotPeriodHelper;
             _executionConfig = executionConfig.Value ?? throw new ArgumentNullException(nameof(executionConfig.Value));
+
+            if (string.IsNullOrWhiteSpace(_executionConfig.HardDataStorageLocation))
+            {
+                throw new ArgumentException("HardDataStorageLocation must be specified in ExecutionConfig.", nameof(_executionConfig.HardDataStorageLocation));
+            }
+
             _logger = logger;
         }
 
@@ -55,6 +61,9 @@ namespace BacklashBot.Management
         public async Task GenerateSnapshotGroups()
         {
             _logger.LogInformation("Starting snapshot group generation process.");
+            var totalStopwatch = Stopwatch.StartNew();
+            int totalMarketsProcessed = 0;
+            long totalProcessingTime = 0;
 
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
@@ -79,6 +88,7 @@ namespace BacklashBot.Management
             {
                 var stopwatch = Stopwatch.StartNew();
                 List<SnapshotDTO> rawSnapshots;
+                totalMarketsProcessed++;
 
                 try
                 {
@@ -138,10 +148,14 @@ namespace BacklashBot.Management
 
                 await context.AddOrUpdateSnapshotGroups(validPeriods);
                 stopwatch.Stop();
+                totalProcessingTime += stopwatch.ElapsedMilliseconds;
                 _logger.LogInformation("Successfully processed {Count} snapshot groups for market {MarketTicker} in {ElapsedMs} ms.", validPeriods.Count, marketTicker, stopwatch.ElapsedMilliseconds);
             }
 
-            _logger.LogInformation("Completed snapshot group generation process.");
+            totalStopwatch.Stop();
+            double averageTimePerMarket = totalMarketsProcessed > 0 ? (double)totalProcessingTime / totalMarketsProcessed : 0;
+            _logger.LogInformation("Completed snapshot group generation process. Total markets processed: {TotalMarkets}, Total processing time: {TotalTime} ms, Average time per market: {AverageTime} ms, Overall duration: {OverallDuration} ms.",
+                totalMarketsProcessed, totalProcessingTime, averageTimePerMarket, totalStopwatch.ElapsedMilliseconds);
         }
     }
 }
