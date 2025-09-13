@@ -51,6 +51,8 @@ namespace TradingSimulator
     /// including data loading, strategy execution, performance analysis, and result reporting.
     /// It integrates with various components like DataLoader, MarketProcessor, and StrategyResolver to provide
     /// comprehensive simulation capabilities for evaluating trading strategies.
+    /// Features include configurable cache directory and timeout values, input validation with warnings for invalid parameters,
+    /// and async operations for high-throughput scenarios.
     /// </summary>
     public class TradingSimulatorService
     {
@@ -68,8 +70,9 @@ namespace TradingSimulator
         private IKalshiBotContext _dbContext;
         private MarketAnalysisHelper _marketAnalysisHelper;
         private IOptions<ExecutionConfig> _executionConfig;
+        private IOptions<SimulatorConfig> _simulatorOptions;
         private HashSet<string> _processedMarkets;
-        private readonly string _cacheDirectory = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
+        private string _cacheDirectory;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;
         public event Action<string> OnTestProgress;
         public event Action<string, double> OnProfitLossUpdate;
@@ -85,8 +88,8 @@ namespace TradingSimulator
 
         /// <summary>
         /// Initializes the trading simulator service by setting up dependencies, configuration, and database context.
-        /// This method configures the service collection, builds the dependency injection container, and initializes
-        /// all required services and helpers for simulation operations.
+        /// This method configures the service collection, builds the dependency injection container, loads simulator-specific
+        /// configuration options (cache directory, timeouts), and initializes all required services and helpers for simulation operations.
         /// </summary>
         public void Setup()
         {
@@ -105,9 +108,11 @@ namespace TradingSimulator
 
             var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>();
             var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>();
+            var simulatorConfig = config.GetSection("Simulator").Get<SimulatorConfig>();
             _snapshotOptions = Options.Create(snapshotConfig);
             _tradingOptions = Options.Create(tradingConfig);
             _executionConfig = Options.Create(config.GetSection("Execution").Get<ExecutionConfig>());
+            _simulatorOptions = Options.Create(simulatorConfig);
 
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
@@ -128,6 +133,7 @@ namespace TradingSimulator
             _sqlDataService = new SqlDataService(config, _sqlLoggerMock.Object);
 
             _processedMarkets = new HashSet<string>();
+            _cacheDirectory = _simulatorOptions.Value.CacheDirectory;
             Directory.CreateDirectory(_cacheDirectory); // ensure output dir exists
 
             // Initialize helper classes
@@ -169,12 +175,19 @@ namespace TradingSimulator
 
         /// <summary>
         /// Retrieves all market snapshots for a specific market name.
-        /// This method loads historical snapshot data for the specified market, filtering and ordering the results chronologically.
+        /// This method validates the market name (logs warning and returns empty list for invalid names),
+        /// then loads historical snapshot data for the specified market, filtering and ordering the results chronologically.
         /// </summary>
-        /// <param name="marketName">The name of the market to retrieve snapshots for.</param>
+        /// <param name="marketName">The name of the market to retrieve snapshots for. Must not be null or empty.</param>
         /// <returns>A list of MarketSnapshot objects ordered by timestamp for the specified market.</returns>
         public async Task<List<MarketSnapshot>> GetSnapshotsForMarket(string marketName)
         {
+            if (string.IsNullOrWhiteSpace(marketName))
+            {
+                OnTestProgress?.Invoke("Warning: marketName is null or empty. Returning empty list.");
+                return new List<MarketSnapshot>();
+            }
+
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
             return await _dataLoader.LoadSnapshotsForMarketAsync(context, marketName);
@@ -183,19 +196,44 @@ namespace TradingSimulator
 
         /// <summary>
         /// Runs a specific strategy set for GUI display, processing the selected parameter set against the specified markets.
-        /// This method resolves the strategy family from the set key, finds the matching weight set, and executes
-        /// the simulation for all specified markets, optionally writing results to files and reporting progress.
+        /// This method validates inputs (setKey, weightName, market names), resolves the strategy family from the set key,
+        /// finds the matching weight set, and executes the simulation for all specified markets, optionally writing results
+        /// to files and reporting progress. Invalid inputs are logged as warnings and skipped.
         /// </summary>
-        /// <param name="setKey">The key identifying the strategy family (e.g., "bollinger", "breakout").</param>
-        /// <param name="weightName">The name of the specific parameter set within the strategy family.</param>
+        /// <param name="setKey">The key identifying the strategy family (e.g., "bollinger", "breakout"). Must not be null or empty.</param>
+        /// <param name="weightName">The name of the specific parameter set within the strategy family. Must not be null or empty.</param>
         /// <param name="writeToFile">Whether to save detailed market data to JSON files in the cache directory.</param>
-        /// <param name="marketsToRun">Optional list of market names to process. If null, processes all available markets.</param>
+        /// <param name="marketsToRun">Optional list of market names to process. Invalid names are filtered out with warnings. If null, processes all available markets.</param>
         public async Task RunSelectedSetForGuiAsync(
             string setKey,
             string weightName,
             bool writeToFile,
             List<string>? marketsToRun = null)
         {
+            // Validate inputs
+            if (string.IsNullOrWhiteSpace(setKey))
+            {
+                OnTestProgress?.Invoke("Warning: setKey is null or empty. Skipping execution.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(weightName))
+            {
+                OnTestProgress?.Invoke("Warning: weightName is null or empty. Skipping execution.");
+                return;
+            }
+
+            // Validate marketsToRun
+            if (marketsToRun != null)
+            {
+                var invalidMarkets = marketsToRun.Where(m => string.IsNullOrWhiteSpace(m)).ToList();
+                if (invalidMarkets.Any())
+                {
+                    OnTestProgress?.Invoke($"Warning: Found {invalidMarkets.Count} invalid market names (null or empty). Filtering them out.");
+                    marketsToRun = marketsToRun.Where(m => !string.IsNullOrWhiteSpace(m)).ToList();
+                }
+            }
+
             // map provided setKey -> family
             var family = MapFamilyFromSetKey(setKey);
 
@@ -206,7 +244,10 @@ namespace TradingSimulator
             var idx = paramSets.FindIndex(ps =>
                 string.Equals(ps.Name, weightName, StringComparison.OrdinalIgnoreCase));
             if (idx < 0)
-                throw new InvalidOperationException($"Weight set '{weightName}' not found in {label}.");
+            {
+                OnTestProgress?.Invoke($"Warning: Weight set '{weightName}' not found in {label}. Skipping execution.");
+                return;
+            }
 
             // prep context once
             using var scope = _scopeFactory.CreateScope();
@@ -344,13 +385,25 @@ namespace TradingSimulator
 
         /// <summary>
         /// Retrieves a list of valid base market names that have sufficient snapshot data for simulation.
-        /// This method filters snapshot groups by duration and optionally by a provided list of base markets,
-        /// then extracts the base market names (removing numeric suffixes) and returns them sorted.
+        /// This method validates the basesToInclude list (filtering out invalid names with warnings), filters snapshot groups
+        /// by duration and optionally by the provided list of base markets, then extracts the base market names
+        /// (removing numeric suffixes) and returns them sorted.
         /// </summary>
-        /// <param name="basesToInclude">Optional list of base market names to filter by. If null, includes all valid bases.</param>
+        /// <param name="basesToInclude">Optional list of base market names to filter by. Invalid names are filtered out with warnings. If null, includes all valid bases.</param>
         /// <returns>A sorted list of valid base market names with available snapshot data.</returns>
         public async Task<List<string>> GetValidBaseMarketsAsync(List<string>? basesToInclude = null)
         {
+            // Validate basesToInclude
+            if (basesToInclude != null)
+            {
+                var invalidBases = basesToInclude.Where(b => string.IsNullOrWhiteSpace(b)).ToList();
+                if (invalidBases.Any())
+                {
+                    OnTestProgress?.Invoke($"Warning: Found {invalidBases.Count} invalid base market names (null or empty). Filtering them out.");
+                    basesToInclude = basesToInclude.Where(b => !string.IsNullOrWhiteSpace(b)).ToList();
+                }
+            }
+
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
@@ -400,6 +453,17 @@ ResolveFamily(StrategyFamily family)
             bool writeToFile,
             List<string>? marketsToRun = null)
         {
+            // Validate marketsToRun
+            if (marketsToRun != null)
+            {
+                var invalidMarkets = marketsToRun.Where(m => string.IsNullOrWhiteSpace(m)).ToList();
+                if (invalidMarkets.Any())
+                {
+                    OnTestProgress?.Invoke($"Warning: Found {invalidMarkets.Count} invalid market names (null or empty). Filtering them out.");
+                    marketsToRun = marketsToRun.Where(m => !string.IsNullOrWhiteSpace(m)).ToList();
+                }
+            }
+
             var label = "MLShared";
             var helper = new StrategySelectionHelper();
             var paramSets = MLEntrySeekerShared.MLSharedParameterSets;
@@ -576,17 +640,29 @@ ResolveFamily(StrategyFamily family)
 
         /// <summary>
         /// Runs all parameter sets for a specific strategy family against the provided markets.
-        /// This method executes comprehensive backtesting for all available parameter combinations within a strategy family,
-        /// generating performance reports and optionally saving detailed results to files.
+        /// This method validates market names (filtering out invalid ones with warnings), executes comprehensive backtesting
+        /// for all available parameter combinations within a strategy family, generating performance reports and optionally
+        /// saving detailed results to files.
         /// </summary>
         /// <param name="family">The strategy family to execute (e.g., Bollinger, Breakout, MLShared).</param>
         /// <param name="writeToFile">Whether to save detailed market data to JSON files for each parameter set.</param>
-        /// <param name="marketsToRun">Optional list of market names to process. If null, processes all available markets.</param>
+        /// <param name="marketsToRun">Optional list of market names to process. Invalid names are filtered out with warnings. If null, processes all available markets.</param>
         public async Task RunMultipleForGuiAsync(
             StrategyFamily family,
             bool writeToFile,
             List<string>? marketsToRun = null)
         {
+            // Validate marketsToRun
+            if (marketsToRun != null)
+            {
+                var invalidMarkets = marketsToRun.Where(m => string.IsNullOrWhiteSpace(m)).ToList();
+                if (invalidMarkets.Any())
+                {
+                    OnTestProgress?.Invoke($"Warning: Found {invalidMarkets.Count} invalid market names (null or empty). Filtering them out.");
+                    marketsToRun = marketsToRun.Where(m => !string.IsNullOrWhiteSpace(m)).ToList();
+                }
+            }
+
             var (strategiesList, paramSets, label) = ResolveFamily(family);
 
             using var scope = _scopeFactory.CreateScope();
