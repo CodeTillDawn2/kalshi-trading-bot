@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class SimulatorReporting | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Provides comprehensive reporting and analysis functionality for trading simulator operations. This class serves as the core engine for detecting velocity discrepancies in market snapshots, computing rolling observations, generating detailed memos, and coalescing discrepancy data. It is designed to analyze orderbook flow patterns and identify potential anomalies in market data that could indicate trading opportunities or data quality issues.">
+    <meta name="description" content="Provides comprehensive reporting and analysis functionality for trading simulator operations. This class serves as the core engine for detecting velocity discrepancies in market snapshots, computing rolling observations, generating detailed memos, and coalescing discrepancy data. It is designed to analyze orderbook flow patterns and identify potential anomalies in market data that could indicate trading opportunities or data quality issues. Key Features:  Configurable analysis parameters via AnalysisConfiguration class Async processing support for better performance with large datasets Parallel processing for multiple market analyses Comprehensive input validation for data integrity Performance metrics collection and timing analysis Configurable logging with automatic directory creation Spike suppression to reduce false positives Robust error handling and recovery">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -86,6 +86,17 @@ This class serves as the core engine for detecting velocity discrepancies in mar
 computing rolling observations, generating detailed memos, and coalescing discrepancy data.
 It is designed to analyze orderbook flow patterns and identify potential anomalies in market data
 that could indicate trading opportunities or data quality issues.</p>
+<p>Key Features:</p>
+<ul>
+<li>Configurable analysis parameters via AnalysisConfiguration class</li>
+<li>Async processing support for better performance with large datasets</li>
+<li>Parallel processing for multiple market analyses</li>
+<li>Comprehensive input validation for data integrity</li>
+<li>Performance metrics collection and timing analysis</li>
+<li>Configurable logging with automatic directory creation</li>
+<li>Spike suppression to reduce false positives</li>
+<li>Robust error handling and recovery</li>
+</ul>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -123,27 +134,69 @@ that could indicate trading opportunities or data quality issues.</p>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class SimulatorReporting</code></pre>
   </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Simulator_SimulatorReporting__ctor_TradingSimulator_Simulator_AnalysisConfiguration_.md&amp;value=---%0Auid%3A%20TradingSimulator.Simulator.SimulatorReporting.%23ctor(TradingSimulator.Simulator.AnalysisConfiguration)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/SimulatorReporting.cs/#L84">View Source</a>
+  </span>
+  <a id="TradingSimulator_Simulator_SimulatorReporting__ctor_" data-uid="TradingSimulator.Simulator.SimulatorReporting.#ctor*"></a>
+  <h4 id="TradingSimulator_Simulator_SimulatorReporting__ctor_TradingSimulator_Simulator_AnalysisConfiguration_" data-uid="TradingSimulator.Simulator.SimulatorReporting.#ctor(TradingSimulator.Simulator.AnalysisConfiguration)">SimulatorReporting(AnalysisConfiguration)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SimulatorReporting(AnalysisConfiguration config = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="TradingSimulator.Simulator.AnalysisConfiguration.html">AnalysisConfiguration</a></td>
+        <td><span class="parametername">config</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Simulator_SimulatorReporting_DetectVelocityDiscrepancies_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_System_Double_System_Double_System_Int32_System_Double_System_Double_System_Double_System_Double_System_Boolean_System_Double_System_Boolean_System_Boolean_System_Double_System_Double_System_Double_System_Double_.md&amp;value=---%0Auid%3A%20TradingSimulator.Simulator.SimulatorReporting.DetectVelocityDiscrepancies(System.Collections.Generic.List%7BBacklashDTOs.MarketSnapshot%7D%2CSystem.Boolean%2CSystem.Double%2CSystem.Double%2CSystem.Int32%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Boolean%2CSystem.Double%2CSystem.Boolean%2CSystem.Boolean%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Simulator_SimulatorReporting_DetectVelocityDiscrepancies_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_.md&amp;value=---%0Auid%3A%20TradingSimulator.Simulator.SimulatorReporting.DetectVelocityDiscrepancies(System.Collections.Generic.List%7BBacklashDTOs.MarketSnapshot%7D%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/SimulatorReporting.cs/#L41">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/SimulatorReporting.cs/#L213">View Source</a>
   </span>
   <a id="TradingSimulator_Simulator_SimulatorReporting_DetectVelocityDiscrepancies_" data-uid="TradingSimulator.Simulator.SimulatorReporting.DetectVelocityDiscrepancies*"></a>
-  <h4 id="TradingSimulator_Simulator_SimulatorReporting_DetectVelocityDiscrepancies_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_System_Double_System_Double_System_Int32_System_Double_System_Double_System_Double_System_Double_System_Boolean_System_Double_System_Boolean_System_Boolean_System_Double_System_Double_System_Double_System_Double_" data-uid="TradingSimulator.Simulator.SimulatorReporting.DetectVelocityDiscrepancies(System.Collections.Generic.List{BacklashDTOs.MarketSnapshot},System.Boolean,System.Double,System.Double,System.Int32,System.Double,System.Double,System.Double,System.Double,System.Boolean,System.Double,System.Boolean,System.Boolean,System.Double,System.Double,System.Double,System.Double)">DetectVelocityDiscrepancies(List&lt;MarketSnapshot&gt;, bool, double, double, int, double, double, double, double, bool, double, bool, bool, double, double, double, double)</h4>
+  <h4 id="TradingSimulator_Simulator_SimulatorReporting_DetectVelocityDiscrepancies_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_" data-uid="TradingSimulator.Simulator.SimulatorReporting.DetectVelocityDiscrepancies(System.Collections.Generic.List{BacklashDTOs.MarketSnapshot},System.Boolean)">DetectVelocityDiscrepancies(List&lt;MarketSnapshot&gt;, bool)</h4>
   <div class="markdown level1 summary"><p>Detects velocity discrepancies in market snapshots by analyzing orderbook flow patterns.
 This method compares observed orderbook velocity changes against expected flows derived from
 rolling window analysis, identifying potential anomalies that may indicate trading opportunities
 or data quality issues. The analysis includes spike suppression, leakage tolerance, and
 various statistical thresholds to reduce false positives.</p>
+<p>Features:</p>
+<ul>
+<li>Automatic parallel processing for large datasets (&gt;100 snapshots)</li>
+<li>Comprehensive input validation and error handling</li>
+<li>Performance metrics collection when enabled</li>
+<li>Configurable logging with automatic directory creation</li>
+<li>Robust spike suppression to reduce false positives</li>
+</ul>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; DetectVelocityDiscrepancies(List&lt;MarketSnapshot&gt; s, bool CreateLog, double relativeSlack = 1.5, double averagingWindowMin = 5, int minAbsChangeToFlag = 500, double shortIntervalExponent = 0.5, double gapThresholdMin = 1.5, double leakageFactor = 0.05, double winsorPct = 0.2, bool useMaxMagnitudeForThreshold = false, double ratioSlack = 0.5, bool hardFlagOnSignFlip = true, bool suppressSpikes = true, double domRatio = 0.9, double gapShare = 0.85, double edgeMult = 8, double ratioFloor = 0.5)</code></pre>
+    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; DetectVelocityDiscrepancies(List&lt;MarketSnapshot&gt; s, bool CreateLog)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -167,96 +220,6 @@ various statistical thresholds to reduce false positives.</p>
         <td><p>Whether to create log files for detected discrepancies.</p>
 </td>
       </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">relativeSlack</span></td>
-        <td><p>Relative slack factor for threshold calculation (default: 1.5).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">averagingWindowMin</span></td>
-        <td><p>Time window in minutes for rolling average calculations (default: 5.0).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
-        <td><span class="parametername">minAbsChangeToFlag</span></td>
-        <td><p>Minimum absolute change in cents to consider for flagging (default: 500).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">shortIntervalExponent</span></td>
-        <td><p>Exponent for scaling thresholds on short intervals (default: 0.5).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">gapThresholdMin</span></td>
-        <td><p>Maximum gap in minutes to allow in rolling window (default: 1.5).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">leakageFactor</span></td>
-        <td><p>Factor for calculating leakage tolerance from previous intervals (default: 0.05).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">winsorPct</span></td>
-        <td><p>Percentage for Winsorization of extreme values in expected flows (default: 0.2).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td><span class="parametername">useMaxMagnitudeForThreshold</span></td>
-        <td><p>Whether to use maximum magnitude for threshold calculation (default: false).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">ratioSlack</span></td>
-        <td><p>Slack factor for ratio-based discrepancy detection (default: 0.5).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td><span class="parametername">hardFlagOnSignFlip</span></td>
-        <td><p>Whether to hard-flag sign flips in velocity (default: true).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
-        <td><span class="parametername">suppressSpikes</span></td>
-        <td><p>Whether to suppress spike-driven discrepancies (default: true).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">domRatio</span></td>
-        <td><p>Dominance ratio threshold for spike suppression (default: 0.90).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">gapShare</span></td>
-        <td><p>Gap share threshold for spike suppression (default: 0.85).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">edgeMult</span></td>
-        <td><p>Edge multiplier for spike suppression at window boundaries (default: 8.0).</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td><span class="parametername">ratioFloor</span></td>
-        <td><p>Minimum ratio floor in $/min to avoid tiny-exp blowups (default: 0.5).</p>
-</td>
-      </tr>
     </tbody>
   </table>
   <h5 class="returns">Returns</h5>
@@ -275,6 +238,94 @@ various statistical thresholds to reduce false positives.</p>
       </tr>
     </tbody>
   </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Simulator_SimulatorReporting_DetectVelocityDiscrepanciesAsync_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_.md&amp;value=---%0Auid%3A%20TradingSimulator.Simulator.SimulatorReporting.DetectVelocityDiscrepanciesAsync(System.Collections.Generic.List%7BBacklashDTOs.MarketSnapshot%7D%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/SimulatorReporting.cs/#L189">View Source</a>
+  </span>
+  <a id="TradingSimulator_Simulator_SimulatorReporting_DetectVelocityDiscrepanciesAsync_" data-uid="TradingSimulator.Simulator.SimulatorReporting.DetectVelocityDiscrepanciesAsync*"></a>
+  <h4 id="TradingSimulator_Simulator_SimulatorReporting_DetectVelocityDiscrepanciesAsync_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_" data-uid="TradingSimulator.Simulator.SimulatorReporting.DetectVelocityDiscrepanciesAsync(System.Collections.Generic.List{BacklashDTOs.MarketSnapshot},System.Boolean)">DetectVelocityDiscrepanciesAsync(List&lt;MarketSnapshot&gt;, bool)</h4>
+  <div class="markdown level1 summary"><p>Asynchronously detects velocity discrepancies in market snapshots by analyzing orderbook flow patterns.
+This method provides the same functionality as the synchronous version but runs on a background thread
+to avoid blocking the calling thread. Ideal for large datasets or when responsiveness is critical.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;List&lt;PricePoint&gt;&gt; DetectVelocityDiscrepanciesAsync(List&lt;MarketSnapshot&gt; s, bool CreateLog)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.MarketSnapshot.html">MarketSnapshot</a>&gt;</td>
+        <td><span class="parametername">s</span></td>
+        <td><p>The list of market snapshots to analyze for velocity discrepancies.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">CreateLog</span></td>
+        <td><p>Whether to create log files for detected discrepancies.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingSimulator.PricePoint.html">PricePoint</a>&gt;&gt;</td>
+        <td><p>A task that represents the asynchronous operation, containing a list of PricePoint objects representing detected velocity discrepancies.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Simulator_SimulatorReporting_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20TradingSimulator.Simulator.SimulatorReporting.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/SimulatorReporting.cs/#L90">View Source</a>
+  </span>
+  <a id="TradingSimulator_Simulator_SimulatorReporting_GetPerformanceMetrics_" data-uid="TradingSimulator.Simulator.SimulatorReporting.GetPerformanceMetrics*"></a>
+  <h4 id="TradingSimulator_Simulator_SimulatorReporting_GetPerformanceMetrics" data-uid="TradingSimulator.Simulator.SimulatorReporting.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PerformanceMetrics GetPerformanceMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="TradingSimulator.Simulator.PerformanceMetrics.html">PerformanceMetrics</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 
 </article>
           </div>
@@ -287,7 +338,7 @@ various statistical thresholds to reduce false positives.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Simulator_SimulatorReporting.md&amp;value=---%0Auid%3A%20TradingSimulator.Simulator.SimulatorReporting%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/SimulatorReporting.cs/#L12" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/SimulatorReporting.cs/#L79" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

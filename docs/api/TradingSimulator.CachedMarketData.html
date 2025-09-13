@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class CachedMarketData | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Contains cached market data for a specific market, including profit/loss, position information, and various lists of price points representing different market events and states. This class serves as the primary data structure for storing processed market simulation results that can be serialized to JSON for persistence and later visualization in the GUI.">
+    <meta name="description" content="Contains cached market data for a specific market, including profit/loss, position information, and various lists of price points representing different market events and states. This class serves as the primary data structure for storing processed market simulation results that can be serialized to JSON for persistence and later visualization in the GUI. Enhanced with validation, deep cloning, and serialization controls.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -84,13 +84,18 @@
   <div class="markdown level0 summary"><p>Contains cached market data for a specific market, including profit/loss, position information,
 and various lists of price points representing different market events and states.
 This class serves as the primary data structure for storing processed market simulation results
-that can be serialized to JSON for persistence and later visualization in the GUI.</p>
+that can be serialized to JSON for persistence and later visualization in the GUI.
+Enhanced with validation, deep cloning, and serialization controls.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
     <div class="level1"><span class="xref">CachedMarketData</span></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.icloneable">ICloneable</a></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -120,7 +125,25 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <h6><strong>Assembly</strong>: TradingSimulator.dll</h6>
   <h5 id="TradingSimulator_CachedMarketData_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class CachedMarketData</code></pre>
+    <pre><code class="lang-csharp hljs">public class CachedMarketData : ICloneable</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData__ctor.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L155">View Source</a>
+  </span>
+  <a id="TradingSimulator_CachedMarketData__ctor_" data-uid="TradingSimulator.CachedMarketData.#ctor*"></a>
+  <h4 id="TradingSimulator_CachedMarketData__ctor" data-uid="TradingSimulator.CachedMarketData.#ctor">CachedMarketData()</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of CachedMarketData with validation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CachedMarketData()</code></pre>
   </div>
   <h3 id="properties">Properties
 </h3>
@@ -129,7 +152,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_AskPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.AskPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L66">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L83">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_AskPoints_" data-uid="TradingSimulator.CachedMarketData.AskPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_AskPoints" data-uid="TradingSimulator.CachedMarketData.AskPoints">AskPoints</h4>
@@ -138,7 +161,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; AskPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;askPoints&quot;)]
+public List&lt;PricePoint&gt; AskPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -160,7 +184,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_AverageCost.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.AverageCost%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L56">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L71">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_AverageCost_" data-uid="TradingSimulator.CachedMarketData.AverageCost*"></a>
   <h4 id="TradingSimulator_CachedMarketData_AverageCost" data-uid="TradingSimulator.CachedMarketData.AverageCost">AverageCost</h4>
@@ -169,7 +193,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double AverageCost { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;averageCost&quot;)]
+public double AverageCost { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -191,7 +216,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_AverageCostPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.AverageCostPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L106">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L131">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_AverageCostPoints_" data-uid="TradingSimulator.CachedMarketData.AverageCostPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_AverageCostPoints" data-uid="TradingSimulator.CachedMarketData.AverageCostPoints">AverageCostPoints</h4>
@@ -200,7 +225,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; AverageCostPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;averageCostPoints&quot;)]
+public List&lt;PricePoint&gt; AverageCostPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -222,7 +248,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_BidPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.BidPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L61">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L77">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_BidPoints_" data-uid="TradingSimulator.CachedMarketData.BidPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_BidPoints" data-uid="TradingSimulator.CachedMarketData.BidPoints">BidPoints</h4>
@@ -231,7 +257,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; BidPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;bidPoints&quot;)]
+public List&lt;PricePoint&gt; BidPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -253,7 +280,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_BuyPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.BuyPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L71">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L89">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_BuyPoints_" data-uid="TradingSimulator.CachedMarketData.BuyPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_BuyPoints" data-uid="TradingSimulator.CachedMarketData.BuyPoints">BuyPoints</h4>
@@ -262,7 +289,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; BuyPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;buyPoints&quot;)]
+public List&lt;PricePoint&gt; BuyPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -284,7 +312,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_DiscrepancyPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.DiscrepancyPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L116">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L143">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_DiscrepancyPoints_" data-uid="TradingSimulator.CachedMarketData.DiscrepancyPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_DiscrepancyPoints" data-uid="TradingSimulator.CachedMarketData.DiscrepancyPoints">DiscrepancyPoints</h4>
@@ -293,7 +321,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; DiscrepancyPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;discrepancyPoints&quot;)]
+public List&lt;PricePoint&gt; DiscrepancyPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -315,7 +344,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_EventPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.EventPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L86">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L107">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_EventPoints_" data-uid="TradingSimulator.CachedMarketData.EventPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_EventPoints" data-uid="TradingSimulator.CachedMarketData.EventPoints">EventPoints</h4>
@@ -324,7 +353,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; EventPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;eventPoints&quot;)]
+public List&lt;PricePoint&gt; EventPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -346,7 +376,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_ExitPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.ExitPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L81">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L101">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_ExitPoints_" data-uid="TradingSimulator.CachedMarketData.ExitPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_ExitPoints" data-uid="TradingSimulator.CachedMarketData.ExitPoints">ExitPoints</h4>
@@ -355,7 +385,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; ExitPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;exitPoints&quot;)]
+public List&lt;PricePoint&gt; ExitPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -377,7 +408,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_IntendedLongPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.IntendedLongPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L91">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L113">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_IntendedLongPoints_" data-uid="TradingSimulator.CachedMarketData.IntendedLongPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_IntendedLongPoints" data-uid="TradingSimulator.CachedMarketData.IntendedLongPoints">IntendedLongPoints</h4>
@@ -386,7 +417,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; IntendedLongPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;intendedLongPoints&quot;)]
+public List&lt;PricePoint&gt; IntendedLongPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -408,7 +440,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_IntendedShortPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.IntendedShortPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L96">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L119">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_IntendedShortPoints_" data-uid="TradingSimulator.CachedMarketData.IntendedShortPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_IntendedShortPoints" data-uid="TradingSimulator.CachedMarketData.IntendedShortPoints">IntendedShortPoints</h4>
@@ -417,7 +449,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; IntendedShortPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;intendedShortPoints&quot;)]
+public List&lt;PricePoint&gt; IntendedShortPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -439,7 +472,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_Market.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.Market%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L41">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L53">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_Market_" data-uid="TradingSimulator.CachedMarketData.Market*"></a>
   <h4 id="TradingSimulator_CachedMarketData_Market" data-uid="TradingSimulator.CachedMarketData.Market">Market</h4>
@@ -448,7 +481,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string Market { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;market&quot;)]
+public string Market { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -470,7 +504,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_PatternPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.PatternPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L121">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L149">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_PatternPoints_" data-uid="TradingSimulator.CachedMarketData.PatternPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_PatternPoints" data-uid="TradingSimulator.CachedMarketData.PatternPoints">PatternPoints</h4>
@@ -479,7 +513,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; PatternPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;patternPoints&quot;)]
+public List&lt;PricePoint&gt; PatternPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -501,7 +536,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_PnL.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.PnL%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L46">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L59">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_PnL_" data-uid="TradingSimulator.CachedMarketData.PnL*"></a>
   <h4 id="TradingSimulator_CachedMarketData_PnL" data-uid="TradingSimulator.CachedMarketData.PnL">PnL</h4>
@@ -510,7 +545,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double PnL { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;pnl&quot;)]
+public double PnL { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -532,7 +568,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_PositionPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.PositionPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L101">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L125">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_PositionPoints_" data-uid="TradingSimulator.CachedMarketData.PositionPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_PositionPoints" data-uid="TradingSimulator.CachedMarketData.PositionPoints">PositionPoints</h4>
@@ -541,7 +577,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; PositionPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;positionPoints&quot;)]
+public List&lt;PricePoint&gt; PositionPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -563,7 +600,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_RestingOrdersPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.RestingOrdersPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L111">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L137">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_RestingOrdersPoints_" data-uid="TradingSimulator.CachedMarketData.RestingOrdersPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_RestingOrdersPoints" data-uid="TradingSimulator.CachedMarketData.RestingOrdersPoints">RestingOrdersPoints</h4>
@@ -572,7 +609,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; RestingOrdersPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;restingOrdersPoints&quot;)]
+public List&lt;PricePoint&gt; RestingOrdersPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -594,7 +632,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_SellPoints.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.SellPoints%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L76">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L95">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_SellPoints_" data-uid="TradingSimulator.CachedMarketData.SellPoints*"></a>
   <h4 id="TradingSimulator_CachedMarketData_SellPoints" data-uid="TradingSimulator.CachedMarketData.SellPoints">SellPoints</h4>
@@ -603,7 +641,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;PricePoint&gt; SellPoints { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;sellPoints&quot;)]
+public List&lt;PricePoint&gt; SellPoints { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -625,7 +664,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_SimulatedPosition.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.SimulatedPosition%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L51">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L65">View Source</a>
   </span>
   <a id="TradingSimulator_CachedMarketData_SimulatedPosition_" data-uid="TradingSimulator.CachedMarketData.SimulatedPosition*"></a>
   <h4 id="TradingSimulator_CachedMarketData_SimulatedPosition" data-uid="TradingSimulator.CachedMarketData.SimulatedPosition">SimulatedPosition</h4>
@@ -634,7 +673,8 @@ that can be serialized to JSON for persistence and later visualization in the GU
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int SimulatedPosition { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;simulatedPosition&quot;)]
+public int SimulatedPosition { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -651,6 +691,160 @@ that can be serialized to JSON for persistence and later visualization in the GU
       </tr>
     </tbody>
   </table>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_Clone.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.Clone%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L186">View Source</a>
+  </span>
+  <a id="TradingSimulator_CachedMarketData_Clone_" data-uid="TradingSimulator.CachedMarketData.Clone*"></a>
+  <h4 id="TradingSimulator_CachedMarketData_Clone" data-uid="TradingSimulator.CachedMarketData.Clone">Clone()</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of the CachedMarketData instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object Clone()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_DeserializeWithMetrics_System_String_System_TimeSpan__.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.DeserializeWithMetrics(System.String%2CSystem.TimeSpan%40)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L226">View Source</a>
+  </span>
+  <a id="TradingSimulator_CachedMarketData_DeserializeWithMetrics_" data-uid="TradingSimulator.CachedMarketData.DeserializeWithMetrics*"></a>
+  <h4 id="TradingSimulator_CachedMarketData_DeserializeWithMetrics_System_String_System_TimeSpan__" data-uid="TradingSimulator.CachedMarketData.DeserializeWithMetrics(System.String,System.TimeSpan@)">DeserializeWithMetrics(string, out TimeSpan)</h4>
+  <div class="markdown level1 summary"><p>Deserializes JSON to CachedMarketData with performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static CachedMarketData DeserializeWithMetrics(string json, out TimeSpan deserializationTime)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">json</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td><span class="parametername">deserializationTime</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="TradingSimulator.CachedMarketData.html">CachedMarketData</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_SerializeWithMetrics_System_TimeSpan__.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.SerializeWithMetrics(System.TimeSpan%40)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L214">View Source</a>
+  </span>
+  <a id="TradingSimulator_CachedMarketData_SerializeWithMetrics_" data-uid="TradingSimulator.CachedMarketData.SerializeWithMetrics*"></a>
+  <h4 id="TradingSimulator_CachedMarketData_SerializeWithMetrics_System_TimeSpan__" data-uid="TradingSimulator.CachedMarketData.SerializeWithMetrics(System.TimeSpan@)">SerializeWithMetrics(out TimeSpan)</h4>
+  <div class="markdown level1 summary"><p>Serializes the CachedMarketData to JSON with performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string SerializeWithMetrics(out TimeSpan serializationTime)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td><span class="parametername">serializationTime</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData_Validate.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData.Validate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L174">View Source</a>
+  </span>
+  <a id="TradingSimulator_CachedMarketData_Validate_" data-uid="TradingSimulator.CachedMarketData.Validate*"></a>
+  <h4 id="TradingSimulator_CachedMarketData_Validate" data-uid="TradingSimulator.CachedMarketData.Validate">Validate()</h4>
+  <div class="markdown level1 summary"><p>Validates the data integrity of the CachedMarketData instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Validate()</code></pre>
+  </div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.icloneable">ICloneable</a>
+  </div>
 
 </article>
           </div>
@@ -663,7 +857,7 @@ that can be serialized to JSON for persistence and later visualization in the GU
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_CachedMarketData.md&amp;value=---%0Auid%3A%20TradingSimulator.CachedMarketData%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L36" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/TestObjects/TestObjects.cs/#L48" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

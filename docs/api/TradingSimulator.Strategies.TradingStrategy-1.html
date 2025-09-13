@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class TradingStrategy&lt;T&gt; | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Generic trading strategy simulator that executes trading strategies against historical market snapshots. This class manages the complete simulation lifecycle including data loading, strategy execution, position tracking, and performance calculation. It supports multiple strategies running simultaneously and provides real-time progress updates through events.">
+    <meta name="description" content="Enhanced trading strategy simulator that executes trading strategies against historical market snapshots. This class manages the complete simulation lifecycle including data loading, strategy execution, position tracking, performance calculation, and risk management. Features include:  Parallel strategy execution for improved performance Comprehensive input validation for market data integrity Progress persistence for long-running simulations with resume capability Advanced risk management with position limits, stop-loss, and take-profit Performance monitoring and optimization Real-time progress updates through events">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,10 +81,17 @@
 
 
   <h1 id="TradingSimulator_Strategies_TradingStrategy_1" data-uid="TradingSimulator.Strategies.TradingStrategy`1" class="text-break">Class TradingStrategy&lt;T&gt;</h1>
-  <div class="markdown level0 summary"><p>Generic trading strategy simulator that executes trading strategies against historical market snapshots.
+  <div class="markdown level0 summary"><p>Enhanced trading strategy simulator that executes trading strategies against historical market snapshots.
 This class manages the complete simulation lifecycle including data loading, strategy execution,
-position tracking, and performance calculation. It supports multiple strategies running simultaneously
-and provides real-time progress updates through events.</p>
+position tracking, performance calculation, and risk management. Features include:</p>
+<ul>
+<li>Parallel strategy execution for improved performance</li>
+<li>Comprehensive input validation for market data integrity</li>
+<li>Progress persistence for long-running simulations with resume capability</li>
+<li>Advanced risk management with position limits, stop-loss, and take-profit</li>
+<li>Performance monitoring and optimization</li>
+<li>Real-time progress updates through events</li>
+</ul>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -145,7 +152,7 @@ and provides real-time progress updates through events.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Strategies_TradingStrategy_1__ctor_BacklashBot_Services_Interfaces_ITradingSnapshotService_TradingStrategies_Classification_Interfaces_ISnapshotPeriodHelper_Microsoft_Extensions_Logging_ILogger_TradingSimulator_Strategies_TradingStrategy__0___Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_SnapshotConfig__Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_TradingConfig__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_KalshiBotData_Data_Interfaces_IKalshiBotContext_System_Collections_Generic_List_System_ValueTuple_System_String_TradingSimulator_TradingStrategyFunc__0____.md&amp;value=---%0Auid%3A%20TradingSimulator.Strategies.TradingStrategy%601.%23ctor(BacklashBot.Services.Interfaces.ITradingSnapshotService%2CTradingStrategies.Classification.Interfaces.ISnapshotPeriodHelper%2CMicrosoft.Extensions.Logging.ILogger%7BTradingSimulator.Strategies.TradingStrategy%7B%600%7D%7D%2CMicrosoft.Extensions.Options.IOptions%7BTradingStrategies.Configuration.SnapshotConfig%7D%2CMicrosoft.Extensions.Options.IOptions%7BTradingStrategies.Configuration.TradingConfig%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CKalshiBotData.Data.Interfaces.IKalshiBotContext%2CSystem.Collections.Generic.List%7BSystem.ValueTuple%7BSystem.String%2CTradingSimulator.TradingStrategyFunc%7B%600%7D%7D%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L108">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L143">View Source</a>
   </span>
   <a id="TradingSimulator_Strategies_TradingStrategy_1__ctor_" data-uid="TradingSimulator.Strategies.TradingStrategy`1.#ctor*"></a>
   <h4 id="TradingSimulator_Strategies_TradingStrategy_1__ctor_BacklashBot_Services_Interfaces_ITradingSnapshotService_TradingStrategies_Classification_Interfaces_ISnapshotPeriodHelper_Microsoft_Extensions_Logging_ILogger_TradingSimulator_Strategies_TradingStrategy__0___Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_SnapshotConfig__Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_TradingConfig__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_KalshiBotData_Data_Interfaces_IKalshiBotContext_System_Collections_Generic_List_System_ValueTuple_System_String_TradingSimulator_TradingStrategyFunc__0____" data-uid="TradingSimulator.Strategies.TradingStrategy`1.#ctor(BacklashBot.Services.Interfaces.ITradingSnapshotService,TradingStrategies.Classification.Interfaces.ISnapshotPeriodHelper,Microsoft.Extensions.Logging.ILogger{TradingSimulator.Strategies.TradingStrategy{`0}},Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.SnapshotConfig},Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.TradingConfig},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,KalshiBotData.Data.Interfaces.IKalshiBotContext,System.Collections.Generic.List{System.ValueTuple{System.String,TradingSimulator.TradingStrategyFunc{`0}}})">TradingStrategy(ITradingSnapshotService, ISnapshotPeriodHelper, ILogger&lt;TradingStrategy&lt;T&gt;&gt;, IOptions&lt;SnapshotConfig&gt;, IOptions&lt;TradingConfig&gt;, IServiceScopeFactory, IKalshiBotContext, List&lt;(string Name, TradingStrategyFunc&lt;T&gt; Func)&gt;)</h4>
@@ -223,7 +230,7 @@ and provides real-time progress updates through events.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Strategies_TradingStrategy_1_Reset.md&amp;value=---%0Auid%3A%20TradingSimulator.Strategies.TradingStrategy%601.Reset%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L133">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L197">View Source</a>
   </span>
   <a id="TradingSimulator_Strategies_TradingStrategy_1_Reset_" data-uid="TradingSimulator.Strategies.TradingStrategy`1.Reset*"></a>
   <h4 id="TradingSimulator_Strategies_TradingStrategy_1_Reset" data-uid="TradingSimulator.Strategies.TradingStrategy`1.Reset">Reset()</h4>
@@ -237,22 +244,76 @@ This method initializes the simulator to a clean state for a new simulation run.
   </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Strategies_TradingStrategy_1_RunStrategyTestAsync.md&amp;value=---%0Auid%3A%20TradingSimulator.Strategies.TradingStrategy%601.RunStrategyTestAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Strategies_TradingStrategy_1_ResumeSimulationAsync.md&amp;value=---%0Auid%3A%20TradingSimulator.Strategies.TradingStrategy%601.ResumeSimulationAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L147">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L214">View Source</a>
   </span>
-  <a id="TradingSimulator_Strategies_TradingStrategy_1_RunStrategyTestAsync_" data-uid="TradingSimulator.Strategies.TradingStrategy`1.RunStrategyTestAsync*"></a>
-  <h4 id="TradingSimulator_Strategies_TradingStrategy_1_RunStrategyTestAsync" data-uid="TradingSimulator.Strategies.TradingStrategy`1.RunStrategyTestAsync">RunStrategyTestAsync()</h4>
-  <div class="markdown level1 summary"><p>Executes the trading strategy simulation across all available markets.
-This method loads market data, applies all configured strategies, makes trading decisions,
-tracks positions and profit/loss, and reports simulation results.</p>
+  <a id="TradingSimulator_Strategies_TradingStrategy_1_ResumeSimulationAsync_" data-uid="TradingSimulator.Strategies.TradingStrategy`1.ResumeSimulationAsync*"></a>
+  <h4 id="TradingSimulator_Strategies_TradingStrategy_1_ResumeSimulationAsync" data-uid="TradingSimulator.Strategies.TradingStrategy`1.ResumeSimulationAsync">ResumeSimulationAsync()</h4>
+  <div class="markdown level1 summary"><p>Resumes a simulation from previously saved progress state.
+This method loads the last saved simulation state including positions, processed markets,
+and profit/loss tracking, then continues processing from where it left off.
+Useful for recovering from interruptions or system restarts during long-running simulations.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Task RunStrategyTestAsync()</code></pre>
+    <pre><code class="lang-csharp hljs">public Task ResumeSimulationAsync()</code></pre>
   </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous resume operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Strategies_TradingStrategy_1_RunStrategyTestAsync_System_Boolean_.md&amp;value=---%0Auid%3A%20TradingSimulator.Strategies.TradingStrategy%601.RunStrategyTestAsync(System.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L242">View Source</a>
+  </span>
+  <a id="TradingSimulator_Strategies_TradingStrategy_1_RunStrategyTestAsync_" data-uid="TradingSimulator.Strategies.TradingStrategy`1.RunStrategyTestAsync*"></a>
+  <h4 id="TradingSimulator_Strategies_TradingStrategy_1_RunStrategyTestAsync_System_Boolean_" data-uid="TradingSimulator.Strategies.TradingStrategy`1.RunStrategyTestAsync(System.Boolean)">RunStrategyTestAsync(bool)</h4>
+  <div class="markdown level1 summary"><p>Executes the trading strategy simulation across all available markets.
+This method loads market data, applies all configured strategies in parallel, makes trading decisions
+with risk management validation, tracks positions and profit/loss, and reports simulation results.
+Features include performance monitoring, progress persistence, and comprehensive error handling.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task RunStrategyTestAsync(bool resume = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">resume</span></td>
+        <td><p>Whether this is a resumed simulation from saved progress.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-condensed">
     <thead>
@@ -276,7 +337,7 @@ tracks positions and profit/loss, and reports simulation results.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Strategies_TradingStrategy_1_OnMarketProcessed.md&amp;value=---%0Auid%3A%20TradingSimulator.Strategies.TradingStrategy%601.OnMarketProcessed%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L95">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L100">View Source</a>
   </span>
   <h4 id="TradingSimulator_Strategies_TradingStrategy_1_OnMarketProcessed" data-uid="TradingSimulator.Strategies.TradingStrategy`1.OnMarketProcessed">OnMarketProcessed</h4>
   <div class="markdown level1 summary"><p>Event raised when processing of a market is completed.</p>
@@ -306,7 +367,7 @@ tracks positions and profit/loss, and reports simulation results.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Strategies_TradingStrategy_1_OnPriceUpdate.md&amp;value=---%0Auid%3A%20TradingSimulator.Strategies.TradingStrategy%601.OnPriceUpdate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L80">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L85">View Source</a>
   </span>
   <h4 id="TradingSimulator_Strategies_TradingStrategy_1_OnPriceUpdate" data-uid="TradingSimulator.Strategies.TradingStrategy`1.OnPriceUpdate">OnPriceUpdate</h4>
   <div class="markdown level1 summary"><p>Event raised when price data is updated for a market.</p>
@@ -336,7 +397,7 @@ tracks positions and profit/loss, and reports simulation results.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Strategies_TradingStrategy_1_OnProfitLossUpdate.md&amp;value=---%0Auid%3A%20TradingSimulator.Strategies.TradingStrategy%601.OnProfitLossUpdate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L85">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L90">View Source</a>
   </span>
   <h4 id="TradingSimulator_Strategies_TradingStrategy_1_OnProfitLossUpdate" data-uid="TradingSimulator.Strategies.TradingStrategy`1.OnProfitLossUpdate">OnProfitLossUpdate</h4>
   <div class="markdown level1 summary"><p>Event raised when profit/loss is updated for a market or overall.</p>
@@ -366,7 +427,7 @@ tracks positions and profit/loss, and reports simulation results.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Strategies_TradingStrategy_1_OnSimulationProgress.md&amp;value=---%0Auid%3A%20TradingSimulator.Strategies.TradingStrategy%601.OnSimulationProgress%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L75">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L80">View Source</a>
   </span>
   <h4 id="TradingSimulator_Strategies_TradingStrategy_1_OnSimulationProgress" data-uid="TradingSimulator.Strategies.TradingStrategy`1.OnSimulationProgress">OnSimulationProgress</h4>
   <div class="markdown level1 summary"><p>Event raised to report simulation progress and status updates.</p>
@@ -396,7 +457,7 @@ tracks positions and profit/loss, and reports simulation results.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Strategies_TradingStrategy_1_OnTradeDecision.md&amp;value=---%0Auid%3A%20TradingSimulator.Strategies.TradingStrategy%601.OnTradeDecision%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L90">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L95">View Source</a>
   </span>
   <h4 id="TradingSimulator_Strategies_TradingStrategy_1_OnTradeDecision" data-uid="TradingSimulator.Strategies.TradingStrategy`1.OnTradeDecision">OnTradeDecision</h4>
   <div class="markdown level1 summary"><p>Event raised when a trading decision is made (buy/sell/hold).</p>
@@ -433,7 +494,7 @@ tracks positions and profit/loss, and reports simulation results.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingSimulator_Strategies_TradingStrategy_1.md&amp;value=---%0Auid%3A%20TradingSimulator.Strategies.TradingStrategy%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L20" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingSimulator/Strategies/TradingStrategy.cs/#L25" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

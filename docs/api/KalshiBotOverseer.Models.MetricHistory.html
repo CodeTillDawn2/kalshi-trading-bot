@@ -127,7 +127,7 @@ Used to track time-series data for various system performance indicators.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_MetricHistory_Timestamp.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.MetricHistory.Timestamp%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L396">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L546">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_MetricHistory_Timestamp_" data-uid="KalshiBotOverseer.Models.MetricHistory.Timestamp*"></a>
   <h4 id="KalshiBotOverseer_Models_MetricHistory_Timestamp" data-uid="KalshiBotOverseer.Models.MetricHistory.Timestamp">Timestamp</h4>
@@ -137,7 +137,9 @@ Used for chronological ordering and time-based analysis of performance trends.</
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DateTime Timestamp { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;timestamp&quot;)]
+public DateTime Timestamp { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -159,7 +161,7 @@ Used for chronological ordering and time-based analysis of performance trends.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_MetricHistory_Value.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.MetricHistory.Value%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L402">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L554">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_MetricHistory_Value_" data-uid="KalshiBotOverseer.Models.MetricHistory.Value*"></a>
   <h4 id="KalshiBotOverseer_Models_MetricHistory_Value" data-uid="KalshiBotOverseer.Models.MetricHistory.Value">Value</h4>
@@ -169,7 +171,8 @@ The interpretation depends on the specific metric being tracked (e.g., CPU %, qu
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double Value { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;value&quot;)]
+public double Value { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -198,7 +201,7 @@ The interpretation depends on the specific metric being tracked (e.g., CPU %, qu
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_MetricHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.MetricHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L390" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L540" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

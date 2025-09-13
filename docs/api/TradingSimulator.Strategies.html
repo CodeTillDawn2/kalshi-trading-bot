@@ -93,10 +93,17 @@ output container for strategy logic, allowing strategies to communicate
 actionable insights and supplementary information to the trading engine.</p>
 </section>
       <h4><a class="xref" href="TradingSimulator.Strategies.TradingStrategy-1.html">TradingStrategy&lt;T&gt;</a></h4>
-      <section><p>Generic trading strategy simulator that executes trading strategies against historical market snapshots.
+      <section><p>Enhanced trading strategy simulator that executes trading strategies against historical market snapshots.
 This class manages the complete simulation lifecycle including data loading, strategy execution,
-position tracking, and performance calculation. It supports multiple strategies running simultaneously
-and provides real-time progress updates through events.</p>
+position tracking, performance calculation, and risk management. Features include:</p>
+<ul>
+<li>Parallel strategy execution for improved performance</li>
+<li>Comprehensive input validation for market data integrity</li>
+<li>Progress persistence for long-running simulations with resume capability</li>
+<li>Advanced risk management with position limits, stop-loss, and take-profit</li>
+<li>Performance monitoring and optimization</li>
+<li>Real-time progress updates through events</li>
+</ul>
 </section>
     <h3 id="enums">
 Enums

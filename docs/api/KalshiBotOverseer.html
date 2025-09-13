@@ -111,6 +111,19 @@ handles real-time market data events, coordinates periodic data fetching, and ma
 system health monitoring. This class serves as the main entry point for overseer operations,
 integrating with WebSocket clients, database services, and SignalR hubs to provide
 comprehensive monitoring and control of the trading bot ecosystem.</p>
+<p>Key features:</p>
+<ul>
+<li>Configurable API fetch intervals (default: 10 minutes)</li>
+<li>Configurable system info logging intervals (default: 1 minute)</li>
+<li>Performance metrics collection for WebSocket events and API operations</li>
+<li>Input validation for event data processing to prevent null reference exceptions</li>
+<li>Progress reporting for long-running API fetch operations</li>
+<li>Batch processing for brain persistence logging (default batch size: 50)</li>
+<li>Configurable SignalR broadcast batch sizes (default: 10)</li>
+</ul>
+</section>
+      <h4><a class="xref" href="KalshiBotOverseer.OverseerConfig.html">OverseerConfig</a></h4>
+      <section><p>Configuration options for the Overseer system.</p>
 </section>
       <h4><a class="xref" href="KalshiBotOverseer.OverseerHub.html">OverseerHub</a></h4>
       <section><p>SignalR hub for managing real-time communication with brain instances in the

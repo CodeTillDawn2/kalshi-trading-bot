@@ -93,8 +93,10 @@ subscription handling, and message processing components.</p>
 </section>
       <h4><a class="xref" href="KalshiBotAPI.Websockets.MessageProcessor.html">MessageProcessor</a></h4>
       <section><p>Processes incoming WebSocket messages from Kalshi's trading platform, routing them to appropriate handlers
-based on message type. Manages event counting, order book message queuing, and integrates with data
-persistence and API services for comprehensive market data processing.</p>
+based on message type. Features configurable message batching for high-volume scenarios, performance
+metrics collection, sophisticated locking mechanisms, and enhanced message deduplication with warnings.
+Manages event counting, order book message queuing, and integrates with data persistence and API services
+for comprehensive market data processing.</p>
 </section>
       <h4><a class="xref" href="KalshiBotAPI.Websockets.SubscriptionManager.html">SubscriptionManager</a></h4>
       <section><p>Manages WebSocket channel subscriptions for real-time market data from Kalshi's trading platform.

@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class InterestScoreService | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Service responsible for calculating interest scores for Kalshi markets based on various trading metrics. This service evaluates market attractiveness by analyzing spread characteristics, trading volume, liquidity patterns, and market continuity to provide quantitative scores for market selection.">
+    <meta name="description" content="Service responsible for calculating interest scores for Kalshi markets based on various trading metrics. This service evaluates market attractiveness by analyzing spread characteristics, trading volume, liquidity patterns, and market continuity to provide quantitative scores for market selection. Features:  Configurable cache duration for performance optimization Comprehensive performance metrics collection and monitoring Input validation for market tickers and weight parameters Thread-safe operations for concurrent access Automatic metrics logging with configurable intervals">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -84,6 +84,14 @@
   <div class="markdown level0 summary"><p>Service responsible for calculating interest scores for Kalshi markets based on various trading metrics.
 This service evaluates market attractiveness by analyzing spread characteristics, trading volume,
 liquidity patterns, and market continuity to provide quantitative scores for market selection.</p>
+<p>Features:</p>
+<ul>
+<li>Configurable cache duration for performance optimization</li>
+<li>Comprehensive performance metrics collection and monitoring</li>
+<li>Input validation for market tickers and weight parameters</li>
+<li>Thread-safe operations for concurrent access</li>
+<li>Automatic metrics logging with configurable intervals</li>
+</ul>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -129,19 +137,19 @@ liquidity patterns, and market continuity to provide quantitative scores for mar
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_InterestScoreService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_IInterestScoreService__.md&amp;value=---%0Auid%3A%20BacklashBot.Services.InterestScoreService.%23ctor(Microsoft.Extensions.Logging.ILogger%7BBacklashBot.Management.Interfaces.IInterestScoreService%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_InterestScoreService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_IInterestScoreService__Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_InterestScoreConfig__.md&amp;value=---%0Auid%3A%20BacklashBot.Services.InterestScoreService.%23ctor(Microsoft.Extensions.Logging.ILogger%7BBacklashBot.Management.Interfaces.IInterestScoreService%7D%2CMicrosoft.Extensions.Options.IOptions%7BBacklashDTOs.Configuration.InterestScoreConfig%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L24">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L160">View Source</a>
   </span>
   <a id="BacklashBot_Services_InterestScoreService__ctor_" data-uid="BacklashBot.Services.InterestScoreService.#ctor*"></a>
-  <h4 id="BacklashBot_Services_InterestScoreService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_IInterestScoreService__" data-uid="BacklashBot.Services.InterestScoreService.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.Management.Interfaces.IInterestScoreService})">InterestScoreService(ILogger&lt;IInterestScoreService&gt;)</h4>
+  <h4 id="BacklashBot_Services_InterestScoreService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_IInterestScoreService__Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_InterestScoreConfig__" data-uid="BacklashBot.Services.InterestScoreService.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.Management.Interfaces.IInterestScoreService},Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.InterestScoreConfig})">InterestScoreService(ILogger&lt;IInterestScoreService&gt;, IOptions&lt;InterestScoreConfig&gt;)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="BacklashBot.Services.InterestScoreService.html">InterestScoreService</a> class.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public InterestScoreService(ILogger&lt;IInterestScoreService&gt; logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public InterestScoreService(ILogger&lt;IInterestScoreService&gt; logger, IOptions&lt;InterestScoreConfig&gt; config)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -159,6 +167,12 @@ liquidity patterns, and market continuity to provide quantitative scores for mar
         <td><p>The logger instance for recording service operations and errors.</p>
 </td>
       </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="BacklashDTOs.Configuration.InterestScoreConfig.html">InterestScoreConfig</a>&gt;</td>
+        <td><span class="parametername">config</span></td>
+        <td><p>The configuration options for the interest score service, including cache duration and performance metrics settings.</p>
+</td>
+      </tr>
     </tbody>
   </table>
   <h3 id="methods">Methods
@@ -168,14 +182,23 @@ liquidity patterns, and market continuity to provide quantitative scores for mar
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_InterestScoreService_CalculateMarketInterestScoreAsync_KalshiBotData_Data_Interfaces_IKalshiBotContext_System_String_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.InterestScoreService.CalculateMarketInterestScoreAsync(KalshiBotData.Data.Interfaces.IKalshiBotContext%2CSystem.String%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L120">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L285">View Source</a>
   </span>
   <a id="BacklashBot_Services_InterestScoreService_CalculateMarketInterestScoreAsync_" data-uid="BacklashBot.Services.InterestScoreService.CalculateMarketInterestScoreAsync*"></a>
   <h4 id="BacklashBot_Services_InterestScoreService_CalculateMarketInterestScoreAsync_KalshiBotData_Data_Interfaces_IKalshiBotContext_System_String_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_" data-uid="BacklashBot.Services.InterestScoreService.CalculateMarketInterestScoreAsync(KalshiBotData.Data.Interfaces.IKalshiBotContext,System.String,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">CalculateMarketInterestScoreAsync(IKalshiBotContext, string, double, double, double, double, double, double, double)</h4>
   <div class="markdown level1 summary"><p>Calculates a comprehensive interest score for a specific market ticker.
 The score is computed using multiple weighted factors including spread characteristics,
 trading volume, liquidity, open interest, and market continuity. Thresholds and
-maximum values are cached for performance and recalculated periodically.</p>
+maximum values are cached for performance and recalculated periodically based on
+configurable cache duration settings.</p>
+<p>Features:</p>
+<ul>
+<li>Input validation for ticker and weight parameters</li>
+<li>Configurable cache duration for performance optimization</li>
+<li>Performance metrics collection for operation timing</li>
+<li>Cache hit/miss tracking for monitoring efficiency</li>
+<li>Comprehensive error handling with detailed logging</li>
+</ul>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -201,49 +224,49 @@ maximum values are cached for performance and recalculated periodically.</p>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">marketTicker</span></td>
-        <td><p>The market ticker symbol to score.</p>
+        <td><p>The market ticker symbol to score. Must not be null or empty.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">spreadTightnessWeight</span></td>
-        <td><p>Weight for spread tightness factor.</p>
+        <td><p>Weight for spread tightness factor (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">spreadWidthWeight</span></td>
-        <td><p>Weight for spread width factor.</p>
+        <td><p>Weight for spread width factor (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">volumeWeight</span></td>
-        <td><p>Weight for volume factor.</p>
+        <td><p>Weight for volume factor (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">volumePercentileWeight</span></td>
-        <td><p>Weight for volume percentile factor.</p>
+        <td><p>Weight for volume percentile factor (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">liquidityPercentileWeight</span></td>
-        <td><p>Weight for liquidity percentile factor.</p>
+        <td><p>Weight for liquidity percentile factor (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">openInterestPercentileWeight</span></td>
-        <td><p>Weight for open interest percentile factor.</p>
+        <td><p>Weight for open interest percentile factor (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">continuityWeight</span></td>
-        <td><p>Weight for market continuity factor.</p>
+        <td><p>Weight for market continuity factor (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
     </tbody>
@@ -264,18 +287,41 @@ maximum values are cached for performance and recalculated periodically.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown when ticker is invalid or weights are outside the 0.0-1.0 range.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_InterestScoreService_GetMarketInterestScores_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_System_Collections_Generic_IEnumerable_System_String__System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.InterestScoreService.GetMarketInterestScores(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory%2CSystem.Collections.Generic.IEnumerable%7BSystem.String%7D%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L43">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L188">View Source</a>
   </span>
   <a id="BacklashBot_Services_InterestScoreService_GetMarketInterestScores_" data-uid="BacklashBot.Services.InterestScoreService.GetMarketInterestScores*"></a>
   <h4 id="BacklashBot_Services_InterestScoreService_GetMarketInterestScores_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_System_Collections_Generic_IEnumerable_System_String__System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_" data-uid="BacklashBot.Services.InterestScoreService.GetMarketInterestScores(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,System.Collections.Generic.IEnumerable{System.String},System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">GetMarketInterestScores(IServiceScopeFactory, IEnumerable&lt;string&gt;, double, double, double, double, double, double)</h4>
   <div class="markdown level1 summary"><p>Calculates interest scores for a collection of market tickers using configurable weighting factors.
 This method fetches current market data from the API and computes scores for each ticker,
 handling errors gracefully by assigning default scores to failed calculations.</p>
+<p>Features:</p>
+<ul>
+<li>Input validation for tickers and weight parameters</li>
+<li>Performance metrics collection for operation timing</li>
+<li>Thread-safe processing with cancellation support</li>
+<li>Comprehensive error handling with detailed logging</li>
+</ul>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -301,43 +347,43 @@ handling errors gracefully by assigning default scores to failed calculations.</
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
         <td><span class="parametername">tickers</span></td>
-        <td><p>Collection of market ticker symbols to score.</p>
+        <td><p>Collection of market ticker symbols to score. Must not be null or contain empty/whitespace values.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">spreadTightnessWeight</span></td>
-        <td><p>Weight factor for spread tightness component (0.0-1.0).</p>
+        <td><p>Weight factor for spread tightness component (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">spreadWidthWeight</span></td>
-        <td><p>Weight factor for spread width component (0.0-1.0).</p>
+        <td><p>Weight factor for spread width component (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">volumeWeight</span></td>
-        <td><p>Weight factor for volume component (0.0-1.0).</p>
+        <td><p>Weight factor for volume component (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">volumePercentileWeight</span></td>
-        <td><p>Weight factor for volume percentile component (0.0-1.0).</p>
+        <td><p>Weight factor for volume percentile component (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">liquidityPercentileWeight</span></td>
-        <td><p>Weight factor for liquidity percentile component (0.0-1.0).</p>
+        <td><p>Weight factor for liquidity percentile component (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td><span class="parametername">openInterestPercentileWeight</span></td>
-        <td><p>Weight factor for open interest percentile component (0.0-1.0).</p>
+        <td><p>Weight factor for open interest percentile component (0.0-1.0). Must be within valid range.</p>
 </td>
       </tr>
     </tbody>
@@ -358,6 +404,27 @@ handling errors gracefully by assigning default scores to failed calculations.</
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown when tickers are invalid or weights are outside the 0.0-1.0 range.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when the tickers collection is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BacklashBot.Management.Interfaces.IInterestScoreService.html">IInterestScoreService</a>
@@ -374,7 +441,7 @@ handling errors gracefully by assigning default scores to failed calculations.</
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_InterestScoreService.md&amp;value=---%0Auid%3A%20BacklashBot.Services.InterestScoreService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L13" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L22" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

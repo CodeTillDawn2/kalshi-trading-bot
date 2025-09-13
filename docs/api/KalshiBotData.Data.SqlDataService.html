@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class SqlDataService | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Provides asynchronous data persistence services for real-time market data from Kalshi&#39;s trading platform. This service manages concurrent queues for different data types (order book, trades, fills, lifecycle events) and processes them using background worker tasks with retry logic for transient SQL errors. Implements the ISqlDataService interface for dependency injection and proper resource management.">
+    <meta name="description" content="Provides asynchronous data persistence services for real-time market data from Kalshi&#39;s trading platform. This service manages concurrent queues for different data types (order book, trades, fills, lifecycle events) and processes them using configurable background worker tasks with retry logic for transient SQL errors. Supports batch processing, performance metrics collection, input validation, and configurable queue sizes to prevent resource exhaustion. Implements the ISqlDataService interface for dependency injection and proper resource management.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -83,8 +83,9 @@
   <h1 id="KalshiBotData_Data_SqlDataService" data-uid="KalshiBotData.Data.SqlDataService" class="text-break">Class SqlDataService</h1>
   <div class="markdown level0 summary"><p>Provides asynchronous data persistence services for real-time market data from Kalshi's trading platform.
 This service manages concurrent queues for different data types (order book, trades, fills, lifecycle events)
-and processes them using background worker tasks with retry logic for transient SQL errors.
-Implements the ISqlDataService interface for dependency injection and proper resource management.</p>
+and processes them using configurable background worker tasks with retry logic for transient SQL errors.
+Supports batch processing, performance metrics collection, input validation, and configurable queue sizes
+to prevent resource exhaustion. Implements the ISqlDataService interface for dependency injection and proper resource management.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -130,7 +131,10 @@ Implements the ISqlDataService interface for dependency injection and proper res
   <h5 id="KalshiBotData_Data_SqlDataService_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks"><p>The service uses Polly for retry policies on SQL operations and maintains separate queues to ensure
 data integrity and prevent blocking between different data types. All operations are asynchronous
-to support high-throughput real-time data processing without impacting the main application flow.</p>
+to support high-throughput real-time data processing without impacting the main application flow.
+Configuration options include retry counts, delays, queue sizes, worker counts, and batch sizes.
+Performance metrics are collected for processing rates, queue depths, and success rates.
+Input validation ensures JSON data integrity before queuing operations.</p>
 </div>
   <h3 id="constructors">Constructors
 </h3>
@@ -139,7 +143,7 @@ to support high-throughput real-time data processing without impacting the main 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService__ctor_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_ISqlDataService__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.%23ctor(Microsoft.Extensions.Configuration.IConfiguration%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.ISqlDataService%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L80">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L121">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService__ctor_" data-uid="KalshiBotData.Data.SqlDataService.#ctor*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService__ctor_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_ISqlDataService__" data-uid="KalshiBotData.Data.SqlDataService.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.ISqlDataService})">SqlDataService(IConfiguration, ILogger&lt;ISqlDataService&gt;)</h4>
@@ -182,7 +186,7 @@ Sets up concurrent queues for different data types and starts background worker 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_Dispose.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L464">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L677">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_Dispose_" data-uid="KalshiBotData.Data.SqlDataService.Dispose*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_Dispose" data-uid="KalshiBotData.Data.SqlDataService.Dispose">Dispose()</h4>
@@ -199,7 +203,7 @@ Waits for worker tasks to complete gracefully within a timeout period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_ExecuteSnapshotImportJobAsync_System_Threading_CancellationToken_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.ExecuteSnapshotImportJobAsync(System.Threading.CancellationToken)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L108">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L162">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_ExecuteSnapshotImportJobAsync_" data-uid="KalshiBotData.Data.SqlDataService.ExecuteSnapshotImportJobAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_ExecuteSnapshotImportJobAsync_System_Threading_CancellationToken_" data-uid="KalshiBotData.Data.SqlDataService.ExecuteSnapshotImportJobAsync(System.Threading.CancellationToken)">ExecuteSnapshotImportJobAsync(CancellationToken)</h4>
@@ -271,12 +275,13 @@ Monitors the job execution status and waits for completion, with retry logic for
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreEventLifecycleAsync_System_Text_Json_JsonElement_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreEventLifecycleAsync(System.Text.Json.JsonElement)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L355">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L540">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreEventLifecycleAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreEventLifecycleAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreEventLifecycleAsync_System_Text_Json_JsonElement_" data-uid="KalshiBotData.Data.SqlDataService.StoreEventLifecycleAsync(System.Text.Json.JsonElement)">StoreEventLifecycleAsync(JsonElement)</h4>
   <div class="markdown level1 summary"><p>Asynchronously stores event lifecycle data from WebSocket messages into the database queue for processing.
-Records event metadata including titles, subtitles, collateral types, and timing information.</p>
+Records event metadata including titles, subtitles, collateral types, and timing information.
+Includes input validation and queue size checks.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -322,12 +327,13 @@ Records event metadata including titles, subtitles, collateral types, and timing
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreFillAsync_System_Text_Json_JsonElement_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreFillAsync(System.Text.Json.JsonElement)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L319">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L476">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreFillAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreFillAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreFillAsync_System_Text_Json_JsonElement_" data-uid="KalshiBotData.Data.SqlDataService.StoreFillAsync(System.Text.Json.JsonElement)">StoreFillAsync(JsonElement)</h4>
   <div class="markdown level1 summary"><p>Asynchronously stores order fill data from WebSocket messages into the database queue for processing.
-Records fill details including trade IDs, order IDs, prices, and execution information.</p>
+Records fill details including trade IDs, order IDs, prices, and execution information.
+Includes input validation and queue size checks.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -373,13 +379,13 @@ Records fill details including trade IDs, order IDs, prices, and execution infor
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreMarketLifecycleAsync_System_Text_Json_JsonElement_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreMarketLifecycleAsync(System.Text.Json.JsonElement)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L390">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L599">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreMarketLifecycleAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreMarketLifecycleAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreMarketLifecycleAsync_System_Text_Json_JsonElement_" data-uid="KalshiBotData.Data.SqlDataService.StoreMarketLifecycleAsync(System.Text.Json.JsonElement)">StoreMarketLifecycleAsync(JsonElement)</h4>
   <div class="markdown level1 summary"><p>Asynchronously stores market lifecycle data from WebSocket messages into the database queue for processing.
 Records market state changes including open/close times, determination times, and settlement results.
-Validates required market ticker presence before queuing the operation.</p>
+Includes input validation and queue size checks.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -420,33 +426,18 @@ Validates required market ticker presence before queuing the operation.</p>
       </tr>
     </tbody>
   </table>
-  <h5 class="exceptions">Exceptions</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Condition</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
-        <td><p>Thrown when required 'msg' or 'market_ticker' properties are missing.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreOrderBookAsync_System_Text_Json_JsonElement_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreOrderBookAsync(System.Text.Json.JsonElement%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L211">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L266">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreOrderBookAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreOrderBookAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreOrderBookAsync_System_Text_Json_JsonElement_System_String_" data-uid="KalshiBotData.Data.SqlDataService.StoreOrderBookAsync(System.Text.Json.JsonElement,System.String)">StoreOrderBookAsync(JsonElement, string)</h4>
   <div class="markdown level1 summary"><p>Asynchronously stores order book data from WebSocket messages into the database queue for processing.
-Handles both snapshot (SNP) and delta (DEL) order book updates, converting prices for &quot;no&quot; side orders.</p>
+Handles both snapshot (SNP) and delta (DEL) order book updates, converting prices for &quot;no&quot; side orders.
+Includes input validation and queue size checks.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -498,12 +489,13 @@ Handles both snapshot (SNP) and delta (DEL) order book updates, converting price
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreTickerAsync_System_Text_Json_JsonElement_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreTickerAsync(System.Text.Json.JsonElement)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L258">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L358">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreTickerAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreTickerAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreTickerAsync_System_Text_Json_JsonElement_" data-uid="KalshiBotData.Data.SqlDataService.StoreTickerAsync(System.Text.Json.JsonElement)">StoreTickerAsync(JsonElement)</h4>
   <div class="markdown level1 summary"><p>Asynchronously stores ticker data from WebSocket messages into the database queue for processing.
-Captures current market prices, bid/ask spreads, volume, and open interest information.</p>
+Captures current market prices, bid/ask spreads, volume, and open interest information.
+Includes input validation and queue size checks.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -549,12 +541,13 @@ Captures current market prices, bid/ask spreads, volume, and open interest infor
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreTradeAsync_System_Text_Json_JsonElement_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreTradeAsync(System.Text.Json.JsonElement)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L291">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L420">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreTradeAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreTradeAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreTradeAsync_System_Text_Json_JsonElement_" data-uid="KalshiBotData.Data.SqlDataService.StoreTradeAsync(System.Text.Json.JsonElement)">StoreTradeAsync(JsonElement)</h4>
   <div class="markdown level1 summary"><p>Asynchronously stores trade execution data from WebSocket messages into the database queue for processing.
-Records trade details including prices, volumes, and taker side information.</p>
+Records trade details including prices, volumes, and taker side information.
+Includes input validation and queue size checks.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -614,7 +607,7 @@ Records trade details including prices, volumes, and taker side information.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L27" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L33" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

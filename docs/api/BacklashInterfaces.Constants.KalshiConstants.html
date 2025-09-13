@@ -128,10 +128,12 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_AllChannels.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.AllChannels%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L204">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L260">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_AllChannels" data-uid="BacklashInterfaces.Constants.KalshiConstants.AllChannels">AllChannels</h4>
-  <div class="markdown level1 summary"><p>Array of all available WebSocket feed channels for subscription.</p>
+  <div class="markdown level1 summary"><p>Array of all available WebSocket feed channels for subscription.
+Note: These arrays are static readonly for performance, initialized once at runtime.
+For frequent access, consider caching if lookups are needed.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -158,7 +160,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Channel_Market_Lifecycle_V2.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Channel_Market_Lifecycle_V2%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L197">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L251">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Channel_Market_Lifecycle_V2" data-uid="BacklashInterfaces.Constants.KalshiConstants.Channel_Market_Lifecycle_V2">Channel_Market_Lifecycle_V2</h4>
   <div class="markdown level1 summary"><p>Channel name for market lifecycle v2 updates.</p>
@@ -188,7 +190,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Channel_Orderbook_Delta.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Channel_Orderbook_Delta%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L192">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L246">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Channel_Orderbook_Delta" data-uid="BacklashInterfaces.Constants.KalshiConstants.Channel_Orderbook_Delta">Channel_Orderbook_Delta</h4>
   <div class="markdown level1 summary"><p>Channel name for orderbook delta updates (incremental changes).</p>
@@ -218,7 +220,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Interval_Day.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Interval_Day%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L76">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L130">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Interval_Day" data-uid="BacklashInterfaces.Constants.KalshiConstants.Interval_Day">Interval_Day</h4>
   <div class="markdown level1 summary"><p>Represents a one-day time interval for candlestick data.</p>
@@ -248,7 +250,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Interval_Hour.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Interval_Hour%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L71">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L125">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Interval_Hour" data-uid="BacklashInterfaces.Constants.KalshiConstants.Interval_Hour">Interval_Hour</h4>
   <div class="markdown level1 summary"><p>Represents a one-hour time interval for candlestick data.</p>
@@ -278,7 +280,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Interval_Minute.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Interval_Minute%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L66">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L120">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Interval_Minute" data-uid="BacklashInterfaces.Constants.KalshiConstants.Interval_Minute">Interval_Minute</h4>
   <div class="markdown level1 summary"><p>Represents a one-minute time interval for candlestick data.</p>
@@ -308,10 +310,12 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_MarketChannels.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.MarketChannels%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L216">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L274">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_MarketChannels" data-uid="BacklashInterfaces.Constants.KalshiConstants.MarketChannels">MarketChannels</h4>
-  <div class="markdown level1 summary"><p>Array of market-specific WebSocket feed channels (excluding event-level feeds).</p>
+  <div class="markdown level1 summary"><p>Array of market-specific WebSocket feed channels (excluding event-level feeds).
+Note: These arrays are static readonly for performance, initialized once at runtime.
+For frequent access, consider caching if lookups are needed.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -338,10 +342,12 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_MarketChannelsDelta.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.MarketChannelsDelta%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L225">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L285">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_MarketChannelsDelta" data-uid="BacklashInterfaces.Constants.KalshiConstants.MarketChannelsDelta">MarketChannelsDelta</h4>
-  <div class="markdown level1 summary"><p>Array of market-specific WebSocket channels for delta updates.</p>
+  <div class="markdown level1 summary"><p>Array of market-specific WebSocket channels for delta updates.
+Note: These arrays are static readonly for performance, initialized once at runtime.
+For frequent access, consider caching if lookups are needed.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -368,7 +374,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Action.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Action%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L83">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L137">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Action" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Action">Parameter_Action</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying the action in API requests (e.g., buy/sell).</p>
@@ -398,7 +404,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_End_Ts.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_End_Ts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L128">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L182">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_End_Ts" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_End_Ts">Parameter_End_Ts</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying an end timestamp in API requests.</p>
@@ -428,7 +434,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Event_Ticker.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Event_Ticker%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L98">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L152">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Event_Ticker" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Event_Ticker">Parameter_Event_Ticker</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying an event ticker in API requests.</p>
@@ -458,7 +464,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Interval.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Interval%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L103">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L157">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Interval" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Interval">Parameter_Interval</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying a time interval in API requests.</p>
@@ -488,7 +494,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Market_Ticker.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Market_Ticker%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L93">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L147">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Market_Ticker" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Market_Ticker">Parameter_Market_Ticker</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying a market ticker in API requests.</p>
@@ -518,7 +524,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Max_Close_TS.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Max_Close_TS%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L143">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L197">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Max_Close_TS" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Max_Close_TS">Parameter_Max_Close_TS</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying maximum close timestamp in API requests.</p>
@@ -548,7 +554,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Min_Close_TS.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Min_Close_TS%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L148">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L202">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Min_Close_TS" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Min_Close_TS">Parameter_Min_Close_TS</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying minimum close timestamp in API requests.</p>
@@ -578,7 +584,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Series_Ticker.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Series_Ticker%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L88">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L142">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Series_Ticker" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Series_Ticker">Parameter_Series_Ticker</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying a series ticker in API requests.</p>
@@ -608,7 +614,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Start_Ts.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L108">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L162">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Start_Ts" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts">Parameter_Start_Ts</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying a start timestamp in API requests.</p>
@@ -638,7 +644,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Start_Ts_d.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts_d%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L123">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L177">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Start_Ts_d" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts_d">Parameter_Start_Ts_d</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying a start timestamp in days in API requests.</p>
@@ -668,7 +674,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Start_Ts_h.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts_h%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L118">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L172">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Start_Ts_h" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts_h">Parameter_Start_Ts_h</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying a start timestamp in hours in API requests.</p>
@@ -698,7 +704,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Start_Ts_m.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts_m%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L113">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L167">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Start_Ts_m" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Start_Ts_m">Parameter_Start_Ts_m</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying a start timestamp in minutes in API requests.</p>
@@ -728,7 +734,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Status.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Status%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L133">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L187">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Status" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Status">Parameter_Status</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying market status in API requests.</p>
@@ -758,7 +764,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_Tickers.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_Tickers%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L153">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L207">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_Tickers" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_Tickers">Parameter_Tickers</h4>
   <div class="markdown level1 summary"><p>Parameter name for specifying multiple tickers in API requests.</p>
@@ -788,7 +794,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Parameter_With_Nested_Markets.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Parameter_With_Nested_Markets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L138">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L192">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Parameter_With_Nested_Markets" data-uid="BacklashInterfaces.Constants.KalshiConstants.Parameter_With_Nested_Markets">Parameter_With_Nested_Markets</h4>
   <div class="markdown level1 summary"><p>Parameter name for including nested markets in API responses.</p>
@@ -818,7 +824,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_ScriptType_Candlestick.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.ScriptType_Candlestick%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L251">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L311">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_ScriptType_Candlestick" data-uid="BacklashInterfaces.Constants.KalshiConstants.ScriptType_Candlestick">ScriptType_Candlestick</h4>
   <div class="markdown level1 summary"><p>Script type identifier for candlestick data API endpoints.</p>
@@ -848,7 +854,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_ScriptType_ChartCandlesticks.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.ScriptType_ChartCandlesticks%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L256">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L316">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_ScriptType_ChartCandlesticks" data-uid="BacklashInterfaces.Constants.KalshiConstants.ScriptType_ChartCandlesticks">ScriptType_ChartCandlesticks</h4>
   <div class="markdown level1 summary"><p>Script type identifier for chart candlestick data API endpoints.</p>
@@ -878,7 +884,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_ScriptType_Event.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.ScriptType_Event%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L241">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L301">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_ScriptType_Event" data-uid="BacklashInterfaces.Constants.KalshiConstants.ScriptType_Event">ScriptType_Event</h4>
   <div class="markdown level1 summary"><p>Script type identifier for event-related API endpoints.</p>
@@ -908,7 +914,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Event_Lifecycle.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Event_Lifecycle%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L185">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L239">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Event_Lifecycle" data-uid="BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Event_Lifecycle">ScriptType_Feed_Event_Lifecycle</h4>
   <div class="markdown level1 summary"><p>Feed type for event lifecycle updates containing event-level status changes.</p>
@@ -938,7 +944,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Fill.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Fill%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L170">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L224">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Fill" data-uid="BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Fill">ScriptType_Feed_Fill</h4>
   <div class="markdown level1 summary"><p>Feed type for fill updates containing executed trade information.</p>
@@ -968,7 +974,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Lifecycle.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Lifecycle%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L175">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L229">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Lifecycle" data-uid="BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Lifecycle">ScriptType_Feed_Lifecycle</h4>
   <div class="markdown level1 summary"><p>Feed type for lifecycle updates containing market status changes.</p>
@@ -998,7 +1004,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Orderbook.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Orderbook%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L165">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L219">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Orderbook" data-uid="BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Orderbook">ScriptType_Feed_Orderbook</h4>
   <div class="markdown level1 summary"><p>Feed type for orderbook updates containing bid/ask price changes.</p>
@@ -1028,7 +1034,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Ticker.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Ticker%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L160">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L214">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Ticker" data-uid="BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Ticker">ScriptType_Feed_Ticker</h4>
   <div class="markdown level1 summary"><p>Feed type for ticker updates containing price and volume information.</p>
@@ -1058,7 +1064,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Trade.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Trade%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L180">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L234">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_ScriptType_Feed_Trade" data-uid="BacklashInterfaces.Constants.KalshiConstants.ScriptType_Feed_Trade">ScriptType_Feed_Trade</h4>
   <div class="markdown level1 summary"><p>Feed type for trade updates containing individual trade executions.</p>
@@ -1088,7 +1094,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_ScriptType_Market.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.ScriptType_Market%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L236">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L296">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_ScriptType_Market" data-uid="BacklashInterfaces.Constants.KalshiConstants.ScriptType_Market">ScriptType_Market</h4>
   <div class="markdown level1 summary"><p>Script type identifier for market-related API endpoints.</p>
@@ -1118,7 +1124,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_ScriptType_Series.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.ScriptType_Series%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L246">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L306">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_ScriptType_Series" data-uid="BacklashInterfaces.Constants.KalshiConstants.ScriptType_Series">ScriptType_Series</h4>
   <div class="markdown level1 summary"><p>Script type identifier for series-related API endpoints.</p>
@@ -1148,7 +1154,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Status_Active.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Status_Active%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L19">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L73">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Status_Active" data-uid="BacklashInterfaces.Constants.KalshiConstants.Status_Active">Status_Active</h4>
   <div class="markdown level1 summary"><p>Represents an actively trading market where orders can be placed.</p>
@@ -1178,7 +1184,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Status_Bad.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Status_Bad%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L24">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L78">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Status_Bad" data-uid="BacklashInterfaces.Constants.KalshiConstants.Status_Bad">Status_Bad</h4>
   <div class="markdown level1 summary"><p>Represents a market that has been marked as bad or invalid.</p>
@@ -1208,7 +1214,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Status_Closed.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Status_Closed%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L34">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L88">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Status_Closed" data-uid="BacklashInterfaces.Constants.KalshiConstants.Status_Closed">Status_Closed</h4>
   <div class="markdown level1 summary"><p>Represents a market that has been closed and is no longer accepting orders.</p>
@@ -1238,7 +1244,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Status_Determined.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Status_Determined%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L39">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L93">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Status_Determined" data-uid="BacklashInterfaces.Constants.KalshiConstants.Status_Determined">Status_Determined</h4>
   <div class="markdown level1 summary"><p>Represents a market where the outcome has been determined.</p>
@@ -1268,7 +1274,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Status_Finalized.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Status_Finalized%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L14">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L68">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Status_Finalized" data-uid="BacklashInterfaces.Constants.KalshiConstants.Status_Finalized">Status_Finalized</h4>
   <div class="markdown level1 summary"><p>Represents a market that has been finalized and is no longer active.</p>
@@ -1298,7 +1304,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Status_Inactive.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Status_Inactive%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L44">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L98">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Status_Inactive" data-uid="BacklashInterfaces.Constants.KalshiConstants.Status_Inactive">Status_Inactive</h4>
   <div class="markdown level1 summary"><p>Represents a market that is inactive and not available for trading.</p>
@@ -1328,7 +1334,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Status_Initialized.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Status_Initialized%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L49">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L103">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Status_Initialized" data-uid="BacklashInterfaces.Constants.KalshiConstants.Status_Initialized">Status_Initialized</h4>
   <div class="markdown level1 summary"><p>Represents a market that has been initialized but not yet open.</p>
@@ -1358,7 +1364,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Status_Open.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Status_Open%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L29">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L83">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Status_Open" data-uid="BacklashInterfaces.Constants.KalshiConstants.Status_Open">Status_Open</h4>
   <div class="markdown level1 summary"><p>Represents a market that is open for trading but not yet active.</p>
@@ -1388,7 +1394,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Status_Settled.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Status_Settled%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L54">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L108">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Status_Settled" data-uid="BacklashInterfaces.Constants.KalshiConstants.Status_Settled">Status_Settled</h4>
   <div class="markdown level1 summary"><p>Represents a market that has been settled and payouts distributed.</p>
@@ -1418,7 +1424,7 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_Status_Unopened.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.Status_Unopened%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L59">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L113">View Source</a>
   </span>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_Status_Unopened" data-uid="BacklashInterfaces.Constants.KalshiConstants.Status_Unopened">Status_Unopened</h4>
   <div class="markdown level1 summary"><p>Represents a market that has not yet opened for trading.</p>
@@ -1447,10 +1453,60 @@ maintainability and reduce the risk of typos in hardcoded values.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_IsMarketStatusEnded_BacklashInterfaces_Constants_KalshiConstants_MarketStatus_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.IsMarketStatusEnded(BacklashInterfaces.Constants.KalshiConstants.MarketStatus)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L375">View Source</a>
+  </span>
+  <a id="BacklashInterfaces_Constants_KalshiConstants_IsMarketStatusEnded_" data-uid="BacklashInterfaces.Constants.KalshiConstants.IsMarketStatusEnded*"></a>
+  <h4 id="BacklashInterfaces_Constants_KalshiConstants_IsMarketStatusEnded_BacklashInterfaces_Constants_KalshiConstants_MarketStatus_" data-uid="BacklashInterfaces.Constants.KalshiConstants.IsMarketStatusEnded(BacklashInterfaces.Constants.KalshiConstants.MarketStatus)">IsMarketStatusEnded(MarketStatus)</h4>
+  <div class="markdown level1 summary"><p>Determines whether a market status indicates that the market has ended and is no longer active.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool IsMarketStatusEnded(KalshiConstants.MarketStatus status)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashInterfaces.Constants.KalshiConstants.html">KalshiConstants</a>.<a class="xref" href="BacklashInterfaces.Constants.KalshiConstants.MarketStatus.html">MarketStatus</a></td>
+        <td><span class="parametername">status</span></td>
+        <td><p>The market status enum to evaluate.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p>True if the market has ended, false otherwise.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_IsMarketStatusEnded_System_String_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.IsMarketStatusEnded(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L277">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L365">View Source</a>
   </span>
   <a id="BacklashInterfaces_Constants_KalshiConstants_IsMarketStatusEnded_" data-uid="BacklashInterfaces.Constants.KalshiConstants.IsMarketStatusEnded*"></a>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_IsMarketStatusEnded_System_String_" data-uid="BacklashInterfaces.Constants.KalshiConstants.IsMarketStatusEnded(System.String)">IsMarketStatusEnded(string)</h4>
@@ -1501,7 +1557,7 @@ Ended markets include those that are finalized, bad, closed, settled, determined
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_Constants_KalshiConstants_TruncateDateTimeToMinute_System_DateTime_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.Constants.KalshiConstants.TruncateDateTimeToMinute(System.DateTime)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L266">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/Constants/KalshiConstants.cs/#L326">View Source</a>
   </span>
   <a id="BacklashInterfaces_Constants_KalshiConstants_TruncateDateTimeToMinute_" data-uid="BacklashInterfaces.Constants.KalshiConstants.TruncateDateTimeToMinute*"></a>
   <h4 id="BacklashInterfaces_Constants_KalshiConstants_TruncateDateTimeToMinute_System_DateTime_" data-uid="BacklashInterfaces.Constants.KalshiConstants.TruncateDateTimeToMinute(System.DateTime)">TruncateDateTimeToMinute(DateTime)</h4>

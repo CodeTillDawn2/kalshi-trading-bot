@@ -86,10 +86,15 @@
 Classes
 </h3>
       <h4><a class="xref" href="KalshiBotOverseer.Services.BrainPersistenceService.html">BrainPersistenceService</a></h4>
-      <section><p>Service responsible for managing the in-memory persistence of brain instance states.
+      <section><p>Service responsible for managing brain instance states with configurable persistence options.
 This service provides thread-safe operations for storing, retrieving, and updating brain
-configuration, market watch lists, and performance metrics history. It serves as the
-central data store for brain instances in the Kalshi trading bot overseer system.</p>
+configuration, market watch lists, and performance metrics history. It supports both
+in-memory storage and optional database persistence for recovery after application restarts.
+The service includes configurable history retention, performance metrics collection,
+batch operations, and comprehensive health monitoring.</p>
+</section>
+      <h4><a class="xref" href="KalshiBotOverseer.Services.BrainPersistenceServiceConfig.html">BrainPersistenceServiceConfig</a></h4>
+      <section><p>Configuration options for the BrainPersistenceService.</p>
 </section>
       <h4><a class="xref" href="KalshiBotOverseer.Services.SnapshotService.html">SnapshotService</a></h4>
       <section><p>Provides services for retrieving and processing snapshot group data from the database.

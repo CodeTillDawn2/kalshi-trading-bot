@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class CalculationConfig | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Configuration class containing all technical indicator parameters used throughout the trading bot. These settings control the calculation periods and thresholds for various technical analysis indicators that drive trading decisions and market analysis. Values are injected via dependency injection and used by MarketData and TradingCalculator classes for real-time indicator computation.">
+    
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,16 +81,16 @@
 
 
   <h1 id="TradingStrategies_Configuration_CalculationConfig" data-uid="TradingStrategies.Configuration.CalculationConfig" class="text-break">Class CalculationConfig</h1>
-  <div class="markdown level0 summary"><p>Configuration class containing all technical indicator parameters used throughout the trading bot.
-These settings control the calculation periods and thresholds for various technical analysis indicators
-that drive trading decisions and market analysis. Values are injected via dependency injection
-and used by MarketData and TradingCalculator classes for real-time indicator computation.</p>
-</div>
+  <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
     <div class="level1"><span class="xref">CalculationConfig</span></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.dataannotations.ivalidatableobject">IValidatableObject</a></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -120,7 +120,7 @@ and used by MarketData and TradingCalculator classes for real-time indicator com
   <h6><strong>Assembly</strong>: TradingStrategies.dll</h6>
   <h5 id="TradingStrategies_Configuration_CalculationConfig_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class CalculationConfig</code></pre>
+    <pre><code class="lang-csharp hljs">public class CalculationConfig : IValidatableObject</code></pre>
   </div>
   <h3 id="properties">Properties
 </h3>
@@ -129,7 +129,7 @@ and used by MarketData and TradingCalculator classes for real-time indicator com
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_ADX_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.ADX_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L200">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L243">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_ADX_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.ADX_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_ADX_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.ADX_Periods">ADX_Periods</h4>
@@ -140,7 +140,8 @@ Longer periods provide more stable trend strength readings.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int ADX_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;ADX_Periods must be greater than 0.&quot;)]
+public int ADX_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -162,7 +163,7 @@ Longer periods provide more stable trend strength readings.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_ATR_Long_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.ATR_Long_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L131">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L163">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_ATR_Long_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.ATR_Long_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_ATR_Long_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.ATR_Long_Periods">ATR_Long_Periods</h4>
@@ -172,7 +173,8 @@ Used for broader volatility trends and long-term risk assessment.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int ATR_Long_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;ATR_Long_Periods must be greater than 0.&quot;)]
+public int ATR_Long_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -194,7 +196,7 @@ Used for broader volatility trends and long-term risk assessment.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_ATR_Medium_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.ATR_Medium_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L125">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L156">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_ATR_Medium_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.ATR_Medium_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_ATR_Medium_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.ATR_Medium_Periods">ATR_Medium_Periods</h4>
@@ -206,7 +208,8 @@ Medium period provides intermediate volatility context.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int ATR_Medium_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;ATR_Medium_Periods must be greater than 0.&quot;)]
+public int ATR_Medium_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -228,17 +231,16 @@ Medium period provides intermediate volatility context.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_BollingerBands_Long_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.BollingerBands_Long_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L98">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L124">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_BollingerBands_Long_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.BollingerBands_Long_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_BollingerBands_Long_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.BollingerBands_Long_Periods">BollingerBands_Long_Periods</h4>
-  <div class="markdown level1 summary"><p>Number of periods for long-term Bollinger Bands calculations.
-Used for extended volatility analysis and major price level identification.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int BollingerBands_Long_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;BollingerBands_Long_Periods must be greater than 0.&quot;)]
+public int BollingerBands_Long_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -260,17 +262,19 @@ Used for extended volatility analysis and major price level identification.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_BollingerBands_Long_StdDev.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.BollingerBands_Long_StdDev%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L104">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L132">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_BollingerBands_Long_StdDev_" data-uid="TradingStrategies.Configuration.CalculationConfig.BollingerBands_Long_StdDev*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_BollingerBands_Long_StdDev" data-uid="TradingStrategies.Configuration.CalculationConfig.BollingerBands_Long_StdDev">BollingerBands_Long_StdDev</h4>
   <div class="markdown level1 summary"><p>Standard deviation multiplier for long-term Bollinger Bands.
-Configures band sensitivity for long-term trend analysis.</p>
+Configures band sensitivity for long-term trend analysis.
+Validation ensures: StdDev ≥ 0.1.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int BollingerBands_Long_StdDev { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0.1, 1.7976931348623157E+308, ErrorMessage = &quot;BollingerBands_Long_StdDev must be greater than 0.&quot;)]
+public double BollingerBands_Long_StdDev { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -282,7 +286,7 @@ Configures band sensitivity for long-term trend analysis.</p>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -292,7 +296,7 @@ Configures band sensitivity for long-term trend analysis.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_BollingerBands_Medium_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.BollingerBands_Medium_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L85">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L107">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_BollingerBands_Medium_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.BollingerBands_Medium_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_BollingerBands_Medium_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.BollingerBands_Medium_Periods">BollingerBands_Medium_Periods</h4>
@@ -303,7 +307,8 @@ Medium period provides intermediate volatility analysis.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int BollingerBands_Medium_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;BollingerBands_Medium_Periods must be greater than 0.&quot;)]
+public int BollingerBands_Medium_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -325,18 +330,20 @@ Medium period provides intermediate volatility analysis.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_BollingerBands_Medium_StdDev.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.BollingerBands_Medium_StdDev%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L92">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L116">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_BollingerBands_Medium_StdDev_" data-uid="TradingStrategies.Configuration.CalculationConfig.BollingerBands_Medium_StdDev*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_BollingerBands_Medium_StdDev" data-uid="TradingStrategies.Configuration.CalculationConfig.BollingerBands_Medium_StdDev">BollingerBands_Medium_StdDev</h4>
   <div class="markdown level1 summary"><p>Standard deviation multiplier for medium-term Bollinger Bands.
 Controls band width - higher values create wider bands, lower values create tighter bands.
-Typically 2.0 for standard Bollinger Bands.</p>
+Typically 2.0 for standard Bollinger Bands.
+Validation ensures: StdDev ≥ 0.1.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int BollingerBands_Medium_StdDev { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0.1, 1.7976931348623157E+308, ErrorMessage = &quot;BollingerBands_Medium_StdDev must be greater than 0.&quot;)]
+public double BollingerBands_Medium_StdDev { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -348,7 +355,7 @@ Typically 2.0 for standard Bollinger Bands.</p>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -358,7 +365,7 @@ Typically 2.0 for standard Bollinger Bands.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_EMA_Long_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.EMA_Long_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L78">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L99">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_EMA_Long_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.EMA_Long_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_EMA_Long_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.EMA_Long_Periods">EMA_Long_Periods</h4>
@@ -368,7 +375,8 @@ Used for major trend analysis and long-term market direction assessment.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int EMA_Long_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;EMA_Long_Periods must be greater than 0.&quot;)]
+public int EMA_Long_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -390,7 +398,7 @@ Used for major trend analysis and long-term market direction assessment.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_EMA_Medium_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.EMA_Medium_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L72">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L92">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_EMA_Medium_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.EMA_Medium_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_EMA_Medium_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.EMA_Medium_Periods">EMA_Medium_Periods</h4>
@@ -401,7 +409,8 @@ Medium period balances short-term responsiveness with trend stability.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int EMA_Medium_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;EMA_Medium_Periods must be greater than 0.&quot;)]
+public int EMA_Medium_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -423,7 +432,7 @@ Medium period balances short-term responsiveness with trend stability.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_MACD_Long_FastPeriod.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.MACD_Long_FastPeriod%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L53">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L70">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_MACD_Long_FastPeriod_" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Long_FastPeriod*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_MACD_Long_FastPeriod" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Long_FastPeriod">MACD_Long_FastPeriod</h4>
@@ -433,7 +442,8 @@ Used for broader market trend analysis over extended timeframes.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int MACD_Long_FastPeriod { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;MACD_Long_FastPeriod must be greater than 0.&quot;)]
+public int MACD_Long_FastPeriod { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -455,7 +465,7 @@ Used for broader market trend analysis over extended timeframes.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_MACD_Long_SignalPeriod.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.MACD_Long_SignalPeriod%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L65">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L84">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_MACD_Long_SignalPeriod_" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Long_SignalPeriod*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_MACD_Long_SignalPeriod" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Long_SignalPeriod">MACD_Long_SignalPeriod</h4>
@@ -465,7 +475,8 @@ Generates signals for longer-term trading strategies.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int MACD_Long_SignalPeriod { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;MACD_Long_SignalPeriod must be greater than 0.&quot;)]
+public int MACD_Long_SignalPeriod { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -487,7 +498,7 @@ Generates signals for longer-term trading strategies.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_MACD_Long_SlowPeriod.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.MACD_Long_SlowPeriod%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L59">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L77">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_MACD_Long_SlowPeriod_" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Long_SlowPeriod*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_MACD_Long_SlowPeriod" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Long_SlowPeriod">MACD_Long_SlowPeriod</h4>
@@ -497,7 +508,8 @@ Provides long-term trend baseline for extended analysis periods.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int MACD_Long_SlowPeriod { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;MACD_Long_SlowPeriod must be greater than 0.&quot;)]
+public int MACD_Long_SlowPeriod { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -519,18 +531,16 @@ Provides long-term trend baseline for extended analysis periods.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_MACD_Medium_FastPeriod.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.MACD_Medium_FastPeriod%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L35">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L48">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_MACD_Medium_FastPeriod_" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Medium_FastPeriod*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_MACD_Medium_FastPeriod" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Medium_FastPeriod">MACD_Medium_FastPeriod</h4>
-  <div class="markdown level1 summary"><p>Fast EMA period for medium-term MACD (Moving Average Convergence Divergence) calculations.
-MACD shows the relationship between two moving averages of price, used for momentum analysis.
-The fast period should be shorter than the slow period for proper convergence/divergence signals.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int MACD_Medium_FastPeriod { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;MACD_Medium_FastPeriod must be greater than 0.&quot;)]
+public int MACD_Medium_FastPeriod { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -552,7 +562,7 @@ The fast period should be shorter than the slow period for proper convergence/di
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_MACD_Medium_SignalPeriod.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.MACD_Medium_SignalPeriod%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L47">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L63">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_MACD_Medium_SignalPeriod_" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Medium_SignalPeriod*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_MACD_Medium_SignalPeriod" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Medium_SignalPeriod">MACD_Medium_SignalPeriod</h4>
@@ -562,7 +572,8 @@ Applied to the MACD line to generate trading signals when crossed.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int MACD_Medium_SignalPeriod { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;MACD_Medium_SignalPeriod must be greater than 0.&quot;)]
+public int MACD_Medium_SignalPeriod { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -584,17 +595,16 @@ Applied to the MACD line to generate trading signals when crossed.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_MACD_Medium_SlowPeriod.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.MACD_Medium_SlowPeriod%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L41">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L56">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_MACD_Medium_SlowPeriod_" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Medium_SlowPeriod*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_MACD_Medium_SlowPeriod" data-uid="TradingStrategies.Configuration.CalculationConfig.MACD_Medium_SlowPeriod">MACD_Medium_SlowPeriod</h4>
-  <div class="markdown level1 summary"><p>Slow EMA period for medium-term MACD calculations.
-Longer period provides the baseline trend against which the fast period converges/diverges.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int MACD_Medium_SlowPeriod { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;MACD_Medium_SlowPeriod must be greater than 0.&quot;)]
+public int MACD_Medium_SlowPeriod { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -616,7 +626,7 @@ Longer period provides the baseline trend against which the fast period converge
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_PSAR_AFStep.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.PSAR_AFStep%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L221">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L267">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_PSAR_AFStep_" data-uid="TradingStrategies.Configuration.CalculationConfig.PSAR_AFStep*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_PSAR_AFStep" data-uid="TradingStrategies.Configuration.CalculationConfig.PSAR_AFStep">PSAR_AFStep</h4>
@@ -627,7 +637,8 @@ Typical value is 0.02.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double PSAR_AFStep { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0.001, 1.7976931348623157E+308, ErrorMessage = &quot;PSAR_AFStep must be greater than 0.&quot;)]
+public double PSAR_AFStep { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -649,7 +660,7 @@ Typical value is 0.02.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_PSAR_InitialAF.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.PSAR_InitialAF%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L207">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L251">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_PSAR_InitialAF_" data-uid="TradingStrategies.Configuration.CalculationConfig.PSAR_InitialAF*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_PSAR_InitialAF" data-uid="TradingStrategies.Configuration.CalculationConfig.PSAR_InitialAF">PSAR_InitialAF</h4>
@@ -660,7 +671,8 @@ Typical value is 0.02.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double PSAR_InitialAF { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0.001, 1.7976931348623157E+308, ErrorMessage = &quot;PSAR_InitialAF must be greater than 0.&quot;)]
+public double PSAR_InitialAF { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -682,7 +694,7 @@ Typical value is 0.02.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_PSAR_MaxAF.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.PSAR_MaxAF%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L214">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L259">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_PSAR_MaxAF_" data-uid="TradingStrategies.Configuration.CalculationConfig.PSAR_MaxAF*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_PSAR_MaxAF" data-uid="TradingStrategies.Configuration.CalculationConfig.PSAR_MaxAF">PSAR_MaxAF</h4>
@@ -693,7 +705,8 @@ Typical value is 0.2.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double PSAR_MaxAF { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0.001, 1.7976931348623157E+308, ErrorMessage = &quot;PSAR_MaxAF must be greater than 0.&quot;)]
+public double PSAR_MaxAF { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -715,7 +728,7 @@ Typical value is 0.2.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_PseudoCandlestickLookbackPeriods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.PseudoCandlestickLookbackPeriods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L266">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L323">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_PseudoCandlestickLookbackPeriods_" data-uid="TradingStrategies.Configuration.CalculationConfig.PseudoCandlestickLookbackPeriods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_PseudoCandlestickLookbackPeriods" data-uid="TradingStrategies.Configuration.CalculationConfig.PseudoCandlestickLookbackPeriods">PseudoCandlestickLookbackPeriods</h4>
@@ -725,7 +738,8 @@ Controls how many historical periods are included in pseudo candlestick generati
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int PseudoCandlestickLookbackPeriods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;PseudoCandlestickLookbackPeriods must be greater than 0.&quot;)]
+public int PseudoCandlestickLookbackPeriods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -747,17 +761,16 @@ Controls how many historical periods are included in pseudo candlestick generati
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_RSI_Long_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.RSI_Long_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L28">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L39">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_RSI_Long_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.RSI_Long_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_RSI_Long_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.RSI_Long_Periods">RSI_Long_Periods</h4>
-  <div class="markdown level1 summary"><p>Number of periods to use for long-term RSI calculations.
-Provides broader trend context, less sensitive to short-term price fluctuations.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int RSI_Long_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;RSI_Long_Periods must be greater than 0.&quot;)]
+public int RSI_Long_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -779,17 +792,16 @@ Provides broader trend context, less sensitive to short-term price fluctuations.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_RSI_Medium_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.RSI_Medium_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L22">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L31">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_RSI_Medium_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.RSI_Medium_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_RSI_Medium_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.RSI_Medium_Periods">RSI_Medium_Periods</h4>
-  <div class="markdown level1 summary"><p>Number of periods to use for medium-term RSI calculations.
-Used for intermediate trend analysis, balancing responsiveness with signal reliability.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int RSI_Medium_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;RSI_Medium_Periods must be greater than 0.&quot;)]
+public int RSI_Medium_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -811,18 +823,16 @@ Used for intermediate trend analysis, balancing responsiveness with signal relia
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_RSI_Short_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.RSI_Short_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L16">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L23">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_RSI_Short_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.RSI_Short_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_RSI_Short_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.RSI_Short_Periods">RSI_Short_Periods</h4>
-  <div class="markdown level1 summary"><p>Number of periods to use for short-term RSI (Relative Strength Index) calculations.
-RSI measures price momentum on a scale of 0-100, commonly used for overbought/oversold signals.
-Shorter periods (e.g., 14) provide more responsive but potentially noisier signals.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int RSI_Short_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;RSI_Short_Periods must be greater than 0.&quot;)]
+public int RSI_Short_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -844,7 +854,7 @@ Shorter periods (e.g., 14) provide more responsive but potentially noisier signa
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_RecentCandlestickDays.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.RecentCandlestickDays%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L260">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L316">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_RecentCandlestickDays_" data-uid="TradingStrategies.Configuration.CalculationConfig.RecentCandlestickDays*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_RecentCandlestickDays" data-uid="TradingStrategies.Configuration.CalculationConfig.RecentCandlestickDays">RecentCandlestickDays</h4>
@@ -854,7 +864,8 @@ Determines the timeframe for identifying recent high/low bid levels.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int RecentCandlestickDays { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;RecentCandlestickDays must be greater than 0.&quot;)]
+public int RecentCandlestickDays { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -876,7 +887,7 @@ Determines the timeframe for identifying recent high/low bid levels.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_RecentCandlesticksCount.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.RecentCandlesticksCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L272">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L330">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_RecentCandlesticksCount_" data-uid="TradingStrategies.Configuration.CalculationConfig.RecentCandlesticksCount*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_RecentCandlesticksCount" data-uid="TradingStrategies.Configuration.CalculationConfig.RecentCandlesticksCount">RecentCandlesticksCount</h4>
@@ -886,7 +897,8 @@ Controls how many of the most recent minute-level pseudo candlesticks are kept i
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int RecentCandlesticksCount { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;RecentCandlesticksCount must be greater than 0.&quot;)]
+public int RecentCandlesticksCount { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -908,7 +920,7 @@ Controls how many of the most recent minute-level pseudo candlesticks are kept i
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_ExponentialMultiplier.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_ExponentialMultiplier%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L228">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L275">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_ExponentialMultiplier_" data-uid="TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_ExponentialMultiplier*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_ExponentialMultiplier" data-uid="TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_ExponentialMultiplier">ResistanceLevels_ExponentialMultiplier</h4>
@@ -919,7 +931,8 @@ Typical value is 2.0.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double ResistanceLevels_ExponentialMultiplier { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0.1, 1.7976931348623157E+308, ErrorMessage = &quot;ResistanceLevels_ExponentialMultiplier must be greater than 0.&quot;)]
+public double ResistanceLevels_ExponentialMultiplier { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -941,7 +954,7 @@ Typical value is 2.0.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_MaxLevels.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_MaxLevels%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L181">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L221">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_MaxLevels_" data-uid="TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_MaxLevels*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_MaxLevels" data-uid="TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_MaxLevels">ResistanceLevels_MaxLevels</h4>
@@ -951,7 +964,8 @@ Limits computational complexity and focuses on most significant levels.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int ResistanceLevels_MaxLevels { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;ResistanceLevels_MaxLevels must be greater than 0.&quot;)]
+public int ResistanceLevels_MaxLevels { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -973,7 +987,7 @@ Limits computational complexity and focuses on most significant levels.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_MinCandlestickPercentage.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_MinCandlestickPercentage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L175">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L214">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_MinCandlestickPercentage_" data-uid="TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_MinCandlestickPercentage*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_MinCandlestickPercentage" data-uid="TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_MinCandlestickPercentage">ResistanceLevels_MinCandlestickPercentage</h4>
@@ -984,7 +998,8 @@ Expressed as decimal (e.g., 0.05 for 5%).</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double ResistanceLevels_MinCandlestickPercentage { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0, 1, ErrorMessage = &quot;ResistanceLevels_MinCandlestickPercentage must be between 0 and 1.&quot;)]
+public double ResistanceLevels_MinCandlestickPercentage { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1006,7 +1021,7 @@ Expressed as decimal (e.g., 0.05 for 5%).</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_MinDistance.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_MinDistance%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L193">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L235">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_MinDistance_" data-uid="TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_MinDistance*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_MinDistance" data-uid="TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_MinDistance">ResistanceLevels_MinDistance</h4>
@@ -1016,7 +1031,8 @@ Prevents clustering of levels in narrow price ranges.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int ResistanceLevels_MinDistance { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;ResistanceLevels_MinDistance must be greater than 0.&quot;)]
+public int ResistanceLevels_MinDistance { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1038,7 +1054,7 @@ Prevents clustering of levels in narrow price ranges.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_Sigma.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_Sigma%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L187">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L228">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_Sigma_" data-uid="TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_Sigma*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_ResistanceLevels_Sigma" data-uid="TradingStrategies.Configuration.CalculationConfig.ResistanceLevels_Sigma">ResistanceLevels_Sigma</h4>
@@ -1048,7 +1064,8 @@ Higher values require stronger statistical evidence for level identification.</p
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double ResistanceLevels_Sigma { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0.1, 1.7976931348623157E+308, ErrorMessage = &quot;ResistanceLevels_Sigma must be greater than 0.&quot;)]
+public double ResistanceLevels_Sigma { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1070,17 +1087,16 @@ Higher values require stronger statistical evidence for level identification.</p
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_SlopeMediumMinutes.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.SlopeMediumMinutes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L254">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L309">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_SlopeMediumMinutes_" data-uid="TradingStrategies.Configuration.CalculationConfig.SlopeMediumMinutes*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_SlopeMediumMinutes" data-uid="TradingStrategies.Configuration.CalculationConfig.SlopeMediumMinutes">SlopeMediumMinutes</h4>
-  <div class="markdown level1 summary"><p>Number of minutes for medium-term slope calculations in price movement analysis.
-Used to calculate bid slope over a medium timeframe for balanced signals.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int SlopeMediumMinutes { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;SlopeMediumMinutes must be greater than 0.&quot;)]
+public int SlopeMediumMinutes { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1102,17 +1118,16 @@ Used to calculate bid slope over a medium timeframe for balanced signals.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_SlopeShortMinutes.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.SlopeShortMinutes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L248">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L301">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_SlopeShortMinutes_" data-uid="TradingStrategies.Configuration.CalculationConfig.SlopeShortMinutes*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_SlopeShortMinutes" data-uid="TradingStrategies.Configuration.CalculationConfig.SlopeShortMinutes">SlopeShortMinutes</h4>
-  <div class="markdown level1 summary"><p>Number of minutes for short-term slope calculations in price movement analysis.
-Used to calculate bid slope over a short timeframe for responsive signals.</p>
-</div>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int SlopeShortMinutes { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;SlopeShortMinutes must be greater than 0.&quot;)]
+public int SlopeShortMinutes { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1134,7 +1149,7 @@ Used to calculate bid slope over a short timeframe for responsive signals.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_Stochastic_Long_DPeriods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.Stochastic_Long_DPeriods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L168">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L206">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Long_DPeriods_" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Long_DPeriods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Long_DPeriods" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Long_DPeriods">Stochastic_Long_DPeriods</h4>
@@ -1144,7 +1159,8 @@ Provides smoothing for long-term momentum signals.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Stochastic_Long_DPeriods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;Stochastic_Long_DPeriods must be greater than 0.&quot;)]
+public int Stochastic_Long_DPeriods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1166,7 +1182,7 @@ Provides smoothing for long-term momentum signals.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_Stochastic_Long_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.Stochastic_Long_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L162">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L199">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Long_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Long_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Long_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Long_Periods">Stochastic_Long_Periods</h4>
@@ -1176,7 +1192,8 @@ Used for extended trend momentum analysis.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Stochastic_Long_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;Stochastic_Long_Periods must be greater than 0.&quot;)]
+public int Stochastic_Long_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1198,7 +1215,7 @@ Used for extended trend momentum analysis.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_Stochastic_Medium_DPeriods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.Stochastic_Medium_DPeriods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L156">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L192">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Medium_DPeriods_" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Medium_DPeriods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Medium_DPeriods" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Medium_DPeriods">Stochastic_Medium_DPeriods</h4>
@@ -1208,7 +1225,8 @@ Smooths the medium-term %K line for more reliable signals.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Stochastic_Medium_DPeriods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;Stochastic_Medium_DPeriods must be greater than 0.&quot;)]
+public int Stochastic_Medium_DPeriods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1230,7 +1248,7 @@ Smooths the medium-term %K line for more reliable signals.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_Stochastic_Medium_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.Stochastic_Medium_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L150">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L185">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Medium_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Medium_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Medium_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Medium_Periods">Stochastic_Medium_Periods</h4>
@@ -1240,7 +1258,8 @@ Provides intermediate momentum analysis with balanced responsiveness.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Stochastic_Medium_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;Stochastic_Medium_Periods must be greater than 0.&quot;)]
+public int Stochastic_Medium_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1262,7 +1281,7 @@ Provides intermediate momentum analysis with balanced responsiveness.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_Stochastic_Short_DPeriods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.Stochastic_Short_DPeriods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L144">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L178">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Short_DPeriods_" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Short_DPeriods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Short_DPeriods" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Short_DPeriods">Stochastic_Short_DPeriods</h4>
@@ -1272,7 +1291,8 @@ Applied as moving average to %K line to reduce noise and generate signals.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Stochastic_Short_DPeriods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;Stochastic_Short_DPeriods must be greater than 0.&quot;)]
+public int Stochastic_Short_DPeriods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1294,7 +1314,7 @@ Applied as moving average to %K line to reduce noise and generate signals.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_Stochastic_Short_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.Stochastic_Short_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L138">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L171">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Short_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Short_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_Stochastic_Short_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.Stochastic_Short_Periods">Stochastic_Short_Periods</h4>
@@ -1305,7 +1325,8 @@ Short period provides responsive overbought/oversold signals.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Stochastic_Short_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;Stochastic_Short_Periods must be greater than 0.&quot;)]
+public int Stochastic_Short_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1327,18 +1348,20 @@ Short period provides responsive overbought/oversold signals.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_TolerancePercentage.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.TolerancePercentage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L235">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L284">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_TolerancePercentage_" data-uid="TradingStrategies.Configuration.CalculationConfig.TolerancePercentage*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_TolerancePercentage" data-uid="TradingStrategies.Configuration.CalculationConfig.TolerancePercentage">TolerancePercentage</h4>
   <div class="markdown level1 summary"><p>Tolerance percentage used for depth calculations within a price range.
 Determines the percentage range around the best bid to include in depth calculations.
-Expressed as percentage (e.g., 10.0 for 10%).</p>
+Expressed as percentage (e.g., 10.0 for 10%).
+Validation ensures: 0.1 ≤ TolerancePercentage ≤ 100.0.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double TolerancePercentage { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0.1, 100, ErrorMessage = &quot;TolerancePercentage must be between 0.1 and 100.&quot;)]
+public double TolerancePercentage { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1360,18 +1383,20 @@ Expressed as percentage (e.g., 10.0 for 10%).</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_TradingFeeRate.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.TradingFeeRate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L242">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L293">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_TradingFeeRate_" data-uid="TradingStrategies.Configuration.CalculationConfig.TradingFeeRate*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_TradingFeeRate" data-uid="TradingStrategies.Configuration.CalculationConfig.TradingFeeRate">TradingFeeRate</h4>
   <div class="markdown level1 summary"><p>Trading fee rate applied to calculate expected fees.
 The fee is calculated as: roundup(fee_rate * contracts * price * (1 - price)).
-Expressed as decimal (e.g., 0.07 for 7%).</p>
+Expressed as decimal (e.g., 0.07 for 7%).
+Validation ensures: 0.0 ≤ TradingFeeRate ≤ 1.0.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double TradingFeeRate { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0, 1, ErrorMessage = &quot;TradingFeeRate must be between 0 and 1.&quot;)]
+public double TradingFeeRate { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1393,7 +1418,7 @@ Expressed as decimal (e.g., 0.07 for 7%).</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_VWAP_Medium_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.VWAP_Medium_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L117">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L147">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_VWAP_Medium_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.VWAP_Medium_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_VWAP_Medium_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.VWAP_Medium_Periods">VWAP_Medium_Periods</h4>
@@ -1403,7 +1428,8 @@ Balances responsiveness with trend stability for intermediate analysis.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int VWAP_Medium_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;VWAP_Medium_Periods must be greater than 0.&quot;)]
+public int VWAP_Medium_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1425,7 +1451,7 @@ Balances responsiveness with trend stability for intermediate analysis.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_VWAP_Short_Periods.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.VWAP_Short_Periods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L111">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L140">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_CalculationConfig_VWAP_Short_Periods_" data-uid="TradingStrategies.Configuration.CalculationConfig.VWAP_Short_Periods*"></a>
   <h4 id="TradingStrategies_Configuration_CalculationConfig_VWAP_Short_Periods" data-uid="TradingStrategies.Configuration.CalculationConfig.VWAP_Short_Periods">VWAP_Short_Periods</h4>
@@ -1436,7 +1462,8 @@ Short period provides more responsive VWAP levels for intraday trading.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int VWAP_Short_Periods { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;VWAP_Short_Periods must be greater than 0.&quot;)]
+public int VWAP_Short_Periods { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1453,6 +1480,64 @@ Short period provides more responsive VWAP levels for intraday trading.</p>
       </tr>
     </tbody>
   </table>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig_Validate_System_ComponentModel_DataAnnotations_ValidationContext_.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig.Validate(System.ComponentModel.DataAnnotations.ValidationContext)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L340">View Source</a>
+  </span>
+  <a id="TradingStrategies_Configuration_CalculationConfig_Validate_" data-uid="TradingStrategies.Configuration.CalculationConfig.Validate*"></a>
+  <h4 id="TradingStrategies_Configuration_CalculationConfig_Validate_System_ComponentModel_DataAnnotations_ValidationContext_" data-uid="TradingStrategies.Configuration.CalculationConfig.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">Validate(ValidationContext)</h4>
+  <div class="markdown level1 summary"><p>Validates the configuration parameters to ensure they are within valid ranges and logical constraints.
+This method is called during dependency injection to catch misconfigurations early.
+For performance, validation is only performed once on startup, not during runtime indicator calculations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;ValidationResult&gt; Validate(ValidationContext validationContext)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.dataannotations.validationcontext">ValidationContext</a></td>
+        <td><span class="parametername">validationContext</span></td>
+        <td><p>The validation context.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.dataannotations.validationresult">ValidationResult</a>&gt;</td>
+        <td><p>A collection of validation results.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.dataannotations.ivalidatableobject">IValidatableObject</a>
+  </div>
 
 </article>
           </div>
@@ -1465,7 +1550,7 @@ Short period provides more responsive VWAP levels for intraday trading.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_CalculationConfig.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.CalculationConfig%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L9" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/CalculationConfig.cs/#L15" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

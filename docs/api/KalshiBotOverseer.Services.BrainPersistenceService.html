@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class BrainPersistenceService | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Service responsible for managing the in-memory persistence of brain instance states. This service provides thread-safe operations for storing, retrieving, and updating brain configuration, market watch lists, and performance metrics history. It serves as the central data store for brain instances in the Kalshi trading bot overseer system.">
+    <meta name="description" content="Service responsible for managing brain instance states with configurable persistence options. This service provides thread-safe operations for storing, retrieving, and updating brain configuration, market watch lists, and performance metrics history. It supports both in-memory storage and optional database persistence for recovery after application restarts. The service includes configurable history retention, performance metrics collection, batch operations, and comprehensive health monitoring.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,10 +81,12 @@
 
 
   <h1 id="KalshiBotOverseer_Services_BrainPersistenceService" data-uid="KalshiBotOverseer.Services.BrainPersistenceService" class="text-break">Class BrainPersistenceService</h1>
-  <div class="markdown level0 summary"><p>Service responsible for managing the in-memory persistence of brain instance states.
+  <div class="markdown level0 summary"><p>Service responsible for managing brain instance states with configurable persistence options.
 This service provides thread-safe operations for storing, retrieving, and updating brain
-configuration, market watch lists, and performance metrics history. It serves as the
-central data store for brain instances in the Kalshi trading bot overseer system.</p>
+configuration, market watch lists, and performance metrics history. It supports both
+in-memory storage and optional database persistence for recovery after application restarts.
+The service includes configurable history retention, performance metrics collection,
+batch operations, and comprehensive health monitoring.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -122,14 +124,79 @@ central data store for brain instances in the Kalshi trading bot overseer system
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class BrainPersistenceService</code></pre>
   </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService__ctor_Microsoft_Extensions_Options_IOptions_KalshiBotOverseer_Services_BrainPersistenceServiceConfig__KalshiBotData_Data_Interfaces_IKalshiBotContext_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_Services_BrainPersistenceService__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.%23ctor(Microsoft.Extensions.Options.IOptions%7BKalshiBotOverseer.Services.BrainPersistenceServiceConfig%7D%2CKalshiBotData.Data.Interfaces.IKalshiBotContext%2CMicrosoft.Extensions.Logging.ILogger%7BKalshiBotOverseer.Services.BrainPersistenceService%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L81">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_BrainPersistenceService__ctor_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.#ctor*"></a>
+  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService__ctor_Microsoft_Extensions_Options_IOptions_KalshiBotOverseer_Services_BrainPersistenceServiceConfig__KalshiBotData_Data_Interfaces_IKalshiBotContext_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_Services_BrainPersistenceService__" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.#ctor(Microsoft.Extensions.Options.IOptions{KalshiBotOverseer.Services.BrainPersistenceServiceConfig},KalshiBotData.Data.Interfaces.IKalshiBotContext,Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.Services.BrainPersistenceService})">BrainPersistenceService(IOptions&lt;BrainPersistenceServiceConfig&gt;, IKalshiBotContext?, ILogger&lt;BrainPersistenceService&gt;?)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the BrainPersistenceService with configurable options.
+When persistence is enabled, automatically starts a background timer for periodic saves.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BrainPersistenceService(IOptions&lt;BrainPersistenceServiceConfig&gt; config, IKalshiBotContext? context = null, ILogger&lt;BrainPersistenceService&gt;? logger = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="KalshiBotOverseer.Services.BrainPersistenceServiceConfig.html">BrainPersistenceServiceConfig</a>&gt;</td>
+        <td><span class="parametername">config</span></td>
+        <td><p>Configuration options including history limits, metric names, and persistence settings.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Data.Interfaces.IKalshiBotContext.html">IKalshiBotContext</a></td>
+        <td><span class="parametername">context</span></td>
+        <td><p>Optional database context for persistence operations. Required when EnablePersistence is true.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="KalshiBotOverseer.Services.BrainPersistenceService.html">BrainPersistenceService</a>&gt;</td>
+        <td><span class="parametername">logger</span></td>
+        <td><p>Optional logger for service operations and performance metrics.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
 </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_Dispose.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L476">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_BrainPersistenceService_Dispose_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.Dispose*"></a>
+  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_Dispose" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"><p>Disposes of the service and cleans up resources.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_GetAllBrains.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.GetAllBrains%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L54">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L190">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Services_BrainPersistenceService_GetAllBrains_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.GetAllBrains*"></a>
   <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_GetAllBrains" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.GetAllBrains">GetAllBrains()</h4>
@@ -162,7 +229,7 @@ This provides access to the complete set of brain configurations and states.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_GetBrain_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.GetBrain(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L22">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L106">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Services_BrainPersistenceService_GetBrain_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.GetBrain*"></a>
   <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_GetBrain_System_String_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.GetBrain(System.String)">GetBrain(string)</h4>
@@ -208,12 +275,62 @@ a new instance is created with the specified name and added to the collection.</
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown when brainInstanceName is null or empty.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_GetHealthStatus.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.GetHealthStatus%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L352">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_BrainPersistenceService_GetHealthStatus_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.GetHealthStatus*"></a>
+  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_GetHealthStatus" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.GetHealthStatus">GetHealthStatus()</h4>
+  <div class="markdown level1 summary"><p>Performs comprehensive health checks to monitor service status and resource usage.
+Returns detailed statistics including memory usage, brain instance count, total history entries,
+and service uptime for monitoring and diagnostics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (long TotalMemoryBytes, int BrainCount, long TotalHistoryEntries, TimeSpan ServiceUptime) GetHealthStatus()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int64,system.int32,system.int64,system.timespan-.totalmemorybytes">TotalMemoryBytes</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int64,system.int32,system.int64,system.timespan-.braincount">BrainCount</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int64,system.int32,system.int64,system.timespan-.totalhistoryentries">TotalHistoryEntries</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int64,system.int32,system.int64,system.timespan-.serviceuptime">ServiceUptime</a>)</td>
+        <td><p>A tuple containing health metrics: (TotalMemoryBytes, BrainCount, TotalHistoryEntries, ServiceUptime).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_GetTargetMarketTickers_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.GetTargetMarketTickers(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L43">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L165">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Services_BrainPersistenceService_GetTargetMarketTickers_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.GetTargetMarketTickers*"></a>
   <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_GetTargetMarketTickers_System_String_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.GetTargetMarketTickers(System.String)">GetTargetMarketTickers(string)</h4>
@@ -259,22 +376,101 @@ Target tickers represent the markets the brain should be monitoring.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown when brainInstanceName is invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_SaveBrain_KalshiBotOverseer_Models_BrainPersistence_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.SaveBrain(KalshiBotOverseer.Models.BrainPersistence)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_InitializeAsync.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.InitializeAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L32">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L382">View Source</a>
   </span>
-  <a id="KalshiBotOverseer_Services_BrainPersistenceService_SaveBrain_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.SaveBrain*"></a>
-  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_SaveBrain_KalshiBotOverseer_Models_BrainPersistence_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.SaveBrain(KalshiBotOverseer.Models.BrainPersistence)">SaveBrain(BrainPersistence)</h4>
-  <div class="markdown level1 summary"><p>Saves or updates a brain instance in the persistence store.
-This method replaces any existing brain instance with the same name.</p>
+  <a id="KalshiBotOverseer_Services_BrainPersistenceService_InitializeAsync_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.InitializeAsync*"></a>
+  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_InitializeAsync" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.InitializeAsync">InitializeAsync()</h4>
+  <div class="markdown level1 summary"><p>Initializes the service by loading persisted brain data from the database.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void SaveBrain(BrainPersistence brain)</code></pre>
+    <pre><code class="lang-csharp hljs">public Task InitializeAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_PersistAllBrainsAsync.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.PersistAllBrainsAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L422">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_BrainPersistenceService_PersistAllBrainsAsync_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.PersistAllBrainsAsync*"></a>
+  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_PersistAllBrainsAsync" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.PersistAllBrainsAsync">PersistAllBrainsAsync()</h4>
+  <div class="markdown level1 summary"><p>Persists all brain data to the database.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task PersistAllBrainsAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_SaveBrainAsync_KalshiBotOverseer_Models_BrainPersistence_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.SaveBrainAsync(KalshiBotOverseer.Models.BrainPersistence)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L133">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_BrainPersistenceService_SaveBrainAsync_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.SaveBrainAsync*"></a>
+  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_SaveBrainAsync_KalshiBotOverseer_Models_BrainPersistence_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.SaveBrainAsync(KalshiBotOverseer.Models.BrainPersistence)">SaveBrainAsync(BrainPersistence)</h4>
+  <div class="markdown level1 summary"><p>Saves or updates a brain instance in the persistence store asynchronously.
+This method replaces any existing brain instance with the same name and
+optionally persists to database if persistence is enabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task SaveBrainAsync(BrainPersistence brain)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -294,22 +490,54 @@ This method replaces any existing brain instance with the same name.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous save operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when brain is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_UpdateCurrentMarketTickers_System_String_System_Collections_Generic_IEnumerable_System_String__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.UpdateCurrentMarketTickers(System.String%2CSystem.Collections.Generic.IEnumerable%7BSystem.String%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_UpdateCurrentMarketTickersAsync_System_String_System_Collections_Generic_IEnumerable_System_String__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.UpdateCurrentMarketTickersAsync(System.String%2CSystem.Collections.Generic.IEnumerable%7BSystem.String%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L65">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L214">View Source</a>
   </span>
-  <a id="KalshiBotOverseer_Services_BrainPersistenceService_UpdateCurrentMarketTickers_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.UpdateCurrentMarketTickers*"></a>
-  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_UpdateCurrentMarketTickers_System_String_System_Collections_Generic_IEnumerable_System_String__" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.UpdateCurrentMarketTickers(System.String,System.Collections.Generic.IEnumerable{System.String})">UpdateCurrentMarketTickers(string, IEnumerable&lt;string&gt;)</h4>
-  <div class="markdown level1 summary"><p>Updates the current market tickers for a brain instance.
+  <a id="KalshiBotOverseer_Services_BrainPersistenceService_UpdateCurrentMarketTickersAsync_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.UpdateCurrentMarketTickersAsync*"></a>
+  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_UpdateCurrentMarketTickersAsync_System_String_System_Collections_Generic_IEnumerable_System_String__" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.UpdateCurrentMarketTickersAsync(System.String,System.Collections.Generic.IEnumerable{System.String})">UpdateCurrentMarketTickersAsync(string, IEnumerable&lt;string&gt;)</h4>
+  <div class="markdown level1 summary"><p>Updates the current market tickers for a brain instance asynchronously.
 This reflects the markets the brain is actively watching at runtime.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void UpdateCurrentMarketTickers(string brainInstanceName, IEnumerable&lt;string&gt; tickers)</code></pre>
+    <pre><code class="lang-csharp hljs">public Task UpdateCurrentMarketTickersAsync(string brainInstanceName, IEnumerable&lt;string&gt; tickers)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -335,22 +563,128 @@ This reflects the markets the brain is actively watching at runtime.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous update operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown when parameters are invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_UpdateMetricHistory_System_String_System_String_System_Double_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.UpdateMetricHistory(System.String%2CSystem.String%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_UpdateMetricHistoriesBatchAsync_System_String_System_Collections_Generic_Dictionary_System_String_System_Double__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.UpdateMetricHistoriesBatchAsync(System.String%2CSystem.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Double%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L79">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L302">View Source</a>
   </span>
-  <a id="KalshiBotOverseer_Services_BrainPersistenceService_UpdateMetricHistory_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.UpdateMetricHistory*"></a>
-  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_UpdateMetricHistory_System_String_System_String_System_Double_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.UpdateMetricHistory(System.String,System.String,System.Double)">UpdateMetricHistory(string, string, double)</h4>
-  <div class="markdown level1 summary"><p>Updates the historical metrics for a specific brain instance.
-Metrics are stored in rolling lists with a maximum of 50 entries to prevent memory issues.</p>
+  <a id="KalshiBotOverseer_Services_BrainPersistenceService_UpdateMetricHistoriesBatchAsync_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.UpdateMetricHistoriesBatchAsync*"></a>
+  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_UpdateMetricHistoriesBatchAsync_System_String_System_Collections_Generic_Dictionary_System_String_System_Double__" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.UpdateMetricHistoriesBatchAsync(System.String,System.Collections.Generic.Dictionary{System.String,System.Double})">UpdateMetricHistoriesBatchAsync(string, Dictionary&lt;string, double&gt;)</h4>
+  <div class="markdown level1 summary"><p>Performs batch update operations for multiple metrics asynchronously to reduce save operations.
+This method updates multiple metrics in a single operation, improving performance by minimizing
+database persistence calls.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void UpdateMetricHistory(string brainInstanceName, string metricName, double value)</code></pre>
+    <pre><code class="lang-csharp hljs">public Task UpdateMetricHistoriesBatchAsync(string brainInstanceName, Dictionary&lt;string, double&gt; metrics)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">brainInstanceName</span></td>
+        <td><p>The name of the brain instance.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</td>
+        <td><span class="parametername">metrics</span></td>
+        <td><p>Dictionary of metric names and their values to update.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous batch update operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown when parameters are invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService_UpdateMetricHistoryAsync_System_String_System_String_System_Double_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService.UpdateMetricHistoryAsync(System.String%2CSystem.String%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L245">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_BrainPersistenceService_UpdateMetricHistoryAsync_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.UpdateMetricHistoryAsync*"></a>
+  <h4 id="KalshiBotOverseer_Services_BrainPersistenceService_UpdateMetricHistoryAsync_System_String_System_String_System_Double_" data-uid="KalshiBotOverseer.Services.BrainPersistenceService.UpdateMetricHistoryAsync(System.String,System.String,System.Double)">UpdateMetricHistoryAsync(string, string, double)</h4>
+  <div class="markdown level1 summary"><p>Updates the historical metrics for a specific brain instance asynchronously.
+Metrics are stored in rolling lists with a configurable maximum number of entries to prevent memory issues.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task UpdateMetricHistoryAsync(string brainInstanceName, string metricName, double value)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -382,6 +716,38 @@ Metrics are stored in rolling lists with a maximum of 50 entries to prevent memo
       </tr>
     </tbody>
   </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous metric update operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown when parameters are invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
 
 </article>
           </div>
@@ -394,7 +760,7 @@ Metrics are stored in rolling lists with a maximum of 50 entries to prevent memo
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_BrainPersistenceService.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.BrainPersistenceService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L12" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/BrainPersistenceService.cs/#L62" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

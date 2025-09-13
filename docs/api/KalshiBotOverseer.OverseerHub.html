@@ -145,19 +145,19 @@ and data broadcasting between the overseer and distributed brain components.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_OverseerHub__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_OverseerHub__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.OverseerHub.%23ctor(Microsoft.Extensions.Logging.ILogger%7BKalshiBotOverseer.OverseerHub%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_OverseerHub__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_OverseerHub__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.OverseerHub.%23ctor(Microsoft.Extensions.Logging.ILogger%7BKalshiBotOverseer.OverseerHub%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CMicrosoft.Extensions.Options.IOptions%7BBacklashDTOs.Configuration.ExecutionConfig%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L36">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L65">View Source</a>
   </span>
   <a id="KalshiBotOverseer_OverseerHub__ctor_" data-uid="KalshiBotOverseer.OverseerHub.#ctor*"></a>
-  <h4 id="KalshiBotOverseer_OverseerHub__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_OverseerHub__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_" data-uid="KalshiBotOverseer.OverseerHub.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.OverseerHub},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory)">OverseerHub(ILogger&lt;OverseerHub&gt;, IServiceScopeFactory)</h4>
+  <h4 id="KalshiBotOverseer_OverseerHub__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_OverseerHub__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__" data-uid="KalshiBotOverseer.OverseerHub.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.OverseerHub},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig})">OverseerHub(ILogger&lt;OverseerHub&gt;, IServiceScopeFactory, IOptions&lt;ExecutionConfig&gt;)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the OverseerHub with required dependencies.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public OverseerHub(ILogger&lt;OverseerHub&gt; logger, IServiceScopeFactory scopeFactory)</code></pre>
+    <pre><code class="lang-csharp hljs">public OverseerHub(ILogger&lt;OverseerHub&gt; logger, IServiceScopeFactory scopeFactory, IOptions&lt;ExecutionConfig&gt; executionConfig)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -181,16 +181,84 @@ and data broadcasting between the overseer and distributed brain components.</p>
         <td><p>Factory for creating service scopes to access database context.</p>
 </td>
       </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="BacklashDTOs.Configuration.ExecutionConfig.html">ExecutionConfig</a>&gt;</td>
+        <td><span class="parametername">executionConfig</span></td>
+        <td><p>Execution configuration options.</p>
+</td>
+      </tr>
     </tbody>
   </table>
   <h3 id="methods">Methods
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_OverseerHub_BroadcastMessage_System_String_System_Object_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.OverseerHub.BroadcastMessage(System.String%2CSystem.Object%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L646">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_OverseerHub_BroadcastMessage_" data-uid="KalshiBotOverseer.OverseerHub.BroadcastMessage*"></a>
+  <h4 id="KalshiBotOverseer_OverseerHub_BroadcastMessage_System_String_System_Object_System_String_" data-uid="KalshiBotOverseer.OverseerHub.BroadcastMessage(System.String,System.Object,System.String)">BroadcastMessage(string, object, string?)</h4>
+  <div class="markdown level1 summary"><p>Broadcasts a message to all clients or filtered clients based on permissions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task BroadcastMessage(string method, object data, string? clientFilter = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">method</span></td>
+        <td><p>The SignalR method to call.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">data</span></td>
+        <td><p>The data to broadcast.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">clientFilter</span></td>
+        <td><p>Optional client type filter (e.g., &quot;brain&quot;, &quot;dashboard&quot;).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_OverseerHub_CheckIn_KalshiBotOverseer_CheckInData_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.OverseerHub.CheckIn(KalshiBotOverseer.CheckInData)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L171">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L253">View Source</a>
   </span>
   <a id="KalshiBotOverseer_OverseerHub_CheckIn_" data-uid="KalshiBotOverseer.OverseerHub.CheckIn*"></a>
   <h4 id="KalshiBotOverseer_OverseerHub_CheckIn_KalshiBotOverseer_CheckInData_" data-uid="KalshiBotOverseer.OverseerHub.CheckIn(KalshiBotOverseer.CheckInData)">CheckIn(CheckInData)</h4>
@@ -240,10 +308,42 @@ and operational state information.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_OverseerHub_GetHubMetrics.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.OverseerHub.GetHubMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L621">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_OverseerHub_GetHubMetrics_" data-uid="KalshiBotOverseer.OverseerHub.GetHubMetrics*"></a>
+  <h4 id="KalshiBotOverseer_OverseerHub_GetHubMetrics" data-uid="KalshiBotOverseer.OverseerHub.GetHubMetrics">GetHubMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets current hub performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task GetHubMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_OverseerHub_Handshake_System_String_System_String_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.OverseerHub.Handshake(System.String%2CSystem.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L98">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L162">View Source</a>
   </span>
   <a id="KalshiBotOverseer_OverseerHub_Handshake_" data-uid="KalshiBotOverseer.OverseerHub.Handshake*"></a>
   <h4 id="KalshiBotOverseer_OverseerHub_Handshake_System_String_System_String_System_String_" data-uid="KalshiBotOverseer.OverseerHub.Handshake(System.String,System.String,System.String)">Handshake(string, string, string)</h4>
@@ -307,7 +407,7 @@ This establishes the client's identity and prepares it for authenticated operati
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_OverseerHub_OnConnectedAsync.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.OverseerHub.OnConnectedAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L48">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L90">View Source</a>
   </span>
   <a id="KalshiBotOverseer_OverseerHub_OnConnectedAsync_" data-uid="KalshiBotOverseer.OverseerHub.OnConnectedAsync*"></a>
   <h4 id="KalshiBotOverseer_OverseerHub_OnConnectedAsync" data-uid="KalshiBotOverseer.OverseerHub.OnConnectedAsync">OnConnectedAsync()</h4>
@@ -343,7 +443,7 @@ if authentication succeeds. Aborts the connection for invalid or missing credent
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_OverseerHub_OnDisconnectedAsync_System_Exception_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.OverseerHub.OnDisconnectedAsync(System.Exception)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L83">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L143">View Source</a>
   </span>
   <a id="KalshiBotOverseer_OverseerHub_OnDisconnectedAsync_" data-uid="KalshiBotOverseer.OverseerHub.OnDisconnectedAsync*"></a>
   <h4 id="KalshiBotOverseer_OverseerHub_OnDisconnectedAsync_System_Exception_" data-uid="KalshiBotOverseer.OverseerHub.OnDisconnectedAsync(System.Exception)">OnDisconnectedAsync(Exception?)</h4>
@@ -406,7 +506,7 @@ if authentication succeeds. Aborts the connection for invalid or missing credent
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_OverseerHub.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.OverseerHub%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L25" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/OverseerHub.cs/#L29" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

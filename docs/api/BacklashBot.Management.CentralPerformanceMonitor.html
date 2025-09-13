@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class CentralPerformanceMonitor | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Central performance monitoring service that tracks system performance metrics, records execution times, and monitors queue depths for the Kalshi trading bot. This class provides comprehensive performance analytics including WebSocket event rates, API execution times, and queue utilization metrics.">
+    <meta name="description" content="Central performance monitoring service that tracks system performance metrics, records execution times, and monitors queue depths for the Kalshi trading bot. This class provides comprehensive performance analytics including WebSocket event rates, API execution times, and queue utilization metrics with configurable alerting.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -84,7 +84,7 @@
   <div class="markdown level0 summary"><p>Central performance monitoring service that tracks system performance metrics,
 records execution times, and monitors queue depths for the Kalshi trading bot.
 This class provides comprehensive performance analytics including WebSocket event
-rates, API execution times, and queue utilization metrics.</p>
+rates, API execution times, and queue utilization metrics with configurable alerting.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -135,6 +135,13 @@ rates, API execution times, and queue utilization metrics.</p>
 <li>Provides rolling averages for queue utilization over 5-minute windows</li>
 <li>Integrates with market refresh service metrics</li>
 <li>Supports performance-based decision making for market management</li>
+<li>Monitors performance thresholds and generates alerts when exceeded</li>
+</ul>
+<p>Configurable alerting thresholds include:</p>
+<ul>
+<li>Queue high count percentage alerts</li>
+<li>Refresh usage percentage alerts</li>
+<li>Absolute queue count threshold alerts</li>
 </ul>
 <p>Key metrics tracked:</p>
 <ul>
@@ -152,7 +159,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor__BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_TradingConfig__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.%23ctor(Microsoft.Extensions.Logging.ILogger%7BBacklashBot.Management.Interfaces.ICentralPerformanceMonitor%7D%2CBacklashBot.Services.Interfaces.IServiceFactory%2CMicrosoft.Extensions.Options.IOptions%7BBacklashDTOs.Configuration.ExecutionConfig%7D%2CMicrosoft.Extensions.Options.IOptions%7BTradingStrategies.Configuration.TradingConfig%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.Services.Interfaces.IScopeManagerService%2CBacklashBot.State.Interfaces.IStatusTrackerService)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L74">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L80">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor__ctor_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.#ctor*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor__BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_TradingConfig__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.Management.Interfaces.ICentralPerformanceMonitor},BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig},Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.TradingConfig},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IStatusTrackerService)">CentralPerformanceMonitor(ILogger&lt;ICentralPerformanceMonitor&gt;, IServiceFactory, IOptions&lt;ExecutionConfig&gt;, IOptions&lt;TradingConfig&gt;, IServiceScopeFactory, IScopeManagerService, IStatusTrackerService)</h4>
@@ -224,7 +231,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_ApiExecutionTimes.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.ApiExecutionTimes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L41">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L47">View Source</a>
   </span>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_ApiExecutionTimes" data-uid="BacklashBot.Management.CentralPerformanceMonitor.ApiExecutionTimes">ApiExecutionTimes</h4>
   <div class="markdown level1 summary"></div>
@@ -255,7 +262,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_BrainInstance.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.BrainInstance%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L46">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L52">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_BrainInstance_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.BrainInstance*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_BrainInstance" data-uid="BacklashBot.Management.CentralPerformanceMonitor.BrainInstance">BrainInstance</h4>
@@ -285,7 +292,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_IsShuttingDown.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.IsShuttingDown%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L62">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L68">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_IsShuttingDown_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.IsShuttingDown*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_IsShuttingDown" data-uid="BacklashBot.Management.CentralPerformanceMonitor.IsShuttingDown">IsShuttingDown</h4>
@@ -315,7 +322,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_IsStartingUp.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.IsStartingUp%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L61">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L67">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_IsStartingUp_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.IsStartingUp*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_IsStartingUp" data-uid="BacklashBot.Management.CentralPerformanceMonitor.IsStartingUp">IsStartingUp</h4>
@@ -345,7 +352,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_LastPerformanceSampleDate.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.LastPerformanceSampleDate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L57">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L63">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_LastPerformanceSampleDate_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastPerformanceSampleDate*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_LastPerformanceSampleDate" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastPerformanceSampleDate">LastPerformanceSampleDate</h4>
@@ -375,7 +382,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_LastRefreshCycleInterval.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.LastRefreshCycleInterval%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L53">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L59">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_LastRefreshCycleInterval_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastRefreshCycleInterval*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_LastRefreshCycleInterval" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastRefreshCycleInterval">LastRefreshCycleInterval</h4>
@@ -405,7 +412,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_LastRefreshCycleSeconds.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.LastRefreshCycleSeconds%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L52">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L58">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_LastRefreshCycleSeconds_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastRefreshCycleSeconds*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_LastRefreshCycleSeconds" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastRefreshCycleSeconds">LastRefreshCycleSeconds</h4>
@@ -435,7 +442,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_LastRefreshMarketCount.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.LastRefreshMarketCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L54">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L60">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_LastRefreshMarketCount_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastRefreshMarketCount*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_LastRefreshMarketCount" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastRefreshMarketCount">LastRefreshMarketCount</h4>
@@ -465,7 +472,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_LastRefreshTimeAcceptable.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.LastRefreshTimeAcceptable%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L56">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L62">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_LastRefreshTimeAcceptable_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastRefreshTimeAcceptable*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_LastRefreshTimeAcceptable" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastRefreshTimeAcceptable">LastRefreshTimeAcceptable</h4>
@@ -495,7 +502,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_LastRefreshUsagePercentage.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.LastRefreshUsagePercentage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L55">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L61">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_LastRefreshUsagePercentage_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastRefreshUsagePercentage*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_LastRefreshUsagePercentage" data-uid="BacklashBot.Management.CentralPerformanceMonitor.LastRefreshUsagePercentage">LastRefreshUsagePercentage</h4>
@@ -525,7 +532,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_RefreshInterval.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.RefreshInterval%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L47">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L53">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_RefreshInterval_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.RefreshInterval*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_RefreshInterval" data-uid="BacklashBot.Management.CentralPerformanceMonitor.RefreshInterval">RefreshInterval</h4>
@@ -557,7 +564,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_CalculateAverageWebsocketEventsReceived_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.CalculateAverageWebsocketEventsReceived(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L110">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L116">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_CalculateAverageWebsocketEventsReceived_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.CalculateAverageWebsocketEventsReceived*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_CalculateAverageWebsocketEventsReceived_System_String_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.CalculateAverageWebsocketEventsReceived(System.String)">CalculateAverageWebsocketEventsReceived(string)</h4>
@@ -613,10 +620,35 @@ rates, API execution times, and queue utilization metrics.</p>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_CheckPerformanceAlerts.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.CheckPerformanceAlerts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L365">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_CentralPerformanceMonitor_CheckPerformanceAlerts_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.CheckPerformanceAlerts*"></a>
+  <h4 id="BacklashBot_Management_CentralPerformanceMonitor_CheckPerformanceAlerts" data-uid="BacklashBot.Management.CentralPerformanceMonitor.CheckPerformanceAlerts">CheckPerformanceAlerts()</h4>
+  <div class="markdown level1 summary"><p>Checks for performance alerts based on configured thresholds and logs warnings if exceeded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void CheckPerformanceAlerts()</code></pre>
+  </div>
+  <h5 id="BacklashBot_Management_CentralPerformanceMonitor_CheckPerformanceAlerts_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method evaluates current performance metrics against configured alert thresholds:</p>
+<ul>
+<li>Queue high count percentage exceeding threshold</li>
+<li>Refresh usage percentage exceeding threshold</li>
+<li>Individual queue counts exceeding absolute thresholds</li>
+</ul>
+<p>Alerts are logged as warnings to notify administrators of potential performance issues.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_GetQueueCountRollingAverages.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.GetQueueCountRollingAverages%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L268">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L277">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_GetQueueCountRollingAverages_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.GetQueueCountRollingAverages*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_GetQueueCountRollingAverages" data-uid="BacklashBot.Management.CentralPerformanceMonitor.GetQueueCountRollingAverages">GetQueueCountRollingAverages()</h4>
@@ -658,7 +690,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_GetQueueHighCountPercentage.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.GetQueueHighCountPercentage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L323">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L332">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_GetQueueHighCountPercentage_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.GetQueueHighCountPercentage*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_GetQueueHighCountPercentage" data-uid="BacklashBot.Management.CentralPerformanceMonitor.GetQueueHighCountPercentage">GetQueueHighCountPercentage()</h4>
@@ -700,7 +732,7 @@ rates, API execution times, and queue utilization metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_RecordExecutionTime_System_String_System_Int64_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.RecordExecutionTime(System.String%2CSystem.Int64)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L153">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L159">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_RecordExecutionTime_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.RecordExecutionTime*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_RecordExecutionTime_System_String_System_Int64_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.RecordExecutionTime(System.String,System.Int64)">RecordExecutionTime(string, long)</h4>
@@ -746,7 +778,7 @@ in a list for statistical analysis.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor_StartTimer.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor.StartTimer%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L176">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L182">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralPerformanceMonitor_StartTimer_" data-uid="BacklashBot.Management.CentralPerformanceMonitor.StartTimer*"></a>
   <h4 id="BacklashBot_Management_CentralPerformanceMonitor_StartTimer" data-uid="BacklashBot.Management.CentralPerformanceMonitor.StartTimer">StartTimer()</h4>
@@ -800,7 +832,7 @@ Multiple calls to StartTimer() are ignored if already running.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralPerformanceMonitor.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralPerformanceMonitor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L37" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralPerformanceMonitor.cs/#L43" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

@@ -89,14 +89,24 @@ Classes
       <section><p>Contains cached market data for a specific market, including profit/loss, position information,
 and various lists of price points representing different market events and states.
 This class serves as the primary data structure for storing processed market simulation results
-that can be serialized to JSON for persistence and later visualization in the GUI.</p>
+that can be serialized to JSON for persistence and later visualization in the GUI.
+Enhanced with validation, deep cloning, and serialization controls.</p>
 </section>
       <h4><a class="xref" href="TradingSimulator.DataLoader.html">DataLoader</a></h4>
       <section></section>
+      <h4><a class="xref" href="TradingSimulator.DiscrepancyDetectionConfig.html">DiscrepancyDetectionConfig</a></h4>
+      <section><p>Configuration for discrepancy detection parameters.</p>
+</section>
       <h4><a class="xref" href="TradingSimulator.MarketProcessor.html">MarketProcessor</a></h4>
       <section><p>Processes individual markets in the trading simulator by running trading strategies,
 analyzing event logs, and generating visualization data points for market analysis.
 This class orchestrates the complete market processing pipeline from simulation to data persistence.</p>
+</section>
+      <h4><a class="xref" href="TradingSimulator.MarketProcessorConfig.html">MarketProcessorConfig</a></h4>
+      <section><p>Configuration class for MarketProcessor settings.</p>
+</section>
+      <h4><a class="xref" href="TradingSimulator.PerformanceMetrics.html">PerformanceMetrics</a></h4>
+      <section><p>Performance metrics class for tracking message processing rates and queue depths.</p>
 </section>
       <h4><a class="xref" href="TradingSimulator.PricePoint.html">PricePoint</a></h4>
       <section><p>Represents a point in time with a price value and optional memo for market data visualization.

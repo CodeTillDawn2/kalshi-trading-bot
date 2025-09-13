@@ -94,8 +94,9 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
       <h4><a class="xref" href="KalshiBotData.Data.SqlDataService.html">SqlDataService</a></h4>
       <section><p>Provides asynchronous data persistence services for real-time market data from Kalshi's trading platform.
 This service manages concurrent queues for different data types (order book, trades, fills, lifecycle events)
-and processes them using background worker tasks with retry logic for transient SQL errors.
-Implements the ISqlDataService interface for dependency injection and proper resource management.</p>
+and processes them using configurable background worker tasks with retry logic for transient SQL errors.
+Supports batch processing, performance metrics collection, input validation, and configurable queue sizes
+to prevent resource exhaustion. Implements the ISqlDataService interface for dependency injection and proper resource management.</p>
 </section>
 
 

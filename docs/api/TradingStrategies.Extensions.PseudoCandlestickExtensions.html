@@ -125,13 +125,13 @@ enabling pattern detection and technical analysis algorithms to work with market
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Extensions_PseudoCandlestickExtensions_ToCandleMids_System_Collections_Generic_IList_BacklashDTOs_PseudoCandlestick__System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Extensions.PseudoCandlestickExtensions.ToCandleMids(System.Collections.Generic.IList%7BBacklashDTOs.PseudoCandlestick%7D%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Extensions_PseudoCandlestickExtensions_ToCandleMids_System_Collections_Generic_IList_BacklashDTOs_PseudoCandlestick__System_String_TradingStrategies_Configuration_TradingConfig_Microsoft_Extensions_Logging_ILogger_.md&amp;value=---%0Auid%3A%20TradingStrategies.Extensions.PseudoCandlestickExtensions.ToCandleMids(System.Collections.Generic.IList%7BBacklashDTOs.PseudoCandlestick%7D%2CSystem.String%2CTradingStrategies.Configuration.TradingConfig%2CMicrosoft.Extensions.Logging.ILogger)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Extensions/PseudoCandlestickExtensions.cs/#L28">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Extensions/PseudoCandlestickExtensions.cs/#L35">View Source</a>
   </span>
   <a id="TradingStrategies_Extensions_PseudoCandlestickExtensions_ToCandleMids_" data-uid="TradingStrategies.Extensions.PseudoCandlestickExtensions.ToCandleMids*"></a>
-  <h4 id="TradingStrategies_Extensions_PseudoCandlestickExtensions_ToCandleMids_System_Collections_Generic_IList_BacklashDTOs_PseudoCandlestick__System_String_" data-uid="TradingStrategies.Extensions.PseudoCandlestickExtensions.ToCandleMids(System.Collections.Generic.IList{BacklashDTOs.PseudoCandlestick},System.String)">ToCandleMids(IList&lt;PseudoCandlestick&gt;, string)</h4>
+  <h4 id="TradingStrategies_Extensions_PseudoCandlestickExtensions_ToCandleMids_System_Collections_Generic_IList_BacklashDTOs_PseudoCandlestick__System_String_TradingStrategies_Configuration_TradingConfig_Microsoft_Extensions_Logging_ILogger_" data-uid="TradingStrategies.Extensions.PseudoCandlestickExtensions.ToCandleMids(System.Collections.Generic.IList{BacklashDTOs.PseudoCandlestick},System.String,TradingStrategies.Configuration.TradingConfig,Microsoft.Extensions.Logging.ILogger)">ToCandleMids(IList&lt;PseudoCandlestick&gt;, string, TradingConfig, ILogger)</h4>
   <div class="markdown level1 summary"><p>Converts a sequence of PseudoCandlesticks to an array of CandleMids with OHLC data.
 Each resulting candlestick represents the price movement between consecutive PseudoCandlesticks,
 using the previous candlestick's mid-close as the open price and the current candlestick's
@@ -140,7 +140,7 @@ mid-close as the close price, with high/low from the current candlestick.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static CandleMids[] ToCandleMids(this IList&lt;PseudoCandlestick&gt; candles, string marketTicker)</code></pre>
+    <pre><code class="lang-csharp hljs">public static CandleMids[] ToCandleMids(this IList&lt;PseudoCandlestick&gt; candles, string marketTicker, TradingConfig config = null, ILogger logger = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -164,6 +164,18 @@ mid-close as the close price, with high/low from the current candlestick.</p>
         <td><p>The market ticker identifier to assign to each resulting CandleMids.</p>
 </td>
       </tr>
+      <tr>
+        <td><a class="xref" href="TradingStrategies.Configuration.TradingConfig.html">TradingConfig</a></td>
+        <td><span class="parametername">config</span></td>
+        <td><p>Optional trading configuration for volume precision handling.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger">ILogger</a></td>
+        <td><span class="parametername">logger</span></td>
+        <td><p>Optional logger for performance metrics collection.</p>
+</td>
+      </tr>
     </tbody>
   </table>
   <h5 class="returns">Returns</h5>
@@ -182,10 +194,11 @@ mid-close as the close price, with high/low from the current candlestick.</p>
       </tr>
     </tbody>
   </table>
-  <h5 id="TradingStrategies_Extensions_PseudoCandlestickExtensions_ToCandleMids_System_Collections_Generic_IList_BacklashDTOs_PseudoCandlestick__System_String__remarks">Remarks</h5>
+  <h5 id="TradingStrategies_Extensions_PseudoCandlestickExtensions_ToCandleMids_System_Collections_Generic_IList_BacklashDTOs_PseudoCandlestick__System_String_TradingStrategies_Configuration_TradingConfig_Microsoft_Extensions_Logging_ILogger__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>This method creates n-1 candlesticks from n input PseudoCandlesticks, where each output candlestick
 represents the transition from one time period to the next. The volume is cast from decimal to double
-to match the CandleMids data type expectations.</p>
+to match the CandleMids data type expectations, with optional precision rounding based on config.
+Performance metrics are logged if the conversion takes longer than 100ms for large sequences.</p>
 </div>
   <h5 class="exceptions">Exceptions</h5>
   <table class="table table-bordered table-condensed">
@@ -203,7 +216,7 @@ to match the CandleMids data type expectations.</p>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
-        <td><p>Thrown when candles contains fewer than 2 elements.</p>
+        <td><p>Thrown when candles contains fewer than 2 elements or marketTicker is null/empty.</p>
 </td>
       </tr>
     </tbody>
@@ -220,7 +233,7 @@ to match the CandleMids data type expectations.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Extensions_PseudoCandlestickExtensions.md&amp;value=---%0Auid%3A%20TradingStrategies.Extensions.PseudoCandlestickExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Extensions/PseudoCandlestickExtensions.cs/#L10" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Extensions/PseudoCandlestickExtensions.cs/#L14" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

@@ -128,7 +128,7 @@ market hours, and recorded hours percentages, and returns structured data for an
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService__ctor_KalshiBotData_Data_Interfaces_IKalshiBotContext_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.%23ctor(KalshiBotData.Data.Interfaces.IKalshiBotContext)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L19">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L21">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Services_SnapshotService__ctor_" data-uid="KalshiBotOverseer.Services.SnapshotService.#ctor*"></a>
   <h4 id="KalshiBotOverseer_Services_SnapshotService__ctor_KalshiBotData_Data_Interfaces_IKalshiBotContext_" data-uid="KalshiBotOverseer.Services.SnapshotService.#ctor(KalshiBotData.Data.Interfaces.IKalshiBotContext)">SnapshotService(IKalshiBotContext)</h4>
@@ -161,20 +161,53 @@ market hours, and recorded hours percentages, and returns structured data for an
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsData_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsData(System.Collections.Generic.List%7BBacklashDTOs.Data.SnapshotGroupDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L45">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L31">View Source</a>
   </span>
-  <a id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsData_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsData*"></a>
-  <h4 id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsData_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsData(System.Collections.Generic.List{BacklashDTOs.Data.SnapshotGroupDTO})">GetSnapshotGroupsData(List&lt;SnapshotGroupDTO&gt;)</h4>
-  <div class="markdown level1 summary"><p>Processes a list of snapshot groups into aggregated market data without related market information.
+  <a id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync*"></a>
+  <h4 id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync">GetSnapshotGroupsDataAsync()</h4>
+  <div class="markdown level1 summary"><p>Asynchronously retrieves all snapshot groups from the database and processes them
+into aggregated market data without related market information.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task&lt;List&lt;object&gt;&gt; GetSnapshotGroupsDataAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;&gt;</td>
+        <td><p>A list of anonymous objects containing aggregated snapshot data per market.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync(System.Collections.Generic.List%7BBacklashDTOs.Data.SnapshotGroupDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L47">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync*"></a>
+  <h4 id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync(System.Collections.Generic.List{BacklashDTOs.Data.SnapshotGroupDTO})">GetSnapshotGroupsDataAsync(List&lt;SnapshotGroupDTO&gt;)</h4>
+  <div class="markdown level1 summary"><p>Asynchronously processes a list of snapshot groups into aggregated market data without related market information.
 Groups snapshots by market ticker and calculates total recorded hours and other metrics.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;object&gt; GetSnapshotGroupsData(List&lt;SnapshotGroupDTO&gt; snapshotGroups)</code></pre>
+    <pre><code class="lang-csharp hljs">public Task&lt;List&lt;object&gt;&gt; GetSnapshotGroupsDataAsync(List&lt;SnapshotGroupDTO&gt; snapshotGroups)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -204,29 +237,29 @@ Groups snapshots by market ticker and calculates total recorded hours and other 
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
-        <td><p>A list of anonymous objects containing aggregated snapshot data per market.</p>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;&gt;</td>
+        <td><p>A task representing the asynchronous operation, containing a list of anonymous objects with aggregated snapshot data per market.</p>
 </td>
       </tr>
     </tbody>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsData_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__System_Collections_Generic_List_BacklashDTOs_Data_MarketDTO__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsData(System.Collections.Generic.List%7BBacklashDTOs.Data.SnapshotGroupDTO%7D%2CSystem.Collections.Generic.List%7BBacklashDTOs.Data.MarketDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__System_Collections_Generic_List_BacklashDTOs_Data_MarketDTO__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync(System.Collections.Generic.List%7BBacklashDTOs.Data.SnapshotGroupDTO%7D%2CSystem.Collections.Generic.List%7BBacklashDTOs.Data.MarketDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L98">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L104">View Source</a>
   </span>
-  <a id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsData_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsData*"></a>
-  <h4 id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsData_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__System_Collections_Generic_List_BacklashDTOs_Data_MarketDTO__" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsData(System.Collections.Generic.List{BacklashDTOs.Data.SnapshotGroupDTO},System.Collections.Generic.List{BacklashDTOs.Data.MarketDTO})">GetSnapshotGroupsData(List&lt;SnapshotGroupDTO&gt;, List&lt;MarketDTO&gt;)</h4>
-  <div class="markdown level1 summary"><p>Processes a list of snapshot groups into aggregated market data with related market information.
+  <a id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync*"></a>
+  <h4 id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__System_Collections_Generic_List_BacklashDTOs_Data_MarketDTO__" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync(System.Collections.Generic.List{BacklashDTOs.Data.SnapshotGroupDTO},System.Collections.Generic.List{BacklashDTOs.Data.MarketDTO})">GetSnapshotGroupsDataAsync(List&lt;SnapshotGroupDTO&gt;, List&lt;MarketDTO&gt;)</h4>
+  <div class="markdown level1 summary"><p>Asynchronously processes a list of snapshot groups into aggregated market data with related market information.
 Groups snapshots by market ticker, calculates recorded hours, market hours, and percentages
 using the provided market data for accurate calculations.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;object&gt; GetSnapshotGroupsData(List&lt;SnapshotGroupDTO&gt; snapshotGroups, List&lt;MarketDTO&gt; relatedMarkets)</code></pre>
+    <pre><code class="lang-csharp hljs">public Task&lt;List&lt;object&gt;&gt; GetSnapshotGroupsDataAsync(List&lt;SnapshotGroupDTO&gt; snapshotGroups, List&lt;MarketDTO&gt; relatedMarkets)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -262,41 +295,8 @@ using the provided market data for accurate calculations.</p>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
-        <td><p>A list of anonymous objects containing aggregated snapshot data per market.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="small pull-right mobile-hide">
-    <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
-  </span>
-  <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L29">View Source</a>
-  </span>
-  <a id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync*"></a>
-  <h4 id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync">GetSnapshotGroupsDataAsync()</h4>
-  <div class="markdown level1 summary"><p>Asynchronously retrieves all snapshot groups from the database and processes them
-into aggregated market data without related market information.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="declaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Task&lt;List&lt;object&gt;&gt; GetSnapshotGroupsDataAsync()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;&gt;</td>
-        <td><p>A list of anonymous objects containing aggregated snapshot data per market.</p>
+        <td><p>A task representing the asynchronous operation, containing a list of anonymous objects with aggregated snapshot data per market.</p>
 </td>
       </tr>
     </tbody>
@@ -313,7 +313,7 @@ into aggregated market data without related market information.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L11" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L13" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

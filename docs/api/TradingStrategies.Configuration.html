@@ -86,11 +86,7 @@
 Classes
 </h3>
       <h4><a class="xref" href="TradingStrategies.Configuration.CalculationConfig.html">CalculationConfig</a></h4>
-      <section><p>Configuration class containing all technical indicator parameters used throughout the trading bot.
-These settings control the calculation periods and thresholds for various technical analysis indicators
-that drive trading decisions and market analysis. Values are injected via dependency injection
-and used by MarketData and TradingCalculator classes for real-time indicator computation.</p>
-</section>
+      <section></section>
       <h4><a class="xref" href="TradingStrategies.Configuration.SnapshotConfig.html">SnapshotConfig</a></h4>
       <section><p>Configuration class containing snapshot-related parameters used throughout the trading bot system.
 These settings control snapshot timing tolerances, schema versioning, and data persistence behavior
@@ -100,7 +96,8 @@ for market data snapshots used in trading strategy evaluation and backtesting.</
       <section><p>Configuration class containing timing parameters for trading operations in the Kalshi trading bot system.
 These settings control decision frequency, change detection windows, trade matching tolerances, and refresh intervals
 used throughout the trading strategy execution pipeline. Values are injected via dependency injection
-and consumed by TradingStrategy, TradingSnapshotService, and related components for consistent timing behavior.</p>
+and consumed by TradingStrategy, TradingSnapshotService, and related components for consistent timing behavior.
+The class includes data validation attributes and a Validate() method to ensure parameters are within acceptable ranges.</p>
 </section>
 
 

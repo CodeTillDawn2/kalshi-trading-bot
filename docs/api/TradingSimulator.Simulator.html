@@ -85,12 +85,34 @@
     <h3 id="classes">
 Classes
 </h3>
+      <h4><a class="xref" href="TradingSimulator.Simulator.AnalysisConfiguration.html">AnalysisConfiguration</a></h4>
+      <section><p>Configuration class for velocity discrepancy analysis parameters.
+This class contains all configurable parameters for the SimulatorReporting analysis engine,
+allowing fine-tuning of detection thresholds, performance settings, and output configuration.
+Parameters can be loaded from appsettings.json under the &quot;SimulatorReporting&quot; section.</p>
+</section>
+      <h4><a class="xref" href="TradingSimulator.Simulator.PerformanceMetrics.html">PerformanceMetrics</a></h4>
+      <section><p>Performance metrics class for tracking velocity discrepancy analysis execution timing and statistics.
+This class provides detailed performance information about the analysis process, including
+timing for different computational phases and counts of processed data points.</p>
+</section>
       <h4><a class="xref" href="TradingSimulator.Simulator.SimulatorReporting.html">SimulatorReporting</a></h4>
       <section><p>Provides comprehensive reporting and analysis functionality for trading simulator operations.
 This class serves as the core engine for detecting velocity discrepancies in market snapshots,
 computing rolling observations, generating detailed memos, and coalescing discrepancy data.
 It is designed to analyze orderbook flow patterns and identify potential anomalies in market data
 that could indicate trading opportunities or data quality issues.</p>
+<p>Key Features:</p>
+<ul>
+<li>Configurable analysis parameters via AnalysisConfiguration class</li>
+<li>Async processing support for better performance with large datasets</li>
+<li>Parallel processing for multiple market analyses</li>
+<li>Comprehensive input validation for data integrity</li>
+<li>Performance metrics collection and timing analysis</li>
+<li>Configurable logging with automatic directory creation</li>
+<li>Spike suppression to reduce false positives</li>
+<li>Robust error handling and recovery</li>
+</ul>
 </section>
 
 

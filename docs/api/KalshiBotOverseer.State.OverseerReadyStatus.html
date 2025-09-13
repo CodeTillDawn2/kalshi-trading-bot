@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class OverseerReadyStatus | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Manages the readiness status of different components within the Kalshi overseer system. This class provides TaskCompletionSource objects to signal when various parts of the overseer have completed their initialization or are ready for operation.">
+    <meta name="description" content="Manages the readiness status of different components within the Kalshi overseer system. This class provides TaskCompletionSource objects to signal when various parts of the overseer have completed their initialization or are ready for operation, with comprehensive logging and metrics.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -83,7 +83,7 @@
   <h1 id="KalshiBotOverseer_State_OverseerReadyStatus" data-uid="KalshiBotOverseer.State.OverseerReadyStatus" class="text-break">Class OverseerReadyStatus</h1>
   <div class="markdown level0 summary"><p>Manages the readiness status of different components within the Kalshi overseer system.
 This class provides TaskCompletionSource objects to signal when various parts of the overseer
-have completed their initialization or are ready for operation.</p>
+have completed their initialization or are ready for operation, with comprehensive logging and metrics.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -133,26 +133,57 @@ have completed their initialization or are ready for operation.</p>
 </ul>
 <p>Components can await these TaskCompletionSource objects to coordinate startup sequences,
 and can set the results to signal completion to waiting components.</p>
+<p>Features include:</p>
+<ul>
+<li>Comprehensive logging for all state changes and operations</li>
+<li>Input validation to prevent null reference exceptions</li>
+<li>Configurable default states through OverseerReadyConfig</li>
+<li>Metrics collection for readiness timing and operation performance</li>
+</ul>
 </div>
   <h3 id="constructors">Constructors
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerReadyStatus__ctor.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerReadyStatus.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerReadyStatus__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_State_OverseerReadyStatus__Microsoft_Extensions_Options_IOptions_KalshiBotOverseer_State_OverseerReadyConfig__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerReadyStatus.%23ctor(Microsoft.Extensions.Logging.ILogger%7BKalshiBotOverseer.State.OverseerReadyStatus%7D%2CMicrosoft.Extensions.Options.IOptions%7BKalshiBotOverseer.State.OverseerReadyConfig%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerReadyStatus.cs/#L38">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerReadyStatus.cs/#L54">View Source</a>
   </span>
   <a id="KalshiBotOverseer_State_OverseerReadyStatus__ctor_" data-uid="KalshiBotOverseer.State.OverseerReadyStatus.#ctor*"></a>
-  <h4 id="KalshiBotOverseer_State_OverseerReadyStatus__ctor" data-uid="KalshiBotOverseer.State.OverseerReadyStatus.#ctor">OverseerReadyStatus()</h4>
+  <h4 id="KalshiBotOverseer_State_OverseerReadyStatus__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_State_OverseerReadyStatus__Microsoft_Extensions_Options_IOptions_KalshiBotOverseer_State_OverseerReadyConfig__" data-uid="KalshiBotOverseer.State.OverseerReadyStatus.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.State.OverseerReadyStatus},Microsoft.Extensions.Options.IOptions{KalshiBotOverseer.State.OverseerReadyConfig})">OverseerReadyStatus(ILogger&lt;OverseerReadyStatus&gt;, IOptions&lt;OverseerReadyConfig&gt;)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the OverseerReadyStatus class.
 Creates the initial TaskCompletionSource objects and sets up the default state.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public OverseerReadyStatus()</code></pre>
+    <pre><code class="lang-csharp hljs">public OverseerReadyStatus(ILogger&lt;OverseerReadyStatus&gt; logger, IOptions&lt;OverseerReadyConfig&gt; config)</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="KalshiBotOverseer.State.OverseerReadyStatus.html">OverseerReadyStatus</a>&gt;</td>
+        <td><span class="parametername">logger</span></td>
+        <td><p>The logger for tracking readiness state changes.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="KalshiBotOverseer.State.OverseerReadyConfig.html">OverseerReadyConfig</a>&gt;</td>
+        <td><span class="parametername">config</span></td>
+        <td><p>The configuration for default readiness states.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="properties">Properties
 </h3>
   <span class="small pull-right mobile-hide">
@@ -160,7 +191,7 @@ Creates the initial TaskCompletionSource objects and sets up the default state.<
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerReadyStatus_BrowserReady.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerReadyStatus.BrowserReady%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerReadyStatus.cs/#L32">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerReadyStatus.cs/#L46">View Source</a>
   </span>
   <a id="KalshiBotOverseer_State_OverseerReadyStatus_BrowserReady_" data-uid="KalshiBotOverseer.State.OverseerReadyStatus.BrowserReady*"></a>
   <h4 id="KalshiBotOverseer_State_OverseerReadyStatus_BrowserReady" data-uid="KalshiBotOverseer.State.OverseerReadyStatus.BrowserReady">BrowserReady</h4>
@@ -193,7 +224,7 @@ This is used for components that depend on browser initialization or UI readines
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerReadyStatus_InitializationCompleted.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerReadyStatus.InitializationCompleted%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerReadyStatus.cs/#L25">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerReadyStatus.cs/#L39">View Source</a>
   </span>
   <a id="KalshiBotOverseer_State_OverseerReadyStatus_InitializationCompleted_" data-uid="KalshiBotOverseer.State.OverseerReadyStatus.InitializationCompleted*"></a>
   <h4 id="KalshiBotOverseer_State_OverseerReadyStatus_InitializationCompleted" data-uid="KalshiBotOverseer.State.OverseerReadyStatus.InitializationCompleted">InitializationCompleted</h4>
@@ -228,12 +259,12 @@ Components can await this task to wait for initialization to finish, or set its 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerReadyStatus_ResetAll.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerReadyStatus.ResetAll%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerReadyStatus.cs/#L51">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerReadyStatus.cs/#L71">View Source</a>
   </span>
   <a id="KalshiBotOverseer_State_OverseerReadyStatus_ResetAll_" data-uid="KalshiBotOverseer.State.OverseerReadyStatus.ResetAll*"></a>
   <h4 id="KalshiBotOverseer_State_OverseerReadyStatus_ResetAll" data-uid="KalshiBotOverseer.State.OverseerReadyStatus.ResetAll">ResetAll()</h4>
   <div class="markdown level1 summary"><p>Resets all readiness status indicators to their initial state.
-This creates new TaskCompletionSource objects and sets the initialization status to false.</p>
+This creates new TaskCompletionSource objects and sets the initialization status to the configured default.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -260,7 +291,7 @@ to clear all previous readiness signals and start fresh.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerReadyStatus.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerReadyStatus%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerReadyStatus.cs/#L18" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerReadyStatus.cs/#L27" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

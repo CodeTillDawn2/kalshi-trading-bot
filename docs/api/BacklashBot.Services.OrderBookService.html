@@ -130,20 +130,20 @@ Integrates with the broader trading bot ecosystem to ensure real-time order book
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IOrderBookService__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.%23ctor(Microsoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.IOrderBookService%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.Services.Interfaces.IServiceFactory%2CBacklashBot.Services.Interfaces.IScopeManagerService%2CBacklashBot.State.Interfaces.IStatusTrackerService)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IOrderBookService__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_BacklashBot_Services_OrderBookServiceConfig_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.%23ctor(Microsoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.IOrderBookService%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.Services.Interfaces.IServiceFactory%2CBacklashBot.Services.Interfaces.IScopeManagerService%2CBacklashBot.State.Interfaces.IStatusTrackerService%2CBacklashBot.Services.OrderBookServiceConfig)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L58">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L79">View Source</a>
   </span>
   <a id="BacklashBot_Services_OrderBookService__ctor_" data-uid="BacklashBot.Services.OrderBookService.#ctor*"></a>
-  <h4 id="BacklashBot_Services_OrderBookService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IOrderBookService__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_" data-uid="BacklashBot.Services.OrderBookService.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IOrderBookService},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IStatusTrackerService)">OrderBookService(ILogger&lt;IOrderBookService&gt;, IServiceScopeFactory, IServiceFactory, IScopeManagerService, IStatusTrackerService)</h4>
+  <h4 id="BacklashBot_Services_OrderBookService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IOrderBookService__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IStatusTrackerService_BacklashBot_Services_OrderBookServiceConfig_" data-uid="BacklashBot.Services.OrderBookService.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IOrderBookService},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IStatusTrackerService,BacklashBot.Services.OrderBookServiceConfig)">OrderBookService(ILogger&lt;IOrderBookService&gt;, IServiceScopeFactory, IServiceFactory, IScopeManagerService, IStatusTrackerService, OrderBookServiceConfig)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the OrderBookService class.
 Sets up dependencies, initializes queues and locks, and starts background processors.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public OrderBookService(ILogger&lt;IOrderBookService&gt; logger, IServiceScopeFactory scopeFactory, IServiceFactory serviceFactory, IScopeManagerService scopeManagerService, IStatusTrackerService statusTrackerService)</code></pre>
+    <pre><code class="lang-csharp hljs">public OrderBookService(ILogger&lt;IOrderBookService&gt; logger, IServiceScopeFactory scopeFactory, IServiceFactory serviceFactory, IScopeManagerService scopeManagerService, IStatusTrackerService statusTrackerService, OrderBookServiceConfig config)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -185,6 +185,12 @@ Sets up dependencies, initializes queues and locks, and starts background proces
         <td><p>Service for tracking cancellation tokens and status.</p>
 </td>
       </tr>
+      <tr>
+        <td><a class="xref" href="BacklashBot.Services.OrderBookServiceConfig.html">OrderBookServiceConfig</a></td>
+        <td><span class="parametername">config</span></td>
+        <td><p>Configuration options for the order book service.</p>
+</td>
+      </tr>
     </tbody>
   </table>
   <h3 id="methods">Methods
@@ -194,7 +200,7 @@ Sets up dependencies, initializes queues and locks, and starts background proces
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_ClearQueueForMarketAsync_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.ClearQueueForMarketAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L193">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L233">View Source</a>
   </span>
   <a id="BacklashBot_Services_OrderBookService_ClearQueueForMarketAsync_" data-uid="BacklashBot.Services.OrderBookService.ClearQueueForMarketAsync*"></a>
   <h4 id="BacklashBot_Services_OrderBookService_ClearQueueForMarketAsync_System_String_" data-uid="BacklashBot.Services.OrderBookService.ClearQueueForMarketAsync(System.String)">ClearQueueForMarketAsync(string)</h4>
@@ -229,7 +235,7 @@ Removes pending events, tickers, and notifications, disposes semaphores, and rem
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_ConfigureWebSocketEventHandlers.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.ConfigureWebSocketEventHandlers%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L107">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L137">View Source</a>
   </span>
   <a id="BacklashBot_Services_OrderBookService_ConfigureWebSocketEventHandlers_" data-uid="BacklashBot.Services.OrderBookService.ConfigureWebSocketEventHandlers*"></a>
   <h4 id="BacklashBot_Services_OrderBookService_ConfigureWebSocketEventHandlers" data-uid="BacklashBot.Services.OrderBookService.ConfigureWebSocketEventHandlers">ConfigureWebSocketEventHandlers()</h4>
@@ -246,7 +252,7 @@ Ensures proper event subscription to receive real-time market data updates.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_GetCurrentOrderBook_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.GetCurrentOrderBook(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L121">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L151">View Source</a>
   </span>
   <a id="BacklashBot_Services_OrderBookService_GetCurrentOrderBook_" data-uid="BacklashBot.Services.OrderBookService.GetCurrentOrderBook*"></a>
   <h4 id="BacklashBot_Services_OrderBookService_GetCurrentOrderBook_System_String_" data-uid="BacklashBot.Services.OrderBookService.GetCurrentOrderBook(System.String)">GetCurrentOrderBook(string)</h4>
@@ -297,7 +303,7 @@ Returns an empty list if the market is not found in the cache.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_GetQueueCounts.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.GetQueueCounts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L390">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L436">View Source</a>
   </span>
   <a id="BacklashBot_Services_OrderBookService_GetQueueCounts_" data-uid="BacklashBot.Services.OrderBookService.GetQueueCounts*"></a>
   <h4 id="BacklashBot_Services_OrderBookService_GetQueueCounts" data-uid="BacklashBot.Services.OrderBookService.GetQueueCounts">GetQueueCounts()</h4>
@@ -330,7 +336,7 @@ Used for monitoring and diagnostics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_IsEventQueueUnderLimit_System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.IsEventQueueUnderLimit(System.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L236">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L281">View Source</a>
   </span>
   <a id="BacklashBot_Services_OrderBookService_IsEventQueueUnderLimit_" data-uid="BacklashBot.Services.OrderBookService.IsEventQueueUnderLimit*"></a>
   <h4 id="BacklashBot_Services_OrderBookService_IsEventQueueUnderLimit_System_Int32_" data-uid="BacklashBot.Services.OrderBookService.IsEventQueueUnderLimit(System.Int32)">IsEventQueueUnderLimit(int)</h4>
@@ -340,7 +346,7 @@ Used to prevent queue overflow and manage processing load.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool IsEventQueueUnderLimit(int limit)</code></pre>
+    <pre><code class="lang-csharp hljs">public bool IsEventQueueUnderLimit(int limit = -1)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -381,7 +387,7 @@ Used to prevent queue overflow and manage processing load.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_StartServicesAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.StartServicesAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L82">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L112">View Source</a>
   </span>
   <a id="BacklashBot_Services_OrderBookService_StartServicesAsync_" data-uid="BacklashBot.Services.OrderBookService.StartServicesAsync*"></a>
   <h4 id="BacklashBot_Services_OrderBookService_StartServicesAsync" data-uid="BacklashBot.Services.OrderBookService.StartServicesAsync">StartServicesAsync()</h4>
@@ -414,7 +420,7 @@ and starting background processors for handling order book updates.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_StopServicesAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.StopServicesAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L247">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L293">View Source</a>
   </span>
   <a id="BacklashBot_Services_OrderBookService_StopServicesAsync_" data-uid="BacklashBot.Services.OrderBookService.StopServicesAsync*"></a>
   <h4 id="BacklashBot_Services_OrderBookService_StopServicesAsync" data-uid="BacklashBot.Services.OrderBookService.StopServicesAsync">StopServicesAsync()</h4>
@@ -447,7 +453,7 @@ completing queues, waiting for processors to finish, and disposing resources.</p
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_SyncOrderBookAsync_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.SyncOrderBookAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L136">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L171">View Source</a>
   </span>
   <a id="BacklashBot_Services_OrderBookService_SyncOrderBookAsync_" data-uid="BacklashBot.Services.OrderBookService.SyncOrderBookAsync*"></a>
   <h4 id="BacklashBot_Services_OrderBookService_SyncOrderBookAsync_System_String_" data-uid="BacklashBot.Services.OrderBookService.SyncOrderBookAsync(System.String)">SyncOrderBookAsync(string)</h4>
@@ -500,7 +506,7 @@ Attempts to acquire a semaphore lock and notifies listeners if the WebSocket is 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_OrderBookUpdated.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.OrderBookUpdated%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L47">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L67">View Source</a>
   </span>
   <h4 id="BacklashBot_Services_OrderBookService_OrderBookUpdated" data-uid="BacklashBot.Services.OrderBookService.OrderBookUpdated">OrderBookUpdated</h4>
   <div class="markdown level1 summary"><p>Event raised when an order book is updated for a market.

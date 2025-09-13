@@ -642,26 +642,26 @@ with database and external API services.</p>
   <h5 id="KalshiBotOverseer_Controllers_MarketWatchController_syntax">Syntax</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">[ApiController]
-[Route(&quot;[controller]&quot;)]
+[Route(&quot;v1/[controller]&quot;)]
 public class MarketWatchController : ControllerBase</code></pre>
   </div>
   <h3 id="constructors">Constructors
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController__ctor_KalshiBotData_Data_Interfaces_IKalshiBotContext_Microsoft_Extensions_Caching_Memory_IMemoryCache_BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_KalshiBotOverseer_Services_SnapshotService_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_Controllers_MarketWatchController__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController.%23ctor(KalshiBotData.Data.Interfaces.IKalshiBotContext%2CMicrosoft.Extensions.Caching.Memory.IMemoryCache%2CBacklashBot.KalshiAPI.Interfaces.IKalshiAPIService%2CKalshiBotOverseer.Services.SnapshotService%2CMicrosoft.Extensions.Logging.ILogger%7BKalshiBotOverseer.Controllers.MarketWatchController%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController__ctor_KalshiBotData_Data_Interfaces_IKalshiBotContext_Microsoft_Extensions_Caching_Memory_IMemoryCache_BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_KalshiBotOverseer_Services_SnapshotService_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_Controllers_MarketWatchController__Microsoft_Extensions_Configuration_IConfiguration_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController.%23ctor(KalshiBotData.Data.Interfaces.IKalshiBotContext%2CMicrosoft.Extensions.Caching.Memory.IMemoryCache%2CBacklashBot.KalshiAPI.Interfaces.IKalshiAPIService%2CKalshiBotOverseer.Services.SnapshotService%2CMicrosoft.Extensions.Logging.ILogger%7BKalshiBotOverseer.Controllers.MarketWatchController%7D%2CMicrosoft.Extensions.Configuration.IConfiguration)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L46">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L50">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Controllers_MarketWatchController__ctor_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.#ctor*"></a>
-  <h4 id="KalshiBotOverseer_Controllers_MarketWatchController__ctor_KalshiBotData_Data_Interfaces_IKalshiBotContext_Microsoft_Extensions_Caching_Memory_IMemoryCache_BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_KalshiBotOverseer_Services_SnapshotService_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_Controllers_MarketWatchController__" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.#ctor(KalshiBotData.Data.Interfaces.IKalshiBotContext,Microsoft.Extensions.Caching.Memory.IMemoryCache,BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService,KalshiBotOverseer.Services.SnapshotService,Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.Controllers.MarketWatchController})">MarketWatchController(IKalshiBotContext, IMemoryCache, IKalshiAPIService, SnapshotService, ILogger&lt;MarketWatchController&gt;)</h4>
+  <h4 id="KalshiBotOverseer_Controllers_MarketWatchController__ctor_KalshiBotData_Data_Interfaces_IKalshiBotContext_Microsoft_Extensions_Caching_Memory_IMemoryCache_BacklashBot_KalshiAPI_Interfaces_IKalshiAPIService_KalshiBotOverseer_Services_SnapshotService_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_Controllers_MarketWatchController__Microsoft_Extensions_Configuration_IConfiguration_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.#ctor(KalshiBotData.Data.Interfaces.IKalshiBotContext,Microsoft.Extensions.Caching.Memory.IMemoryCache,BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService,KalshiBotOverseer.Services.SnapshotService,Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.Controllers.MarketWatchController},Microsoft.Extensions.Configuration.IConfiguration)">MarketWatchController(IKalshiBotContext, IMemoryCache, IKalshiAPIService, SnapshotService, ILogger&lt;MarketWatchController&gt;, IConfiguration)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the MarketWatchController with required dependencies.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotService snapshotService, ILogger&lt;MarketWatchController&gt; logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotService snapshotService, ILogger&lt;MarketWatchController&gt; logger, IConfiguration configuration)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -703,6 +703,12 @@ public class MarketWatchController : ControllerBase</code></pre>
         <td><p>Logger for recording operational information and errors.</p>
 </td>
       </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.configuration.iconfiguration">IConfiguration</a></td>
+        <td><span class="parametername">configuration</span></td>
+        <td><p>Configuration for cache durations and other settings.</p>
+</td>
+      </tr>
     </tbody>
   </table>
   <h3 id="methods">Methods
@@ -712,7 +718,7 @@ public class MarketWatchController : ControllerBase</code></pre>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController_GetAccountData.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController.GetAccountData%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L395">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L415">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Controllers_MarketWatchController_GetAccountData_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetAccountData*"></a>
   <h4 id="KalshiBotOverseer_Controllers_MarketWatchController_GetAccountData" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetAccountData">GetAccountData()</h4>
@@ -745,7 +751,7 @@ public Task&lt;IActionResult&gt; GetAccountData()</code></pre>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController_GetBrainLocksData.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController.GetBrainLocksData%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L160">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L171">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Controllers_MarketWatchController_GetBrainLocksData_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetBrainLocksData*"></a>
   <h4 id="KalshiBotOverseer_Controllers_MarketWatchController_GetBrainLocksData" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetBrainLocksData">GetBrainLocksData()</h4>
@@ -779,7 +785,7 @@ public Task&lt;IActionResult&gt; GetBrainLocksData()</code></pre>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController_GetBrainsData.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController.GetBrainsData%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L473">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L511">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Controllers_MarketWatchController_GetBrainsData_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetBrainsData*"></a>
   <h4 id="KalshiBotOverseer_Controllers_MarketWatchController_GetBrainsData" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetBrainsData">GetBrainsData()</h4>
@@ -812,7 +818,7 @@ public Task&lt;IActionResult&gt; GetBrainsData()</code></pre>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController_GetMarketWatchData.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController.GetMarketWatchData%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L72">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L80">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Controllers_MarketWatchController_GetMarketWatchData_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetMarketWatchData*"></a>
   <h4 id="KalshiBotOverseer_Controllers_MarketWatchController_GetMarketWatchData" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetMarketWatchData">GetMarketWatchData()</h4>
@@ -846,7 +852,7 @@ public Task&lt;IActionResult&gt; GetMarketWatchData()</code></pre>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController_GetOrdersData.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController.GetOrdersData%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L353">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L370">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Controllers_MarketWatchController_GetOrdersData_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetOrdersData*"></a>
   <h4 id="KalshiBotOverseer_Controllers_MarketWatchController_GetOrdersData" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetOrdersData">GetOrdersData()</h4>
@@ -879,7 +885,7 @@ public Task&lt;IActionResult&gt; GetOrdersData()</code></pre>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController_GetPositionsData_System_Boolean_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController.GetPositionsData(System.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L307">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L321">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Controllers_MarketWatchController_GetPositionsData_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetPositionsData*"></a>
   <h4 id="KalshiBotOverseer_Controllers_MarketWatchController_GetPositionsData_System_Boolean_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetPositionsData(System.Boolean)">GetPositionsData(bool)</h4>
@@ -930,7 +936,7 @@ public Task&lt;IActionResult&gt; GetPositionsData(bool currentOnly = true)</code
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController_GetSnapshotsData.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController.GetSnapshotsData%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L452">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L486">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Controllers_MarketWatchController_GetSnapshotsData_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetSnapshotsData*"></a>
   <h4 id="KalshiBotOverseer_Controllers_MarketWatchController_GetSnapshotsData" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.GetSnapshotsData">GetSnapshotsData()</h4>
@@ -963,7 +969,7 @@ public Task&lt;IActionResult&gt; GetSnapshotsData()</code></pre>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController_Index.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController.Index%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L59">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L67">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Controllers_MarketWatchController_Index_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.Index*"></a>
   <h4 id="KalshiBotOverseer_Controllers_MarketWatchController_Index" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.Index">Index()</h4>
@@ -996,7 +1002,7 @@ public IActionResult Index()</code></pre>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController_LogEvent_System_Object_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController.LogEvent(System.Object)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L426">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L449">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Controllers_MarketWatchController_LogEvent_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.LogEvent*"></a>
   <h4 id="KalshiBotOverseer_Controllers_MarketWatchController_LogEvent_System_Object_" data-uid="KalshiBotOverseer.Controllers.MarketWatchController.LogEvent(System.Object)">LogEvent(object)</h4>
@@ -1054,7 +1060,7 @@ public Task&lt;IActionResult&gt; LogEvent(object request)</code></pre>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Controllers_MarketWatchController.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Controllers.MarketWatchController%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L22" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Controllers/MarketWatchController.cs/#L24" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

@@ -143,11 +143,12 @@ Key simulation mechanics include:</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation__ctor_TradingStrategies_Strategies_Strategy_System_Double_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.%23ctor(TradingStrategies.Strategies.Strategy%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L64">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L87">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation__ctor_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.#ctor*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation__ctor_TradingStrategies_Strategies_Strategy_System_Double_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.#ctor(TradingStrategies.Strategies.Strategy,System.Double)">StrategySimulation(Strategy, double)</h4>
-  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="TradingStrategies.Trading.Overseer.StrategySimulation.html">StrategySimulation</a> class.</p>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="TradingStrategies.Trading.Overseer.StrategySimulation.html">StrategySimulation</a> class.
+Validates that the strategy parameter is not null to prevent runtime errors.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -167,7 +168,7 @@ Key simulation mechanics include:</p>
       <tr>
         <td><a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a></td>
         <td><span class="parametername">strategy</span></td>
-        <td><p>The trading strategy to simulate.</p>
+        <td><p>The trading strategy to simulate. Cannot be null.</p>
 </td>
       </tr>
       <tr>
@@ -178,14 +179,61 @@ Key simulation mechanics include:</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when strategy is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="properties">Properties
 </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_AverageExecutionTimeMs.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.AverageExecutionTimeMs%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L58">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_StrategySimulation_AverageExecutionTimeMs_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.AverageExecutionTimeMs*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_AverageExecutionTimeMs" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.AverageExecutionTimeMs">AverageExecutionTimeMs</h4>
+  <div class="markdown level1 summary"><p>Gets the average execution time in milliseconds for ProcessSnapshot calls.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double AverageExecutionTimeMs { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_Cash.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.Cash%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L41">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L43">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_Cash_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.Cash*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_Cash" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.Cash">Cash</h4>
@@ -216,7 +264,7 @@ Key simulation mechanics include:</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_InitialCash.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.InitialCash%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L46">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L48">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_InitialCash_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.InitialCash*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_InitialCash" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.InitialCash">InitialCash</h4>
@@ -244,10 +292,41 @@ Key simulation mechanics include:</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_PeakMemoryUsage.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.PeakMemoryUsage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L63">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_StrategySimulation_PeakMemoryUsage_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.PeakMemoryUsage*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_PeakMemoryUsage" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.PeakMemoryUsage">PeakMemoryUsage</h4>
+  <div class="markdown level1 summary"><p>Gets the peak memory usage recorded during simulation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long PeakMemoryUsage { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_Position.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.Position%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L36">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L38">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_Position_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.Position*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_Position" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.Position">Position</h4>
@@ -278,7 +357,7 @@ Key simulation mechanics include:</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_SimulatedBook.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.SimulatedBook%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L51">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L68">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_SimulatedBook_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.SimulatedBook*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_SimulatedBook" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.SimulatedBook">SimulatedBook</h4>
@@ -309,7 +388,7 @@ Key simulation mechanics include:</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_SimulatedRestingOrders.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.SimulatedRestingOrders%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L57">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L74">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_SimulatedRestingOrders_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.SimulatedRestingOrders*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_SimulatedRestingOrders" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.SimulatedRestingOrders">SimulatedRestingOrders</h4>
@@ -341,7 +420,7 @@ Each tuple contains (action, side, type, count, price, expiration).</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_Strategy.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.Strategy%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L31">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L33">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_Strategy_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.Strategy*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_Strategy" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.Strategy">Strategy</h4>
@@ -367,6 +446,37 @@ Each tuple contains (action, side, type, count, price, expiration).</p>
       </tr>
     </tbody>
   </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_TotalExecutionTime.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.TotalExecutionTime%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L53">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_StrategySimulation_TotalExecutionTime_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.TotalExecutionTime*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_TotalExecutionTime" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.TotalExecutionTime">TotalExecutionTime</h4>
+  <div class="markdown level1 summary"><p>Gets the total execution time for all ProcessSnapshot calls.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan TotalExecutionTime { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
 </h3>
   <span class="small pull-right mobile-hide">
@@ -374,7 +484,7 @@ Each tuple contains (action, side, type, count, price, expiration).</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_GetFinalEquity_BacklashDTOs_MarketSnapshot_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.GetFinalEquity(BacklashDTOs.MarketSnapshot)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L376">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L413">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_GetFinalEquity_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.GetFinalEquity*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_GetFinalEquity_BacklashDTOs_MarketSnapshot_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.GetFinalEquity(BacklashDTOs.MarketSnapshot)">GetFinalEquity(MarketSnapshot)</h4>
@@ -421,7 +531,7 @@ Each tuple contains (action, side, type, count, price, expiration).</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshot_BacklashDTOs_MarketSnapshot_BacklashDTOs_MarketSnapshot_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshot(BacklashDTOs.MarketSnapshot%2CBacklashDTOs.MarketSnapshot)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L93">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L121">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshot_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshot*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshot_BacklashDTOs_MarketSnapshot_BacklashDTOs_MarketSnapshot_" data-uid="TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshot(BacklashDTOs.MarketSnapshot,BacklashDTOs.MarketSnapshot)">ProcessSnapshot(MarketSnapshot, MarketSnapshot?)</h4>
@@ -446,7 +556,7 @@ This is the main entry point for advancing the simulation state with new market 
       <tr>
         <td><a class="xref" href="BacklashDTOs.MarketSnapshot.html">MarketSnapshot</a></td>
         <td><span class="parametername">snapshot</span></td>
-        <td><p>The current market snapshot to process, containing order book, position, and market data.</p>
+        <td><p>The current market snapshot to process, containing order book, position, and market data. Cannot be null.</p>
 </td>
       </tr>
       <tr>
@@ -458,7 +568,8 @@ This is the main entry point for advancing the simulation state with new market 
     </tbody>
   </table>
   <h5 id="TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshot_BacklashDTOs_MarketSnapshot_BacklashDTOs_MarketSnapshot__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>This method handles the core simulation loop with the following steps:</p>
+  <div class="markdown level1 remarks"><p>This method handles the core simulation loop with the following steps:
+0. Validate input parameters and start performance monitoring (timing and memory)</p>
 <ol>
 <li>Compute and apply order book deltas if previous snapshot exists (for efficiency)</li>
 <li>Simulate fills from those deltas on resting orders</li>
@@ -466,12 +577,30 @@ This is the main entry point for advancing the simulation state with new market 
 <li>Create effective snapshot with simulated state overlay</li>
 <li>Get trading decision from strategy</li>
 <li>Apply the decision to update position, cash, and order book</li>
+<li>Record performance metrics (execution time and memory usage)</li>
 </ol>
 <p>As a developer, this method orchestrates the entire simulation step, ensuring proper sequencing
-of market updates, strategy evaluation, and state changes. The effective snapshot approach
-allows strategies to see the current simulated state while maintaining separation between
-real market data and simulation artifacts.</p>
+of market updates, strategy evaluation, and state changes. Input validation prevents null reference
+exceptions, while performance monitoring tracks execution timing and memory usage for optimization.
+The effective snapshot approach allows strategies to see the current simulated state while maintaining
+separation between real market data and simulation artifacts.</p>
 </div>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when snapshot is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
 
 </article>
           </div>
@@ -484,7 +613,7 @@ real market data and simulation artifacts.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_StrategySimulation.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.StrategySimulation%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L26" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/StrategySimulation.cs/#L28" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

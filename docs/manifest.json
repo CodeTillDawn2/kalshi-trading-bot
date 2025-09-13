@@ -232,7 +232,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Management.CentralPerformanceMonitor",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Management.CentralPerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Central performance monitoring service that tracks system performance metrics,\nrecords execution times, and monitors queue depths for the Kalshi trading bot.\nThis class provides comprehensive performance analytics including WebSocket event\nrates, API execution times, and queue utilization metrics.</p>\n"
+      "Summary": "<p sourcefile=\"api/BacklashBot.Management.CentralPerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Central performance monitoring service that tracks system performance metrics,\nrecords execution times, and monitors queue depths for the Kalshi trading bot.\nThis class provides comprehensive performance analytics including WebSocket event\nrates, API execution times, and queue utilization metrics with configurable alerting.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -554,7 +554,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.InterestScoreService",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"1\">Service responsible for calculating interest scores for Kalshi markets based on various trading metrics.\nThis service evaluates market attractiveness by analyzing spread characteristics, trading volume,\nliquidity patterns, and market continuity to provide quantitative scores for market selection.</p>\n"
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"1\">Service responsible for calculating interest scores for Kalshi markets based on various trading metrics.\nThis service evaluates market attractiveness by analyzing spread characteristics, trading volume,\nliquidity patterns, and market continuity to provide quantitative scores for market selection.</p>\n<p sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"5\">Features:</p>\n<ul sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"6\">\n<li sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"6\">Configurable cache duration for performance optimization</li>\n<li sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"7\">Comprehensive performance metrics collection and monitoring</li>\n<li sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"8\">Input validation for market tickers and weight parameters</li>\n<li sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"9\">Thread-safe operations for concurrent access</li>\n<li sourcefile=\"api/BacklashBot.Services.InterestScoreService.yml\" sourcestartlinenumber=\"10\">Automatic metrics logging with configurable intervals</li>\n</ul>\n"
     },
     {
       "type": "ManagedReference",
@@ -807,6 +807,20 @@
       "IsMRef": true,
       "Title": "BacklashBot.Services.OrderBookService",
       "Summary": "<p sourcefile=\"api/BacklashBot.Services.OrderBookService.yml\" sourcestartlinenumber=\"1\">Service responsible for managing order book data for Kalshi markets.\nHandles WebSocket order book events, processes snapshots and deltas asynchronously,\nmaintains thread-safe access to order book data, and provides synchronization capabilities.\nIntegrates with the broader trading bot ecosystem to ensure real-time order book updates.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Services.OrderBookServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Services.OrderBookServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Services.OrderBookServiceConfig",
+      "Summary": null
     },
     {
       "type": "ManagedReference",
@@ -1146,6 +1160,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/BacklashDTOs.Configuration.ErrorHandlerConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashDTOs.Configuration.ErrorHandlerConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashDTOs.Configuration.ErrorHandlerConfig",
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.ErrorHandlerConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for the CentralErrorHandler component that manages error processing,\ncatastrophic failure detection, and internet connectivity monitoring.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/BacklashDTOs.Configuration.ExecutionConfig.yml",
       "output": {
         ".html": {
@@ -1157,6 +1185,20 @@
       "IsMRef": true,
       "Title": "BacklashDTOs.Configuration.ExecutionConfig",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashDTOs.Configuration.InterestScoreConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashDTOs.Configuration.InterestScoreConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashDTOs.Configuration.InterestScoreConfig",
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.InterestScoreConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for InterestScoreService settings.\nControls cache duration, performance monitoring, and operational parameters\nfor the interest scoring system. These settings can be configured via appsettings.json\nand are injected through dependency injection.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2980,6 +3022,62 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.Constants.KalshiConstants.FeedType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.Constants.KalshiConstants.FeedType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.Constants.KalshiConstants.FeedType",
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Constants.KalshiConstants.FeedType.yml\" sourcestartlinenumber=\"1\">Enum representing WebSocket feed types.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.Constants.KalshiConstants.MarketStatus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.Constants.KalshiConstants.MarketStatus.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.Constants.KalshiConstants.MarketStatus",
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Constants.KalshiConstants.MarketStatus.yml\" sourcestartlinenumber=\"1\">Enum representing the possible statuses of a market.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.Constants.KalshiConstants.ScriptType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.Constants.KalshiConstants.ScriptType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.Constants.KalshiConstants.ScriptType",
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Constants.KalshiConstants.ScriptType.yml\" sourcestartlinenumber=\"1\">Enum representing script types for API endpoints.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.Constants.KalshiConstants.TimeInterval.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.Constants.KalshiConstants.TimeInterval.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.Constants.KalshiConstants.TimeInterval",
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Constants.KalshiConstants.TimeInterval.yml\" sourcestartlinenumber=\"1\">Enum representing time intervals for candlestick data.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/BacklashInterfaces.Constants.KalshiConstants.yml",
       "output": {
         ".html": {
@@ -3246,6 +3344,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotAPI.Configuration.CandlestickCushionConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotAPI.Configuration.CandlestickCushionConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotAPI.Configuration.CandlestickCushionConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.CandlestickCushionConfig.yml\" sourcestartlinenumber=\"1\">Configuration for candlestick cushion seconds.\nDefines the overlap period in seconds to prevent data gaps when fetching historical data in chunks.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotAPI.Configuration.CandlestickLookbackConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotAPI.Configuration.CandlestickLookbackConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotAPI.Configuration.CandlestickLookbackConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.CandlestickLookbackConfig.yml\" sourcestartlinenumber=\"1\">Configuration for candlestick lookback periods in days.\nDefines the maximum historical data range to fetch for each time interval.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/KalshiBotAPI.Configuration.KalshiConfig.yml",
       "output": {
         ".html": {
@@ -3257,6 +3383,20 @@
       "IsMRef": true,
       "Title": "KalshiBotAPI.Configuration.KalshiConfig",
       "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.KalshiConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for the Kalshi API integration.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotAPI.Configuration.MessageProcessorConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotAPI.Configuration.MessageProcessorConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotAPI.Configuration.MessageProcessorConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Configuration.MessageProcessorConfig.yml\" sourcestartlinenumber=\"1\">Configuration settings for the MessageProcessor component.\nControls message batching, queue sizes, timeouts, and performance monitoring.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3284,7 +3424,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotAPI.KalshiAPI.KalshiAPIService",
-      "Summary": "<p sourcefile=\"api/KalshiBotAPI.KalshiAPI.KalshiAPIService.yml\" sourcestartlinenumber=\"1\">Provides a comprehensive service for interacting with the Kalshi trading API.\nThis service handles authentication, market data retrieval, order management, position tracking,\nand various other API operations required for automated trading on the Kalshi platform.\nIt implements the IKalshiAPIService interface and uses RSA-based authentication with API keys.\nThe service maintains execution time tracking for performance monitoring and includes\nrobust error handling with cancellation token support throughout all operations.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.KalshiAPI.KalshiAPIService.yml\" sourcestartlinenumber=\"1\">Provides a comprehensive service for interacting with the Kalshi trading API.\nThis service handles authentication, market data retrieval, order management, position tracking,\nand various other API operations required for automated trading on the Kalshi platform.\nIt implements the IKalshiAPIService interface and uses RSA-based authentication with API keys.\nThe service maintains execution time tracking for performance monitoring, supports parallel processing\nfor high-volume data operations, and includes configurable parameters for lookback periods and calculations.\nRobust error handling with cancellation token support throughout all operations.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3396,7 +3536,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotAPI.Websockets.MessageProcessor",
-      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Websockets.MessageProcessor.yml\" sourcestartlinenumber=\"1\">Processes incoming WebSocket messages from Kalshi's trading platform, routing them to appropriate handlers\nbased on message type. Manages event counting, order book message queuing, and integrates with data\npersistence and API services for comprehensive market data processing.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.Websockets.MessageProcessor.yml\" sourcestartlinenumber=\"1\">Processes incoming WebSocket messages from Kalshi's trading platform, routing them to appropriate handlers\nbased on message type. Features configurable message batching for high-volume scenarios, performance\nmetrics collection, sophisticated locking mechanisms, and enhanced message deduplication with warnings.\nManages event counting, order book message queuing, and integrates with data persistence and API services\nfor comprehensive market data processing.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3494,7 +3634,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Data.SqlDataService",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Data.SqlDataService.yml\" sourcestartlinenumber=\"1\">Provides asynchronous data persistence services for real-time market data from Kalshi's trading platform.\nThis service manages concurrent queues for different data types (order book, trades, fills, lifecycle events)\nand processes them using background worker tasks with retry logic for transient SQL errors.\nImplements the ISqlDataService interface for dependency injection and proper resource management.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Data.SqlDataService.yml\" sourcestartlinenumber=\"1\">Provides asynchronous data persistence services for real-time market data from Kalshi's trading platform.\nThis service manages concurrent queues for different data types (order book, trades, fills, lifecycle events)\nand processes them using configurable background worker tasks with retry logic for transient SQL errors.\nSupports batch processing, performance metrics collection, input validation, and configurable queue sizes\nto prevent resource exhaustion. Implements the ISqlDataService interface for dependency injection and proper resource management.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3859,6 +3999,20 @@
       "IsMRef": true,
       "Title": "KalshiBotData.Models.BrainInstance",
       "Summary": "<p sourcefile=\"api/KalshiBotData.Models.BrainInstance.yml\" sourcestartlinenumber=\"1\">Represents a brain instance configuration and operational state in the trading bot system.\nThis entity manages the settings and runtime state for individual brain instances that\nexecute trading strategies, monitor markets, and capture snapshots. Each brain instance\ncan have different configurations for market watching, position tracking, and resource usage.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotData.Models.BrainPersistenceEntity.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotData.Models.BrainPersistenceEntity.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotData.Models.BrainPersistenceEntity",
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.BrainPersistenceEntity.yml\" sourcestartlinenumber=\"1\">Database entity for storing BrainPersistence data.\nUses JSON serialization to store complex nested objects.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4394,6 +4548,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotOverseer.Models.BrainPersistenceDefaults.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotOverseer.Models.BrainPersistenceDefaults.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotOverseer.Models.BrainPersistenceDefaults",
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Models.BrainPersistenceDefaults.yml\" sourcestartlinenumber=\"1\">Configuration class for default values used in BrainPersistence initialization.\nProvides centralized configuration options that can be loaded from appsettings.json.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/KalshiBotOverseer.Models.BrainStatusData.yml",
       "output": {
         ".html": {
@@ -4474,7 +4642,21 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotOverseer.Overseer",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"1\">Central orchestrator for the KalshiBot Overseer system that manages WebSocket connections,\nhandles real-time market data events, coordinates periodic data fetching, and maintains\nsystem health monitoring. This class serves as the main entry point for overseer operations,\nintegrating with WebSocket clients, database services, and SignalR hubs to provide\ncomprehensive monitoring and control of the trading bot ecosystem.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"1\">Central orchestrator for the KalshiBot Overseer system that manages WebSocket connections,\nhandles real-time market data events, coordinates periodic data fetching, and maintains\nsystem health monitoring. This class serves as the main entry point for overseer operations,\nintegrating with WebSocket clients, database services, and SignalR hubs to provide\ncomprehensive monitoring and control of the trading bot ecosystem.</p>\n<p sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"7\">Key features:</p>\n<ul sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"8\">\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"8\">Configurable API fetch intervals (default: 10 minutes)</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"9\">Configurable system info logging intervals (default: 1 minute)</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"10\">Performance metrics collection for WebSocket events and API operations</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"11\">Input validation for event data processing to prevent null reference exceptions</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"12\">Progress reporting for long-running API fetch operations</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"13\">Batch processing for brain persistence logging (default batch size: 50)</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"14\">Configurable SignalR broadcast batch sizes (default: 10)</li>\n</ul>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotOverseer.OverseerConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotOverseer.OverseerConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotOverseer.OverseerConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.OverseerConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the Overseer system.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4502,7 +4684,21 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotOverseer.Services.BrainPersistenceService",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Services.BrainPersistenceService.yml\" sourcestartlinenumber=\"1\">Service responsible for managing the in-memory persistence of brain instance states.\nThis service provides thread-safe operations for storing, retrieving, and updating brain\nconfiguration, market watch lists, and performance metrics history. It serves as the\ncentral data store for brain instances in the Kalshi trading bot overseer system.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Services.BrainPersistenceService.yml\" sourcestartlinenumber=\"1\">Service responsible for managing brain instance states with configurable persistence options.\nThis service provides thread-safe operations for storing, retrieving, and updating brain\nconfiguration, market watch lists, and performance metrics history. It supports both\nin-memory storage and optional database persistence for recovery after application restarts.\nThe service includes configurable history retention, performance metrics collection,\nbatch operations, and comprehensive health monitoring.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotOverseer.Services.BrainPersistenceServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotOverseer.Services.BrainPersistenceServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotOverseer.Services.BrainPersistenceServiceConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Services.BrainPersistenceServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the BrainPersistenceService.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4548,6 +4744,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotOverseer.State.OverseerReadyConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotOverseer.State.OverseerReadyConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotOverseer.State.OverseerReadyConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.State.OverseerReadyConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for OverseerReadyStatus default states.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/KalshiBotOverseer.State.OverseerReadyStatus.yml",
       "output": {
         ".html": {
@@ -4558,7 +4768,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotOverseer.State.OverseerReadyStatus",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.State.OverseerReadyStatus.yml\" sourcestartlinenumber=\"1\">Manages the readiness status of different components within the Kalshi overseer system.\nThis class provides TaskCompletionSource objects to signal when various parts of the overseer\nhave completed their initialization or are ready for operation.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.State.OverseerReadyStatus.yml\" sourcestartlinenumber=\"1\">Manages the readiness status of different components within the Kalshi overseer system.\nThis class provides TaskCompletionSource objects to signal when various parts of the overseer\nhave completed their initialization or are ready for operation, with comprehensive logging and metrics.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4628,7 +4838,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingSimulator.CachedMarketData",
-      "Summary": "<p sourcefile=\"api/TradingSimulator.CachedMarketData.yml\" sourcestartlinenumber=\"1\">Contains cached market data for a specific market, including profit/loss, position information,\nand various lists of price points representing different market events and states.\nThis class serves as the primary data structure for storing processed market simulation results\nthat can be serialized to JSON for persistence and later visualization in the GUI.</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingSimulator.CachedMarketData.yml\" sourcestartlinenumber=\"1\">Contains cached market data for a specific market, including profit/loss, position information,\nand various lists of price points representing different market events and states.\nThis class serves as the primary data structure for storing processed market simulation results\nthat can be serialized to JSON for persistence and later visualization in the GUI.\nEnhanced with validation, deep cloning, and serialization controls.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4643,6 +4853,20 @@
       "IsMRef": true,
       "Title": "TradingSimulator.DataLoader",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingSimulator.DiscrepancyDetectionConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingSimulator.DiscrepancyDetectionConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingSimulator.DiscrepancyDetectionConfig",
+      "Summary": "<p sourcefile=\"api/TradingSimulator.DiscrepancyDetectionConfig.yml\" sourcestartlinenumber=\"1\">Configuration for discrepancy detection parameters.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4730,6 +4954,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingSimulator.MarketProcessorConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingSimulator.MarketProcessorConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingSimulator.MarketProcessorConfig",
+      "Summary": "<p sourcefile=\"api/TradingSimulator.MarketProcessorConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for MarketProcessor settings.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingSimulator.PerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingSimulator.PerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingSimulator.PerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/TradingSimulator.PerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Performance metrics class for tracking message processing rates and queue depths.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingSimulator.PricePoint.yml",
       "output": {
         ".html": {
@@ -4744,6 +4996,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingSimulator.Simulator.AnalysisConfiguration.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingSimulator.Simulator.AnalysisConfiguration.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingSimulator.Simulator.AnalysisConfiguration",
+      "Summary": "<p sourcefile=\"api/TradingSimulator.Simulator.AnalysisConfiguration.yml\" sourcestartlinenumber=\"1\">Configuration class for velocity discrepancy analysis parameters.\nThis class contains all configurable parameters for the SimulatorReporting analysis engine,\nallowing fine-tuning of detection thresholds, performance settings, and output configuration.\nParameters can be loaded from appsettings.json under the &quot;SimulatorReporting&quot; section.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingSimulator.Simulator.PerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingSimulator.Simulator.PerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingSimulator.Simulator.PerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/TradingSimulator.Simulator.PerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Performance metrics class for tracking velocity discrepancy analysis execution timing and statistics.\nThis class provides detailed performance information about the analysis process, including\ntiming for different computational phases and counts of processed data points.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingSimulator.Simulator.SimulatorReporting.yml",
       "output": {
         ".html": {
@@ -4754,7 +5034,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingSimulator.Simulator.SimulatorReporting",
-      "Summary": "<p sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"1\">Provides comprehensive reporting and analysis functionality for trading simulator operations.\nThis class serves as the core engine for detecting velocity discrepancies in market snapshots,\ncomputing rolling observations, generating detailed memos, and coalescing discrepancy data.\nIt is designed to analyze orderbook flow patterns and identify potential anomalies in market data\nthat could indicate trading opportunities or data quality issues.</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"1\">Provides comprehensive reporting and analysis functionality for trading simulator operations.\nThis class serves as the core engine for detecting velocity discrepancies in market snapshots,\ncomputing rolling observations, generating detailed memos, and coalescing discrepancy data.\nIt is designed to analyze orderbook flow patterns and identify potential anomalies in market data\nthat could indicate trading opportunities or data quality issues.</p>\n<p sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"7\">Key Features:</p>\n<ul sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"8\">\n<li sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"8\">Configurable analysis parameters via AnalysisConfiguration class</li>\n<li sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"9\">Async processing support for better performance with large datasets</li>\n<li sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"10\">Parallel processing for multiple market analyses</li>\n<li sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"11\">Comprehensive input validation for data integrity</li>\n<li sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"12\">Performance metrics collection and timing analysis</li>\n<li sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"13\">Configurable logging with automatic directory creation</li>\n<li sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"14\">Spike suppression to reduce false positives</li>\n<li sourcefile=\"api/TradingSimulator.Simulator.SimulatorReporting.yml\" sourcestartlinenumber=\"15\">Robust error handling and recovery</li>\n</ul>\n"
     },
     {
       "type": "ManagedReference",
@@ -4810,7 +5090,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingSimulator.Strategies.TradingStrategy<T>",
-      "Summary": "<p sourcefile=\"api/TradingSimulator.Strategies.TradingStrategy-1.yml\" sourcestartlinenumber=\"1\">Generic trading strategy simulator that executes trading strategies against historical market snapshots.\nThis class manages the complete simulation lifecycle including data loading, strategy execution,\nposition tracking, and performance calculation. It supports multiple strategies running simultaneously\nand provides real-time progress updates through events.</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingSimulator.Strategies.TradingStrategy-1.yml\" sourcestartlinenumber=\"1\">Enhanced trading strategy simulator that executes trading strategies against historical market snapshots.\nThis class manages the complete simulation lifecycle including data loading, strategy execution,\nposition tracking, performance calculation, and risk management. Features include:</p>\n<ul sourcefile=\"api/TradingSimulator.Strategies.TradingStrategy-1.yml\" sourcestartlinenumber=\"4\">\n<li sourcefile=\"api/TradingSimulator.Strategies.TradingStrategy-1.yml\" sourcestartlinenumber=\"4\">Parallel strategy execution for improved performance</li>\n<li sourcefile=\"api/TradingSimulator.Strategies.TradingStrategy-1.yml\" sourcestartlinenumber=\"5\">Comprehensive input validation for market data integrity</li>\n<li sourcefile=\"api/TradingSimulator.Strategies.TradingStrategy-1.yml\" sourcestartlinenumber=\"6\">Progress persistence for long-running simulations with resume capability</li>\n<li sourcefile=\"api/TradingSimulator.Strategies.TradingStrategy-1.yml\" sourcestartlinenumber=\"7\">Advanced risk management with position limits, stop-loss, and take-profit</li>\n<li sourcefile=\"api/TradingSimulator.Strategies.TradingStrategy-1.yml\" sourcestartlinenumber=\"8\">Performance monitoring and optimization</li>\n<li sourcefile=\"api/TradingSimulator.Strategies.TradingStrategy-1.yml\" sourcestartlinenumber=\"9\">Real-time progress updates through events</li>\n</ul>\n"
     },
     {
       "type": "ManagedReference",
@@ -4978,7 +5258,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Classification.SnapshotPeriodHelper",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Classification.SnapshotPeriodHelper.yml\" sourcestartlinenumber=\"1\">Provides functionality for processing and grouping market snapshots into valid analysis periods.\nThis class implements the core logic for identifying continuous market periods based on time gaps\nand price stability, ensuring that only stable market conditions are used for trading strategy\nevaluation and backtesting. It handles the serialization of snapshot groups to disk and their\nsubsequent loading for analysis.</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Classification.SnapshotPeriodHelper.yml\" sourcestartlinenumber=\"1\">Provides functionality for processing and grouping market snapshots into valid analysis periods.\nThis class implements the core logic for identifying continuous market periods based on time gaps\nand price stability, ensuring that only stable market conditions are used for trading strategy\nevaluation and backtesting. It handles the serialization of snapshot groups to disk and their\nsubsequent loading for analysis. Supports async operations, parallel processing, and progress reporting.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5006,7 +5286,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Configuration.CalculationConfig",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.CalculationConfig.yml\" sourcestartlinenumber=\"1\">Configuration class containing all technical indicator parameters used throughout the trading bot.\nThese settings control the calculation periods and thresholds for various technical analysis indicators\nthat drive trading decisions and market analysis. Values are injected via dependency injection\nand used by MarketData and TradingCalculator classes for real-time indicator computation.</p>\n"
+      "Summary": null
     },
     {
       "type": "ManagedReference",
@@ -5034,7 +5314,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Configuration.TradingConfig",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.TradingConfig.yml\" sourcestartlinenumber=\"1\">Configuration class containing timing parameters for trading operations in the Kalshi trading bot system.\nThese settings control decision frequency, change detection windows, trade matching tolerances, and refresh intervals\nused throughout the trading strategy execution pipeline. Values are injected via dependency injection\nand consumed by TradingStrategy, TradingSnapshotService, and related components for consistent timing behavior.</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.TradingConfig.yml\" sourcestartlinenumber=\"1\">Configuration class containing timing parameters for trading operations in the Kalshi trading bot system.\nThese settings control decision frequency, change detection windows, trade matching tolerances, and refresh intervals\nused throughout the trading strategy execution pipeline. Values are injected via dependency injection\nand consumed by TradingStrategy, TradingSnapshotService, and related components for consistent timing behavior.\nThe class includes data validation attributes and a Validate() method to ensure parameters are within acceptable ranges.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5636,7 +5916,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Trading.Overseer.MarketTypeService",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.MarketTypeService.yml\" sourcestartlinenumber=\"1\">Service responsible for determining and caching market types for trading snapshots.\nThis class acts as a facade over the MarketTypeHelper, providing caching functionality\nto avoid redundant market type calculations for the same market snapshot.</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.MarketTypeService.yml\" sourcestartlinenumber=\"1\">Service responsible for determining and caching market types for trading snapshots.\nThis class acts as a facade over the MarketTypeHelper, providing caching functionality\nto avoid redundant market type calculations for the same market snapshot.\nIncludes performance metrics collection, configurable cache expiration, and async operations.</p>\n"
     },
     {
       "type": "ManagedReference",

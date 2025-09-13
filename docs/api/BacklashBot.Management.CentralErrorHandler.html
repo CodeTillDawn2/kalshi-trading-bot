@@ -131,7 +131,13 @@ recovery, and system restarts.</p>
   <div class="markdown level0 remarks"><p>The error handler processes errors from a database logging queue and categorizes them
 as either catastrophic (requiring system restart) or non-catastrophic (handled with
 market resets or connection recovery). It maintains counters for error tracking and
-implements threshold-based catastrophic detection based on error frequency.</p>
+implements threshold-based catastrophic detection based on configurable error frequency parameters.</p>
+<p>Configuration options include:</p>
+<ul>
+<li>Error window duration for frequency monitoring</li>
+<li>Error threshold for catastrophic detection</li>
+<li>Internet connectivity check parameters (max attempts, delays)</li>
+</ul>
 <p>Key responsibilities:</p>
 <ul>
 <li>Process warnings and errors from the logging queue</li>
@@ -140,25 +146,26 @@ implements threshold-based catastrophic detection based on error frequency.</p>
 <li>Maintain error statistics and timestamps</li>
 <li>Trigger market resets for transient failures</li>
 <li>Manage internet connectivity checks for connection-related errors</li>
+<li>Validate input parameters to prevent null reference exceptions</li>
 </ul>
 </div>
   <h3 id="constructors">Constructors
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler__ctor_BacklashBot_Management_Interfaces_IMarketManagerService_BacklashBot_Services_Interfaces_IServiceFactory_KalshiBotLogging_DatabaseLoggingQueue_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_ICentralErrorHandler__.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.%23ctor(BacklashBot.Management.Interfaces.IMarketManagerService%2CBacklashBot.Services.Interfaces.IServiceFactory%2CKalshiBotLogging.DatabaseLoggingQueue%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Management.Interfaces.ICentralErrorHandler%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler__ctor_BacklashBot_Management_Interfaces_IMarketManagerService_BacklashBot_Services_Interfaces_IServiceFactory_KalshiBotLogging_DatabaseLoggingQueue_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ErrorHandlerConfig__Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_ICentralErrorHandler__.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.%23ctor(BacklashBot.Management.Interfaces.IMarketManagerService%2CBacklashBot.Services.Interfaces.IServiceFactory%2CKalshiBotLogging.DatabaseLoggingQueue%2CMicrosoft.Extensions.Options.IOptions%7BBacklashDTOs.Configuration.ErrorHandlerConfig%7D%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Management.Interfaces.ICentralErrorHandler%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L102">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L112">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler__ctor_" data-uid="BacklashBot.Management.CentralErrorHandler.#ctor*"></a>
-  <h4 id="BacklashBot_Management_CentralErrorHandler__ctor_BacklashBot_Management_Interfaces_IMarketManagerService_BacklashBot_Services_Interfaces_IServiceFactory_KalshiBotLogging_DatabaseLoggingQueue_Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_ICentralErrorHandler__" data-uid="BacklashBot.Management.CentralErrorHandler.#ctor(BacklashBot.Management.Interfaces.IMarketManagerService,BacklashBot.Services.Interfaces.IServiceFactory,KalshiBotLogging.DatabaseLoggingQueue,Microsoft.Extensions.Logging.ILogger{BacklashBot.Management.Interfaces.ICentralErrorHandler})">CentralErrorHandler(IMarketManagerService, IServiceFactory, DatabaseLoggingQueue, ILogger&lt;ICentralErrorHandler&gt;)</h4>
+  <h4 id="BacklashBot_Management_CentralErrorHandler__ctor_BacklashBot_Management_Interfaces_IMarketManagerService_BacklashBot_Services_Interfaces_IServiceFactory_KalshiBotLogging_DatabaseLoggingQueue_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ErrorHandlerConfig__Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_Interfaces_ICentralErrorHandler__" data-uid="BacklashBot.Management.CentralErrorHandler.#ctor(BacklashBot.Management.Interfaces.IMarketManagerService,BacklashBot.Services.Interfaces.IServiceFactory,KalshiBotLogging.DatabaseLoggingQueue,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ErrorHandlerConfig},Microsoft.Extensions.Logging.ILogger{BacklashBot.Management.Interfaces.ICentralErrorHandler})">CentralErrorHandler(IMarketManagerService, IServiceFactory, DatabaseLoggingQueue, IOptions&lt;ErrorHandlerConfig&gt;, ILogger&lt;ICentralErrorHandler&gt;)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the CentralErrorHandler class.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public CentralErrorHandler(IMarketManagerService marketManagerService, IServiceFactory serviceFactory, DatabaseLoggingQueue loggingQueue, ILogger&lt;ICentralErrorHandler&gt; logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public CentralErrorHandler(IMarketManagerService marketManagerService, IServiceFactory serviceFactory, DatabaseLoggingQueue loggingQueue, IOptions&lt;ErrorHandlerConfig&gt; errorHandlerConfig, ILogger&lt;ICentralErrorHandler&gt; logger)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -189,6 +196,12 @@ implements threshold-based catastrophic detection based on error frequency.</p>
 </td>
       </tr>
       <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a class="xref" href="BacklashDTOs.Configuration.ErrorHandlerConfig.html">ErrorHandlerConfig</a>&gt;</td>
+        <td><span class="parametername">errorHandlerConfig</span></td>
+        <td><p>Configuration settings for error handling.</p>
+</td>
+      </tr>
+      <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="BacklashBot.Management.Interfaces.ICentralErrorHandler.html">ICentralErrorHandler</a>&gt;</td>
         <td><span class="parametername">logger</span></td>
         <td><p>Logger instance for recording error handler operations.</p>
@@ -203,7 +216,7 @@ implements threshold-based catastrophic detection based on error frequency.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_CatastrophicErrorAlreadyDetected.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.CatastrophicErrorAlreadyDetected%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L69">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L78">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_CatastrophicErrorAlreadyDetected_" data-uid="BacklashBot.Management.CentralErrorHandler.CatastrophicErrorAlreadyDetected*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_CatastrophicErrorAlreadyDetected" data-uid="BacklashBot.Management.CentralErrorHandler.CatastrophicErrorAlreadyDetected">CatastrophicErrorAlreadyDetected</h4>
@@ -238,7 +251,7 @@ and focuses on system recovery procedures.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_ErrorCount.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.ErrorCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L51">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L60">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_ErrorCount_" data-uid="BacklashBot.Management.CentralErrorHandler.ErrorCount*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_ErrorCount" data-uid="BacklashBot.Management.CentralErrorHandler.ErrorCount">ErrorCount</h4>
@@ -269,7 +282,7 @@ and focuses on system recovery procedures.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_Errors.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.Errors%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L79">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L88">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_Errors_" data-uid="BacklashBot.Management.CentralErrorHandler.Errors*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_Errors" data-uid="BacklashBot.Management.CentralErrorHandler.Errors">Errors</h4>
@@ -300,7 +313,7 @@ and focuses on system recovery procedures.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_LastErrorDate.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.LastErrorDate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L93">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L102">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_LastErrorDate_" data-uid="BacklashBot.Management.CentralErrorHandler.LastErrorDate*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_LastErrorDate" data-uid="BacklashBot.Management.CentralErrorHandler.LastErrorDate">LastErrorDate</h4>
@@ -331,7 +344,7 @@ and focuses on system recovery procedures.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_LastSuccessfulSnapshot.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.LastSuccessfulSnapshot%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L88">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L97">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_LastSuccessfulSnapshot_" data-uid="BacklashBot.Management.CentralErrorHandler.LastSuccessfulSnapshot*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_LastSuccessfulSnapshot" data-uid="BacklashBot.Management.CentralErrorHandler.LastSuccessfulSnapshot">LastSuccessfulSnapshot</h4>
@@ -366,7 +379,7 @@ which may indicate a catastrophic system failure.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_NonCatastrophicErrorCount.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.NonCatastrophicErrorCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L60">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L69">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_NonCatastrophicErrorCount_" data-uid="BacklashBot.Management.CentralErrorHandler.NonCatastrophicErrorCount*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_NonCatastrophicErrorCount" data-uid="BacklashBot.Management.CentralErrorHandler.NonCatastrophicErrorCount">NonCatastrophicErrorCount</h4>
@@ -401,7 +414,7 @@ which would trigger a catastrophic failure condition.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_WarningCount.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.WarningCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L46">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L55">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_WarningCount_" data-uid="BacklashBot.Management.CentralErrorHandler.WarningCount*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_WarningCount" data-uid="BacklashBot.Management.CentralErrorHandler.WarningCount">WarningCount</h4>
@@ -432,7 +445,7 @@ which would trigger a catastrophic failure condition.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_Warnings.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.Warnings%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L74">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L83">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_Warnings_" data-uid="BacklashBot.Management.CentralErrorHandler.Warnings*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_Warnings" data-uid="BacklashBot.Management.CentralErrorHandler.Warnings">Warnings</h4>
@@ -465,7 +478,7 @@ which would trigger a catastrophic failure condition.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_AddError_System_Exception_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.AddError(System.Exception%2CSystem.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L413">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L436">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_AddError_" data-uid="BacklashBot.Management.CentralErrorHandler.AddError*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_AddError_System_Exception_System_String_System_String_" data-uid="BacklashBot.Management.CentralErrorHandler.AddError(System.Exception,System.String,System.String)">AddError(Exception, string, string?)</h4>
@@ -515,7 +528,7 @@ the error count and updates the last error timestamp.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_AddWarning_System_Exception_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.AddWarning(System.Exception%2CSystem.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L389">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L403">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_AddWarning_" data-uid="BacklashBot.Management.CentralErrorHandler.AddWarning*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_AddWarning_System_Exception_System_String_System_String_" data-uid="BacklashBot.Management.CentralErrorHandler.AddWarning(System.Exception,System.String,System.String)">AddWarning(Exception, string, string?)</h4>
@@ -565,7 +578,7 @@ it may be converted to an error if it matches certain criteria during processing
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_CheckInternetConnection.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.CheckInternetConnection%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L454">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L485">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_CheckInternetConnection_" data-uid="BacklashBot.Management.CentralErrorHandler.CheckInternetConnection*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_CheckInternetConnection" data-uid="BacklashBot.Management.CentralErrorHandler.CheckInternetConnection">CheckInternetConnection()</h4>
@@ -593,8 +606,7 @@ it may be converted to an error if it matches certain criteria during processing
     </tbody>
   </table>
   <h5 id="BacklashBot_Management_CentralErrorHandler_CheckInternetConnection_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>This method attempts to verify internet connectivity up to 100 times with increasing
-delays between attempts (starting at 1 second, doubling each time, max 60 seconds).
+  <div class="markdown level1 remarks"><p>This method attempts to verify internet connectivity with configurable parameters.
 Used primarily during system startup to ensure network availability before proceeding
 with dashboard initialization.</p>
 </div>
@@ -603,7 +615,7 @@ with dashboard initialization.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler_HandleErrors.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler.HandleErrors%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L138">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L152">View Source</a>
   </span>
   <a id="BacklashBot_Management_CentralErrorHandler_HandleErrors_" data-uid="BacklashBot.Management.CentralErrorHandler.HandleErrors*"></a>
   <h4 id="BacklashBot_Management_CentralErrorHandler_HandleErrors" data-uid="BacklashBot.Management.CentralErrorHandler.HandleErrors">HandleErrors()</h4>
@@ -668,7 +680,7 @@ constitute catastrophic failures, and triggers appropriate recovery actions.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_CentralErrorHandler.md&amp;value=---%0Auid%3A%20BacklashBot.Management.CentralErrorHandler%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L33" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/CentralErrorHandler.cs/#L41" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

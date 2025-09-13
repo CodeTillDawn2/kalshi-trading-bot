@@ -95,6 +95,7 @@ graceful shutdown and cancellation across all components of the overseer.</p>
     <h5>Implements</h5>
     <div><a class="xref" href="BacklashBot.State.Interfaces.IStatusTrackerService.html">IStatusTrackerService</a></div>
     <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iasyncdisposable">IAsyncDisposable</a></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -124,15 +125,16 @@ graceful shutdown and cancellation across all components of the overseer.</p>
   <h6><strong>Assembly</strong>: KalshiBotOverseer.dll</h6>
   <h5 id="KalshiBotOverseer_State_OverseerStatusTracker_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class OverseerStatusTracker : IStatusTrackerService, IDisposable</code></pre>
+    <pre><code class="lang-csharp hljs">public class OverseerStatusTracker : IStatusTrackerService, IDisposable, IAsyncDisposable</code></pre>
   </div>
   <h5 id="KalshiBotOverseer_State_OverseerStatusTracker_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks"><p>The status tracker ensures thread-safe access to the global cancellation token and provides:</p>
 <ul>
 <li>A single CancellationToken that all components can monitor for shutdown signals</li>
-<li>Thread-safe cancellation operations</li>
-<li>Proper resource cleanup through IDisposable implementation</li>
-<li>Reset capability for restarting the cancellation state</li>
+<li>Thread-safe cancellation operations with comprehensive logging</li>
+<li>Proper resource cleanup through IDisposable and IAsyncDisposable implementations</li>
+<li>Reset capability for restarting the cancellation state with timing metrics</li>
+<li>Metrics collection for cancellation frequency and operation timing</li>
 </ul>
 <p>This is registered as a singleton service to ensure all components share the same cancellation state.</p>
 </div>
@@ -140,21 +142,39 @@ graceful shutdown and cancellation across all components of the overseer.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker__ctor.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_State_OverseerStatusTracker__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.%23ctor(Microsoft.Extensions.Logging.ILogger%7BKalshiBotOverseer.State.OverseerStatusTracker%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L35">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L44">View Source</a>
   </span>
   <a id="KalshiBotOverseer_State_OverseerStatusTracker__ctor_" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.#ctor*"></a>
-  <h4 id="KalshiBotOverseer_State_OverseerStatusTracker__ctor" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.#ctor">OverseerStatusTracker()</h4>
+  <h4 id="KalshiBotOverseer_State_OverseerStatusTracker__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_State_OverseerStatusTracker__" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.State.OverseerStatusTracker})">OverseerStatusTracker(ILogger&lt;OverseerStatusTracker&gt;)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the OverseerStatusTracker class.
-Creates the initial CancellationTokenSource and sets up the cancellation state.</p>
+Creates the initial CancellationTokenSource and sets up the cancellation state with logging and metrics.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public OverseerStatusTracker()</code></pre>
+    <pre><code class="lang-csharp hljs">public OverseerStatusTracker(ILogger&lt;OverseerStatusTracker&gt; logger)</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="KalshiBotOverseer.State.OverseerStatusTracker.html">OverseerStatusTracker</a>&gt;</td>
+        <td><span class="parametername">logger</span></td>
+        <td><p>The logger for tracking cancellation operations and state changes.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
 </h3>
   <span class="small pull-right mobile-hide">
@@ -162,7 +182,7 @@ Creates the initial CancellationTokenSource and sets up the cancellation state.<
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker_CancelAll.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.CancelAll%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L65">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L78">View Source</a>
   </span>
   <a id="KalshiBotOverseer_State_OverseerStatusTracker_CancelAll_" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.CancelAll*"></a>
   <h4 id="KalshiBotOverseer_State_OverseerStatusTracker_CancelAll" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.CancelAll">CancelAll()</h4>
@@ -183,12 +203,12 @@ After calling this method, the cancellation token will be in a cancelled state.<
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker_Dispose.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L101">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L125">View Source</a>
   </span>
   <a id="KalshiBotOverseer_State_OverseerStatusTracker_Dispose_" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.Dispose*"></a>
   <h4 id="KalshiBotOverseer_State_OverseerStatusTracker_Dispose" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.Dispose">Dispose()</h4>
-  <div class="markdown level1 summary"><p>Disposes of the resources used by the status tracker.
-This cancels any pending operations and disposes of the CancellationTokenSource.</p>
+  <div class="markdown level1 summary"><p>Disposes of the resources used by the status tracker synchronously.
+This cancels any pending operations and disposes of the CancellationTokenSource and metrics.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -197,14 +217,48 @@ This cancels any pending operations and disposes of the CancellationTokenSource.
   </div>
   <h5 id="KalshiBotOverseer_State_OverseerStatusTracker_Dispose_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>This method should be called when the status tracker is no longer needed,
-typically during application shutdown. It ensures proper cleanup of unmanaged resources.</p>
+typically during application shutdown. It ensures proper cleanup of unmanaged resources
+and logs the disposal operation for monitoring purposes.</p>
 </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker_DisposeAsync.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.DisposeAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L142">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_State_OverseerStatusTracker_DisposeAsync_" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.DisposeAsync*"></a>
+  <h4 id="KalshiBotOverseer_State_OverseerStatusTracker_DisposeAsync" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.DisposeAsync">DisposeAsync()</h4>
+  <div class="markdown level1 summary"><p>Asynchronously disposes of the resources used by the status tracker.
+This cancels any pending operations and disposes of the CancellationTokenSource.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ValueTask DisposeAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.valuetask">ValueTask</a></td>
+        <td><p>A ValueTask representing the asynchronous dispose operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker_GetCancellationToken.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.GetCancellationToken%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L49">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L62">View Source</a>
   </span>
   <a id="KalshiBotOverseer_State_OverseerStatusTracker_GetCancellationToken_" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.GetCancellationToken*"></a>
   <h4 id="KalshiBotOverseer_State_OverseerStatusTracker_GetCancellationToken" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.GetCancellationToken">GetCancellationToken()</h4>
@@ -241,7 +295,7 @@ to respond to shutdown requests gracefully.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker_ResetAll.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker.ResetAll%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L81">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L97">View Source</a>
   </span>
   <a id="KalshiBotOverseer_State_OverseerStatusTracker_ResetAll_" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.ResetAll*"></a>
   <h4 id="KalshiBotOverseer_State_OverseerStatusTracker_ResetAll" data-uid="KalshiBotOverseer.State.OverseerStatusTracker.ResetAll">ResetAll()</h4>
@@ -264,6 +318,9 @@ It should be called when restarting the overseer or when a fresh cancellation st
   <div>
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
   </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iasyncdisposable">IAsyncDisposable</a>
+  </div>
 
 </article>
           </div>
@@ -276,7 +333,7 @@ It should be called when restarting the overseer or when a fresh cancellation st
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_State_OverseerStatusTracker.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.State.OverseerStatusTracker%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L19" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/State/OverseerStatusTracker.cs/#L22" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

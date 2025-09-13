@@ -127,7 +127,7 @@ and historical performance metrics for a specific brain instance.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_Brain.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.Brain%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L27">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L93">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_Brain_" data-uid="KalshiBotOverseer.Models.BrainPersistence.Brain*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_Brain" data-uid="KalshiBotOverseer.Models.BrainPersistence.Brain">Brain</h4>
@@ -159,7 +159,7 @@ May be null if the brain hasn't been assigned an ID yet.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_BrainInstanceName.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.BrainInstanceName%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L21">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L85">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_BrainInstanceName_" data-uid="KalshiBotOverseer.Models.BrainPersistence.BrainInstanceName*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_BrainInstanceName" data-uid="KalshiBotOverseer.Models.BrainPersistence.BrainInstanceName">BrainInstanceName</h4>
@@ -169,7 +169,9 @@ Used as the primary key for brain management and persistence operations.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string BrainInstanceName { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;brainInstanceName&quot;)]
+public string BrainInstanceName { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -191,7 +193,7 @@ Used as the primary key for brain management and persistence operations.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_CaptureSnapshots.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.CaptureSnapshots%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L51">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L117">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_CaptureSnapshots_" data-uid="KalshiBotOverseer.Models.BrainPersistence.CaptureSnapshots*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_CaptureSnapshots" data-uid="KalshiBotOverseer.Models.BrainPersistence.CaptureSnapshots">CaptureSnapshots</h4>
@@ -223,7 +225,7 @@ Snapshots provide point-in-time views of market state for analysis and backtesti
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_CpuUsageHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.CpuUsageHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L135">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L214">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_CpuUsageHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.CpuUsageHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_CpuUsageHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.CpuUsageHistory">CpuUsageHistory</h4>
@@ -233,7 +235,9 @@ Used for performance analysis and resource optimization decisions.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; CpuUsageHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;cpuUsageHistory&quot;)]
+public List&lt;MetricHistory&gt; CpuUsageHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -255,7 +259,7 @@ Used for performance analysis and resource optimization decisions.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_CurrentMarketTickers.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.CurrentMarketTickers%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L87">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L161">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_CurrentMarketTickers_" data-uid="KalshiBotOverseer.Models.BrainPersistence.CurrentMarketTickers*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_CurrentMarketTickers" data-uid="KalshiBotOverseer.Models.BrainPersistence.CurrentMarketTickers">CurrentMarketTickers</h4>
@@ -265,7 +269,9 @@ Represents the active market watch list at any given time.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;string&gt; CurrentMarketTickers { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;currentMarketTickers&quot;)]
+public List&lt;string&gt; CurrentMarketTickers { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -287,7 +293,7 @@ Represents the active market watch list at any given time.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_ErrorCount.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.ErrorCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L117">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L196">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_ErrorCount_" data-uid="KalshiBotOverseer.Models.BrainPersistence.ErrorCount*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_ErrorCount" data-uid="KalshiBotOverseer.Models.BrainPersistence.ErrorCount">ErrorCount</h4>
@@ -319,7 +325,7 @@ Used for monitoring system health and triggering error recovery procedures.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_ErrorHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.ErrorHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L171">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L262">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_ErrorHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.ErrorHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_ErrorHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.ErrorHistory">ErrorHistory</h4>
@@ -329,7 +335,9 @@ Used to identify patterns in system instability and recovery effectiveness.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; ErrorHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;errorHistory&quot;)]
+public List&lt;MetricHistory&gt; ErrorHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -351,7 +359,7 @@ Used to identify patterns in system instability and recovery effectiveness.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_EventQueueHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.EventQueueHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L141">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L222">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_EventQueueHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.EventQueueHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_EventQueueHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.EventQueueHistory">EventQueueHistory</h4>
@@ -361,7 +369,9 @@ Used to monitor system load and identify potential bottlenecks.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; EventQueueHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;eventQueueHistory&quot;)]
+public List&lt;MetricHistory&gt; EventQueueHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -383,7 +393,7 @@ Used to monitor system load and identify potential bottlenecks.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_IsShuttingDown.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.IsShuttingDown%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L111">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L190">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_IsShuttingDown_" data-uid="KalshiBotOverseer.Models.BrainPersistence.IsShuttingDown*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_IsShuttingDown" data-uid="KalshiBotOverseer.Models.BrainPersistence.IsShuttingDown">IsShuttingDown</h4>
@@ -415,7 +425,7 @@ Used to coordinate graceful shutdown and prevent new operations during teardown.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_IsStartingUp.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.IsStartingUp%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L105">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L184">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_IsStartingUp_" data-uid="KalshiBotOverseer.Models.BrainPersistence.IsStartingUp*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_IsStartingUp" data-uid="KalshiBotOverseer.Models.BrainPersistence.IsStartingUp">IsStartingUp</h4>
@@ -447,7 +457,7 @@ Used to track initialization state and prevent premature operations.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_IsWebSocketConnected.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.IsWebSocketConnected%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L129">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L208">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_IsWebSocketConnected_" data-uid="KalshiBotOverseer.Models.BrainPersistence.IsWebSocketConnected*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_IsWebSocketConnected" data-uid="KalshiBotOverseer.Models.BrainPersistence.IsWebSocketConnected">IsWebSocketConnected</h4>
@@ -479,7 +489,7 @@ Critical for real-time data streaming and market monitoring capabilities.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_LastRefreshTimeAcceptable.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.LastRefreshTimeAcceptable%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L207">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L310">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_LastRefreshTimeAcceptable_" data-uid="KalshiBotOverseer.Models.BrainPersistence.LastRefreshTimeAcceptable*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_LastRefreshTimeAcceptable" data-uid="KalshiBotOverseer.Models.BrainPersistence.LastRefreshTimeAcceptable">LastRefreshTimeAcceptable</h4>
@@ -511,7 +521,7 @@ Used to monitor system performance and trigger optimization measures when needed
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_LastSeen.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.LastSeen%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L81">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L155">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_LastSeen_" data-uid="KalshiBotOverseer.Models.BrainPersistence.LastSeen*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_LastSeen" data-uid="KalshiBotOverseer.Models.BrainPersistence.LastSeen">LastSeen</h4>
@@ -543,7 +553,7 @@ Used to determine if the brain is still active and responsive.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_LastSnapshot.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.LastSnapshot%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L123">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L202">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_LastSnapshot_" data-uid="KalshiBotOverseer.Models.BrainPersistence.LastSnapshot*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_LastSnapshot" data-uid="KalshiBotOverseer.Models.BrainPersistence.LastSnapshot">LastSnapshot</h4>
@@ -575,7 +585,7 @@ Used to track snapshot frequency and ensure regular data capture.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_ManagedWatchList.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.ManagedWatchList%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L45">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L111">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_ManagedWatchList_" data-uid="KalshiBotOverseer.Models.BrainPersistence.ManagedWatchList*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_ManagedWatchList" data-uid="KalshiBotOverseer.Models.BrainPersistence.ManagedWatchList">ManagedWatchList</h4>
@@ -607,7 +617,7 @@ When enabled, the brain will dynamically add/remove markets based on interest sc
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_MarketCountHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.MarketCountHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L165">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L254">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_MarketCountHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.MarketCountHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_MarketCountHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.MarketCountHistory">MarketCountHistory</h4>
@@ -617,7 +627,9 @@ Used to analyze market coverage trends and optimization effectiveness.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; MarketCountHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;marketCountHistory&quot;)]
+public List&lt;MetricHistory&gt; MarketCountHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -639,7 +651,7 @@ Used to analyze market coverage trends and optimization effectiveness.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_MinimumInterest.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.MinimumInterest%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L63">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L131">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_MinimumInterest_" data-uid="KalshiBotOverseer.Models.BrainPersistence.MinimumInterest*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_MinimumInterest" data-uid="KalshiBotOverseer.Models.BrainPersistence.MinimumInterest">MinimumInterest</h4>
@@ -649,7 +661,9 @@ Markets below this threshold will not be added to the watch list.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double MinimumInterest { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0, 1.7976931348623157E+308)]
+[JsonPropertyName(&quot;minimumInterest&quot;)]
+public double MinimumInterest { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -671,7 +685,7 @@ Markets below this threshold will not be added to the watch list.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_Mode.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.Mode%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L99">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L177">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_Mode_" data-uid="KalshiBotOverseer.Models.BrainPersistence.Mode*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_Mode" data-uid="KalshiBotOverseer.Models.BrainPersistence.Mode">Mode</h4>
@@ -681,7 +695,8 @@ Defaults to &quot;Autonomous&quot; but can be set to other modes like &quot;Manu
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string Mode { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;mode&quot;)]
+public string Mode { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -703,7 +718,7 @@ Defaults to &quot;Autonomous&quot; but can be set to other modes like &quot;Manu
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_NotificationQueueHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.NotificationQueueHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L153">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L238">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_NotificationQueueHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.NotificationQueueHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_NotificationQueueHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.NotificationQueueHistory">NotificationQueueHistory</h4>
@@ -713,7 +728,9 @@ Used to monitor alert and notification processing.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; NotificationQueueHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;notificationQueueHistory&quot;)]
+public List&lt;MetricHistory&gt; NotificationQueueHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -735,7 +752,7 @@ Used to monitor alert and notification processing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_OrderbookQueueHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.OrderbookQueueHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L159">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L246">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_OrderbookQueueHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.OrderbookQueueHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_OrderbookQueueHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.OrderbookQueueHistory">OrderbookQueueHistory</h4>
@@ -745,7 +762,9 @@ Used to monitor order book update processing efficiency.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; OrderbookQueueHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;orderbookQueueHistory&quot;)]
+public List&lt;MetricHistory&gt; OrderbookQueueHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -767,7 +786,7 @@ Used to monitor order book update processing efficiency.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_PerformanceSampleDateHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.PerformanceSampleDateHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L201">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L302">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_PerformanceSampleDateHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.PerformanceSampleDateHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_PerformanceSampleDateHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.PerformanceSampleDateHistory">PerformanceSampleDateHistory</h4>
@@ -777,7 +796,9 @@ Used to maintain chronological context for performance analysis.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; PerformanceSampleDateHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;performanceSampleDateHistory&quot;)]
+public List&lt;MetricHistory&gt; PerformanceSampleDateHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -799,7 +820,7 @@ Used to maintain chronological context for performance analysis.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_RefreshCycleIntervalHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.RefreshCycleIntervalHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L183">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L278">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_RefreshCycleIntervalHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.RefreshCycleIntervalHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_RefreshCycleIntervalHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.RefreshCycleIntervalHistory">RefreshCycleIntervalHistory</h4>
@@ -809,7 +830,9 @@ Used to ensure consistent and timely market data updates.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; RefreshCycleIntervalHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;refreshCycleIntervalHistory&quot;)]
+public List&lt;MetricHistory&gt; RefreshCycleIntervalHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -831,7 +854,7 @@ Used to ensure consistent and timely market data updates.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_RefreshCycleSecondsHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.RefreshCycleSecondsHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L177">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L270">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_RefreshCycleSecondsHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.RefreshCycleSecondsHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_RefreshCycleSecondsHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.RefreshCycleSecondsHistory">RefreshCycleSecondsHistory</h4>
@@ -841,7 +864,9 @@ Used to monitor and optimize market data refresh performance.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; RefreshCycleSecondsHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;refreshCycleSecondsHistory&quot;)]
+public List&lt;MetricHistory&gt; RefreshCycleSecondsHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -863,7 +888,7 @@ Used to monitor and optimize market data refresh performance.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_RefreshMarketCountHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.RefreshMarketCountHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L189">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L286">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_RefreshMarketCountHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.RefreshMarketCountHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_RefreshMarketCountHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.RefreshMarketCountHistory">RefreshMarketCountHistory</h4>
@@ -873,7 +898,9 @@ Used to monitor refresh efficiency and system throughput.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; RefreshMarketCountHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;refreshMarketCountHistory&quot;)]
+public List&lt;MetricHistory&gt; RefreshMarketCountHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -895,7 +922,7 @@ Used to monitor refresh efficiency and system throughput.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_RefreshUsagePercentageHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.RefreshUsagePercentageHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L195">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L294">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_RefreshUsagePercentageHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.RefreshUsagePercentageHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_RefreshUsagePercentageHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.RefreshUsagePercentageHistory">RefreshUsagePercentageHistory</h4>
@@ -905,7 +932,9 @@ Used to correlate resource usage with system performance.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; RefreshUsagePercentageHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;refreshUsagePercentageHistory&quot;)]
+public List&lt;MetricHistory&gt; RefreshUsagePercentageHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -927,7 +956,7 @@ Used to correlate resource usage with system performance.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_TargetMarketTickers.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.TargetMarketTickers%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L93">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L169">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_TargetMarketTickers_" data-uid="KalshiBotOverseer.Models.BrainPersistence.TargetMarketTickers*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_TargetMarketTickers" data-uid="KalshiBotOverseer.Models.BrainPersistence.TargetMarketTickers">TargetMarketTickers</h4>
@@ -937,7 +966,9 @@ Represents the desired market watch list, which may differ from current during t
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;string&gt; TargetMarketTickers { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;targetMarketTickers&quot;)]
+public List&lt;string&gt; TargetMarketTickers { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -959,7 +990,7 @@ Represents the desired market watch list, which may differ from current during t
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_TargetWatches.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.TargetWatches%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L57">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L123">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_TargetWatches_" data-uid="KalshiBotOverseer.Models.BrainPersistence.TargetWatches*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_TargetWatches" data-uid="KalshiBotOverseer.Models.BrainPersistence.TargetWatches">TargetWatches</h4>
@@ -969,7 +1000,9 @@ Used by the market management system to determine optimal watch list size.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int TargetWatches { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0, 2147483647)]
+[JsonPropertyName(&quot;targetWatches&quot;)]
+public int TargetWatches { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -991,7 +1024,7 @@ Used by the market management system to determine optimal watch list size.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_TickerQueueHistory.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.TickerQueueHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L147">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L230">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_TickerQueueHistory_" data-uid="KalshiBotOverseer.Models.BrainPersistence.TickerQueueHistory*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_TickerQueueHistory" data-uid="KalshiBotOverseer.Models.BrainPersistence.TickerQueueHistory">TickerQueueHistory</h4>
@@ -1001,7 +1034,9 @@ Used to monitor market data processing efficiency.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public List&lt;MetricHistory&gt; TickerQueueHistory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;tickerQueueHistory&quot;)]
+public List&lt;MetricHistory&gt; TickerQueueHistory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1023,7 +1058,7 @@ Used to monitor market data processing efficiency.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_UsageMax.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.UsageMax%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L75">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L147">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_UsageMax_" data-uid="KalshiBotOverseer.Models.BrainPersistence.UsageMax*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_UsageMax" data-uid="KalshiBotOverseer.Models.BrainPersistence.UsageMax">UsageMax</h4>
@@ -1033,7 +1068,9 @@ Used for performance monitoring and resource allocation decisions.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double UsageMax { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0, 100)]
+[JsonPropertyName(&quot;usageMax&quot;)]
+public double UsageMax { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1055,7 +1092,7 @@ Used for performance monitoring and resource allocation decisions.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_UsageMin.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.UsageMin%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L69">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L139">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_UsageMin_" data-uid="KalshiBotOverseer.Models.BrainPersistence.UsageMin*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_UsageMin" data-uid="KalshiBotOverseer.Models.BrainPersistence.UsageMin">UsageMin</h4>
@@ -1065,7 +1102,9 @@ Used for performance monitoring and resource allocation decisions.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double UsageMin { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0, 100)]
+[JsonPropertyName(&quot;usageMin&quot;)]
+public double UsageMin { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -1087,7 +1126,7 @@ Used for performance monitoring and resource allocation decisions.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_WatchOrders.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.WatchOrders%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L39">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L105">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_WatchOrders_" data-uid="KalshiBotOverseer.Models.BrainPersistence.WatchOrders*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_WatchOrders" data-uid="KalshiBotOverseer.Models.BrainPersistence.WatchOrders">WatchOrders</h4>
@@ -1119,7 +1158,7 @@ When enabled, the brain will track order placements, fills, and cancellations.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_WatchPositions.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.WatchPositions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L33">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L99">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Models_BrainPersistence_WatchPositions_" data-uid="KalshiBotOverseer.Models.BrainPersistence.WatchPositions*"></a>
   <h4 id="KalshiBotOverseer_Models_BrainPersistence_WatchPositions" data-uid="KalshiBotOverseer.Models.BrainPersistence.WatchPositions">WatchPositions</h4>
@@ -1146,6 +1185,123 @@ When enabled, the brain will track and respond to position updates in watched ma
       </tr>
     </tbody>
   </table>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_Clone.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.Clone%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L317">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Models_BrainPersistence_Clone_" data-uid="KalshiBotOverseer.Models.BrainPersistence.Clone*"></a>
+  <h4 id="KalshiBotOverseer_Models_BrainPersistence_Clone" data-uid="KalshiBotOverseer.Models.BrainPersistence.Clone">Clone()</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of this BrainPersistence instance.
+Uses JSON serialization for safe copying of complex nested objects.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BrainPersistence Clone()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotOverseer.Models.BrainPersistence.html">BrainPersistence</a></td>
+        <td><p>A new BrainPersistence instance with all properties deeply cloned.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_DeserializeWithMetrics_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.DeserializeWithMetrics(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L340">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Models_BrainPersistence_DeserializeWithMetrics_" data-uid="KalshiBotOverseer.Models.BrainPersistence.DeserializeWithMetrics*"></a>
+  <h4 id="KalshiBotOverseer_Models_BrainPersistence_DeserializeWithMetrics_System_String_" data-uid="KalshiBotOverseer.Models.BrainPersistence.DeserializeWithMetrics(System.String)">DeserializeWithMetrics(string)</h4>
+  <div class="markdown level1 summary"><p>Deserializes a JSON string to BrainPersistence with performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static (BrainPersistence Instance, long Milliseconds) DeserializeWithMetrics(string json)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">json</span></td>
+        <td><p>The JSON string to deserialize.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="KalshiBotOverseer.Models.BrainPersistence.html">BrainPersistence</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-kalshibotoverseer.models.brainpersistence,system.int64-.instance">Instance</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-kalshibotoverseer.models.brainpersistence,system.int64-.milliseconds">Milliseconds</a>)</td>
+        <td><p>A tuple containing the deserialized instance and the deserialization time in milliseconds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence_SerializeWithMetrics.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence.SerializeWithMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L327">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Models_BrainPersistence_SerializeWithMetrics_" data-uid="KalshiBotOverseer.Models.BrainPersistence.SerializeWithMetrics*"></a>
+  <h4 id="KalshiBotOverseer_Models_BrainPersistence_SerializeWithMetrics" data-uid="KalshiBotOverseer.Models.BrainPersistence.SerializeWithMetrics">SerializeWithMetrics()</h4>
+  <div class="markdown level1 summary"><p>Serializes this BrainPersistence instance to JSON with performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (string Json, long Milliseconds) SerializeWithMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.int64-.json">Json</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.int64-.milliseconds">Milliseconds</a>)</td>
+        <td><p>A tuple containing the JSON string and the serialization time in milliseconds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
 
 </article>
           </div>
@@ -1158,7 +1314,7 @@ When enabled, the brain will track and respond to position updates in watched ma
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Models_BrainPersistence.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Models.BrainPersistence%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L15" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Models/BrainPersistence.cs/#L79" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>
