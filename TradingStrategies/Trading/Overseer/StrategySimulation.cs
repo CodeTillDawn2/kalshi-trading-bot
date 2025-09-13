@@ -67,6 +67,23 @@ namespace TradingStrategies.Trading.Overseer
         public long PeakMemoryUsage => _memoryUsages.Count > 0 ? _memoryUsages.Max() : 0;
 
         /// <summary>
+        /// Gets the total number of trades executed during the simulation.
+        /// </summary>
+        public int TotalTradesExecuted => _totalTradesExecuted;
+
+        /// <summary>
+        /// Gets the average decision time in milliseconds for strategy evaluation.
+        /// Only available when EnableDecisionTiming is enabled in configuration.
+        /// </summary>
+        public double AverageDecisionTimeMs => _decisionTimes.Count > 0 ? _decisionTimes.Average(t => t.TotalMilliseconds) : 0;
+
+        /// <summary>
+        /// Gets the average action application time in milliseconds.
+        /// Measures the time spent applying trading decisions to the simulation state.
+        /// </summary>
+        public double AverageApplyTimeMs => _applyTimes.Count > 0 ? _applyTimes.Average(t => t.TotalMilliseconds) : 0;
+
+        /// <summary>
         /// Gets the simulated order book containing bid/ask levels.
         /// </summary>
         public SimulatedOrderbook SimulatedBook { get; private set; }
@@ -80,7 +97,11 @@ namespace TradingStrategies.Trading.Overseer
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private readonly List<TimeSpan> _executionTimes = new List<TimeSpan>();
         private readonly List<long> _memoryUsages = new List<long>();
+        private readonly List<TimeSpan> _decisionTimes = new List<TimeSpan>();
+        private readonly List<TimeSpan> _applyTimes = new List<TimeSpan>();
         private readonly SimulationConfig _config;
+        private int _totalTradesExecuted = 0;
+        private int _tradeCountThisSnapshot = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StrategySimulation"/> class.
@@ -131,6 +152,8 @@ namespace TradingStrategies.Trading.Overseer
             if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
             _stopwatch.Restart();
             long memoryBefore = GC.GetTotalMemory(true);
+            _tradeCountThisSnapshot = 0;
+            _tradeCountThisSnapshot = 0;
 
             // Apply deltas if previous snapshot provided
             Dictionary<int, int> yesDeltas = new Dictionary<int, int>();
@@ -157,8 +180,22 @@ namespace TradingStrategies.Trading.Overseer
             effectiveSnapshot.RestingOrders = SimulatedRestingOrders;
 
             // Decision + execution
+            Stopwatch decisionStopwatch = new Stopwatch();
+            decisionStopwatch.Start();
             var decision = Strategy.GetAction(effectiveSnapshot, prevSnapshot, Position);
+            decisionStopwatch.Stop();
+            _decisionTimes.Add(decisionStopwatch.Elapsed);
+
+            if (_config.EnableDecisionTiming && decisionStopwatch.Elapsed.TotalMilliseconds > _config.DecisionThresholdMs)
+            {
+                Console.WriteLine($"Decision timing warning: GetAction took {decisionStopwatch.Elapsed.TotalMilliseconds:F2}ms");
+            }
+
+            Stopwatch applyStopwatch = new Stopwatch();
+            applyStopwatch.Start();
             ApplyAction(decision, effectiveSnapshot);
+            applyStopwatch.Stop();
+            _applyTimes.Add(applyStopwatch.Elapsed);
 
             _stopwatch.Stop();
             _executionTimes.Add(_stopwatch.Elapsed);
@@ -220,7 +257,7 @@ namespace TradingStrategies.Trading.Overseer
 
             string tradeSide = longSide ? "no" : "yes";
 
-            int qty = (action == ActionType.Exit) ? Math.Abs(Position) : 1;
+            int qty = (action == ActionType.Exit) ? Math.Abs(Position) : _config.DefaultMarketOrderQuantity;
             int remainingQuantity = qty;
             double totalCost = 0;
 
@@ -229,7 +266,7 @@ namespace TradingStrategies.Trading.Overseer
             bool isPaying = longSide || (shortSide && action != ActionType.Exit);
             double LevelPriceFunc(int price) => isPaying ? (100 - price) / 100.0 : price / 100.0;
 
-            for (int p = 99; p >= 1; p--)
+            for (int p = _config.MaxContractPrice; p >= _config.MinContractPrice; p--)
             {
                 if (remainingQuantity <= 0) break;
                 if (bookToReduce[p] == null || bookToReduce[p].Count == 0) continue;
@@ -243,6 +280,14 @@ namespace TradingStrategies.Trading.Overseer
 
             int filled = qty - remainingQuantity;
             if (filled == 0) return;
+
+            _totalTradesExecuted++;
+            _tradeCountThisSnapshot++;
+
+            if (_tradeCountThisSnapshot > _config.TradeRateLimitPerSnapshot)
+            {
+                Console.WriteLine($"Trade rate limit exceeded: {_tradeCountThisSnapshot} trades in this snapshot, limit is {_config.TradeRateLimitPerSnapshot}");
+            }
 
             double tempCash = Cash;
             int tempPosition = Position;
@@ -668,8 +713,22 @@ namespace TradingStrategies.Trading.Overseer
             effectiveSnapshot.RestingOrders = SimulatedRestingOrders;
 
             // Decision + execution
+            Stopwatch decisionStopwatch = new Stopwatch();
+            decisionStopwatch.Start();
             var decision = await Task.Run(() => Strategy.GetAction(effectiveSnapshot, prevSnapshot, Position), cancellationToken);
+            decisionStopwatch.Stop();
+            _decisionTimes.Add(decisionStopwatch.Elapsed);
+
+            if (_config.EnableDecisionTiming && decisionStopwatch.Elapsed.TotalMilliseconds > _config.DecisionThresholdMs)
+            {
+                Console.WriteLine($"Decision timing warning: GetAction took {decisionStopwatch.Elapsed.TotalMilliseconds:F2}ms");
+            }
+
+            Stopwatch applyStopwatch = new Stopwatch();
+            applyStopwatch.Start();
             await Task.Run(() => ApplyAction(decision, effectiveSnapshot), cancellationToken);
+            applyStopwatch.Stop();
+            _applyTimes.Add(applyStopwatch.Elapsed);
 
             _stopwatch.Stop();
             _executionTimes.Add(_stopwatch.Elapsed);
@@ -727,8 +786,19 @@ namespace TradingStrategies.Trading.Overseer
 
         /// <summary>
         /// Gets detailed performance metrics for analysis and optimization.
+        /// Includes execution timing, memory usage, trade counts, and decision performance metrics.
+        /// New metrics include decision timing, action application timing, and trade rate monitoring
+        /// when corresponding configuration options are enabled.
         /// </summary>
-        /// <returns>A dictionary containing various performance metrics.</returns>
+        /// <returns>A dictionary containing various performance metrics including:
+        /// - TotalExecutionTime: Total time spent processing snapshots
+        /// - AverageExecutionTimeMs: Average time per snapshot
+        /// - PeakMemoryUsage: Maximum memory usage recorded
+        /// - TotalTradesExecuted: Total number of trades executed
+        /// - AverageDecisionTimeMs: Average strategy decision time (when enabled)
+        /// - AverageApplyTimeMs: Average action application time
+        /// - SlowDecisionsCount: Number of decisions exceeding threshold
+        /// - Configuration values for reference</returns>
         public Dictionary<string, object> GetDetailedPerformanceMetrics()
         {
             var metrics = new Dictionary<string, object>
@@ -743,20 +813,33 @@ namespace TradingStrategies.Trading.Overseer
                 ["HighMemoryOperationsCount"] = _memoryUsages.Count(m => m > _config.MemoryThresholdMB * 1024 * 1024),
                 ["RestingOrdersCount"] = SimulatedRestingOrders.Count,
                 ["CurrentPosition"] = Position,
-                ["CurrentCash"] = Cash
+                ["CurrentCash"] = Cash,
+                ["TotalTradesExecuted"] = _totalTradesExecuted,
+                ["AverageDecisionTimeMs"] = _decisionTimes.Count > 0 ? _decisionTimes.Average(t => t.TotalMilliseconds) : 0,
+                ["AverageApplyTimeMs"] = _applyTimes.Count > 0 ? _applyTimes.Average(t => t.TotalMilliseconds) : 0,
+                ["SlowDecisionsCount"] = _decisionTimes.Count(t => t.TotalMilliseconds > _config.DecisionThresholdMs),
+                ["DecisionThresholdMs"] = _config.DecisionThresholdMs,
+                ["BandWidthRatioThreshold"] = _config.BandWidthRatioThreshold,
+                ["TradeRateLimitPerSnapshot"] = _config.TradeRateLimitPerSnapshot
             };
 
             return metrics;
         }
 
         /// <summary>
-        /// Resets performance metrics for a new simulation run.
+        /// Resets all performance metrics for a new simulation run.
+        /// Clears execution times, memory usage data, decision timing metrics,
+        /// action application timing, and trade counters. Prepares the simulation
+        /// for a fresh performance measurement cycle.
         /// </summary>
         public void ResetPerformanceMetrics()
         {
             _executionTimes.Clear();
             _memoryUsages.Clear();
+            _decisionTimes.Clear();
+            _applyTimes.Clear();
             _stopwatch.Reset();
+            _totalTradesExecuted = 0;
         }
     }
 }

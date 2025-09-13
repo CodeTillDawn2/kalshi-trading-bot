@@ -34,6 +34,236 @@
             Gets or sets the delay after overnight start time to execute tasks.
             </summary>
         </member>
+        <member name="T:BacklashDTOs.Configuration.ErrorHandlerConfig">
+            <summary>
+            Configuration settings for the CentralErrorHandler component that manages error processing,
+            catastrophic failure detection, and internet connectivity monitoring.
+            </summary>
+            <remarks>
+            This configuration allows customization of error handling behavior including:
+            - Time window for error frequency monitoring
+            - Threshold for triggering catastrophic failure detection
+            - Parameters for internet connectivity check retry logic
+            </remarks>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ErrorHandlerConfig.ErrorWindowMinutes">
+            <summary>
+            Gets or sets the time window in minutes for monitoring error frequency.
+            Errors occurring within this window are counted toward the catastrophic threshold.
+            </summary>
+            <value>Default is 5 minutes.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ErrorHandlerConfig.ErrorThreshold">
+            <summary>
+            Gets or sets the threshold number of non-catastrophic errors within the monitoring window
+            that triggers catastrophic failure detection and system restart.
+            </summary>
+            <value>Default is 10 errors.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ErrorHandlerConfig.InternetCheckMaxAttempts">
+            <summary>
+            Gets or sets the maximum number of attempts for internet connectivity checks
+            before declaring the connection as failed.
+            </summary>
+            <value>Default is 100 attempts.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ErrorHandlerConfig.InternetCheckInitialDelayMs">
+            <summary>
+            Gets or sets the initial delay in milliseconds between internet connectivity check attempts.
+            This delay doubles with each retry attempt until reaching the maximum delay.
+            </summary>
+            <value>Default is 1000 milliseconds (1 second).</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ErrorHandlerConfig.InternetCheckMaxDelayMs">
+            <summary>
+            Gets or sets the maximum delay in milliseconds between internet connectivity check attempts.
+            The delay will not exceed this value even after exponential backoff.
+            </summary>
+            <value>Default is 60000 milliseconds (60 seconds).</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.QueueHighCountAlertThreshold">
+            <summary>
+            Gets or sets the percentage threshold for queue high count alerts.
+            When the EventQueue utilization exceeds this percentage, a performance alert is logged.
+            </summary>
+            <value>Default is 80.0%.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.RefreshUsageAlertThreshold">
+            <summary>
+            Gets or sets the percentage threshold for refresh usage alerts.
+            When the market refresh cycle usage exceeds this percentage, a performance alert is logged.
+            </summary>
+            <value>Default is 90.0%.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.QueueCountAlertThreshold">
+            <summary>
+            Gets or sets the absolute count threshold for queue alerts.
+            When any queue's average count exceeds this value, a performance alert is logged.
+            </summary>
+            <value>Default is 100 items.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.RetryDelayMs">
+            <summary>
+            Gets or sets the retry delay in milliseconds for operations that require retries.
+            </summary>
+            <value>Default is 5000 milliseconds (5 seconds).</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.SessionIdLength">
+            <summary>
+            Gets or sets the length of the session identifier string.
+            </summary>
+            <value>Default is 5 characters.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.OverseerConnectionTimeoutSeconds">
+            <summary>
+            Gets or sets the timeout in seconds for connection attempts to the overseer.
+            </summary>
+            <value>Default is 30 seconds.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.OverseerSemaphoreTimeoutSeconds">
+            <summary>
+            Gets or sets the timeout in seconds for semaphore operations.
+            </summary>
+            <value>Default is 10 seconds.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.OverseerDiscoveryIntervalMinutes">
+            <summary>
+            Gets or sets the interval in minutes for overseer discovery operations.
+            </summary>
+            <value>Default is 3 minutes.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.OverseerCheckInIntervalSeconds">
+            <summary>
+            Gets or sets the interval in seconds for check-in operations.
+            </summary>
+            <value>Default is 30 seconds.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.OverseerCircuitBreakerFailureThreshold">
+            <summary>
+            Gets or sets the failure threshold for the circuit breaker pattern.
+            </summary>
+            <value>Default is 5 failures.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.OverseerCircuitBreakerTimeoutMinutes">
+            <summary>
+            Gets or sets the timeout in minutes for the circuit breaker to reset.
+            </summary>
+            <value>Default is 5 minutes.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.OvernightBatchSize">
+            <summary>
+            Gets or sets the batch size for overnight market refresh operations.
+            </summary>
+            <value>Default is 20 markets per batch.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.OvernightRetryDelayMinutes">
+            <summary>
+            Gets or sets the retry delay in minutes for overnight market refresh operations.
+            </summary>
+            <value>Default is 30 minutes.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.InterestScoreAgeThresholdHours">
+            <summary>
+            Gets or sets the age threshold in hours for interest score calculations.
+            Markets with interest scores older than this will be recalculated.
+            </summary>
+            <value>Default is 12 hours.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.MarketRefreshCircuitBreakerFailureThreshold">
+            <summary>
+            Gets or sets the failure threshold for the market refresh circuit breaker.
+            </summary>
+            <value>Default is 5 failures.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.MarketRefreshCircuitBreakerTimeoutMinutes">
+            <summary>
+            Gets or sets the timeout in minutes for the market refresh circuit breaker to reset.
+            </summary>
+            <value>Default is 5 minutes.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.ConnectionHealthCheckIntervalSeconds">
+            <summary>
+            Gets or sets the connection health check interval in seconds.
+            </summary>
+            <value>Default is 30 seconds.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.ConnectionHealthTimeoutSeconds">
+            <summary>
+            Gets or sets the connection timeout in seconds for health monitoring.
+            </summary>
+            <value>Default is 60 seconds.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.AuthTokenValidityHours">
+            <summary>
+            Gets or sets the authentication token validity duration in hours.
+            </summary>
+            <value>Default is 24 hours.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.HandshakeRateLimitPerMinute">
+            <summary>
+            Gets or sets the rate limit for handshake operations per minute per IP.
+            </summary>
+            <value>Default is 10 handshakes per minute.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.CheckInRateLimitPerMinute">
+            <summary>
+            Gets or sets the rate limit for check-in operations per minute per client.
+            </summary>
+            <value>Default is 60 check-ins per minute.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.MessageBatchSize">
+            <summary>
+            Gets or sets the message batch size for broadcast operations.
+            </summary>
+            <value>Default is 50 messages per batch.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.MessageBatchIntervalMs">
+            <summary>
+            Gets or sets the message batch processing interval in milliseconds.
+            </summary>
+            <value>Default is 100 milliseconds.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.StaleConnectionCleanupIntervalMinutes">
+            <summary>
+            Gets or sets the stale connection cleanup interval in minutes.
+            </summary>
+            <value>Default is 5 minutes.</value>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.ExecutionConfig.MaxConnectionAgeMinutes">
+            <summary>
+            Gets or sets the maximum age for connections to be considered stale in minutes.
+            </summary>
+            <value>Default is 10 minutes.</value>
+        </member>
+        <member name="T:BacklashDTOs.Configuration.InterestScoreConfig">
+            <summary>
+            Configuration class for InterestScoreService settings.
+            Controls cache duration, performance monitoring, and operational parameters
+            for the interest scoring system. These settings can be configured via appsettings.json
+            and are injected through dependency injection.
+            </summary>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.InterestScoreConfig.CacheDurationHours">
+            <summary>
+            Gets or sets the cache duration in hours for percentile thresholds and market values.
+            Default is 6 hours. Increasing this reduces database queries but may use stale data.
+            Lower values provide more current data but increase computational overhead.
+            </summary>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.InterestScoreConfig.EnablePerformanceMetrics">
+            <summary>
+            Gets or sets whether to enable performance metrics collection.
+            When enabled, tracks scoring operation times, cache hit rates, and other performance indicators.
+            Disabling this improves performance but removes monitoring capabilities.
+            </summary>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.InterestScoreConfig.MaxPerformanceMetricsHistory">
+            <summary>
+            Gets or sets the maximum number of performance metrics to retain in memory.
+            Older metrics are discarded when this limit is reached to prevent memory leaks.
+            Higher values provide better historical analysis but consume more memory.
+            </summary>
+        </member>
         <member name="T:BacklashDTOs.Configuration.MarketDataConfig">
             <summary>
             Configuration class for market data settings.
@@ -61,6 +291,60 @@
             <param name="name">The name of the options instance being validated.</param>
             <param name="options">The options instance.</param>
             <returns>A <see cref="T:Microsoft.Extensions.Options.ValidateOptionsResult"/> indicating success or failure.</returns>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.SimulatorConfig.CacheDirectory">
+            <summary>
+            Gets or sets the directory path where simulation cache files and reports are stored.
+            This directory is created automatically if it doesn't exist.
+            </summary>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.SimulatorConfig.ProcessingTimeoutSeconds">
+            <summary>
+            Gets or sets the timeout in seconds for processing market data during simulation.
+            Default is 300 seconds (5 minutes).
+            </summary>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.SimulatorConfig.MarketDataFileNamePattern">
+            <summary>
+            Gets or sets the file naming pattern for market data JSON files.
+            Supports placeholders: {market}, {label}, {strategy}, {timestamp}.
+            Default pattern: "{market}_{label}_{strategy}_{timestamp}.json"
+            </summary>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.SimulatorConfig.ResearchBusFileNamePattern">
+            <summary>
+            Gets or sets the file naming pattern for ResearchBus CSV files.
+            Supports placeholders: {label}, {timestamp}.
+            Default pattern: "{label}_ResearchBus_{timestamp}.csv"
+            </summary>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.SimulatorConfig.BestFitReportFileNamePattern">
+            <summary>
+            Gets or sets the file naming pattern for best-fit report CSV files.
+            Supports placeholders: {label}, {timestamp}.
+            Default pattern: "{label}_BestFitReport_{timestamp}.csv"
+            </summary>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.SimulatorConfig.DiscrepancyThresholdPercentage">
+            <summary>
+            Gets or sets the percentage threshold for detecting widespread discrepancies in snapshots.
+            Used to determine when discrepancies indicate a systemic issue.
+            Default is 10%.
+            </summary>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.SimulatorConfig.EnableSnapshotValidation">
+            <summary>
+            Gets or sets whether to enable validation of market snapshots before processing.
+            When enabled, snapshots are checked for data integrity and completeness.
+            Default is true.
+            </summary>
+        </member>
+        <member name="P:BacklashDTOs.Configuration.SimulatorConfig.MinSnapshotCountForValidation">
+            <summary>
+            Gets or sets the minimum number of snapshots required for validation to be meaningful.
+            Markets with fewer snapshots will still be processed but with warnings.
+            Default is 1.
+            </summary>
         </member>
         <member name="T:BacklashDTOs.Converters.MarketSnapshotSlimConverter">
             <summary>
