@@ -21,6 +21,9 @@ jobs:
       - name: Install DocFX
         run: dotnet tool install -g docfx
 
+      - name: Restore Dependencies
+        run: cd BacklashBot && dotnet restore BacklashBot.sln
+
       - name: Build Project
         run: cd BacklashBot && dotnet build BacklashBot.sln /p:EnableWindowsTargeting=true
         env:
