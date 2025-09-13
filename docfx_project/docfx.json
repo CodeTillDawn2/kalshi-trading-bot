@@ -33,7 +33,9 @@
   ],
   "build": {
     "content": [
-      { "files": [ "obj/api/**.yml", "index.md", "toc.yml", "api/index.md", "api/toc.yml" ] },
+      { "files": [ "obj/api/**.yml" ] },
+      { "files": [ "index.md", "toc.yml" ] },
+      { "files": [ "api/index.md", "api/toc.yml" ] },
       { "files": [ "articles/**.md", "articles/**.html" ] }
     ],
     "resource": [
