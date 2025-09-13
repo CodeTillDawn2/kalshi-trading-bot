@@ -474,20 +474,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.MarketDataTests.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashBot.MarketDataTests.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashBot.MarketDataTests",
-      "Summary": "<p sourcefile=\"api/BacklashBot.MarketDataTests.yml\" sourcestartlinenumber=\"1\">Simple console app to test MarketDataConfig instantiation and validation,\nValidateTickerData method with valid and invalid data, and a mock for the retry policy.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BacklashBot.Middleware.SignalRAuthenticationMiddleware.yml",
       "output": {
         ".html": {
@@ -1086,20 +1072,6 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Timers",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashBot.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashBot",
       "Summary": null
     },
     {

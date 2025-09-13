@@ -1,12 +1,6 @@
 ### YamlMime:XRefMap
 sorted: true
 references:
-- uid: BacklashBot
-  name: BacklashBot
-  href: api/BacklashBot.html
-  commentId: N:BacklashBot
-  fullName: BacklashBot
-  nameWithType: BacklashBot
 - uid: BacklashBot.Helpers
   name: BacklashBot.Helpers
   href: api/BacklashBot.Helpers.html
@@ -3014,28 +3008,6 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Management.UnmanagedMarketManagerService.MonitorWatchList
   nameWithType: UnmanagedMarketManagerService.MonitorWatchList
-- uid: BacklashBot.MarketDataTests
-  name: MarketDataTests
-  href: api/BacklashBot.MarketDataTests.html
-  commentId: T:BacklashBot.MarketDataTests
-  fullName: BacklashBot.MarketDataTests
-  nameWithType: MarketDataTests
-- uid: BacklashBot.MarketDataTests.Main(System.String[])
-  name: Main(string[])
-  href: api/BacklashBot.MarketDataTests.html#BacklashBot_MarketDataTests_Main_System_String___
-  commentId: M:BacklashBot.MarketDataTests.Main(System.String[])
-  name.vb: Main(String())
-  fullName: BacklashBot.MarketDataTests.Main(string[])
-  fullName.vb: BacklashBot.MarketDataTests.Main(String())
-  nameWithType: MarketDataTests.Main(string[])
-  nameWithType.vb: MarketDataTests.Main(String())
-- uid: BacklashBot.MarketDataTests.Main*
-  name: Main
-  href: api/BacklashBot.MarketDataTests.html#BacklashBot_MarketDataTests_Main_
-  commentId: Overload:BacklashBot.MarketDataTests.Main
-  isSpec: "True"
-  fullName: BacklashBot.MarketDataTests.Main
-  nameWithType: MarketDataTests.Main
 - uid: BacklashBot.Middleware
   name: BacklashBot.Middleware
   href: api/BacklashBot.Middleware.html
