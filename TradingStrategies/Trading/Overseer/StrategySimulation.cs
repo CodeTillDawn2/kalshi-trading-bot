@@ -2,6 +2,8 @@ using BacklashDTOs;
 using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
 using static BacklashInterfaces.Enums.StrategyEnums;
+using System.Diagnostics;
+using System.Linq;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -46,6 +48,21 @@ namespace TradingStrategies.Trading.Overseer
         public double InitialCash { get; private set; }
 
         /// <summary>
+        /// Gets the total execution time for all ProcessSnapshot calls.
+        /// </summary>
+        public TimeSpan TotalExecutionTime => _executionTimes.Aggregate(TimeSpan.Zero, (sum, t) => sum + t);
+
+        /// <summary>
+        /// Gets the average execution time in milliseconds for ProcessSnapshot calls.
+        /// </summary>
+        public double AverageExecutionTimeMs => _executionTimes.Count > 0 ? _executionTimes.Average(t => t.TotalMilliseconds) : 0;
+
+        /// <summary>
+        /// Gets the peak memory usage recorded during simulation.
+        /// </summary>
+        public long PeakMemoryUsage => _memoryUsages.Count > 0 ? _memoryUsages.Max() : 0;
+
+        /// <summary>
         /// Gets the simulated order book containing bid/ask levels.
         /// </summary>
         public SimulatedOrderbook SimulatedBook { get; private set; }
@@ -56,13 +73,20 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         public List<(string action, string side, string type, int count, int price, DateTime? expiration)> SimulatedRestingOrders { get; private set; } = new List<(string, string, string, int, int, DateTime?)>();
 
+        private readonly Stopwatch _stopwatch = new Stopwatch();
+        private readonly List<TimeSpan> _executionTimes = new List<TimeSpan>();
+        private readonly List<long> _memoryUsages = new List<long>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StrategySimulation"/> class.
+        /// Validates that the strategy parameter is not null to prevent runtime errors.
         /// </summary>
-        /// <param name="strategy">The trading strategy to simulate.</param>
+        /// <param name="strategy">The trading strategy to simulate. Cannot be null.</param>
         /// <param name="initialCash">The initial cash balance for the simulation (default is 100.0).</param>
+        /// <exception cref="ArgumentNullException">Thrown when strategy is null.</exception>
         public StrategySimulation(Strategy strategy, double initialCash = 100.0)
         {
+            if (strategy == null) throw new ArgumentNullException(nameof(strategy));
             Strategy = strategy;
             Position = 0;
             Cash = initialCash;
@@ -74,24 +98,32 @@ namespace TradingStrategies.Trading.Overseer
         /// Processes a market snapshot by applying deltas, updating the order book, and executing trading decisions.
         /// This is the main entry point for advancing the simulation state with new market data.
         /// </summary>
-        /// <param name="snapshot">The current market snapshot to process, containing order book, position, and market data.</param>
+        /// <param name="snapshot">The current market snapshot to process, containing order book, position, and market data. Cannot be null.</param>
         /// <param name="prevSnapshot">The previous market snapshot for delta calculation (optional). If provided, enables efficient delta-based updates.</param>
+        /// <exception cref="ArgumentNullException">Thrown when snapshot is null.</exception>
         /// <remarks>
         /// This method handles the core simulation loop with the following steps:
+        /// 0. Validate input parameters and start performance monitoring (timing and memory)
         /// 1. Compute and apply order book deltas if previous snapshot exists (for efficiency)
         /// 2. Simulate fills from those deltas on resting orders
         /// 3. Initialize order book from snapshot if this is the first snapshot
         /// 4. Create effective snapshot with simulated state overlay
         /// 5. Get trading decision from strategy
         /// 6. Apply the decision to update position, cash, and order book
+        /// 7. Record performance metrics (execution time and memory usage)
         ///
         /// As a developer, this method orchestrates the entire simulation step, ensuring proper sequencing
-        /// of market updates, strategy evaluation, and state changes. The effective snapshot approach
-        /// allows strategies to see the current simulated state while maintaining separation between
-        /// real market data and simulation artifacts.
+        /// of market updates, strategy evaluation, and state changes. Input validation prevents null reference
+        /// exceptions, while performance monitoring tracks execution timing and memory usage for optimization.
+        /// The effective snapshot approach allows strategies to see the current simulated state while maintaining
+        /// separation between real market data and simulation artifacts.
         /// </remarks>
         public void ProcessSnapshot(MarketSnapshot snapshot, MarketSnapshot? prevSnapshot)
         {
+            if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
+            _stopwatch.Restart();
+            long memoryBefore = GC.GetTotalMemory(true);
+
             // Apply deltas if previous snapshot provided
             Dictionary<int, int> yesDeltas = new Dictionary<int, int>();
             Dictionary<int, int> noDeltas = new Dictionary<int, int>();
@@ -119,6 +151,11 @@ namespace TradingStrategies.Trading.Overseer
             // Decision + execution
             var decision = Strategy.GetAction(effectiveSnapshot, prevSnapshot, Position);
             ApplyAction(decision, effectiveSnapshot);
+
+            _stopwatch.Stop();
+            _executionTimes.Add(_stopwatch.Elapsed);
+            long memoryAfter = GC.GetTotalMemory(true);
+            _memoryUsages.Add(memoryAfter);
         }
 
 

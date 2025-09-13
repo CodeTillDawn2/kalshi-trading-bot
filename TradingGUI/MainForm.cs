@@ -509,7 +509,7 @@ namespace SimulatorWinForms
         {
             _lastTooltipMemo = null;
 
-            _tooltipPoints = SimulatorWinForms.Charting.MarketChartRenderer.Render(
+            _tooltipPoints = await SimulatorWinForms.Charting.MarketChartRenderer.Render(
                 formsPlot1,
                 _cacheDir,
                 market,

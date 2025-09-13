@@ -171,7 +171,16 @@ namespace KalshiBotTasks
             services.AddScoped<CentralPerformanceMonitor>();
             services.AddSingleton<IConfiguration>(config);
 
-            _interestScoreService = new InterestScoreService(interestLoggerMock.Object);
+            // Create InterestScoreConfig options for testing
+            var interestScoreConfig = new InterestScoreConfig
+            {
+                CacheDurationHours = 6,
+                EnablePerformanceMetrics = true,
+                MaxPerformanceMetricsHistory = 1000
+            };
+            var interestScoreOptions = Options.Create(interestScoreConfig);
+
+            _interestScoreService = new InterestScoreService(interestLoggerMock.Object, interestScoreOptions);
 
             // Register the mocks and options required by KalshiAPIService
             services.AddScoped(p => apiLoggerMock.Object);
@@ -189,6 +198,7 @@ namespace KalshiBotTasks
             _serviceProvider = services.BuildServiceProvider();
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
+            _snapshotPeriodHelper = new SnapshotPeriodHelper(_snapshotOptions.Value);
             _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, marketAnalysisLoggerMock.Object);
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _marketAnalysisHelper, _executionConfig, _sqlDataService);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _snapshotOptions, Options.Create(tradingConfig), _scopeFactory);

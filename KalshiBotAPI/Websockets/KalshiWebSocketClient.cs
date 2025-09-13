@@ -43,6 +43,11 @@ namespace KalshiBotAPI.Websockets
         private readonly IDataCache _dataCache;
         private bool _allowReconnect = true;
 
+        /// <summary>
+        /// Configurable WebSocket buffer size in bytes. Default is 16KB.
+        /// </summary>
+        private readonly int _webSocketBufferSize;
+
         // Channel enable/disable state - all enabled by default
         private readonly ConcurrentDictionary<string, bool> _enabledChannels = new();
 
@@ -142,6 +147,7 @@ namespace KalshiBotAPI.Websockets
         /// <param name="messageProcessor">Processor for incoming WebSocket messages.</param>
         /// <param name="dataCache">Cache for storing watched markets and other data.</param>
         /// <param name="writeToSql">Whether to write market data to SQL database.</param>
+        /// <param name="webSocketBufferSize">Size of the WebSocket buffer in bytes. Default is 16KB.</param>
         public KalshiWebSocketClient(
             IOptions<KalshiConfig> kalshiConfig,
             ILogger<IKalshiWebSocketClient> logger,
@@ -152,7 +158,8 @@ namespace KalshiBotAPI.Websockets
             ISubscriptionManager subscriptionManager,
             IMessageProcessor messageProcessor,
             IDataCache dataCache,
-            bool writeToSql)
+            bool writeToSql,
+            int webSocketBufferSize = 16384)
         {
             _kalshiConfig = kalshiConfig.Value;
             _logger = logger;
@@ -164,6 +171,7 @@ namespace KalshiBotAPI.Websockets
             _messageProcessor = messageProcessor;
             _dataCache = dataCache;
             WriteToSQL = writeToSql;
+            _webSocketBufferSize = webSocketBufferSize;
 
             // Wire up events from MessageProcessor to expose them publicly
             _messageProcessor.OrderBookReceived += (sender, args) => OrderBookReceived?.Invoke(sender, args);
@@ -506,7 +514,7 @@ namespace KalshiBotAPI.Websockets
                 // Start the receiving loop in a background task
                 _ = Task.Run(async () =>
                 {
-                    var buffer = new byte[1024 * 16];
+                    var buffer = new byte[_webSocketBufferSize];
                     var messageBuilder = new StringBuilder();
 
                     while (!_globalCancellationToken.IsCancellationRequested)

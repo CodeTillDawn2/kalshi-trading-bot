@@ -57,12 +57,27 @@ namespace BacklashBot.Services
         private string _clientId;
         private string _clientName = "BacklashBot";
         private string _clientType = "TradingBot";
+        private string? _authToken; // For authentication
+        private DateTime _authTokenExpiry = DateTime.MinValue; // Token expiry
         private BacklashDTOs.Data.OverseerInfo? _currentOverseer;
         private string? _currentOverseerUrl;
         private DateTime _lastOverseerDiscovery = DateTime.MinValue;
-        private readonly TimeSpan _overseerDiscoveryInterval = TimeSpan.FromMinutes(3); // Check for better overseer every 3 minutes
+        private readonly TimeSpan _overseerDiscoveryInterval; // Configurable discovery interval
+        private readonly TimeSpan _checkInInterval; // Configurable check-in interval
+        private readonly TimeSpan _connectionTimeout; // Configurable connection timeout
+        private readonly TimeSpan _semaphoreTimeout; // Configurable semaphore timeout
+        private readonly int _circuitBreakerFailureThreshold; // Configurable circuit breaker threshold
+        private readonly TimeSpan _circuitBreakerTimeout; // Configurable circuit breaker timeout
         private readonly object _connectionStateLock = new object(); // Lock for connection state changes
         private readonly SemaphoreSlim _connectionOperationSemaphore = new SemaphoreSlim(1, 1); // Semaphore for connection operations
+        private int _circuitBreakerFailureCount = 0; // Current failure count for circuit breaker
+        private DateTime _circuitBreakerLastFailure = DateTime.MinValue; // Last failure time
+        private readonly object _circuitBreakerLock = new object(); // Lock for circuit breaker state
+        // Performance metrics
+        private int _connectionAttemptCount = 0; // Total connection attempts
+        private int _connectionSuccessCount = 0; // Successful connections
+        private TimeSpan _totalDiscoveryTime = TimeSpan.Zero; // Total time spent on discovery
+        private int _discoveryOperationCount = 0; // Number of discovery operations
 
         /// <summary>
         /// Initializes a new instance of the OverseerClientService with required dependencies.
@@ -82,6 +97,14 @@ namespace BacklashBot.Services
             // Read brain instance name from configuration, fallback to hardcoded if not set
             _clientName = executionConfig.Value.BrainInstance ?? "BacklashBot";
             _logger.LogInformation("OVERSEER- Using brain instance name: {BrainInstanceName}", _clientName);
+
+            // Initialize configurable timeouts and intervals
+            _connectionTimeout = TimeSpan.FromSeconds(executionConfig.Value.OverseerConnectionTimeoutSeconds);
+            _semaphoreTimeout = TimeSpan.FromSeconds(executionConfig.Value.OverseerSemaphoreTimeoutSeconds);
+            _overseerDiscoveryInterval = TimeSpan.FromMinutes(executionConfig.Value.OverseerDiscoveryIntervalMinutes);
+            _checkInInterval = TimeSpan.FromSeconds(executionConfig.Value.OverseerCheckInIntervalSeconds);
+            _circuitBreakerFailureThreshold = executionConfig.Value.OverseerCircuitBreakerFailureThreshold;
+            _circuitBreakerTimeout = TimeSpan.FromMinutes(executionConfig.Value.OverseerCircuitBreakerTimeoutMinutes);
         }
 
         /// <summary>
@@ -100,13 +123,13 @@ namespace BacklashBot.Services
             {
                 _logger.LogInformation("OVERSEER- Starting OverseerClientService...");
 
-                // Start Overseer Discovery timer first (every 3 minutes) - this ensures we keep trying to find overseer
+                // Start Overseer Discovery timer first - this ensures we keep trying to find overseer
                 _overseerDiscoveryTimer = new Timer(async _ => await PerformOverseerDiscoveryAsync(), null, TimeSpan.Zero, _overseerDiscoveryInterval);
                 _logger.LogInformation("OVERSEER- Overseer discovery timer started (every {Interval} minutes)", _overseerDiscoveryInterval.TotalMinutes);
 
-                // Start CheckIn timer (every 30 seconds) - it will only send if connected
-                _checkInTimer = new Timer(async _ => await SendCheckInAsync(), null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(30));
-                _logger.LogInformation("OVERSEER- CheckIn timer started (every 30 seconds, first check in 10 seconds)");
+                // Start CheckIn timer - it will only send if connected
+                _checkInTimer = new Timer(async _ => await SendCheckInAsync(), null, TimeSpan.FromSeconds(10), _checkInInterval);
+                _logger.LogInformation("OVERSEER- CheckIn timer started (every {Interval} seconds, first check in 10 seconds)", _checkInInterval.TotalSeconds);
 
                 // Find overseer IP from database or configuration
                 var overseerUrl = await GetOverseerUrlAsync();
@@ -351,8 +374,15 @@ namespace BacklashBot.Services
             _logger.LogDebug("OVERSEER- AttemptConnectionAsync ENTERED for {Url}", overseerUrl);
             _logger.LogDebug("OVERSEER- Current semaphore count: {Count}", _connectionOperationSemaphore.CurrentCount);
 
+            // Check circuit breaker
+            if (IsCircuitBreakerOpen())
+            {
+                _logger.LogWarning("OVERSEER- Circuit breaker is open, skipping connection attempt to {Url}", overseerUrl);
+                return;
+            }
+
             // Add timeout to semaphore to prevent hanging
-            using var semaphoreTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            using var semaphoreTimeout = new CancellationTokenSource(_semaphoreTimeout);
             await _connectionOperationSemaphore.WaitAsync(semaphoreTimeout.Token);
             _logger.LogDebug("OVERSEER- Semaphore acquired successfully");
 
@@ -412,8 +442,8 @@ namespace BacklashBot.Services
                     _logger.LogDebug("OVERSEER- Fresh connection created");
                 }
 
-                _logger.LogDebug("OVERSEER- About to call StartAsync with 30s timeout");
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                _logger.LogDebug("OVERSEER- About to call StartAsync with configurable timeout");
+                using var cts = new CancellationTokenSource(_connectionTimeout);
                 await _hubConnection.StartAsync(cts.Token);
                 _logger.LogInformation("OVERSEER- StartAsync completed successfully, state: {State}", _hubConnection.State);
 
@@ -424,6 +454,9 @@ namespace BacklashBot.Services
                 }
                 _logger.LogInformation("OVERSEER- Successfully connected to overseer at {Url}", overseerUrl);
 
+                // Record successful connection
+                RecordConnectionAttempt(true);
+
                 // Perform handshake
                 _logger.LogDebug("OVERSEER- About to perform handshake");
                 await PerformHandshakeAsync();
@@ -431,12 +464,14 @@ namespace BacklashBot.Services
             }
             catch (TaskCanceledException)
             {
-                _logger.LogWarning("OVERSEER- Connection attempt timed out after 30 seconds");
+                _logger.LogWarning("OVERSEER- Connection attempt timed out after {Timeout} seconds", _connectionTimeout.TotalSeconds);
+                RecordConnectionAttempt(false);
             }
             catch (Exception ex)
             {
                 _logger.LogWarning("OVERSEER- Exception in AttemptConnectionAsync: {Message}", ex.Message);
                 _logger.LogWarning("OVERSEER- Stack trace: {StackTrace}", ex.StackTrace);
+                RecordConnectionAttempt(false);
             }
             finally
             {
@@ -504,6 +539,7 @@ namespace BacklashBot.Services
 
         private async Task PerformOverseerDiscoveryAsync()
         {
+            var startTime = DateTime.UtcNow;
             try
             {
                 _logger.LogDebug("OVERSEER- Performing overseer discovery cycle...");
@@ -534,6 +570,16 @@ namespace BacklashBot.Services
             catch (Exception ex)
             {
                 _logger.LogWarning("OVERSEER- Overseer discovery failed - this is normal and will be retried on next cycle. Error: {Error}", ex.Message);
+            }
+            finally
+            {
+                var duration = DateTime.UtcNow - startTime;
+                lock (_circuitBreakerLock)
+                {
+                    _totalDiscoveryTime += duration;
+                    _discoveryOperationCount++;
+                }
+                _logger.LogDebug("OVERSEER- Discovery operation completed in {Duration} ms", duration.TotalMilliseconds);
             }
         }
 
@@ -596,6 +642,118 @@ namespace BacklashBot.Services
                    _hubConnection.State == HubConnectionState.Connected;
         }
 
+        /// <summary>
+        /// Checks if the circuit breaker is currently open, preventing connection attempts.
+        /// </summary>
+        /// <returns>True if the circuit breaker is open, false otherwise.</returns>
+        private bool IsCircuitBreakerOpen()
+        {
+            lock (_circuitBreakerLock)
+            {
+                if (_circuitBreakerFailureCount >= _circuitBreakerFailureThreshold)
+                {
+                    var timeSinceLastFailure = DateTime.UtcNow - _circuitBreakerLastFailure;
+                    if (timeSinceLastFailure < _circuitBreakerTimeout)
+                    {
+                        return true; // Circuit is open
+                    }
+                    else
+                    {
+                        // Reset circuit breaker after timeout
+                        _circuitBreakerFailureCount = 0;
+                        _circuitBreakerLastFailure = DateTime.MinValue;
+                        _logger.LogInformation("OVERSEER- Circuit breaker reset after timeout");
+                    }
+                }
+                return false; // Circuit is closed
+            }
+        }
+
+        /// <summary>
+        /// Ensures that a valid authentication token is available for the connection.
+        /// Refreshes the token if it is expired or missing.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task EnsureValidAuthTokenAsync()
+        {
+            // Check if token is expired or missing
+            if (string.IsNullOrEmpty(_authToken) || DateTime.UtcNow >= _authTokenExpiry)
+            {
+                _logger.LogInformation("OVERSEER- Refreshing auth token");
+                await RefreshAuthTokenAsync();
+            }
+        }
+
+        /// <summary>
+        /// Refreshes the authentication token by generating a new one.
+        /// In a production environment, this would typically call an authentication service.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task RefreshAuthTokenAsync()
+        {
+            try
+            {
+                // For now, generate a simple token. In a real implementation, this would call an auth service.
+                _authToken = Guid.NewGuid().ToString();
+                _authTokenExpiry = DateTime.UtcNow.AddHours(1); // Token valid for 1 hour
+                _logger.LogInformation("OVERSEER- Auth token refreshed, expires at {Expiry}", _authTokenExpiry);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("OVERSEER- Failed to refresh auth token: {Error}", ex.Message);
+                _authToken = null;
+                _authTokenExpiry = DateTime.MinValue;
+            }
+        }
+
+        /// <summary>
+        /// Records the result of a connection attempt for metrics and circuit breaker tracking.
+        /// </summary>
+        /// <param name="success">True if the connection attempt was successful, false otherwise.</param>
+        private void RecordConnectionAttempt(bool success)
+        {
+            lock (_circuitBreakerLock)
+            {
+                _connectionAttemptCount++;
+                if (success)
+                {
+                    _connectionSuccessCount++;
+                    _circuitBreakerFailureCount = 0; // Reset on success
+                }
+                else
+                {
+                    _circuitBreakerFailureCount++;
+                    _circuitBreakerLastFailure = DateTime.UtcNow;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the current performance metrics for the overseer client service.
+        /// Includes connection success rates, discovery timing, and circuit breaker status.
+        /// </summary>
+        /// <returns>A dictionary containing metric names and values.</returns>
+        public Dictionary<string, object> GetMetrics()
+        {
+            lock (_circuitBreakerLock)
+            {
+                var successRate = _connectionAttemptCount > 0 ? (double)_connectionSuccessCount / _connectionAttemptCount : 0.0;
+                var avgDiscoveryTime = _discoveryOperationCount > 0 ? _totalDiscoveryTime.TotalMilliseconds / _discoveryOperationCount : 0.0;
+
+                return new Dictionary<string, object>
+                {
+                    ["ConnectionAttempts"] = _connectionAttemptCount,
+                    ["ConnectionSuccesses"] = _connectionSuccessCount,
+                    ["ConnectionSuccessRate"] = successRate,
+                    ["CircuitBreakerFailures"] = _circuitBreakerFailureCount,
+                    ["DiscoveryOperations"] = _discoveryOperationCount,
+                    ["AverageDiscoveryTimeMs"] = avgDiscoveryTime,
+                    ["TotalDiscoveryTimeMs"] = _totalDiscoveryTime.TotalMilliseconds,
+                    ["IsCircuitBreakerOpen"] = IsCircuitBreakerOpen()
+                };
+            }
+        }
+
         private async Task PerformHandshakeAsync()
         {
             await PerformHandshakeAsyncInternal();
@@ -621,9 +779,12 @@ namespace BacklashBot.Services
 
             try
             {
-                _logger.LogInformation("OVERSEER- Sending handshake with ClientId={ClientId}, ClientName={ClientName}, ClientType={ClientType}",
-                    _clientId, _clientName, _clientType);
-                await _hubConnection.InvokeAsync("Handshake", _clientId, _clientName, _clientType);
+                // Ensure auth token is valid
+                await EnsureValidAuthTokenAsync();
+
+                _logger.LogInformation("OVERSEER- Sending handshake with ClientId={ClientId}, ClientName={ClientName}, ClientType={ClientType}, AuthToken={HasToken}",
+                    _clientId, _clientName, _clientType, !string.IsNullOrEmpty(_authToken));
+                await _hubConnection.InvokeAsync("Handshake", _clientId, _clientName, _clientType, _authToken);
                 _logger.LogInformation("OVERSEER- Handshake sent successfully to overseer");
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
@@ -650,6 +811,14 @@ namespace BacklashBot.Services
 
             try
             {
+                // Log metrics every 10 check-ins
+                if (_connectionSuccessCount > 0 && _connectionSuccessCount % 10 == 0)
+                {
+                    var metrics = GetMetrics();
+                    _logger.LogInformation("OVERSEER- Performance Metrics: Attempts={Attempts}, Successes={Successes}, SuccessRate={Rate:P2}, AvgDiscoveryTime={AvgTime:F2}ms, CircuitBreakerOpen={Open}",
+                        metrics["ConnectionAttempts"], metrics["ConnectionSuccesses"], metrics["ConnectionSuccessRate"], metrics["AverageDiscoveryTimeMs"], metrics["IsCircuitBreakerOpen"]);
+                }
+
                 _logger.LogDebug("OVERSEER- Preparing CheckIn data...");
 
                 // Validate that we're still connected to the most recent overseer

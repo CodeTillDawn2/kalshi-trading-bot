@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using BacklashDTOs.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashDTOs.Data;
+using System.Security.Cryptography;
 
 namespace BacklashBot.Management
 {
@@ -30,8 +31,18 @@ namespace BacklashBot.Management
         /// <param name="logger">Logger for recording service operations and errors.</param>
         public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions<ExecutionConfig> executionConfig, ILogger<BrainStatusService> logger)
         {
+            ArgumentNullException.ThrowIfNull(scopeFactory);
+            ArgumentNullException.ThrowIfNull(executionConfig);
+            ArgumentNullException.ThrowIfNull(logger);
+
             _scopeFactory = scopeFactory;
-            _executionConfig = executionConfig.Value;
+            _executionConfig = executionConfig.Value ?? throw new ArgumentNullException(nameof(executionConfig.Value));
+
+            if (string.IsNullOrWhiteSpace(_executionConfig.BrainInstance))
+            {
+                throw new ArgumentException("BrainInstance must be specified in ExecutionConfig.", nameof(_executionConfig.BrainInstance));
+            }
+
             _logger = logger;
         }
 
@@ -105,7 +116,7 @@ namespace BacklashBot.Management
                     throw new Exception($"Brain instance with ID {_executionConfig.BrainInstance} not found.");
                 }
                 _brainLock = brainInstance.BrainLock ?? Guid.NewGuid();
-                _sessionIdentifier = GenerateRandomString(5);
+                _sessionIdentifier = GenerateRandomString(_executionConfig.SessionIdLength);
                 _initialized = true;
                 _logger.LogInformation("Brain status service initialized successfully for brain instance {BrainInstance}.", _executionConfig.BrainInstance);
             }
@@ -117,16 +128,31 @@ namespace BacklashBot.Management
         }
 
         /// <summary>
-        /// Generates a random alphanumeric string of the specified length.
+        /// Generates a random alphanumeric string of the specified length with additional entropy.
         /// </summary>
         /// <param name="length">The length of the string to generate.</param>
         /// <returns>A random alphanumeric string.</returns>
         private string GenerateRandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var random = new Random();
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
+            // Use more bytes for better entropy
+            var data = new byte[length + 8]; // Extra 8 bytes for timestamp
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(data);
+            }
+            // Incorporate timestamp for additional entropy
+            var timestamp = BitConverter.GetBytes(DateTime.UtcNow.Ticks);
+            for (int i = 0; i < Math.Min(8, data.Length); i++)
+            {
+                data[i] ^= timestamp[i];
+            }
+            var result = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                result[i] = chars[data[i] % chars.Length];
+            }
+            return new string(result);
         }
 
         /// <summary>

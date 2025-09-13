@@ -1,5 +1,6 @@
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using BacklashInterfaces.Enums;
 using BacklashInterfaces.Constants;
 using BacklashBot.State.Interfaces;
@@ -39,6 +40,27 @@ namespace KalshiBotAPI.Websockets
         private Task _orderBookQueueProcessorTask = null!;
         private CancellationToken _processingCancellationToken;
 
+        // Configuration options
+        private readonly int _subscriptionTimeoutMs = 60000;
+        private readonly int _confirmationTimeoutSeconds = 60;
+        private readonly int _retryDelayMs = 1000;
+        private readonly int _maxQueueSize = 1000;
+        private readonly int _batchSize = 10;
+        private readonly int _healthCheckIntervalMs = 30000;
+
+        // Performance metrics
+        private readonly ConcurrentDictionary<string, long> _operationTimings = new();
+        private readonly ConcurrentDictionary<string, long> _operationCounts = new();
+        private readonly ConcurrentDictionary<string, long> _successCounts = new();
+
+        // Subscription deduplication
+        private readonly ConcurrentDictionary<string, DateTime> _recentSubscriptions = new();
+
+        // Health monitoring
+        private Task _healthMonitorTask = null!;
+        private readonly ReaderWriterLockSlim _subscriptionLock = new();
+        private readonly ReaderWriterLockSlim _queueLock = new();
+
         /// <summary>
         /// Initializes a new instance of the SubscriptionManager with required dependencies.
         /// Sets up internal data structures for subscription management, state tracking, and queue processing.
@@ -47,17 +69,28 @@ namespace KalshiBotAPI.Websockets
         /// <param name="connectionManager">Manages WebSocket connection lifecycle and communication.</param>
         /// <param name="dataCache">Provides access to cached market data and watched markets list.</param>
         /// <param name="statusTrackerService">Provides system status and cancellation token management.</param>
+        /// <param name="configuration">Configuration for subscription manager settings.</param>
         public SubscriptionManager(
             ILogger<SubscriptionManager> logger,
             IWebSocketConnectionManager connectionManager,
             IDataCache dataCache,
-            IStatusTrackerService statusTrackerService)
+            IStatusTrackerService statusTrackerService,
+            IConfiguration configuration)
         {
             _logger = logger;
             _connectionManager = connectionManager;
             _dataCache = dataCache;
             _statusTrackerService = statusTrackerService;
             _processingCancellationToken = statusTrackerService.GetCancellationToken();
+
+            // Load configuration values
+            var subscriptionConfig = configuration.GetSection("SubscriptionManager");
+            _subscriptionTimeoutMs = subscriptionConfig.GetValue("SubscriptionTimeoutMs", 60000);
+            _confirmationTimeoutSeconds = subscriptionConfig.GetValue("ConfirmationTimeoutSeconds", 60);
+            _retryDelayMs = subscriptionConfig.GetValue("RetryDelayMs", 1000);
+            _maxQueueSize = subscriptionConfig.GetValue("MaxQueueSize", 1000);
+            _batchSize = subscriptionConfig.GetValue("BatchSize", 10);
+            _healthCheckIntervalMs = subscriptionConfig.GetValue("HealthCheckIntervalMs", 30000);
 
             // Initialize message type counts
             _messageTypeCounts.TryAdd("OrderBook", 0);
@@ -71,6 +104,17 @@ namespace KalshiBotAPI.Websockets
             _messageTypeCounts.TryAdd("Ok", 0);
             _messageTypeCounts.TryAdd("Error", 0);
             _messageTypeCounts.TryAdd("Unknown", 0);
+
+            // Initialize performance metrics
+            _operationTimings.TryAdd("Subscribe", 0);
+            _operationTimings.TryAdd("Update", 0);
+            _operationTimings.TryAdd("Unsubscribe", 0);
+            _operationCounts.TryAdd("Subscribe", 0);
+            _operationCounts.TryAdd("Update", 0);
+            _operationCounts.TryAdd("Unsubscribe", 0);
+            _successCounts.TryAdd("Subscribe", 0);
+            _successCounts.TryAdd("Update", 0);
+            _successCounts.TryAdd("Unsubscribe", 0);
         }
 
         /// <summary>
@@ -83,6 +127,7 @@ namespace KalshiBotAPI.Websockets
             _subscriptionQueueProcessorTask = Task.Run(() => ProcessQueuePeriodicallyAsync(), _processingCancellationToken);
             _pendingConfirmationMonitorTask = Task.Run(() => CheckPendingConfirmationsAsync(), _processingCancellationToken);
             _orderBookQueueProcessorTask = Task.Run(() => ProcessOrderBookQueuePeriodicallyAsync(), _processingCancellationToken);
+            _healthMonitorTask = Task.Run(() => MonitorSubscriptionHealthAsync(), _processingCancellationToken);
         }
 
         /// <summary>
@@ -103,6 +148,10 @@ namespace KalshiBotAPI.Websockets
             if (_orderBookQueueProcessorTask != null && !_orderBookQueueProcessorTask.IsCompleted)
             {
                 await _orderBookQueueProcessorTask.ConfigureAwait(false);
+            }
+            if (_healthMonitorTask != null && !_healthMonitorTask.IsCompleted)
+            {
+                await _healthMonitorTask.ConfigureAwait(false);
             }
         }
 
@@ -150,26 +199,38 @@ namespace KalshiBotAPI.Websockets
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task SubscribeToChannelAsync(string action, string[] marketTickers)
         {
+            var startTime = DateTime.UtcNow;
+            bool success = false;
             _logger.LogInformation("Subscribing to channel: action={Action}, markets={Markets}, current subscriptions count: {Count}", action, string.Join(", ", marketTickers), _channelSubscriptions.Count);
-            if (!_connectionManager.IsConnected())
-            {
-                _logger.LogWarning("WebSocket not connected, queuing subscription: action={Action}, markets={Markets}", action, string.Join(", ", marketTickers));
-                _queuedSubscriptionUpdateRequests.Enqueue(("add_markets", marketTickers, action));
-                return;
-            }
 
-            bool semaphoreAcquired = false;
-            try
-            {
-                _processingCancellationToken.ThrowIfCancellationRequested();
-                semaphoreAcquired = await _channelSubscriptionSynchronizationSemaphore.WaitAsync(60000, _processingCancellationToken);
-                if (!semaphoreAcquired)
+                // Check for subscription deduplication
+                var deduplicationKey = $"{action}:{string.Join(",", marketTickers.OrderBy(m => m))}";
+                if (_recentSubscriptions.TryGetValue(deduplicationKey, out var lastSubscriptionTime) &&
+                    DateTime.UtcNow - lastSubscriptionTime < TimeSpan.FromSeconds(5))
                 {
-                    _logger.LogError("Failed to acquire channel subscription semaphore for action {Action} within 60000ms", action);
+                    _logger.LogWarning("Duplicate subscription attempt for {Action} with markets {Markets}, skipping", action, string.Join(", ", marketTickers));
+                    return;
+                }
+                _recentSubscriptions[deduplicationKey] = DateTime.UtcNow;
+
+                if (!_connectionManager.IsConnected())
+                {
+                    if (_queuedSubscriptionUpdateRequests.Count >= _maxQueueSize)
+                    {
+                        _logger.LogWarning("Subscription queue full ({MaxSize}), dropping subscription: action={Action}, markets={Markets}", _maxQueueSize, action, string.Join(", ", marketTickers));
+                        return;
+                    }
+                    _logger.LogWarning("WebSocket not connected, queuing subscription: action={Action}, markets={Markets}", action, string.Join(", ", marketTickers));
+                    _queuedSubscriptionUpdateRequests.Enqueue(("add_markets", marketTickers, action));
                     return;
                 }
 
-                var channel = GetChannelName(action);
+                _subscriptionLock.EnterWriteLock();
+                try
+                {
+                    _processingCancellationToken.ThrowIfCancellationRequested();
+
+                    var channel = GetChannelName(action);
                 if (!_channelSubscriptions.TryGetValue(channel, out var subscription))
                 {
                     subscription = (0, new HashSet<string>());
@@ -201,12 +262,8 @@ namespace KalshiBotAPI.Websockets
                 if (KalshiConstants.MarketChannelsDelta.Contains(channel) && subscription.Sid != 0 && marketTickers.Any())
                 {
                     _logger.LogDebug("Channel {Channel} already has SID {Sid}, using update_subscription for new markets", channel, subscription.Sid);
-                    // Release semaphore before calling UpdateSubscriptionAsync to avoid deadlock
-                    if (semaphoreAcquired)
-                    {
-                        _channelSubscriptionSynchronizationSemaphore.Release();
-                        semaphoreAcquired = false;
-                    }
+                    // Release lock before calling UpdateSubscriptionAsync to avoid deadlock
+                    _subscriptionLock.ExitWriteLock();
                     await UpdateSubscriptionAsync("add_markets", marketTickers, action);
                     return;
                 }
@@ -311,6 +368,7 @@ namespace KalshiBotAPI.Websockets
                 {
                     _logger.LogWarning("Skipping subscription message for {Channel} as no markets to subscribe", channel);
                 }
+                success = true;
             }
             catch (OperationCanceledException)
             {
@@ -327,10 +385,9 @@ namespace KalshiBotAPI.Websockets
             }
             finally
             {
-                if (semaphoreAcquired)
-                {
-                    _channelSubscriptionSynchronizationSemaphore.Release();
-                }
+                _subscriptionLock.ExitWriteLock();
+                var duration = DateTime.UtcNow - startTime;
+                RecordOperationMetrics("Subscribe", duration, success);
             }
         }
 
@@ -395,6 +452,8 @@ namespace KalshiBotAPI.Websockets
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateSubscriptionAsync(string action, string[] marketTickers, string channelAction)
         {
+            var startTime = DateTime.UtcNow;
+            bool success = false;
             _logger.LogInformation("UpdateSubscriptionAsync called: action={Action}, channel={Channel}, markets={Markets}",
                 action, channelAction, string.Join(", ", marketTickers));
 
@@ -406,6 +465,11 @@ namespace KalshiBotAPI.Websockets
 
             if (!_connectionManager.IsConnected())
             {
+                if (_queuedSubscriptionUpdateRequests.Count >= _maxQueueSize)
+                {
+                    _logger.LogWarning("Subscription queue full ({MaxSize}), dropping update: action={Action}, channel={Channel}, markets={Markets}", _maxQueueSize, action, channelAction, string.Join(", ", marketTickers));
+                    return;
+                }
                 _logger.LogWarning("WebSocket not connected, queuing subscription update: action={Action}, channel={Channel}, markets={Markets}",
                     action, channelAction, string.Join(", ", marketTickers));
                 _queuedSubscriptionUpdateRequests.Enqueue((action, marketTickers, channelAction));
@@ -413,16 +477,10 @@ namespace KalshiBotAPI.Websockets
             }
 
             var channel = GetChannelName(channelAction);
-            bool semaphoreAcquired = false;
+            _subscriptionLock.EnterWriteLock();
             try
             {
                 _processingCancellationToken.ThrowIfCancellationRequested();
-                semaphoreAcquired = await _channelSubscriptionSynchronizationSemaphore.WaitAsync(60000, _processingCancellationToken);
-                if (!semaphoreAcquired)
-                {
-                    _logger.LogError("Failed to acquire channel subscription semaphore for update on {Channel} within 60000ms", channel);
-                    return;
-                }
 
                 if (!_channelSubscriptions.TryGetValue(channel, out var subscription))
                 {
@@ -518,6 +576,7 @@ namespace KalshiBotAPI.Websockets
 
                 _logger.LogInformation("Updated subscription locally: channel={Channel}, SID={Sid}, action={Action}, new markets={Markets}",
                     channel, subscription.Sid, action, string.Join(", ", updatedMarkets));
+                success = true;
             }
             catch (OperationCanceledException)
             {
@@ -531,10 +590,9 @@ namespace KalshiBotAPI.Websockets
             }
             finally
             {
-                if (semaphoreAcquired)
-                {
-                    _channelSubscriptionSynchronizationSemaphore.Release();
-                }
+                _subscriptionLock.ExitWriteLock();
+                var duration = DateTime.UtcNow - startTime;
+                RecordOperationMetrics("Update", duration, success);
             }
         }
 
@@ -553,16 +611,10 @@ namespace KalshiBotAPI.Websockets
                 return;
             }
 
-            bool semaphoreAcquired = false;
+            _subscriptionLock.EnterWriteLock();
             try
             {
                 _processingCancellationToken.ThrowIfCancellationRequested();
-                semaphoreAcquired = await _channelSubscriptionSynchronizationSemaphore.WaitAsync(60000, _processingCancellationToken);
-                if (!semaphoreAcquired)
-                {
-                    _logger.LogError("Failed to acquire channel subscription semaphore for action {Action} within 60000ms", action);
-                    return;
-                }
 
                 var channel = GetChannelName(action);
                 if (!_channelSubscriptions.TryGetValue(channel, out var subscription))
@@ -619,10 +671,7 @@ namespace KalshiBotAPI.Websockets
             }
             finally
             {
-                if (semaphoreAcquired)
-                {
-                    _channelSubscriptionSynchronizationSemaphore.Release();
-                }
+                _subscriptionLock.ExitWriteLock();
             }
         }
 
@@ -633,17 +682,11 @@ namespace KalshiBotAPI.Websockets
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UnsubscribeFromAllAsync()
         {
-            _logger.LogDebug("Acquiring channel subscription semaphore for unsubscribe");
-            bool semaphoreAcquired = false;
+            _logger.LogDebug("Acquiring subscription lock for unsubscribe");
+            _subscriptionLock.EnterWriteLock();
             try
             {
                 _processingCancellationToken.ThrowIfCancellationRequested();
-                semaphoreAcquired = await _channelSubscriptionSynchronizationSemaphore.WaitAsync(60000, _processingCancellationToken);
-                if (!semaphoreAcquired)
-                {
-                    _logger.LogError("Failed to acquire channel subscription semaphore for unsubscription within 60000ms");
-                    return;
-                }
 
                 foreach (var subscription in _channelSubscriptions.ToList())
                 {
@@ -697,10 +740,7 @@ namespace KalshiBotAPI.Websockets
             }
             finally
             {
-                if (semaphoreAcquired)
-                {
-                    _channelSubscriptionSynchronizationSemaphore.Release();
-                }
+                _subscriptionLock.ExitWriteLock();
             }
         }
 
@@ -914,13 +954,32 @@ namespace KalshiBotAPI.Websockets
             {
                 try
                 {
-                    if (_connectionManager.IsConnected() && _queuedSubscriptionUpdateRequests.TryDequeue(out var update))
+                    if (_connectionManager.IsConnected())
                     {
-                        var (action, marketTickers, channelAction) = update;
-                        _logger.LogDebug("Processing queued subscription update: action={Action}, markets={Markets}, channel={Channel}",
-                            action, string.Join(", ", marketTickers), channelAction);
+                        // Implement batching: collect multiple requests
+                        var batch = new List<(string Action, string[] MarketTickers, string ChannelAction)>();
+                        while (_queuedSubscriptionUpdateRequests.TryDequeue(out var update) && batch.Count < _batchSize)
+                        {
+                            batch.Add(update);
+                        }
 
-                        await UpdateSubscriptionAsync(action, marketTickers, channelAction);
+                        if (batch.Any())
+                        {
+                            _logger.LogDebug("Processing batched subscription updates: {Count} requests", batch.Count);
+
+                            // Group by action and channel for efficient processing
+                            var grouped = batch.GroupBy(u => (u.Action, u.ChannelAction));
+                            foreach (var group in grouped)
+                            {
+                                var combinedMarkets = group.SelectMany(g => g.MarketTickers).Distinct().ToArray();
+                                var (action, channelAction) = group.Key;
+
+                                _logger.LogDebug("Processing batched update: action={Action}, channel={Channel}, combined markets={Markets}",
+                                    action, channelAction, string.Join(", ", combinedMarkets));
+
+                                await UpdateSubscriptionAsync(action, combinedMarkets, channelAction);
+                            }
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -928,7 +987,7 @@ namespace KalshiBotAPI.Websockets
                     _logger.LogError(ex, "Error processing queued subscription update");
                 }
 
-                await Task.Delay(1000, _processingCancellationToken);
+                await Task.Delay(_retryDelayMs, _processingCancellationToken);
             }
             _logger.LogDebug("Subscription queue processor stopped");
         }
@@ -946,7 +1005,7 @@ namespace KalshiBotAPI.Websockets
                 try
                 {
                     var expiredConfirms = _pendingSubscriptionConfirmations
-                        .Where(kvp => DateTime.UtcNow - kvp.Value.SentTime > TimeSpan.FromSeconds(60))
+                        .Where(kvp => DateTime.UtcNow - kvp.Value.SentTime > TimeSpan.FromSeconds(_confirmationTimeoutSeconds))
                         .ToList();
 
                     foreach (var confirm in expiredConfirms)
@@ -1007,6 +1066,57 @@ namespace KalshiBotAPI.Websockets
         }
 
         /// <summary>
+        /// Background task that monitors subscription health and detects stale subscriptions.
+        /// Periodically checks for subscriptions that may have become unresponsive and attempts recovery.
+        /// </summary>
+        /// <returns>A task representing the background operation.</returns>
+        private async Task MonitorSubscriptionHealthAsync()
+        {
+            _logger.LogDebug("Starting subscription health monitor");
+            while (!_processingCancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var now = DateTime.UtcNow;
+                    var staleThreshold = TimeSpan.FromMinutes(5); // Configurable?
+
+                    _subscriptionLock.EnterReadLock();
+                    try
+                    {
+                        foreach (var subscription in _channelSubscriptions)
+                        {
+                            var channel = subscription.Key;
+                            var sid = subscription.Value.Sid;
+                            if (sid != 0)
+                            {
+                                // Check if this subscription has been active recently
+                                // For simplicity, check if we have recent confirmations or messages
+                                var hasRecentActivity = _pendingSubscriptionConfirmations.Any(c => c.Value.Channel == channel && (now - c.Value.SentTime) < staleThreshold);
+                                if (!hasRecentActivity)
+                                {
+                                    _logger.LogWarning("Detected potentially stale subscription for channel {Channel} with SID {Sid}, initiating health check", channel, sid);
+                                    // Could send a ping or resubscribe
+                                    await ResubscribeAsync(true); // Force resubscribe
+                                }
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        _subscriptionLock.ExitReadLock();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error during subscription health monitoring");
+                }
+
+                await Task.Delay(_healthCheckIntervalMs, _processingCancellationToken);
+            }
+            _logger.LogDebug("Subscription health monitor stopped");
+        }
+
+        /// <summary>
         /// Gets the WebSocket channel name corresponding to a given action.
         /// Maps user-friendly action names to the actual channel names used by Kalshi's WebSocket API.
         /// </summary>
@@ -1020,6 +1130,39 @@ namespace KalshiBotAPI.Websockets
         /// </summary>
         /// <returns>The next available message ID.</returns>
         public int GenerateNextMessageId() => Interlocked.Increment(ref _nextMessageId);
+
+        /// <summary>
+        /// Records performance metrics for subscription operations.
+        /// </summary>
+        /// <param name="operation">The operation type (e.g., "Subscribe", "Update", "Unsubscribe").</param>
+        /// <param name="duration">The duration of the operation.</param>
+        /// <param name="success">Whether the operation was successful.</param>
+        private void RecordOperationMetrics(string operation, TimeSpan duration, bool success)
+        {
+            _operationTimings.AddOrUpdate(operation, duration.Ticks, (key, oldValue) => (oldValue + duration.Ticks) / 2);
+            _operationCounts.AddOrUpdate(operation, 1, (key, oldValue) => oldValue + 1);
+            if (success)
+            {
+                _successCounts.AddOrUpdate(operation, 1, (key, oldValue) => oldValue + 1);
+            }
+        }
+
+        /// <summary>
+        /// Gets performance metrics for subscription operations.
+        /// </summary>
+        /// <returns>A dictionary containing operation metrics.</returns>
+        public ConcurrentDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)> GetPerformanceMetrics()
+        {
+            var metrics = new ConcurrentDictionary<string, (long, long, long)>();
+            foreach (var operation in _operationTimings.Keys)
+            {
+                var avgTicks = _operationTimings.GetOrAdd(operation, 0);
+                var totalOps = _operationCounts.GetOrAdd(operation, 0);
+                var successOps = _successCounts.GetOrAdd(operation, 0);
+                metrics[operation] = (avgTicks, totalOps, successOps);
+            }
+            return metrics;
+        }
 
         /// <summary>
         /// Updates the subscription state when a confirmation is received from the server.

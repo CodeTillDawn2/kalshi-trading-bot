@@ -1,17 +1,197 @@
 using BacklashDTOs;
+using System.Diagnostics;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace TradingSimulator.Simulator
 {
+    /// <summary>
+    /// Configuration class for velocity discrepancy analysis parameters.
+    /// This class contains all configurable parameters for the SimulatorReporting analysis engine,
+    /// allowing fine-tuning of detection thresholds, performance settings, and output configuration.
+    /// Parameters can be loaded from appsettings.json under the "SimulatorReporting" section.
+    /// </summary>
+    public class AnalysisConfiguration
+    {
+        public double RelativeSlack { get; set; } = 1.5;
+        public double AveragingWindowMin { get; set; } = 5.0;
+        public int MinAbsChangeToFlag { get; set; } = 500;
+        public double ShortIntervalExponent { get; set; } = 0.5;
+        public double GapThresholdMin { get; set; } = 1.5;
+        public double LeakageFactor { get; set; } = 0.05;
+        public double WinsorPct { get; set; } = 0.2;
+        public bool UseMaxMagnitudeForThreshold { get; set; } = false;
+        public double RatioSlack { get; set; } = 0.5;
+        public bool HardFlagOnSignFlip { get; set; } = true;
+        public bool SuppressSpikes { get; set; } = true;
+        public double DomRatio { get; set; } = 0.90;
+        public double GapShare { get; set; } = 0.85;
+        public double EdgeMult { get; set; } = 8.0;
+        public double RatioFloor { get; set; } = 0.5;
+        public string LogDirectory { get; set; } = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
+        public string LogFilePrefix { get; set; } = "discrepancies";
+        public bool EnableParallelProcessing { get; set; } = false;
+        public int MaxDegreeOfParallelism { get; set; } = Environment.ProcessorCount;
+        public bool EnablePerformanceMetrics { get; set; } = true;
+    }
+
+    /// <summary>
+    /// Performance metrics class for tracking velocity discrepancy analysis execution timing and statistics.
+    /// This class provides detailed performance information about the analysis process, including
+    /// timing for different computational phases and counts of processed data points.
+    /// </summary>
+    public class PerformanceMetrics
+    {
+        public TimeSpan TotalAnalysisTime { get; set; }
+        public TimeSpan RollingObservationsTime { get; set; }
+        public TimeSpan ExpectedFlowsTime { get; set; }
+        public TimeSpan SpikeSuppressionTime { get; set; }
+        public int SnapshotsProcessed { get; set; }
+        public int DiscrepanciesDetected { get; set; }
+
+        public override string ToString()
+        {
+            return $"Analysis Time: {TotalAnalysisTime.TotalMilliseconds:F2}ms, " +
+                   $"Rolling Obs: {RollingObservationsTime.TotalMilliseconds:F2}ms, " +
+                   $"Expected Flows: {ExpectedFlowsTime.TotalMilliseconds:F2}ms, " +
+                   $"Spike Suppression: {SpikeSuppressionTime.TotalMilliseconds:F2}ms, " +
+                   $"Snapshots: {SnapshotsProcessed}, Discrepancies: {DiscrepanciesDetected}";
+        }
+    }
+
     /// <summary>
     /// Provides comprehensive reporting and analysis functionality for trading simulator operations.
     /// This class serves as the core engine for detecting velocity discrepancies in market snapshots,
     /// computing rolling observations, generating detailed memos, and coalescing discrepancy data.
     /// It is designed to analyze orderbook flow patterns and identify potential anomalies in market data
     /// that could indicate trading opportunities or data quality issues.
+    ///
+    /// Key Features:
+    /// - Configurable analysis parameters via AnalysisConfiguration class
+    /// - Async processing support for better performance with large datasets
+    /// - Parallel processing for multiple market analyses
+    /// - Comprehensive input validation for data integrity
+    /// - Performance metrics collection and timing analysis
+    /// - Configurable logging with automatic directory creation
+    /// - Spike suppression to reduce false positives
+    /// - Robust error handling and recovery
     /// </summary>
     public class SimulatorReporting
     {
-        private readonly string _cacheDirectory = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
+        private readonly AnalysisConfiguration _config;
+        private readonly PerformanceMetrics _metrics;
+
+        public SimulatorReporting(AnalysisConfiguration config = null)
+        {
+            _config = config ?? new AnalysisConfiguration();
+            _metrics = new PerformanceMetrics();
+        }
+
+        public PerformanceMetrics GetPerformanceMetrics() => _metrics;
+
+        /// <summary>
+        /// Validates the integrity of market snapshot data before processing.
+        /// </summary>
+        /// <param name="snapshots">The list of market snapshots to validate.</param>
+        /// <exception cref="ArgumentException">Thrown when validation fails.</exception>
+        private void ValidateMarketSnapshots(List<MarketSnapshot> snapshots)
+        {
+            if (snapshots == null)
+                throw new ArgumentNullException(nameof(snapshots), "Market snapshots list cannot be null.");
+
+            if (snapshots.Count == 0)
+                throw new ArgumentException("Market snapshots list cannot be empty.", nameof(snapshots));
+
+            if (snapshots.Count < 2)
+                throw new ArgumentException("At least 2 market snapshots are required for analysis.", nameof(snapshots));
+
+            for (int i = 0; i < snapshots.Count; i++)
+            {
+                var snapshot = snapshots[i];
+                if (snapshot == null)
+                    throw new ArgumentException($"Market snapshot at index {i} is null.", nameof(snapshots));
+
+                if (string.IsNullOrWhiteSpace(snapshot.MarketTicker))
+                    throw new ArgumentException($"Market snapshot at index {i} has invalid or missing market ticker.", nameof(snapshots));
+
+                if (snapshot.Timestamp == default)
+                    throw new ArgumentException($"Market snapshot at index {i} has invalid timestamp.", nameof(snapshots));
+
+                if (snapshot.BestYesBid <= 0 || snapshot.BestYesAsk <= 0)
+                    throw new ArgumentException($"Market snapshot at index {i} has invalid bid/ask prices.", nameof(snapshots));
+
+                if (snapshot.TotalOrderbookDepth_Yes < 0 || snapshot.TotalOrderbookDepth_No < 0)
+                    throw new ArgumentException($"Market snapshot at index {i} has negative orderbook depth.", nameof(snapshots));
+            }
+
+            // Check for chronological order
+            for (int i = 1; i < snapshots.Count; i++)
+            {
+                if (snapshots[i].Timestamp <= snapshots[i - 1].Timestamp)
+                    throw new ArgumentException($"Market snapshots are not in chronological order at index {i}.", nameof(snapshots));
+            }
+        }
+
+        /// <summary>
+        /// Validates analysis configuration parameters.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown when configuration validation fails.</exception>
+        private void ValidateConfiguration()
+        {
+            if (_config.RelativeSlack <= 0)
+                throw new ArgumentException("RelativeSlack must be greater than 0.", nameof(_config.RelativeSlack));
+
+            if (_config.AveragingWindowMin <= 0)
+                throw new ArgumentException("AveragingWindowMin must be greater than 0.", nameof(_config.AveragingWindowMin));
+
+            if (_config.MinAbsChangeToFlag < 0)
+                throw new ArgumentException("MinAbsChangeToFlag must be non-negative.", nameof(_config.MinAbsChangeToFlag));
+
+            if (_config.ShortIntervalExponent < 0)
+                throw new ArgumentException("ShortIntervalExponent must be non-negative.", nameof(_config.ShortIntervalExponent));
+
+            if (_config.GapThresholdMin < 0)
+                throw new ArgumentException("GapThresholdMin must be non-negative.", nameof(_config.GapThresholdMin));
+
+            if (_config.LeakageFactor < 0 || _config.LeakageFactor > 1)
+                throw new ArgumentException("LeakageFactor must be between 0 and 1.", nameof(_config.LeakageFactor));
+
+            if (_config.WinsorPct < 0 || _config.WinsorPct > 0.5)
+                throw new ArgumentException("WinsorPct must be between 0 and 0.5.", nameof(_config.WinsorPct));
+
+            if (_config.RatioSlack < 0)
+                throw new ArgumentException("RatioSlack must be non-negative.", nameof(_config.RatioSlack));
+
+            if (_config.DomRatio < 0 || _config.DomRatio > 1)
+                throw new ArgumentException("DomRatio must be between 0 and 1.", nameof(_config.DomRatio));
+
+            if (_config.GapShare < 0 || _config.GapShare > 1)
+                throw new ArgumentException("GapShare must be between 0 and 1.", nameof(_config.GapShare));
+
+            if (_config.EdgeMult <= 0)
+                throw new ArgumentException("EdgeMult must be greater than 0.", nameof(_config.EdgeMult));
+
+            if (_config.RatioFloor < 0)
+                throw new ArgumentException("RatioFloor must be non-negative.", nameof(_config.RatioFloor));
+
+            if (_config.MaxDegreeOfParallelism < 1)
+                throw new ArgumentException("MaxDegreeOfParallelism must be at least 1.", nameof(_config.MaxDegreeOfParallelism));
+        }
+
+        /// <summary>
+        /// Asynchronously detects velocity discrepancies in market snapshots by analyzing orderbook flow patterns.
+        /// This method provides the same functionality as the synchronous version but runs on a background thread
+        /// to avoid blocking the calling thread. Ideal for large datasets or when responsiveness is critical.
+        /// </summary>
+        /// <param name="s">The list of market snapshots to analyze for velocity discrepancies.</param>
+        /// <param name="CreateLog">Whether to create log files for detected discrepancies.</param>
+        /// <returns>A task that represents the asynchronous operation, containing a list of PricePoint objects representing detected velocity discrepancies.</returns>
+        public async Task<List<PricePoint>> DetectVelocityDiscrepanciesAsync(
+            List<MarketSnapshot> s,
+            bool CreateLog)
+        {
+            return await Task.Run(() => DetectVelocityDiscrepancies(s, CreateLog));
+        }
 
         /// <summary>
         /// Detects velocity discrepancies in market snapshots by analyzing orderbook flow patterns.
@@ -19,184 +199,209 @@ namespace TradingSimulator.Simulator
         /// rolling window analysis, identifying potential anomalies that may indicate trading opportunities
         /// or data quality issues. The analysis includes spike suppression, leakage tolerance, and
         /// various statistical thresholds to reduce false positives.
+        ///
+        /// Features:
+        /// - Automatic parallel processing for large datasets (>100 snapshots)
+        /// - Comprehensive input validation and error handling
+        /// - Performance metrics collection when enabled
+        /// - Configurable logging with automatic directory creation
+        /// - Robust spike suppression to reduce false positives
         /// </summary>
         /// <param name="s">The list of market snapshots to analyze for velocity discrepancies.</param>
         /// <param name="CreateLog">Whether to create log files for detected discrepancies.</param>
-        /// <param name="relativeSlack">Relative slack factor for threshold calculation (default: 1.5).</param>
-        /// <param name="averagingWindowMin">Time window in minutes for rolling average calculations (default: 5.0).</param>
-        /// <param name="minAbsChangeToFlag">Minimum absolute change in cents to consider for flagging (default: 500).</param>
-        /// <param name="shortIntervalExponent">Exponent for scaling thresholds on short intervals (default: 0.5).</param>
-        /// <param name="gapThresholdMin">Maximum gap in minutes to allow in rolling window (default: 1.5).</param>
-        /// <param name="leakageFactor">Factor for calculating leakage tolerance from previous intervals (default: 0.05).</param>
-        /// <param name="winsorPct">Percentage for Winsorization of extreme values in expected flows (default: 0.2).</param>
-        /// <param name="useMaxMagnitudeForThreshold">Whether to use maximum magnitude for threshold calculation (default: false).</param>
-        /// <param name="ratioSlack">Slack factor for ratio-based discrepancy detection (default: 0.5).</param>
-        /// <param name="hardFlagOnSignFlip">Whether to hard-flag sign flips in velocity (default: true).</param>
-        /// <param name="suppressSpikes">Whether to suppress spike-driven discrepancies (default: true).</param>
-        /// <param name="domRatio">Dominance ratio threshold for spike suppression (default: 0.90).</param>
-        /// <param name="gapShare">Gap share threshold for spike suppression (default: 0.85).</param>
-        /// <param name="edgeMult">Edge multiplier for spike suppression at window boundaries (default: 8.0).</param>
-        /// <param name="ratioFloor">Minimum ratio floor in $/min to avoid tiny-exp blowups (default: 0.5).</param>
         /// <returns>A list of PricePoint objects representing detected velocity discrepancies.</returns>
         public List<PricePoint> DetectVelocityDiscrepancies(
-    List<MarketSnapshot> s,
-    bool CreateLog,
-    double relativeSlack = 1.5,
-    double averagingWindowMin = 5.0,
-    int minAbsChangeToFlag = 500,
-    double shortIntervalExponent = 0.5,
-    double gapThresholdMin = 1.5,
-    double leakageFactor = 0.05,
-    double winsorPct = 0.2,
-    bool useMaxMagnitudeForThreshold = false,
-    double ratioSlack = 0.5,
-    bool hardFlagOnSignFlip = true,
-    bool suppressSpikes = true,
-    double domRatio = 0.90,
-    double gapShare = 0.85,
-    double edgeMult = 8.0,
-    double ratioFloor = 0.5 // $/min
-)
+            List<MarketSnapshot> s,
+            bool CreateLog)
         {
+            // Validate inputs and configuration
+            ValidateMarketSnapshots(s);
+            ValidateConfiguration();
+
+            var stopwatch = Stopwatch.StartNew();
             var outPts = new List<PricePoint>();
-            if (s == null || s.Count <= 1) return outPts;
+            _metrics.SnapshotsProcessed = s.Count;
 
-            for (int i = 1; i < s.Count; i++)
+            if (_config.EnableParallelProcessing && s.Count > 100)
             {
-                var curr = s[i];
-                var prev = s[i - 1];
-                if (!curr.ChangeMetricsMature) continue;
+                // Use parallel processing for large datasets
+                var options = new ParallelOptions { MaxDegreeOfParallelism = _config.MaxDegreeOfParallelism };
+                var results = new ConcurrentBag<PricePoint>();
 
-                double dtMin = (curr.Timestamp - prev.Timestamp).TotalMinutes;
-                if (dtMin <= 0) continue;
-
-                var (rollObsYes5m, rollObsNo5m, rollObsYesWin, rollObsNoWin,
-                      windowDt, gapNote, windowDy, windowDn,
-                      instYesList, instNoList) =
-                    ComputeRollingObservations(curr, s, averagingWindowMin, gapThresholdMin);
-
-                if (windowDt <= 0) continue;
-
-                var (expYesRateWin, expNoRateWin) =
-                    ComputeExpectedFlowsWinsorized(instYesList, instNoList, winsorPct);
-
-                double scale = (windowDt < averagingWindowMin)
-                    ? Math.Pow(averagingWindowMin / windowDt, shortIntervalExponent)
-                    : 1.0;
-
-                // leakage tolerance
-                double toleranceYes = 0.0, toleranceNo = 0.0;
-                int oldestIncludedIndex = FindOldestIncludedIndex(i, s, averagingWindowMin, gapThresholdMin);
-                if (oldestIncludedIndex > 1)
+                Parallel.For(1, s.Count, options, i =>
                 {
-                    var preSnap = s[oldestIncludedIndex - 1];
-                    var prePrev = s[oldestIncludedIndex - 2];
-                    double preDt = (preSnap.Timestamp - prePrev.Timestamp).TotalMinutes;
-                    if (preDt > 0 && preDt <= gapThresholdMin)
-                    {
-                        double preDy = preSnap.TotalOrderbookDepth_Yes - prePrev.TotalOrderbookDepth_Yes;
-                        double preDn = preSnap.TotalOrderbookDepth_No  - prePrev.TotalOrderbookDepth_No;
-                        double preVelYes = preDy / (100.0 * preDt);
-                        double preVelNo = preDn / (100.0 * preDt);
-                        toleranceYes = Math.Abs(preVelYes) * leakageFactor;
-                        toleranceNo  = Math.Abs(preVelNo)  * leakageFactor;
-                    }
-                }
+                    var point = ProcessSnapshot(i, s, CreateLog);
+                    if (point != null)
+                        results.Add(point);
+                });
 
-                // base magnitudes
-                double magYes = useMaxMagnitudeForThreshold
-                                ? Math.Max(Math.Abs(expYesRateWin), Math.Abs(rollObsYes5m))
-                                : Math.Abs(expYesRateWin);
-                double magNo = useMaxMagnitudeForThreshold
-                                ? Math.Max(Math.Abs(expNoRateWin), Math.Abs(rollObsNo5m))
-                                : Math.Abs(expNoRateWin);
-
-                double floorRate = (double)minAbsChangeToFlag / (100.0 * averagingWindowMin);
-
-                double thrYes = Math.Max(magYes * relativeSlack * scale + toleranceYes, floorRate);
-                double thrNo = Math.Max(magNo  * relativeSlack * scale + toleranceNo, floorRate);
-
-                // residual tests
-                double residYes = Math.Abs(rollObsYes5m - expYesRateWin);
-                double residNo = Math.Abs(rollObsNo5m  - expNoRateWin);
-
-                // Gate ratio rule by ratioFloor to avoid tiny-exp blowups
-                bool ratioHitYes = (Math.Abs(expYesRateWin) >= Math.Max(floorRate, ratioFloor)) &&
-                                   (Math.Abs(rollObsYes5m / (expYesRateWin == 0 ? 1e-9 : expYesRateWin) - 1.0) > ratioSlack);
-                bool ratioHitNo = (Math.Abs(expNoRateWin)  >= Math.Max(floorRate, ratioFloor)) &&
-                                   (Math.Abs(rollObsNo5m  / (expNoRateWin  == 0 ? 1e-9 : expNoRateWin)  - 1.0) > ratioSlack);
-
-                bool signFlipYes = hardFlagOnSignFlip &&
-                                   (Math.Sign(rollObsYes5m) != Math.Sign(expYesRateWin)) &&
-                                   (Math.Max(Math.Abs(rollObsYes5m), Math.Abs(expYesRateWin)) >= floorRate);
-                bool signFlipNo = hardFlagOnSignFlip &&
-                                   (Math.Sign(rollObsNo5m) != Math.Sign(expNoRateWin)) &&
-                                   (Math.Max(Math.Abs(rollObsNo5m), Math.Abs(expNoRateWin))  >= floorRate);
-
-                bool discYes = (residYes > thrYes) || ratioHitYes || signFlipYes;
-                bool discNo = (residNo  > thrNo)  || ratioHitNo  || signFlipNo;
-
-                if (!(discYes || discNo)) continue;
-
-                // spike-driven suppression (parametric)
-                bool IsSpikeSuppressed(List<double> flows, double obsRate, double expRate)
+                outPts = results.ToList();
+            }
+            else
+            {
+                // Sequential processing
+                for (int i = 1; i < s.Count; i++)
                 {
-                    if (!suppressSpikes || flows == null || flows.Count == 0) return false;
-
-                    double net = flows.Sum();
-                    if (Math.Abs(net) < 1e-12) return false;
-
-                    int m = 0; double maxAbs = double.NegativeInfinity;
-                    for (int k = 0; k < flows.Count; k++)
-                    {
-                        double v = Math.Abs(flows[k]);
-                        if (v > maxAbs) { maxAbs = v; m = k; }
-                    }
-                    bool ruleA = (Math.Abs(flows[m]) / Math.Abs(net) >= domRatio) &&
-                                 (Math.Sign(flows[m]) == Math.Sign(net));
-
-                    double avgRaw = flows.Average();
-                    double gapCents = Math.Abs((avgRaw - expRate) * windowDt * 100.0);
-                    double residCents = Math.Abs((obsRate - expRate) * windowDt * 100.0);
-                    bool ruleB = residCents > 0 && (gapCents / residCents >= gapShare);
-
-                    var absSorted = flows.Select(Math.Abs).OrderBy(x => x).ToArray();
-                    double medianAbs = absSorted[absSorted.Length / 2];
-                    bool isEdge = (m == 0 || m == flows.Count - 1);
-                    bool ruleC = isEdge && (Math.Abs(flows[m]) >= edgeMult * (medianAbs <= 1e-12 ? 1.0 : medianAbs));
-
-                    return ruleA || ruleB || ruleC;
+                    var point = ProcessSnapshot(i, s, CreateLog);
+                    if (point != null)
+                        outPts.Add(point);
                 }
-
-                bool suppressYes = discYes && IsSpikeSuppressed(instYesList, rollObsYes5m, expYesRateWin);
-                bool suppressNo = discNo  && IsSpikeSuppressed(instNoList, rollObsNo5m, expNoRateWin);
-
-                if (suppressYes && !discNo) continue;
-                if (suppressNo  && !discYes) continue;
-                if (suppressYes && suppressNo) continue;
-
-                double expDepthYesC = expYesRateWin * windowDt * 100.0;
-                double expDepthNoC = expNoRateWin  * windowDt * 100.0;
-
-                var lastSnapshots = s.Skip(Math.Max(0, i - 6)).Take(7).ToList();
-                string memo = GenerateDiscrepancyMemo(
-                    curr, lastSnapshots, s,
-                    averagingWindowMin, gapThresholdMin,
-                    windowDt, windowDy, windowDn,
-                    expYesRateWin, expNoRateWin,
-                    rollObsYes5m, rollObsNo5m,
-                    rollObsYesWin, rollObsNoWin,
-                    gapNote, scale, shortIntervalExponent,
-                    false, false,
-                    toleranceYes, toleranceNo, leakageFactor,
-                    expDepthYesC, expDepthNoC);
-
-                outPts.Add(new PricePoint(curr.Timestamp, (curr.BestYesBid + curr.BestYesAsk) / 2.0, memo));
-                if (CreateLog)
-                    AppendDiscrepancyLog(curr.MarketTicker ?? "UnknownMarket", memo);
             }
 
+            stopwatch.Stop();
+            _metrics.TotalAnalysisTime = stopwatch.Elapsed;
+            _metrics.DiscrepanciesDetected = outPts.Count;
+
             return outPts;
+        }
+
+        private PricePoint ProcessSnapshot(int i, List<MarketSnapshot> s, bool CreateLog)
+        {
+            var curr = s[i];
+            var prev = s[i - 1];
+            if (!curr.ChangeMetricsMature) return null;
+
+            double dtMin = (curr.Timestamp - prev.Timestamp).TotalMinutes;
+            if (dtMin <= 0) return null;
+
+            var rollingStopwatch = Stopwatch.StartNew();
+            var (rollObsYes5m, rollObsNo5m, rollObsYesWin, rollObsNoWin,
+                  windowDt, gapNote, windowDy, windowDn,
+                  instYesList, instNoList) =
+                ComputeRollingObservations(curr, s, _config.AveragingWindowMin, _config.GapThresholdMin);
+            rollingStopwatch.Stop();
+            _metrics.RollingObservationsTime += rollingStopwatch.Elapsed;
+
+            if (windowDt <= 0) return null;
+
+            var expectedStopwatch = Stopwatch.StartNew();
+            var (expYesRateWin, expNoRateWin) =
+                ComputeExpectedFlowsWinsorized(instYesList, instNoList, _config.WinsorPct);
+            expectedStopwatch.Stop();
+            _metrics.ExpectedFlowsTime += expectedStopwatch.Elapsed;
+
+            double scale = (windowDt < _config.AveragingWindowMin)
+                ? Math.Pow(_config.AveragingWindowMin / windowDt, _config.ShortIntervalExponent)
+                : 1.0;
+
+            // leakage tolerance
+            double toleranceYes = 0.0, toleranceNo = 0.0;
+            int oldestIncludedIndex = FindOldestIncludedIndex(i, s, _config.AveragingWindowMin, _config.GapThresholdMin);
+            if (oldestIncludedIndex > 1)
+            {
+                var preSnap = s[oldestIncludedIndex - 1];
+                var prePrev = s[oldestIncludedIndex - 2];
+                double preDt = (preSnap.Timestamp - prePrev.Timestamp).TotalMinutes;
+                if (preDt > 0 && preDt <= _config.GapThresholdMin)
+                {
+                    double preDy = preSnap.TotalOrderbookDepth_Yes - prePrev.TotalOrderbookDepth_Yes;
+                    double preDn = preSnap.TotalOrderbookDepth_No  - prePrev.TotalOrderbookDepth_No;
+                    double preVelYes = preDy / (100.0 * preDt);
+                    double preVelNo = preDn / (100.0 * preDt);
+                    toleranceYes = Math.Abs(preVelYes) * _config.LeakageFactor;
+                    toleranceNo  = Math.Abs(preVelNo)  * _config.LeakageFactor;
+                }
+            }
+
+            // base magnitudes
+            double magYes = _config.UseMaxMagnitudeForThreshold
+                            ? Math.Max(Math.Abs(expYesRateWin), Math.Abs(rollObsYes5m))
+                            : Math.Abs(expYesRateWin);
+            double magNo = _config.UseMaxMagnitudeForThreshold
+                            ? Math.Max(Math.Abs(expNoRateWin), Math.Abs(rollObsNo5m))
+                            : Math.Abs(expNoRateWin);
+
+            double floorRate = (double)_config.MinAbsChangeToFlag / (100.0 * _config.AveragingWindowMin);
+
+            double thrYes = Math.Max(magYes * _config.RelativeSlack * scale + toleranceYes, floorRate);
+            double thrNo = Math.Max(magNo  * _config.RelativeSlack * scale + toleranceNo, floorRate);
+
+            // residual tests
+            double residYes = Math.Abs(rollObsYes5m - expYesRateWin);
+            double residNo = Math.Abs(rollObsNo5m  - expNoRateWin);
+
+            // Gate ratio rule by ratioFloor to avoid tiny-exp blowups
+            bool ratioHitYes = (Math.Abs(expYesRateWin) >= Math.Max(floorRate, _config.RatioFloor)) &&
+                               (Math.Abs(rollObsYes5m / (expYesRateWin == 0 ? 1e-9 : expYesRateWin) - 1.0) > _config.RatioSlack);
+            bool ratioHitNo = (Math.Abs(expNoRateWin)  >= Math.Max(floorRate, _config.RatioFloor)) &&
+                               (Math.Abs(rollObsNo5m  / (expNoRateWin  == 0 ? 1e-9 : expNoRateWin)  - 1.0) > _config.RatioSlack);
+
+            bool signFlipYes = _config.HardFlagOnSignFlip &&
+                               (Math.Sign(rollObsYes5m) != Math.Sign(expYesRateWin)) &&
+                               (Math.Max(Math.Abs(rollObsYes5m), Math.Abs(expYesRateWin)) >= floorRate);
+            bool signFlipNo = _config.HardFlagOnSignFlip &&
+                               (Math.Sign(rollObsNo5m) != Math.Sign(expNoRateWin)) &&
+                               (Math.Max(Math.Abs(rollObsNo5m), Math.Abs(expNoRateWin))  >= floorRate);
+
+            bool discYes = (residYes > thrYes) || ratioHitYes || signFlipYes;
+            bool discNo = (residNo  > thrNo)  || ratioHitNo  || signFlipNo;
+
+            if (!(discYes || discNo)) return null;
+
+            // spike-driven suppression (parametric)
+            var spikeStopwatch = Stopwatch.StartNew();
+            bool suppressYes = discYes && IsSpikeSuppressed(instYesList, rollObsYes5m, expYesRateWin);
+            bool suppressNo = discNo  && IsSpikeSuppressed(instNoList, rollObsNo5m, expNoRateWin);
+            spikeStopwatch.Stop();
+            _metrics.SpikeSuppressionTime += spikeStopwatch.Elapsed;
+
+            if (suppressYes && !discNo) return null;
+            if (suppressNo  && !discYes) return null;
+            if (suppressYes && suppressNo) return null;
+
+            double expDepthYesC = expYesRateWin * windowDt * 100.0;
+            double expDepthNoC = expNoRateWin  * windowDt * 100.0;
+
+            var lastSnapshots = s.Skip(Math.Max(0, i - 6)).Take(7).ToList();
+            string memo = GenerateDiscrepancyMemo(
+                curr, lastSnapshots, s,
+                _config.AveragingWindowMin, _config.GapThresholdMin,
+                windowDt, windowDy, windowDn,
+                expYesRateWin, expNoRateWin,
+                rollObsYes5m, rollObsNo5m,
+                rollObsYesWin, rollObsNoWin,
+                gapNote, scale, _config.ShortIntervalExponent,
+                false, false,
+                toleranceYes, toleranceNo, _config.LeakageFactor,
+                expDepthYesC, expDepthNoC);
+
+            var pricePoint = new PricePoint(curr.Timestamp, (curr.BestYesBid + curr.BestYesAsk) / 2.0, memo);
+            if (CreateLog)
+                AppendDiscrepancyLog(curr.MarketTicker ?? "UnknownMarket", memo);
+
+            return pricePoint;
+        }
+
+        /// <summary>
+        /// Determines if a discrepancy should be suppressed due to spike-driven behavior.
+        /// </summary>
+        private bool IsSpikeSuppressed(List<double> flows, double obsRate, double expRate)
+        {
+            if (!_config.SuppressSpikes || flows == null || flows.Count == 0) return false;
+
+            double net = flows.Sum();
+            if (Math.Abs(net) < 1e-12) return false;
+
+            int m = 0; double maxAbs = double.NegativeInfinity;
+            for (int k = 0; k < flows.Count; k++)
+            {
+                double v = Math.Abs(flows[k]);
+                if (v > maxAbs) { maxAbs = v; m = k; }
+            }
+            bool ruleA = (Math.Abs(flows[m]) / Math.Abs(net) >= _config.DomRatio) &&
+                         (Math.Sign(flows[m]) == Math.Sign(net));
+
+            double avgRaw = flows.Average();
+            double gapCents = Math.Abs((avgRaw - expRate) * _config.AveragingWindowMin * 100.0);
+            double residCents = Math.Abs((obsRate - expRate) * _config.AveragingWindowMin * 100.0);
+            bool ruleB = residCents > 0 && (gapCents / residCents >= _config.GapShare);
+
+            var absSorted = flows.Select(Math.Abs).OrderBy(x => x).ToArray();
+            double medianAbs = absSorted[absSorted.Length / 2];
+            bool isEdge = (m == 0 || m == flows.Count - 1);
+            bool ruleC = isEdge && (Math.Abs(flows[m]) >= _config.EdgeMult * (medianAbs <= 1e-12 ? 1.0 : medianAbs));
+
+            return ruleA || ruleB || ruleC;
         }
 
         /// <summary>
@@ -319,16 +524,27 @@ namespace TradingSimulator.Simulator
         /// Appends a discrepancy log entry to a timestamped log file for the specified market.
         /// This method creates or appends to a log file containing detailed information about
         /// detected velocity discrepancies, including the market ticker and comprehensive memo data.
-        /// Log files are stored in the configured cache directory with timestamp-based filenames.
+        /// Log files are stored in the configured log directory with configurable naming.
         /// </summary>
         /// <param name="marketTicker">The ticker symbol of the market where the discrepancy was detected.</param>
         /// <param name="memo">The detailed memo containing discrepancy analysis and context information.</param>
         private void AppendDiscrepancyLog(string marketTicker, string memo)
         {
-            string timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
-            string logFilename = $"discrepancies_{timestamp}.log";
-            string logPath = Path.Combine(_cacheDirectory, logFilename);
-            File.AppendAllText(logPath, $"Market: {marketTicker}\n{memo}\n\n");
+            try
+            {
+                // Ensure log directory exists
+                Directory.CreateDirectory(_config.LogDirectory);
+
+                string timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+                string logFilename = $"{_config.LogFilePrefix}_{timestamp}.log";
+                string logPath = Path.Combine(_config.LogDirectory, logFilename);
+                File.AppendAllText(logPath, $"Market: {marketTicker}\n{memo}\n\n");
+            }
+            catch (Exception ex)
+            {
+                // Log to console if file logging fails
+                Console.WriteLine($"Failed to write discrepancy log: {ex.Message}");
+            }
         }
 
         /// <summary>

@@ -51,5 +51,19 @@ namespace BacklashPatterns
         /// Default value: 10
         /// </summary>
         public int MaxPatternSize { get; set; } = 10;
+
+        /// <summary>
+        /// Array of lookback periods used in PatternUtils for multi-period calculations.
+        /// These periods are used to compute metrics at different timeframes.
+        /// Default values: [1, 2, 3, 4, 5]
+        /// </summary>
+        public int[] LookbackPeriods { get; set; } = new int[] { 1, 2, 3, 4, 5 };
+
+        /// <summary>
+        /// Number of lookback periods to use in calculations.
+        /// Should match the length of LookbackPeriods array.
+        /// Default value: 5
+        /// </summary>
+        public int LookbackPeriodCount => LookbackPeriods.Length;
     }
 }

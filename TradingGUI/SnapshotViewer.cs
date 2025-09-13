@@ -69,6 +69,27 @@ namespace SimulatorWinForms
         private const float MaxScale = 2.0f;
 
         /// <summary>
+        /// Configuration class for interaction parameters loaded from appsettings.json.
+        /// </summary>
+        private class InteractionConfig
+        {
+            public double ZoomInFactor { get; set; }
+            public double ZoomOutFactor { get; set; }
+            public double PanThreshold { get; set; }
+            public int NavigationTimerInterval { get; set; }
+            public int NavigationResetDelay { get; set; }
+            public int RapidNavigationThreshold { get; set; }
+            public int FastNavigationThreshold { get; set; }
+            public int MediumNavigationThreshold { get; set; }
+            public int RapidStepSize { get; set; }
+            public int FastStepSize { get; set; }
+            public int MediumStepSize { get; set; }
+            public int NormalStepSize { get; set; }
+        }
+
+        private readonly InteractionConfig _interactionConfig;
+
+        /// <summary>
         /// Initializes a new instance of the SnapshotViewer control.
         /// Sets up the user interface, configures chart controls, initializes navigation systems,
         /// and establishes event handlers for interactive functionality.
@@ -88,14 +109,32 @@ namespace SimulatorWinForms
             InitializeComponent();
             backButton.Click += (s, e) => BackAction?.Invoke();
 
-            // Initialize database context
+            // Initialize database context and load configuration
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
                     ["ConnectionStrings:DefaultConnection"] = "Server=localhost;Database=KalshiBot;Trusted_Connection=True;"
                 })
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .Build();
             _context = new KalshiBotContext(config);
+
+            // Load SnapshotViewer interaction configuration
+            _interactionConfig = config.GetSection("SnapshotViewer:InteractionConfig").Get<InteractionConfig>() ?? new InteractionConfig
+            {
+                ZoomInFactor = 0.9,
+                ZoomOutFactor = 1.1,
+                PanThreshold = 0.001,
+                NavigationTimerInterval = 300,
+                NavigationResetDelay = 500,
+                RapidNavigationThreshold = 60,
+                FastNavigationThreshold = 15,
+                MediumNavigationThreshold = 5,
+                RapidStepSize = 60,
+                FastStepSize = 5,
+                MediumStepSize = 2,
+                NormalStepSize = 1
+            };
 
             // Add AutoScroll to containers to handle overflow
             marketInfoContainer.AutoScroll = true;
@@ -151,7 +190,7 @@ namespace SimulatorWinForms
 
             // Initialize navigation timer for deferred updates
             _chartUpdateTimer = new System.Windows.Forms.Timer();
-            _chartUpdateTimer.Interval = 300; // 300ms delay after user stops pressing keys
+            _chartUpdateTimer.Interval = _interactionConfig.NavigationTimerInterval; // Configurable delay after user stops pressing keys
             _chartUpdateTimer.Tick += NavigationTimer_Tick;
 
             // Add panning support for snapshot viewer charts
@@ -164,6 +203,57 @@ namespace SimulatorWinForms
             secondaryChart.Visible = false; // Start hidden, will be shown when metrics are checked
             secondaryChart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
             secondaryChart.Plot.AxisAutoY();
+        }
+
+        /// <summary>
+        /// Validates the integrity of snapshot data before processing.
+        /// </summary>
+        /// <param name="snapshot">The snapshot to validate.</param>
+        /// <returns>True if the snapshot data is valid, false otherwise.</returns>
+        private bool ValidateSnapshotData(MarketSnapshot snapshot)
+        {
+            if (snapshot == null)
+                return false;
+
+            // Validate timestamp
+            if (snapshot.Timestamp == DateTime.MinValue || snapshot.Timestamp.Year < 2000)
+                return false;
+
+            // Validate prices (should be positive and reasonable)
+            if (snapshot.BestYesBid < 0 || snapshot.BestYesBid > 100 ||
+                snapshot.BestNoBid < 0 || snapshot.BestNoBid > 100 ||
+                snapshot.BestYesAsk < 0 || snapshot.BestYesAsk > 100 ||
+                snapshot.BestNoAsk < 0 || snapshot.BestNoAsk > 100)
+                return false;
+
+            // Validate position size (should not be negative)
+            if (snapshot.PositionSize < 0)
+                return false;
+
+            // Validate buyin price (should be positive if position exists)
+            if (snapshot.PositionSize > 0 && snapshot.BuyinPrice <= 0)
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Validates a list of snapshots for data integrity.
+        /// </summary>
+        /// <param name="snapshots">The list of snapshots to validate.</param>
+        /// <returns>True if all snapshots are valid, false otherwise.</returns>
+        private bool ValidateSnapshotList(List<MarketSnapshot> snapshots)
+        {
+            if (snapshots == null || snapshots.Count == 0)
+                return false;
+
+            foreach (var snapshot in snapshots)
+            {
+                if (!ValidateSnapshotData(snapshot))
+                    return false;
+            }
+
+            return true;
         }
 
 
@@ -299,7 +389,7 @@ namespace SimulatorWinForms
                 double dy = yNow - yStart;
 
                 // Use smaller movement threshold for more responsive panning
-                if (Math.Abs(dx) > 0.001 || Math.Abs(dy) > 0.001)
+                if (Math.Abs(dx) > _interactionConfig.PanThreshold || Math.Abs(dy) > _interactionConfig.PanThreshold)
                 {
                     priceChart.Plot.SetAxisLimits(
                         _mainChartPanStartLimits.xMin - dx,
@@ -350,7 +440,7 @@ namespace SimulatorWinForms
                 double dy = yNow - yStart;
 
                 // Use smaller movement threshold for more responsive panning
-                if (Math.Abs(dx) > 0.001 || Math.Abs(dy) > 0.001)
+                if (Math.Abs(dx) > _interactionConfig.PanThreshold || Math.Abs(dy) > _interactionConfig.PanThreshold)
                 {
                     // Secondary chart pans independently - no interference with main chart
                     secondaryChart.Plot.SetAxisLimits(
@@ -497,7 +587,7 @@ namespace SimulatorWinForms
                     }
 
                     // Update UI immediately
-                    _ = RefreshUIQuickly();
+                    _ = RefreshUIQuicklyAsync();
 
                     // Reset navigation speed counters
                     _navigationSpeedCounter = 0;
@@ -514,7 +604,7 @@ namespace SimulatorWinForms
             var currentLimits = priceChart.Plot.GetAxisLimits();
 
             // Calculate zoom factor (smaller steps for finer control)
-            double zoomFactor = e.Delta > 0 ? 0.9 : 1.1; // Zoom in on scroll up, out on scroll down
+            double zoomFactor = e.Delta > 0 ? _interactionConfig.ZoomInFactor : _interactionConfig.ZoomOutFactor; // Zoom in on scroll up, out on scroll down
 
             // Calculate new X range
             double currentSpan = currentLimits.XMax - currentLimits.XMin;
@@ -568,7 +658,7 @@ namespace SimulatorWinForms
             var currentLimits = secondaryChart.Plot.GetAxisLimits();
 
             // Calculate zoom factor (smaller steps for finer control)
-            double zoomFactor = e.Delta > 0 ? 0.9 : 1.1; // Zoom in on scroll up, out on scroll down
+            double zoomFactor = e.Delta > 0 ? _interactionConfig.ZoomInFactor : _interactionConfig.ZoomOutFactor; // Zoom in on scroll up, out on scroll down
 
             // Calculate new X range
             double currentSpan = currentLimits.XMax - currentLimits.XMin;
@@ -897,10 +987,10 @@ namespace SimulatorWinForms
             }
 
             // Immediately update all UI elements (fast operations)
-            _ = RefreshUIQuickly();
+            _ = RefreshUIQuicklyAsync();
 
             // Update orderbook from the new snapshot
-            PopulateUIFromSnapshot();
+            await PopulateUIFromSnapshotAsync();
 
             // Start navigation mode and reset timer for expensive operations
             _chartUpdateTimer.Stop();
@@ -926,31 +1016,31 @@ namespace SimulatorWinForms
             DateTime now = DateTime.Now;
 
             // Reset consecutive count if too much time has passed
-            if ((now - _lastNavigationTimestamp).TotalMilliseconds > 500)
+            if ((now - _lastNavigationTimestamp).TotalMilliseconds > _interactionConfig.NavigationResetDelay)
             {
                 _navigationSpeedCounter = 0;
-                _currentNavigationStepSize = 1;
+                _currentNavigationStepSize = _interactionConfig.NormalStepSize;
             }
 
             _navigationSpeedCounter++;
             _lastNavigationTimestamp = now;
 
             // Progressive speed based on consecutive navigations
-            if (_navigationSpeedCounter >= 60)
+            if (_navigationSpeedCounter >= _interactionConfig.RapidNavigationThreshold)
             {
-                _currentNavigationStepSize = 60; // Jump 60 bars at a time
+                _currentNavigationStepSize = _interactionConfig.RapidStepSize; // Jump rapid bars at a time
             }
-            else if (_navigationSpeedCounter >= 15)
+            else if (_navigationSpeedCounter >= _interactionConfig.FastNavigationThreshold)
             {
-                _currentNavigationStepSize = 5; // Jump 5 bars at a time
+                _currentNavigationStepSize = _interactionConfig.FastStepSize; // Jump fast bars at a time
             }
-            else if (_navigationSpeedCounter >= 5)
+            else if (_navigationSpeedCounter >= _interactionConfig.MediumNavigationThreshold)
             {
-                _currentNavigationStepSize = 2; // Jump 2 bars at a time
+                _currentNavigationStepSize = _interactionConfig.MediumStepSize; // Jump medium bars at a time
             }
             else
             {
-                _currentNavigationStepSize = 1; // Normal speed
+                _currentNavigationStepSize = _interactionConfig.NormalStepSize; // Normal speed
             }
 
             return _currentNavigationStepSize;
@@ -969,7 +1059,7 @@ namespace SimulatorWinForms
         /// - Moves vertical timeline indicator immediately
         /// - Queries database for market titles with fallback to ticker symbols
         /// </remarks>
-        private async Task RefreshUIQuickly()
+        private async Task RefreshUIQuicklyAsync()
         {
             if (currentSnapshot == null) return;
 
@@ -1228,14 +1318,22 @@ namespace SimulatorWinForms
         /// <param name="patternPoints">Time series data for detected technical patterns (optional).</param>
         /// <remarks>
         /// This method performs comprehensive data initialization:
+        /// - Validates snapshot data integrity before processing
         /// - Validates and sets the current snapshot with fallback logic
         /// - Orders historical data chronologically
         /// - Maps simulation data to individual snapshots
         /// - Updates the UI to reflect the new data context
         /// - Handles edge cases like invalid timestamps gracefully
         /// </remarks>
-        public void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history, List<string> memosList, int simulatedPosition = 0, double averageCost = 0.0, int simulatedRestingOrders = 0, List<PricePoint>? positionPoints = null, List<PricePoint>? averageCostPoints = null, List<PricePoint>? restingOrdersPoints = null, List<PricePoint>? patternPoints = null)
+        public async void Populate(MarketSnapshot snapshot, List<MarketSnapshot> history, List<string> memosList, int simulatedPosition = 0, double averageCost = 0.0, int simulatedRestingOrders = 0, List<PricePoint>? positionPoints = null, List<PricePoint>? averageCostPoints = null, List<PricePoint>? restingOrdersPoints = null, List<PricePoint>? patternPoints = null)
         {
+            // Validate input data
+            if (!ValidateSnapshotData(snapshot) || !ValidateSnapshotList(history))
+            {
+                // Log or handle invalid data - for now, throw an exception
+                throw new ArgumentException("Invalid snapshot data provided.");
+            }
+
             currentSnapshot = snapshot;
             historySnapshots = history.OrderBy(s => s.Timestamp).ToList();
 
@@ -1335,7 +1433,7 @@ namespace SimulatorWinForms
                 }
             }
 
-            PopulateUIFromSnapshot();  // Full UI update
+            await PopulateUIFromSnapshotAsync();  // Full UI update
         }
 
         private string FormatTimeSpan(TimeSpan? ts)
@@ -1356,7 +1454,7 @@ namespace SimulatorWinForms
         /// - Automatic scrolling to center on the current spread
         /// - Size calculations showing both quantity and value
         /// </remarks>
-        private async void PopulateUIFromSnapshot()
+        private async Task PopulateUIFromSnapshotAsync()
         {
             // Clear and repopulate order book with bids and asks
             orderbookGrid.Rows.Clear();
@@ -1458,7 +1556,7 @@ namespace SimulatorWinForms
             }
 
             // Update all UI elements (fast operations)
-            _ = RefreshUIQuickly();
+            _ = RefreshUIQuicklyAsync();
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace BacklashBot.Management
     /// Central performance monitoring service that tracks system performance metrics,
     /// records execution times, and monitors queue depths for the Kalshi trading bot.
     /// This class provides comprehensive performance analytics including WebSocket event
-    /// rates, API execution times, and queue utilization metrics.
+    /// rates, API execution times, and queue utilization metrics with configurable alerting.
     /// </summary>
     /// <remarks>
     /// The performance monitor serves multiple purposes:
@@ -26,6 +26,12 @@ namespace BacklashBot.Management
     /// - Provides rolling averages for queue utilization over 5-minute windows
     /// - Integrates with market refresh service metrics
     /// - Supports performance-based decision making for market management
+    /// - Monitors performance thresholds and generates alerts when exceeded
+    ///
+    /// Configurable alerting thresholds include:
+    /// - Queue high count percentage alerts
+    /// - Refresh usage percentage alerts
+    /// - Absolute queue count threshold alerts
     ///
     /// Key metrics tracked:
     /// - Method execution times with timestamps
@@ -211,6 +217,9 @@ namespace BacklashBot.Management
                                 _logger.LogInformation(
                                     "{Service} processing time: Elapsed={ElapsedSeconds:F2}s, Markets={MarketCount}, Usage={UsagePercentage:F2}%, Acceptable={IsAcceptable}",
                                     marketServiceName, LastRefreshCycleSeconds, LastRefreshMarketCount, LastRefreshUsagePercentage, LastRefreshTimeAcceptable);
+
+                                // Check for performance alerts
+                                CheckPerformanceAlerts();
                             }
                             marketCheckCounter = 0;
                         }
@@ -340,6 +349,55 @@ namespace BacklashBot.Management
             _queueCountSamples["EventQueue"] = eventSamples;
 
             return percentage;
+        }
+
+        /// <summary>
+        /// Checks for performance alerts based on configured thresholds and logs warnings if exceeded.
+        /// </summary>
+        /// <remarks>
+        /// This method evaluates current performance metrics against configured alert thresholds:
+        /// - Queue high count percentage exceeding threshold
+        /// - Refresh usage percentage exceeding threshold
+        /// - Individual queue counts exceeding absolute thresholds
+        ///
+        /// Alerts are logged as warnings to notify administrators of potential performance issues.
+        /// </remarks>
+        public void CheckPerformanceAlerts()
+        {
+            var queueHighPercentage = GetQueueHighCountPercentage();
+            if (queueHighPercentage >= _executionConfig.QueueHighCountAlertThreshold)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: EventQueue high count percentage {Percentage:F2}% exceeds threshold {Threshold:F2}%. System may be overloaded.",
+                    queueHighPercentage, _executionConfig.QueueHighCountAlertThreshold);
+            }
+
+            if (LastRefreshUsagePercentage >= _executionConfig.RefreshUsageAlertThreshold)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Refresh usage {Usage:F2}% exceeds threshold {Threshold:F2}%. Market refresh cycle may be too slow.",
+                    LastRefreshUsagePercentage, _executionConfig.RefreshUsageAlertThreshold);
+            }
+
+            var (eventQueueAvg, tickerQueueAvg, notificationQueueAvg, orderBookQueueAvg) = GetQueueCountRollingAverages();
+            if (eventQueueAvg >= _executionConfig.QueueCountAlertThreshold)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Average EventQueue count {Avg:F2} exceeds threshold {Threshold}. Processing may be delayed.",
+                    eventQueueAvg, _executionConfig.QueueCountAlertThreshold);
+            }
+            if (tickerQueueAvg >= _executionConfig.QueueCountAlertThreshold)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Average TickerQueue count {Avg:F2} exceeds threshold {Threshold}. Processing may be delayed.",
+                    tickerQueueAvg, _executionConfig.QueueCountAlertThreshold);
+            }
+            if (notificationQueueAvg >= _executionConfig.QueueCountAlertThreshold)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Average NotificationQueue count {Avg:F2} exceeds threshold {Threshold}. Processing may be delayed.",
+                    notificationQueueAvg, _executionConfig.QueueCountAlertThreshold);
+            }
+            if (orderBookQueueAvg >= _executionConfig.QueueCountAlertThreshold)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Average OrderBookQueue count {Avg:F2} exceeds threshold {Threshold}. Processing may be delayed.",
+                    orderBookQueueAvg, _executionConfig.QueueCountAlertThreshold);
+            }
         }
     }
 }

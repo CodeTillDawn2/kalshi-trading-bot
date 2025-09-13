@@ -7,6 +7,7 @@ using KalshiBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
+using BacklashBot.Services;
 using BacklashBot.Hubs;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management;
@@ -59,6 +60,8 @@ builder.Services.Configure<CalculationConfig>(builder.Configuration.GetSection("
 builder.Services.Configure<ExecutionConfig>(builder.Configuration.GetSection("Execution"));
 builder.Services.Configure<MarketDataConfig>(builder.Configuration.GetSection("MarketData"));
 builder.Services.Configure<CentralBrainConfig>(builder.Configuration.GetSection("CentralBrain"));
+builder.Services.Configure<InterestScoreConfig>(builder.Configuration.GetSection("InterestScore"));
+builder.Services.Configure<ErrorHandlerConfig>(builder.Configuration.GetSection("ErrorHandler"));
 
 // Increase shutdown timeout
 builder.Services.Configure<HostOptions>(options =>
@@ -171,12 +174,21 @@ builder.Services.AddScoped<IMarketRefreshService, MarketRefreshService>();
 builder.Services.AddScoped<IWebSocketMonitorService, WebSocketMonitorService>();
 builder.Services.AddSingleton<IOverseerClientService, OverseerClientService>();
 builder.Services.AddScoped<IWebSocketConnectionManager, WebSocketConnectionManager>();
-builder.Services.AddScoped<IMessageProcessor, MessageProcessor>();
+builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
+    sp.GetRequiredService<ILogger<MessageProcessor>>(),
+    sp.GetRequiredService<IWebSocketConnectionManager>(),
+    sp.GetRequiredService<ISubscriptionManager>(),
+    sp.GetRequiredService<IStatusTrackerService>(),
+    sp.GetRequiredService<ISqlDataService>(),
+    sp.GetRequiredService<IKalshiAPIService>(),
+    sp.GetRequiredService<IOptions<KalshiConfig>>().Value
+));
 builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
     sp.GetRequiredService<ILogger<SubscriptionManager>>(),
     sp.GetRequiredService<IWebSocketConnectionManager>(),
     sp.GetRequiredService<IDataCache>(),
-    sp.GetRequiredService<IStatusTrackerService>()
+    sp.GetRequiredService<IStatusTrackerService>(),
+    sp.GetRequiredService<IConfiguration>()
 ));
 builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
     sp.GetRequiredService<IOptions<KalshiConfig>>(),
@@ -192,7 +204,8 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClie
 ));
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper, OvernightActivitiesHelper>();
-builder.Services.AddScoped<ISnapshotPeriodHelper, SnapshotPeriodHelper>();
+builder.Services.AddScoped<ISnapshotPeriodHelper>(provider =>
+    new SnapshotPeriodHelper(provider.GetRequiredService<IOptions<SnapshotConfig>>().Value));
 builder.Services.AddScoped<BacklashInterfaces.SmokehouseBot.Services.IHealthCheckService, HealthCheckService>();
 builder.Services.AddScoped<IDataCache, BacklashBot.State.DataCache>();
 

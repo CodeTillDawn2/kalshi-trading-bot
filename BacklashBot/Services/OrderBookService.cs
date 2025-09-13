@@ -41,6 +41,26 @@ namespace BacklashBot.Services
         private const int MaxWaitTimeSamples = 100;
 
         /// <summary>
+        /// Configuration options for the order book service timeouts and limits.
+        /// </summary>
+        private readonly OrderBookServiceConfig _config;
+
+        /// <summary>
+        /// Tracks processing times for event queue operations.
+        /// </summary>
+        private readonly ConcurrentDictionary<string, List<long>> _eventQueueProcessingTimes = new();
+
+        /// <summary>
+        /// Tracks processing times for ticker queue operations.
+        /// </summary>
+        private readonly ConcurrentDictionary<string, List<long>> _tickerQueueProcessingTimes = new();
+
+        /// <summary>
+        /// Tracks processing times for notification queue operations.
+        /// </summary>
+        private readonly ConcurrentDictionary<string, List<long>> _notificationQueueProcessingTimes = new();
+
+        /// <summary>
         /// Event raised when an order book is updated for a market.
         /// The string parameter contains the market ticker that was updated.
         /// </summary>
@@ -55,24 +75,34 @@ namespace BacklashBot.Services
         /// <param name="serviceFactory">Factory for accessing other services.</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
         /// <param name="statusTrackerService">Service for tracking cancellation tokens and status.</param>
+        /// <param name="config">Configuration options for the order book service.</param>
         public OrderBookService(
             ILogger<IOrderBookService> logger,
             IServiceScopeFactory scopeFactory,
             IServiceFactory serviceFactory,
             IScopeManagerService scopeManagerService,
-            IStatusTrackerService statusTrackerService)
+            IStatusTrackerService statusTrackerService,
+            OrderBookServiceConfig config)
         {
             _logger = logger;
             _scopeManagerService = scopeManagerService;
             _statusTrackerService = statusTrackerService;
             _serviceFactory = serviceFactory;
             _scopeFactory = scopeFactory;
+            _config = config;
 
             _logger.LogDebug("OrderBookService constructor initializing processors...");
             StartProcessors();
             _logger.LogDebug("OrderBookService initialized with processors, EventProcessor Status: {EventStatus}, TickerProcessor Status: {TickerStatus}, NotificationProcessor Status: {NotificationStatus}",
                 _eventProcessor.Status, _tickerProcessor.Status, _notificationProcessor.Status);
         }
+
+        /// <summary>
+        /// Validates if the provided market ticker is not null or whitespace.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to validate.</param>
+        /// <returns>True if the ticker is valid; otherwise, false.</returns>
+        private bool IsValidMarketTicker(string marketTicker) => !string.IsNullOrWhiteSpace(marketTicker);
 
         /// <summary>
         /// Starts the order book service by initializing queues, configuring WebSocket event handlers,
@@ -120,6 +150,11 @@ namespace BacklashBot.Services
         /// <returns>A list of OrderbookData sorted by price.</returns>
         public List<OrderbookData> GetCurrentOrderBook(string marketTicker)
         {
+            if (!IsValidMarketTicker(marketTicker))
+            {
+                _logger.LogWarning("Invalid market ticker provided: {MarketTicker}", marketTicker);
+                return new List<OrderbookData>();
+            }
             if (!_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker)) return new List<OrderbookData>();
             var orderbook = _serviceFactory.GetDataCache().Markets[marketTicker]?.OrderbookData;
             if (orderbook == null) return new List<OrderbookData>();
@@ -135,6 +170,11 @@ namespace BacklashBot.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task SyncOrderBookAsync(string marketTicker)
         {
+            if (!IsValidMarketTicker(marketTicker))
+            {
+                _logger.LogWarning("Invalid market ticker provided: {MarketTicker}", marketTicker);
+                return;
+            }
             if (!_serviceFactory.GetDataCache().Markets.ContainsKey(marketTicker)) return;
 
             var semaphore = _marketUpdateSemaphores.GetOrAdd(marketTicker, _ => new SemaphoreSlim(1, 1));
@@ -146,7 +186,7 @@ namespace BacklashBot.Services
                 var orderbook = _serviceFactory.GetDataCache().Markets[marketTicker]?.OrderbookData;
                 if (orderbook != null)
                 {
-                    lockAcquired = await semaphore.WaitAsync(30000, _statusTrackerService.GetCancellationToken());
+                    lockAcquired = await semaphore.WaitAsync(_config.SemaphoreTimeoutMs, _statusTrackerService.GetCancellationToken());
                     if (!lockAcquired)
                     {
                         _logger.LogError("Timeout waiting for sync lock for {MarketTicker}", marketTicker);
@@ -192,6 +232,11 @@ namespace BacklashBot.Services
         /// <param name="marketTicker">The market ticker to clear resources for.</param>
         public void ClearQueueForMarketAsync(string marketTicker)
         {
+            if (!IsValidMarketTicker(marketTicker))
+            {
+                _logger.LogWarning("Invalid market ticker provided: {MarketTicker}", marketTicker);
+                return;
+            }
             _logger.LogDebug("Clearing data for market {MarketTicker}", marketTicker);
 
             try
@@ -233,9 +278,10 @@ namespace BacklashBot.Services
         /// </summary>
         /// <param name="limit">The maximum allowed queue count.</param>
         /// <returns>True if the event queue count is less than the limit.</returns>
-        public bool IsEventQueueUnderLimit(int limit)
+        public bool IsEventQueueUnderLimit(int limit = -1)
         {
-            bool queuesUnderLimit = _eventQueue.Count < limit;
+            int effectiveLimit = limit == -1 ? _config.QueueLimit : limit;
+            bool queuesUnderLimit = _eventQueue.Count < effectiveLimit;
             return queuesUnderLimit;
         }
 
@@ -471,6 +517,7 @@ namespace BacklashBot.Services
             _logger.LogDebug("HandleNotificationQueueAsync started, CancellationRequested: {CancellationRequested}", _statusTrackerService.GetCancellationToken().IsCancellationRequested);
             while (!_statusTrackerService.GetCancellationToken().IsCancellationRequested)
             {
+                var startTime = DateTime.UtcNow;
                 try
                 {
                     string marketTicker;
@@ -486,6 +533,12 @@ namespace BacklashBot.Services
 
                     _logger.LogDebug("Processing notification for {MarketTicker}", marketTicker);
                     OrderBookUpdated?.Invoke(this, marketTicker);
+                    var processingTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                    _notificationQueueProcessingTimes.AddOrUpdate(
+                        "notification",
+                        _ => new List<long> { (long)processingTimeMs },
+                        (_, list) => { list.Add((long)processingTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
+                    );
                 }
                 catch (OperationCanceledException)
                 {
@@ -510,6 +563,7 @@ namespace BacklashBot.Services
                 try
                 {
                     (JsonElement data, string offerType, long seq, Guid eventId) eventData;
+                    var queueStartTime = DateTime.UtcNow;
                     try
                     {
                         eventData = _eventQueue.Take(_statusTrackerService.GetCancellationToken());
@@ -528,7 +582,7 @@ namespace BacklashBot.Services
                     _logger.LogDebug("Acquiring semaphore for {MarketTicker}, Seq: {Seq}, ThreadId: {ThreadId}",
                         marketTicker, seq, Thread.CurrentThread.ManagedThreadId);
                     var startTime = DateTime.UtcNow;
-                    bool lockAcquired = await semaphore.WaitAsync(1000, _statusTrackerService.GetCancellationToken());
+                    bool lockAcquired = await semaphore.WaitAsync(_config.EventQueueSemaphoreTimeoutMs, _statusTrackerService.GetCancellationToken());
                     if (!lockAcquired)
                     {
                         _logger.LogWarning(new OrderbookTransientFailureException(marketTicker,
@@ -548,6 +602,12 @@ namespace BacklashBot.Services
                         _logger.LogDebug("Releasing semaphore for {MarketTicker}, Seq: {Seq}", marketTicker, seq);
                         semaphore.Release();
                     }
+                    var processingTimeMs = (DateTime.UtcNow - queueStartTime).TotalMilliseconds;
+                    _eventQueueProcessingTimes.AddOrUpdate(
+                        "event",
+                        _ => new List<long> { (long)processingTimeMs },
+                        (_, list) => { list.Add((long)processingTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
+                    );
                 }
                 catch (OperationCanceledException)
                 {
@@ -573,6 +633,7 @@ namespace BacklashBot.Services
             _logger.LogDebug("HandleTickerQueueAsync started, CancellationRequested: {CancellationRequested}", _statusTrackerService.GetCancellationToken().IsCancellationRequested);
             while (!_statusTrackerService.GetCancellationToken().IsCancellationRequested)
             {
+                var startTime = DateTime.UtcNow;
                 try
                 {
                     string marketTicker;
@@ -586,6 +647,12 @@ namespace BacklashBot.Services
                         break;
                     }
                     GenerateTickerFromOrderBook(marketTicker);
+                    var processingTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                    _tickerQueueProcessingTimes.AddOrUpdate(
+                        "ticker",
+                        _ => new List<long> { (long)processingTimeMs },
+                        (_, list) => { list.Add((long)processingTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
+                    );
                 }
                 catch (ObjectDisposedException)
                 {

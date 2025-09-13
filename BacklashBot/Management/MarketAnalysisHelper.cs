@@ -7,6 +7,7 @@ using BacklashBot.Services.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using TradingStrategies.Classification.Interfaces;
+using System.Diagnostics;
 
 namespace BacklashBot.Management
 {
@@ -32,10 +33,22 @@ namespace BacklashBot.Management
         /// <param name="logger">Logger for recording analysis operations and errors.</param>
         public MarketAnalysisHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper, ITradingSnapshotService snapshotService, IOptions<ExecutionConfig> executionConfig, ILogger<MarketAnalysisHelper> logger)
         {
+            ArgumentNullException.ThrowIfNull(scopeFactory);
+            ArgumentNullException.ThrowIfNull(snapshotPeriodHelper);
+            ArgumentNullException.ThrowIfNull(snapshotService);
+            ArgumentNullException.ThrowIfNull(executionConfig);
+            ArgumentNullException.ThrowIfNull(logger);
+
             _snapshotService = snapshotService;
             _scopeFactory = scopeFactory;
             _snapshotPeriodHelper = snapshotPeriodHelper;
-            _executionConfig = executionConfig.Value;
+            _executionConfig = executionConfig.Value ?? throw new ArgumentNullException(nameof(executionConfig.Value));
+
+            if (string.IsNullOrWhiteSpace(_executionConfig.HardDataStorageLocation))
+            {
+                throw new ArgumentException("HardDataStorageLocation must be specified in ExecutionConfig.", nameof(_executionConfig.HardDataStorageLocation));
+            }
+
             _logger = logger;
         }
 
@@ -48,6 +61,9 @@ namespace BacklashBot.Management
         public async Task GenerateSnapshotGroups()
         {
             _logger.LogInformation("Starting snapshot group generation process.");
+            var totalStopwatch = Stopwatch.StartNew();
+            int totalMarketsProcessed = 0;
+            long totalProcessingTime = 0;
 
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
@@ -70,7 +86,9 @@ namespace BacklashBot.Management
 
             foreach (string marketTicker in tickersToAnalyze)
             {
+                var stopwatch = Stopwatch.StartNew();
                 List<SnapshotDTO> rawSnapshots;
+                totalMarketsProcessed++;
 
                 try
                 {
@@ -80,15 +98,20 @@ namespace BacklashBot.Management
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "Failed to retrieve snapshots for market {MarketTicker}. Retrying after delay.", marketTicker);
+                    stopwatch.Stop();
+                    _logger.LogWarning("Initial failure for market {MarketTicker} in {ElapsedMs} ms.", marketTicker, stopwatch.ElapsedMilliseconds);
+                    stopwatch.Restart();
                     try
                     {
-                        await Task.Delay(5000);
+                        await Task.Delay(_executionConfig.RetryDelayMs);
                         rawSnapshots = await context.GetSnapshotsFiltered(marketTicker: marketTicker);
                         rawSnapshots = rawSnapshots.OrderBy(x => x.SnapshotDate).ToList();
                     }
                     catch (Exception retryEx)
                     {
                         _logger.LogError(retryEx, "Failed to retrieve snapshots for market {MarketTicker} after retry. Skipping.", marketTicker);
+                        stopwatch.Stop();
+                        _logger.LogWarning("Failed to process market {MarketTicker} in {ElapsedMs} ms.", marketTicker, stopwatch.ElapsedMilliseconds);
                         continue;
                     }
                 }
@@ -121,13 +144,18 @@ namespace BacklashBot.Management
                 string snapshotDirectory = Path.Combine(_executionConfig.HardDataStorageLocation, "Preprocessed", "SnapshotGroups");
 
                 // Process valid snapshots into snapshot groups
-                var validPeriods = _snapshotPeriodHelper.SplitIntoValidGroups(validSnapshots, snapshotDirectory);
+                var validPeriods = await _snapshotPeriodHelper.SplitIntoValidGroups(validSnapshots, snapshotDirectory);
 
                 await context.AddOrUpdateSnapshotGroups(validPeriods);
-                _logger.LogInformation("Successfully processed {Count} snapshot groups for market {MarketTicker}.", validPeriods.Count, marketTicker);
+                stopwatch.Stop();
+                totalProcessingTime += stopwatch.ElapsedMilliseconds;
+                _logger.LogInformation("Successfully processed {Count} snapshot groups for market {MarketTicker} in {ElapsedMs} ms.", validPeriods.Count, marketTicker, stopwatch.ElapsedMilliseconds);
             }
 
-            _logger.LogInformation("Completed snapshot group generation process.");
+            totalStopwatch.Stop();
+            double averageTimePerMarket = totalMarketsProcessed > 0 ? (double)totalProcessingTime / totalMarketsProcessed : 0;
+            _logger.LogInformation("Completed snapshot group generation process. Total markets processed: {TotalMarkets}, Total processing time: {TotalTime} ms, Average time per market: {AverageTime} ms, Overall duration: {OverallDuration} ms.",
+                totalMarketsProcessed, totalProcessingTime, averageTimePerMarket, totalStopwatch.ElapsedMilliseconds);
         }
     }
 }

@@ -1,6 +1,9 @@
 using BacklashDTOs;
 using TradingStrategies.Trading.Helpers;
 using static BacklashInterfaces.Enums.StrategyEnums;
+using System.Diagnostics;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -8,6 +11,7 @@ namespace TradingStrategies.Trading.Overseer
     /// Service responsible for determining and caching market types for trading snapshots.
     /// This class acts as a facade over the MarketTypeHelper, providing caching functionality
     /// to avoid redundant market type calculations for the same market snapshot.
+    /// Includes performance metrics collection, configurable cache expiration, and async operations.
     /// </summary>
     /// <remarks>
     /// The MarketTypeService is used in the trading simulation pipeline to classify market conditions
@@ -16,11 +20,13 @@ namespace TradingStrategies.Trading.Overseer
     /// performance during simulation runs where the same snapshot may be processed multiple times.
     ///
     /// Key responsibilities:
-    /// - Assign market types to MarketSnapshot instances
-    /// - Cache market type results to reduce computational overhead
+    /// - Assign market types to MarketSnapshot instances (sync and async)
+    /// - Cache market type results with configurable expiration to reduce computational overhead
+    /// - Collect performance metrics (cache hit rates, classification timing)
     /// - Convert string representations back to MarketType enums
     ///
     /// This service is instantiated once per simulation engine and reused throughout the simulation process.
+    /// Cache expiration can be configured via TradingConfig:MarketTypeCacheExpirationMinutes in appsettings.json.
     /// </remarks>
     public class MarketTypeService
     {
@@ -41,19 +47,47 @@ namespace TradingStrategies.Trading.Overseer
         /// is processed multiple times during simulation. The key combines ticker and timestamp
         /// to uniquely identify a market state.
         /// </remarks>
-        private readonly Dictionary<(string Ticker, DateTime Timestamp), MarketType> _marketTypeCache;
+        private readonly ConcurrentDictionary<string, (MarketType Type, DateTime CachedAt)> _marketTypeCache;
+
+        /// <summary>
+        /// Configuration for cache expiration.
+        /// </summary>
+        private readonly TimeSpan _cacheExpiration;
+
+        /// <summary>
+        /// Performance metrics: cache hits.
+        /// </summary>
+        private long _cacheHits;
+
+        /// <summary>
+        /// Performance metrics: cache misses.
+        /// </summary>
+        private long _cacheMisses;
+
+        /// <summary>
+        /// Performance metrics: total time spent on classification.
+        /// </summary>
+        private TimeSpan _totalClassificationTime;
+
+        /// <summary>
+        /// Performance metrics: number of classifications performed.
+        /// </summary>
+        private int _classificationCount;
 
         /// <summary>
         /// Initializes a new instance of the MarketTypeService class.
         /// </summary>
+        /// <param name="cacheExpiration">The time span after which cache entries expire. If null, defaults to 30 minutes.</param>
         /// <remarks>
-        /// Creates the MarketTypeHelper instance and initializes the cache dictionary.
+        /// Creates the MarketTypeHelper instance and initializes the cache with configurable expiration.
+        /// The cache expiration can be configured via TradingConfig:MarketTypeCacheExpirationMinutes in appsettings.json.
         /// This constructor sets up the service for immediate use in market type classification.
         /// </remarks>
-        public MarketTypeService()
+        public MarketTypeService(TimeSpan? cacheExpiration = null)
         {
             _marketTypeHelper = new MarketTypeHelper();
-            _marketTypeCache = new Dictionary<(string, DateTime), MarketType>();
+            _marketTypeCache = new ConcurrentDictionary<string, (MarketType Type, DateTime CachedAt)>();
+            _cacheExpiration = cacheExpiration ?? TimeSpan.FromMinutes(30);
         }
 
         /// <summary>
@@ -61,12 +95,13 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         /// <param name="snapshot">The market snapshot to classify and update with market type information.</param>
         /// <remarks>
-        /// This method first checks the cache for an existing classification result. If not found,
+        /// This method first checks the cache for an existing classification result. If not found or expired,
         /// it delegates to the MarketTypeHelper to determine the market type based on the snapshot's
         /// trading conditions. The result is then cached and assigned to the snapshot's MarketType property.
+        /// Performance metrics are collected including cache hit/miss rates and classification timing.
         ///
         /// If an exception occurs during classification (e.g., due to missing or invalid data),
-        /// the market type is set to "Unknown" as a fallback to ensure simulation continuity.
+        /// the market type is set to "Undefined" as a fallback to ensure simulation continuity.
         ///
         /// The method modifies the input snapshot in-place, setting its MarketType property to the
         /// string representation of the determined MarketType enum value.
@@ -81,13 +116,79 @@ namespace TradingStrategies.Trading.Overseer
                     return;
                 }
 
-                var key = (snapshot.MarketTicker, snapshot.Timestamp);
-                if (!_marketTypeCache.TryGetValue(key, out var cachedType))
+                var key = $"{snapshot.MarketTicker}_{snapshot.Timestamp.Ticks}";
+                if (_marketTypeCache.TryGetValue(key, out var cached))
                 {
-                    cachedType = _marketTypeHelper.GetMarketType(snapshot);
-                    _marketTypeCache[key] = cachedType;
+                    if (DateTime.Now - cached.CachedAt > _cacheExpiration)
+                    {
+                        _marketTypeCache.TryRemove(key, out _);
+                    }
+                    else
+                    {
+                        _cacheHits++;
+                        snapshot.MarketType = cached.Type.ToString();
+                        return;
+                    }
                 }
-                snapshot.MarketType = cachedType.ToString();
+
+                _cacheMisses++;
+                var stopwatch = Stopwatch.StartNew();
+                var type = _marketTypeHelper.GetMarketType(snapshot);
+                stopwatch.Stop();
+                _totalClassificationTime += stopwatch.Elapsed;
+                _classificationCount++;
+                _marketTypeCache[key] = (type, DateTime.Now);
+                snapshot.MarketType = type.ToString();
+            }
+            catch
+            {
+                snapshot.MarketType = MarketType.Undefined.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously assigns the appropriate market type to the provided market snapshot.
+        /// </summary>
+        /// <param name="snapshot">The market snapshot to classify and update with market type information.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// This async version of the method allows for better performance in high-throughput scenarios
+        /// by not blocking the calling thread during market type classification. It performs the same
+        /// caching, expiration, and metrics collection as the synchronous version.
+        /// </remarks>
+        public async Task AssignMarketTypeToSnapshotAsync(MarketSnapshot snapshot)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(snapshot.MarketTicker))
+                {
+                    snapshot.MarketType = MarketType.Undefined.ToString();
+                    return;
+                }
+
+                var key = $"{snapshot.MarketTicker}_{snapshot.Timestamp.Ticks}";
+                if (_marketTypeCache.TryGetValue(key, out var cached))
+                {
+                    if (DateTime.Now - cached.CachedAt > _cacheExpiration)
+                    {
+                        _marketTypeCache.TryRemove(key, out _);
+                    }
+                    else
+                    {
+                        _cacheHits++;
+                        snapshot.MarketType = cached.Type.ToString();
+                        return;
+                    }
+                }
+
+                _cacheMisses++;
+                var stopwatch = Stopwatch.StartNew();
+                var type = await Task.Run(() => _marketTypeHelper.GetMarketType(snapshot));
+                stopwatch.Stop();
+                _totalClassificationTime += stopwatch.Elapsed;
+                _classificationCount++;
+                _marketTypeCache[key] = (type, DateTime.Now);
+                snapshot.MarketType = type.ToString();
             }
             catch
             {
@@ -121,5 +222,23 @@ namespace TradingStrategies.Trading.Overseer
             }
             return currentMarketConditions;
         }
+
+        /// <summary>
+        /// Gets the cache hit and miss statistics.
+        /// </summary>
+        /// <returns>A tuple containing the number of cache hits and misses.</returns>
+        public (long Hits, long Misses) GetCacheStatistics() => (_cacheHits, _cacheMisses);
+
+        /// <summary>
+        /// Gets the average time spent on market type classification.
+        /// </summary>
+        /// <returns>The average classification time, or TimeSpan.Zero if no classifications have been performed.</returns>
+        public TimeSpan GetAverageClassificationTime() => _classificationCount > 0 ? _totalClassificationTime / _classificationCount : TimeSpan.Zero;
+
+        /// <summary>
+        /// Gets the total number of market type classifications performed.
+        /// </summary>
+        /// <returns>The classification count.</returns>
+        public int GetClassificationCount() => _classificationCount;
     }
 }

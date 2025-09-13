@@ -65,12 +65,21 @@ namespace KalshiBotOverseer
             // Register required services
             services.AddScoped<IKalshiAPIService, KalshiAPIService>();
             services.AddScoped<IWebSocketConnectionManager, WebSocketConnectionManager>();
-            services.AddScoped<IMessageProcessor, MessageProcessor>();
+            services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
+                sp.GetRequiredService<ILogger<MessageProcessor>>(),
+                sp.GetRequiredService<IWebSocketConnectionManager>(),
+                sp.GetRequiredService<ISubscriptionManager>(),
+                sp.GetRequiredService<IStatusTrackerService>(),
+                sp.GetRequiredService<ISqlDataService>(),
+                sp.GetRequiredService<IKalshiAPIService>(),
+                sp.GetRequiredService<IOptions<KalshiConfig>>().Value
+            ));
             services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
                 sp.GetRequiredService<ILogger<SubscriptionManager>>(),
                 sp.GetRequiredService<IWebSocketConnectionManager>(),
                 sp.GetRequiredService<IDataCache>(),
-                sp.GetRequiredService<IStatusTrackerService>()
+                sp.GetRequiredService<IStatusTrackerService>(),
+                sp.GetRequiredService<IConfiguration>()
             ));
             services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
                 sp.GetRequiredService<IOptions<KalshiConfig>>(),
@@ -179,6 +188,15 @@ namespace KalshiBotOverseer
             app.UseStaticFiles();
 
             app.UseCors("AllowAll");
+
+            // Add request/response logging middleware
+            app.Use(async (context, next) =>
+            {
+                var logger = context.RequestServices.GetRequiredService<ILogger<Startup>>();
+                logger.LogInformation("Request: {Method} {Path}", context.Request.Method, context.Request.Path);
+                await next();
+                logger.LogInformation("Response: {StatusCode}", context.Response.StatusCode);
+            });
 
             app.UseRouting();
 

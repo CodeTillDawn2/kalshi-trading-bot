@@ -249,16 +249,16 @@ namespace KalshiBotOverseer
                 {
                     try
                     {
-                        _brainService.UpdateCurrentMarketTickers(clientInfo.ClientName, checkInData.Markets ?? new List<string>());
+                        await _brainService.UpdateCurrentMarketTickersAsync(clientInfo.ClientName, checkInData.Markets ?? new List<string>());
 
                         // Update historical metrics
-                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "CpuUsage", checkInData.CurrentCpuUsage);
-                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "EventQueue", checkInData.EventQueueAvg);
-                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "TickerQueue", checkInData.TickerQueueAvg);
-                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "NotificationQueue", checkInData.NotificationQueueAvg);
-                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "OrderbookQueue", checkInData.OrderbookQueueAvg);
-                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "MarketCount", checkInData.Markets?.Count ?? 0);
-                        _brainService.UpdateMetricHistory(clientInfo.ClientName, "Error", checkInData.ErrorCount);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "CpuUsage", checkInData.CurrentCpuUsage);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "EventQueue", checkInData.EventQueueAvg);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "TickerQueue", checkInData.TickerQueueAvg);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "NotificationQueue", checkInData.NotificationQueueAvg);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "OrderbookQueue", checkInData.OrderbookQueueAvg);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "MarketCount", checkInData.Markets?.Count ?? 0);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "Error", checkInData.ErrorCount);
                     }
                     catch (Exception brainEx)
                     {

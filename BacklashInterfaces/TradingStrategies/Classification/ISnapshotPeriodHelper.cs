@@ -4,7 +4,7 @@ namespace TradingStrategies.Classification.Interfaces
 {
     public interface ISnapshotPeriodHelper
     {
-        List<SnapshotGroupDTO> SplitIntoValidGroups(List<SnapshotDTO> snapshots, string snapshotDirectory);
-        List<SnapshotDTO> LoadSnapshotGroup(string filePath);
+        Task<List<SnapshotGroupDTO>> SplitIntoValidGroups(List<SnapshotDTO> snapshots, string snapshotDirectory, IProgress<double>? progress = null);
+        Task<List<SnapshotDTO>> LoadSnapshotGroup(string filePath);
     }
 }

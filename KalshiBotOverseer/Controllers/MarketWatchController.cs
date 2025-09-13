@@ -2,10 +2,12 @@ using KalshiBotData.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using BacklashBot.KalshiAPI.Interfaces;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using KalshiBotOverseer.Services;
@@ -20,7 +22,7 @@ namespace KalshiBotOverseer.Controllers
     /// with database and external API services.
     /// </summary>
     [ApiController]
-    [Route("[controller]")]
+    [Route("v1/[controller]")]
     public class MarketWatchController : ControllerBase
     {
         private readonly IKalshiBotContext _context;
@@ -28,12 +30,13 @@ namespace KalshiBotOverseer.Controllers
         private readonly IKalshiAPIService _apiService;
         private readonly SnapshotService _snapshotService;
         private readonly ILogger<MarketWatchController> _logger;
+        private readonly IConfiguration _configuration;
         private const string MarketsCacheKey = "ActiveMarkets";
         private const string BrainInstancesCacheKey = "BrainInstances";
         private const string AllBrainInstancesCacheKey = "AllBrainInstances";
         private const string LogDataCacheKey = "LogData";
-        private readonly TimeSpan MarketsCacheDuration = TimeSpan.FromMinutes(15);
-        private readonly TimeSpan LogDataCacheDuration = TimeSpan.FromMinutes(5); // Shorter cache for log data
+        private readonly TimeSpan MarketsCacheDuration;
+        private readonly TimeSpan LogDataCacheDuration; // Shorter cache for log data
 
         /// <summary>
         /// Initializes a new instance of the MarketWatchController with required dependencies.
@@ -43,13 +46,18 @@ namespace KalshiBotOverseer.Controllers
         /// <param name="apiService">Service for interacting with Kalshi API.</param>
         /// <param name="snapshotService">Service for managing market snapshots.</param>
         /// <param name="logger">Logger for recording operational information and errors.</param>
-        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotService snapshotService, ILogger<MarketWatchController> logger)
+        /// <param name="configuration">Configuration for cache durations and other settings.</param>
+        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotService snapshotService, ILogger<MarketWatchController> logger, IConfiguration configuration)
         {
             _context = context;
             _cache = cache;
             _apiService = apiService;
             _snapshotService = snapshotService;
             _logger = logger;
+            _configuration = configuration;
+
+            MarketsCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("CacheConfig:MarketsCacheDurationMinutes", 15));
+            LogDataCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("CacheConfig:LogDataCacheDurationMinutes", 5));
         }
 
         /// <summary>
@@ -72,6 +80,7 @@ namespace KalshiBotOverseer.Controllers
         [HttpGet("data")]
         public async Task<IActionResult> GetMarketWatchData()
         {
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 // Get cached active markets or fetch fresh data
@@ -140,12 +149,14 @@ namespace KalshiBotOverseer.Controllers
                     };
                 }).ToList();
 
+                stopwatch.Stop();
+                _logger.LogInformation("GetMarketWatchData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(marketWatchData);
             }
             catch (Exception ex)
             {
-                // Log the error and return a proper error response
-                _logger.LogError(ex, "Failed to retrieve market watch data");
+                stopwatch.Stop();
+                _logger.LogError(ex, "Failed to retrieve market watch data in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return StatusCode(500, new { error = "Failed to retrieve market watch data", details = ex.Message });
             }
         }
@@ -160,6 +171,7 @@ namespace KalshiBotOverseer.Controllers
         [HttpGet("brainlocks")]
         public async Task<IActionResult> GetBrainLocksData()
         {
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 // Get cached active markets
@@ -287,12 +299,14 @@ namespace KalshiBotOverseer.Controllers
                 .ThenBy(bl => bl.BrainInstanceName)
                 .ToList();
 
+                stopwatch.Stop();
+                _logger.LogInformation("GetBrainLocksData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(brainLockGroups);
             }
             catch (Exception ex)
             {
-                // Log the error and return a proper error response
-                _logger.LogError(ex, "Failed to retrieve brain locks data");
+                stopwatch.Stop();
+                _logger.LogError(ex, "Failed to retrieve brain locks data in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return StatusCode(500, new { error = "Failed to retrieve brain locks data", details = ex.Message });
             }
         }
@@ -307,6 +321,7 @@ namespace KalshiBotOverseer.Controllers
         [HttpGet("positions")]
         public async Task<IActionResult> GetPositionsData(bool currentOnly = true)
         {
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 // Get market positions with optional filtering
@@ -334,12 +349,14 @@ namespace KalshiBotOverseer.Controllers
                     LastModified = p.LastModified
                 }).ToList();
 
+                stopwatch.Stop();
+                _logger.LogInformation("GetPositionsData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(positionsData);
             }
             catch (Exception ex)
             {
-                // Log the error and return a proper error response
-                _logger.LogError(ex, "Failed to retrieve positions data");
+                stopwatch.Stop();
+                _logger.LogError(ex, "Failed to retrieve positions data in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return StatusCode(500, new { error = "Failed to retrieve positions data", details = ex.Message });
             }
         }
@@ -353,6 +370,7 @@ namespace KalshiBotOverseer.Controllers
         [HttpGet("orders")]
         public async Task<IActionResult> GetOrdersData()
         {
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 // Get orders data
@@ -376,12 +394,14 @@ namespace KalshiBotOverseer.Controllers
                     UpdatedAt = o.LastUpdateTimeUTC
                 }).ToList();
 
+                stopwatch.Stop();
+                _logger.LogInformation("GetOrdersData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(ordersData);
             }
             catch (Exception ex)
             {
-                // Log the error and return a proper error response
-                _logger.LogError(ex, "Failed to retrieve orders data");
+                stopwatch.Stop();
+                _logger.LogError(ex, "Failed to retrieve orders data in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return StatusCode(500, new { error = "Failed to retrieve orders data", details = ex.Message });
             }
         }
@@ -395,6 +415,7 @@ namespace KalshiBotOverseer.Controllers
         [HttpGet("account")]
         public async Task<IActionResult> GetAccountData()
         {
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 // Get balance from Kalshi API
@@ -402,6 +423,8 @@ namespace KalshiBotOverseer.Controllers
                 var balanceInDollars = (double)balance / 100.0;
 
                 // Portfolio value calculation is not yet implemented
+                stopwatch.Stop();
+                _logger.LogInformation("GetAccountData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(new
                 {
                     balance = balanceInDollars,
@@ -410,8 +433,8 @@ namespace KalshiBotOverseer.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error and return a proper error response
-                _logger.LogError(ex, "Failed to retrieve account data");
+                stopwatch.Stop();
+                _logger.LogError(ex, "Failed to retrieve account data in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return StatusCode(500, new { error = "Failed to retrieve account data", details = ex.Message });
             }
         }
@@ -426,6 +449,14 @@ namespace KalshiBotOverseer.Controllers
         [HttpPost("log")]
         public async Task<IActionResult> LogEvent([FromBody] object request)
         {
+            var stopwatch = Stopwatch.StartNew();
+            if (request == null)
+            {
+                stopwatch.Stop();
+                _logger.LogWarning("LogEvent called with null request in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
+                return BadRequest("Request body is required");
+            }
+
             try
             {
                 // Log the event using structured logging
@@ -434,11 +465,14 @@ namespace KalshiBotOverseer.Controllers
                 // Optionally, you could also insert into the LogEntry table if needed
                 // await _context.InsertLogEntry(new LogEntry { ... });
 
+                stopwatch.Stop();
+                _logger.LogInformation("LogEvent completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(new { status = "logged" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to log client event");
+                stopwatch.Stop();
+                _logger.LogError(ex, "Failed to log client event in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return StatusCode(500, new { error = "Failed to log event", details = ex.Message });
             }
         }
@@ -452,14 +486,18 @@ namespace KalshiBotOverseer.Controllers
         [HttpGet("snapshots")]
         public async Task<IActionResult> GetSnapshotsData()
         {
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 var snapshotsData = await _snapshotService.GetSnapshotGroupsDataAsync();
+                stopwatch.Stop();
+                _logger.LogInformation("GetSnapshotsData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(snapshotsData);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to retrieve snapshots data");
+                stopwatch.Stop();
+                _logger.LogError(ex, "Failed to retrieve snapshots data in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return StatusCode(500, new { error = "Failed to retrieve snapshots data", details = ex.Message });
             }
         }
@@ -473,6 +511,7 @@ namespace KalshiBotOverseer.Controllers
         [HttpGet("brains")]
         public async Task<IActionResult> GetBrainsData()
         {
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 // Get all brain instances from database
@@ -536,11 +575,14 @@ namespace KalshiBotOverseer.Controllers
                     });
                 }
 
+                stopwatch.Stop();
+                _logger.LogInformation("GetBrainsData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(brainData);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to retrieve brains data");
+                stopwatch.Stop();
+                _logger.LogError(ex, "Failed to retrieve brains data in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return StatusCode(500, new { error = "Failed to retrieve brains data", details = ex.Message });
             }
         }

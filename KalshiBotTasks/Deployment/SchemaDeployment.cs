@@ -36,7 +36,7 @@ namespace KalshiBotTasks
         private KalshiBotContext _context;
         private SchemaDeploymentObj _schemaDeployment;
         private IConfigurationRoot _configuration;
-        private string basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
+        private string basePath;
 
         /// <summary>
         /// Initializes the test environment by setting up dependency injection and database context.
@@ -44,7 +44,10 @@ namespace KalshiBotTasks
         /// </summary>
         /// <remarks>
         /// This setup method:
-        /// - Builds configuration from JSON files in the BacklashBot directory
+        /// - Builds initial configuration to read deployment settings (BasePath, JsonWriteIndented)
+        /// - Reads configured base path from Deployment:BasePath with fallback to default
+        /// - Validates base path configuration to prevent null reference exceptions
+        /// - Builds final configuration from JSON files in the configured BacklashBot directory
         /// - Registers the database context with SQL Server connection
         /// - Adds logging services for test output
         /// - Registers the SchemaDeploymentObj service for testing
@@ -58,7 +61,24 @@ namespace KalshiBotTasks
         [SetUp]
         public void Setup()
         {
-            // Load configuration
+            // Load configuration with default basePath first to read Deployment config
+            string tempBasePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
+            var tempConfig = new ConfigurationBuilder()
+                .SetBasePath(tempBasePath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
+                .Build();
+
+            // Read configured basePath
+            basePath = tempConfig["Deployment:BasePath"] ?? tempBasePath;
+
+            // Validate basePath
+            if (string.IsNullOrWhiteSpace(basePath))
+            {
+                throw new InvalidOperationException("BasePath configuration is required and cannot be null or empty.");
+            }
+
+            // Load configuration with configured basePath
             _configuration = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -149,11 +169,13 @@ namespace KalshiBotTasks
         /// - Generates JSON schemas from .NET types using NJsonSchema
         /// - Compares schemas to determine if new versions need deployment
         /// - Persists schema versions to the database with auto-incremented version numbers
-        /// - Updates application configuration with the latest schema version
+        /// - Updates application configuration with the latest schema version using configurable paths
+        /// - Uses configurable JSON serialization options for configuration file updates
         /// - Provides logging for deployment operations and error conditions
         ///
         /// The service ensures that schema changes are tracked and versioned properly
         /// for data compatibility and migration purposes in the trading system.
+        /// Configuration options include base paths and JSON formatting settings.
         /// </remarks>
         public class SchemaDeploymentObj
         {
@@ -251,13 +273,15 @@ namespace KalshiBotTasks
             /// <param name="newVersion">The new schema version number to write to the configuration file.</param>
             /// <remarks>
             /// This method performs the following operations:
-            /// - Constructs the path to appsettings.local.json in the BacklashBot directory
+            /// - Reads the configured base path from Deployment:BasePath configuration with fallback
+            /// - Constructs the path to appsettings.local.json in the configured BacklashBot directory
             /// - Validates that the file exists, logging a warning if not found
             /// - Reads the JSON content from the file
             /// - Parses the JSON into a JsonNode for manipulation
             /// - Navigates to or creates the "Snapshots" section in the JSON
             /// - Updates the "SnapshotSchemaVersion" property with the new version
-            /// - Serializes the updated JSON back to the file with proper formatting
+            /// - Reads configured JSON serialization options from Deployment:JsonWriteIndented
+            /// - Serializes the updated JSON back to the file with configured formatting
             /// - Logs successful update with the new version number
             ///
             /// If the file cannot be parsed or updated, the method logs an error
@@ -268,7 +292,8 @@ namespace KalshiBotTasks
             {
                 try
                 {
-                    string basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
+                    // Read configured basePath from configuration
+                    string basePath = _configuration["Deployment:BasePath"] ?? Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
                     string fullAppSettingsPath = Path.Combine(basePath, "appsettings.local.json");
 
                     var filePath = fullAppSettingsPath;
@@ -301,8 +326,9 @@ namespace KalshiBotTasks
                     // Update SnapshotSchemaVersion
                     snapshotsNode["SnapshotSchemaVersion"] = newVersion;
 
-                    // Write updated JSON back to file
-                    var options = new JsonSerializerOptions { WriteIndented = true };
+                    // Read configured JSON serialization options
+                    var writeIndented = _configuration.GetValue<bool>("Deployment:JsonWriteIndented", true);
+                    var options = new JsonSerializerOptions { WriteIndented = writeIndented };
                     var updatedJson = jsonNode.ToJsonString(options);
                     await File.WriteAllTextAsync(filePath, updatedJson);
 

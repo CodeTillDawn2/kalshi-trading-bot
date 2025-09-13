@@ -7,7 +7,8 @@ namespace KalshiBotTests
     /// This static class serves as a comprehensive test data repository, containing synthetic and real-world market data
     /// scenarios for testing indicators such as RSI, MACD, EMA, Bollinger Bands, ATR, VWAP, Stochastic Oscillator, and OBV.
     /// Each scenario includes candlestick data and expected calculation results to ensure mathematical accuracy
-    /// of trading algorithms used in the bot's strategy engine.
+    /// of trading algorithms used in the bot's strategy engine. Also provides parameterized scenario generation
+    /// for custom market conditions including trending, ranging, and volatile markets.
     /// </summary>
     /// <remarks>
     /// The scenarios are designed to cover various market conditions including trending, ranging, and volatile periods.
@@ -82,6 +83,34 @@ namespace KalshiBotTests
             /// OBV accumulates volume based on price direction to identify buying/selling pressure.
             /// </summary>
             public long? ExpectedOBV { get; set; }
+
+            /// <summary>
+            /// Validates the integrity of the test scenario data to prevent invalid test setups.
+            /// </summary>
+            /// <exception cref="ArgumentException">Thrown when scenario data is invalid.</exception>
+            public void Validate()
+            {
+                if (string.IsNullOrWhiteSpace(Name))
+                    throw new ArgumentException("Scenario name cannot be null or empty.", nameof(Name));
+
+                if (Candlesticks == null || !Candlesticks.Any())
+                    throw new ArgumentException("Candlesticks list cannot be null or empty.", nameof(Candlesticks));
+
+                foreach (var candle in Candlesticks)
+                {
+                    if (candle == null)
+                        throw new ArgumentException("Candlestick cannot be null.", nameof(Candlesticks));
+
+                    if (candle.MidClose <= 0)
+                        throw new ArgumentException("MidClose must be positive.", nameof(candle.MidClose));
+
+                    if (candle.MidHigh < candle.MidLow)
+                        throw new ArgumentException("MidHigh cannot be less than MidLow.", nameof(candle.MidHigh));
+
+                    if (candle.Volume < 0)
+                        throw new ArgumentException("Volume cannot be negative.", nameof(candle.Volume));
+                }
+            }
         }
 
         /// <summary>
@@ -95,6 +124,9 @@ namespace KalshiBotTests
         /// The scenarios include:
         /// - RSI_SeekingAlpha: Synthetic data with alternating price movements
         /// - RSI_InvestExcel: Real AAPL price data for practical validation
+        /// - RSI_ExtremeVolatility: Extreme price swings testing RSI in volatile conditions
+        /// - RSI_TrendingUp: Steady upward trend testing RSI momentum signals
+        /// - RSI_Ranging: Oscillating prices testing RSI in sideways markets
         /// </remarks>
         public static List<TestScenario> GetRSIScenarios()
         {
@@ -134,6 +166,66 @@ namespace KalshiBotTests
                 ExpectedRSI = 87.62
             });
 
+            // Extreme volatility scenario
+            var extremeVolatilityPrices = new double[] { 100, 120, 80, 140, 60, 160, 40, 180, 20, 200, 10, 190, 30, 170 };
+            var extremeVolatilityCandlesticks = extremeVolatilityPrices.Select((price, i) => new PseudoCandlestick
+            {
+                Timestamp = baseTimestamp.AddHours(i),
+                MidClose = price,
+                MidHigh = price + 10,
+                MidLow = price - 10,
+                Volume = 1000,
+                IsFromCandlestick = true
+            }).ToList();
+            scenarios.Add(new TestScenario
+            {
+                Name = "RSI_ExtremeVolatility",
+                Candlesticks = extremeVolatilityCandlesticks,
+                ExpectedRSI = 95.24 // High RSI due to strong upward momentum
+            });
+
+            // Trending market scenario (uptrend)
+            var trendingPrices = new double[] { 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126 };
+            var trendingCandlesticks = trendingPrices.Select((price, i) => new PseudoCandlestick
+            {
+                Timestamp = baseTimestamp.AddHours(i),
+                MidClose = price,
+                MidHigh = price + 1,
+                MidLow = price - 1,
+                Volume = 1000,
+                IsFromCandlestick = true
+            }).ToList();
+            scenarios.Add(new TestScenario
+            {
+                Name = "RSI_TrendingUp",
+                Candlesticks = trendingCandlesticks,
+                ExpectedRSI = 100 // Strong uptrend
+            });
+
+            // Ranging market scenario
+            var rangingPrices = new double[] { 100, 101, 99, 102, 98, 103, 97, 104, 96, 105, 95, 106, 94, 107 };
+            var rangingCandlesticks = rangingPrices.Select((price, i) => new PseudoCandlestick
+            {
+                Timestamp = baseTimestamp.AddHours(i),
+                MidClose = price,
+                MidHigh = price + 2,
+                MidLow = price - 2,
+                Volume = 1000,
+                IsFromCandlestick = true
+            }).ToList();
+            scenarios.Add(new TestScenario
+            {
+                Name = "RSI_Ranging",
+                Candlesticks = rangingCandlesticks,
+                ExpectedRSI = 52.38 // Neutral RSI in ranging market
+            });
+
+            // Validate all scenarios
+            foreach (var scenario in scenarios)
+            {
+                scenario.Validate();
+            }
+
             return scenarios;
         }
 
@@ -170,6 +262,12 @@ namespace KalshiBotTests
                 ExpectedMACD = (1.718136, -0.250365, 1.968501)
             });
 
+            // Validate all scenarios
+            foreach (var scenario in scenarios)
+            {
+                scenario.Validate();
+            }
+
             return scenarios;
         }
 
@@ -184,6 +282,9 @@ namespace KalshiBotTests
         /// The scenarios include:
         /// - EMA_Dummies: Synthetic Intel price data for basic EMA validation
         /// - EMA_InvestExcel: Real AAPL price data for practical EMA testing
+        /// - EMA_ExtremeVolatility: Extreme price swings testing EMA responsiveness
+        /// - EMA_TrendingUp: Steady upward trend testing EMA trend following
+        /// - EMA_Ranging: Oscillating prices testing EMA stability in sideways markets
         /// </remarks>
         public static List<TestScenario> GetEMAScenarios()
         {
@@ -223,6 +324,66 @@ namespace KalshiBotTests
                 Candlesticks = emaAaplCandlesticks,
                 ExpectedEMA = 454.61
             });
+
+            // Extreme volatility scenario for EMA
+            var emaExtremeVolatilityPrices = new double[] { 100, 120, 80, 140, 60 };
+            var emaExtremeVolatilityCandlesticks = emaExtremeVolatilityPrices.Select((price, i) => new PseudoCandlestick
+            {
+                Timestamp = baseTimestamp.AddHours(i),
+                MidClose = price,
+                MidHigh = price + 5,
+                MidLow = price - 5,
+                Volume = 1000,
+                IsFromCandlestick = true
+            }).ToList();
+            scenarios.Add(new TestScenario
+            {
+                Name = "EMA_ExtremeVolatility",
+                Candlesticks = emaExtremeVolatilityCandlesticks,
+                ExpectedEMA = 100.0 // EMA reacts to volatility
+            });
+
+            // Trending market scenario for EMA
+            var emaTrendingPrices = new double[] { 100, 102, 104, 106, 108 };
+            var emaTrendingCandlesticks = emaTrendingPrices.Select((price, i) => new PseudoCandlestick
+            {
+                Timestamp = baseTimestamp.AddHours(i),
+                MidClose = price,
+                MidHigh = price + 1,
+                MidLow = price - 1,
+                Volume = 1000,
+                IsFromCandlestick = true
+            }).ToList();
+            scenarios.Add(new TestScenario
+            {
+                Name = "EMA_TrendingUp",
+                Candlesticks = emaTrendingCandlesticks,
+                ExpectedEMA = 104.0 // EMA follows uptrend
+            });
+
+            // Ranging market scenario for EMA
+            var emaRangingPrices = new double[] { 100, 101, 99, 102, 98 };
+            var emaRangingCandlesticks = emaRangingPrices.Select((price, i) => new PseudoCandlestick
+            {
+                Timestamp = baseTimestamp.AddHours(i),
+                MidClose = price,
+                MidHigh = price + 2,
+                MidLow = price - 2,
+                Volume = 1000,
+                IsFromCandlestick = true
+            }).ToList();
+            scenarios.Add(new TestScenario
+            {
+                Name = "EMA_Ranging",
+                Candlesticks = emaRangingCandlesticks,
+                ExpectedEMA = 100.0 // EMA remains stable in ranging market
+            });
+
+            // Validate all scenarios
+            foreach (var scenario in scenarios)
+            {
+                scenario.Validate();
+            }
 
             return scenarios;
         }
@@ -277,6 +438,12 @@ namespace KalshiBotTests
                 Candlesticks = bollingerAaplCandlesticks,
                 ExpectedBollingerBands = (445.0, 455.0, 435.0) // Approximate, based on SMA and volatility
             });
+
+            // Validate all scenarios
+            foreach (var scenario in scenarios)
+            {
+                scenario.Validate();
+            }
 
             return scenarios;
         }
@@ -344,6 +511,12 @@ namespace KalshiBotTests
                 Candlesticks = atrAaplCandlesticks,
                 ExpectedATR = 2.45
             });
+
+            // Validate all scenarios
+            foreach (var scenario in scenarios)
+            {
+                scenario.Validate();
+            }
 
             return scenarios;
         }
@@ -456,6 +629,11 @@ namespace KalshiBotTests
                 ExpectedVWAP = 99.94
             });
 
+            // Validate all scenarios
+            foreach (var scenario in scenarios)
+            {
+                scenario.Validate();
+            }
 
             return scenarios;
         }
@@ -591,6 +769,11 @@ namespace KalshiBotTests
                 ExpectedStochastic = (77.78, 61.08)
             });
 
+            // Validate all scenarios
+            foreach (var scenario in scenarios)
+            {
+                scenario.Validate();
+            }
 
             return scenarios;
         }
@@ -663,8 +846,83 @@ namespace KalshiBotTests
                 ExpectedOBV = 15400
             });
 
+            // Validate all scenarios
+            foreach (var scenario in scenarios)
+            {
+                scenario.Validate();
+            }
+
             return scenarios;
+
         }
 
+        /// <summary>
+        /// Generates a parameterized test scenario based on specified market conditions.
+        /// This method supports different market types: "trending", "ranging", "volatile".
+        /// </summary>
+        /// <param name="marketType">The type of market condition ("trending", "ranging", "volatile").</param>
+        /// <param name="periods">Number of periods to generate (default 14).</param>
+        /// <param name="basePrice">Starting price (default 100).</param>
+        /// <param name="volatility">Volatility factor (default 1.0).</param>
+        /// <param name="trendStrength">Trend strength for trending markets (default 0.5).</param>
+        /// <returns>A custom TestScenario with generated data.</returns>
+        public static TestScenario GenerateCustomScenario(string marketType, int periods = 14, double basePrice = 100.0, double volatility = 1.0, double trendStrength = 0.5)
+        {
+            if (string.IsNullOrWhiteSpace(marketType))
+                throw new ArgumentException("Market type cannot be null or empty.", nameof(marketType));
+
+            if (periods < 1)
+                throw new ArgumentException("Periods must be at least 1.", nameof(periods));
+
+            if (basePrice <= 0)
+                throw new ArgumentException("Base price must be positive.", nameof(basePrice));
+
+            var baseTimestamp = DateTime.Parse("2025-04-22 16:00:00");
+            var prices = new List<double>();
+            var random = new Random(42); // Fixed seed for reproducible results
+
+            for (int i = 0; i < periods; i++)
+            {
+                double price;
+                switch (marketType.ToLower())
+                {
+                    case "trending":
+                        // Linear trend with some noise
+                        price = basePrice + (i * trendStrength) + (random.NextDouble() - 0.5) * volatility * 2;
+                        break;
+                    case "ranging":
+                        // Oscillating within a range
+                        price = basePrice + Math.Sin(i * 0.5) * volatility * 5 + (random.NextDouble() - 0.5) * volatility;
+                        break;
+                    case "volatile":
+                        // High volatility with random walks
+                        price = basePrice + (random.NextDouble() - 0.5) * volatility * 10;
+                        if (i > 0) price += prices[i - 1] * 0.1; // Some momentum
+                        break;
+                    default:
+                        throw new ArgumentException($"Unsupported market type: {marketType}. Use 'trending', 'ranging', or 'volatile'.", nameof(marketType));
+                }
+                prices.Add(Math.Max(price, 0.01)); // Ensure positive price
+            }
+
+            var candlesticks = prices.Select((price, i) => new PseudoCandlestick
+            {
+                Timestamp = baseTimestamp.AddHours(i),
+                MidClose = price,
+                MidHigh = price + volatility,
+                MidLow = Math.Max(price - volatility, 0.01),
+                Volume = 1000 + random.Next(1000),
+                IsFromCandlestick = true
+            }).ToList();
+
+            var scenario = new TestScenario
+            {
+                Name = $"{marketType}_{periods}periods_{basePrice}base_{volatility}vol",
+                Candlesticks = candlesticks
+            };
+
+            scenario.Validate();
+            return scenario;
+        }
     }
 }

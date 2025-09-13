@@ -22,5 +22,23 @@ namespace TradingStrategies.Configuration
         /// Used by TradingSnapshotService for schema validation and snapshot upgrading during loading.
         /// </summary>
         public int SnapshotSchemaVersion { get; set; }
+
+        /// <summary>
+        /// The maximum time gap in minutes between snapshots that allows them to be considered
+        /// part of the same continuous period without requiring price stability checks.
+        /// </summary>
+        public double SmallGapMinutes { get; set; } = 10.0;
+
+        /// <summary>
+        /// The maximum time gap in hours for active market periods. Gaps exceeding this threshold
+        /// will cause a period break regardless of price stability.
+        /// </summary>
+        public double MaxActiveGapHours { get; set; } = 1.0;
+
+        /// <summary>
+        /// The price change threshold in points for determining significant price movements.
+        /// Used to break snapshot groups when price changes exceed this threshold.
+        /// </summary>
+        public int PriceChangeThreshold { get; set; } = 3;
     }
 }

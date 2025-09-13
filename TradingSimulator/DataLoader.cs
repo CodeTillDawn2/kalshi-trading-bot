@@ -4,16 +4,20 @@ using TradingStrategies;
 using System.Text.RegularExpressions;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
+using BacklashDTOs.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace TradingSimulator
 {
     public class DataLoader
     {
         private readonly ITradingSnapshotService _snapshotService;
+        private readonly IOptions<SimulatorConfig> _simulatorOptions;
 
-        public DataLoader(ITradingSnapshotService snapshotService)
+        public DataLoader(ITradingSnapshotService snapshotService, IOptions<SimulatorConfig> simulatorOptions)
         {
             _snapshotService = snapshotService;
+            _simulatorOptions = simulatorOptions;
         }
 
         public async Task<List<SnapshotGroupDTO>> GetFilteredSnapshotGroupsAsync(
@@ -92,6 +96,12 @@ namespace TradingSimulator
                     .OrderBy(ms => ms.Timestamp)
                     .ToList();
 
+                // Validate snapshots if enabled
+                if (_simulatorOptions.Value.EnableSnapshotValidation && marketSnapshots.Any())
+                {
+                    marketSnapshots = ValidateSnapshots(marketSnapshots, market);
+                }
+
                 if (marketSnapshots.Any())
                 {
                     dataset[market] = marketSnapshots;
@@ -99,6 +109,48 @@ namespace TradingSimulator
             }
 
             return dataset;
+        }
+
+        private List<MarketSnapshot> ValidateSnapshots(List<MarketSnapshot> snapshots, string marketName)
+        {
+            var validSnapshots = new List<MarketSnapshot>();
+            int minCount = _simulatorOptions.Value.MinSnapshotCountForValidation;
+
+            if (snapshots.Count < minCount)
+            {
+                // Log warning but still return snapshots
+                Console.WriteLine($"Warning: Market {marketName} has only {snapshots.Count} snapshots, minimum required is {minCount}. Proceeding with available data.");
+                return snapshots;
+            }
+
+            foreach (var snapshot in snapshots)
+            {
+                if (IsValidSnapshot(snapshot))
+                {
+                    validSnapshots.Add(snapshot);
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: Invalid snapshot detected for market {marketName} at {snapshot.Timestamp}. Skipping.");
+                }
+            }
+
+            return validSnapshots;
+        }
+
+        private bool IsValidSnapshot(MarketSnapshot snapshot)
+        {
+            // Basic validation checks
+            if (snapshot == null) return false;
+            if (string.IsNullOrWhiteSpace(snapshot.MarketTicker)) return false;
+            if (snapshot.Timestamp == DateTime.MinValue || snapshot.Timestamp > DateTime.UtcNow.AddMinutes(1)) return false;
+            if (snapshot.BestYesBid < 0 || snapshot.BestNoBid < 0) return false;
+            if (snapshot.SnapshotSchemaVersion < 1) return false;
+
+            // Additional integrity checks
+            if (snapshot.OrderbookData == null || !snapshot.OrderbookData.Any()) return false;
+
+            return true;
         }
     }
 }

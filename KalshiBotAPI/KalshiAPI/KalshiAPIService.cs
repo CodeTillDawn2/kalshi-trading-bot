@@ -28,8 +28,9 @@ namespace KalshiBotAPI.KalshiAPI
     /// This service handles authentication, market data retrieval, order management, position tracking,
     /// and various other API operations required for automated trading on the Kalshi platform.
     /// It implements the IKalshiAPIService interface and uses RSA-based authentication with API keys.
-    /// The service maintains execution time tracking for performance monitoring and includes
-    /// robust error handling with cancellation token support throughout all operations.
+    /// The service maintains execution time tracking for performance monitoring, supports parallel processing
+    /// for high-volume data operations, and includes configurable parameters for lookback periods and calculations.
+    /// Robust error handling with cancellation token support throughout all operations.
     /// </summary>
     public class KalshiAPIService : IKalshiAPIService
     {
@@ -44,13 +45,9 @@ namespace KalshiBotAPI.KalshiAPI
         private IStatusTrackerService _statusTrackerService;
 
         private readonly ConcurrentDictionary<string, ConcurrentBag<long>> _methodExecutionDurations = new();
+        private readonly ConcurrentDictionary<string, ConcurrentBag<long>> _calculationExecutionDurations = new();
 
-        private readonly Dictionary<string, (int Minutes, int DbType, int MaxDays, int CushionSeconds)> _intervals = new()
-        {
-            ["minute"] = (1, 1, 3, 60),
-            ["hour"] = (60, 2, 7, 3600),
-            ["day"] = (1440, 3, 15, 86400)
-        };
+        private readonly Dictionary<string, (int Minutes, int DbType, int MaxDays, int CushionSeconds)> _intervals;
 
         public KalshiAPIService(
             ILogger<IKalshiAPIService> logger,
@@ -77,6 +74,14 @@ namespace KalshiBotAPI.KalshiAPI
             _privateKey = RSA.Create();
             _privateKey.ImportFromPem(File.ReadAllText(keyFile));
             _scopeFactory = scopeFactory;
+
+            // Initialize intervals from configuration
+            _intervals = new Dictionary<string, (int Minutes, int DbType, int MaxDays, int CushionSeconds)>
+            {
+                ["minute"] = (1, 1, _kalshiConfig.CandlestickLookback.Minute, _kalshiConfig.CandlestickCushion.Minute),
+                ["hour"] = (60, 2, _kalshiConfig.CandlestickLookback.Hour, _kalshiConfig.CandlestickCushion.Hour),
+                ["day"] = (1440, 3, _kalshiConfig.CandlestickLookback.Day, _kalshiConfig.CandlestickCushion.Day)
+            };
         }
 
         /// <summary>
@@ -204,65 +209,72 @@ namespace KalshiBotAPI.KalshiAPI
 
                         try
                         {
-                            List<MarketDTO> marketsToUpdate = new List<MarketDTO>();
+                            var marketsToUpdate = new ConcurrentBag<MarketDTO>();
 
-                            foreach (var apiMarket in responseData?.Markets)
+                            await Parallel.ForEachAsync(responseData?.Markets ?? new List<KalshiMarket>(), new ParallelOptions { CancellationToken = _statusTrackerService.GetCancellationToken() }, async (apiMarket, cancellationToken) =>
                             {
-                                _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
-
-                                foundTickers.Add(apiMarket.Ticker);
-
-                                var market = new MarketDTO
+                                var calcStopwatch = Stopwatch.StartNew();
+                                try
                                 {
-                                    market_ticker = apiMarket.Ticker,
-                                    event_ticker = apiMarket.EventTicker,
-                                    market_type = apiMarket.MarketType,
-                                    title = apiMarket.Title,
-                                    subtitle = apiMarket.Subtitle,
-                                    yes_sub_title = apiMarket.YesSubTitle,
-                                    no_sub_title = apiMarket.NoSubTitle,
-                                    open_time = apiMarket.OpenTime,
-                                    close_time = apiMarket.CloseTime,
-                                    expected_expiration_time = apiMarket.ExpectedExpirationTime,
-                                    expiration_time = apiMarket.ExpirationTime,
-                                    latest_expiration_time = apiMarket.LatestExpirationTime,
-                                    settlement_timer_seconds = apiMarket.SettlementTimerSeconds,
-                                    status = apiMarket.Status,
-                                    response_price_units = apiMarket.ResponsePriceUnits,
-                                    notional_value = apiMarket.NotionalValue,
-                                    tick_size = apiMarket.TickSize,
-                                    yes_bid = apiMarket.YesBid,
-                                    yes_ask = apiMarket.YesAsk,
-                                    no_bid = apiMarket.NoBid,
-                                    no_ask = apiMarket.NoAsk,
-                                    last_price = apiMarket.LastPrice,
-                                    previous_yes_bid = apiMarket.PreviousYesBid,
-                                    previous_yes_ask = apiMarket.PreviousYesAsk,
-                                    previous_price = apiMarket.PreviousPrice,
-                                    volume = apiMarket.Volume,
-                                    volume_24h = apiMarket.Volume24h,
-                                    liquidity = apiMarket.Liquidity,
-                                    open_interest = apiMarket.OpenInterest,
-                                    result = apiMarket.Result,
-                                    can_close_early = apiMarket.CanCloseEarly,
-                                    expiration_value = apiMarket.ExpirationValue,
-                                    risk_limit_cents = apiMarket.RiskLimitCents,
-                                    strike_type = apiMarket.StrikeType,
-                                    floor_strike = (apiMarket.StrikeType == "" || apiMarket.FloorStrike == null) ? 0 : apiMarket.FloorStrike,
-                                    rules_primary = apiMarket.RulesPrimary,
-                                    rules_secondary = apiMarket.RulesSecondary,
-                                    APILastFetchedDate = DateTime.Now,
-                                    LastModifiedDate = DateTime.Now,
-                                    category = ""
-                                };
+                                    foundTickers.Add(apiMarket.Ticker);
 
-                                marketsToUpdate.Add(market);
-                                processedCount++;
-                            }
+                                    var market = new MarketDTO
+                                    {
+                                        market_ticker = apiMarket.Ticker,
+                                        event_ticker = apiMarket.EventTicker,
+                                        market_type = apiMarket.MarketType,
+                                        title = apiMarket.Title,
+                                        subtitle = apiMarket.Subtitle,
+                                        yes_sub_title = apiMarket.YesSubTitle,
+                                        no_sub_title = apiMarket.NoSubTitle,
+                                        open_time = apiMarket.OpenTime,
+                                        close_time = apiMarket.CloseTime,
+                                        expected_expiration_time = apiMarket.ExpectedExpirationTime,
+                                        expiration_time = apiMarket.ExpirationTime,
+                                        latest_expiration_time = apiMarket.LatestExpirationTime,
+                                        settlement_timer_seconds = apiMarket.SettlementTimerSeconds,
+                                        status = apiMarket.Status,
+                                        response_price_units = apiMarket.ResponsePriceUnits,
+                                        notional_value = apiMarket.NotionalValue,
+                                        tick_size = apiMarket.TickSize,
+                                        yes_bid = apiMarket.YesBid,
+                                        yes_ask = apiMarket.YesAsk,
+                                        no_bid = apiMarket.NoBid,
+                                        no_ask = apiMarket.NoAsk,
+                                        last_price = apiMarket.LastPrice,
+                                        previous_yes_bid = apiMarket.PreviousYesBid,
+                                        previous_yes_ask = apiMarket.PreviousYesAsk,
+                                        previous_price = apiMarket.PreviousPrice,
+                                        volume = apiMarket.Volume,
+                                        volume_24h = apiMarket.Volume24h,
+                                        liquidity = apiMarket.Liquidity,
+                                        open_interest = apiMarket.OpenInterest,
+                                        result = apiMarket.Result,
+                                        can_close_early = apiMarket.CanCloseEarly,
+                                        expiration_value = apiMarket.ExpirationValue,
+                                        risk_limit_cents = apiMarket.RiskLimitCents,
+                                        strike_type = apiMarket.StrikeType,
+                                        floor_strike = (apiMarket.StrikeType == "" || apiMarket.FloorStrike == null) ? 0 : apiMarket.FloorStrike,
+                                        rules_primary = apiMarket.RulesPrimary,
+                                        rules_secondary = apiMarket.RulesSecondary,
+                                        APILastFetchedDate = DateTime.Now,
+                                        LastModifiedDate = DateTime.Now,
+                                        category = ""
+                                    };
+
+                                    marketsToUpdate.Add(market);
+                                    Interlocked.Increment(ref processedCount);
+                                }
+                                finally
+                                {
+                                    calcStopwatch.Stop();
+                                    RecordCalculationExecutionDuration("ProcessMarketDTO", calcStopwatch.ElapsedMilliseconds);
+                                }
+                            });
 
                             using var scope = _scopeFactory.CreateScope();
                             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                            await context.AddOrUpdateMarkets(marketsToUpdate);
+                            await context.AddOrUpdateMarkets(marketsToUpdate.ToList());
                         }
                         catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key"))
                         {
@@ -1021,59 +1033,63 @@ namespace KalshiBotAPI.KalshiAPI
 
                 _logger.LogInformation("Fetched {Count} candlesticks for {MarketTicker} from API", candlesticks.Count, marketTicker);
 
-                foreach (var apiCandlestick in candlesticks)
+                await Parallel.ForEachAsync(candlesticks, new ParallelOptions { CancellationToken = _statusTrackerService.GetCancellationToken() }, async (apiCandlestick, cancellationToken) =>
                 {
-                    using var scope = _scopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-
-                    var endDateTime = DateTimeOffset.FromUnixTimeSeconds(apiCandlestick.EndPeriodTs).UtcDateTime;
-                    if (endDateTime > now)
-                    {
-                        _logger.LogWarning("Future candlestick timestamp detected for {MarketTicker}, {Interval}: Original={Original}, Adjusting to={Adjusted}",
-                            marketTicker, interval, endDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), now.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
-                        apiCandlestick.EndPeriodTs = UnixHelper.ConvertToUnixTimestamp(now);
-                    }
-
-                    var candlestick = new CandlestickDTO
-                    {
-                        market_ticker = marketTicker,
-                        interval_type = dbType,
-                        end_period_ts = apiCandlestick.EndPeriodTs,
-                        open_interest = apiCandlestick.OpenInterest,
-                        volume = apiCandlestick.Volume,
-                        price_close = apiCandlestick.Price.Close,
-                        price_high = apiCandlestick.Price.High,
-                        price_low = apiCandlestick.Price.Low,
-                        price_mean = apiCandlestick.Price.Mean,
-                        price_open = apiCandlestick.Price.Open,
-                        price_previous = apiCandlestick.Price.Previous,
-                        yes_ask_close = apiCandlestick.YesAsk.Close ?? 0,
-                        yes_ask_high = apiCandlestick.YesAsk.High ?? 0,
-                        yes_ask_low = apiCandlestick.YesAsk.Low ?? 0,
-                        yes_ask_open = apiCandlestick.YesAsk.Open ?? 0,
-                        yes_bid_close = apiCandlestick.YesBid.Close ?? 0,
-                        yes_bid_high = apiCandlestick.YesBid.High ?? 0,
-                        yes_bid_low = apiCandlestick.YesBid.Low ?? 0,
-                        yes_bid_open = apiCandlestick.YesBid.Open ?? 0
-                    };
-
+                    var calcStopwatch = Stopwatch.StartNew();
                     try
                     {
+                        using var scope = _scopeFactory.CreateScope();
+                        var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+
+                        var endDateTime = DateTimeOffset.FromUnixTimeSeconds(apiCandlestick.EndPeriodTs).UtcDateTime;
+                        if (endDateTime > now)
+                        {
+                            _logger.LogWarning("Future candlestick timestamp detected for {MarketTicker}, {Interval}: Original={Original}, Adjusting to={Adjusted}",
+                                marketTicker, interval, endDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), now.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                            apiCandlestick.EndPeriodTs = UnixHelper.ConvertToUnixTimestamp(now);
+                        }
+
+                        var candlestick = new CandlestickDTO
+                        {
+                            market_ticker = marketTicker,
+                            interval_type = dbType,
+                            end_period_ts = apiCandlestick.EndPeriodTs,
+                            open_interest = apiCandlestick.OpenInterest,
+                            volume = apiCandlestick.Volume,
+                            price_close = apiCandlestick.Price.Close,
+                            price_high = apiCandlestick.Price.High,
+                            price_low = apiCandlestick.Price.Low,
+                            price_mean = apiCandlestick.Price.Mean,
+                            price_open = apiCandlestick.Price.Open,
+                            price_previous = apiCandlestick.Price.Previous,
+                            yes_ask_close = apiCandlestick.YesAsk.Close ?? 0,
+                            yes_ask_high = apiCandlestick.YesAsk.High ?? 0,
+                            yes_ask_low = apiCandlestick.YesAsk.Low ?? 0,
+                            yes_ask_open = apiCandlestick.YesAsk.Open ?? 0,
+                            yes_bid_close = apiCandlestick.YesBid.Close ?? 0,
+                            yes_bid_high = apiCandlestick.YesBid.High ?? 0,
+                            yes_bid_low = apiCandlestick.YesBid.Low ?? 0,
+                            yes_bid_open = apiCandlestick.YesBid.Open ?? 0
+                        };
+
                         await context.AddOrUpdateCandlestick(candlestick);
-                        processedCount++;
+                        Interlocked.Increment(ref processedCount);
                     }
                     catch (OperationCanceledException)
                     {
                         _logger.LogDebug("FetchCandlesticksAsync was cancelled");
-                        return (0, 0);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Failed to save candlestick for {MarketTicker}", marketTicker);
-                        errorCount++;
+                        Interlocked.Increment(ref errorCount);
                     }
-
-                }
+                    finally
+                    {
+                        calcStopwatch.Stop();
+                        RecordCalculationExecutionDuration("ProcessCandlestick", calcStopwatch.ElapsedMilliseconds);
+                    }
+                });
 
                 if (candlesticks.Count > 0 && interval == "minute" && updateLastCandlestick)
                 {
@@ -2235,6 +2251,19 @@ namespace KalshiBotAPI.KalshiAPI
         private void RecordMethodExecutionDuration(string methodName, long elapsedMs)
         {
             var bag = _methodExecutionDurations.GetOrAdd(methodName, _ => new ConcurrentBag<long>());
+            bag.Add(elapsedMs);
+        }
+
+        /// <summary>
+        /// Records the execution duration of a specific calculation for performance monitoring.
+        /// Stores the elapsed time in a thread-safe concurrent bag for later analysis and optimization.
+        /// Used to track timing of data processing operations like DTO creation and database saves.
+        /// </summary>
+        /// <param name="calculationName">The name of the calculation being tracked (e.g., "ProcessCandlestick", "ProcessMarketDTO").</param>
+        /// <param name="elapsedMs">The execution time in milliseconds.</param>
+        private void RecordCalculationExecutionDuration(string calculationName, long elapsedMs)
+        {
+            var bag = _calculationExecutionDurations.GetOrAdd(calculationName, _ => new ConcurrentBag<long>());
             bag.Add(elapsedMs);
         }
     }
