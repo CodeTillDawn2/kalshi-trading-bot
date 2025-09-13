@@ -70,7 +70,8 @@ namespace KalshiBotOverseer
                 sp.GetRequiredService<ILogger<SubscriptionManager>>(),
                 sp.GetRequiredService<IWebSocketConnectionManager>(),
                 sp.GetRequiredService<IDataCache>(),
-                sp.GetRequiredService<IStatusTrackerService>()
+                sp.GetRequiredService<IStatusTrackerService>(),
+                sp.GetRequiredService<IConfiguration>()
             ));
             services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
                 sp.GetRequiredService<IOptions<KalshiConfig>>(),
