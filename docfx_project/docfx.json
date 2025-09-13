@@ -3,34 +3,25 @@
     {
       "src": [
         {
-          "src": ".",
+          "src": "..",
           "files": [
-            "KalshiBotAPI/bin/Debug/net8.0/KalshiBotAPI.dll",
-            "BacklashBot/bin/Debug/net8.0/BacklashBot.exe",
-            "KalshiBotOverseer/bin/Debug/net8.0/KalshiBotOverseer.exe"
+            "BacklashBot/BacklashBot.sln"
           ]
         }
       ],
-      "dest": "obj/api"
+      "dest": "obj/api",
+      "properties": {
+        "TargetFramework": "net8.0"
+      }
     }
   ],
   "build": {
     "content": [
-      {
-        "files": [
-          "obj/api/**.yml",
-          "articles/**.md",
-          "articles/**.html"
-        ]
-      }
+      { "files": [ "obj/api/**.yml", "obj/api/index.md" ] },
+      { "files": [ "articles/**.md", "articles/**.html" ] }
     ],
     "resource": [
-      {
-        "files": [
-          "articles/**.js",
-          "articles/**.css"
-        ]
-      }
+      { "files": [ "articles/**.js", "articles/**.css" ] }
     ],
     "dest": "docs",
     "globalMetadata": {

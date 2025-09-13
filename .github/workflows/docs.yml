@@ -1,56 +1,47 @@
-name: Update Documentation
-
+name: Docs
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  build-and-deploy-docs:
+  build-docs:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: '8.0.x'
+
+      - name: Restore solution
+        run: dotnet restore BacklashBot/BacklashBot.sln /p:EnableWindowsTargeting=true
+
+      - name: Build solution (optional for docs)
+        run: dotnet build -c Release BacklashBot/BacklashBot.sln /p:EnableWindowsTargeting=true
 
       - name: Install DocFX
-        run: dotnet tool install -g docfx
+        run: dotnet tool update -g docfx
 
-      - name: Restore Dependencies
-        run: cd BacklashBot && dotnet restore BacklashBot.sln /p:EnableWindowsTargeting=true
-
-      - name: Build Project
-        run: cd BacklashBot && dotnet build BacklashBot.sln /p:EnableWindowsTargeting=true
-        env:
-          DOTNET_CLI_ENABLE_WINDOWS_TARGETING: true
-
-      - name: List Build Output
-        run: find . -name "*.dll" -o -name "*.exe" | head -20
-
-      - name: Check Specific Assemblies
+      - name: Show tree (quick sanity)
         run: |
-          ls -la KalshiBotAPI/bin/Debug/net8.0/ || echo "KalshiBotAPI bin not found"
-          ls -la BacklashBot/bin/Debug/net8.0/ || echo "BacklashBot bin not found"
-          ls -la KalshiBotOverseer/bin/Debug/net8.0/ || echo "KalshiBotOverseer bin not found"
+          ls -la
+          ls -la BacklashBot
+          ls -la docfx_project
 
-      - name: Generate Documentation
-        run: docfx build docfx_project/docfx.json --verbose
+      - name: Generate API metadata
+        run: docfx metadata docfx_project/docfx.json --logLevel Verbose
 
-      - name: Commit Updated Documentation
+      - name: Check metadata output
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          if [ -d "docs" ]; then
-            git add docs/
-            if [ -n "$(git status --porcelain docs/)" ]; then
-              git commit -m "Update documentation"
-              git push
-            fi
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ls -R docfx_project/obj || true
+          test -f docfx_project/obj/api/index.yaml || true
+
+      - name: Build site
+        run: docfx build docfx_project/docfx.json --logLevel Verbose
+
+      - name: Publish artifact (optional)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docfx_project/docs
