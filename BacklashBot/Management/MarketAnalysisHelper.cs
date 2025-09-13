@@ -121,7 +121,7 @@ namespace BacklashBot.Management
                 string snapshotDirectory = Path.Combine(_executionConfig.HardDataStorageLocation, "Preprocessed", "SnapshotGroups");
 
                 // Process valid snapshots into snapshot groups
-                var validPeriods = _snapshotPeriodHelper.SplitIntoValidGroups(validSnapshots, snapshotDirectory);
+                var validPeriods = await _snapshotPeriodHelper.SplitIntoValidGroups(validSnapshots, snapshotDirectory);
 
                 await context.AddOrUpdateSnapshotGroups(validPeriods);
                 _logger.LogInformation("Successfully processed {Count} snapshot groups for market {MarketTicker}.", validPeriods.Count, marketTicker);

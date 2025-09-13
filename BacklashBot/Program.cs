@@ -192,7 +192,8 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClie
 ));
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper, OvernightActivitiesHelper>();
-builder.Services.AddScoped<ISnapshotPeriodHelper, SnapshotPeriodHelper>();
+builder.Services.AddScoped<ISnapshotPeriodHelper>(provider =>
+    new SnapshotPeriodHelper(provider.GetRequiredService<IOptions<SnapshotConfig>>().Value));
 builder.Services.AddScoped<BacklashInterfaces.SmokehouseBot.Services.IHealthCheckService, HealthCheckService>();
 builder.Services.AddScoped<IDataCache, BacklashBot.State.DataCache>();
 
