@@ -5290,6 +5290,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Configuration.SimulationConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Configuration.SimulationConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Configuration.SimulationConfig",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Configuration.SimulationConfig.yml\" sourcestartlinenumber=\"1\">Configuration class containing simulation-related parameters used throughout the trading bot system.\nThese settings control simulation behavior, fees, position sizing, and performance thresholds\nfor strategy backtesting and evaluation. Values are injected via dependency injection\nand used by StrategySimulation class for accurate market simulation.\nIncludes comprehensive data validation to prevent invalid parameter combinations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Configuration.SnapshotConfig.yml",
       "output": {
         ".html": {
@@ -5864,6 +5878,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.yml\" sourcestartlinenumber=\"1\">Data structure to hold performance metrics for strategy instantiation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.yml",
       "output": {
         ".html": {
@@ -5902,7 +5930,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Trading.Overseer.EquityCalculator",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.EquityCalculator.yml\" sourcestartlinenumber=\"1\">Provides methods for calculating the total equity value of a trading simulation path.\nThis class is responsible for determining the current market value of positions held in a simulated trading environment,\ntaking into account both cash holdings and the unrealized value of open positions based on current order book data.</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.EquityCalculator.yml\" sourcestartlinenumber=\"1\">Provides methods for calculating the total equity value of a trading simulation path.\nThis class is responsible for determining the current market value of positions held in a simulated trading environment,\ntaking into account both cash holdings and the unrealized value of open positions based on current order book data.\nIt includes performance metrics collection for timing analysis and async versions for high-throughput scenarios.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5920,6 +5948,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.PatternDetectionConfig",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for pattern detection parameters.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml",
       "output": {
         ".html": {
@@ -5930,7 +5972,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Trading.Overseer.PatternDetectionService",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"1\">Service responsible for detecting candlestick patterns from market snapshots in the Kalshi trading bot system.\nThis service acts as a bridge between market data and pattern recognition algorithms, enabling trading\nstrategies to incorporate technical analysis based on historical price movements.</p>\n<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"5\">The service processes market snapshots containing recent candlestick data, converts them to a format\nsuitable for pattern analysis, and applies comprehensive pattern detection algorithms to identify\nvarious technical analysis formations including single-candle, multi-candle, and complex patterns.</p>\n<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"9\">Key responsibilities:</p>\n<ul sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"10\">\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"10\">Convert market snapshot candlestick data to pattern analysis format</li>\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"11\">Execute pattern detection algorithms across multiple timeframes and pattern types</li>\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"12\">Filter and return the most relevant patterns for trading decision making</li>\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"13\">Handle edge cases and provide graceful fallbacks for data processing errors</li>\n</ul>\n<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"15\">This service is used by the SimulationEngine during backtesting and strategy evaluation to enrich\nmarket analysis with technical pattern recognition capabilities.</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"1\">Service responsible for detecting candlestick patterns from market snapshots in the Kalshi trading bot system.\nThis service acts as a bridge between market data and pattern recognition algorithms, enabling trading\nstrategies to incorporate technical analysis based on historical price movements.</p>\n<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"5\">The service processes market snapshots containing recent candlestick data, converts them to a format\nsuitable for pattern analysis, and applies comprehensive pattern detection algorithms to identify\nvarious technical analysis formations including single-candle, multi-candle, and complex patterns.</p>\n<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"9\">Key responsibilities:</p>\n<ul sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"10\">\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"10\">Convert market snapshot candlestick data to pattern analysis format</li>\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"11\">Execute pattern detection algorithms across multiple timeframes and pattern types</li>\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"12\">Filter and return the most relevant patterns for trading decision making</li>\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"13\">Handle edge cases and provide graceful fallbacks for data processing errors</li>\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"14\">Collect performance metrics for timing analysis in high-frequency scenarios</li>\n</ul>\n<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"16\">This service is used by the SimulationEngine during backtesting and strategy evaluation to enrich\nmarket analysis with technical pattern recognition capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",

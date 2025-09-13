@@ -128,7 +128,7 @@ for market data snapshots used in trading strategy evaluation and backtesting.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SnapshotConfig_MaxActiveGapHours.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SnapshotConfig.MaxActiveGapHours%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L36">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L41">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_SnapshotConfig_MaxActiveGapHours_" data-uid="TradingStrategies.Configuration.SnapshotConfig.MaxActiveGapHours*"></a>
   <h4 id="TradingStrategies_Configuration_SnapshotConfig_MaxActiveGapHours" data-uid="TradingStrategies.Configuration.SnapshotConfig.MaxActiveGapHours">MaxActiveGapHours</h4>
@@ -138,7 +138,8 @@ will cause a period break regardless of price stability.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double MaxActiveGapHours { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0.01, 1.7976931348623157E+308, ErrorMessage = &quot;MaxActiveGapHours must be greater than 0.&quot;)]
+public double MaxActiveGapHours { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -160,7 +161,7 @@ will cause a period break regardless of price stability.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SnapshotConfig_PriceChangeThreshold.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SnapshotConfig.PriceChangeThreshold%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L42">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L48">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_SnapshotConfig_PriceChangeThreshold_" data-uid="TradingStrategies.Configuration.SnapshotConfig.PriceChangeThreshold*"></a>
   <h4 id="TradingStrategies_Configuration_SnapshotConfig_PriceChangeThreshold" data-uid="TradingStrategies.Configuration.SnapshotConfig.PriceChangeThreshold">PriceChangeThreshold</h4>
@@ -170,7 +171,8 @@ Used to break snapshot groups when price changes exceed this threshold.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int PriceChangeThreshold { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;PriceChangeThreshold must be at least 1.&quot;)]
+public int PriceChangeThreshold { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -192,7 +194,7 @@ Used to break snapshot groups when price changes exceed this threshold.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SnapshotConfig_SmallGapMinutes.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SnapshotConfig.SmallGapMinutes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L30">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L34">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_SnapshotConfig_SmallGapMinutes_" data-uid="TradingStrategies.Configuration.SnapshotConfig.SmallGapMinutes*"></a>
   <h4 id="TradingStrategies_Configuration_SnapshotConfig_SmallGapMinutes" data-uid="TradingStrategies.Configuration.SnapshotConfig.SmallGapMinutes">SmallGapMinutes</h4>
@@ -202,7 +204,8 @@ part of the same continuous period without requiring price stability checks.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public double SmallGapMinutes { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(0.01, 1.7976931348623157E+308, ErrorMessage = &quot;SmallGapMinutes must be greater than 0.&quot;)]
+public double SmallGapMinutes { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -224,7 +227,7 @@ part of the same continuous period without requiring price stability checks.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SnapshotConfig_SnapshotSchemaVersion.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SnapshotConfig.SnapshotSchemaVersion%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L24">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L27">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_SnapshotConfig_SnapshotSchemaVersion_" data-uid="TradingStrategies.Configuration.SnapshotConfig.SnapshotSchemaVersion*"></a>
   <h4 id="TradingStrategies_Configuration_SnapshotConfig_SnapshotSchemaVersion" data-uid="TradingStrategies.Configuration.SnapshotConfig.SnapshotSchemaVersion">SnapshotSchemaVersion</h4>
@@ -236,7 +239,8 @@ Used by TradingSnapshotService for schema validation and snapshot upgrading duri
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int SnapshotSchemaVersion { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 2147483647, ErrorMessage = &quot;SnapshotSchemaVersion must be at least 1.&quot;)]
+public int SnapshotSchemaVersion { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -258,7 +262,7 @@ Used by TradingSnapshotService for schema validation and snapshot upgrading duri
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SnapshotConfig_SnapshotToleranceSeconds.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SnapshotConfig.SnapshotToleranceSeconds%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L16">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L18">View Source</a>
   </span>
   <a id="TradingStrategies_Configuration_SnapshotConfig_SnapshotToleranceSeconds_" data-uid="TradingStrategies.Configuration.SnapshotConfig.SnapshotToleranceSeconds*"></a>
   <h4 id="TradingStrategies_Configuration_SnapshotConfig_SnapshotToleranceSeconds" data-uid="TradingStrategies.Configuration.SnapshotConfig.SnapshotToleranceSeconds">SnapshotToleranceSeconds</h4>
@@ -270,7 +274,8 @@ Typically set to match expected decision frequency intervals (e.g., 30-60 second
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int SnapshotToleranceSeconds { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Range(1, 3600, ErrorMessage = &quot;SnapshotToleranceSeconds must be between 1 and 3600 seconds.&quot;)]
+public int SnapshotToleranceSeconds { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -299,7 +304,7 @@ Typically set to match expected decision frequency intervals (e.g., 30-60 second
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Configuration_SnapshotConfig.md&amp;value=---%0Auid%3A%20TradingStrategies.Configuration.SnapshotConfig%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L8" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Configuration/SnapshotConfig.cs/#L10" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

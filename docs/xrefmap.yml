@@ -45352,6 +45352,19 @@ references:
   commentId: T:TradingStrategies.ActionDecision
   fullName: TradingStrategies.ActionDecision
   nameWithType: ActionDecision
+- uid: TradingStrategies.ActionDecision.Clone
+  name: Clone()
+  href: api/TradingStrategies.ActionDecision.html#TradingStrategies_ActionDecision_Clone
+  commentId: M:TradingStrategies.ActionDecision.Clone
+  fullName: TradingStrategies.ActionDecision.Clone()
+  nameWithType: ActionDecision.Clone()
+- uid: TradingStrategies.ActionDecision.Clone*
+  name: Clone
+  href: api/TradingStrategies.ActionDecision.html#TradingStrategies_ActionDecision_Clone_
+  commentId: Overload:TradingStrategies.ActionDecision.Clone
+  isSpec: "True"
+  fullName: TradingStrategies.ActionDecision.Clone
+  nameWithType: ActionDecision.Clone
 - uid: TradingStrategies.ActionDecision.Expiration
   name: Expiration
   href: api/TradingStrategies.ActionDecision.html#TradingStrategies_ActionDecision_Expiration
@@ -46082,6 +46095,220 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Configuration.CalculationConfig.Validate
   nameWithType: CalculationConfig.Validate
+- uid: TradingStrategies.Configuration.SimulationConfig
+  name: SimulationConfig
+  href: api/TradingStrategies.Configuration.SimulationConfig.html
+  commentId: T:TradingStrategies.Configuration.SimulationConfig
+  fullName: TradingStrategies.Configuration.SimulationConfig
+  nameWithType: SimulationConfig
+- uid: TradingStrategies.Configuration.SimulationConfig.AsyncBatchSize
+  name: AsyncBatchSize
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_AsyncBatchSize
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.AsyncBatchSize
+  fullName: TradingStrategies.Configuration.SimulationConfig.AsyncBatchSize
+  nameWithType: SimulationConfig.AsyncBatchSize
+- uid: TradingStrategies.Configuration.SimulationConfig.AsyncBatchSize*
+  name: AsyncBatchSize
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_AsyncBatchSize_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.AsyncBatchSize
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.AsyncBatchSize
+  nameWithType: SimulationConfig.AsyncBatchSize
+- uid: TradingStrategies.Configuration.SimulationConfig.AsyncTimeoutSeconds
+  name: AsyncTimeoutSeconds
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_AsyncTimeoutSeconds
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.AsyncTimeoutSeconds
+  fullName: TradingStrategies.Configuration.SimulationConfig.AsyncTimeoutSeconds
+  nameWithType: SimulationConfig.AsyncTimeoutSeconds
+- uid: TradingStrategies.Configuration.SimulationConfig.AsyncTimeoutSeconds*
+  name: AsyncTimeoutSeconds
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_AsyncTimeoutSeconds_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.AsyncTimeoutSeconds
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.AsyncTimeoutSeconds
+  nameWithType: SimulationConfig.AsyncTimeoutSeconds
+- uid: TradingStrategies.Configuration.SimulationConfig.BandWidthRatioThreshold
+  name: BandWidthRatioThreshold
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_BandWidthRatioThreshold
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.BandWidthRatioThreshold
+  fullName: TradingStrategies.Configuration.SimulationConfig.BandWidthRatioThreshold
+  nameWithType: SimulationConfig.BandWidthRatioThreshold
+- uid: TradingStrategies.Configuration.SimulationConfig.BandWidthRatioThreshold*
+  name: BandWidthRatioThreshold
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_BandWidthRatioThreshold_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.BandWidthRatioThreshold
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.BandWidthRatioThreshold
+  nameWithType: SimulationConfig.BandWidthRatioThreshold
+- uid: TradingStrategies.Configuration.SimulationConfig.ComboPositionSizePercentage
+  name: ComboPositionSizePercentage
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_ComboPositionSizePercentage
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.ComboPositionSizePercentage
+  fullName: TradingStrategies.Configuration.SimulationConfig.ComboPositionSizePercentage
+  nameWithType: SimulationConfig.ComboPositionSizePercentage
+- uid: TradingStrategies.Configuration.SimulationConfig.ComboPositionSizePercentage*
+  name: ComboPositionSizePercentage
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_ComboPositionSizePercentage_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.ComboPositionSizePercentage
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.ComboPositionSizePercentage
+  nameWithType: SimulationConfig.ComboPositionSizePercentage
+- uid: TradingStrategies.Configuration.SimulationConfig.DecisionThresholdMs
+  name: DecisionThresholdMs
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_DecisionThresholdMs
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.DecisionThresholdMs
+  fullName: TradingStrategies.Configuration.SimulationConfig.DecisionThresholdMs
+  nameWithType: SimulationConfig.DecisionThresholdMs
+- uid: TradingStrategies.Configuration.SimulationConfig.DecisionThresholdMs*
+  name: DecisionThresholdMs
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_DecisionThresholdMs_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.DecisionThresholdMs
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.DecisionThresholdMs
+  nameWithType: SimulationConfig.DecisionThresholdMs
+- uid: TradingStrategies.Configuration.SimulationConfig.DefaultMarketOrderQuantity
+  name: DefaultMarketOrderQuantity
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_DefaultMarketOrderQuantity
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.DefaultMarketOrderQuantity
+  fullName: TradingStrategies.Configuration.SimulationConfig.DefaultMarketOrderQuantity
+  nameWithType: SimulationConfig.DefaultMarketOrderQuantity
+- uid: TradingStrategies.Configuration.SimulationConfig.DefaultMarketOrderQuantity*
+  name: DefaultMarketOrderQuantity
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_DefaultMarketOrderQuantity_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.DefaultMarketOrderQuantity
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.DefaultMarketOrderQuantity
+  nameWithType: SimulationConfig.DefaultMarketOrderQuantity
+- uid: TradingStrategies.Configuration.SimulationConfig.EnableDecisionTiming
+  name: EnableDecisionTiming
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_EnableDecisionTiming
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.EnableDecisionTiming
+  fullName: TradingStrategies.Configuration.SimulationConfig.EnableDecisionTiming
+  nameWithType: SimulationConfig.EnableDecisionTiming
+- uid: TradingStrategies.Configuration.SimulationConfig.EnableDecisionTiming*
+  name: EnableDecisionTiming
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_EnableDecisionTiming_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.EnableDecisionTiming
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.EnableDecisionTiming
+  nameWithType: SimulationConfig.EnableDecisionTiming
+- uid: TradingStrategies.Configuration.SimulationConfig.EnableDetailedPerformanceLogging
+  name: EnableDetailedPerformanceLogging
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_EnableDetailedPerformanceLogging
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.EnableDetailedPerformanceLogging
+  fullName: TradingStrategies.Configuration.SimulationConfig.EnableDetailedPerformanceLogging
+  nameWithType: SimulationConfig.EnableDetailedPerformanceLogging
+- uid: TradingStrategies.Configuration.SimulationConfig.EnableDetailedPerformanceLogging*
+  name: EnableDetailedPerformanceLogging
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_EnableDetailedPerformanceLogging_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.EnableDetailedPerformanceLogging
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.EnableDetailedPerformanceLogging
+  nameWithType: SimulationConfig.EnableDetailedPerformanceLogging
+- uid: TradingStrategies.Configuration.SimulationConfig.MaxContractPrice
+  name: MaxContractPrice
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_MaxContractPrice
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.MaxContractPrice
+  fullName: TradingStrategies.Configuration.SimulationConfig.MaxContractPrice
+  nameWithType: SimulationConfig.MaxContractPrice
+- uid: TradingStrategies.Configuration.SimulationConfig.MaxContractPrice*
+  name: MaxContractPrice
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_MaxContractPrice_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.MaxContractPrice
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.MaxContractPrice
+  nameWithType: SimulationConfig.MaxContractPrice
+- uid: TradingStrategies.Configuration.SimulationConfig.MaxRestingOrders
+  name: MaxRestingOrders
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_MaxRestingOrders
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.MaxRestingOrders
+  fullName: TradingStrategies.Configuration.SimulationConfig.MaxRestingOrders
+  nameWithType: SimulationConfig.MaxRestingOrders
+- uid: TradingStrategies.Configuration.SimulationConfig.MaxRestingOrders*
+  name: MaxRestingOrders
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_MaxRestingOrders_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.MaxRestingOrders
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.MaxRestingOrders
+  nameWithType: SimulationConfig.MaxRestingOrders
+- uid: TradingStrategies.Configuration.SimulationConfig.MaxTradesPerSnapshot
+  name: MaxTradesPerSnapshot
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_MaxTradesPerSnapshot
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.MaxTradesPerSnapshot
+  fullName: TradingStrategies.Configuration.SimulationConfig.MaxTradesPerSnapshot
+  nameWithType: SimulationConfig.MaxTradesPerSnapshot
+- uid: TradingStrategies.Configuration.SimulationConfig.MaxTradesPerSnapshot*
+  name: MaxTradesPerSnapshot
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_MaxTradesPerSnapshot_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.MaxTradesPerSnapshot
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.MaxTradesPerSnapshot
+  nameWithType: SimulationConfig.MaxTradesPerSnapshot
+- uid: TradingStrategies.Configuration.SimulationConfig.MemoryThresholdMB
+  name: MemoryThresholdMB
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_MemoryThresholdMB
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.MemoryThresholdMB
+  fullName: TradingStrategies.Configuration.SimulationConfig.MemoryThresholdMB
+  nameWithType: SimulationConfig.MemoryThresholdMB
+- uid: TradingStrategies.Configuration.SimulationConfig.MemoryThresholdMB*
+  name: MemoryThresholdMB
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_MemoryThresholdMB_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.MemoryThresholdMB
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.MemoryThresholdMB
+  nameWithType: SimulationConfig.MemoryThresholdMB
+- uid: TradingStrategies.Configuration.SimulationConfig.MinContractPrice
+  name: MinContractPrice
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_MinContractPrice
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.MinContractPrice
+  fullName: TradingStrategies.Configuration.SimulationConfig.MinContractPrice
+  nameWithType: SimulationConfig.MinContractPrice
+- uid: TradingStrategies.Configuration.SimulationConfig.MinContractPrice*
+  name: MinContractPrice
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_MinContractPrice_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.MinContractPrice
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.MinContractPrice
+  nameWithType: SimulationConfig.MinContractPrice
+- uid: TradingStrategies.Configuration.SimulationConfig.PerformanceThresholdMs
+  name: PerformanceThresholdMs
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_PerformanceThresholdMs
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.PerformanceThresholdMs
+  fullName: TradingStrategies.Configuration.SimulationConfig.PerformanceThresholdMs
+  nameWithType: SimulationConfig.PerformanceThresholdMs
+- uid: TradingStrategies.Configuration.SimulationConfig.PerformanceThresholdMs*
+  name: PerformanceThresholdMs
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_PerformanceThresholdMs_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.PerformanceThresholdMs
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.PerformanceThresholdMs
+  nameWithType: SimulationConfig.PerformanceThresholdMs
+- uid: TradingStrategies.Configuration.SimulationConfig.TakerFeeRate
+  name: TakerFeeRate
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_TakerFeeRate
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.TakerFeeRate
+  fullName: TradingStrategies.Configuration.SimulationConfig.TakerFeeRate
+  nameWithType: SimulationConfig.TakerFeeRate
+- uid: TradingStrategies.Configuration.SimulationConfig.TakerFeeRate*
+  name: TakerFeeRate
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_TakerFeeRate_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.TakerFeeRate
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.TakerFeeRate
+  nameWithType: SimulationConfig.TakerFeeRate
+- uid: TradingStrategies.Configuration.SimulationConfig.TradeRateLimitPerSnapshot
+  name: TradeRateLimitPerSnapshot
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_TradeRateLimitPerSnapshot
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.TradeRateLimitPerSnapshot
+  fullName: TradingStrategies.Configuration.SimulationConfig.TradeRateLimitPerSnapshot
+  nameWithType: SimulationConfig.TradeRateLimitPerSnapshot
+- uid: TradingStrategies.Configuration.SimulationConfig.TradeRateLimitPerSnapshot*
+  name: TradeRateLimitPerSnapshot
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_TradeRateLimitPerSnapshot_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.TradeRateLimitPerSnapshot
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.TradeRateLimitPerSnapshot
+  nameWithType: SimulationConfig.TradeRateLimitPerSnapshot
 - uid: TradingStrategies.Configuration.SnapshotConfig
   name: SnapshotConfig
   href: api/TradingStrategies.Configuration.SnapshotConfig.html
@@ -49316,6 +49543,19 @@ references:
   commentId: F:TradingStrategies.Trading.Helpers.StrategySelectionHelper.BreakoutParameterSets
   fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.BreakoutParameterSets
   nameWithType: StrategySelectionHelper.BreakoutParameterSets
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.ClearPerformanceMetrics
+  name: ClearPerformanceMetrics()
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_ClearPerformanceMetrics
+  commentId: M:TradingStrategies.Trading.Helpers.StrategySelectionHelper.ClearPerformanceMetrics
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.ClearPerformanceMetrics()
+  nameWithType: StrategySelectionHelper.ClearPerformanceMetrics()
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.ClearPerformanceMetrics*
+  name: ClearPerformanceMetrics
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_ClearPerformanceMetrics_
+  commentId: Overload:TradingStrategies.Trading.Helpers.StrategySelectionHelper.ClearPerformanceMetrics
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.ClearPerformanceMetrics
+  nameWithType: StrategySelectionHelper.ClearPerformanceMetrics
 - uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.CreateStrategyInstance(System.String,System.String)
   name: CreateStrategyInstance(string, string)
   href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_CreateStrategyInstance_System_String_System_String_
@@ -49348,6 +49588,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.CreateTrainingStrategyInstances
   nameWithType: StrategySelectionHelper.CreateTrainingStrategyInstances
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.EnablePerformanceMetrics
+  name: EnablePerformanceMetrics
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_EnablePerformanceMetrics
+  commentId: P:TradingStrategies.Trading.Helpers.StrategySelectionHelper.EnablePerformanceMetrics
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.EnablePerformanceMetrics
+  nameWithType: StrategySelectionHelper.EnablePerformanceMetrics
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.EnablePerformanceMetrics*
+  name: EnablePerformanceMetrics
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_EnablePerformanceMetrics_
+  commentId: Overload:TradingStrategies.Trading.Helpers.StrategySelectionHelper.EnablePerformanceMetrics
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.EnablePerformanceMetrics
+  nameWithType: StrategySelectionHelper.EnablePerformanceMetrics
 - uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.FlowMomentumParameterSets
   name: FlowMomentumParameterSets
   href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_FlowMomentumParameterSets
@@ -49562,6 +49815,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetParameterSetNames
   nameWithType: StrategySelectionHelper.GetParameterSetNames
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetPerformanceMetrics
+  commentId: M:TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetPerformanceMetrics
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetPerformanceMetrics()
+  nameWithType: StrategySelectionHelper.GetPerformanceMetrics()
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetPerformanceMetrics_
+  commentId: Overload:TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetPerformanceMetrics
+  nameWithType: StrategySelectionHelper.GetPerformanceMetrics
 - uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetSlopeMomentumStrategiesForTraining
   name: GetSlopeMomentumStrategiesForTraining()
   href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_GetSlopeMomentumStrategiesForTraining
@@ -49645,6 +49911,77 @@ references:
   commentId: F:TradingStrategies.Trading.Helpers.StrategySelectionHelper.NothingEverHappensParameterSets
   fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.NothingEverHappensParameterSets
   nameWithType: StrategySelectionHelper.NothingEverHappensParameterSets
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics
+  name: StrategySelectionHelper.StrategyInstantiationMetrics
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html
+  commentId: T:TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics
+  nameWithType: StrategySelectionHelper.StrategyInstantiationMetrics
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.AverageInstantiationTime
+  name: AverageInstantiationTime
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_StrategyInstantiationMetrics_AverageInstantiationTime
+  commentId: P:TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.AverageInstantiationTime
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.AverageInstantiationTime
+  nameWithType: StrategySelectionHelper.StrategyInstantiationMetrics.AverageInstantiationTime
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.AverageInstantiationTime*
+  name: AverageInstantiationTime
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_StrategyInstantiationMetrics_AverageInstantiationTime_
+  commentId: Overload:TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.AverageInstantiationTime
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.AverageInstantiationTime
+  nameWithType: StrategySelectionHelper.StrategyInstantiationMetrics.AverageInstantiationTime
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.InstanceCount
+  name: InstanceCount
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_StrategyInstantiationMetrics_InstanceCount
+  commentId: P:TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.InstanceCount
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.InstanceCount
+  nameWithType: StrategySelectionHelper.StrategyInstantiationMetrics.InstanceCount
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.InstanceCount*
+  name: InstanceCount
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_StrategyInstantiationMetrics_InstanceCount_
+  commentId: Overload:TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.InstanceCount
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.InstanceCount
+  nameWithType: StrategySelectionHelper.StrategyInstantiationMetrics.InstanceCount
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.StrategyType
+  name: StrategyType
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_StrategyInstantiationMetrics_StrategyType
+  commentId: P:TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.StrategyType
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.StrategyType
+  nameWithType: StrategySelectionHelper.StrategyInstantiationMetrics.StrategyType
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.StrategyType*
+  name: StrategyType
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_StrategyInstantiationMetrics_StrategyType_
+  commentId: Overload:TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.StrategyType
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.StrategyType
+  nameWithType: StrategySelectionHelper.StrategyInstantiationMetrics.StrategyType
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.Timestamp
+  name: Timestamp
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_StrategyInstantiationMetrics_Timestamp
+  commentId: P:TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.Timestamp
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.Timestamp
+  nameWithType: StrategySelectionHelper.StrategyInstantiationMetrics.Timestamp
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.Timestamp*
+  name: Timestamp
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_StrategyInstantiationMetrics_Timestamp_
+  commentId: Overload:TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.Timestamp
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.Timestamp
+  nameWithType: StrategySelectionHelper.StrategyInstantiationMetrics.Timestamp
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.TotalInstantiationTime
+  name: TotalInstantiationTime
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_StrategyInstantiationMetrics_TotalInstantiationTime
+  commentId: P:TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.TotalInstantiationTime
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.TotalInstantiationTime
+  nameWithType: StrategySelectionHelper.StrategyInstantiationMetrics.TotalInstantiationTime
+- uid: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.TotalInstantiationTime*
+  name: TotalInstantiationTime
+  href: api/TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.html#TradingStrategies_Trading_Helpers_StrategySelectionHelper_StrategyInstantiationMetrics_TotalInstantiationTime_
+  commentId: Overload:TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.TotalInstantiationTime
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Helpers.StrategySelectionHelper.StrategyInstantiationMetrics.TotalInstantiationTime
+  nameWithType: StrategySelectionHelper.StrategyInstantiationMetrics.TotalInstantiationTime
 - uid: TradingStrategies.Trading.Overseer
   name: TradingStrategies.Trading.Overseer
   href: api/TradingStrategies.Trading.Overseer.html
@@ -49670,6 +50007,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.EquityCalculator.GetEquity
   nameWithType: EquityCalculator.GetEquity
+- uid: TradingStrategies.Trading.Overseer.EquityCalculator.GetEquityAsync(TradingStrategies.Trading.Overseer.SimulationPath,BacklashDTOs.MarketSnapshot)
+  name: GetEquityAsync(SimulationPath, MarketSnapshot)
+  href: api/TradingStrategies.Trading.Overseer.EquityCalculator.html#TradingStrategies_Trading_Overseer_EquityCalculator_GetEquityAsync_TradingStrategies_Trading_Overseer_SimulationPath_BacklashDTOs_MarketSnapshot_
+  commentId: M:TradingStrategies.Trading.Overseer.EquityCalculator.GetEquityAsync(TradingStrategies.Trading.Overseer.SimulationPath,BacklashDTOs.MarketSnapshot)
+  fullName: TradingStrategies.Trading.Overseer.EquityCalculator.GetEquityAsync(TradingStrategies.Trading.Overseer.SimulationPath, BacklashDTOs.MarketSnapshot)
+  nameWithType: EquityCalculator.GetEquityAsync(SimulationPath, MarketSnapshot)
+- uid: TradingStrategies.Trading.Overseer.EquityCalculator.GetEquityAsync*
+  name: GetEquityAsync
+  href: api/TradingStrategies.Trading.Overseer.EquityCalculator.html#TradingStrategies_Trading_Overseer_EquityCalculator_GetEquityAsync_
+  commentId: Overload:TradingStrategies.Trading.Overseer.EquityCalculator.GetEquityAsync
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.EquityCalculator.GetEquityAsync
+  nameWithType: EquityCalculator.GetEquityAsync
 - uid: TradingStrategies.Trading.Overseer.MarketTypeService
   name: MarketTypeService
   href: api/TradingStrategies.Trading.Overseer.MarketTypeService.html
@@ -49776,12 +50126,63 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.MarketTypeService.GetClassificationCount
   nameWithType: MarketTypeService.GetClassificationCount
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig
+  name: PatternDetectionConfig
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html
+  commentId: T:TradingStrategies.Trading.Overseer.PatternDetectionConfig
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig
+  nameWithType: PatternDetectionConfig
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.LookbackWindow
+  name: LookbackWindow
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_LookbackWindow
+  commentId: P:TradingStrategies.Trading.Overseer.PatternDetectionConfig.LookbackWindow
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.LookbackWindow
+  nameWithType: PatternDetectionConfig.LookbackWindow
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.LookbackWindow*
+  name: LookbackWindow
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_LookbackWindow_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PatternDetectionConfig.LookbackWindow
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.LookbackWindow
+  nameWithType: PatternDetectionConfig.LookbackWindow
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.PatternTypes
+  name: PatternTypes
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_PatternTypes
+  commentId: P:TradingStrategies.Trading.Overseer.PatternDetectionConfig.PatternTypes
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.PatternTypes
+  nameWithType: PatternDetectionConfig.PatternTypes
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.PatternTypes*
+  name: PatternTypes
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_PatternTypes_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PatternDetectionConfig.PatternTypes
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.PatternTypes
+  nameWithType: PatternDetectionConfig.PatternTypes
 - uid: TradingStrategies.Trading.Overseer.PatternDetectionService
   name: PatternDetectionService
   href: api/TradingStrategies.Trading.Overseer.PatternDetectionService.html
   commentId: T:TradingStrategies.Trading.Overseer.PatternDetectionService
   fullName: TradingStrategies.Trading.Overseer.PatternDetectionService
   nameWithType: PatternDetectionService
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor(TradingStrategies.Trading.Overseer.PatternDetectionConfig)
+  name: PatternDetectionService(PatternDetectionConfig)
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionService.html#TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_TradingStrategies_Trading_Overseer_PatternDetectionConfig_
+  commentId: M:TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor(TradingStrategies.Trading.Overseer.PatternDetectionConfig)
+  name.vb: New(PatternDetectionConfig)
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionService.PatternDetectionService(TradingStrategies.Trading.Overseer.PatternDetectionConfig)
+  fullName.vb: TradingStrategies.Trading.Overseer.PatternDetectionService.New(TradingStrategies.Trading.Overseer.PatternDetectionConfig)
+  nameWithType: PatternDetectionService.PatternDetectionService(PatternDetectionConfig)
+  nameWithType.vb: PatternDetectionService.New(PatternDetectionConfig)
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor*
+  name: PatternDetectionService
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionService.html#TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionService.PatternDetectionService
+  fullName.vb: TradingStrategies.Trading.Overseer.PatternDetectionService.New
+  nameWithType: PatternDetectionService.PatternDetectionService
+  nameWithType.vb: PatternDetectionService.New
 - uid: TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatterns(BacklashDTOs.MarketSnapshot)
   name: DetectPatterns(MarketSnapshot)
   href: api/TradingStrategies.Trading.Overseer.PatternDetectionService.html#TradingStrategies_Trading_Overseer_PatternDetectionService_DetectPatterns_BacklashDTOs_MarketSnapshot_
@@ -49795,6 +50196,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatterns
   nameWithType: PatternDetectionService.DetectPatterns
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatternsAsync(BacklashDTOs.MarketSnapshot)
+  name: DetectPatternsAsync(MarketSnapshot)
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionService.html#TradingStrategies_Trading_Overseer_PatternDetectionService_DetectPatternsAsync_BacklashDTOs_MarketSnapshot_
+  commentId: M:TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatternsAsync(BacklashDTOs.MarketSnapshot)
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatternsAsync(BacklashDTOs.MarketSnapshot)
+  nameWithType: PatternDetectionService.DetectPatternsAsync(MarketSnapshot)
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatternsAsync*
+  name: DetectPatternsAsync
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionService.html#TradingStrategies_Trading_Overseer_PatternDetectionService_DetectPatternsAsync_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatternsAsync
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatternsAsync
+  nameWithType: PatternDetectionService.DetectPatternsAsync
 - uid: TradingStrategies.Trading.Overseer.ReportGenerator
   name: ReportGenerator
   href: api/TradingStrategies.Trading.Overseer.ReportGenerator.html
@@ -50998,15 +51412,15 @@ references:
   commentId: T:TradingStrategies.Trading.Overseer.StrategySimulation
   fullName: TradingStrategies.Trading.Overseer.StrategySimulation
   nameWithType: StrategySimulation
-- uid: TradingStrategies.Trading.Overseer.StrategySimulation.#ctor(TradingStrategies.Strategies.Strategy,System.Double)
-  name: StrategySimulation(Strategy, double)
-  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation__ctor_TradingStrategies_Strategies_Strategy_System_Double_
-  commentId: M:TradingStrategies.Trading.Overseer.StrategySimulation.#ctor(TradingStrategies.Strategies.Strategy,System.Double)
-  name.vb: New(Strategy, Double)
-  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.StrategySimulation(TradingStrategies.Strategies.Strategy, double)
-  fullName.vb: TradingStrategies.Trading.Overseer.StrategySimulation.New(TradingStrategies.Strategies.Strategy, Double)
-  nameWithType: StrategySimulation.StrategySimulation(Strategy, double)
-  nameWithType.vb: StrategySimulation.New(Strategy, Double)
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.#ctor(TradingStrategies.Strategies.Strategy,Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.SimulationConfig},System.Double)
+  name: StrategySimulation(Strategy, IOptions<SimulationConfig>, double)
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation__ctor_TradingStrategies_Strategies_Strategy_Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_SimulationConfig__System_Double_
+  commentId: M:TradingStrategies.Trading.Overseer.StrategySimulation.#ctor(TradingStrategies.Strategies.Strategy,Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.SimulationConfig},System.Double)
+  name.vb: New(Strategy, IOptions(Of SimulationConfig), Double)
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.StrategySimulation(TradingStrategies.Strategies.Strategy, Microsoft.Extensions.Options.IOptions<TradingStrategies.Configuration.SimulationConfig>, double)
+  fullName.vb: TradingStrategies.Trading.Overseer.StrategySimulation.New(TradingStrategies.Strategies.Strategy, Microsoft.Extensions.Options.IOptions(Of TradingStrategies.Configuration.SimulationConfig), Double)
+  nameWithType: StrategySimulation.StrategySimulation(Strategy, IOptions<SimulationConfig>, double)
+  nameWithType.vb: StrategySimulation.New(Strategy, IOptions(Of SimulationConfig), Double)
 - uid: TradingStrategies.Trading.Overseer.StrategySimulation.#ctor*
   name: StrategySimulation
   href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation__ctor_
@@ -51017,6 +51431,32 @@ references:
   fullName.vb: TradingStrategies.Trading.Overseer.StrategySimulation.New
   nameWithType: StrategySimulation.StrategySimulation
   nameWithType.vb: StrategySimulation.New
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.AverageApplyTimeMs
+  name: AverageApplyTimeMs
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_AverageApplyTimeMs
+  commentId: P:TradingStrategies.Trading.Overseer.StrategySimulation.AverageApplyTimeMs
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.AverageApplyTimeMs
+  nameWithType: StrategySimulation.AverageApplyTimeMs
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.AverageApplyTimeMs*
+  name: AverageApplyTimeMs
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_AverageApplyTimeMs_
+  commentId: Overload:TradingStrategies.Trading.Overseer.StrategySimulation.AverageApplyTimeMs
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.AverageApplyTimeMs
+  nameWithType: StrategySimulation.AverageApplyTimeMs
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.AverageDecisionTimeMs
+  name: AverageDecisionTimeMs
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_AverageDecisionTimeMs
+  commentId: P:TradingStrategies.Trading.Overseer.StrategySimulation.AverageDecisionTimeMs
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.AverageDecisionTimeMs
+  nameWithType: StrategySimulation.AverageDecisionTimeMs
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.AverageDecisionTimeMs*
+  name: AverageDecisionTimeMs
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_AverageDecisionTimeMs_
+  commentId: Overload:TradingStrategies.Trading.Overseer.StrategySimulation.AverageDecisionTimeMs
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.AverageDecisionTimeMs
+  nameWithType: StrategySimulation.AverageDecisionTimeMs
 - uid: TradingStrategies.Trading.Overseer.StrategySimulation.AverageExecutionTimeMs
   name: AverageExecutionTimeMs
   href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_AverageExecutionTimeMs
@@ -51043,6 +51483,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.StrategySimulation.Cash
   nameWithType: StrategySimulation.Cash
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.GetDetailedPerformanceMetrics
+  name: GetDetailedPerformanceMetrics()
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_GetDetailedPerformanceMetrics
+  commentId: M:TradingStrategies.Trading.Overseer.StrategySimulation.GetDetailedPerformanceMetrics
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.GetDetailedPerformanceMetrics()
+  nameWithType: StrategySimulation.GetDetailedPerformanceMetrics()
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.GetDetailedPerformanceMetrics*
+  name: GetDetailedPerformanceMetrics
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_GetDetailedPerformanceMetrics_
+  commentId: Overload:TradingStrategies.Trading.Overseer.StrategySimulation.GetDetailedPerformanceMetrics
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.GetDetailedPerformanceMetrics
+  nameWithType: StrategySimulation.GetDetailedPerformanceMetrics
 - uid: TradingStrategies.Trading.Overseer.StrategySimulation.GetFinalEquity(BacklashDTOs.MarketSnapshot)
   name: GetFinalEquity(MarketSnapshot)
   href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_GetFinalEquity_BacklashDTOs_MarketSnapshot_
@@ -51111,6 +51564,51 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshot
   nameWithType: StrategySimulation.ProcessSnapshot
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotAsync(BacklashDTOs.MarketSnapshot,BacklashDTOs.MarketSnapshot,System.Threading.CancellationToken)
+  name: ProcessSnapshotAsync(MarketSnapshot, MarketSnapshot?, CancellationToken)
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshotAsync_BacklashDTOs_MarketSnapshot_BacklashDTOs_MarketSnapshot_System_Threading_CancellationToken_
+  commentId: M:TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotAsync(BacklashDTOs.MarketSnapshot,BacklashDTOs.MarketSnapshot,System.Threading.CancellationToken)
+  name.vb: ProcessSnapshotAsync(MarketSnapshot, MarketSnapshot, CancellationToken)
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotAsync(BacklashDTOs.MarketSnapshot, BacklashDTOs.MarketSnapshot?, System.Threading.CancellationToken)
+  fullName.vb: TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotAsync(BacklashDTOs.MarketSnapshot, BacklashDTOs.MarketSnapshot, System.Threading.CancellationToken)
+  nameWithType: StrategySimulation.ProcessSnapshotAsync(MarketSnapshot, MarketSnapshot?, CancellationToken)
+  nameWithType.vb: StrategySimulation.ProcessSnapshotAsync(MarketSnapshot, MarketSnapshot, CancellationToken)
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotAsync*
+  name: ProcessSnapshotAsync
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshotAsync_
+  commentId: Overload:TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotAsync
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotAsync
+  nameWithType: StrategySimulation.ProcessSnapshotAsync
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotsAsync(System.Collections.Generic.IEnumerable{BacklashDTOs.MarketSnapshot},System.Threading.CancellationToken)
+  name: ProcessSnapshotsAsync(IEnumerable<MarketSnapshot>, CancellationToken)
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshotsAsync_System_Collections_Generic_IEnumerable_BacklashDTOs_MarketSnapshot__System_Threading_CancellationToken_
+  commentId: M:TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotsAsync(System.Collections.Generic.IEnumerable{BacklashDTOs.MarketSnapshot},System.Threading.CancellationToken)
+  name.vb: ProcessSnapshotsAsync(IEnumerable(Of MarketSnapshot), CancellationToken)
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotsAsync(System.Collections.Generic.IEnumerable<BacklashDTOs.MarketSnapshot>, System.Threading.CancellationToken)
+  fullName.vb: TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotsAsync(System.Collections.Generic.IEnumerable(Of BacklashDTOs.MarketSnapshot), System.Threading.CancellationToken)
+  nameWithType: StrategySimulation.ProcessSnapshotsAsync(IEnumerable<MarketSnapshot>, CancellationToken)
+  nameWithType.vb: StrategySimulation.ProcessSnapshotsAsync(IEnumerable(Of MarketSnapshot), CancellationToken)
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotsAsync*
+  name: ProcessSnapshotsAsync
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_ProcessSnapshotsAsync_
+  commentId: Overload:TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotsAsync
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.ProcessSnapshotsAsync
+  nameWithType: StrategySimulation.ProcessSnapshotsAsync
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.ResetPerformanceMetrics
+  name: ResetPerformanceMetrics()
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_ResetPerformanceMetrics
+  commentId: M:TradingStrategies.Trading.Overseer.StrategySimulation.ResetPerformanceMetrics
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.ResetPerformanceMetrics()
+  nameWithType: StrategySimulation.ResetPerformanceMetrics()
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.ResetPerformanceMetrics*
+  name: ResetPerformanceMetrics
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_ResetPerformanceMetrics_
+  commentId: Overload:TradingStrategies.Trading.Overseer.StrategySimulation.ResetPerformanceMetrics
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.ResetPerformanceMetrics
+  nameWithType: StrategySimulation.ResetPerformanceMetrics
 - uid: TradingStrategies.Trading.Overseer.StrategySimulation.SimulatedBook
   name: SimulatedBook
   href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_SimulatedBook
@@ -51163,6 +51661,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.StrategySimulation.TotalExecutionTime
   nameWithType: StrategySimulation.TotalExecutionTime
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.TotalTradesExecuted
+  name: TotalTradesExecuted
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_TotalTradesExecuted
+  commentId: P:TradingStrategies.Trading.Overseer.StrategySimulation.TotalTradesExecuted
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.TotalTradesExecuted
+  nameWithType: StrategySimulation.TotalTradesExecuted
+- uid: TradingStrategies.Trading.Overseer.StrategySimulation.TotalTradesExecuted*
+  name: TotalTradesExecuted
+  href: api/TradingStrategies.Trading.Overseer.StrategySimulation.html#TradingStrategies_Trading_Overseer_StrategySimulation_TotalTradesExecuted_
+  commentId: Overload:TradingStrategies.Trading.Overseer.StrategySimulation.TotalTradesExecuted
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.StrategySimulation.TotalTradesExecuted
+  nameWithType: StrategySimulation.TotalTradesExecuted
 - uid: TradingStrategies.TradingOverseer
   name: TradingOverseer
   href: api/TradingStrategies.TradingOverseer.html

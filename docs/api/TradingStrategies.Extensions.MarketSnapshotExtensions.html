@@ -130,14 +130,15 @@ market simulation scenarios.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Extensions_MarketSnapshotExtensions_UpdateOrderbookMetricsFromSimulated_BacklashDTOs_MarketSnapshot_BacklashDTOs_SimulatedOrderbook_.md&amp;value=---%0Auid%3A%20TradingStrategies.Extensions.MarketSnapshotExtensions.UpdateOrderbookMetricsFromSimulated(BacklashDTOs.MarketSnapshot%2CBacklashDTOs.SimulatedOrderbook)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Extensions/MarketSnapshotExtensions.cs/#L35">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Extensions/MarketSnapshotExtensions.cs/#L40">View Source</a>
   </span>
   <a id="TradingStrategies_Extensions_MarketSnapshotExtensions_UpdateOrderbookMetricsFromSimulated_" data-uid="TradingStrategies.Extensions.MarketSnapshotExtensions.UpdateOrderbookMetricsFromSimulated*"></a>
   <h4 id="TradingStrategies_Extensions_MarketSnapshotExtensions_UpdateOrderbookMetricsFromSimulated_BacklashDTOs_MarketSnapshot_BacklashDTOs_SimulatedOrderbook_" data-uid="TradingStrategies.Extensions.MarketSnapshotExtensions.UpdateOrderbookMetricsFromSimulated(BacklashDTOs.MarketSnapshot,BacklashDTOs.SimulatedOrderbook)">UpdateOrderbookMetricsFromSimulated(MarketSnapshot, SimulatedOrderbook)</h4>
   <div class="markdown level1 summary"><p>Updates all order book-related metrics in the MarketSnapshot based on the current state of the SimulatedOrderbook.
 This method recalculates spreads, depths, volumes, ranges, imbalances, and center of mass values to reflect
 the latest order book state. It is typically called after order book modifications during trading simulations
-to ensure all derived metrics remain consistent with the underlying order book data.</p>
+to ensure all derived metrics remain consistent with the underlying order book data.
+Includes input validation and performance timing for robustness and monitoring.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -181,6 +182,8 @@ to ensure all derived metrics remain consistent with the underlying order book d
 </ul>
 <p>All calculations use the snapshot's TolerancePercentage for range-based metrics and assume
 prices are in cents (1-99 range) as per Kalshi market conventions.</p>
+<p>Includes input validation to prevent null reference exceptions and performance timing
+measurement for monitoring execution time in high-frequency scenarios.</p>
 </div>
 
 </article>
@@ -194,7 +197,7 @@ prices are in cents (1-99 range) as per Kalshi market conventions.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Extensions_MarketSnapshotExtensions.md&amp;value=---%0Auid%3A%20TradingStrategies.Extensions.MarketSnapshotExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Extensions/MarketSnapshotExtensions.cs/#L12" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Extensions/MarketSnapshotExtensions.cs/#L13" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

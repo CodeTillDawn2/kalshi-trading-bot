@@ -88,13 +88,17 @@ Classes
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.EquityCalculator.html">EquityCalculator</a></h4>
       <section><p>Provides methods for calculating the total equity value of a trading simulation path.
 This class is responsible for determining the current market value of positions held in a simulated trading environment,
-taking into account both cash holdings and the unrealized value of open positions based on current order book data.</p>
+taking into account both cash holdings and the unrealized value of open positions based on current order book data.
+It includes performance metrics collection for timing analysis and async versions for high-throughput scenarios.</p>
 </section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.MarketTypeService.html">MarketTypeService</a></h4>
       <section><p>Service responsible for determining and caching market types for trading snapshots.
 This class acts as a facade over the MarketTypeHelper, providing caching functionality
 to avoid redundant market type calculations for the same market snapshot.
 Includes performance metrics collection, configurable cache expiration, and async operations.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PatternDetectionConfig.html">PatternDetectionConfig</a></h4>
+      <section><p>Configuration options for pattern detection parameters.</p>
 </section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PatternDetectionService.html">PatternDetectionService</a></h4>
       <section><p>Service responsible for detecting candlestick patterns from market snapshots in the Kalshi trading bot system.
@@ -109,6 +113,7 @@ various technical analysis formations including single-candle, multi-candle, and
 <li>Execute pattern detection algorithms across multiple timeframes and pattern types</li>
 <li>Filter and return the most relevant patterns for trading decision making</li>
 <li>Handle edge cases and provide graceful fallbacks for data processing errors</li>
+<li>Collect performance metrics for timing analysis in high-frequency scenarios</li>
 </ul>
 <p>This service is used by the SimulationEngine during backtesting and strategy evaluation to enrich
 market analysis with technical pattern recognition capabilities.</p>
