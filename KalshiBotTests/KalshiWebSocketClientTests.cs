@@ -15,7 +15,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 
-namespace TradingSimulator.Tests
+namespace KalshiBotTests
 {
     /// <summary>
     /// Comprehensive NUnit test fixture for validating the KalshiWebSocketClient functionality.

@@ -23,8 +23,9 @@ using BacklashDTOs;
 using BacklashDTOs.Data;
 using System.Text;
 using TradingStrategies.Configuration;
+using TradingSimulator.ML;
 
-namespace TradingSimulator.ML
+namespace KalshiBotTests
 {
     /// <summary>
     /// NUnit test fixture for validating machine learning training and evaluation functionality

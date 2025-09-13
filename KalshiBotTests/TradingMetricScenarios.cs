@@ -1,6 +1,6 @@
 using BacklashDTOs;
 
-namespace TradingSimulator.Tests
+namespace KalshiBotTests
 {
     /// <summary>
     /// Provides predefined test scenarios for validating technical indicator calculations in the Kalshi trading bot.

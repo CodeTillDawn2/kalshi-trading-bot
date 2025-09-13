@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TradingSimulator\TradingSimulator.csproj" />
+    <ProjectReference Include="..\KalshiBotTests\KalshiBotTests.csproj" />
   </ItemGroup>
 
   <ItemGroup>

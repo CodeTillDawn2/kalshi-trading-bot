@@ -24,7 +24,6 @@ using BacklashDTOs.Data;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TradingSimulator.Strategies;
-using TradingSimulator.TestObjects;
 using TradingStrategies;
 using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
@@ -62,6 +61,7 @@ namespace TradingSimulator
         private Mock<ILogger<ITradingSnapshotService>> _snapshotLoggerMock;
         private Mock<ILogger<IInterestScoreService>> _interestScoreLoggerMock;
         private Mock<ILogger<TradingStrategy<MarketSnapshot>>> _strategyLoggerMock;
+        private Mock<ILogger<TradingOverseer>> _overseerLoggerMock;
         private IOptions<SnapshotConfig> _snapshotOptions;
         private IOptions<TradingConfig> _tradingOptions;
         private IServiceScopeFactory _scopeFactory;
@@ -101,6 +101,7 @@ namespace TradingSimulator
             _strategyLoggerMock = new Mock<ILogger<TradingStrategy<MarketSnapshot>>>();
             _interestScoreLoggerMock = new Mock<ILogger<IInterestScoreService>>();
             var marketAnalysisLoggerMock = new Mock<ILogger<MarketAnalysisHelper>>();
+            _overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
             var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>();
             var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>();
@@ -118,7 +119,7 @@ namespace TradingSimulator
 
             _snapshotPeriodHelper = new SnapshotPeriodHelper();
             _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, _snapshotOptions, _tradingOptions, _scopeFactory);
-            _overseer = new TradingOverseer(_scopeFactory, _snapshotService);
+            _overseer = new TradingOverseer(_scopeFactory, _snapshotService, _overseerLoggerMock.Object);
             _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 

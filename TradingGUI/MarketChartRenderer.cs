@@ -8,7 +8,8 @@
 /// </summary>
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using TradingSimulator.TestObjects;
+using TradingSimulator;
+
 
 namespace SimulatorWinForms.Charting
 {

@@ -11,7 +11,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using TradingStrategies.Configuration;
 
-namespace TradingSimulator.Executable
+namespace KalshiBotTasks
 {
     /// <summary>
     /// NUnit test fixture for validating schema deployment functionality in the trading simulator.
@@ -30,6 +30,7 @@ namespace TradingSimulator.Executable
     /// This ensures that schema versioning works correctly for snapshot data persistence
     /// and that configuration remains synchronized with database schema versions.
     /// </remarks>
+    [TestFixture]
     public class SchemaDeployment
     {
         private KalshiBotContext _context;

@@ -5,7 +5,7 @@ using KalshiBotData.Data;
 using KalshiBotData.Models;
 using Microsoft.Extensions.Configuration;
 using BacklashDTOs;
-using TradingSimulator.TestObjects;
+using TradingSimulator;
 
 namespace SimulatorWinForms
 {

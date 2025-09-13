@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TradingSimulator;
-using TradingSimulator.TestObjects;
 using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Trading.Helpers;
 

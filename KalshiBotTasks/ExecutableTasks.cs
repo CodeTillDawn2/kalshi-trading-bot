@@ -23,7 +23,7 @@ using TradingStrategies.Classification;
 using TradingStrategies.Configuration;
 
 
-namespace TradingSimulator.Executable
+namespace KalshiBotTasks
 {
     /// <summary>
     /// Test fixture class for executing and validating trading simulator tasks.
@@ -811,9 +811,8 @@ namespace TradingSimulator.Executable
         }
 
         /// <summary>
-        /// Cleans up resources after test execution.
-        /// Disposes of database contexts and service providers to prevent resource leaks
-        /// and ensure proper cleanup between test runs.
+        /// Cleans up test resources by disposing of the database context and service provider.
+        /// Ensures proper resource cleanup after each test execution.
         /// </summary>
         [TearDown]
         public void TearDown()

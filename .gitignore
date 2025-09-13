@@ -104,3 +104,7 @@ BacklashBot/UiMockup.psd
 BacklashBot/Logs/shutodown.log
 /KalshiBotLogging/obj
 /KalshiBotLogging/obj
+/KalshiBotTasks/bin
+/KalshiBotTasks/obj
+/KalshiBotTests/bin
+/KalshiBotTests/obj

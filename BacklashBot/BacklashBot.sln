@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradingStrategies", "..\Tra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradingSimulator", "..\TradingSimulator\TradingSimulator.csproj", "{2534A9A8-FE6E-44C6-8581-23870A3474F8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KalshiBotTests", "..\KalshiBotTests\KalshiBotTests.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567891}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KalshiBotTasks", "..\KalshiBotTasks\KalshiBotTasks.csproj", "{8E118017-CAAB-405E-BC3A-C889DF51E52F}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashInterfaces", "..\BacklashInterfaces\BacklashInterfaces.csproj", "{8DB07D0B-A55A-4594-A83B-B8728F43B4D3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashDTOs", "..\BacklashDTOs\BacklashDTOs.csproj", "{8A84CDB4-160B-4FE4-88C2-68223D68C245}"
@@ -49,6 +53,14 @@ Global
 		{2534A9A8-FE6E-44C6-8581-23870A3474F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2534A9A8-FE6E-44C6-8581-23870A3474F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2534A9A8-FE6E-44C6-8581-23870A3474F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567891}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567891}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567891}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567891}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E118017-CAAB-405E-BC3A-C889DF51E52F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E118017-CAAB-405E-BC3A-C889DF51E52F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E118017-CAAB-405E-BC3A-C889DF51E52F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E118017-CAAB-405E-BC3A-C889DF51E52F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8DB07D0B-A55A-4594-A83B-B8728F43B4D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8DB07D0B-A55A-4594-A83B-B8728F43B4D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DB07D0B-A55A-4594-A83B-B8728F43B4D3}.Release|Any CPU.ActiveCfg = Release|Any CPU

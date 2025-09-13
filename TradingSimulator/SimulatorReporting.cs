@@ -1,5 +1,4 @@
 using BacklashDTOs;
-using TradingSimulator.TestObjects;
 
 namespace TradingSimulator.Simulator
 {
@@ -10,7 +9,6 @@ namespace TradingSimulator.Simulator
     /// It is designed to analyze orderbook flow patterns and identify potential anomalies in market data
     /// that could indicate trading opportunities or data quality issues.
     /// </summary>
-    [TestFixture]
     public class SimulatorReporting
     {
         private readonly string _cacheDirectory = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");

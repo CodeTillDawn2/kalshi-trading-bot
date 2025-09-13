@@ -1,6 +1,6 @@
 using TradingSimulator.Strategies;
 
-namespace TradingSimulator.TestObjects
+namespace TradingSimulator
 {
     /// <summary>
     /// Represents a point in time with a price value and optional memo for market data visualization.

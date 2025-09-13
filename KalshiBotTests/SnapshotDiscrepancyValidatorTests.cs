@@ -3,7 +3,7 @@ using BacklashDTOs;
 using BacklashBot.Helpers;
 using System.Collections.Generic;
 
-namespace TradingSimulator
+namespace KalshiBotTests
 {
     [TestFixture]
     public class SnapshotDiscrepancyValidatorTests

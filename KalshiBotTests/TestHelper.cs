@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Options;
 using TradingStrategies.Configuration;
 
-namespace TradingSimulator.Tests
+namespace KalshiBotTests
 {
     /// <summary>
-    /// Provides utility methods for creating test configurations used in unit tests within the TradingSimulator project.
+    /// Provides utility methods for creating test configurations used in unit tests within the KalshiBotTests project.
     /// This class centralizes the creation of standardized configuration objects with typical values for testing trading and calculation logic.
     /// </summary>
     public static class TestHelper

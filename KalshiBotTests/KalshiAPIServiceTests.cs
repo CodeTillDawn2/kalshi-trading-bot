@@ -15,7 +15,7 @@ using BacklashDTOs.Helpers;
 using BacklashDTOs.KalshiAPI;
 using BacklashInterfaces.Constants;
 
-namespace TradingSimulator.Tests
+namespace KalshiBotTests
 {
     /// <summary>
     /// Comprehensive NUnit test fixture for validating the KalshiAPIService functionality.

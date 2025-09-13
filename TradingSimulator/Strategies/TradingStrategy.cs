@@ -159,7 +159,7 @@ namespace TradingSimulator.Strategies
             if (!markets.Any())
             {
                 OnSimulationProgress?.Invoke("No market tickers found.");
-                Assert.Inconclusive("No market tickers found.");
+                _logger.LogWarning("No market tickers found.");
                 return;
             }
 
@@ -254,9 +254,12 @@ namespace TradingSimulator.Strategies
             }
 
             OnSimulationProgress?.Invoke(decisionMade
-                ? $"Test passed: Decisions made. Final P/L: ${_totalProfitLoss:F2}"
-                : $"Test failed: No decisions made. Final P/L: ${_totalProfitLoss:F2}");
-            Assert.That(decisionMade, Is.True, "No decisions made.");
+                ? $"Simulation completed: Decisions made. Final P/L: ${_totalProfitLoss:F2}"
+                : $"Simulation completed: No decisions made. Final P/L: ${_totalProfitLoss:F2}");
+            if (!decisionMade)
+            {
+                _logger.LogWarning("No decisions made during simulation.");
+            }
         }
 
         /// <summary>

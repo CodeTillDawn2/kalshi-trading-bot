@@ -6,7 +6,7 @@ using BacklashBot.Helpers;
 using BacklashBot.Services;
 using TradingStrategies.Configuration;
 
-namespace TradingSimulator.Tests
+namespace KalshiBotTests
 {
     /// <summary>
     /// Comprehensive unit test suite for validating the accuracy of technical indicator calculations
@@ -82,7 +82,7 @@ namespace TradingSimulator.Tests
         [SetUp]
         public void Setup()
         {
-            _tempSnapshotDir = Path.Combine(Path.GetTempPath(), $"TradingSimulator_{Guid.NewGuid()}");
+            _tempSnapshotDir = Path.Combine(Path.GetTempPath(), $"KalshiBotTests_{Guid.NewGuid()}");
             Directory.CreateDirectory(_tempSnapshotDir);
 
             _scopeFactory = new Mock<IServiceScopeFactory>().Object;

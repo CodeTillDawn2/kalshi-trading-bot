@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 
-namespace TradingSimulator.Tests
+namespace KalshiBotTests
 {
     /// <summary>
     /// Unit test suite for TrendCalcs class.
