@@ -110,7 +110,3 @@ BacklashBot/Logs/shutodown.log
 /KalshiBotTests/obj
 !docs/**
 docfx_project/api/
-!docs/**
-!docs/**
-!docs/**
-!docs/**
