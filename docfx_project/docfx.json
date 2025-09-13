@@ -3,6 +3,7 @@
     {
       "src": [
         {
+          "src": ".",
           "files": [
             "**/bin/Debug/net8.0/*.dll"
           ]
