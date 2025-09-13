@@ -64,9 +64,10 @@ namespace BacklashBot.Services
                     for (int i = 0; i < pseudoCandles.Count; i++)
                     {
                         var pc = pseudoCandles[i];
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || pc.MidOpen <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                         {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, pc.MidOpen, pc.Timestamp);
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
                         }
                     }
                     if (periods < 1)
@@ -176,9 +177,10 @@ namespace BacklashBot.Services
                     for (int i = 0; i < pseudoCandlesticks.Count; i++)
                     {
                         var pc = pseudoCandlesticks[i];
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || pc.MidOpen <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandlesticks[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                         {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, pc.MidOpen, pc.Timestamp);
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
                         }
                     }
                     int totalPeriods = longPeriod + signalPeriod - 1;
@@ -278,9 +280,10 @@ namespace BacklashBot.Services
                     for (int i = 0; i < pseudoCandles.Count; i++)
                     {
                         var pc = pseudoCandles[i];
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || pc.MidOpen <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                         {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, pc.MidOpen, pc.Timestamp);
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
                         }
                     }
                     var log = new StringBuilder();
@@ -384,9 +387,10 @@ namespace BacklashBot.Services
                     for (int i = 0; i < pseudoCandles.Count; i++)
                     {
                         var pc = pseudoCandles[i];
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || pc.MidOpen <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                         {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, pc.MidOpen, pc.Timestamp);
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
                         }
                     }
                     var log = new StringBuilder();
@@ -490,19 +494,20 @@ namespace BacklashBot.Services
                     for (int i = 0; i < pseudoCandles.Count; i++)
                     {
                         var pc = pseudoCandles[i];
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || pc.MidOpen <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                         {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, pc.MidOpen, pc.Timestamp);
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
                         }
                     }
                     var log = new StringBuilder();
                     log.AppendLine($"Calculating ATR for {period} periods.");
 
-            if (_config.ADX_Periods < 1)
+            if (period < 1)
             {
-                log.AppendLine($"Invalid period: {_config.ADX_Periods}. Must be at least 1.");
+                log.AppendLine($"Invalid period: {period}. Must be at least 1.");
                 _logger.LogError("{Log}", log.ToString());
-                throw new ArgumentException("Period must be at least 1.", nameof(_config.ADX_Periods));
+                throw new ArgumentException("Period must be at least 1.", nameof(period));
             }
 
             if (pseudoCandles == null || pseudoCandles.Count < period + 1)
@@ -586,9 +591,10 @@ namespace BacklashBot.Services
                     for (int i = 0; i < pseudoCandles.Count; i++)
                     {
                         var pc = pseudoCandles[i];
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || pc.MidOpen <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                         {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, pc.MidOpen, pc.Timestamp);
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
                         }
                     }
                     var log = new StringBuilder();
@@ -671,9 +677,10 @@ namespace BacklashBot.Services
                     for (int i = 0; i < pseudoCandles.Count; i++)
                     {
                         var pc = pseudoCandles[i];
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || pc.MidOpen <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                         {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, pc.MidOpen, pc.Timestamp);
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
                         }
                     }
                     var log = new StringBuilder();
@@ -937,7 +944,7 @@ namespace BacklashBot.Services
         /// - Acceleration factor (AF) increases (up to the maximum, typically 0.20) amplify the PSAR's sensitivity in strong trends, tightening stops to lock in gains.
         /// <see cref="CalculatePSARAsync(List{CandlestickData})"/>
         /// </remarks>
-        public double? CalculatePSAR(List<CandlestickData> candlesticks)
+        public double? CalculatePSAR(List<PseudoCandlestick> pseudoCandles)
         {
             var log = new StringBuilder();
             log.AppendLine($"Calculating PSAR with InitialAF={_config.PSAR_InitialAF}, MaxAF={_config.PSAR_MaxAF}, AFStep={_config.PSAR_AFStep}.");
@@ -949,23 +956,23 @@ namespace BacklashBot.Services
                 throw new ArgumentException("Acceleration factors must be positive and InitialAF <= MaxAF.");
             }
 
-            if (candlesticks == null || candlesticks.Count < 2)
+            if (pseudoCandles == null || pseudoCandles.Count < 2)
             {
-                log.AppendLine($"Insufficient data. Candles: {candlesticks?.Count ?? 0}, Required: 2.");
+                log.AppendLine($"Insufficient data. Candles: {pseudoCandles?.Count ?? 0}, Required: 2.");
                 _logger.LogDebug("{Log}", log.ToString());
                 return null;
             }
 
-            var highs = candlesticks.Select(c => (c.AskHigh + c.BidHigh) / 2.0).ToList();
-            var lows = candlesticks.Select(c => (c.AskLow + c.BidLow) / 2.0).ToList();
-            var closes = candlesticks.Select(c => (c.AskClose + c.BidClose) / 2.0).ToList();
+            var highs = pseudoCandles.Select(pc => pc.MidHigh).ToList();
+            var lows = pseudoCandles.Select(pc => pc.MidLow).ToList();
+            var closes = pseudoCandles.Select(pc => pc.MidClose).ToList();
 
             double psar = lows[0]; // Initialize with first low
             int trend = closes[1] > closes[0] ? 1 : -1; // 1 for uptrend, -1 for downtrend
             double ep = trend == 1 ? highs[0] : lows[0]; // Extreme point
             double af = _config.PSAR_InitialAF;
 
-            for (int i = 1; i < candlesticks.Count; i++)
+            for (int i = 1; i < pseudoCandles.Count; i++)
             {
                 double currentPsar = psar + af * (ep - psar);
 
@@ -1035,9 +1042,9 @@ namespace BacklashBot.Services
         /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
         /// <see cref="CalculatePSAR(List{CandlestickData})"/>
         /// </remarks>
-        public async Task<double?> CalculatePSARAsync(List<CandlestickData> candlesticks)
+        public async Task<double?> CalculatePSARAsync(List<PseudoCandlestick> pseudoCandles)
         {
-            return await Task.Run(() => CalculatePSAR(candlesticks));
+            return await Task.Run(() => CalculatePSAR(pseudoCandles));
         }
 
         /// <summary>
@@ -1081,13 +1088,15 @@ namespace BacklashBot.Services
                     for (int i = 0; i < pseudoCandles.Count; i++)
                     {
                         var pc = pseudoCandles[i];
-                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || pc.MidOpen <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
                         {
-                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, pc.MidOpen, pc.Timestamp);
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
                         }
                     }
                     var log = new StringBuilder();
-                    log.AppendLine($"Calculating ADX for {_config.ADX_Periods} periods.");
+                    int period = _config.ADX_Periods;
+                    log.AppendLine($"Calculating ADX for {period} periods.");
 
             if (period < 1)
             {
@@ -1096,9 +1105,9 @@ namespace BacklashBot.Services
                 throw new ArgumentException("Period must be at least 1.", nameof(period));
             }
 
-            if (pseudoCandles == null || pseudoCandles.Count < _config.ADX_Periods * 2)
+            if (pseudoCandles == null || pseudoCandles.Count < period * 2)
             {
-                log.AppendLine($"Insufficient data. Candles: {pseudoCandles?.Count ?? 0}, Required: {_config.ADX_Periods * 2}.");
+                log.AppendLine($"Insufficient data. Candles: {pseudoCandles?.Count ?? 0}, Required: {period * 2}.");
                 _logger.LogDebug("{Log}", log.ToString());
                 return (null,null,null);
             }
@@ -1109,7 +1118,7 @@ namespace BacklashBot.Services
 
             // Calculate smoothed +DM, -DM, and TR
             double smoothedPlusDM = 0, smoothedMinusDM = 0, smoothedTR = 0;
-            for (int i = 1; i <= _config.ADX_Periods; i++)
+            for (int i = 1; i <= period; i++)
             {
                 double upMove = highs[i] - highs[i - 1];
                 double downMove = lows[i - 1] - lows[i];
@@ -1120,16 +1129,16 @@ namespace BacklashBot.Services
                 smoothedMinusDM += minusDM;
                 smoothedTR += tr;
             }
-            smoothedPlusDM /= _config.ADX_Periods;
-            smoothedMinusDM /= _config.ADX_Periods;
-            smoothedTR /= _config.ADX_Periods;
+            smoothedPlusDM /= period;
+            smoothedMinusDM /= period;
+            smoothedTR /= period;
 
             // Calculate subsequent values iteratively
             var dxValues = new List<double>();
             double? latestPlusDI = null;
             double? latestMinusDI = null;
 
-            for (int i = _config.ADX_Periods + 1; i < pseudoCandles.Count; i++)
+            for (int i = period + 1; i < pseudoCandles.Count; i++)
             {
                 double upMove = highs[i] - highs[i - 1];
                 double downMove = lows[i - 1] - lows[i];
@@ -1137,9 +1146,9 @@ namespace BacklashBot.Services
                 double minusDM = (downMove > upMove && downMove > 0) ? downMove : 0;
                 double tr = Math.Max(highs[i] - lows[i], Math.Max(Math.Abs(highs[i] - closes[i - 1]), Math.Abs(lows[i] - closes[i - 1])));
 
-                smoothedPlusDM = ((smoothedPlusDM * (_config.ADX_Periods - 1)) + plusDM) / _config.ADX_Periods;
-                smoothedMinusDM = ((smoothedMinusDM * (_config.ADX_Periods - 1)) + minusDM) / _config.ADX_Periods;
-                smoothedTR = ((smoothedTR * (_config.ADX_Periods - 1)) + tr) / _config.ADX_Periods;
+                smoothedPlusDM = ((smoothedPlusDM * (period - 1)) + plusDM) / period;
+                smoothedMinusDM = ((smoothedMinusDM * (period - 1)) + minusDM) / period;
+                smoothedTR = ((smoothedTR * (period - 1)) + tr) / period;
 
                 if (smoothedTR == 0) continue; // Avoid division by zero
 
@@ -1155,15 +1164,15 @@ namespace BacklashBot.Services
                 log.AppendLine($"Index {i}: +DM={plusDM:F4}, -DM={minusDM:F4}, TR={tr:F4}, +DI={plusDI:F2}, -DI={minusDI:F2}, DX={dx:F2}");
             }
 
-            if (dxValues.Count < _config.ADX_Periods)
+            if (dxValues.Count < period)
             {
-                log.AppendLine($"Insufficient DX values for ADX: {dxValues.Count}, Required: {_config.ADX_Periods}.");
+                log.AppendLine($"Insufficient DX values for ADX: {dxValues.Count}, Required: {period}.");
                 _logger.LogDebug("{Log}", log.ToString());
                 return (null, null, null);
             }
 
             // Calculate ADX as SMA of last 'period' DX values
-            double adx = dxValues.TakeLast(_config.ADX_Periods).Average();
+            double adx = dxValues.TakeLast(period).Average();
             if (double.IsNaN(adx) || double.IsInfinity(adx))
             {
                 log.AppendLine($"Invalid ADX: {adx}.");

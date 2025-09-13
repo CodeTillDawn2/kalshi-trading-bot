@@ -19,25 +19,25 @@ namespace BacklashBot.Helpers
             /// Gets a value indicating whether the snapshot passed all validation checks.
             /// True if no discrepancies were found; false otherwise.
             /// </summary>
-            public bool IsValid { get; init; }
+            public bool IsValid { get; set; }
 
             /// <summary>
             /// Gets a value indicating whether the orderbook data is missing or empty.
             /// This is a critical issue as orderbook data is essential for trading decisions.
             /// </summary>
-            public bool IsOrderbookMissing { get; init; }
+            public bool IsOrderbookMissing { get; set; }
 
             /// <summary>
             /// Gets a value indicating whether the best bid and ask prices overlap, which is an invalid state.
             /// In a properly functioning market, the best bid should be less than the best ask.
             /// </summary>
-            public bool DoPricesOverlap { get; init; }
+            public bool DoPricesOverlap { get; set; }
 
             /// <summary>
             /// Gets a value indicating whether there are significant discrepancies between velocity metrics
             /// and actual trade/order volumes, suggesting potential data corruption or calculation errors.
             /// </summary>
-            public bool IsRateDiscrepancy { get; init; }
+            public bool IsRateDiscrepancy { get; set; }
         }
 
         /// <summary>

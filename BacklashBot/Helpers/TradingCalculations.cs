@@ -1,6 +1,5 @@
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace BacklashBot.Helpers
 {
@@ -11,7 +10,6 @@ namespace BacklashBot.Helpers
     /// </summary>
     public static class TradingCalculations
     {
-        private static readonly ILogger _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<TradingCalculations>();
 
         /// <summary>
         /// Calculates the Exponential Moving Average (EMA) for a list of prices over a specified period.
@@ -26,31 +24,25 @@ namespace BacklashBot.Helpers
         {
             if (period < 1)
             {
-                _logger.LogDebug("Period must be at least 1. Period: {Period}", period);
                 throw new ArgumentException("Period must be at least 1.", nameof(period));
             }
             if (prices == null)
             {
-                _logger.LogDebug("Prices list is null.");
                 return null;
             }
             if (prices.Count < period)
             {
-                _logger.LogDebug("Insufficient data. Prices count: {Count}, Required: {Period}", prices.Count, period);
                 return null;
             }
             if (prices.Any(double.IsNaN) || prices.Any(double.IsInfinity))
             {
-                _logger.LogDebug("Prices contain invalid values (NaN or Infinity).");
                 return null;
             }
             double multiplier = 2.0 / (period + 1);
-            _logger.LogDebug("Multiplier: {Multiplier}", multiplier);
             double result;
             if (previousEMA == null)
             {
                 result = prices.Take(period).Average();
-                _logger.LogDebug("Initial EMA: {InitialEMA}", result);
                 // Iterate from the second price onward
                 for (int i = period; i < prices.Count; i++)
                 {
@@ -60,14 +52,11 @@ namespace BacklashBot.Helpers
             else
             {
                 result = (prices.Last() * multiplier) + (previousEMA.Value * (1 - multiplier));
-                _logger.LogDebug("CurrentPrice: {CurrentPrice}, PreviousEMA: {PreviousEMA}, EMA: {EMA}", prices.Last(), previousEMA, result);
             }
             if (double.IsNaN(result) || double.IsInfinity(result))
             {
-                _logger.LogDebug("Invalid EMA result: {Result}", result);
                 return null;
             }
-            _logger.LogDebug("Final EMA: {FinalEMA}", result);
             return result;
         }
 
@@ -98,40 +87,32 @@ namespace BacklashBot.Helpers
         {
             if (prices == null)
             {
-                _logger.LogDebug("Prices list is null.");
                 throw new ArgumentNullException(nameof(prices));
             }
             if (period < 1)
             {
-                _logger.LogDebug("Period must be at least 1. Period: {Period}", period);
                 throw new ArgumentException("Period must be at least 1.", nameof(period));
             }
             if (endIndex < period - 1 || prices.Count <= endIndex)
             {
-                _logger.LogDebug("Invalid indices. EndIndex: {EndIndex}, Period: {Period}, PricesCount: {Count}", endIndex, period, prices.Count);
                 throw new ArgumentException("Invalid indices for EMA calculation.");
             }
             if (prices.Any(double.IsNaN) || prices.Any(double.IsInfinity))
             {
-                _logger.LogDebug("Prices contain invalid values (NaN or Infinity).");
                 throw new ArgumentException("Prices contain invalid values.");
             }
 
             double multiplier = 2.0 / (period + 1);
-            _logger.LogDebug("Multiplier: {Multiplier}", multiplier);
 
             // Calculate initial SMA for the first period prices
             var initialPrices = prices.Take(period).ToList();
             double ema = initialPrices.Average();
-            _logger.LogDebug("Initial EMA: {InitialEMA}", ema);
 
             // Iterate over all prices from period to endIndex
             for (int i = period; i <= endIndex; i++)
             {
                 ema = (prices[i] * multiplier) + (ema * (1 - multiplier));
             }
-
-            _logger.LogDebug("Final EMA: {FinalEMA}", ema);
             return ema;
         }
 
@@ -159,11 +140,9 @@ namespace BacklashBot.Helpers
         {
             if (dt == DateTime.MinValue || dt == DateTime.MaxValue || dt.Kind == DateTimeKind.Unspecified)
             {
-                _logger.LogDebug("Invalid DateTime provided: {DateTime}", dt);
                 throw new ArgumentException("Invalid DateTime provided.", nameof(dt));
             }
             var result = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0, DateTimeKind.Utc);
-            _logger.LogDebug("Truncated DateTime from {Original} to {Truncated}", dt, result);
             return result;
         }
 
@@ -178,7 +157,6 @@ namespace BacklashBot.Helpers
         {
             if (sigma <= 0 || double.IsNaN(sigma) || double.IsInfinity(sigma))
             {
-                _logger.LogDebug("Invalid sigma value: {Sigma}", sigma);
                 throw new ArgumentException("Sigma must be a positive finite number.", nameof(sigma));
             }
             int size = (int)Math.Ceiling(3 * sigma) * 2 + 1;
@@ -195,7 +173,6 @@ namespace BacklashBot.Helpers
             {
                 kernel[i] /= sum;
             }
-            _logger.LogDebug("Generated Gaussian kernel with size {Size} for sigma {Sigma}", size, sigma);
             return kernel;
         }
 
@@ -211,17 +188,14 @@ namespace BacklashBot.Helpers
         {
             if (input == null || input.Length == 0)
             {
-                _logger.LogDebug("Input array is null or empty.");
                 throw new ArgumentException("Input array must not be null or empty.", nameof(input));
             }
             if (kernel == null || kernel.Length == 0)
             {
-                _logger.LogDebug("Kernel array is null or empty.");
                 throw new ArgumentException("Kernel array must not be null or empty.", nameof(kernel));
             }
             if (input.Any(double.IsNaN) || input.Any(double.IsInfinity) || kernel.Any(double.IsNaN) || kernel.Any(double.IsInfinity))
             {
-                _logger.LogDebug("Input or kernel contain invalid values (NaN or Infinity).");
                 throw new ArgumentException("Input and kernel must not contain NaN or Infinity.");
             }
             int n = input.Length;
@@ -247,7 +221,6 @@ namespace BacklashBot.Helpers
                 }
                 output[i] = sum;
             }
-            _logger.LogDebug("Convolved input array of length {Length} with kernel of length {KernelLength}", n, k);
             return output;
         }
 
@@ -274,12 +247,10 @@ namespace BacklashBot.Helpers
         {
             if (data == null || data.Length == 0)
             {
-                _logger.LogDebug("Data array is null or empty.");
                 throw new ArgumentException("Data array must not be null or empty.", nameof(data));
             }
             if (data.Any(double.IsNaN) || data.Any(double.IsInfinity))
             {
-                _logger.LogDebug("Data array contains invalid values (NaN or Infinity).");
                 throw new ArgumentException("Data array must not contain NaN or Infinity.");
             }
             var maxima = new List<int>();
@@ -290,7 +261,6 @@ namespace BacklashBot.Helpers
                     maxima.Add(i);
                 }
             }
-            _logger.LogDebug("Found {Count} local maxima in data array of length {Length}", maxima.Count, data.Length);
             return maxima;
         }
 
@@ -317,16 +287,13 @@ namespace BacklashBot.Helpers
         {
             if (positionSize == 0)
             {
-                _logger.LogDebug("Position size is zero, returning 0.");
                 return 0;
             }
             if (double.IsNaN(marketExposure) || double.IsInfinity(marketExposure))
             {
-                _logger.LogDebug("Invalid market exposure: {MarketExposure}", marketExposure);
                 throw new ArgumentException("Market exposure must be a finite number.", nameof(marketExposure));
             }
             double result = Math.Round(Math.Abs(marketExposure) / Math.Abs(positionSize), 2);
-            _logger.LogDebug("Calculated buy-in price: {BuyinPrice} for exposure {Exposure} and size {Size}", result, marketExposure, positionSize);
             return result;
         }
 
@@ -342,17 +309,14 @@ namespace BacklashBot.Helpers
         {
             if (positionSize == 0)
             {
-                _logger.LogDebug("Position size is zero, returning 0.");
                 return 0;
             }
             if (orderbookLevels == null)
             {
-                _logger.LogDebug("Orderbook levels is null, returning 0.");
                 return 0;
             }
             if (orderbookLevels.Any(x => x.Price <= 0 || x.Quantity <= 0))
             {
-                _logger.LogDebug("Orderbook levels contain invalid prices or quantities.");
                 throw new ArgumentException("Orderbook levels must have positive prices and quantities.");
             }
 
@@ -371,10 +335,8 @@ namespace BacklashBot.Helpers
                     remainingShares -= sharesAtThisPrice;
                 }
                 double result = remainingShares > 0 ? totalValue / (sharesToLiquidate - remainingShares) : totalValue / sharesToLiquidate;
-                _logger.LogDebug("Calculated liquidation price: {LiquidationPrice} for position size {Size}", result, positionSize);
                 return result;
             }
-            _logger.LogDebug("Orderbook is empty, returning 0.");
             return 0;
         }
 
@@ -390,17 +352,14 @@ namespace BacklashBot.Helpers
         {
             if (contracts <= 0)
             {
-                _logger.LogDebug("Contracts must be positive. Contracts: {Contracts}", contracts);
                 throw new ArgumentException("Contracts must be positive.", nameof(contracts));
             }
             if (priceInDollars < 0 || priceInDollars > 1 || double.IsNaN(priceInDollars) || double.IsInfinity(priceInDollars))
             {
-                _logger.LogDebug("Price must be between 0 and 1. Price: {Price}", priceInDollars);
                 throw new ArgumentException("Price must be a finite number between 0 and 1.", nameof(priceInDollars));
             }
             double fee = 0.07 * contracts * priceInDollars * (1 - priceInDollars);
             double result = Math.Ceiling(fee * 100) / 100;
-            _logger.LogDebug("Calculated trading fees: {Fees} for {Contracts} contracts at {Price}", result, contracts, priceInDollars);
             return result;
         }
 
@@ -416,17 +375,14 @@ namespace BacklashBot.Helpers
         {
             if (positionSize == 0)
             {
-                _logger.LogDebug("Position size is zero, returning 0.");
                 return 0;
             }
             if (orderbookLevels == null)
             {
-                _logger.LogDebug("Orderbook levels is null, returning 0.");
                 return 0;
             }
             if (orderbookLevels.Any(x => x.Price <= 0 || x.Quantity <= 0))
             {
-                _logger.LogDebug("Orderbook levels contain invalid prices or quantities.");
                 throw new ArgumentException("Orderbook levels must have positive prices and quantities.");
             }
 
@@ -445,10 +401,8 @@ namespace BacklashBot.Helpers
                     remainingShares -= sharesAtThisPrice;
                 }
                 double result = Math.Round(totalFees, 2);
-                _logger.LogDebug("Calculated expected fees: {Fees} for position size {Size}", result, positionSize);
                 return result;
             }
-            _logger.LogDebug("Orderbook is empty, returning 0.");
             return 0;
         }
 
@@ -466,14 +420,12 @@ namespace BacklashBot.Helpers
         {
             if (positionSize == 0)
             {
-                _logger.LogDebug("Position size is zero, returning (0,0).");
                 return (0, 0);
             }
             if (double.IsNaN(liquidationPrice) || double.IsInfinity(liquidationPrice) ||
                 double.IsNaN(buyinPrice) || double.IsInfinity(buyinPrice) || buyinPrice <= 0 ||
                 double.IsNaN(expectedFees) || double.IsInfinity(expectedFees))
             {
-                _logger.LogDebug("Invalid inputs: LiquidationPrice={LP}, BuyinPrice={BP}, Fees={Fees}", liquidationPrice, buyinPrice, expectedFees);
                 throw new ArgumentException("Prices and fees must be finite numbers, buyinPrice must be positive.");
             }
 
@@ -482,7 +434,6 @@ namespace BacklashBot.Helpers
             double profitPerShare = liquidationPrice - buyinPrice;
             double roiAmount = Math.Round((profitPerShare * sharesToLiquidate) - expectedFees, 2);
             double roiPercentage = Math.Round((roiAmount / cost) * 100, 2);
-            _logger.LogDebug("Calculated ROI: Amount={Amount}, Percentage={Percentage}% for position size {Size}", roiAmount, roiPercentage, positionSize);
             return (roiAmount, roiPercentage);
         }
 
@@ -499,13 +450,11 @@ namespace BacklashBot.Helpers
         {
             if (positionSize == 0)
             {
-                _logger.LogDebug("Position size is zero, returning (0,0).");
                 return (0, 0);
             }
             if (double.IsNaN(liquidationPrice) || double.IsInfinity(liquidationPrice) ||
                 double.IsNaN(expectedFees) || double.IsInfinity(expectedFees))
             {
-                _logger.LogDebug("Invalid inputs: LiquidationPrice={LP}, Fees={Fees}", liquidationPrice, expectedFees);
                 throw new ArgumentException("Prices and fees must be finite numbers.");
             }
 
@@ -514,7 +463,6 @@ namespace BacklashBot.Helpers
             double currentValue = liquidationPrice * sharesToLiquidate;
             double upside = Math.Round(totalPayout - currentValue - expectedFees, 2);
             double downside = Math.Round(-(currentValue + expectedFees), 2);
-            _logger.LogDebug("Calculated Upside/Downside: Upside={Upside}, Downside={Downside} for position size {Size}", upside, downside, positionSize);
             return (upside, downside);
         }
     }

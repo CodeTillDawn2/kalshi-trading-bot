@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using BacklashDTOs;
 using BacklashBot.Helpers;
+using System.Collections.Generic;
 
 namespace TradingSimulator
 {
@@ -13,9 +14,8 @@ namespace TradingSimulator
             // Arrange: Create a valid snapshot with all checks passing
             var snapshot = new MarketSnapshot
             {
-                OrderbookData = new List<OrderbookEntry> { new OrderbookEntry() },
+                OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
                 BestYesBid = 10,
-                BestYesAsk = 11,
                 BestNoBid = 9,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
@@ -46,7 +46,6 @@ namespace TradingSimulator
             {
                 OrderbookData = null,
                 BestYesBid = 10,
-                BestYesAsk = 11,
                 BestNoBid = 9,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
@@ -75,9 +74,8 @@ namespace TradingSimulator
             // Arrange: Snapshot with empty orderbook
             var snapshot = new MarketSnapshot
             {
-                OrderbookData = new List<OrderbookEntry>(),
+                OrderbookData = new List<Dictionary<string, object>>(),
                 BestYesBid = 10,
-                BestYesAsk = 11,
                 BestNoBid = 9,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
@@ -103,12 +101,11 @@ namespace TradingSimulator
         [Test]
         public void ValidateDiscrepancies_OverlappingPrices_ReturnsInvalidResult()
         {
-            // Arrange: BestYesBid >= BestYesAsk
+            // Arrange: BestYesBid >= BestYesAsk (BestYesAsk = 100 - BestNoBid = 91, so BestYesBid = 95 >= 91)
             var snapshot = new MarketSnapshot
             {
-                OrderbookData = new List<OrderbookEntry> { new OrderbookEntry() },
-                BestYesBid = 12,
-                BestYesAsk = 10,
+                OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
+                BestYesBid = 95,
                 BestNoBid = 9,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
@@ -137,9 +134,8 @@ namespace TradingSimulator
             // Arrange: Discrepancy > 0.1
             var snapshot = new MarketSnapshot
             {
-                OrderbookData = new List<OrderbookEntry> { new OrderbookEntry() },
+                OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
                 BestYesBid = 10,
-                BestYesAsk = 11,
                 BestNoBid = 9,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
@@ -168,9 +164,8 @@ namespace TradingSimulator
             // Arrange: Discrepancy < custom threshold (0.5)
             var snapshot = new MarketSnapshot
             {
-                OrderbookData = new List<OrderbookEntry> { new OrderbookEntry() },
+                OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
                 BestYesBid = 10,
-                BestYesAsk = 11,
                 BestNoBid = 9,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
@@ -199,9 +194,8 @@ namespace TradingSimulator
             // Arrange: Discrepancy > custom threshold (0.05)
             var snapshot = new MarketSnapshot
             {
-                OrderbookData = new List<OrderbookEntry> { new OrderbookEntry() },
+                OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
                 BestYesBid = 10,
-                BestYesAsk = 11,
                 BestNoBid = 9,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
@@ -230,9 +224,8 @@ namespace TradingSimulator
             // Arrange: ChangeMetricsMature false, large discrepancy but should be valid
             var snapshot = new MarketSnapshot
             {
-                OrderbookData = new List<OrderbookEntry> { new OrderbookEntry() },
+                OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
                 BestYesBid = 10,
-                BestYesAsk = 11,
                 BestNoBid = 9,
                 ChangeMetricsMature = false,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
@@ -261,9 +254,8 @@ namespace TradingSimulator
             // Arrange: BestYesBid = 0, should not trigger overlap
             var snapshot = new MarketSnapshot
             {
-                OrderbookData = new List<OrderbookEntry> { new OrderbookEntry() },
+                OrderbookData = new List<Dictionary<string, object>> { new Dictionary<string, object>() },
                 BestYesBid = 0,
-                BestYesAsk = 10,
                 BestNoBid = 9,
                 ChangeMetricsMature = true,
                 VelocityPerMinute_Top_Yes_Bid = 1.0,
