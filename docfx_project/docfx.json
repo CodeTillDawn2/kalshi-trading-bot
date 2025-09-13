@@ -5,13 +5,29 @@
         {
           "src": "..",
           "files": [
-            "BacklashBot/BacklashBot.sln"
+            "BacklashBot/BacklashBot.csproj",
+            "KalshiBotAPI/KalshiBotAPI.csproj",
+            "KalshiBotOverseer/KalshiBotOverseer.csproj",
+            "BacklashDTOs/BacklashDTOs.csproj",
+            "BacklashInterfaces/BacklashInterfaces.csproj",
+            "KalshiBotLogging/KalshiBotLogging.csproj",
+            "KalshiBotContext/KalshiBotData.csproj",
+            "TradingStrategies/TradingStrategies.csproj",
+            "TradingSimulator/TradingSimulator.csproj",
+            "KalshiBotTasks/KalshiBotTasks.csproj",
+            "BacklashPatterns/BacklashPatterns.csproj"
+          ],
+          "exclude": [
+            "TradingGUI/**",
+            "**/*Tests.csproj",
+            "**/*.sln"
           ]
         }
       ],
       "dest": "obj/api",
       "properties": {
-        "TargetFramework": "net8.0"
+        "TargetFramework": "net8.0",
+        "EnableWindowsTargeting": "true"
       }
     }
   ],
