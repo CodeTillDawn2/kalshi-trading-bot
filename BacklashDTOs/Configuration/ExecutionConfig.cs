@@ -35,5 +35,11 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         /// <value>Default is 100 items.</value>
         public int QueueCountAlertThreshold { get; set; } = 100;
+
+        /// <summary>
+        /// Gets or sets the retry delay in milliseconds for operations that require retries.
+        /// </summary>
+        /// <value>Default is 5000 milliseconds (5 seconds).</value>
+        public int RetryDelayMs { get; set; } = 5000;
     }
 }

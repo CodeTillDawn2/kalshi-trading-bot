@@ -7,6 +7,7 @@ using BacklashBot.Services.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using TradingStrategies.Classification.Interfaces;
+using System.Diagnostics;
 
 namespace BacklashBot.Management
 {
@@ -32,10 +33,16 @@ namespace BacklashBot.Management
         /// <param name="logger">Logger for recording analysis operations and errors.</param>
         public MarketAnalysisHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper, ITradingSnapshotService snapshotService, IOptions<ExecutionConfig> executionConfig, ILogger<MarketAnalysisHelper> logger)
         {
+            ArgumentNullException.ThrowIfNull(scopeFactory);
+            ArgumentNullException.ThrowIfNull(snapshotPeriodHelper);
+            ArgumentNullException.ThrowIfNull(snapshotService);
+            ArgumentNullException.ThrowIfNull(executionConfig);
+            ArgumentNullException.ThrowIfNull(logger);
+
             _snapshotService = snapshotService;
             _scopeFactory = scopeFactory;
             _snapshotPeriodHelper = snapshotPeriodHelper;
-            _executionConfig = executionConfig.Value;
+            _executionConfig = executionConfig.Value ?? throw new ArgumentNullException(nameof(executionConfig.Value));
             _logger = logger;
         }
 
@@ -70,6 +77,7 @@ namespace BacklashBot.Management
 
             foreach (string marketTicker in tickersToAnalyze)
             {
+                var stopwatch = Stopwatch.StartNew();
                 List<SnapshotDTO> rawSnapshots;
 
                 try
@@ -80,15 +88,20 @@ namespace BacklashBot.Management
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "Failed to retrieve snapshots for market {MarketTicker}. Retrying after delay.", marketTicker);
+                    stopwatch.Stop();
+                    _logger.LogWarning("Initial failure for market {MarketTicker} in {ElapsedMs} ms.", marketTicker, stopwatch.ElapsedMilliseconds);
+                    stopwatch.Restart();
                     try
                     {
-                        await Task.Delay(5000);
+                        await Task.Delay(_executionConfig.RetryDelayMs);
                         rawSnapshots = await context.GetSnapshotsFiltered(marketTicker: marketTicker);
                         rawSnapshots = rawSnapshots.OrderBy(x => x.SnapshotDate).ToList();
                     }
                     catch (Exception retryEx)
                     {
                         _logger.LogError(retryEx, "Failed to retrieve snapshots for market {MarketTicker} after retry. Skipping.", marketTicker);
+                        stopwatch.Stop();
+                        _logger.LogWarning("Failed to process market {MarketTicker} in {ElapsedMs} ms.", marketTicker, stopwatch.ElapsedMilliseconds);
                         continue;
                     }
                 }
@@ -124,7 +137,8 @@ namespace BacklashBot.Management
                 var validPeriods = await _snapshotPeriodHelper.SplitIntoValidGroups(validSnapshots, snapshotDirectory);
 
                 await context.AddOrUpdateSnapshotGroups(validPeriods);
-                _logger.LogInformation("Successfully processed {Count} snapshot groups for market {MarketTicker}.", validPeriods.Count, marketTicker);
+                stopwatch.Stop();
+                _logger.LogInformation("Successfully processed {Count} snapshot groups for market {MarketTicker} in {ElapsedMs} ms.", validPeriods.Count, marketTicker, stopwatch.ElapsedMilliseconds);
             }
 
             _logger.LogInformation("Completed snapshot group generation process.");

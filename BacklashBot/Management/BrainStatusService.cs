@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using BacklashDTOs.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashDTOs.Data;
+using System.Security.Cryptography;
 
 namespace BacklashBot.Management
 {
@@ -30,8 +31,12 @@ namespace BacklashBot.Management
         /// <param name="logger">Logger for recording service operations and errors.</param>
         public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions<ExecutionConfig> executionConfig, ILogger<BrainStatusService> logger)
         {
+            ArgumentNullException.ThrowIfNull(scopeFactory);
+            ArgumentNullException.ThrowIfNull(executionConfig);
+            ArgumentNullException.ThrowIfNull(logger);
+
             _scopeFactory = scopeFactory;
-            _executionConfig = executionConfig.Value;
+            _executionConfig = executionConfig.Value ?? throw new ArgumentNullException(nameof(executionConfig.Value));
             _logger = logger;
         }
 
@@ -124,9 +129,17 @@ namespace BacklashBot.Management
         private string GenerateRandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var random = new Random();
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
+            var data = new byte[length];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(data);
+            }
+            var result = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                result[i] = chars[data[i] % chars.Length];
+            }
+            return new string(result);
         }
 
         /// <summary>
