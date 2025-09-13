@@ -55,6 +55,7 @@ builder.Configuration
 builder.Services.Configure<LoggingConfig>(builder.Configuration.GetSection("Logging"));
 builder.Services.Configure<KalshiConfig>(builder.Configuration.GetSection("Kalshi"));
 builder.Services.Configure<SnapshotConfig>(builder.Configuration.GetSection("Snapshots"));
+builder.Services.AddOptions<SnapshotConfig>().ValidateDataAnnotations();
 builder.Services.Configure<TradingConfig>(builder.Configuration.GetSection("TradingConfig"));
 builder.Services.Configure<CalculationConfig>(builder.Configuration.GetSection("CalculationConfig"));
 builder.Services.Configure<ExecutionConfig>(builder.Configuration.GetSection("Execution"));
