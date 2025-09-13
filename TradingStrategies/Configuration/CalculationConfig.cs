@@ -198,5 +198,49 @@ namespace TradingStrategies.Configuration
         /// Longer periods provide more stable trend strength readings.
         /// </summary>
         public int ADX_Periods { get; set; }
+
+        /// <summary>
+        /// Tolerance percentage used for depth calculations within a price range.
+        /// Determines the percentage range around the best bid to include in depth calculations.
+        /// Expressed as percentage (e.g., 10.0 for 10%).
+        /// </summary>
+        public double TolerancePercentage { get; set; } = 10.0;
+
+        /// <summary>
+        /// Trading fee rate applied to calculate expected fees.
+        /// The fee is calculated as: roundup(fee_rate * contracts * price * (1 - price)).
+        /// Expressed as decimal (e.g., 0.07 for 7%).
+        /// </summary>
+        public double TradingFeeRate { get; set; } = 0.07;
+
+        /// <summary>
+        /// Number of minutes for short-term slope calculations in price movement analysis.
+        /// Used to calculate bid slope over a short timeframe for responsive signals.
+        /// </summary>
+        public int SlopeShortMinutes { get; set; } = 5;
+
+        /// <summary>
+        /// Number of minutes for medium-term slope calculations in price movement analysis.
+        /// Used to calculate bid slope over a medium timeframe for balanced signals.
+        /// </summary>
+        public int SlopeMediumMinutes { get; set; } = 15;
+
+        /// <summary>
+        /// Number of days to look back for recent candlestick metadata.
+        /// Determines the timeframe for identifying recent high/low bid levels.
+        /// </summary>
+        public int RecentCandlestickDays { get; set; } = 1;
+
+        /// <summary>
+        /// Default number of lookback periods for building pseudo candlesticks.
+        /// Controls how many historical periods are included in pseudo candlestick generation.
+        /// </summary>
+        public int PseudoCandlestickLookbackPeriods { get; set; } = 34;
+
+        /// <summary>
+        /// Number of recent candlesticks to retain for analysis and display.
+        /// Controls how many of the most recent minute-level pseudo candlesticks are kept in memory.
+        /// </summary>
+        public int RecentCandlesticksCount { get; set; } = 15;
     }
 }

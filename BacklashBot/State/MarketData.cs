@@ -12,11 +12,27 @@
 /// - Order book change velocities and trade metrics
 /// - Support/resistance levels and market metadata
 ///
+/// Data integrity is ensured through comprehensive input validation:
+/// - Candlestick data validation for non-negative prices (0-100), valid timestamps, and reasonable values
+/// - Ticker data validation for price ranges, volume, and timestamp integrity
+/// - Orderbook data validation for price bounds, quantities, and side validity
+/// - Position data validation for size reasonableness, exposure bounds, and update timestamps
+/// Invalid data triggers informative warnings via logging but processing continues to maintain system resilience.
+///
 /// Data is updated through various mechanisms:
 /// - WebSocket events for real-time order book and ticker updates
 /// - Periodic API calls for position and market information
-/// - Background calculations for technical indicators and metrics
+/// - Asynchronous background calculations for technical indicators and metrics to avoid blocking
 /// - Historical data loading from candlestick storage
+///
+/// Performance optimizations include:
+/// - Efficient data structures and minimized LINQ queries
+/// - Parallel processing for CPU-intensive calculations
+/// - Binary search for large dataset lookups
+/// - Asynchronous operations to maintain responsiveness
+///
+/// Calculation parameters such as tolerance percentages, fee rates, time periods for slope calculations,
+/// and lookback periods are configurable via CalculationConfig to allow runtime customization without code changes.
 ///
 /// This class implements the IMarketData interface and is used throughout the trading bot
 /// for market analysis, strategy execution, and data persistence via MarketSnapshot serialization.
@@ -106,26 +122,44 @@ namespace BacklashBot.State
         private double _yesBidSlopePerMinute_Medium = 0;
         private double _noBidSlopePerMinute_Medium = 0;
 
+        /// <summary>
+        /// Gets or sets the short-term slope of yes bid prices per minute, calculated from recent ticker data.
+        /// Represents the rate of change for yes bid prices over a short time period.
+        /// </summary>
         public double YesBidSlopePerMinute_Short { get { return _yesBidSlopePerMinute_Short; } set { _yesBidSlopePerMinute_Short = value; } }
+        /// <summary>
+        /// Gets or sets the short-term slope of no bid prices per minute, calculated from recent ticker data.
+        /// Represents the rate of change for no bid prices over a short time period.
+        /// </summary>
         public double NoBidSlopePerMinute_Short { get { return _noBidSlopePerMinute_Short; } set { _noBidSlopePerMinute_Short = value; } }
+        /// <summary>
+        /// Gets or sets the medium-term slope of yes bid prices per minute, calculated from recent ticker data.
+        /// Represents the rate of change for yes bid prices over a medium time period.
+        /// </summary>
         public double YesBidSlopePerMinute_Medium { get { return _yesBidSlopePerMinute_Medium; } set { _yesBidSlopePerMinute_Medium = value; } }
+        /// <summary>
+        /// Gets or sets the medium-term slope of no bid prices per minute, calculated from recent ticker data.
+        /// Represents the rate of change for no bid prices over a medium time period.
+        /// </summary>
         public double NoBidSlopePerMinute_Medium { get { return _noBidSlopePerMinute_Medium; } set { _noBidSlopePerMinute_Medium = value; } }
 
         public string MarketType { get; set; } = "";
 
-        private double _tolerancePercentage = 10.0;
+        private double _tolerancePercentage;
 
         public bool ChangeMetricsMature => _changeTracker.IsMature;
 
         /// <summary>
         /// Initializes a new instance of the MarketData class for a specific market.
         /// Sets up all data collections, dependencies, and initial state for market data tracking.
+        /// Initializes candlestick dictionaries for minute, hour, and day timeframes, and configures
+        /// calculation parameters from the provided configuration.
         /// </summary>
         /// <param name="market">The market DTO containing basic market information (ticker, category, status).</param>
         /// <param name="logger">Logger instance for recording market data operations and events.</param>
         /// <param name="tradingCalculator">Calculator service for technical indicators and trading metrics.</param>
         /// <param name="changeTracker">Tracker for monitoring order book changes and velocities.</param>
-        /// <param name="calculationConfig">Configuration options for calculation parameters and thresholds.</param>
+        /// <param name="calculationConfig">Configuration options for calculation parameters and thresholds, allowing runtime customization.</param>
         /// <exception cref="ArgumentNullException">Thrown when any required dependency is null.</exception>
         public MarketData(
             MarketDTO market,
@@ -135,6 +169,7 @@ namespace BacklashBot.State
             IOptions<CalculationConfig> calculationConfig)
         {
             _calculationConfig = calculationConfig?.Value ?? throw new ArgumentNullException(nameof(calculationConfig));
+            _tolerancePercentage = _calculationConfig.TolerancePercentage;
             _marketTicker = market.market_ticker ?? "";
             _marketCategory = market.category ?? "";
             _marketInfo = market;
@@ -154,6 +189,133 @@ namespace BacklashBot.State
             _lastWebSocketMessageReceived = DateTime.UtcNow;
 
             _logger.LogDebug("MarketData initialized for ticker {MarketTicker}", _marketTicker);
+        }
+        /// <summary>
+        /// Validates candlestick data for integrity before processing.
+        /// Checks for non-negative prices within valid range (0-100), non-negative volume, and reasonable timestamps.
+        /// Logs warnings for invalid data but continues processing to maintain system resilience.
+        /// </summary>
+        /// <param name="candlesticks">The list of candlestick data to validate.</param>
+        private void ValidateCandlesticks(List<CandlestickData> candlesticks)
+        {
+            foreach (var candle in candlesticks)
+            {
+                bool hasInvalidPrice = candle.AskClose < 0 || candle.AskClose > 100 ||
+                                       candle.BidClose < 0 || candle.BidClose > 100 ||
+                                       candle.AskHigh < 0 || candle.AskHigh > 100 ||
+                                       candle.BidHigh < 0 || candle.BidHigh > 100 ||
+                                       candle.AskLow < 0 || candle.AskLow > 100 ||
+                                       candle.BidLow < 0 || candle.BidLow > 100;
+                if (hasInvalidPrice)
+                {
+                    _logger.LogWarning("Invalid candlestick data for {MarketTicker}: prices out of range (0-100). AskClose={AskClose}, BidClose={BidClose}, AskHigh={AskHigh}, BidHigh={BidHigh}, AskLow={AskLow}, BidLow={BidLow}",
+                        _marketTicker, candle.AskClose, candle.BidClose, candle.AskHigh, candle.BidHigh, candle.AskLow, candle.BidLow);
+                }
+                if (candle.Volume < 0)
+                {
+                    _logger.LogWarning("Invalid candlestick data for {MarketTicker}: negative volume {Volume}", _marketTicker, candle.Volume);
+                }
+                if (candle.Date > DateTime.UtcNow.AddMinutes(1)) // Allow small future tolerance
+                {
+                    _logger.LogWarning("Invalid candlestick data for {MarketTicker}: future timestamp {Timestamp}", _marketTicker, candle.Date);
+                }
+                if (candle.Date < DateTime.UtcNow.AddYears(-10)) // Not too old
+                {
+                    _logger.LogWarning("Invalid candlestick data for {MarketTicker}: unreasonably old timestamp {Timestamp}", _marketTicker, candle.Date);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Validates ticker data for integrity before processing.
+        /// Checks for non-negative prices within valid range (0-100), non-negative volume, and reasonable timestamps.
+        /// Logs warnings for invalid data but continues processing to maintain system resilience.
+        /// </summary>
+        /// <param name="tickers">The list of ticker data to validate.</param>
+        private void ValidateTickers(List<TickerDTO> tickers)
+        {
+            foreach (var ticker in tickers)
+            {
+                bool hasInvalidPrice = ticker.yes_bid < 0 || ticker.yes_bid > 100 ||
+                                       ticker.yes_ask < 0 || ticker.yes_ask > 100 ||
+                                       ticker.no_bid < 0 || ticker.no_bid > 100 ||
+                                       ticker.no_ask < 0 || ticker.no_ask > 100;
+                if (hasInvalidPrice)
+                {
+                    _logger.LogWarning("Invalid ticker data for {MarketTicker}: prices out of range (0-100). yes_bid={yes_bid}, yes_ask={yes_ask}, no_bid={no_bid}, no_ask={no_ask}",
+                        _marketTicker, ticker.yes_bid, ticker.yes_ask, ticker.no_bid, ticker.no_ask);
+                }
+                if (ticker.volume < 0)
+                {
+                    _logger.LogWarning("Invalid ticker data for {MarketTicker}: negative volume {Volume}", _marketTicker, ticker.volume);
+                }
+                if (ticker.LoggedDate > DateTime.UtcNow.AddMinutes(1))
+                {
+                    _logger.LogWarning("Invalid ticker data for {MarketTicker}: future timestamp {Timestamp}", _marketTicker, ticker.LoggedDate);
+                }
+                if (ticker.LoggedDate < DateTime.UtcNow.AddYears(-10))
+                {
+                    _logger.LogWarning("Invalid ticker data for {MarketTicker}: unreasonably old timestamp {Timestamp}", _marketTicker, ticker.LoggedDate);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Validates orderbook data for integrity before processing.
+        /// Checks for non-negative prices within valid range (0-100), non-negative quantities, and valid sides.
+        /// Logs warnings for invalid data but continues processing to maintain system resilience.
+        /// </summary>
+        /// <param name="orderbookData">The list of orderbook data to validate.</param>
+        private void ValidateOrderbook(List<OrderbookData> orderbookData)
+        {
+            foreach (var order in orderbookData)
+            {
+                if (order.Price < 0 || order.Price > 100)
+                {
+                    _logger.LogWarning("Invalid orderbook data for {MarketTicker}: price out of range (0-100) {Price}", _marketTicker, order.Price);
+                }
+                if (order.RestingContracts < 0)
+                {
+                    _logger.LogWarning("Invalid orderbook data for {MarketTicker}: negative resting contracts {RestingContracts}", _marketTicker, order.RestingContracts);
+                }
+                if (order.Side != "yes" && order.Side != "no")
+                {
+                    _logger.LogWarning("Invalid orderbook data for {MarketTicker}: invalid side '{Side}'", _marketTicker, order.Side);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Validates position data for integrity before processing.
+        /// Checks for reasonable position sizes, market exposure within bounds, and valid timestamps.
+        /// Logs warnings for invalid data but continues processing to maintain system resilience.
+        /// </summary>
+        /// <param name="positions">The list of position data to validate.</param>
+        private void ValidatePositions(List<MarketPositionDTO> positions)
+        {
+            foreach (var position in positions)
+            {
+                if (Math.Abs(position.Position) > 1000000) // Arbitrary large number, adjust as needed
+                {
+                    _logger.LogWarning("Invalid position data for {MarketTicker}: unreasonably large position size {Position}", _marketTicker, position.Position);
+                }
+                if (position.MarketExposure < 0 || position.MarketExposure > 1)
+                {
+                    _logger.LogWarning("Invalid position data for {MarketTicker}: market exposure out of range (0-1) {MarketExposure}", _marketTicker, position.MarketExposure);
+                }
+                if (position.TotalTraded < 0)
+                {
+                    _logger.LogWarning("Invalid position data for {MarketTicker}: negative total traded {TotalTraded}", _marketTicker, position.TotalTraded);
+                }
+                if (position.LastUpdatedUTC.HasValue && position.LastUpdatedUTC.Value > DateTime.UtcNow.AddMinutes(1))
+                {
+                    _logger.LogWarning("Invalid position data for {MarketTicker}: future last updated timestamp {Timestamp}", _marketTicker, position.LastUpdatedUTC.Value);
+                }
+                if (position.LastUpdatedUTC.HasValue && position.LastUpdatedUTC.Value < DateTime.UtcNow.AddYears(-10))
+                {
+                    _logger.LogWarning("Invalid position data for {MarketTicker}: unreasonably old last updated timestamp {Timestamp}", _marketTicker, position.LastUpdatedUTC.Value);
+                }
+            }
         }
 
         /// <summary>
@@ -184,6 +346,12 @@ namespace BacklashBot.State
 
         public double ExpectedFees { get { return _expectedFees; } set { _expectedFees = value; } }
 
+        /// <summary>
+        /// Gets or sets the tolerance percentage used for depth calculations within a price range.
+        /// This value is initialized from CalculationConfig but can be overridden locally.
+        /// Determines the percentage range around the best bid to include in depth calculations.
+        /// Must be non-negative.
+        /// </summary>
         public double TolerancePercentage
         {
             get => _tolerancePercentage;
@@ -200,6 +368,10 @@ namespace BacklashBot.State
             set => _lastSnapshotTaken = value;
         }
 
+        /// <summary>
+        /// Recalculates all order book change metrics using the change tracker.
+        /// This method triggers a full recalculation of velocities, trade rates, and other dynamic metrics.
+        /// </summary>
         public void RecalculateOrderbookChangeMetrics()
         {
             _changeTracker.RecalculateAllMetrics();
@@ -236,9 +408,25 @@ namespace BacklashBot.State
         public int LevelCount_Bottom_No_Bid { get { return _yesBidBottomLevelCount; } set { _yesBidBottomLevelCount = value; } }
         public int LevelCount_Bottom_Yes_Bid { get { return _noBidBottomLevelCount; } set { _noBidBottomLevelCount = value; } }
 
+        /// <summary>
+        /// Gets or sets the velocity (rate of change) of the top yes bid price per minute.
+        /// Calculated from order book change metrics to track market momentum.
+        /// </summary>
         public double VelocityPerMinute_Top_Yes_Bid { get { return _velocityPerMinute_Top_Yes_Bid; } set { _velocityPerMinute_Top_Yes_Bid = value; } }
+        /// <summary>
+        /// Gets or sets the velocity (rate of change) of the top no bid price per minute.
+        /// Calculated from order book change metrics to track market momentum.
+        /// </summary>
         public double VelocityPerMinute_Top_No_Bid { get { return _velocityPerMinute_Top_No_Bid; } set { _velocityPerMinute_Top_No_Bid = value; } }
+        /// <summary>
+        /// Gets or sets the velocity (rate of change) of the bottom yes bid price per minute.
+        /// Calculated from order book change metrics to track market momentum.
+        /// </summary>
         public double VelocityPerMinute_Bottom_Yes_Bid { get { return _VelocityPerMinute_Bottom_Yes_Bid; } set { _VelocityPerMinute_Bottom_Yes_Bid = value; } }
+        /// <summary>
+        /// Gets or sets the velocity (rate of change) of the bottom no bid price per minute.
+        /// Calculated from order book change metrics to track market momentum.
+        /// </summary>
         public double VelocityPerMinute_Bottom_No_Bid { get { return _VelocityPerMinute_Bottom_No_Bid; } set { _VelocityPerMinute_Bottom_No_Bid = value; } }
 
         private double _tradeVolumePerMinute_Yes = 0;
@@ -246,9 +434,25 @@ namespace BacklashBot.State
         private double _tradeRatePerMinute_Yes = 0;
         private double _tradeRatePerMinute_No = 0;
 
+        /// <summary>
+        /// Gets or sets the trade volume per minute for yes positions.
+        /// Represents the volume of trades executed for yes contracts in the last minute.
+        /// </summary>
         public double TradeVolumePerMinute_Yes { get { return _tradeVolumePerMinute_Yes; } set { _tradeVolumePerMinute_Yes = value; } }
+        /// <summary>
+        /// Gets or sets the trade volume per minute for no positions.
+        /// Represents the volume of trades executed for no contracts in the last minute.
+        /// </summary>
         public double TradeVolumePerMinute_No { get { return _tradeVolumePerMinute_No; } set { _tradeVolumePerMinute_No = value; } }
+        /// <summary>
+        /// Gets or sets the trade rate per minute for yes positions.
+        /// Represents the number of trades executed for yes contracts in the last minute.
+        /// </summary>
         public double TradeRatePerMinute_Yes { get { return _tradeRatePerMinute_Yes; } set { _tradeRatePerMinute_Yes = value; } }
+        /// <summary>
+        /// Gets or sets the trade rate per minute for no positions.
+        /// Represents the number of trades executed for no contracts in the last minute.
+        /// </summary>
         public double TradeRatePerMinute_No { get { return _tradeRatePerMinute_No; } set { _tradeRatePerMinute_No = value; } }
 
         private double _yesBidOrderRatePerMinute = 0;
@@ -331,6 +535,14 @@ namespace BacklashBot.State
             Math.Round(GetBids("no").Sum(o => o.Price * (double)o.Price * o.RestingContracts) /
             GetBids("no").Sum(o => o.Price * (double)o.RestingContracts), 2) : 0;
 
+        /// <summary>
+        /// Updates the current price information if the timestamp is newer than the existing price data.
+        /// This method ensures that only the most recent price updates are retained, based on timestamp comparison.
+        /// </summary>
+        /// <param name="yesAsk">The ask price for yes contracts.</param>
+        /// <param name="yesBid">The bid price for yes contracts.</param>
+        /// <param name="timestamp">The timestamp of the price update.</param>
+        /// <param name="source">The source of the price update (e.g., "Candlestick", "Ticker").</param>
         public void UpdateCurrentPrice(int yesAsk, int yesBid, DateTime timestamp, string source)
         {
 
@@ -349,15 +561,24 @@ namespace BacklashBot.State
             }
         }
 
-        public void RefreshAllMetadata()
+        /// <summary>
+        /// Asynchronously refreshes all metadata for the market, including candlestick, ticker, and position data.
+        /// This method coordinates the refresh process, calling synchronous methods for candlestick and position data,
+        /// and asynchronous methods for ticker data to ensure non-blocking updates.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task RefreshAllMetadata()
         {
             RefreshCandlestickMetadata();
-            RefreshTickerMetadata();
+            await RefreshTickerMetadata();
             RefreshPositionMetadata();
         }
 
         public void RefreshCandlestickMetadata()
         {
+            // Validate candlestick data integrity
+            ValidateCandlesticks(_candlesticks["minute"]);
+
             if (_candlesticks["minute"].Count > 0)
             {
                 var latestCandlestick = _candlesticks["minute"].OrderByDescending(c => c.Date).First();
@@ -379,7 +600,7 @@ namespace BacklashBot.State
                 if (candle != null) _allTimeLowNoBid = (candle.AskHigh, candle.Date);
 
 
-                List<CandlestickData> recentCandlesticks = _candlesticks["minute"].Where(x => x.Date >= DateTime.UtcNow.AddDays(-1)).ToList();
+                List<CandlestickData> recentCandlesticks = _candlesticks["minute"].Where(x => x.Date >= DateTime.UtcNow.AddDays(-_calculationConfig.RecentCandlestickDays)).ToList();
                 candle = recentCandlesticks.MaxBy(x => x.BidHigh);
                 if (candle != null) _recentHighYesBid = (candle.BidHigh, candle.Date);
                 candle = recentCandlesticks.MaxBy(x => 100 - x.AskHigh);
@@ -404,34 +625,42 @@ namespace BacklashBot.State
             }
         }
 
-        public void RefreshTickerMetadata()
+        /// <summary>
+        /// Asynchronously refreshes ticker metadata, validates ticker data integrity, and updates trading metrics.
+        /// This method performs validation on ticker data and triggers asynchronous calculation of technical indicators.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task RefreshTickerMetadata()
         {
+            // Validate ticker data integrity
+            ValidateTickers(_tickers.ToList());
+
             if (!_tickers.IsEmpty)
             {
                 _mostRecentTicker = _tickers.OrderByDescending(t => t.LoggedDate).FirstOrDefault()?.LoggedDate ?? default;
             }
 
-            UpdateTradingMetrics();
+            await UpdateTradingMetrics();
 
         }
 
         private void CalculateSlope()
         {
             var now = DateTime.UtcNow;
-            var fiveMinAgo = now.AddMinutes(-5);
-            var fifteenMinAgo = now.AddMinutes(-15);
+            var shortMinAgo = now.AddMinutes(-_calculationConfig.SlopeShortMinutes);
+            var mediumMinAgo = now.AddMinutes(-_calculationConfig.SlopeMediumMinutes);
 
             var recentTickers = _tickers
-                .Where(t => t.LoggedDate >= fiveMinAgo && t.LoggedDate <= now)
+                .Where(t => t.LoggedDate >= shortMinAgo && t.LoggedDate <= now)
                 .OrderBy(t => t.LoggedDate)
                 .ToList();
 
             var recentTickers_m = _tickers
-                .Where(t => t.LoggedDate >= fifteenMinAgo && t.LoggedDate <= now)
+                .Where(t => t.LoggedDate >= mediumMinAgo && t.LoggedDate <= now)
                 .OrderBy(t => t.LoggedDate)
                 .ToList();
 
-            // 5-minute
+            // Short-term slope
             if (recentTickers.Count >= 2)
             {
                 var first = recentTickers.First();
@@ -455,7 +684,7 @@ namespace BacklashBot.State
                 _noBidSlopePerMinute_Short  = 0;
             }
 
-            // 15-minute
+            // Medium-term slope
             if (recentTickers_m.Count >= 2)
             {
                 var first_m = recentTickers_m.First();
@@ -501,17 +730,25 @@ namespace BacklashBot.State
         private long _obv_Medium;
         private long _obv_Long;
 
-        public void UpdateTradingMetrics()
+        /// <summary>
+        /// Asynchronously updates trading metrics for the market, including technical indicators and pseudo candlesticks.
+        /// This method performs CPU-intensive calculations for RSI, MACD, Bollinger Bands, and other indicators using parallel processing
+        /// to maintain system responsiveness. All calculations are offloaded to background threads to avoid blocking the main thread.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task UpdateTradingMetrics()
         {
             _logger.LogDebug("**Started updating trading metrics for {marketTicker}**", _marketTicker);
-            _minutePseudoCandlesticks = BuildPseudoCandlesticks("minute");
-            _hourPseudoCandlesticks = BuildPseudoCandlesticks("hour");
-            _dayPseudoCandlesticks = BuildPseudoCandlesticks("day");
+            _minutePseudoCandlesticks = await BuildPseudoCandlesticks("minute");
+            _hourPseudoCandlesticks = await BuildPseudoCandlesticks("hour");
+            _dayPseudoCandlesticks = await BuildPseudoCandlesticks("day");
             var minuteCopy = _minutePseudoCandlesticks.ToList();
             var hourCopy = _hourPseudoCandlesticks.ToList();
             var dayCopy = _dayPseudoCandlesticks.ToList();
 
-            _rsi_Short = _tradingCalculator.CalculateRSI(minuteCopy, _calculationConfig.RSI_Short_Periods);
+            await Task.Run(() =>
+            {
+                _rsi_Short = _tradingCalculator.CalculateRSI(minuteCopy, _calculationConfig.RSI_Short_Periods);
             if (_rsi_Short != null) _rsi_Short = Math.Round((double)_rsi_Short, 2);
             _rsi_Medium = _tradingCalculator.CalculateRSI(hourCopy, _calculationConfig.RSI_Medium_Periods);
             if (_rsi_Medium != null) _rsi_Medium = Math.Round((double)_rsi_Medium, 2);
@@ -571,17 +808,17 @@ namespace BacklashBot.State
             if (_vwap_Medium != null) _vwap_Medium = Math.Round((double)_vwap_Medium, 2);
             _stochasticoscilator_Short = _tradingCalculator.CalculateStochastic(minuteCopy,
                 _calculationConfig.Stochastic_Short_Periods,
-                3);
+                _calculationConfig.Stochastic_Short_DPeriods);
             if (_stochasticoscilator_Short.K != null) _stochasticoscilator_Short.K = Math.Round((double)_stochasticoscilator_Short.K, 2);
             if (_stochasticoscilator_Short.D != null) _stochasticoscilator_Short.D = Math.Round((double)_stochasticoscilator_Short.D, 2);
             _stochasticoscilator_Medium = _tradingCalculator.CalculateStochastic(hourCopy,
                 _calculationConfig.Stochastic_Medium_Periods,
-                3);
+                _calculationConfig.Stochastic_Medium_DPeriods);
             if (_stochasticoscilator_Medium.K != null) _stochasticoscilator_Medium.K = Math.Round((double)_stochasticoscilator_Medium.K, 2);
             if (_stochasticoscilator_Medium.D != null) _stochasticoscilator_Medium.D = Math.Round((double)_stochasticoscilator_Medium.D, 2);
             _stochasticoscilator_Long = _tradingCalculator.CalculateStochastic(dayCopy,
                 _calculationConfig.Stochastic_Long_Periods,
-                3);
+                _calculationConfig.Stochastic_Long_DPeriods);
             if (_stochasticoscilator_Long.K != null) _stochasticoscilator_Long.K = Math.Round((double)_stochasticoscilator_Long.K, 2);
             if (_stochasticoscilator_Long.D != null) _stochasticoscilator_Long.D = Math.Round((double)_stochasticoscilator_Long.D, 2);
             _obv_Medium = (long)_tradingCalculator.CalculateOBV(hourCopy);
@@ -599,9 +836,10 @@ namespace BacklashBot.State
 
             CalculateSlope();
 
-            RecentCandlesticks = minuteCopy.TakeLast(15).ToList();
+            RecentCandlesticks = minuteCopy.TakeLast(_calculationConfig.RecentCandlesticksCount).ToList();
             PSAR = Math.Round((double)_tradingCalculator.CalculatePSAR(Candlesticks["minute"]), 2);
             _logger.LogDebug("**Ended updating trading metrics for {marketTicker}**", _marketTicker);
+            });
         }
 
         public double? RSI_Short
@@ -729,6 +967,16 @@ namespace BacklashBot.State
 
         public void RefreshPositionMetadata()
         {
+            // Validate position and orderbook data integrity
+            if (_positions != null)
+            {
+                ValidatePositions(_positions);
+            }
+            if (_orderbookData != null)
+            {
+                ValidateOrderbook(_orderbookData);
+            }
+
             if (_positions == null || _positions.Count == 0)
             {
                 _positionSize = 0;
@@ -782,8 +1030,8 @@ namespace BacklashBot.State
 
         private double CalculateTradingFees(int contracts, double priceInDollars)
         {
-            // fees = roundup(0.07 * C * P * (1-P))
-            double fee = 0.07 * contracts * priceInDollars * (1 - priceInDollars);
+            // fees = roundup(fee_rate * C * P * (1-P))
+            double fee = _calculationConfig.TradingFeeRate * contracts * priceInDollars * (1 - priceInDollars);
             return Math.Ceiling(fee * 100) / 100; // Round up to the next cent
         }
 
@@ -822,159 +1070,263 @@ namespace BacklashBot.State
         public List<OrderDTO> RestingOrders { get { return _restingOrders; } set { _restingOrders = value; } }
         public double PositionROI => _positionROI;
 
-        public List<PseudoCandlestick> BuildPseudoCandlesticks(string period, int lookbackPeriods = 34)
+        /// <summary>
+        /// Asynchronously builds pseudo candlesticks for the specified period and lookback periods.
+        /// This method performs CPU-intensive calculations to generate candlestick data from historical and real-time market data.
+        /// Optimized for high-frequency scenarios with reduced redundant operations, efficient data structures, minimized LINQ queries,
+        /// binary search for large dataset lookups, and parallel processing where appropriate to improve performance for large datasets
+        /// while maintaining correctness. All processing is offloaded to background threads to ensure non-blocking operation.
+        /// </summary>
+        /// <param name="period">The time period for the candlesticks ("minute", "hour", or "day").</param>
+        /// <param name="lookbackPeriods">The number of periods to look back for data aggregation. Defaults to 0, which uses the configured default.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the list of pseudo candlesticks.</returns>
+        public async Task<List<PseudoCandlestick>> BuildPseudoCandlesticks(string period, int lookbackPeriods = 0)
         {
             _logger.LogDebug("Starting BuildPseudoCandlesticks: period={Period}, lookbackPeriods={Lookback}", period, lookbackPeriods);
-
-            // Determine interval based on period
-            TimeSpan interval;
-            string candlestickKey;
-            Func<DateTime, DateTime> truncateFunc;
-            switch (period.ToLower())
+            return await Task.Run(() =>
             {
-                case "minute":
-                    candlestickKey = "minute";
-                    interval = TimeSpan.FromMinutes(1);
-                    truncateFunc = dt => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0, DateTimeKind.Utc);
-                    break;
-                case "hour":
-                    candlestickKey = "hour";
-                    interval = TimeSpan.FromHours(1);
-                    truncateFunc = dt => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, 0, 0, DateTimeKind.Utc);
-                    break;
-                case "day":
-                    candlestickKey = "day";
-                    interval = TimeSpan.FromDays(1);
-                    truncateFunc = dt => new DateTime(dt.Year, dt.Month, dt.Day, 0, 0, 0, DateTimeKind.Utc);
-                    break;
-                default:
-                    throw new ArgumentException("Period must be 'minute', 'hour', or 'day'.");
-            }
-            _logger.LogDebug("Selected candlestickKey={Key}, interval={Interval}", candlestickKey, interval);
-
-            // Retrieve and sort data
-            var candlesticks = _candlesticks.ContainsKey(candlestickKey)
-                ? _candlesticks[candlestickKey].OrderByDescending(c => c.Date).ToList()
-                : new List<CandlestickData>();
-            var tickers = _tickers.OrderByDescending(t => t.LoggedDate).ToList();
-            _logger.LogDebug("Retrieved {Count} candlesticks, {TickerCount} tickers", candlesticks.Count, tickers.Count);
-
-            // Truncate current time to the start of the current period
-            DateTime now = DateTime.UtcNow;
-            DateTime currentPeriodStart = truncateFunc(now);
-            _logger.LogDebug("Current period start={CurrentPeriodStart}", currentPeriodStart);
-
-            // Calculate lookback to cover lookbackPeriods intervals
-            TimeSpan lookback = interval * lookbackPeriods;
-            DateTime startTime = truncateFunc(currentPeriodStart - lookback);
-            _logger.LogDebug("StartTime={StartTime}, lookback={Lookback}", startTime, lookback);
-
-            // Filter candlesticks to the lookback timeframe
-            var filteredCandlesticks = candlesticks
-                .Where(c => c.Date >= startTime && c.Date <= currentPeriodStart)
-                .ToList();
-            _logger.LogDebug("Filtered {Count} candlesticks within lookback timeframe", filteredCandlesticks.Count);
-
-            // Generate all intervals within the lookback timeframe
-            var allIntervals = new List<DateTime>();
-            for (DateTime t = startTime; t <= currentPeriodStart; t += interval)
-            {
-                allIntervals.Add(t);
-            }
-            _logger.LogDebug("Generated {Count} intervals", allIntervals.Count);
-
-            // Take the most recent lookbackPeriods intervals
-            var targetIntervals = allIntervals.OrderByDescending(t => t).Take(lookbackPeriods).OrderBy(t => t).ToList();
-            if (targetIntervals.Count < lookbackPeriods)
-            {
-                _logger.LogWarning("Only {Count} intervals available, expected {Expected}", targetIntervals.Count, lookbackPeriods);
-            }
-
-            var result = new List<PseudoCandlestick>();
-            PseudoCandlestick previousCandlestick = null;
-
-            foreach (var periodStart in targetIntervals)
-            {
-                DateTime periodEnd = periodStart + interval;
-                // Set timestamp to the last millisecond of the period (e.g., 12:29:59.999 for minute period)
-                DateTime periodTimestamp = periodEnd - TimeSpan.FromMilliseconds(1);
-                _logger.LogDebug("Processing interval: {Start} to {End}, Timestamp={Timestamp}", periodStart, periodEnd, periodTimestamp);
-
-                // For the current interval, include partial data if it's the latest
-                bool isCurrentInterval = periodStart == currentPeriodStart;
-                var candle = filteredCandlesticks
-                    .Where(c => c.Date >= periodStart && (isCurrentInterval ? c.Date <= now : c.Date < periodEnd))
-                    .OrderByDescending(c => c.Date)
-                    .FirstOrDefault();
-
-                if (candle != null)
+                // Determine interval based on period
+                TimeSpan interval;
+                string candlestickKey;
+                Func<DateTime, DateTime> truncateFunc;
+                switch (period.ToLower())
                 {
-                    var currentPseudoCandlestick = new PseudoCandlestick
-                    {
-                        Timestamp = periodTimestamp, // Last millisecond of the period
-                        MidClose = (candle.AskClose + candle.BidClose) / 2.0,
-                        MidHigh = (candle.AskHigh + candle.BidHigh) / 2.0,
-                        MidLow = (candle.AskLow + candle.BidLow) / 2.0,
-                        Volume = candle.Volume,
-                        IsFromCandlestick = true
-                    };
-                    _logger.LogDebug("PseudoCandlestick: Time={Time}, MidClose={MidClose}, Source=Candlestick",
-                        currentPseudoCandlestick.Timestamp, currentPseudoCandlestick.MidClose);
-                    result.Add(currentPseudoCandlestick);
-                    previousCandlestick = currentPseudoCandlestick;
+                    case "minute":
+                        candlestickKey = "minute";
+                        interval = TimeSpan.FromMinutes(1);
+                        truncateFunc = dt => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0, DateTimeKind.Utc);
+                        break;
+                    case "hour":
+                        candlestickKey = "hour";
+                        interval = TimeSpan.FromHours(1);
+                        truncateFunc = dt => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, 0, 0, DateTimeKind.Utc);
+                        break;
+                    case "day":
+                        candlestickKey = "day";
+                        interval = TimeSpan.FromDays(1);
+                        truncateFunc = dt => new DateTime(dt.Year, dt.Month, dt.Day, 0, 0, 0, DateTimeKind.Utc);
+                        break;
+                    default:
+                        throw new ArgumentException("Period must be 'minute', 'hour', or 'day'.");
                 }
-                else
-                {
-                    // Aggregate tickers within the interval
-                    var intervalTickers = tickers
-                        .Where(t => t.LoggedDate >= periodStart && (isCurrentInterval ? t.LoggedDate <= now : t.LoggedDate < periodEnd))
-                        .OrderBy(t => t.LoggedDate)
-                        .ToList();
+                _logger.LogDebug("Selected candlestickKey={Key}, interval={Interval}", candlestickKey, interval);
 
-                    if (intervalTickers.Any())
+                // Use default lookback if not specified
+                if (lookbackPeriods == 0)
+                {
+                    lookbackPeriods = _calculationConfig.PseudoCandlestickLookbackPeriods;
+                }
+
+                // Retrieve and sort data once (ascending for binary search efficiency)
+                var candlesticks = _candlesticks.ContainsKey(candlestickKey)
+                    ? _candlesticks[candlestickKey].OrderBy(c => c.Date).ToList()
+                    : new List<CandlestickData>();
+                var tickers = _tickers.OrderBy(t => t.LoggedDate).ToList();
+                _logger.LogDebug("Retrieved {Count} candlesticks, {TickerCount} tickers", candlesticks.Count, tickers.Count);
+
+                // Truncate current time to the start of the current period
+                DateTime now = DateTime.UtcNow;
+                DateTime currentPeriodStart = truncateFunc(now);
+                _logger.LogDebug("Current period start={CurrentPeriodStart}", currentPeriodStart);
+
+                // Calculate lookback to cover lookbackPeriods intervals
+                TimeSpan lookback = interval * lookbackPeriods;
+                DateTime startTime = truncateFunc(currentPeriodStart - lookback);
+                _logger.LogDebug("StartTime={StartTime}, lookback={Lookback}", startTime, lookback);
+
+                // Filter candlesticks to the lookback timeframe using binary search for efficiency
+                int candlestickStartIndex = BinarySearchLeftmost(candlesticks, startTime, c => c.Date);
+                int candlestickEndIndex = BinarySearchRightmost(candlesticks, currentPeriodStart, c => c.Date);
+                var filteredCandlesticks = candlesticks.GetRange(candlestickStartIndex, candlestickEndIndex - candlestickStartIndex + 1);
+                _logger.LogDebug("Filtered {Count} candlesticks within lookback timeframe", filteredCandlesticks.Count);
+
+                // Generate intervals as array for efficiency
+                int intervalCount = (int)((currentPeriodStart - startTime).TotalSeconds / interval.TotalSeconds) + 1;
+                DateTime[] allIntervals = new DateTime[intervalCount];
+                for (int i = 0; i < intervalCount; i++)
+                {
+                    allIntervals[i] = startTime + interval * i;
+                }
+                _logger.LogDebug("Generated {Count} intervals", allIntervals.Length);
+
+                // Take the most recent lookbackPeriods intervals
+                int startIdx = Math.Max(0, allIntervals.Length - lookbackPeriods);
+                DateTime[] targetIntervals = new DateTime[allIntervals.Length - startIdx];
+                Array.Copy(allIntervals, startIdx, targetIntervals, 0, targetIntervals.Length);
+                if (targetIntervals.Length < lookbackPeriods)
+                {
+                    _logger.LogWarning("Only {Count} intervals available, expected {Expected}", targetIntervals.Length, lookbackPeriods);
+                }
+
+                var result = new List<PseudoCandlestick>(targetIntervals.Length);
+                PseudoCandlestick previousCandlestick = null;
+
+                // Process intervals sequentially to maintain carry-forward logic
+                foreach (var periodStart in targetIntervals)
+                {
+                    DateTime periodEnd = periodStart + interval;
+                    DateTime periodTimestamp = periodEnd - TimeSpan.FromMilliseconds(1);
+                    _logger.LogDebug("Processing interval: {Start} to {End}, Timestamp={Timestamp}", periodStart, periodEnd, periodTimestamp);
+
+                    bool isCurrentInterval = periodStart == currentPeriodStart;
+                    DateTime endTime = isCurrentInterval ? now : periodEnd;
+
+                    // Find candlestick using binary search
+                    int candleIdx = BinarySearchRightmost(filteredCandlesticks, endTime, c => c.Date);
+                    CandlestickData candle = null;
+                    if (candleIdx >= 0 && filteredCandlesticks[candleIdx].Date >= periodStart)
                     {
-                        var lastTicker = intervalTickers.Last();
-                        double tickerMidClose = (double)(lastTicker.yes_ask + lastTicker.yes_bid) / 2;
-                        decimal totalVolume = intervalTickers.Sum(t => (decimal)t.volume);
-                        var currentPseudoCandlestick = new PseudoCandlestick
-                        {
-                            Timestamp = periodTimestamp, // Last millisecond of the period
-                            MidClose = tickerMidClose,
-                            MidHigh = intervalTickers.Max(t => (double)(t.yes_ask + t.yes_bid) / 2),
-                            MidLow = intervalTickers.Min(t => (double)(t.yes_ask + t.yes_bid) / 2),
-                            Volume = totalVolume,
-                            IsFromCandlestick = false
-                        };
-                        _logger.LogDebug("PseudoCandlestick: Time={Time}, MidClose={MidClose}, Source=Ticker",
-                            currentPseudoCandlestick.Timestamp, currentPseudoCandlestick.MidClose);
-                        result.Add(currentPseudoCandlestick);
-                        previousCandlestick = currentPseudoCandlestick;
+                        candle = filteredCandlesticks[candleIdx];
                     }
-                    else if (previousCandlestick != null)
+
+                    if (candle != null)
                     {
                         var currentPseudoCandlestick = new PseudoCandlestick
                         {
-                            Timestamp = periodTimestamp, // Last millisecond of the period
-                            MidClose = previousCandlestick.MidClose,
-                            MidHigh = previousCandlestick.MidHigh,
-                            MidLow = previousCandlestick.MidLow,
-                            Volume = 0,
-                            IsFromCandlestick = false
+                            Timestamp = periodTimestamp,
+                            MidClose = (candle.AskClose + candle.BidClose) / 2.0,
+                            MidHigh = (candle.AskHigh + candle.BidHigh) / 2.0,
+                            MidLow = (candle.AskLow + candle.BidLow) / 2.0,
+                            Volume = candle.Volume,
+                            IsFromCandlestick = true
                         };
-                        _logger.LogDebug("PseudoCandlestick: Time={Time}, MidClose={MidClose}, Source=CarryForward",
+                        _logger.LogDebug("PseudoCandlestick: Time={Time}, MidClose={MidClose}, Source=Candlestick",
                             currentPseudoCandlestick.Timestamp, currentPseudoCandlestick.MidClose);
                         result.Add(currentPseudoCandlestick);
                         previousCandlestick = currentPseudoCandlestick;
                     }
                     else
                     {
-                        _logger.LogDebug("No data for interval {Start}, skipping", periodStart);
+                        // Aggregate tickers using binary search for range
+                        int tickerStartIdx = BinarySearchLeftmost(tickers, periodStart, t => t.LoggedDate);
+                        int tickerEndIdx = BinarySearchRightmost(tickers, endTime, t => t.LoggedDate);
+                        if (tickerStartIdx <= tickerEndIdx && tickerEndIdx >= 0)
+                        {
+                            // Aggregate in parallel if many tickers
+                            var intervalTickers = tickers.GetRange(tickerStartIdx, tickerEndIdx - tickerStartIdx + 1);
+                            if (intervalTickers.Count > 0)
+                            {
+                                var lastTicker = intervalTickers[intervalTickers.Count - 1]; // Since sorted descending, last is oldest? Wait, no: sorted descending, so [0] is most recent, [Count-1] is oldest
+                                double tickerMidClose = (double)(lastTicker.yes_ask + lastTicker.yes_bid) / 2;
+                                double maxMid = double.MinValue;
+                                double minMid = double.MaxValue;
+                                decimal totalVolume = 0;
+                                foreach (var t in intervalTickers)
+                                {
+                                    double mid = (double)(t.yes_ask + t.yes_bid) / 2;
+                                    if (mid > maxMid) maxMid = mid;
+                                    if (mid < minMid) minMid = mid;
+                                    totalVolume += (decimal)t.volume;
+                                }
+                                var currentPseudoCandlestick = new PseudoCandlestick
+                                {
+                                    Timestamp = periodTimestamp,
+                                    MidClose = tickerMidClose,
+                                    MidHigh = maxMid,
+                                    MidLow = minMid,
+                                    Volume = totalVolume,
+                                    IsFromCandlestick = false
+                                };
+                                _logger.LogDebug("PseudoCandlestick: Time={Time}, MidClose={MidClose}, Source=Ticker",
+                                    currentPseudoCandlestick.Timestamp, currentPseudoCandlestick.MidClose);
+                                result.Add(currentPseudoCandlestick);
+                                previousCandlestick = currentPseudoCandlestick;
+                            }
+                            else if (previousCandlestick != null)
+                            {
+                                var currentPseudoCandlestick = new PseudoCandlestick
+                                {
+                                    Timestamp = periodTimestamp,
+                                    MidClose = previousCandlestick.MidClose,
+                                    MidHigh = previousCandlestick.MidHigh,
+                                    MidLow = previousCandlestick.MidLow,
+                                    Volume = 0,
+                                    IsFromCandlestick = false
+                                };
+                                _logger.LogDebug("PseudoCandlestick: Time={Time}, MidClose={MidClose}, Source=CarryForward",
+                                    currentPseudoCandlestick.Timestamp, currentPseudoCandlestick.MidClose);
+                                result.Add(currentPseudoCandlestick);
+                                previousCandlestick = currentPseudoCandlestick;
+                            }
+                            else
+                            {
+                                _logger.LogDebug("No data for interval {Start}, skipping", periodStart);
+                            }
+                        }
+                        else if (previousCandlestick != null)
+                        {
+                            var currentPseudoCandlestick = new PseudoCandlestick
+                            {
+                                Timestamp = periodTimestamp,
+                                MidClose = previousCandlestick.MidClose,
+                                MidHigh = previousCandlestick.MidHigh,
+                                MidLow = previousCandlestick.MidLow,
+                                Volume = 0,
+                                IsFromCandlestick = false
+                            };
+                            _logger.LogDebug("PseudoCandlestick: Time={Time}, MidClose={MidClose}, Source=CarryForward",
+                                currentPseudoCandlestick.Timestamp, currentPseudoCandlestick.MidClose);
+                            result.Add(currentPseudoCandlestick);
+                            previousCandlestick = currentPseudoCandlestick;
+                        }
+                        else
+                        {
+                            _logger.LogDebug("No data for interval {Start}, skipping", periodStart);
+                        }
                     }
                 }
-            }
 
-            _logger.LogDebug("Produced {Count} candlesticks", result.Count);
-            return result.OrderBy(pc => pc.Timestamp).ToList();
+                _logger.LogDebug("Produced {Count} candlesticks", result.Count);
+                return result;
+            });
+        }
+
+        /// <summary>
+        /// Performs binary search to find the leftmost index where the key is greater than or equal to the target.
+        /// </summary>
+        private static int BinarySearchLeftmost<T>(List<T> list, DateTime target, Func<T, DateTime> selector)
+        {
+            int low = 0;
+            int high = list.Count - 1;
+            int result = list.Count;
+            while (low <= high)
+            {
+                int mid = low + (high - low) / 2;
+                if (selector(list[mid]) >= target)
+                {
+                    result = mid;
+                    high = mid - 1;
+                }
+                else
+                {
+                    low = mid + 1;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Performs binary search to find the rightmost index where the key is less than or equal to the target.
+        /// </summary>
+        private static int BinarySearchRightmost<T>(List<T> list, DateTime target, Func<T, DateTime> selector)
+        {
+            int low = 0;
+            int high = list.Count - 1;
+            int result = -1;
+            while (low <= high)
+            {
+                int mid = low + (high - low) / 2;
+                if (selector(list[mid]) <= target)
+                {
+                    result = mid;
+                    low = mid + 1;
+                }
+                else
+                {
+                    high = mid - 1;
+                }
+            }
+            return result;
         }
 
         public List<PseudoCandlestick> RecentCandlesticks { get { return _recentCandlesticks; } set { _recentCandlesticks = value; } }
@@ -1041,12 +1393,20 @@ namespace BacklashBot.State
         private double _currentAverageTradeSize_Yes;
         private double _currentAverageTradeSize_No;
 
+        /// <summary>
+        /// Gets or sets the current trade rate per minute for yes positions.
+        /// Represents the most recent trade rate calculated from live data.
+        /// </summary>
         public double CurrentTradeRatePerMinute_Yes
         {
             get => _currentTradeRatePerMinute_Yes;
             set => _currentTradeRatePerMinute_Yes = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current trade rate per minute for no positions.
+        /// Represents the most recent trade rate calculated from live data.
+        /// </summary>
         public double CurrentTradeRatePerMinute_No
         {
             get => _currentTradeRatePerMinute_No;

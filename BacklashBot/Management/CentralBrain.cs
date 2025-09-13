@@ -848,12 +848,12 @@ namespace BacklashBot.Management
                     if (!kvp.Value.ReceivedFirstSnapshot) continue;
 
                     // Create snapshot task for parallel processing
-                    var snapshotTask = Task.Run(() =>
+                    var snapshotTask = Task.Run(async () =>
                     {
                         try
                         {
                             cancellationToken.ThrowIfCancellationRequested();
-                            kvp.Value.RefreshTickerMetadata();
+                            await kvp.Value.RefreshTickerMetadata();
                             kvp.Value.RecalculateOrderbookChangeMetrics();
                             var marketSnapshot = CreateMarketSnapshot(snapshotDate, kvp);
                             kvp.Value.LastSnapshotTaken = DateTime.UtcNow;

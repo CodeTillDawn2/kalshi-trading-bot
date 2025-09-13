@@ -127,14 +127,14 @@ namespace BacklashBot.State.Interfaces
         List<SupportResistanceLevel> AllSupportResistanceLevels { get; set; }
         List<OrderbookData> GetBids(string side = "");
         void UpdateCurrentPrice(int yesAsk, int yesBid, DateTime timestamp, string source);
-        void RefreshAllMetadata();
+        Task RefreshAllMetadata();
         void RefreshCandlestickMetadata();
-        void RefreshTickerMetadata();
+        Task RefreshTickerMetadata();
         void RefreshPositionMetadata();
         void RecalculateOrderbookChangeMetrics();
-        List<PseudoCandlestick> BuildPseudoCandlesticks(string period, int lookbackPeriods = 34);
+        Task<List<PseudoCandlestick>> BuildPseudoCandlesticks(string period, int lookbackPeriods = 34);
         List<SupportResistanceLevel> GetFilteredSupportResistanceLevels();
-        void UpdateTradingMetrics();
+        Task UpdateTradingMetrics();
 
         double YesBidSlopePerMinute_Short { get; set; }
         double NoBidSlopePerMinute_Short { get; set; }
