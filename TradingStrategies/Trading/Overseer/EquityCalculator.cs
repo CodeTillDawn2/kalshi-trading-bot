@@ -24,8 +24,9 @@ namespace TradingStrategies.Trading.Overseer
     /// - Collect performance metrics for calculation timing to identify bottlenecks in high-frequency simulations
     /// - Provide async versions of calculation methods for better performance in high-throughput scenarios
     ///
-    /// This class maintains performance metrics in a thread-safe manner and provides both synchronous and asynchronous calculation methods,
-    /// making it suitable for concurrent simulation runs and high-throughput environments.
+    /// This class collects performance metrics and provides both synchronous and asynchronous calculation methods.
+    /// While the calculation logic itself is thread-safe, the performance metrics collection should be used carefully
+    /// in highly concurrent scenarios. The async methods help improve performance in high-throughput environments.
     /// </remarks>
     public class EquityCalculator
     {
@@ -52,9 +53,11 @@ namespace TradingStrategies.Trading.Overseer
         ///    - Use mid-prices (average of best bid and ask) to value positions
         ///    - Long positions valued at mid-price of the "Yes" side
         ///    - Short positions valued at mid-price of the "No" side
+        /// 7. Record the calculation execution time for performance monitoring
         ///
         /// The method ensures accurate valuation that reflects the current state of the simulated market,
         /// providing a realistic assessment of portfolio value for strategy evaluation and backtesting purposes.
+        /// Performance timing data is collected to help identify bottlenecks in high-frequency simulations.
         ///
         /// Example usage:
         /// <code>
