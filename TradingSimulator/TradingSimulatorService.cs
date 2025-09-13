@@ -81,6 +81,19 @@ namespace TradingSimulator
 
         private SqlDataService _sqlDataService;
 
+        /// <summary>
+        /// Formats a file name using the configured pattern and provided parameters.
+        /// </summary>
+        private string FormatFileName(string pattern, Dictionary<string, string> parameters)
+        {
+            string result = pattern;
+            foreach (var param in parameters)
+            {
+                result = result.Replace($"{{{param.Key}}}", param.Value);
+            }
+            return result;
+        }
+
         // Helper classes
         private DataLoader _dataLoader;
         private MarketProcessor _marketProcessor;
@@ -137,7 +150,7 @@ namespace TradingSimulator
             Directory.CreateDirectory(_cacheDirectory); // ensure output dir exists
 
             // Initialize helper classes
-            _dataLoader = new DataLoader(_snapshotService);
+            _dataLoader = new DataLoader(_snapshotService, _simulatorOptions);
             var marketProcessorConfig = new MarketProcessorConfig
             {
                 CacheDirectory = _cacheDirectory,
@@ -311,8 +324,17 @@ namespace TradingSimulator
 
 
                 if (writeToFile)
+                {
+                    var fileName = FormatFileName(_simulatorOptions.Value.MarketDataFileNamePattern, new Dictionary<string, string>
+                    {
+                        { "market", market },
+                        { "label", label },
+                        { "strategy", dto.StrategyName },
+                        { "timestamp", DateTime.Now.ToString("yyyyMMdd_HHmmss") }
+                    });
                     _marketProcessor.SaveMarketDataToFile(market, finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort,
-                        pos, avgCost, rest, disc, patterns, fileNameSuffix: $"_{label}_{dto.StrategyName}");
+                        pos, avgCost, rest, disc, patterns, fileNameSuffix: fileName);
+                }
 
                 dto.WeightSetMarkets.Add(new WeightSetMarketDTO
                 {
@@ -334,7 +356,7 @@ namespace TradingSimulator
             await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
 
             OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{marketList.Count} markets)");
-            OnTestProgress?.Invoke($"Total discrepancies across all markets: {totalDiscrepancies} (widespread if >10% of snapshots).");
+            OnTestProgress?.Invoke($"Total discrepancies across all markets: {totalDiscrepancies} (widespread if >{_simulatorOptions.Value.DiscrepancyThresholdPercentage}% of snapshots).");
             OnTestProgress?.Invoke($"{label}/{dto.StrategyName}: completed");
         }
 
@@ -521,16 +543,26 @@ ResolveFamily(StrategyFamily family)
             var metrics = new List<(string Name, double AvgEntryScore, double AvgPeakSize, double AvgTimeToPeak)>();
             for (int i = 0; i < paramSets.Count; i++)
             {
-                var (name, parameters) = paramSets[i];
-                var mlStrat = new MLEntrySeekerShared(
-                    name: name,
-                    evaluationOnly: false,
-                    weight: 1.0,
-                    p: parameters);
-                mlStrat.PreTrain(trainData);
-                var strategiesDict = helper.GetMLSharedStrategy(name);
-                strategiesList.Add(strategiesDict);
-                metrics.Add((name, 0.0, 0.0, 0.0));
+                try
+                {
+                    var (name, parameters) = paramSets[i];
+                    var mlStrat = new MLEntrySeekerShared(
+                        name: name,
+                        evaluationOnly: false,
+                        weight: 1.0,
+                        p: parameters);
+                    mlStrat.PreTrain(trainData);
+                    var strategiesDict = helper.GetMLSharedStrategy(name);
+                    strategiesList.Add(strategiesDict);
+                    metrics.Add((name, 0.0, 0.0, 0.0));
+                }
+                catch (Exception ex)
+                {
+                    OnTestProgress?.Invoke($"Error during ML training for parameter set {i}: {ex.Message}. Skipping this set.");
+                    // Add empty strategy to maintain indexing
+                    strategiesList.Add(new Dictionary<MarketType, List<Strategy>>());
+                    metrics.Add(($"Error_{i}", 0.0, 0.0, 0.0));
+                }
             }
 
             // Clear ResearchBus before run
@@ -617,7 +649,11 @@ ResolveFamily(StrategyFamily family)
             // Save report to file if requested
             if (writeToFile)
             {
-                string reportPath = Path.Combine(_cacheDirectory, $"MLShared_BestFitReport_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+                string reportPath = Path.Combine(_cacheDirectory, FormatFileName(_simulatorOptions.Value.BestFitReportFileNamePattern, new Dictionary<string, string>
+                {
+                    { "label", label },
+                    { "timestamp", DateTime.Now.ToString("yyyyMMdd_HHmmss") }
+                }));
                 using var sw = new StreamWriter(reportPath);
                 sw.WriteLine("Rank,ParameterSet,AvgEntryScore,AvgPeakSize,AvgTimeToPeak,Composite,Parameters");
                 prevComposite = double.MaxValue;
@@ -718,8 +754,17 @@ ResolveFamily(StrategyFamily family)
 
 
                     if (writeToFile)
+                    {
+                        var fileName = FormatFileName(_simulatorOptions.Value.MarketDataFileNamePattern, new Dictionary<string, string>
+                        {
+                            { "market", market },
+                            { "label", label },
+                            { "strategy", dto.StrategyName },
+                            { "timestamp", DateTime.Now.ToString("yyyyMMdd_HHmmss") }
+                        });
                         _marketProcessor.SaveMarketDataToFile(market, finalPnL, finalPosition, finalAverageCost, bid, ask, buy, sell, exit, ev, il, ishort,
-                            pos, avgCost, rest, disc, patterns, fileNameSuffix: $"_{label}_{dto.StrategyName}");
+                            pos, avgCost, rest, disc, patterns, fileNameSuffix: fileName);
+                    }
 
                     dto.WeightSetMarkets.Add(new WeightSetMarketDTO
                     {
@@ -744,7 +789,11 @@ ResolveFamily(StrategyFamily family)
                 OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{marketList.Count} markets)");
             }
 
-            string csvPath = Path.Combine(_cacheDirectory, $"{label}_ResearchBus_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+            string csvPath = Path.Combine(_cacheDirectory, FormatFileName(_simulatorOptions.Value.ResearchBusFileNamePattern, new Dictionary<string, string>
+            {
+                { "label", label },
+                { "timestamp", DateTime.Now.ToString("yyyyMMdd_HHmmss") }
+            }));
             ResearchBus.DumpCsv(csvPath);
             OnTestProgress?.Invoke($"Dumped ResearchBus to {csvPath}");
 
