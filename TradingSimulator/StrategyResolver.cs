@@ -6,15 +6,63 @@ using TradingStrategies.Trading.Helpers;
 
 namespace TradingSimulator
 {
+    /// <summary>
+    /// Central resolver for trading strategy families in the trading simulator.
+    /// This class acts as a bridge between strategy family enums and their concrete implementations,
+    /// providing a unified interface for accessing training mappings and parameter sets for different
+    /// trading strategies. It encapsulates the logic for resolving strategy families to their
+    /// corresponding configurations and mappings.
+    /// </summary>
+    /// <remarks>
+    /// The StrategyResolver works closely with the StrategySelectionHelper to provide:
+    /// - Training mappings for different market types
+    /// - Parameter sets for strategy optimization
+    /// - Family-to-set-key mapping for user input
+    ///
+    /// Supported strategy families include:
+    /// - Bollinger: Bollinger Band breakout strategies
+    /// - FlowMo: Flow momentum-based strategies
+    /// - TryAgain: Retry-based strategies
+    /// - SloMo: Slope momentum strategies
+    /// - Breakout: Breakout detection strategies
+    /// - NothingHappens: Baseline strategies for comparison
+    /// - Momentum: Momentum trading strategies
+    /// - MLShared: Machine learning-based strategies
+    /// </remarks>
     public class StrategyResolver
     {
+        /// <summary>
+        /// Helper class that provides access to strategy configurations and mappings.
+        /// </summary>
         private readonly StrategySelectionHelper _helper;
 
+        /// <summary>
+        /// Initializes a new instance of the StrategyResolver class.
+        /// Creates a new StrategySelectionHelper instance for accessing strategy configurations.
+        /// </summary>
         public StrategyResolver()
         {
             _helper = new StrategySelectionHelper();
         }
 
+        /// <summary>
+        /// Resolves a strategy family to its training mappings, parameter sets, and display label.
+        /// This method acts as the main entry point for accessing strategy configurations for a given family.
+        /// </summary>
+        /// <param name="family">The strategy family to resolve (e.g., Bollinger, FlowMo, etc.)</param>
+        /// <returns>
+        /// A tuple containing:
+        /// - Strategies: List of market-to-strategy mappings for training
+        /// - ParamSets: List of parameter set names and their configurations
+        /// - Label: Human-readable label for the strategy family
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when an unsupported strategy family is provided</exception>
+        /// <remarks>
+        /// This method uses a switch statement to handle different strategy families, each mapping to:
+        /// - Training mappings from StrategySelectionHelper
+        /// - Parameter sets specific to each strategy type
+        /// - A consistent label for UI/display purposes
+        /// </remarks>
         public (List<Dictionary<MarketType, List<Strategy>>> Strategies,
                 List<(string Name, object Parameters)> ParamSets,
                 string Label) ResolveFamily(StrategyFamily family)
@@ -24,49 +72,49 @@ namespace TradingSimulator
                 case StrategyFamily.Bollinger:
                     return (
                         _helper.GetTrainingMappings("Bollinger"),
-                        ConvertBollingerParameterSets(),
+                        GetBollingerParameterSets(),
                         "Bollinger"
                     );
                 case StrategyFamily.FlowMo:
                     return (
                         _helper.GetTrainingMappings("FlowMo"),
-                        ConvertFlowMomentumParameterSets(),
+                        GetFlowMomentumParameterSets(),
                         "FlowMo"
                     );
                 case StrategyFamily.TryAgain:
                     return (
                         _helper.GetTrainingMappings("TryAgain"),
-                        ConvertTryAgainParameterSets(),
+                        GetTryAgainParameterSets(),
                         "TryAgain"
                     );
                 case StrategyFamily.SloMo:
                     return (
                         _helper.GetTrainingMappings("SloMo"),
-                        ConvertSlopeMomentumParameterSets(),
+                        GetSlopeMomentumParameterSets(),
                         "SloMo"
                     );
                 case StrategyFamily.Breakout:
                     return (
                         _helper.GetTrainingMappings("Breakout2"),
-                        ConvertBreakoutParameterSets(),
+                        GetBreakoutParameterSets(),
                         "Breakout"
                     );
                 case StrategyFamily.NothingHappens:
                     return (
                         _helper.GetTrainingMappings("Nothing"),
-                        ConvertNothingEverHappensParameterSets(),
+                        GetNothingEverHappensParameterSets(),
                         "NothingHappens"
                     );
                 case StrategyFamily.Momentum:
                     return (
                         _helper.GetTrainingMappings("Momentum"),
-                        ConvertMomentumTradingParameterSets(),
+                        GetMomentumTradingParameterSets(),
                         "Momentum"
                     );
                 case StrategyFamily.MLShared:
                     return (
                         _helper.GetTrainingMappings("MLShared"),
-                        ConvertMLSharedParameterSets(),
+                        GetMLSharedParameterSets(),
                         "MLShared"
                     );
                 default:
@@ -74,62 +122,133 @@ namespace TradingSimulator
             }
         }
 
-        private List<(string Name, object Parameters)> ConvertBollingerParameterSets()
+        /// <summary>
+        /// Retrieves the parameter sets for Bollinger Band breakout strategies.
+        /// These parameter sets define various configurations for Bollinger Band-based trading strategies,
+        /// including squeeze thresholds, absorption thresholds, signal strengths, and velocity parameters.
+        /// </summary>
+        /// <returns>A list of tuples containing parameter set names and their configurations</returns>
+        private List<(string Name, object Parameters)> GetBollingerParameterSets()
         {
             return StrategySelectionHelper.BollingerParameterSets
                 .Select(ps => (ps.Name, (object)ps.Parameters))
                 .ToList();
         }
 
-        private List<(string Name, object Parameters)> ConvertFlowMomentumParameterSets()
+        /// <summary>
+        /// Retrieves the parameter sets for Flow Momentum strategies.
+        /// These parameter sets define configurations for momentum-based trading strategies
+        /// that analyze market flow and momentum patterns.
+        /// </summary>
+        /// <returns>A list of tuples containing parameter set names and their configurations</returns>
+        private List<(string Name, object Parameters)> GetFlowMomentumParameterSets()
         {
             return StrategySelectionHelper.FlowMomentumParameterSets
                 .Select(ps => (ps.Name, (object)ps.Parameters))
                 .ToList();
         }
 
-        private List<(string Name, object Parameters)> ConvertTryAgainParameterSets()
+        /// <summary>
+        /// Retrieves the parameter sets for Try Again strategies.
+        /// These parameter sets define configurations for retry-based trading strategies
+        /// that implement logic for re-entering positions after initial attempts.
+        /// </summary>
+        /// <returns>A list of tuples containing parameter set names and their configurations</returns>
+        private List<(string Name, object Parameters)> GetTryAgainParameterSets()
         {
             return TryAgainStrat.TryAgainStratParameterSets
                 .Select(ps => (ps.Name, (object)ps.Parameters))
                 .ToList();
         }
 
-        private List<(string Name, object Parameters)> ConvertSlopeMomentumParameterSets()
+        /// <summary>
+        /// Retrieves the parameter sets for Slope Momentum strategies.
+        /// These parameter sets define configurations for momentum strategies that analyze
+        /// price slope and momentum characteristics in market data.
+        /// </summary>
+        /// <returns>A list of tuples containing parameter set names and their configurations</returns>
+        private List<(string Name, object Parameters)> GetSlopeMomentumParameterSets()
         {
             return SlopeMomentumStrat.SlopeMomentumParameterSets
                 .Select(ps => (ps.Name, (object)ps.Parameters))
                 .ToList();
         }
 
-        private List<(string Name, object Parameters)> ConvertBreakoutParameterSets()
+        /// <summary>
+        /// Retrieves the parameter sets for Breakout strategies.
+        /// These parameter sets define configurations for breakout detection strategies
+        /// that identify and capitalize on significant price movements and breakouts.
+        /// </summary>
+        /// <returns>A list of tuples containing parameter set names and their configurations</returns>
+        private List<(string Name, object Parameters)> GetBreakoutParameterSets()
         {
             return StrategySelectionHelper.BreakoutParameterSets
                 .Select(ps => (ps.Name, (object)ps.Parameters))
                 .ToList();
         }
 
-        private List<(string Name, object Parameters)> ConvertNothingEverHappensParameterSets()
+        /// <summary>
+        /// Retrieves the parameter sets for Nothing Ever Happens strategies.
+        /// These parameter sets define baseline configurations for comparison strategies
+        /// that serve as a control group for evaluating other strategy performance.
+        /// </summary>
+        /// <returns>A list of tuples containing parameter set names and their configurations</returns>
+        private List<(string Name, object Parameters)> GetNothingEverHappensParameterSets()
         {
             return StrategySelectionHelper.NothingEverHappensParameterSets
                 .Select(ps => (ps.Name, (object)ps.Parameters))
                 .ToList();
         }
 
-        private List<(string Name, object Parameters)> ConvertMomentumTradingParameterSets()
+        /// <summary>
+        /// Retrieves the parameter sets for Momentum Trading strategies.
+        /// These parameter sets define configurations for momentum-based trading strategies
+        /// that follow and capitalize on market momentum trends.
+        /// </summary>
+        /// <returns>A list of tuples containing parameter set names and their configurations</returns>
+        private List<(string Name, object Parameters)> GetMomentumTradingParameterSets()
         {
             return StrategySelectionHelper.MomentumTradingParameterSets
                 .Select(ps => (ps.Name, (object)ps.Parameters))
                 .ToList();
         }
 
-        private List<(string Name, object Parameters)> ConvertMLSharedParameterSets()
+        /// <summary>
+        /// Retrieves the parameter sets for ML Shared strategies.
+        /// These parameter sets define configurations for machine learning-based trading strategies
+        /// that use shared ML models and parameters for market prediction and trading decisions.
+        /// </summary>
+        /// <returns>A list of tuples containing parameter set names and their configurations</returns>
+        private List<(string Name, object Parameters)> GetMLSharedParameterSets()
         {
             return MLEntrySeekerShared.MLSharedParameterSets
                 .Select(ps => (ps.Name, (object)ps.Parameters))
                 .ToList();
         }
 
+        /// <summary>
+        /// Maps a user-provided set key string to its corresponding StrategyFamily enum value.
+        /// This method provides flexible string matching to allow users to specify strategy families
+        /// using various common names, abbreviations, or partial matches.
+        /// </summary>
+        /// <param name="setKey">The string key representing a strategy family (case-insensitive)</param>
+        /// <returns>The corresponding StrategyFamily enum value</returns>
+        /// <exception cref="ArgumentException">Thrown when setKey is null, empty, or whitespace</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when setKey cannot be mapped to any known strategy family</exception>
+        /// <remarks>
+        /// This method supports multiple ways to specify each strategy family:
+        /// - Bollinger: "bollinger", "bb", "bollingerbreakout"
+        /// - Breakout: "breakout", "b2", "breakout2"
+        /// - FlowMo: "flowmo"
+        /// - TryAgain: "tryagain"
+        /// - SloMo: "slomo"
+        /// - NothingHappens: "nothing"
+        /// - Momentum: "momentum"
+        /// - MLShared: "ml", "mlshared"
+        ///
+        /// The method performs case-insensitive matching and supports partial string matches
+        /// for better user experience.
+        /// </remarks>
         public StrategyFamily MapFamilyFromSetKey(string setKey)
         {
             if (string.IsNullOrWhiteSpace(setKey)) throw new ArgumentException("setKey is required.", nameof(setKey));
