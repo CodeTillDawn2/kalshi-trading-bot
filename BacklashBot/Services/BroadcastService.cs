@@ -1,7 +1,8 @@
 /// <summary>
 /// Service responsible for broadcasting system status and health information to connected SignalR clients.
-/// Manages periodic check-in broadcasts containing brain instance status, market data, performance metrics,
+/// Manages periodic check-in broadcasts at configurable intervals containing brain instance status, market data, performance metrics,
 /// and system health indicators to keep monitoring systems and dashboards updated.
+/// Includes retry logic for failed SignalR sends and performance metrics collection.
 /// </summary>
 using Microsoft.AspNetCore.SignalR;
 using BacklashBot.Hubs;
@@ -30,6 +31,41 @@ namespace BacklashBot.Services
         private readonly ExecutionConfig _executionConfig;
 
         /// <summary>
+        /// The interval in seconds between broadcast operations.
+        /// </summary>
+        private int _broadcastIntervalSeconds = 30;
+
+        /// <summary>
+        /// Maximum number of retry attempts for failed SignalR sends.
+        /// </summary>
+        private int _maxRetryAttempts = 3;
+
+        /// <summary>
+        /// Delay between retry attempts for failed broadcasts.
+        /// </summary>
+        private TimeSpan _retryDelay = TimeSpan.FromSeconds(1);
+
+        /// <summary>
+        /// Counter for successful broadcast operations.
+        /// </summary>
+        private long _successfulBroadcasts = 0;
+
+        /// <summary>
+        /// Counter for failed broadcast operations.
+        /// </summary>
+        private long _failedBroadcasts = 0;
+
+        /// <summary>
+        /// Cumulative total time spent on broadcast operations in milliseconds.
+        /// </summary>
+        private double _totalBroadcastTime = 0;
+
+        /// <summary>
+        /// Lock object for thread-safe updates to performance metrics.
+        /// </summary>
+        private object _metricsLock = new object();
+
+        /// <summary>
         /// Initializes a new instance of the BroadcastService with required dependencies.
         /// </summary>
         /// <param name="hubContext">SignalR hub context for broadcasting messages to connected clients</param>
@@ -55,11 +91,16 @@ namespace BacklashBot.Services
             _scopeFactory = scopeFactory;
             _logger = logger;
             _executionConfig = executionConfig.Value;
+
+            // Configure broadcast settings from ExecutionConfig
+            _broadcastIntervalSeconds = GetConfigValue(_executionConfig, "BroadcastIntervalSeconds", 30);
+            _maxRetryAttempts = GetConfigValue(_executionConfig, "BroadcastMaxRetryAttempts", 3);
+            _retryDelay = TimeSpan.FromSeconds(GetConfigValue(_executionConfig, "BroadcastRetryDelaySeconds", 1));
         }
 
         /// <summary>
         /// Starts the broadcast service, initiating the periodic status broadcast loop.
-        /// Creates a background task that broadcasts system status every 30 seconds to connected clients.
+        /// Creates a background task that broadcasts system status at configurable intervals to connected clients.
         /// </summary>
         /// <returns>A task representing the asynchronous operation</returns>
         public async Task StartServicesAsync()
@@ -84,7 +125,7 @@ namespace BacklashBot.Services
                             {
                                 _logger.LogDebug("No clients connected, skipping status broadcast.");
                             }
-                            await Task.Delay(30000, cancellationToken); // 30 seconds
+                            await Task.Delay(_broadcastIntervalSeconds * 1000, cancellationToken);
                         }
                         catch (OperationCanceledException)
                         {
@@ -111,12 +152,14 @@ namespace BacklashBot.Services
         /// <summary>
         /// Broadcasts comprehensive system status information to all connected SignalR clients.
         /// Gathers data from various system services including market information, performance metrics,
-        /// error counts, and operational status, then sends it as a CheckIn message.
+        /// error counts, and operational status, then sends it as a CheckIn message with retry logic for failed sends.
+        /// Collects performance metrics for timing and success rates.
         /// </summary>
         /// <returns>A task representing the asynchronous broadcast operation</returns>
         private async Task BroadcastCheckInAsync()
         {
             var stopwatch = Stopwatch.StartNew();
+            bool broadcastSuccessful = false;
             var cancellationToken = _statusTracker.GetCancellationToken();
             cancellationToken.ThrowIfCancellationRequested();
             if (!ChartHub.HasConnectedClients())
@@ -179,10 +222,30 @@ namespace BacklashBot.Services
                     LastPerformanceSampleDate = performanceTracker.LastPerformanceSampleDate
                 };
 
-                await _hubContext.Clients.All.SendAsync("CheckIn", checkInData, cancellationToken);
-                var perfMonitor = _serviceFactory.GetPerformanceMonitor();
-                _logger.LogInformation("Status broadcast completed from {BrainInstanceName} with {MarketCount} markets, ErrorCount: {ErrorCount}",
-                    perfMonitor?.BrainInstance ?? "Unknown", markets.Count, errorHandler.ErrorCount);
+                for (int attempt = 1; attempt <= _maxRetryAttempts; attempt++)
+                {
+                    try
+                    {
+                        await _hubContext.Clients.All.SendAsync("CheckIn", checkInData, cancellationToken);
+                        broadcastSuccessful = true;
+                        var perfMonitor = _serviceFactory.GetPerformanceMonitor();
+                        _logger.LogInformation("Status broadcast completed from {BrainInstanceName} with {MarketCount} markets, ErrorCount: {ErrorCount}",
+                            perfMonitor?.BrainInstance ?? "Unknown", markets.Count, errorHandler.ErrorCount);
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Broadcast attempt {Attempt} failed", attempt);
+                        if (attempt < _maxRetryAttempts)
+                        {
+                            await Task.Delay(_retryDelay, cancellationToken);
+                        }
+                        else
+                        {
+                            _logger.LogError(ex, "Broadcast failed after {MaxAttempts} attempts", _maxRetryAttempts);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -191,6 +254,18 @@ namespace BacklashBot.Services
             finally
             {
                 stopwatch.Stop();
+                lock (_metricsLock)
+                {
+                    _totalBroadcastTime += stopwatch.Elapsed.TotalMilliseconds;
+                    if (broadcastSuccessful)
+                    {
+                        _successfulBroadcasts++;
+                    }
+                    else
+                    {
+                        _failedBroadcasts++;
+                    }
+                }
             }
         }
 
@@ -235,6 +310,23 @@ namespace BacklashBot.Services
                 _logger.LogError(ex, "Error stopping BroadcastService.");
             }
             _logger.LogInformation("BroadcastService stopped.");
+        }
+
+        /// <summary>
+        /// Retrieves a configuration value from ExecutionConfig using reflection, with a default fallback.
+        /// </summary>
+        /// <param name="config">The ExecutionConfig instance</param>
+        /// <param name="propertyName">The name of the property to retrieve</param>
+        /// <param name="defaultValue">The default value if property is not found or invalid</param>
+        /// <returns>The configuration value or default</returns>
+        private int GetConfigValue(ExecutionConfig config, string propertyName, int defaultValue)
+        {
+            var property = config.GetType().GetProperty(propertyName);
+            if (property != null && property.GetValue(config) is int value && value > 0)
+            {
+                return value;
+            }
+            return defaultValue;
         }
 
         /// <summary>
