@@ -89,7 +89,7 @@ namespace TradingStrategies.Trading.Overseer
 
         private void SetMarketType(MarketSnapshot snapshot)
         {
-            _marketTypeService.SetMarketType(snapshot);
+            _marketTypeService.AssignMarketTypeToSnapshot(snapshot);
         }
 
         private (Dictionary<int, int> yesDeltas, Dictionary<int, int> noDeltas) ComputeDeltasIfApplicable(MarketSnapshot prevSnapshot, MarketSnapshot snapshot)
@@ -154,7 +154,7 @@ namespace TradingStrategies.Trading.Overseer
 
         private MarketType ParseMarketConditions(string marketType)
         {
-            return _marketTypeService.ParseMarketConditions(marketType);
+            return _marketTypeService.ConvertStringToMarketType(marketType);
         }
 
         private SimulationPath HandleNoStrategies(SimulationPath path, MarketSnapshot effectiveSnapshot, MarketType currentMarketConditions, SimulatedOrderbook book, bool isSingleStrategy)

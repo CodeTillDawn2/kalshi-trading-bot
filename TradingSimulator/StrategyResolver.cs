@@ -71,49 +71,49 @@ namespace TradingSimulator
             {
                 case StrategyFamily.Bollinger:
                     return (
-                        _helper.GetTrainingMappings("Bollinger"),
+                        _helper.CreateTrainingStrategyInstances("Bollinger"),
                         GetBollingerParameterSets(),
                         "Bollinger"
                     );
                 case StrategyFamily.FlowMo:
                     return (
-                        _helper.GetTrainingMappings("FlowMo"),
+                        _helper.CreateTrainingStrategyInstances("FlowMo"),
                         GetFlowMomentumParameterSets(),
                         "FlowMo"
                     );
                 case StrategyFamily.TryAgain:
                     return (
-                        _helper.GetTrainingMappings("TryAgain"),
+                        _helper.CreateTrainingStrategyInstances("TryAgain"),
                         GetTryAgainParameterSets(),
                         "TryAgain"
                     );
                 case StrategyFamily.SloMo:
                     return (
-                        _helper.GetTrainingMappings("SloMo"),
+                        _helper.CreateTrainingStrategyInstances("SloMo"),
                         GetSlopeMomentumParameterSets(),
                         "SloMo"
                     );
                 case StrategyFamily.Breakout:
                     return (
-                        _helper.GetTrainingMappings("Breakout2"),
+                        _helper.CreateTrainingStrategyInstances("Breakout2"),
                         GetBreakoutParameterSets(),
                         "Breakout"
                     );
                 case StrategyFamily.NothingHappens:
                     return (
-                        _helper.GetTrainingMappings("Nothing"),
+                        _helper.CreateTrainingStrategyInstances("Nothing"),
                         GetNothingEverHappensParameterSets(),
                         "NothingHappens"
                     );
                 case StrategyFamily.Momentum:
                     return (
-                        _helper.GetTrainingMappings("Momentum"),
+                        _helper.CreateTrainingStrategyInstances("Momentum"),
                         GetMomentumTradingParameterSets(),
                         "Momentum"
                     );
                 case StrategyFamily.MLShared:
                     return (
-                        _helper.GetTrainingMappings("MLShared"),
+                        _helper.CreateTrainingStrategyInstances("MLShared"),
                         GetMLSharedParameterSets(),
                         "MLShared"
                     );
