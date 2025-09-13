@@ -58,6 +58,7 @@ builder.Services.Configure<TradingConfig>(builder.Configuration.GetSection("Trad
 builder.Services.Configure<CalculationConfig>(builder.Configuration.GetSection("CalculationConfig"));
 builder.Services.Configure<ExecutionConfig>(builder.Configuration.GetSection("Execution"));
 builder.Services.Configure<MarketDataConfig>(builder.Configuration.GetSection("MarketData"));
+builder.Services.Configure<CentralBrainConfig>(builder.Configuration.GetSection("CentralBrain"));
 
 // Increase shutdown timeout
 builder.Services.Configure<HostOptions>(options =>
@@ -75,6 +76,7 @@ builder.Services.AddSingleton<IMarketManagerService, MarketManagerService>();
 builder.Services.AddSingleton<IStatusTrackerService, KalshiBotStatusTracker>();
 builder.Services.AddSingleton<IBotReadyStatus, KalshiBotReadyStatus>();
 builder.Services.AddSingleton<IBrainStatusService, BrainStatusService>();
+builder.Services.AddTransient<BacklashInterfaces.SmokehouseBot.Timers.ITimer, BacklashBot.Timers.SystemTimer>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<ICentralBrain>());
 
 // Register the custom logger provider with DI
@@ -190,6 +192,7 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClie
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper, OvernightActivitiesHelper>();
 builder.Services.AddScoped<ISnapshotPeriodHelper, SnapshotPeriodHelper>();
+builder.Services.AddScoped<BacklashInterfaces.SmokehouseBot.Services.IHealthCheckService, HealthCheckService>();
 builder.Services.AddScoped<IDataCache, BacklashBot.State.DataCache>();
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);

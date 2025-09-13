@@ -8,6 +8,7 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashInterfaces.SmokehouseBot.Services;
+using BTimer = BacklashInterfaces.SmokehouseBot.Timers.ITimer;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
@@ -29,6 +30,8 @@ namespace BacklashBot.Management
     /// - Market watchlist monitoring and adjustments
     /// - Error detection and recovery
     /// - Scheduled overnight maintenance tasks
+    /// - Health checks for dependent services
+    /// - Configurable timeouts and intervals via dependency injection
     /// </remarks>
     public class CentralBrain : ICentralBrain
     {
@@ -44,12 +47,15 @@ namespace BacklashBot.Management
         private readonly ExecutionConfig _executionConfig;
         private readonly TradingConfig _tradingConfig;
         private readonly CalculationConfig _calculationConfig;
+        private readonly CentralBrainConfig _centralBrainConfig;
         private readonly IScopeManagerService _scopeManagerService;
+        private readonly IHealthCheckService _healthCheckService;
         private IStatusTrackerService _statusTrackerService;
         private IBotReadyStatus _readyStatus;
-        private Timer? _snapshotTimer;
+        private BTimer? _snapshotTimer;
         private readonly SemaphoreSlim _snapshotLock = new SemaphoreSlim(1, 1);
         private readonly TimeSpan _decisionInterval;
+        private readonly Func<BTimer> _timerFactory;
         private bool SchemaVerified = false;
         private bool _servicesStopped = false;
         private bool _isStartingUp = false;
@@ -58,17 +64,14 @@ namespace BacklashBot.Management
         public bool IsStartingUp => _isStartingUp;
         public bool IsShuttingDown => _isShuttingDown;
 
-        private Timer? _shutdownTimer;
-        private Timer? _startTimer;
+        private BTimer? _shutdownTimer;
+        private BTimer? _startTimer;
         private static int _instanceCounter = 0;
         private readonly string? _brainInstance;
 
-        private Timer? _errorCheckTimer;
+        private BTimer? _errorCheckTimer;
         private bool _isReset = false;
-        private Timer? _overnightTimer;
-
-        private static readonly TimeSpan OvernightStart = new TimeSpan(3, 0, 0); // 3:00 AM
-        private static readonly TimeSpan OvernightTaskDelay = TimeSpan.FromMinutes(15); // 15 minutes after start
+        private BTimer? _overnightTimer;
 
         private BrainInstanceDTO? _thisBrain = null;
 
@@ -90,7 +93,10 @@ namespace BacklashBot.Management
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBotReadyStatus readyStatus,
-            IBrainStatusService brainStatusService)
+            IBrainStatusService brainStatusService,
+            IOptions<CentralBrainConfig> centralBrainConfig,
+            IHealthCheckService healthCheckService,
+            Func<BTimer> timerFactory)
         {
             _logger = logger;
             _scopeManagerService = scopeManagerService;
@@ -104,10 +110,13 @@ namespace BacklashBot.Management
             _tradingConfig = tradingConfig.Value;
             _executionConfig = executionConfig.Value;
             _calculationConfig = calculationConfig.Value;
+            _centralBrainConfig = centralBrainConfig.Value;
+            _healthCheckService = healthCheckService;
             _statusTrackerService = statusTrackerService;
             _readyStatus = readyStatus;
             _brainInstance = _executionConfig.BrainInstance;
             _decisionInterval = TimeSpan.FromSeconds(_tradingConfig.DecisionFrequencySeconds);
+            _timerFactory = timerFactory;
 
         }
 
@@ -124,16 +133,24 @@ namespace BacklashBot.Management
         /// <returns>A task representing the asynchronous operation.</returns>
         /// <remarks>
         /// This method performs the following initialization steps:
-        /// 1. Ensures brain status is initialized
-        /// 2. Initializes brain instance management
-        /// 3. Starts dashboard services if enabled
-        /// 4. Sets up error monitoring timer
-        /// 5. Begins the complete startup sequence
+        /// 1. Performs health checks on dependent services
+        /// 2. Ensures brain status is initialized
+        /// 3. Initializes brain instance management
+        /// 4. Starts dashboard services if enabled
+        /// 5. Sets up error monitoring timer
+        /// 6. Begins the complete startup sequence
         /// </remarks>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             try
             {
+                // Perform health checks on dependent services before starting
+                if (!await _healthCheckService.CheckHealthAsync())
+                {
+                    _logger.LogError("BRAIN: Health check failed. Aborting startup.");
+                    throw new Exception("Health check failed for dependent services.");
+                }
+
                 await _brainStatus.EnsureInitializedAsync();
                 _logger.LogInformation("BRAIN: Created SmokehouseBrain instance {InstanceName}", _brainInstance);
                 _logger.LogInformation("BRAIN: {InstanceName} Waking up, Session {1}", _brainInstance, _brainStatus.SessionIdentifier);
@@ -143,7 +160,15 @@ namespace BacklashBot.Management
                     _logger.LogInformation("BRAIN: LaunchDataDashboard is false, skipping dashboard startup and daily timers.");
                     return;
                 }
-                _errorCheckTimer = new Timer(MonitorAndHandleErrors, null, TimeSpan.FromSeconds(.5), TimeSpan.FromSeconds(.5));
+                _errorCheckTimer = _timerFactory();
+                _errorCheckTimer.Interval = _centralBrainConfig.ErrorCheckInterval.TotalMilliseconds;
+                _errorCheckTimer.AutoReset = true;
+                _errorCheckTimer.Elapsed += (sender, e) => MonitorAndHandleErrors(null);
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(_centralBrainConfig.ErrorCheckInterval);
+                    _errorCheckTimer.Start();
+                });
 
                 _=Task.Run(() => CompleteStartupSequence(), cancellationToken);
 
@@ -211,7 +236,10 @@ namespace BacklashBot.Management
                 _performanceTracker.IsStartingUp = false;
                 _logger.LogWarning("BRAIN: Brain did not start due to the internet being down.");
                 _startTimer?.Dispose();
-                _startTimer = new Timer(async _ =>
+                _startTimer = _timerFactory();
+                _startTimer.Interval = _centralBrainConfig.StartupRetryInterval.TotalMilliseconds;
+                _startTimer.AutoReset = false;
+                _startTimer.Elapsed += async (sender, e) =>
                 {
                     _logger.LogDebug("BRAIN: Retry start timer triggered at {Now}", DateTimeOffset.Now);
                     if (IsServicesStopped && !IsStartingUp)
@@ -227,7 +255,7 @@ namespace BacklashBot.Management
                         }
                     }
                     ConfigureScheduledTasks();
-                }, null, TimeSpan.FromMinutes(5), Timeout.InfiniteTimeSpan);
+                };
                 return;
             }
 
@@ -407,12 +435,15 @@ namespace BacklashBot.Management
                 _logger.LogInformation("BRAIN: Initializing snapshot timer early with 1-minute delay...");
                 if (_snapshotTimer == null)
                 {
-                    _snapshotTimer = new Timer(
-                        async state => await ExecuteSnapshotCycle(state),
-                        null,
-                        TimeSpan.FromMinutes(1),
-                        _decisionInterval
-                    );
+                    _snapshotTimer = _timerFactory();
+                    _snapshotTimer.Interval = _decisionInterval.TotalMilliseconds;
+                    _snapshotTimer.AutoReset = true;
+                    _snapshotTimer.Elapsed += async (sender, e) => await ExecuteSnapshotCycle(null);
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(_centralBrainConfig.SnapshotInitialDelay);
+                        _snapshotTimer.Start();
+                    });
                     _logger.LogInformation("BRAIN: Snapshot timer initialized early with 1-minute delay.");
                 }
                 else
@@ -1229,7 +1260,7 @@ namespace BacklashBot.Management
 
             var now = DateTimeOffset.Now;
             var today = now.Date;
-            var overnightTaskTime = new DateTimeOffset(today.Year, today.Month, today.Day, OvernightStart.Hours, OvernightStart.Minutes, OvernightStart.Seconds, now.Offset);
+            var overnightTaskTime = new DateTimeOffset(today.Year, today.Month, today.Day, _centralBrainConfig.OvernightStart.Hours, _centralBrainConfig.OvernightStart.Minutes, _centralBrainConfig.OvernightStart.Seconds, now.Offset);
 
             if (now > overnightTaskTime) overnightTaskTime = overnightTaskTime.AddDays(1);
 
@@ -1244,7 +1275,10 @@ namespace BacklashBot.Management
 
             if (_executionConfig.RunOvernightActivities)
             {
-                _overnightTimer = new Timer(async _ =>
+                _overnightTimer = _timerFactory();
+                _overnightTimer.Interval = overnightTaskDelay.TotalMilliseconds;
+                _overnightTimer.AutoReset = false;
+                _overnightTimer.Elapsed += async (sender, e) =>
                 {
                     _logger.LogInformation("BRAIN: Overnight tasks timer triggered at {Now}", DateTimeOffset.Now);
                     try
@@ -1262,7 +1296,7 @@ namespace BacklashBot.Management
                     {
                         ConfigureScheduledTasks();
                     }
-                }, null, overnightTaskDelay, Timeout.InfiniteTimeSpan);
+                };
             }
         }
 
