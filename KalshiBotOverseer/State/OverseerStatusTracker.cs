@@ -1,4 +1,6 @@
 using BacklashBot.State.Interfaces;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics.Metrics;
 
 namespace KalshiBotOverseer.State
 {
@@ -10,14 +12,20 @@ namespace KalshiBotOverseer.State
     /// <remarks>
     /// The status tracker ensures thread-safe access to the global cancellation token and provides:
     /// - A single CancellationToken that all components can monitor for shutdown signals
-    /// - Thread-safe cancellation operations
-    /// - Proper resource cleanup through IDisposable implementation
-    /// - Reset capability for restarting the cancellation state
+    /// - Thread-safe cancellation operations with comprehensive logging
+    /// - Proper resource cleanup through IDisposable and IAsyncDisposable implementations
+    /// - Reset capability for restarting the cancellation state with timing metrics
+    /// - Metrics collection for cancellation frequency and operation timing
     ///
     /// This is registered as a singleton service to ensure all components share the same cancellation state.
     /// </remarks>
-    public class OverseerStatusTracker : IStatusTrackerService
+    public class OverseerStatusTracker : IStatusTrackerService, IAsyncDisposable
     {
+        private readonly ILogger<OverseerStatusTracker> _logger;
+        private readonly Meter _meter;
+        private readonly Counter<long> _cancellationCounter;
+        private readonly Histogram<double> _resetTimingHistogram;
+
         /// <summary>
         /// The global CancellationTokenSource used to coordinate cancellation across all overseer components.
         /// </summary>
@@ -30,10 +38,15 @@ namespace KalshiBotOverseer.State
 
         /// <summary>
         /// Initializes a new instance of the OverseerStatusTracker class.
-        /// Creates the initial CancellationTokenSource and sets up the cancellation state.
+        /// Creates the initial CancellationTokenSource and sets up the cancellation state with logging and metrics.
         /// </summary>
-        public OverseerStatusTracker()
+        /// <param name="logger">The logger for tracking cancellation operations and state changes.</param>
+        public OverseerStatusTracker(ILogger<OverseerStatusTracker> logger)
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _meter = new Meter("KalshiBotOverseer.StatusTracker");
+            _cancellationCounter = _meter.CreateCounter<long>("cancellation_count", description: "Number of cancellation operations");
+            _resetTimingHistogram = _meter.CreateHistogram<double>("reset_timing", unit: "ms", description: "Timing for reset operations");
             ResetAll();
         }
 
@@ -64,10 +77,13 @@ namespace KalshiBotOverseer.State
         /// </remarks>
         public void CancelAll()
         {
+            _logger.LogInformation("Initiating cancellation of all operations.");
             lock (_lock)
             {
                 _globalCancellationTokenSource.Cancel();
+                _cancellationCounter.Add(1);
             }
+            _logger.LogInformation("Cancellation of all operations completed.");
         }
 
         /// <summary>
@@ -80,31 +96,62 @@ namespace KalshiBotOverseer.State
         /// </remarks>
         public void ResetAll()
         {
+            var startTime = DateTime.UtcNow;
+            _logger.LogInformation("Resetting cancellation state.");
             lock (_lock)
             {
                 if (_globalCancellationTokenSource != null)
                 {
                     _globalCancellationTokenSource.Dispose();
+                    _logger.LogDebug("Disposed old CancellationTokenSource.");
                 }
                 _globalCancellationTokenSource = new CancellationTokenSource();
+                _logger.LogDebug("Created new CancellationTokenSource.");
             }
+            var duration = (DateTime.UtcNow - startTime).TotalMilliseconds;
+            _resetTimingHistogram.Record(duration);
+            _logger.LogInformation("Cancellation state reset completed in {Duration}ms.", duration);
         }
 
         /// <summary>
-        /// Disposes of the resources used by the status tracker.
-        /// This cancels any pending operations and disposes of the CancellationTokenSource.
+        /// Disposes of the resources used by the status tracker synchronously.
+        /// This cancels any pending operations and disposes of the CancellationTokenSource and metrics.
         /// </summary>
         /// <remarks>
         /// This method should be called when the status tracker is no longer needed,
-        /// typically during application shutdown. It ensures proper cleanup of unmanaged resources.
+        /// typically during application shutdown. It ensures proper cleanup of unmanaged resources
+        /// and logs the disposal operation for monitoring purposes.
         /// </remarks>
         public void Dispose()
         {
+            _logger.LogInformation("Disposing status tracker synchronously.");
             lock (_lock)
             {
                 CancelAll();
                 _globalCancellationTokenSource?.Dispose();
+                _meter?.Dispose();
             }
+            _logger.LogInformation("Status tracker disposed synchronously.");
+        }
+
+        /// <summary>
+        /// Asynchronously disposes of the resources used by the status tracker.
+        /// This cancels any pending operations and disposes of the CancellationTokenSource.
+        /// </summary>
+        /// <returns>A ValueTask representing the asynchronous dispose operation.</returns>
+        public async ValueTask DisposeAsync()
+        {
+            _logger.LogInformation("Disposing status tracker asynchronously.");
+            await Task.Run(() =>
+            {
+                lock (_lock)
+                {
+                    CancelAll();
+                    _globalCancellationTokenSource?.Dispose();
+                    _meter?.Dispose();
+                }
+            });
+            _logger.LogInformation("Status tracker disposed asynchronously.");
         }
     }
 }
