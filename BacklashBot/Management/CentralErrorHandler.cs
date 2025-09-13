@@ -3,9 +3,11 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Exceptions;
+using BacklashDTOs.Configuration;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Management
 {
@@ -20,7 +22,12 @@ namespace BacklashBot.Management
     /// The error handler processes errors from a database logging queue and categorizes them
     /// as either catastrophic (requiring system restart) or non-catastrophic (handled with
     /// market resets or connection recovery). It maintains counters for error tracking and
-    /// implements threshold-based catastrophic detection based on error frequency.
+    /// implements threshold-based catastrophic detection based on configurable error frequency parameters.
+    ///
+    /// Configuration options include:
+    /// - Error window duration for frequency monitoring
+    /// - Error threshold for catastrophic detection
+    /// - Internet connectivity check parameters (max attempts, delays)
     ///
     /// Key responsibilities:
     /// - Process warnings and errors from the logging queue
@@ -29,15 +36,17 @@ namespace BacklashBot.Management
     /// - Maintain error statistics and timestamps
     /// - Trigger market resets for transient failures
     /// - Manage internet connectivity checks for connection-related errors
+    /// - Validate input parameters to prevent null reference exceptions
     /// </remarks>
     public class CentralErrorHandler : ICentralErrorHandler
     {
         private readonly IMarketManagerService _marketManagerService;
         private readonly IServiceFactory _serviceFactory;
         private readonly DatabaseLoggingQueue _loggingQueue;
+        private readonly ErrorHandlerConfig _errorHandlerConfig;
         private readonly ConcurrentQueue<(DateTime Timestamp, ErrorHandlerTaskInfo Error)> _nonCatastrophicErrors = new();
-        private readonly TimeSpan _errorWindow = TimeSpan.FromMinutes(5); // Adjustable window
-        private readonly int _errorThreshold = 10; // Adjustable threshold
+        private readonly TimeSpan _errorWindow; // Configurable window
+        private readonly int _errorThreshold; // Configurable threshold
         private ILogger<ICentralErrorHandler> _logger;
 
         /// <summary>
@@ -98,17 +107,22 @@ namespace BacklashBot.Management
         /// <param name="marketManagerService">Service for managing market operations and resets.</param>
         /// <param name="serviceFactory">Factory for creating and accessing various system services.</param>
         /// <param name="loggingQueue">Queue containing logged errors and warnings to be processed.</param>
+        /// <param name="errorHandlerConfig">Configuration settings for error handling.</param>
         /// <param name="logger">Logger instance for recording error handler operations.</param>
         public CentralErrorHandler(
             IMarketManagerService marketManagerService,
             IServiceFactory serviceFactory,
             DatabaseLoggingQueue loggingQueue,
+            IOptions<ErrorHandlerConfig> errorHandlerConfig,
             ILogger<ICentralErrorHandler> logger)
         {
             _logger = logger;
             _marketManagerService = marketManagerService;
             _serviceFactory = serviceFactory;
             _loggingQueue = loggingQueue;
+            _errorHandlerConfig = errorHandlerConfig.Value;
+            _errorWindow = TimeSpan.FromMinutes(_errorHandlerConfig.ErrorWindowMinutes);
+            _errorThreshold = _errorHandlerConfig.ErrorThreshold;
             LastSuccessfulSnapshot = DateTime.MinValue;
         }
 
@@ -388,6 +402,15 @@ namespace BacklashBot.Management
         /// </remarks>
         public void AddWarning(Exception ex, string identifier, string? message = null)
         {
+            if (string.IsNullOrWhiteSpace(identifier))
+            {
+                throw new ArgumentException("Identifier cannot be null or empty.", nameof(identifier));
+            }
+            if (ex == null && string.IsNullOrWhiteSpace(message))
+            {
+                throw new ArgumentException("Either an exception or a message must be provided.");
+            }
+
             var cts = new CancellationTokenSource();
             Warnings.Enqueue(new ErrorHandlerTaskInfo
             {
@@ -412,6 +435,15 @@ namespace BacklashBot.Management
         /// </remarks>
         public void AddError(Exception ex, string identifier, string? message = null)
         {
+            if (string.IsNullOrWhiteSpace(identifier))
+            {
+                throw new ArgumentException("Identifier cannot be null or empty.", nameof(identifier));
+            }
+            if (ex == null && string.IsNullOrWhiteSpace(message))
+            {
+                throw new ArgumentException("Either an exception or a message must be provided.");
+            }
+
             var cts = new CancellationTokenSource();
             var timestamp = DateTime.Now;
             Errors.Enqueue(new ErrorHandlerTaskInfo
@@ -446,16 +478,15 @@ namespace BacklashBot.Management
         /// </summary>
         /// <returns>True if internet connection is confirmed; false if all attempts fail.</returns>
         /// <remarks>
-        /// This method attempts to verify internet connectivity up to 100 times with increasing
-        /// delays between attempts (starting at 1 second, doubling each time, max 60 seconds).
+        /// This method attempts to verify internet connectivity with configurable parameters.
         /// Used primarily during system startup to ensure network availability before proceeding
         /// with dashboard initialization.
         /// </remarks>
         public async Task<bool> CheckInternetConnection()
         {
-            int maxAttempts = 100;
+            int maxAttempts = _errorHandlerConfig.InternetCheckMaxAttempts;
             int attempt = 0;
-            int delayMs = 1000;
+            int delayMs = _errorHandlerConfig.InternetCheckInitialDelayMs;
             while (attempt < maxAttempts)
             {
                 if (await IsInternetUpAsync())
@@ -472,9 +503,9 @@ namespace BacklashBot.Management
                 _logger.LogWarning("BRAIN: Internet down, retrying in {Delay}ms (attempt {Attempt}/{MaxAttempts})", delayMs, attempt, maxAttempts);
                 await Task.Delay(delayMs);
                 delayMs *= 2;
-                if (delayMs > 60000)
+                if (delayMs > _errorHandlerConfig.InternetCheckMaxDelayMs)
                 {
-                    delayMs = 60000;
+                    delayMs = _errorHandlerConfig.InternetCheckMaxDelayMs;
                 }
             }
 

@@ -61,6 +61,7 @@ builder.Services.Configure<ExecutionConfig>(builder.Configuration.GetSection("Ex
 builder.Services.Configure<MarketDataConfig>(builder.Configuration.GetSection("MarketData"));
 builder.Services.Configure<CentralBrainConfig>(builder.Configuration.GetSection("CentralBrain"));
 builder.Services.Configure<InterestScoreConfig>(builder.Configuration.GetSection("InterestScore"));
+builder.Services.Configure<ErrorHandlerConfig>(builder.Configuration.GetSection("ErrorHandler"));
 
 // Increase shutdown timeout
 builder.Services.Configure<HostOptions>(options =>
