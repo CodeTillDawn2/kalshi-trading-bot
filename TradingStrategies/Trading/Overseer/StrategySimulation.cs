@@ -132,7 +132,7 @@ namespace TradingStrategies.Trading.Overseer
             string tradeSide = longSide ? "no" : "yes";
 
             int qty = (action == ActionType.Exit) ? Math.Abs(Position) : 1;
-            int remainingQty = qty;
+            int remainingQuantity = qty;
             double totalCost = 0;
 
             var bookToReduce = longSide ? SimulatedBook.NoBids : SimulatedBook.YesBids;
@@ -142,17 +142,17 @@ namespace TradingStrategies.Trading.Overseer
 
             for (int p = 99; p >= 1; p--)
             {
-                if (remainingQty <= 0) break;
+                if (remainingQuantity <= 0) break;
                 if (bookToReduce[p] == null || bookToReduce[p].Count == 0) continue;
                 int depth = bookToReduce[p].Sum(o => o.count);
-                int fill = Math.Min(remainingQty, depth);
+                int fill = Math.Min(remainingQuantity, depth);
                 double levelPrice = LevelPriceFunc(p);
                 totalCost += fill * levelPrice;
                 SimulatedBook.ReduceDepth(bookToReduce, p, fill);
-                remainingQty -= fill;
+                remainingQuantity -= fill;
             }
 
-            int filled = qty - remainingQty;
+            int filled = qty - remainingQuantity;
             if (filled == 0) return;
 
             double tempCash = Cash;
@@ -214,25 +214,25 @@ namespace TradingStrategies.Trading.Overseer
             {
                 int sellYesPrice = decision.Price;   // 1..99 (YES ask)
                 int noBidPrice = 100 - sellYesPrice;
-                int postQty = Position;         // 100% of position
-                if (sellYesPrice > 0 && sellYesPrice < 100 && noBidPrice >= 1 && noBidPrice <= 99 && postQty > 0)
+                int postQuantity = Position;         // 100% of position
+                if (sellYesPrice > 0 && sellYesPrice < 100 && noBidPrice >= 1 && noBidPrice <= 99 && postQuantity > 0)
                 {
                     if (SimulatedBook.NoBids[noBidPrice] == null)
                         SimulatedBook.NoBids[noBidPrice] = new List<(int count, DateTime timestamp)>();
-                    SimulatedBook.NoBids[noBidPrice].Add((postQty, effectiveSnapshot.Timestamp));
-                    SimulatedRestingOrders.Add(("sell", "yes", "limit", postQty, sellYesPrice, decision.Expiration));
+                    SimulatedBook.NoBids[noBidPrice].Add((postQuantity, effectiveSnapshot.Timestamp));
+                    SimulatedRestingOrders.Add(("sell", "yes", "limit", postQuantity, sellYesPrice, decision.Expiration));
                 }
             }
             else if (isComboShortPostYes && Position < 0)
             {
                 int yesBidPrice = decision.Price;    // 1..99 (YES bid)
-                int postQty = -Position;         // 100% of position
-                if (yesBidPrice > 0 && yesBidPrice < 100 && postQty > 0)
+                int postQuantity = -Position;         // 100% of position
+                if (yesBidPrice > 0 && yesBidPrice < 100 && postQuantity > 0)
                 {
                     if (SimulatedBook.YesBids[yesBidPrice] == null)
                         SimulatedBook.YesBids[yesBidPrice] = new List<(int count, DateTime timestamp)>();
-                    SimulatedBook.YesBids[yesBidPrice].Add((postQty, effectiveSnapshot.Timestamp));
-                    SimulatedRestingOrders.Add(("buy", "yes", "limit", postQty, yesBidPrice, decision.Expiration));
+                    SimulatedBook.YesBids[yesBidPrice].Add((postQuantity, effectiveSnapshot.Timestamp));
+                    SimulatedRestingOrders.Add(("buy", "yes", "limit", postQuantity, yesBidPrice, decision.Expiration));
                 }
             }
         }
@@ -295,7 +295,7 @@ namespace TradingStrategies.Trading.Overseer
             string limitAction = action == ActionType.PostYes ? "buy" : "sell";
             string limitSide = "yes";
             int limitPrice = decision.Price;
-            int qty = decision.Qty;
+            int qty = decision.Quantity;
             DateTime? exp = decision.Expiration;
             if (limitPrice <= 0 || limitPrice >= 100 || qty <= 0) return;
 
@@ -406,25 +406,25 @@ namespace TradingStrategies.Trading.Overseer
                 int depthAhead = Math.Max(0, totalDepth - o.count);
                 int consumed = -deltaAtPrice;
 
-                int fillQty = Math.Max(0, Math.Min(o.count, consumed - depthAhead));
-                if (fillQty <= 0) continue;
+                int fillQuantity = Math.Max(0, Math.Min(o.count, consumed - depthAhead));
+                if (fillQuantity <= 0) continue;
 
                 double px = o.price / 100.0;
                 if (isBidYes || isBidNo)
                 {
-                    Cash     -= fillQty * px;
-                    Position += (o.side == "yes" ? fillQty : -fillQty);
+                    Cash     -= fillQuantity * px;
+                    Position += (o.side == "yes" ? fillQuantity : -fillQuantity);
                 }
                 else
                 {
-                    Cash     += fillQty * px;
-                    Position -= (o.side == "yes" ? fillQty : -fillQty);
+                    Cash     += fillQuantity * px;
+                    Position -= (o.side == "yes" ? fillQuantity : -fillQuantity);
                 }
 
-                o.count -= fillQty;
+                o.count -= fillQuantity;
 
                 // External taker consumed book from the *front* at this price
-                SimulatedBook.ReduceDepth(book, bookPrice, fillQty);
+                SimulatedBook.ReduceDepth(book, bookPrice, fillQuantity);
 
                 if (o.count <= 0) SimulatedRestingOrders.RemoveAt(i);
                 else SimulatedRestingOrders[i] = o;
@@ -438,7 +438,7 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="resting">The list of resting orders to check for fills.</param>
         /// <param name="tradeSide">The side of the trade ("yes" or "no").</param>
         /// <param name="tradePrice">The price at which the trade occurred.</param>
-        /// <param name="tradeQty">The quantity of the trade.</param>
+        /// <param name="tradeQuantity">The quantity of the trade.</param>
         /// <param name="position">Reference to the current position (modified by fills).</param>
         /// <param name="cash">Reference to the current cash balance (modified by fills).</param>
         /// <param name="currentTime">The timestamp of the trade.</param>
@@ -446,7 +446,7 @@ namespace TradingStrategies.Trading.Overseer
         /// Matches resting orders against market trades and updates position and cash accordingly.
         /// Removes or reduces filled orders from the resting list.
         /// </remarks>
-        private void SimulateFillsFromTrade(List<(string action, string side, string type, int count, int price, DateTime? expiration)> resting, string tradeSide, int tradePrice, int tradeQty, ref int position, ref double cash, DateTime currentTime)
+        private void SimulateFillsFromTrade(List<(string action, string side, string type, int count, int price, DateTime? expiration)> resting, string tradeSide, int tradePrice, int tradeQuantity, ref int position, ref double cash, DateTime currentTime)
         {
             for (int i = resting.Count - 1; i >= 0; i--)
             {
@@ -455,22 +455,22 @@ namespace TradingStrategies.Trading.Overseer
                     ((tradeSide == "yes" && order.side == "no" && order.action == "buy") ||
                      (tradeSide == "no" && order.side == "yes" && order.action == "buy")))
                 {
-                    int fillQty = Math.Min(order.count, tradeQty);
+                    int fillQuantity = Math.Min(order.count, tradeQuantity);
                     double fillPrice = order.price / 100.0;
 
                     if (order.action == "buy")
                     {
-                        cash -= fillQty * fillPrice;
-                        position += order.side == "yes" ? fillQty : -fillQty;
+                        cash -= fillQuantity * fillPrice;
+                        position += order.side == "yes" ? fillQuantity : -fillQuantity;
                     }
                     else
                     {
-                        cash += fillQty * fillPrice;
-                        position -= order.side == "yes" ? fillQty : -fillQty;
+                        cash += fillQuantity * fillPrice;
+                        position -= order.side == "yes" ? fillQuantity : -fillQuantity;
                     }
 
-                    order.count -= fillQty;
-                    tradeQty -= fillQty;
+                    order.count -= fillQuantity;
+                    tradeQuantity -= fillQuantity;
                     if (order.count <= 0)
                     {
                         resting.RemoveAt(i);
@@ -479,7 +479,7 @@ namespace TradingStrategies.Trading.Overseer
                     {
                         resting[i] = order;
                     }
-                    if (tradeQty <= 0) break;
+                    if (tradeQuantity <= 0) break;
                 }
             }
         }

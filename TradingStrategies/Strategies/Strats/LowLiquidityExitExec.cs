@@ -27,7 +27,7 @@ namespace TradingStrategies.Strategies.Strats
             // Early exit for illiquid markets
             if (snapshot.BestYesBid == 0 || snapshot.BestNoBid == 0 || snapshot.TotalBidContracts_Yes == 0 || snapshot.TotalBidContracts_No == 0)
             {
-                return new ActionDecision { Type = ActionType.Exit, Price = 0, Qty = 1, Memo = $"Illiquid market: No valid bids or contracts (BestYesBid: {snapshot.BestYesBid}; BestNoBid: {snapshot.BestNoBid}; TotalYesBidContracts: {snapshot.TotalBidContracts_Yes}; TotalNoBidContracts: {snapshot.TotalBidContracts_No})" };
+                return new ActionDecision { Type = ActionType.Exit, Price = 0, Quantity = 1, Memo = $"Illiquid market: No valid bids or contracts (BestYesBid: {snapshot.BestYesBid}; BestNoBid: {snapshot.BestNoBid}; TotalYesBidContracts: {snapshot.TotalBidContracts_Yes}; TotalNoBidContracts: {snapshot.TotalBidContracts_No})" };
             }
 
             // Hypothetical order size: equivalent to $10 (1000 cents), adjusted by price
@@ -142,7 +142,7 @@ namespace TradingStrategies.Strategies.Strats
                           $"YesLiquidity: {yesLiquidity * 100.0:F2}, NoLiquidity: {noLiquidity * 100.0:F2}";
 
             // Always exit in low liquidity scenarios
-            return new ActionDecision { Type = ActionType.Exit, Price = 0, Qty = 1, Memo = memo };
+            return new ActionDecision { Type = ActionType.Exit, Price = 0, Quantity = 1, Memo = memo };
         }
 
         public override string ToJson()

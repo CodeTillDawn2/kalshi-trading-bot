@@ -5,7 +5,7 @@ using static BacklashInterfaces.Enums.StrategyEnums;
 
 namespace TradingStrategies.Strategies.Strats
 {
-    // MomentumTrading — breakout-style momentum with optional top-decile overweighting.
+    // MomentumTrading ï¿½ breakout-style momentum with optional top-decile overweighting.
     public class MomentumTrading : Strat
     {
         public string Name { get; private set; }
@@ -32,7 +32,7 @@ namespace TradingStrategies.Strategies.Strats
             SpikeWeightCap,
             SpikeVolumeWeightScale,
 
-            // Confirmations (share of total) — single thresholds for both sides
+            // Confirmations (share of total) ï¿½ single thresholds for both sides
             TradeRateShareMin,
             TradeEventShareMin,
 
@@ -77,7 +77,7 @@ namespace TradingStrategies.Strategies.Strats
         public override ActionDecision GetAction(MarketSnapshot snapshot, MarketSnapshot? previousSnapshot, int simulationPosition = 0)
         {
             if (snapshot == null || !snapshot.ChangeMetricsMature)
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = "not_mature" };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Quantity = 0, Memo = "not_mature" };
 
             var inv = CultureInfo.InvariantCulture;
             string F(double d)
@@ -347,12 +347,12 @@ namespace TradingStrategies.Strategies.Strats
             if (candidateAction == ActionType.Long && nearResLong)
             {
                 pathTaken.Add("Gate NearResolved L");
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo(ActionType.None) };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Quantity = 0, Memo = BuildActionMemo(ActionType.None) };
             }
             if (candidateAction == ActionType.Short && nearResShort)
             {
                 pathTaken.Add("Gate NearResolved S");
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo(ActionType.None) };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Quantity = 0, Memo = BuildActionMemo(ActionType.None) };
             }
             // ---------------------------------------------------------
 
@@ -360,23 +360,23 @@ namespace TradingStrategies.Strategies.Strats
             if (simulationPosition > 0 && candidateAction == ActionType.Short && signalStrength < (minSignalStrength + reversalExtraStrength))
             {
                 pathTaken.Add("Hold weak flip L->S");
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo(ActionType.None) };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Quantity = 0, Memo = BuildActionMemo(ActionType.None) };
             }
             if (simulationPosition < 0 && candidateAction == ActionType.Long && signalStrength < (minSignalStrength + reversalExtraStrength))
             {
                 pathTaken.Add("Hold weak flip S->L");
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo(ActionType.None) };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Quantity = 0, Memo = BuildActionMemo(ActionType.None) };
             }
 
             if (candidateAction == ActionType.None || signalStrength < minSignalStrength)
             {
                 pathTaken.Add(candidateAction == ActionType.None ? "Gate None" : "Gate Weak");
-                return new ActionDecision { Type = ActionType.None, Price = 0, Qty = 0, Memo = BuildActionMemo(ActionType.None) };
+                return new ActionDecision { Type = ActionType.None, Price = 0, Quantity = 0, Memo = BuildActionMemo(ActionType.None) };
             }
 
             int px = (candidateAction == ActionType.Long) ? snapshot.BestYesBid : snapshot.BestNoBid;
             pathTaken.Add("Final " + candidateAction.ToString());
-            return new ActionDecision { Type = candidateAction, Price = px, Qty = 1, Memo = BuildActionMemo(candidateAction) };
+            return new ActionDecision { Type = candidateAction, Price = px, Quantity = 1, Memo = BuildActionMemo(candidateAction) };
         }
 
 

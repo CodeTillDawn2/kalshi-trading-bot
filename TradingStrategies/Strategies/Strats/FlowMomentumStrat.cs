@@ -22,8 +22,8 @@ namespace TradingStrategies.Strategies.Strats
             VelocityToDepthRatio,           // base flow threshold (on normalized flow = v/depth)
             MaxVelocityThresholdRatio,      // clamp (safety; usually same or slightly higher than base)
             MinRatioDifference,             // min |flowYes - flowNo|
-            MinConsecutiveBars,             // sustain 2–4 bars
-            MinSignalStrength,              // additional flow floor (normalized), e.g., 0.02–0.20
+            MinConsecutiveBars,             // sustain 2ï¿½4 bars
+            MinSignalStrength,              // additional flow floor (normalized), e.g., 0.02ï¿½0.20
 
             // Confirmations (shares among trades)
             TradeRateShareMin,              // min share of trade *rate* for chosen side
@@ -191,7 +191,7 @@ namespace TradingStrategies.Strategies.Strats
         }
 
         private static ActionDecision AD(ActionType t, int p, int q, string memo)
-            => new ActionDecision { Type = t, Price = p, Qty = q, Memo = memo };
+            => new ActionDecision { Type = t, Price = p, Quantity = q, Memo = memo };
 
         private static string Memo(
             IFormatProvider inv, string tail,

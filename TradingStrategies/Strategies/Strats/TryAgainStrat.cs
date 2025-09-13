@@ -198,7 +198,7 @@ namespace TradingStrategies.Strategies.Strats
                 shortSlopeOK &&
                 spreadEntryOK;
 
-            // Strict entry (WITHOUT spread) — used only to memo “blocked by spread”
+            // Strict entry (WITHOUT spread) ï¿½ used only to memo ï¿½blocked by spreadï¿½
             bool entryYesStrict_NoSpread =
                 (yesNow > yesPrev) &&
                 (absNetFlow >= baseVD) &&
@@ -402,40 +402,40 @@ namespace TradingStrategies.Strategies.Strats
 
             string CounterSummaryLong() =>
                 LongCounterOK() ? $"Counter LONG: OK (streak uses =; consecY={consecY})"
-                                : $"Counter LONG: No — price not = (YesBid {yesBidPrev}->{yesBidNow}) (consecY={consecY})";
+                                : $"Counter LONG: No ï¿½ price not = (YesBid {yesBidPrev}->{yesBidNow}) (consecY={consecY})";
 
             string CounterSummaryShort() =>
                 ShortCounterOK() ? $"Counter SHORT: OK (streak uses =; consecN={consecN})"
-                                 : $"Counter SHORT: No — price not = (YesBid {yesBidPrev}->{yesBidNow}) (consecN={consecN})";
+                                 : $"Counter SHORT: No ï¿½ price not = (YesBid {yesBidPrev}->{yesBidNow}) (consecN={consecN})";
 
             string EntrySummaryLong() =>
                 entryYesStrict ? "EntryCheck LONG: OK (strict: price >, |net| = base, shares OK, slope OK: S=min or (M=med & S=med))"
-                               : $"EntryCheck LONG: No — {(longPriceUpStrict ? (Math.Abs(netFlow) >= baseVD ? (trShareYes >= shareTRMin ? (teShareYes >= shareTEMin ? (LongSlopeOK() ? "unexpected" : $"slope rule fail: need S = {F(minSlope)} OR (M = {F(minSlopeMed)} AND S = {F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}") : $"TE? {F(teShareYes)} < {F(shareTEMin)}") : $"TR? {F(trShareYes)} < {F(shareTRMin)}") : $"|net| {F(Math.Abs(netFlow))} < {F(baseVD)}") : $"entry needs strictly > (streak uses =): YesBid {yesBidPrev}->{yesBidNow}")}";
+                               : $"EntryCheck LONG: No ï¿½ {(longPriceUpStrict ? (Math.Abs(netFlow) >= baseVD ? (trShareYes >= shareTRMin ? (teShareYes >= shareTEMin ? (LongSlopeOK() ? "unexpected" : $"slope rule fail: need S = {F(minSlope)} OR (M = {F(minSlopeMed)} AND S = {F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}") : $"TE? {F(teShareYes)} < {F(shareTEMin)}") : $"TR? {F(trShareYes)} < {F(shareTRMin)}") : $"|net| {F(Math.Abs(netFlow))} < {F(baseVD)}") : $"entry needs strictly > (streak uses =): YesBid {yesBidPrev}->{yesBidNow}")}";
 
             string EntrySummaryShort() =>
                 entryNoStrict ? "EntryCheck SHORT: OK (strict: price <, |net| = base, shares OK, slope OK: S=-min or (M=-med & S=-med))"
-                              : $"EntryCheck SHORT: No — {(shortPriceDownStrict ? (Math.Abs(netFlow) >= baseVD ? (trShareNo >= shareTRMin ? (teShareNo >= shareTEMin ? (ShortSlopeOK() ? "unexpected" : $"slope rule fail: need S = -{F(minSlope)} OR (M = -{F(minSlopeMed)} AND S = -{F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}") : $"TE? {F(teShareNo)} < {F(shareTEMin)}") : $"TR? {F(trShareNo)} < {F(shareTRMin)}") : $"|net| {F(Math.Abs(netFlow))} < {F(baseVD)}") : $"entry needs strictly < (streak uses =): YesBid {yesBidPrev}->{yesBidNow}")}";
+                              : $"EntryCheck SHORT: No ï¿½ {(shortPriceDownStrict ? (Math.Abs(netFlow) >= baseVD ? (trShareNo >= shareTRMin ? (teShareNo >= shareTEMin ? (ShortSlopeOK() ? "unexpected" : $"slope rule fail: need S = -{F(minSlope)} OR (M = -{F(minSlopeMed)} AND S = -{F(minSlopeMed)}); got S {F(netSlopeShort)}, M {F(netSlopeMed)}") : $"TE? {F(teShareNo)} < {F(shareTEMin)}") : $"TR? {F(trShareNo)} < {F(shareTRMin)}") : $"|net| {F(Math.Abs(netFlow))} < {F(baseVD)}") : $"entry needs strictly < (streak uses =): YesBid {yesBidPrev}->{yesBidNow}")}";
 
             string longBlock = BlockerLong();
             string shortBlock = BlockerShort();
 
             string wouldLong = wouldEnterLong
-                ? $"Would Enter LONG: Yes — {CounterSummaryLong()} | {EntrySummaryLong()}"
-                : $"Would Enter LONG: No — {CounterSummaryLong()} | {EntrySummaryLong()} | Blocker: {longBlock ?? "n/a"}";
+                ? $"Would Enter LONG: Yes ï¿½ {CounterSummaryLong()} | {EntrySummaryLong()}"
+                : $"Would Enter LONG: No ï¿½ {CounterSummaryLong()} | {EntrySummaryLong()} | Blocker: {longBlock ?? "n/a"}";
 
             string wouldShort = wouldEnterShort
-                ? $"Would Enter SHORT: Yes — {CounterSummaryShort()} | {EntrySummaryShort()}"
-                : $"Would Enter SHORT: No — {CounterSummaryShort()} | {EntrySummaryShort()} | Blocker: {shortBlock ?? "n/a"}";
+                ? $"Would Enter SHORT: Yes ï¿½ {CounterSummaryShort()} | {EntrySummaryShort()}"
+                : $"Would Enter SHORT: No ï¿½ {CounterSummaryShort()} | {EntrySummaryShort()} | Blocker: {shortBlock ?? "n/a"}";
 
             string wouldExit = null;
             if (position > 0)
                 wouldExit = wouldExitLong
-                    ? $"Would EXIT LONG: Yes — (S = -{F(exitMinShort)} OR M = -{F(exitMinMed)}), price ? (YesBid {yesBidPrev}->{yesBidNow})"
-                    : $"Would EXIT LONG: No — need (S = -{F(exitMinShort)} OR M = -{F(exitMinMed)}) and price ?; got S {F(netSlopeShort)}, M {F(netSlopeMed)}, price {(longPriceDown ? "?" : "?/=")}";
+                    ? $"Would EXIT LONG: Yes ï¿½ (S = -{F(exitMinShort)} OR M = -{F(exitMinMed)}), price ? (YesBid {yesBidPrev}->{yesBidNow})"
+                    : $"Would EXIT LONG: No ï¿½ need (S = -{F(exitMinShort)} OR M = -{F(exitMinMed)}) and price ?; got S {F(netSlopeShort)}, M {F(netSlopeMed)}, price {(longPriceDown ? "?" : "?/=")}";
             else if (position < 0)
                 wouldExit = wouldExitShort
-                    ? $"Would EXIT SHORT: Yes — (S = {F(exitMinShort)} OR M = {F(exitMinMed)}), price ? (YesBid {yesBidPrev}->{yesBidNow})"
-                    : $"Would EXIT SHORT: No — need (S = {F(exitMinShort)} OR M = {F(exitMinMed)}) and price ?; got S {F(netSlopeShort)}, M {F(netSlopeMed)}, price {(shortPriceUp ? "?" : "?/=")}";
+                    ? $"Would EXIT SHORT: Yes ï¿½ (S = {F(exitMinShort)} OR M = {F(exitMinMed)}), price ? (YesBid {yesBidPrev}->{yesBidNow})"
+                    : $"Would EXIT SHORT: No ï¿½ need (S = {F(exitMinShort)} OR M = {F(exitMinMed)}) and price ?; got S {F(netSlopeShort)}, M {F(netSlopeMed)}, price {(shortPriceUp ? "?" : "?/=")}";
 
             var lines = new List<string> { ActionLine() };
             if (flipBlocked) lines.Add("Flip blocked: |net flow| below opposite threshold.");
@@ -473,7 +473,7 @@ namespace TradingStrategies.Strategies.Strats
 
 
         private static ActionDecision AD(ActionType t, int p, int q, string memo)
-            => new ActionDecision { Type = t, Price = p, Qty = q, Memo = memo };
+            => new ActionDecision { Type = t, Price = p, Quantity = q, Memo = memo };
 
         public override string ToJson()
         {
