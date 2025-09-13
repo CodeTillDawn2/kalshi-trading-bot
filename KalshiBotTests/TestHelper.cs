@@ -12,10 +12,28 @@ namespace KalshiBotTests
     /// </summary>
     public static class TestHelper
     {
+        /// <summary>
+        /// Enumeration of predefined test scenarios for configuration testing.
+        /// Each scenario provides different parameter values optimized for specific testing needs.
+        /// </summary>
         public enum TestScenario
         {
+            /// <summary>
+            /// Standard configuration values suitable for most testing scenarios.
+            /// Uses balanced periods and intervals for reliable test execution.
+            /// </summary>
             Default,
+
+            /// <summary>
+            /// Fast configuration with shorter periods and intervals for rapid testing.
+            /// Ideal for quick unit tests and performance-critical scenarios.
+            /// </summary>
             Fast,
+
+            /// <summary>
+            /// Slow configuration with longer periods for stable, extended testing.
+            /// Suitable for integration tests and scenarios requiring more data points.
+            /// </summary>
             Slow
         }
 
@@ -77,6 +95,12 @@ namespace KalshiBotTests
             return Options.Create(calculationConfig);
         }
 
+        /// <summary>
+        /// Validates all properties of a TradingConfig instance to ensure they contain valid values.
+        /// Throws ArgumentException if any property has an invalid value.
+        /// </summary>
+        /// <param name="config">The TradingConfig instance to validate.</param>
+        /// <exception cref="ArgumentException">Thrown when any configuration property has an invalid value.</exception>
         private static void ValidateTradingConfig(TradingConfig config)
         {
             if (config.DecisionFrequencySeconds <= 0) throw new ArgumentException("DecisionFrequencySeconds must be positive");
@@ -94,6 +118,12 @@ namespace KalshiBotTests
             if (config.MaxDrawdownPercent < 0 || config.MaxDrawdownPercent > 1) throw new ArgumentException("MaxDrawdownPercent must be between 0 and 1");
         }
 
+        /// <summary>
+        /// Validates all properties of a CalculationConfig instance to ensure they contain valid values.
+        /// Throws ArgumentException if any property has an invalid value.
+        /// </summary>
+        /// <param name="config">The CalculationConfig instance to validate.</param>
+        /// <exception cref="ArgumentException">Thrown when any configuration property has an invalid value.</exception>
         private static void ValidateCalculationConfig(CalculationConfig config)
         {
             if (config.RSI_Short_Periods <= 0) throw new ArgumentException("RSI_Short_Periods must be positive");

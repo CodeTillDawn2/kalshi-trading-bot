@@ -7,7 +7,8 @@ namespace KalshiBotTests
     /// This static class serves as a comprehensive test data repository, containing synthetic and real-world market data
     /// scenarios for testing indicators such as RSI, MACD, EMA, Bollinger Bands, ATR, VWAP, Stochastic Oscillator, and OBV.
     /// Each scenario includes candlestick data and expected calculation results to ensure mathematical accuracy
-    /// of trading algorithms used in the bot's strategy engine.
+    /// of trading algorithms used in the bot's strategy engine. Also provides parameterized scenario generation
+    /// for custom market conditions including trending, ranging, and volatile markets.
     /// </summary>
     /// <remarks>
     /// The scenarios are designed to cover various market conditions including trending, ranging, and volatile periods.
@@ -123,6 +124,9 @@ namespace KalshiBotTests
         /// The scenarios include:
         /// - RSI_SeekingAlpha: Synthetic data with alternating price movements
         /// - RSI_InvestExcel: Real AAPL price data for practical validation
+        /// - RSI_ExtremeVolatility: Extreme price swings testing RSI in volatile conditions
+        /// - RSI_TrendingUp: Steady upward trend testing RSI momentum signals
+        /// - RSI_Ranging: Oscillating prices testing RSI in sideways markets
         /// </remarks>
         public static List<TestScenario> GetRSIScenarios()
         {
@@ -278,6 +282,9 @@ namespace KalshiBotTests
         /// The scenarios include:
         /// - EMA_Dummies: Synthetic Intel price data for basic EMA validation
         /// - EMA_InvestExcel: Real AAPL price data for practical EMA testing
+        /// - EMA_ExtremeVolatility: Extreme price swings testing EMA responsiveness
+        /// - EMA_TrendingUp: Steady upward trend testing EMA trend following
+        /// - EMA_Ranging: Oscillating prices testing EMA stability in sideways markets
         /// </remarks>
         public static List<TestScenario> GetEMAScenarios()
         {
