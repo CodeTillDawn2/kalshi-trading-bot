@@ -11,9 +11,74 @@ using TradingSimulator.Simulator;
 using Microsoft.Extensions.DependencyInjection;
 using TradingStrategies.Strategies;
 using System.Threading;
+using System.Diagnostics;
+using System.ComponentModel.DataAnnotations;
 
 namespace TradingSimulator
 {
+    /// <summary>
+    /// Configuration class for MarketProcessor settings.
+    /// </summary>
+    public class MarketProcessorConfig
+    {
+        /// <summary>
+        /// Directory path where processed market data is cached.
+        /// </summary>
+        [Required]
+        public string CacheDirectory { get; set; } = "Cache";
+
+        /// <summary>
+        /// File naming convention for cache files.
+        /// </summary>
+        public string FileNameTemplate { get; set; } = "{MarketTicker}{Suffix}.json";
+
+        /// <summary>
+        /// Timeout in seconds for processing operations.
+        /// </summary>
+        public int ProcessingTimeoutSeconds { get; set; } = 300;
+
+        /// <summary>
+        /// Maximum number of markets to process concurrently in batch operations.
+        /// </summary>
+        public int MaxConcurrentMarkets { get; set; } = 5;
+
+        /// <summary>
+        /// Size of batches for processing multiple markets to reduce memory pressure.
+        /// </summary>
+        public int BatchSize { get; set; } = 10;
+
+        /// <summary>
+        /// Configuration for discrepancy detection.
+        /// </summary>
+        public DiscrepancyDetectionConfig DiscrepancyDetection { get; set; } = new();
+
+        /// <summary>
+        /// Whether to enable memory usage tracking in performance metrics.
+        /// </summary>
+        public bool EnableMemoryTracking { get; set; } = true;
+    }
+
+    /// <summary>
+    /// Configuration for discrepancy detection parameters.
+    /// </summary>
+    public class DiscrepancyDetectionConfig
+    {
+        /// <summary>
+        /// Whether to enable velocity discrepancy detection.
+        /// </summary>
+        public bool Enabled { get; set; } = false;
+
+        /// <summary>
+        /// Threshold for detecting velocity discrepancies.
+        /// </summary>
+        public double VelocityThreshold { get; set; } = 0.1;
+
+        /// <summary>
+        /// Minimum number of snapshots required for discrepancy detection.
+        /// </summary>
+        public int MinSnapshotsForDetection { get; set; } = 10;
+    }
+
     /// <summary>
     /// Processes individual markets in the trading simulator by running trading strategies,
     /// analyzing event logs, and generating visualization data points for market analysis.
@@ -37,29 +102,14 @@ namespace TradingSimulator
         private readonly HashSet<string> _processedMarkets;
 
         /// <summary>
-        /// Directory path where processed market data is cached for future use.
+        /// Configuration settings for the market processor.
         /// </summary>
-        private readonly string _cacheDirectory;
+        private readonly MarketProcessorConfig _config;
 
         /// <summary>
         /// Reporting service for detecting velocity discrepancies in market snapshots.
         /// </summary>
         private readonly SimulatorReporting _simulatorReporting;
-
-        /// <summary>
-        /// Timeout in seconds for processing operations to prevent hanging in high-throughput scenarios.
-        /// </summary>
-        private readonly int _processingTimeoutSeconds;
-
-        /// <summary>
-        /// Maximum number of markets to process concurrently in batch operations.
-        /// </summary>
-        private readonly int _maxConcurrentMarkets;
-
-        /// <summary>
-        /// Size of batches for processing multiple markets to reduce memory pressure.
-        /// </summary>
-        private readonly int _batchSize;
 
         /// <summary>
         /// Performance metrics for tracking processing rates and queue depths.
@@ -77,30 +127,85 @@ namespace TradingSimulator
         /// <param name="overseer">The trading overseer for running simulations.</param>
         /// <param name="scopeFactory">Factory for creating service scopes.</param>
         /// <param name="processedMarkets">Set of already processed market tickers.</param>
-        /// <param name="cacheDirectory">Directory for caching processed data.</param>
+        /// <param name="config">Configuration settings for the market processor.</param>
         /// <param name="simulatorReporting">Reporting service for discrepancy detection.</param>
-        /// <param name="processingTimeoutSeconds">Timeout in seconds for processing operations.</param>
-        /// <param name="maxConcurrentMarkets">Maximum number of markets to process concurrently in batch operations.</param>
-        /// <param name="batchSize">Size of batches for processing multiple markets to reduce memory pressure.</param>
         public MarketProcessor(
             TradingOverseer overseer,
             IServiceScopeFactory scopeFactory,
             HashSet<string> processedMarkets,
-            string cacheDirectory,
-            SimulatorReporting simulatorReporting,
-            int processingTimeoutSeconds,
-            int maxConcurrentMarkets = 5,
-            int batchSize = 10)
+            MarketProcessorConfig config,
+            SimulatorReporting simulatorReporting)
         {
             _overseer = overseer;
             _scopeFactory = scopeFactory;
             _processedMarkets = processedMarkets;
-            _cacheDirectory = cacheDirectory;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
             _simulatorReporting = simulatorReporting;
-            _processingTimeoutSeconds = processingTimeoutSeconds;
-            _maxConcurrentMarkets = maxConcurrentMarkets;
-            _batchSize = batchSize;
-            _performanceMetrics = new PerformanceMetrics();
+            _performanceMetrics = new PerformanceMetrics(_config.EnableMemoryTracking);
+        }
+
+        /// <summary>
+        /// Validates input parameters for market processing operations.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to validate.</param>
+        /// <param name="marketSnapshots">The market snapshots to validate.</param>
+        /// <param name="strategiesDict">The strategies dictionary to validate.</param>
+        private void ValidateInputs(string marketTicker, List<MarketSnapshot> marketSnapshots, Dictionary<MarketType, List<Strategy>> strategiesDict)
+        {
+            if (string.IsNullOrWhiteSpace(marketTicker))
+                throw new ArgumentException("Market ticker cannot be null or empty.", nameof(marketTicker));
+
+            if (marketSnapshots == null || !marketSnapshots.Any())
+                throw new ArgumentException("Market snapshots cannot be null or empty.", nameof(marketSnapshots));
+
+            if (strategiesDict == null || !strategiesDict.Any())
+                throw new ArgumentException("Strategies dictionary cannot be null or empty.", nameof(strategiesDict));
+
+            // Validate market snapshots integrity
+            foreach (var snapshot in marketSnapshots)
+            {
+                if (snapshot.Timestamp == default)
+                    throw new ArgumentException("Market snapshot has invalid timestamp.", nameof(marketSnapshots));
+
+                if (snapshot.BestYesBid <= 0 || snapshot.BestYesAsk <= 0)
+                    throw new ArgumentException("Market snapshot has invalid bid/ask prices.", nameof(marketSnapshots));
+
+                if (snapshot.BestYesBid >= snapshot.BestYesAsk)
+                    throw new ArgumentException("Market snapshot bid price must be less than ask price.", nameof(marketSnapshots));
+            }
+        }
+
+        /// <summary>
+        /// Validates market snapshots for data integrity before processing.
+        /// </summary>
+        /// <param name="marketSnapshots">The market snapshots to validate.</param>
+        /// <returns>True if validation passes, false otherwise.</returns>
+        private bool ValidateMarketSnapshots(List<MarketSnapshot> marketSnapshots)
+        {
+            if (marketSnapshots == null || !marketSnapshots.Any())
+                return false;
+
+            // Check for chronological order
+            for (int i = 1; i < marketSnapshots.Count; i++)
+            {
+                if (marketSnapshots[i].Timestamp < marketSnapshots[i - 1].Timestamp)
+                {
+                    OnTestProgress?.Invoke($"Warning: Market snapshots are not in chronological order.");
+                    return false;
+                }
+            }
+
+            // Check for reasonable price ranges
+            foreach (var snapshot in marketSnapshots)
+            {
+                if (snapshot.BestYesBid < 0.01 || snapshot.BestYesAsk > 1000.0)
+                {
+                    OnTestProgress?.Invoke($"Warning: Market snapshot prices are outside reasonable range.");
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -113,7 +218,6 @@ namespace TradingSimulator
         /// <param name="strategiesDict">Dictionary mapping market types to their associated trading strategies.</param>
         /// <param name="progressPrefix">Optional prefix for progress reporting messages.</param>
         /// <param name="writeToFile">Whether to save the processed data to a cache file.</param>
-        /// <param name="detectVelocityDiscrepancies">Whether to detect and report orderbook velocity discrepancies.</param>
         /// <param name="group">Optional snapshot group metadata for file naming and organization.</param>
         /// <param name="ignoreProcessedCache">Whether to ignore the processed markets cache and reprocess.</param>
         /// <returns>A tuple containing final P&L, position, average cost, and various lists of price points for visualization.</returns>
@@ -128,10 +232,19 @@ namespace TradingSimulator
             Dictionary<MarketType, List<Strategy>> strategiesDict,
             string progressPrefix = "",
             bool writeToFile = false,
-            bool detectVelocityDiscrepancies = false,
             SnapshotGroupDTO? group = null,
             bool ignoreProcessedCache = false)
         {
+            // Validate inputs
+            ValidateInputs(marketTicker, marketSnapshots, strategiesDict);
+
+            // Validate market snapshots
+            if (!ValidateMarketSnapshots(marketSnapshots))
+            {
+                OnTestProgress?.Invoke($"{progressPrefix}Market snapshot validation failed for {marketTicker}, skipping.");
+                return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
+            }
+
             if (!ignoreProcessedCache && _processedMarkets.Contains(marketTicker))
             {
                 OnTestProgress?.Invoke($"{progressPrefix}Skipping cached market: {marketTicker}");
@@ -152,7 +265,7 @@ namespace TradingSimulator
 
                 // Detect discrepancies
                 List<PricePoint> discrepancyPoints = new List<PricePoint>();
-                if (detectVelocityDiscrepancies)
+                if (_config.DiscrepancyDetection.Enabled && marketSnapshots.Count >= _config.DiscrepancyDetection.MinSnapshotsForDetection)
                 {
                     discrepancyPoints = _simulatorReporting.DetectVelocityDiscrepancies(marketSnapshots, writeToFile);
                     OnTestProgress?.Invoke($"{progressPrefix}Detected {discrepancyPoints.Count} orderbook discrepancies in {marketTicker}.");
@@ -161,7 +274,7 @@ namespace TradingSimulator
                 // Run simulation with timeout
                 var scenario = new Scenario(strategiesDict);
                 var simulationTask = Task.Run(() => _overseer.TestScenario(scenario, marketSnapshots, writeToFile, 100, group));
-                var timeoutTask = Task.Delay(TimeSpan.FromSeconds(_processingTimeoutSeconds));
+                var timeoutTask = Task.Delay(TimeSpan.FromSeconds(_config.ProcessingTimeoutSeconds));
                 var completedTask = await Task.WhenAny(simulationTask, timeoutTask);
 
                 var pathData = new List<(PathPerformance performance, List<SimulationEventLog> events)>();
@@ -171,7 +284,7 @@ namespace TradingSimulator
                 }
                 else
                 {
-                    OnTestProgress?.Invoke($"{progressPrefix}Processing timeout exceeded ({_processingTimeoutSeconds}s) for {marketTicker}. Skipping.");
+                    OnTestProgress?.Invoke($"{progressPrefix}Processing timeout exceeded ({_config.ProcessingTimeoutSeconds}s) for {marketTicker}. Skipping.");
                     _performanceMetrics.CompleteMarketProcessing(marketTicker, DateTime.UtcNow - startTime);
                     return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
                 }
@@ -181,7 +294,7 @@ namespace TradingSimulator
                     var bestPath = pathData.OrderByDescending(p => p.performance.Equity).First();
                     var eventLogs = bestPath.events;
 
-                    var result = ProcessEventLogs(marketSnapshots, eventLogs, marketTicker, writeToFile, progressPrefix, group);
+                    var result = await ProcessEventLogsAsync(marketSnapshots, eventLogs, marketTicker, writeToFile, progressPrefix, group);
                     _performanceMetrics.CompleteMarketProcessing(marketTicker, DateTime.UtcNow - startTime);
                     return result;
                 }
@@ -207,10 +320,10 @@ namespace TradingSimulator
         /// <param name="progressPrefix">Optional prefix for progress reporting messages.</param>
         /// <param name="group">Optional snapshot group metadata for file naming.</param>
         /// <returns>A tuple containing final P&L, position, average cost, and various lists of price points for visualization.</returns>
-        private (double, int, double, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>,
+        private async Task<(double, int, double, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>,
             List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>,
-            List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>)
-        ProcessEventLogs(
+            List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>)>
+        ProcessEventLogsAsync(
             List<MarketSnapshot> marketSnapshots,
             List<SimulationEventLog> eventLogs,
             string marketTicker,
@@ -223,13 +336,22 @@ namespace TradingSimulator
             var finalPosition = bestPath.performance.SimulatedPosition;
             var finalAverageCost = bestPath.performance.AverageCost;
 
-            // Create price points
-            var (bidPoints, askPoints) = CreateBidAskPoints(marketSnapshots);
-            var (buyPoints, sellPoints, exitPoints, intendedLongPoints, intendedShortPoints) = CreateTradePoints(eventLogs);
-            var eventPoints = CreateEventPoints(eventLogs);
-            var (positionPoints, averageCostPoints) = CreatePositionPoints(eventLogs);
-            var restingOrdersPoints = CreateRestingOrdersPoints(eventLogs);
-            var patternPoints = CreatePatternPoints(eventLogs);
+            // Create price points asynchronously
+            var bidAskTask = CreateBidAskPointsAsync(marketSnapshots);
+            var tradeTask = CreateTradePointsAsync(eventLogs);
+            var eventTask = CreateEventPointsAsync(eventLogs);
+            var positionTask = CreatePositionPointsAsync(eventLogs);
+            var restingTask = CreateRestingOrdersPointsAsync(eventLogs);
+            var patternTask = CreatePatternPointsAsync(eventLogs);
+
+            await Task.WhenAll(bidAskTask, tradeTask, eventTask, positionTask, restingTask, patternTask);
+
+            var (bidPoints, askPoints) = bidAskTask.Result;
+            var (buyPoints, sellPoints, exitPoints, intendedLongPoints, intendedShortPoints) = tradeTask.Result;
+            var eventPoints = eventTask.Result;
+            var (positionPoints, averageCostPoints) = positionTask.Result;
+            var restingOrdersPoints = restingTask.Result;
+            var patternPoints = patternTask.Result;
 
             // Save to file if requested
             if (writeToFile)
@@ -255,7 +377,8 @@ namespace TradingSimulator
         /// <param name="strategiesDict">Dictionary mapping market types to their associated trading strategies.</param>
         /// <param name="progressPrefix">Optional prefix for progress reporting messages.</param>
         /// <param name="writeToFile">Whether to save the processed data to cache files.</param>
-        /// <param name="detectVelocityDiscrepancies">Whether to detect and report orderbook velocity discrepancies.</param>
+        /// <param name="group">Optional snapshot group metadata for file naming and organization.</param>
+        /// <param name="ignoreProcessedCache">Whether to ignore the processed markets cache and reprocess.</param>
         /// <param name="group">Optional snapshot group metadata for file naming and organization.</param>
         /// <param name="ignoreProcessedCache">Whether to ignore the processed markets cache and reprocess.</param>
         /// <returns>A dictionary mapping market tickers to their processing results.</returns>
@@ -269,7 +392,6 @@ namespace TradingSimulator
             Dictionary<MarketType, List<Strategy>> strategiesDict,
             string progressPrefix = "",
             bool writeToFile = false,
-            bool detectVelocityDiscrepancies = false,
             SnapshotGroupDTO? group = null,
             bool ignoreProcessedCache = false)
         {
@@ -286,18 +408,18 @@ namespace TradingSimulator
                 return results;
             }
 
-            OnTestProgress?.Invoke($"{progressPrefix}Processing {marketsToProcess.Count} markets in batches (batch size: {_batchSize}, max concurrent: {_maxConcurrentMarkets})");
+            OnTestProgress?.Invoke($"{progressPrefix}Processing {marketsToProcess.Count} markets in batches (batch size: {_config.BatchSize}, max concurrent: {_config.MaxConcurrentMarkets})");
 
             // Process markets in batches
-            for (int i = 0; i < marketsToProcess.Count; i += _batchSize)
+            for (int i = 0; i < marketsToProcess.Count; i += _config.BatchSize)
             {
                 var batchStartTime = DateTime.UtcNow;
-                var batch = marketsToProcess.Skip(i).Take(_batchSize).ToList();
-                OnTestProgress?.Invoke($"{progressPrefix}Processing batch {i / _batchSize + 1} with {batch.Count} markets");
+                var batch = marketsToProcess.Skip(i).Take(_config.BatchSize).ToList();
+                OnTestProgress?.Invoke($"{progressPrefix}Processing batch {i / _config.BatchSize + 1} with {batch.Count} markets");
 
                 // Process markets in this batch concurrently, but limit concurrency
                 var batchTasks = new List<Task>();
-                var semaphore = new SemaphoreSlim(_maxConcurrentMarkets);
+                var semaphore = new SemaphoreSlim(_config.MaxConcurrentMarkets);
 
                 foreach (var marketTicker in batch)
                 {
@@ -313,7 +435,7 @@ namespace TradingSimulator
                         try
                         {
                             var result = await ProcessMarketAsync(marketTicker, snapshots, strategiesDict,
-                                progressPrefix, writeToFile, detectVelocityDiscrepancies, group, ignoreProcessedCache);
+                                progressPrefix, writeToFile, group, ignoreProcessedCache);
                             lock (results)
                             {
                                 results[marketTicker] = result;
@@ -330,7 +452,7 @@ namespace TradingSimulator
                 await Task.WhenAll(batchTasks);
                 var batchProcessingTime = DateTime.UtcNow - batchStartTime;
                 _performanceMetrics.RecordBatchProcessing(batch.Count, batchProcessingTime);
-                OnTestProgress?.Invoke($"{progressPrefix}Completed batch {i / _batchSize + 1} in {batchProcessingTime.TotalSeconds:F2}s");
+                OnTestProgress?.Invoke($"{progressPrefix}Completed batch {i / _config.BatchSize + 1} in {batchProcessingTime.TotalSeconds:F2}s");
             }
 
             OnTestProgress?.Invoke($"{progressPrefix}Batch processing completed. Processed {results.Count} markets.");
@@ -349,6 +471,23 @@ namespace TradingSimulator
             var bidPoints = marketSnapshots.Select(s => new PricePoint(s.Timestamp, s.BestYesBid, " Best Bid")).ToList();
             var askPoints = marketSnapshots.Select(s => new PricePoint(s.Timestamp, s.BestYesAsk, " Best Ask")).ToList();
             return (bidPoints, askPoints);
+        }
+
+        /// <summary>
+        /// Asynchronously creates price point collections for bid and ask prices from market snapshots.
+        /// This method extracts the best bid and ask prices at each snapshot timestamp
+        /// to provide the baseline price data for market visualization.
+        /// </summary>
+        /// <param name="marketSnapshots">The list of market snapshots to extract price data from.</param>
+        /// <returns>A task that returns a tuple containing lists of bid and ask price points for charting.</returns>
+        private async Task<(List<PricePoint>, List<PricePoint>)> CreateBidAskPointsAsync(List<MarketSnapshot> marketSnapshots)
+        {
+            return await Task.Run(() =>
+            {
+                var bidPoints = marketSnapshots.Select(s => new PricePoint(s.Timestamp, s.BestYesBid, " Best Bid")).ToList();
+                var askPoints = marketSnapshots.Select(s => new PricePoint(s.Timestamp, s.BestYesAsk, " Best Ask")).ToList();
+                return (bidPoints, askPoints);
+            });
         }
 
         /// <summary>
@@ -406,6 +545,63 @@ namespace TradingSimulator
         }
 
         /// <summary>
+        /// Asynchronously creates price point collections for various trading actions from event logs.
+        /// This method analyzes the event logs to identify buy/sell actions, intended trades,
+        /// and explicit exits, converting them into timestamped price points for visualization.
+        /// </summary>
+        /// <param name="eventLogs">The event logs from the trading simulation to analyze.</param>
+        /// <returns>A task that returns a tuple containing lists of buy, sell, exit, intended long, and intended short price points.</returns>
+        private async Task<(List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>)>
+            CreateTradePointsAsync(List<SimulationEventLog> eventLogs)
+        {
+            return await Task.Run(() =>
+            {
+                var buyPoints = new List<PricePoint>();
+                var sellPoints = new List<PricePoint>();
+                var exitPoints = new List<PricePoint>();
+                var intendedLongPoints = new List<PricePoint>();
+                var intendedShortPoints = new List<PricePoint>();
+
+                int prevPos = 0;
+                foreach (var ev in eventLogs)
+                {
+                    string prefix = " ";
+
+                    // Trade markers
+                    if (ev.Position != prevPos)
+                    {
+                        if (ev.Position > prevPos)
+                            buyPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesAsk, prefix + ev.Memo));
+                        else
+                            sellPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesBid, prefix + ev.Memo));
+                    }
+                    else
+                    {
+                        if (ev.Action == "Long")
+                            intendedLongPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesAsk, prefix + "Intended Long: " + ev.Memo));
+                        else if (ev.Action == "Short")
+                            intendedShortPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesBid, prefix + "Intended Short: " + ev.Memo));
+                    }
+
+                    // Explicit exits
+                    bool isExit = string.Equals(ev.Action, "Exit", StringComparison.OrdinalIgnoreCase)
+                                  || (prevPos != 0 && ev.Position == 0);
+                    if (isExit)
+                    {
+                        if (prevPos > 0)
+                            exitPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesBid, prefix + "Exit Long: " + ev.Memo));
+                        else if (prevPos < 0)
+                            exitPoints.Add(new PricePoint(ev.Timestamp, ev.BestYesAsk, prefix + "Exit Short: " + ev.Memo));
+                    }
+
+                    prevPos = ev.Position;
+                }
+
+                return (buyPoints, sellPoints, exitPoints, intendedLongPoints, intendedShortPoints);
+            });
+        }
+
+        /// <summary>
         /// Creates price point collections for significant market events from event logs.
         /// This method extracts all event memos and associates them with mid-price points
         /// for visualization of important market occurrences during the simulation.
@@ -417,6 +613,22 @@ namespace TradingSimulator
             return eventLogs
                 .Select(ev => new PricePoint(ev.Timestamp, (ev.BestYesBid + ev.BestYesAsk) / 2.0, " " + ev.Memo))
                 .ToList();
+        }
+
+        /// <summary>
+        /// Asynchronously creates price point collections for significant market events from event logs.
+        /// This method extracts all event memos and associates them with mid-price points
+        /// for visualization of important market occurrences during the simulation.
+        /// </summary>
+        /// <param name="eventLogs">The event logs containing market events and memos.</param>
+        /// <returns>A task that returns a list of price points representing significant market events.</returns>
+        private async Task<List<PricePoint>> CreateEventPointsAsync(List<SimulationEventLog> eventLogs)
+        {
+            return await Task.Run(() =>
+                eventLogs
+                    .Select(ev => new PricePoint(ev.Timestamp, (ev.BestYesBid + ev.BestYesAsk) / 2.0, " " + ev.Memo))
+                    .ToList()
+            );
         }
 
         /// <summary>
@@ -437,6 +649,29 @@ namespace TradingSimulator
                 .ToList();
 
             return (positionPoints, averageCostPoints);
+        }
+
+        /// <summary>
+        /// Asynchronously creates price point collections for position and average cost tracking from event logs.
+        /// This method extracts position sizes and average costs at each event timestamp
+        /// to provide visualization of portfolio changes over time.
+        /// </summary>
+        /// <param name="eventLogs">The event logs containing position and cost information.</param>
+        /// <returns>A task that returns a tuple containing lists of position and average cost price points.</returns>
+        private async Task<(List<PricePoint>, List<PricePoint>)> CreatePositionPointsAsync(List<SimulationEventLog> eventLogs)
+        {
+            return await Task.Run(() =>
+            {
+                var positionPoints = eventLogs
+                    .Select(ev => new PricePoint(ev.Timestamp, ev.Position, $"Position: {ev.Position}"))
+                    .ToList();
+
+                var averageCostPoints = eventLogs
+                    .Select(ev => new PricePoint(ev.Timestamp, ev.AverageCost, $"Avg Cost: {ev.AverageCost:F2}"))
+                    .ToList();
+
+                return (positionPoints, averageCostPoints);
+            });
         }
 
         /// <summary>
@@ -487,6 +722,55 @@ namespace TradingSimulator
         }
 
         /// <summary>
+        /// Asynchronously creates price point collections for resting orders count from event logs.
+        /// This method parses the resting orders data from event logs to track
+        /// the number of outstanding orders at each point in time.
+        /// </summary>
+        /// <param name="eventLogs">The event logs containing resting orders information.</param>
+        /// <returns>A task that returns a list of price points representing resting orders count over time.</returns>
+        private async Task<List<PricePoint>> CreateRestingOrdersPointsAsync(List<SimulationEventLog> eventLogs)
+        {
+            return await Task.Run(() =>
+                eventLogs
+                    .Select(ev =>
+                    {
+                        int totalResting = 0;
+
+                        // Parse RestingYesBids
+                        if (!string.IsNullOrEmpty(ev.RestingYesBids) && ev.RestingYesBids != "N/A")
+                        {
+                            var yesOrders = ev.RestingYesBids.Split(',');
+                            foreach (var order in yesOrders)
+                            {
+                                var parts = order.Trim().Split(':');
+                                if (parts.Length == 2 && int.TryParse(parts[1], out int qty))
+                                {
+                                    totalResting += qty;
+                                }
+                            }
+                        }
+
+                        // Parse RestingNoBids
+                        if (!string.IsNullOrEmpty(ev.RestingNoBids) && ev.RestingNoBids != "N/A")
+                        {
+                            var noOrders = ev.RestingNoBids.Split(',');
+                            foreach (var order in noOrders)
+                            {
+                                var parts = order.Trim().Split(':');
+                                if (parts.Length == 2 && int.TryParse(parts[1], out int qty))
+                                {
+                                    totalResting += qty;
+                                }
+                            }
+                        }
+
+                        return new PricePoint(ev.Timestamp, totalResting, $"Resting Orders: {totalResting}");
+                    })
+                    .ToList()
+            );
+        }
+
+        /// <summary>
         /// Creates price point collections for detected candlestick patterns from event logs.
         /// This method extracts pattern detection events and converts them into
         /// visualization points for technical analysis pattern recognition.
@@ -507,6 +791,32 @@ namespace TradingSimulator
                 }
             }
             return patternPoints;
+        }
+
+        /// <summary>
+        /// Asynchronously creates price point collections for detected candlestick patterns from event logs.
+        /// This method extracts pattern detection events and converts them into
+        /// visualization points for technical analysis pattern recognition.
+        /// </summary>
+        /// <param name="eventLogs">The event logs containing pattern detection information.</param>
+        /// <returns>A task that returns a list of price points representing detected patterns.</returns>
+        private async Task<List<PricePoint>> CreatePatternPointsAsync(List<SimulationEventLog> eventLogs)
+        {
+            return await Task.Run(() =>
+            {
+                var patternPoints = new List<PricePoint>();
+                foreach (var ev in eventLogs)
+                {
+                    if (ev.Patterns != null && ev.Patterns.Any())
+                    {
+                        foreach (var pattern in ev.Patterns)
+                        {
+                            patternPoints.Add(new PricePoint(ev.Timestamp, 0, $"Pattern: {pattern.Name}"));
+                        }
+                    }
+                }
+                return patternPoints;
+            });
         }
 
         /// <summary>
@@ -563,8 +873,11 @@ namespace TradingSimulator
             };
 
             var json = JsonSerializer.Serialize(cachedData);
-            Directory.CreateDirectory(_cacheDirectory);
-            var filePath = Path.Combine(_cacheDirectory, $"{marketTicker}{fileNameSuffix}.json");
+            Directory.CreateDirectory(_config.CacheDirectory);
+            var fileName = _config.FileNameTemplate
+                .Replace("{MarketTicker}", marketTicker)
+                .Replace("{Suffix}", fileNameSuffix);
+            var filePath = Path.Combine(_config.CacheDirectory, fileName);
             File.WriteAllText(filePath, json);
         }
 
@@ -585,6 +898,7 @@ namespace TradingSimulator
     public class PerformanceMetrics
     {
         private readonly object _metricsLock = new object();
+        private readonly bool _enableMemoryTracking;
         private DateTime _startTime = DateTime.UtcNow;
         private int _totalMarketsProcessed = 0;
         private int _totalSnapshotsProcessed = 0;
@@ -593,6 +907,17 @@ namespace TradingSimulator
         private int _maxQueueDepth = 0;
         private int _batchProcessingCount = 0;
         private TimeSpan _totalBatchProcessingTime = TimeSpan.Zero;
+        private long _peakMemoryUsage = 0;
+        private long _totalMemoryAllocated = 0;
+
+        /// <summary>
+        /// Initializes a new instance of the PerformanceMetrics class.
+        /// </summary>
+        /// <param name="enableMemoryTracking">Whether to enable memory usage tracking.</param>
+        public PerformanceMetrics(bool enableMemoryTracking = false)
+        {
+            _enableMemoryTracking = enableMemoryTracking;
+        }
 
         /// <summary>
         /// Records the start of market processing for performance tracking.
@@ -607,6 +932,14 @@ namespace TradingSimulator
                 _currentQueueDepth++;
                 if (_currentQueueDepth > _maxQueueDepth)
                     _maxQueueDepth = _currentQueueDepth;
+
+                if (_enableMemoryTracking)
+                {
+                    var currentMemory = GC.GetTotalMemory(false);
+                    if (currentMemory > _peakMemoryUsage)
+                        _peakMemoryUsage = currentMemory;
+                    _totalMemoryAllocated += currentMemory;
+                }
             }
         }
 
@@ -694,6 +1027,21 @@ namespace TradingSimulator
         public TimeSpan Uptime => DateTime.UtcNow - _startTime;
 
         /// <summary>
+        /// Gets the peak memory usage recorded.
+        /// </summary>
+        public long PeakMemoryUsage => _peakMemoryUsage;
+
+        /// <summary>
+        /// Gets the average memory usage.
+        /// </summary>
+        public double AverageMemoryUsage => _totalMarketsProcessed > 0 ? (double)_totalMemoryAllocated / _totalMarketsProcessed : 0;
+
+        /// <summary>
+        /// Gets the current memory usage.
+        /// </summary>
+        public long CurrentMemoryUsage => _enableMemoryTracking ? GC.GetTotalMemory(false) : 0;
+
+        /// <summary>
         /// Resets all performance metrics to their initial state.
         /// </summary>
         public void Reset()
@@ -718,16 +1066,25 @@ namespace TradingSimulator
         {
             lock (_metricsLock)
             {
-                return $"Performance Metrics:\n" +
-                       $"  Total Markets Processed: {_totalMarketsProcessed}\n" +
-                       $"  Total Snapshots Processed: {_totalSnapshotsProcessed}\n" +
-                       $"  Total Processing Time: {_totalProcessingTime.TotalSeconds:F2}s\n" +
-                       $"  Average Time per Market: {AverageProcessingTimePerMarket.TotalMilliseconds:F2}ms\n" +
-                       $"  Markets per Second: {MarketsPerSecond:F2}\n" +
-                       $"  Snapshots per Second: {SnapshotsPerSecond:F2}\n" +
-                       $"  Current Queue Depth: {_currentQueueDepth}\n" +
-                       $"  Max Queue Depth: {_maxQueueDepth}\n" +
-                       $"  Uptime: {_startTime.ToString()}";
+                var summary = $"Performance Metrics:\n" +
+                        $"  Total Markets Processed: {_totalMarketsProcessed}\n" +
+                        $"  Total Snapshots Processed: {_totalSnapshotsProcessed}\n" +
+                        $"  Total Processing Time: {_totalProcessingTime.TotalSeconds:F2}s\n" +
+                        $"  Average Time per Market: {AverageProcessingTimePerMarket.TotalMilliseconds:F2}ms\n" +
+                        $"  Markets per Second: {MarketsPerSecond:F2}\n" +
+                        $"  Snapshots per Second: {SnapshotsPerSecond:F2}\n" +
+                        $"  Current Queue Depth: {_currentQueueDepth}\n" +
+                        $"  Max Queue Depth: {_maxQueueDepth}\n" +
+                        $"  Uptime: {_startTime.ToString()}";
+
+                if (_enableMemoryTracking)
+                {
+                    summary += $"\n  Peak Memory Usage: {_peakMemoryUsage / 1024.0 / 1024.0:F2} MB\n" +
+                              $"  Average Memory Usage: {AverageMemoryUsage / 1024.0 / 1024.0:F2} MB\n" +
+                              $"  Current Memory Usage: {CurrentMemoryUsage / 1024.0 / 1024.0:F2} MB";
+                }
+
+                return summary;
             }
         }
     }
