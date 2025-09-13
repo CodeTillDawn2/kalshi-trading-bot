@@ -8,6 +8,7 @@
 /// </summary>
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using TradingSimulator;
 
 
@@ -15,6 +16,23 @@ namespace SimulatorWinForms.Charting
 {
     internal static class MarketChartRenderer
     {
+        private static class ChartConfig
+        {
+            public static readonly Color AskColor = Color.OrangeRed;
+            public static readonly Color BidColor = Color.DodgerBlue;
+            public static readonly Color BuyColor = Color.Green;
+            public static readonly Color SellColor = Color.Red;
+            public static readonly Color ExitColor = Color.Black;
+            public static readonly Color EventColor = Color.Purple;
+            public static readonly Color DiscrepancyColor = Color.Magenta;
+            public static readonly int AskSize = 4;
+            public static readonly int BidSize = 4;
+            public static readonly int BuySize = 12;
+            public static readonly int SellSize = 12;
+            public static readonly int ExitSize = 12;
+            public static readonly int EventSize = 0;
+            public static readonly int DiscrepancySize = 8;
+        }
         /// <summary>
         /// Renders a complete market chart by loading cached data and plotting all series.
         /// This method handles data loading from either a single canonical JSON file or
@@ -27,14 +45,25 @@ namespace SimulatorWinForms.Charting
         /// <param name="market">Market identifier, potentially with a suffix that gets stripped for file matching.</param>
         /// <param name="log">Optional logging action for operational messages and errors.</param>
         /// <param name="collectTooltips">Whether to collect tooltip data for interactive chart points.</param>
-        /// <returns>List of tooltip points with coordinates and labels, or empty list if tooltips disabled.</returns>
-        public static List<(double x, double y, string memo)> Render(
+        /// <returns>Task containing list of tooltip points with coordinates and labels, or empty list if tooltips disabled.</returns>
+        public static async Task<List<(double x, double y, string memo)>> Render(
             ScottPlot.FormsPlot plot,
             string cacheDir,
             string market,
             Action<string>? log,
             bool collectTooltips = true)  // Optional, but we'll override per series to match old
         {
+            if (string.IsNullOrEmpty(cacheDir))
+            {
+                log?.Invoke("Cache directory cannot be null or empty");
+                return new List<(double x, double y, string memo)>();
+            }
+            if (string.IsNullOrEmpty(market))
+            {
+                log?.Invoke("Market cannot be null or empty");
+                return new List<(double x, double y, string memo)>();
+            }
+
             plot.Plot.Clear();
             var tooltipPoints = collectTooltips ? new List<(double x, double y, string memo)>() : null;
 
@@ -45,7 +74,7 @@ namespace SimulatorWinForms.Charting
 
             if (File.Exists(canonical))
             {
-                merged = JsonSerializer.Deserialize<CachedMarketData>(File.ReadAllText(canonical));
+                merged = JsonSerializer.Deserialize<CachedMarketData>(await File.ReadAllTextAsync(canonical));
             }
             else
             {
@@ -73,7 +102,7 @@ namespace SimulatorWinForms.Charting
 
                 foreach (var fp in parts)
                 {
-                    var d = JsonSerializer.Deserialize<CachedMarketData>(File.ReadAllText(fp));
+                    var d = JsonSerializer.Deserialize<CachedMarketData>(await File.ReadAllTextAsync(fp));
                     if (d == null) continue;
                     merged.PnL += d.PnL;
                     if (d.BidPoints != null) merged.BidPoints.AddRange(d.BidPoints);
@@ -105,13 +134,13 @@ namespace SimulatorWinForms.Charting
             }
 
             // Match old behavior: no tooltips for lines (Ask, Bid), yes for points
-            Add(plot, merged.AskPoints, "Ask", Color.OrangeRed, 4, false, true, tooltipPoints);
-            Add(plot, merged.BidPoints, "Bid", Color.DodgerBlue, 4, false, true, tooltipPoints);
-            Add(plot, merged.BuyPoints, "Buy", Color.Green, 12, true, false, tooltipPoints);
-            Add(plot, merged.SellPoints, "Sell", Color.Red, 12, true, false, tooltipPoints);
-            Add(plot, merged.ExitPoints, "Exit", Color.Black, 12, true, false, tooltipPoints);
-            Add(plot, merged.EventPoints, "Event", Color.Purple, 0, true, false, tooltipPoints);
-            Add(plot, merged.DiscrepancyPoints, "Discrepancy", Color.Magenta, 8, true, false, tooltipPoints);
+            Add(plot, merged.AskPoints, "Ask", ChartConfig.AskColor, ChartConfig.AskSize, false, true, tooltipPoints);
+            Add(plot, merged.BidPoints, "Bid", ChartConfig.BidColor, ChartConfig.BidSize, false, true, tooltipPoints);
+            Add(plot, merged.BuyPoints, "Buy", ChartConfig.BuyColor, ChartConfig.BuySize, true, false, tooltipPoints);
+            Add(plot, merged.SellPoints, "Sell", ChartConfig.SellColor, ChartConfig.SellSize, true, false, tooltipPoints);
+            Add(plot, merged.ExitPoints, "Exit", ChartConfig.ExitColor, ChartConfig.ExitSize, true, false, tooltipPoints);
+            Add(plot, merged.EventPoints, "Event", ChartConfig.EventColor, ChartConfig.EventSize, true, false, tooltipPoints);
+            Add(plot, merged.DiscrepancyPoints, "Discrepancy", ChartConfig.DiscrepancyColor, ChartConfig.DiscrepancySize, true, false, tooltipPoints);
 
             plot.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
             plot.Plot.AxisAuto();
