@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Windows.Forms;
 
 namespace SimulatorWinForms
@@ -75,6 +77,56 @@ namespace SimulatorWinForms
     }
 
     /// <summary>
+    /// Configuration class for TypographyManager settings.
+    /// </summary>
+    public class TypographyConfig
+    {
+        /// <summary>
+        /// Preferred fonts for primary text, in order of preference.
+        /// Includes a wide range for better cross-platform compatibility.
+        /// </summary>
+        public string[] PreferredFonts { get; set; } = {
+            "Segoe UI",
+            "Microsoft Sans Serif",
+            "Arial",
+            "Helvetica",
+            "Tahoma",
+            "Verdana",
+            "Calibri",
+            "System"
+        };
+
+        /// <summary>
+        /// Preferred monospace fonts, in order of preference.
+        /// Includes common monospace fonts for better compatibility.
+        /// </summary>
+        public string[] MonospaceFonts { get; set; } = {
+            "Consolas",
+            "Source Code Pro",
+            "Fira Code",
+            "Courier New",
+            "Monaco",
+            "Lucida Console",
+            "DejaVu Sans Mono"
+        };
+
+        /// <summary>
+        /// Minimum allowed scale factor to prevent too small fonts.
+        /// </summary>
+        public float MinScaleFactor { get; set; } = 0.5f;
+
+        /// <summary>
+        /// Maximum allowed scale factor to prevent too large fonts.
+        /// </summary>
+        public float MaxScaleFactor { get; set; } = 3.0f;
+
+        /// <summary>
+        /// Default scale factor for normal displays.
+        /// </summary>
+        public float DefaultScaleFactor { get; set; } = 1.0f;
+    }
+
+    /// <summary>
     /// Manages typography for the Windows Forms GUI application, providing consistent font selection,
     /// sizing, and scaling across different display configurations. This singleton class ensures
     /// that all UI elements use appropriate fonts that are universally available and handle DPI scaling
@@ -94,20 +146,47 @@ namespace SimulatorWinForms
         private static TypographyManager _instance;
 
         /// <summary>
+        /// Loads typography configuration from appsettings.json.
+        /// </summary>
+        /// <returns>TypographyConfig instance loaded from configuration file, or default if loading fails.</returns>
+        private static TypographyConfig LoadTypographyConfig()
+        {
+            try
+            {
+                string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
+                if (File.Exists(configPath))
+                {
+                    string json = File.ReadAllText(configPath);
+                    using (JsonDocument doc = JsonDocument.Parse(json))
+                    {
+                        if (doc.RootElement.TryGetProperty("Typography", out JsonElement typographyElement))
+                        {
+                            return JsonSerializer.Deserialize<TypographyConfig>(typographyElement.GetRawText()) ?? new TypographyConfig();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Fall back to default if loading fails
+            }
+            return new TypographyConfig();
+        }
+
+        /// <summary>
         /// Gets the singleton instance of the TypographyManager, creating it if necessary.
         /// </summary>
         public static TypographyManager Instance => _instance ??= new TypographyManager();
 
         /// <summary>
-        /// Array of safe, universally available fonts that have no copyright issues.
-        /// These fonts are checked for availability in order of preference.
+        /// Configuration instance for typography settings.
         /// </summary>
-        private readonly string[] _safeFonts = {
-            "Microsoft Sans Serif",  // Most compatible
-            "Arial",                 // Very common
-            "Tahoma",                // Good alternative
-            "Verdana"                // Clean and readable
-        };
+        private static readonly TypographyConfig _config = LoadTypographyConfig();
+
+        /// <summary>
+        /// Gets the configuration for typography settings.
+        /// </summary>
+        public static TypographyConfig Config => _config;
 
         /// <summary>
         /// The selected primary font for general UI text.
@@ -120,23 +199,24 @@ namespace SimulatorWinForms
         private string _monospaceFont;
 
         /// <summary>
+        /// Cache for font availability checks to improve performance.
+        /// </summary>
+        private readonly Dictionary<string, bool> _fontCache = new Dictionary<string, bool>();
+
+        /// <summary>
         /// Initializes a new instance of the TypographyManager, selecting the best available fonts
-        /// for primary and monospace text from the predefined safe font list.
+        /// for primary and monospace text from the configured font lists.
         /// </summary>
         public TypographyManager()
         {
             // Find the best available font
-            _primaryFont = GetBestAvailableFont(_safeFonts);
-            _monospaceFont = "Consolas"; // Consolas is generally safe for monospace
+            _primaryFont = GetBestAvailableFont(_config.PreferredFonts);
+            _monospaceFont = GetBestAvailableFont(_config.MonospaceFonts);
 
-            // Fallback if Consolas isn't available
-            if (!IsFontAvailable(_monospaceFont))
+            // Ultimate fallback if no monospace font is available
+            if (string.IsNullOrEmpty(_monospaceFont))
             {
-                _monospaceFont = "Courier New";
-                if (!IsFontAvailable(_monospaceFont))
-                {
-                    _monospaceFont = _primaryFont; // Ultimate fallback
-                }
+                _monospaceFont = _primaryFont;
             }
         }
 
@@ -160,22 +240,31 @@ namespace SimulatorWinForms
 
         /// <summary>
         /// Checks if a specific font is available on the system by attempting to create a Font object.
+        /// Uses caching to improve performance for repeated checks.
         /// </summary>
         /// <param name="fontName">The name of the font to check.</param>
         /// <returns>True if the font is available and can be created; otherwise, false.</returns>
         private bool IsFontAvailable(string fontName)
         {
+            if (_fontCache.TryGetValue(fontName, out bool isAvailable))
+            {
+                return isAvailable;
+            }
+
             try
             {
                 using (var font = new Font(fontName, 8f))
                 {
-                    return font.Name == fontName;
+                    isAvailable = font.Name == fontName;
                 }
             }
             catch
             {
-                return false;
+                isAvailable = false;
             }
+
+            _fontCache[fontName] = isAvailable;
+            return isAvailable;
         }
 
         /// <summary>
@@ -225,6 +314,61 @@ namespace SimulatorWinForms
         }
 
         /// <summary>
+        /// Validates the scale factor to ensure it is within acceptable bounds.
+        /// </summary>
+        /// <param name="scaleFactor">The scale factor to validate.</param>
+        /// <exception cref="ArgumentException">Thrown if scaleFactor is not positive or out of bounds.</exception>
+        private void ValidateScaleFactor(float scaleFactor)
+        {
+            if (scaleFactor <= 0)
+            {
+                throw new ArgumentException("Scale factor must be positive.", nameof(scaleFactor));
+            }
+            if (scaleFactor < _config.MinScaleFactor || scaleFactor > _config.MaxScaleFactor)
+            {
+                throw new ArgumentException($"Scale factor must be between {_config.MinScaleFactor} and {_config.MaxScaleFactor}.", nameof(scaleFactor));
+            }
+        }
+
+        /// <summary>
+        /// Calculates the height of the specified font.
+        /// </summary>
+        /// <param name="font">The font to measure.</param>
+        /// <returns>The height of the font in pixels.</returns>
+        public float GetFontHeight(Font font)
+        {
+            using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                return font.GetHeight(graphics);
+            }
+        }
+
+        /// <summary>
+        /// Calculates the size of the specified text when rendered with the given font.
+        /// </summary>
+        /// <param name="text">The text to measure.</param>
+        /// <param name="font">The font used to render the text.</param>
+        /// <returns>The size of the text in pixels.</returns>
+        public SizeF GetTextSize(string text, Font font)
+        {
+            using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                return graphics.MeasureString(text, font);
+            }
+        }
+
+        /// <summary>
+        /// Calculates the width of the specified text when rendered with the given font.
+        /// </summary>
+        /// <param name="text">The text to measure.</param>
+        /// <param name="font">The font used to render the text.</param>
+        /// <returns>The width of the text in pixels.</returns>
+        public float GetTextWidth(string text, Font font)
+        {
+            return GetTextSize(text, font).Width;
+        }
+
+        /// <summary>
         /// Creates a scaled Font object using the primary font, applying a scale factor to the base size.
         /// Useful for DPI scaling and responsive typography.
         /// </summary>
@@ -234,6 +378,7 @@ namespace SimulatorWinForms
         /// <returns>A new Font object with the scaled size and specified characteristics.</returns>
         public Font GetScaledFont(FontSize baseSize, float scaleFactor, FontWeight weight = FontWeight.Regular)
         {
+            ValidateScaleFactor(scaleFactor);
             float scaledSize = (float)baseSize * scaleFactor;
             FontStyle style = GetFontStyle(weight);
 
@@ -250,6 +395,7 @@ namespace SimulatorWinForms
         /// <returns>A new Font object with the scaled size and specified characteristics.</returns>
         public Font GetScaledMonospaceFont(FontSize baseSize, float scaleFactor, FontWeight weight = FontWeight.Regular)
         {
+            ValidateScaleFactor(scaleFactor);
             float scaledSize = (float)baseSize * scaleFactor;
             FontStyle style = GetFontStyle(weight);
 
@@ -259,20 +405,32 @@ namespace SimulatorWinForms
         /// <summary>
         /// Calculates the typography scale factor based on the current display's DPI settings.
         /// This ensures that fonts are appropriately sized for high-DPI displays while maintaining readability.
+        /// Considers all available screens to determine the most appropriate scaling factor.
         /// </summary>
-        /// <returns>A scale factor between 0.8 and 2.0, where 1.0 represents standard 96 DPI.</returns>
+        /// <returns>A scale factor clamped between configured min and max values, where 1.0 represents standard 96 DPI.</returns>
         public float GetTypographyScale()
         {
-            // Get DPI scaling factor
-            using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
-            {
-                float dpiX = graphics.DpiX;
-                float dpiY = graphics.DpiY;
-                float scaleFactor = Math.Min(dpiX, dpiY) / 96f; // 96 DPI is standard
+            float maxDpi = 96f; // Default standard DPI
 
-                // Clamp between reasonable bounds
-                return Math.Max(0.8f, Math.Min(2.0f, scaleFactor));
+            // Check DPI across all screens to find the maximum
+            foreach (var screen in Screen.AllScreens)
+            {
+                using (var graphics = Graphics.FromHwnd(IntPtr.Zero)) // System DPI, as per-monitor DPI requires newer APIs
+                {
+                    float dpiX = graphics.DpiX;
+                    float dpiY = graphics.DpiY;
+                    float screenDpi = Math.Min(dpiX, dpiY);
+                    if (screenDpi > maxDpi)
+                    {
+                        maxDpi = screenDpi;
+                    }
+                }
             }
+
+            float scaleFactor = maxDpi / 96f;
+
+            // Clamp between configured bounds
+            return Math.Max(_config.MinScaleFactor, Math.Min(_config.MaxScaleFactor, scaleFactor));
         }
 
         /// <summary>
@@ -283,6 +441,7 @@ namespace SimulatorWinForms
         /// <param name="scaleFactor">The scaling factor to apply for DPI adjustment (defaults to 1.0).</param>
         public void ApplyTypography(Control control, float scaleFactor = 1.0f)
         {
+            ValidateScaleFactor(scaleFactor);
             if (control == null) return;
 
             // Apply to the control itself
