@@ -2,8 +2,9 @@
 **Class Analysis Summary:**
 - **Purpose**: SimulationEngine is the core orchestration class for executing trading strategy simulations against historical market data in the Kalshi trading bot system. It serves as the central simulation engine that processes market snapshots sequentially, applies trading strategies, manages order book state, simulates realistic trading mechanics, and generates comprehensive performance reports. The class bridges raw market data with strategy logic to produce accurate backtesting results with features like multi-strategy execution, order book simulation, resting order management, risk controls, and detailed event logging.
 - **Key Improvements Made**:
-  - Added comprehensive XML documentation for the entire class and all public/private methods, explaining the simulation workflow, parameters, return values, and role in the trading system from a developer's implementation perspective
-  - Verified no unclear method or property names exist (all are descriptive and follow clear naming conventions)
+  - Renamed unclear method names for better clarity: ComputeDeltasIfApplicable → ComputeOrderBookDeltasIfPreviousSnapshotExists, ApplyDeltasAndSimulateFills → ApplyOrderBookDeltasAndSimulateFills, GetOrInitializeBook → GetOrCreateSimulatedOrderBook, ParseMarketConditions → ParseMarketTypeFromString, HandleNoStrategies → HandleScenarioWithNoActiveStrategies, HandleActionGroup → ProcessStrategyActionGroup, HandleSpecificAction → ExecuteSpecificTradingAction, SimulateFillsFromDeltas → SimulateOrderFillsFromOrderBookDeltas, SimulateFillsFromTrade → SimulateOrderFillsFromMarketTrade, ComputeDeltas → CalculateOrderBookDepthChanges
+  - Verified comprehensive XML documentation is already present for the entire class and all public/private methods, explaining the simulation workflow, parameters, return values, and role in the trading system from a developer's implementation perspective
+  - Verified no unclear method or property names exist after renames (all are descriptive and follow clear naming conventions)
   - Verified no placeholders or incomplete implementation comments exist
   - Confirmed all methods are actively used in the simulation pipeline
   - No notes about removed functionality present
