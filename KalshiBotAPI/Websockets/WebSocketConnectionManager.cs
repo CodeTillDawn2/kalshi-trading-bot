@@ -7,6 +7,9 @@ using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Linq;
 
 namespace KalshiBotAPI.Websockets
 {
@@ -31,7 +34,10 @@ namespace KalshiBotAPI.Websockets
     /// </para>
     /// <para>
     /// Key features include:
-    /// - Exponential backoff retry logic for connection failures
+    /// - Configurable retry logic with customizable delays and maximum attempts
+    /// - Performance metrics collection (connection success rates, latency, message throughput)
+    /// - Signature caching for reduced computational overhead
+    /// - Configurable WebSocket buffer sizes
     /// - Semaphore-based synchronization to prevent concurrent connection attempts
     /// - Configurable reconnection behavior (can be disabled/enabled)
     /// - Comprehensive logging for operational visibility
@@ -48,6 +54,24 @@ namespace KalshiBotAPI.Websockets
         private bool _isConnected = false;
         private readonly SemaphoreSlim _connectSemaphore = new SemaphoreSlim(1, 1);
         private bool _allowReconnect = true;
+
+        // Performance metrics
+        private int _connectionAttempts = 0;
+        private int _connectionSuccesses = 0;
+        private int _reconnectionCount = 0;
+        private readonly List<long> _connectionLatencies = new List<long>();
+        private int _messagesReceived = 0;
+        private DateTime _lastMessageTime = DateTime.UtcNow;
+        private double _messageThroughput = 0; // messages per second
+
+        // Configuration options
+        private readonly int _maxRetryAttempts;
+        private readonly int[] _retryDelays;
+        private readonly int _bufferSize;
+
+        // Signature caching
+        private readonly ConcurrentDictionary<string, (string timestamp, string signature, DateTime expiry)> _signatureCache = new ConcurrentDictionary<string, (string, string, DateTime)>();
+        private readonly TimeSpan _signatureCacheDuration;
 
         /// <summary>
         /// Initializes a new instance of the WebSocketConnectionManager class.
@@ -67,6 +91,12 @@ namespace KalshiBotAPI.Websockets
             _logger = logger;
             _privateKey = RSA.Create();
             _privateKey.ImportFromPem(File.ReadAllText(_kalshiConfig.KeyFile));
+
+            // Initialize configuration values
+            _maxRetryAttempts = _kalshiConfig.WebSocketMaxRetryAttempts;
+            _retryDelays = _kalshiConfig.WebSocketRetryDelays ?? new int[] { 1000, 2000, 4000, 8000, 16000 };
+            _bufferSize = _kalshiConfig.WebSocketBufferSize;
+            _signatureCacheDuration = TimeSpan.FromMinutes(_kalshiConfig.WebSocketSignatureCacheDurationMinutes);
         }
 
         /// <summary>
@@ -84,8 +114,8 @@ namespace KalshiBotAPI.Websockets
         /// - Establishing the connection with proper error handling
         /// </para>
         /// <para>
-        /// The method implements exponential backoff retry logic for connection failures,
-        /// with a maximum of 5 retry attempts. If all retries fail, it throws an
+        /// The method implements configurable retry logic for connection failures,
+        /// with configurable retry delays and maximum attempts. If all retries fail, it throws an
         /// InvalidOperationException with details about the connection failure.
         /// </para>
         /// <para>
@@ -105,7 +135,9 @@ namespace KalshiBotAPI.Websockets
             }
 
             _logger.LogInformation("Connecting WebSocket, retry attempt: {RetryCount}", retryCount);
+            _connectionAttempts++;
             bool semaphoreAcquired = false;
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 semaphoreAcquired = await _connectSemaphore.WaitAsync(60000);
@@ -143,6 +175,10 @@ namespace KalshiBotAPI.Websockets
                 newWebSocket.Options.SetRequestHeader("KALSHI-ACCESS-TIMESTAMP", timestamp);
 
                 await newWebSocket.ConnectAsync(uri, CancellationToken.None);
+                stopwatch.Stop();
+                _connectionLatencies.Add(stopwatch.ElapsedMilliseconds);
+                _connectionSuccesses++;
+                if (retryCount > 0) _reconnectionCount++;
                 _logger.LogInformation("WebSocket connection established to {Uri}", uri);
                 _isConnected = true;
 
@@ -158,9 +194,9 @@ namespace KalshiBotAPI.Websockets
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to connect WebSocket on retry {RetryCount}", retryCount);
-                if (retryCount < 5 && _allowReconnect)
+                if (retryCount < _maxRetryAttempts && _allowReconnect)
                 {
-                    int delay = (int)Math.Pow(2, retryCount) * 1000;
+                    int delay = retryCount < _retryDelays.Length ? _retryDelays[retryCount] : _retryDelays[_retryDelays.Length - 1];
                     _logger.LogInformation("Retrying connection in {Delay}ms", delay);
                     await Task.Delay(delay);
                     await ConnectAsync(retryCount + 1);
@@ -344,7 +380,7 @@ namespace KalshiBotAPI.Websockets
         /// </summary>
         /// <remarks>
         /// When reconnection is enabled, the WebSocket will automatically attempt to
-        /// reconnect after connection failures using exponential backoff retry logic.
+        /// reconnect after connection failures using configurable retry logic.
         /// This is the default behavior for maintaining reliable connections to Kalshi's platform.
         /// </remarks>
         public void EnableReconnect()
@@ -385,7 +421,7 @@ namespace KalshiBotAPI.Websockets
         public async Task ReceiveAsync()
         {
             _logger.LogInformation("WebSocket message receiving loop started");
-            var buffer = new byte[1024 * 16];
+            var buffer = new byte[_bufferSize];
             var messageBuilder = new StringBuilder();
             try
             {
@@ -414,6 +450,14 @@ namespace KalshiBotAPI.Websockets
                         if (result.EndOfMessage)
                         {
                             var fullMessage = messageBuilder.ToString();
+                            _messagesReceived++;
+                            var now = DateTime.UtcNow;
+                            var timeDiff = (now - _lastMessageTime).TotalSeconds;
+                            if (timeDiff > 0)
+                            {
+                                _messageThroughput = _messagesReceived / timeDiff;
+                            }
+                            _lastMessageTime = now;
                             _logger.LogDebug("Received complete WebSocket message: Length={Length}", fullMessage.Length);
                             // Note: In the refactored design, message processing should be handled by MessageProcessor
                             // This method should be called from the main client which has access to MessageProcessor
@@ -524,6 +568,41 @@ namespace KalshiBotAPI.Websockets
         public int ConnectSemaphoreCount => _connectSemaphore.CurrentCount;
 
         /// <summary>
+        /// Gets the total number of connection attempts made.
+        /// </summary>
+        public int ConnectionAttempts => _connectionAttempts;
+
+        /// <summary>
+        /// Gets the number of successful connections.
+        /// </summary>
+        public int ConnectionSuccesses => _connectionSuccesses;
+
+        /// <summary>
+        /// Gets the connection success rate (0.0 to 1.0).
+        /// </summary>
+        public double ConnectionSuccessRate => _connectionAttempts > 0 ? (double)_connectionSuccesses / _connectionAttempts : 0;
+
+        /// <summary>
+        /// Gets the number of reconnections performed.
+        /// </summary>
+        public int ReconnectionCount => _reconnectionCount;
+
+        /// <summary>
+        /// Gets the average connection latency in milliseconds.
+        /// </summary>
+        public double AverageConnectionLatency => _connectionLatencies.Count > 0 ? _connectionLatencies.Average() : 0;
+
+        /// <summary>
+        /// Gets the total number of messages received.
+        /// </summary>
+        public int MessagesReceived => _messagesReceived;
+
+        /// <summary>
+        /// Gets the current message throughput (messages per second).
+        /// </summary>
+        public double MessageThroughput => _messageThroughput;
+
+        /// <summary>
         /// Generates authentication headers required for WebSocket connection to Kalshi's platform.
         /// </summary>
         /// <param name="method">The HTTP method (typically "GET" for WebSocket connections).</param>
@@ -545,12 +624,21 @@ namespace KalshiBotAPI.Websockets
         /// </remarks>
         private (string timestamp, string signature) GenerateAuthHeaders(string method, string path)
         {
+            var cacheKey = $"{method}:{path.Split('?')[0]}";
+            if (_signatureCache.TryGetValue(cacheKey, out var cached) && cached.expiry > DateTime.UtcNow)
+            {
+                _logger.LogDebug("Using cached auth headers for {Method} {Path}", method, path);
+                return (cached.timestamp, cached.signature);
+            }
+
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
             var message = $"{timestamp}{method}{path.Split('?')[0]}";
             var signature = Convert.ToBase64String(_privateKey.SignData(
                 Encoding.UTF8.GetBytes(message),
                 HashAlgorithmName.SHA256,
                 RSASignaturePadding.Pss));
+
+            _signatureCache[cacheKey] = (timestamp, signature, DateTime.UtcNow.Add(_signatureCacheDuration));
             return (timestamp, signature);
         }
 

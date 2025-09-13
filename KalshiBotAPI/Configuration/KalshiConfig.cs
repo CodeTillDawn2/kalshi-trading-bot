@@ -21,6 +21,28 @@ public class KalshiConfig
     public string KeyFile { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the WebSocket buffer size in bytes. Defaults to 16384 (16KB).
+    /// </summary>
+    public int WebSocketBufferSize { get; set; } = 16384;
+
+    /// <summary>
+    /// Gets or sets the maximum number of WebSocket connection retry attempts. Defaults to 5.
+    /// </summary>
+    public int WebSocketMaxRetryAttempts { get; set; } = 5;
+
+    /// <summary>
+    /// Gets or sets the array of retry delay intervals in milliseconds for WebSocket connections.
+    /// Defaults to [1000, 2000, 4000, 8000, 16000].
+    /// </summary>
+    public int[] WebSocketRetryDelays { get; set; } = { 1000, 2000, 4000, 8000, 16000 };
+
+    /// <summary>
+    /// Gets or sets the duration in minutes for caching WebSocket authentication signatures.
+    /// Defaults to 5 minutes.
+    /// </summary>
+    public int WebSocketSignatureCacheDurationMinutes { get; set; } = 5;
+
+    /// <summary>
     /// Gets or sets the configuration for candlestick lookback periods in days.
     /// Controls how far back in time to fetch candlestick data for different intervals.
     /// </summary>
