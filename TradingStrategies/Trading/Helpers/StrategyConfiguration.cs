@@ -78,7 +78,14 @@ namespace TradingStrategies.Trading.Helpers
             return _strategies.Keys;
         }
 
-        // Factory methods for each strategy
+        /// <summary>
+        /// Creates a strategy configuration for the Bollinger Breakout strategy with the specified weight parameters.
+        /// This method retrieves the parameter set for the given weight name from the centralized parameter storage
+        /// and constructs a Strategy instance containing a BollingerBreakout strategy implementation.
+        /// The strategy is then mapped to appropriate market types for execution.
+        /// </summary>
+        /// <param name="weightName">The name of the parameter set to use for configuring the Bollinger Breakout strategy.</param>
+        /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
         private static Dictionary<MarketType, List<Strategy>> GetBollingerBreakoutStrategy(string weightName)
         {
             var defaultParams = StrategySelectionHelper.BollingerParameterSets
@@ -90,6 +97,13 @@ namespace TradingStrategies.Trading.Helpers
             return CreateMarketStrategyMapping(strat);
         }
 
+        /// <summary>
+        /// Creates a strategy configuration for the Breakout strategy with the specified weight parameters.
+        /// This method retrieves the parameter set for the given weight name and constructs a Strategy instance
+        /// containing a Breakout2 strategy implementation for detecting price breakouts with velocity confirmation.
+        /// </summary>
+        /// <param name="weightName">The name of the parameter set to use for configuring the Breakout strategy.</param>
+        /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
         private static Dictionary<MarketType, List<Strategy>> GetBreakoutStrategy(string weightName)
         {
             var defaultParams = StrategySelectionHelper.BreakoutParameterSets
@@ -101,6 +115,13 @@ namespace TradingStrategies.Trading.Helpers
             return CreateMarketStrategyMapping(strat);
         }
 
+        /// <summary>
+        /// Creates a strategy configuration for the Nothing Ever Happens strategy with the specified weight parameters.
+        /// This conservative strategy employs high thresholds to minimize trading frequency and emphasizes stability
+        /// over aggressive trading in volatile conditions.
+        /// </summary>
+        /// <param name="weightName">The name of the parameter set to use for configuring the Nothing Ever Happens strategy.</param>
+        /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
         private static Dictionary<MarketType, List<Strategy>> GetNothingEverHappensStrategy(string weightName)
         {
             var defaultParams = StrategySelectionHelper.NothingEverHappensParameterSets
@@ -112,6 +133,13 @@ namespace TradingStrategies.Trading.Helpers
             return CreateMarketStrategyMapping(strat);
         }
 
+        /// <summary>
+        /// Creates a strategy configuration for the Flow Momentum strategy with the specified weight parameters.
+        /// This strategy focuses on sustained flow patterns with technical confirmations, gating decisions
+        /// on normalized flow, consecutive bars, trade shares, and RSI flattening for position exits.
+        /// </summary>
+        /// <param name="weightName">The name of the parameter set to use for configuring the Flow Momentum strategy.</param>
+        /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
         private static Dictionary<MarketType, List<Strategy>> GetFlowMomentumStrategy(string weightName)
         {
             var defaultParams = StrategySelectionHelper.FlowMomentumParameterSets
@@ -123,6 +151,13 @@ namespace TradingStrategies.Trading.Helpers
             return CreateMarketStrategyMapping(strat);
         }
 
+        /// <summary>
+        /// Creates a strategy configuration for the ML Shared strategy with the specified weight parameters.
+        /// This machine learning-based strategy uses shared parameters for Long/Short signals and incorporates
+        /// an online logistic regression model for entry prediction in trading scenarios.
+        /// </summary>
+        /// <param name="weightName">The name of the parameter set to use for configuring the ML Shared strategy.</param>
+        /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
         private static Dictionary<MarketType, List<Strategy>> GetMLSharedStrategy(string weightName)
         {
             var selectedParams = MLEntrySeekerShared.MLSharedParameterSets
@@ -138,6 +173,13 @@ namespace TradingStrategies.Trading.Helpers
             return CreateMarketStrategyMapping(strat);
         }
 
+        /// <summary>
+        /// Creates a strategy configuration for the Try Again strategy with the specified weight parameters.
+        /// This adaptive retry-based strategy adjusts parameters based on previous failures to improve
+        /// entry timing through learning from unsuccessful attempts.
+        /// </summary>
+        /// <param name="weightName">The name of the parameter set to use for configuring the Try Again strategy.</param>
+        /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
         private static Dictionary<MarketType, List<Strategy>> GetTryAgainStrategy(string weightName)
         {
             var defaultParams = TryAgainStrat.TryAgainStratParameterSets
@@ -149,6 +191,13 @@ namespace TradingStrategies.Trading.Helpers
             return CreateMarketStrategyMapping(strat);
         }
 
+        /// <summary>
+        /// Creates a strategy configuration for the Slope Momentum strategy with the specified weight parameters.
+        /// This strategy analyzes EMA and velocity slopes for trend confirmation, focusing on detecting
+        /// trending conditions through slope analysis of key indicators.
+        /// </summary>
+        /// <param name="weightName">The name of the parameter set to use for configuring the Slope Momentum strategy.</param>
+        /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
         private static Dictionary<MarketType, List<Strategy>> GetSlopeMomentumStrategy(string weightName)
         {
             var defaultParams = SlopeMomentumStrat.SlopeMomentumParameterSets
@@ -160,6 +209,13 @@ namespace TradingStrategies.Trading.Helpers
             return CreateMarketStrategyMapping(strat);
         }
 
+        /// <summary>
+        /// Creates a strategy configuration for the Momentum Trading strategy with the specified weight parameters.
+        /// This strategy uses RSI and velocity indicators for entry and exit signals, detecting momentum
+        /// through RSI divergence and velocity changes to capitalize on trending market conditions.
+        /// </summary>
+        /// <param name="weightName">The name of the parameter set to use for configuring the Momentum Trading strategy.</param>
+        /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
         private static Dictionary<MarketType, List<Strategy>> GetMomentumTradingStrategy(string weightName)
         {
             var defaultParams = StrategySelectionHelper.MomentumTradingParameterSets
@@ -171,14 +227,25 @@ namespace TradingStrategies.Trading.Helpers
             return CreateMarketStrategyMapping(strat);
         }
 
-        // Define the Low Liquidity strategy as a static field
+        /// <summary>
+        /// Defines the Low Liquidity strategy as a static field for use in low liquidity market conditions.
+        /// This strategy always returns an Exit action while calculating comprehensive liquidity metrics
+        /// including spread, depth, volume, imbalance, and slippage scores for risk assessment and decision logging.
+        /// </summary>
         private static readonly Strategy LowLiquidityStrategy = new Strategy(
             "LowLiquidity",
             new List<Strat> { new LowLiquidityExitExec() }
         );
 
-        // Define the market-to-strategy mapping as a static method
-        private static Dictionary<MarketType, List<Strategy>> CreateMarketStrategyMapping(Strategy bollingerStrategy)
+        /// <summary>
+        /// Creates a standardized market-to-strategy mapping dictionary for the provided strategy.
+        /// This method establishes a consistent pattern where the LowLiquidity strategy is applied to
+        /// low liquidity market conditions, while the provided strategy is applied to all other market types.
+        /// This ensures appropriate strategy selection based on market characteristics for optimal trading performance.
+        /// </summary>
+        /// <param name="strategy">The primary strategy to be applied to most market types.</param>
+        /// <returns>A dictionary mapping each market type to its appropriate strategy configuration.</returns>
+        private static Dictionary<MarketType, List<Strategy>> CreateMarketStrategyMapping(Strategy strategy)
         {
             var strategiesDict = new Dictionary<MarketType, List<Strategy>>();
 
@@ -207,7 +274,7 @@ namespace TradingStrategies.Trading.Helpers
 
             foreach (var marketType in strategyMarkets)
             {
-                strategiesDict.Add(marketType, new List<Strategy> { bollingerStrategy });
+                strategiesDict.Add(marketType, new List<Strategy> { strategy });
             }
 
             return strategiesDict;
