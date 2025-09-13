@@ -11,7 +11,7 @@ namespace BacklashDTOs
         public double AccountBalance { get; set; }
         public double PortfolioValue { get; set; }
         public DateTime LastWebSocketTimestamp { get; set; }
-        public string SoftwareVersion { get; set; }
+        public string? SoftwareVersion { get; set; }
         public int? SnapshotVersion { get; set; }
 
         public CacheSnapshot()
@@ -26,7 +26,7 @@ namespace BacklashDTOs
             Markets = new Dictionary<string, MarketSnapshot>();
             foreach (var snapshot in marketSnapshots)
             {
-                Markets[snapshot.MarketTicker] = snapshot;
+                Markets[snapshot.MarketTicker ?? string.Empty] = snapshot;
             }
             SoftwareVersion = softwareVersion;
             AccountBalance = accountBalance;

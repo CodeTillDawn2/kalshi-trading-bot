@@ -61,7 +61,7 @@ public class DarkCloudCoverPattern2 : PatternDefinition
     {
     }
 
-    public static DarkCloudCoverPattern IsPattern(
+    public static DarkCloudCoverPattern? IsPattern(
         int index,
         CandleMids[] prices,
         int trendLookback,
@@ -102,6 +102,7 @@ public class DarkCloudCoverPattern2 : PatternDefinition
         return new DarkCloudCoverPattern(candles);
     }
 }
+
 
 
 

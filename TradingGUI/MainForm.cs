@@ -519,7 +519,7 @@ namespace SimulatorWinForms
             _hoverLine.IsVisible = false;
             formsPlot1.Refresh();  // Ensure the plot is refreshed after adding the line
 
-            _snapshots = await _simulator.ReturnSnapshotsForMarket(market);
+            _snapshots = await _simulator.GetSnapshotsForMarket(market);
             AppendLog($"Loaded snapshots for {market}");
         }
 

@@ -80,7 +80,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="metricsCache">Cache of candle metrics.</param>
         /// <param name="trendLookback">Number of candles to look back for trend and average range.</param>
         /// <returns>A ConcealingBabySwallowPattern instance if detected, otherwise null.</returns>
-        public static ConcealingBabySwallowPattern IsPattern(
+        public static ConcealingBabySwallowPattern? IsPattern(
             int index,
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -126,6 +126,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

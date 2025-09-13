@@ -58,14 +58,14 @@ namespace BacklashBot.Management
         public bool IsStartingUp => _isStartingUp;
         public bool IsShuttingDown => _isShuttingDown;
 
-        private Timer _shutdownTimer;
-        private Timer _startTimer;
+        private Timer? _shutdownTimer;
+        private Timer? _startTimer;
         private static int _instanceCounter = 0;
-        private readonly string _brainInstance;
+        private readonly string? _brainInstance;
 
-        private Timer _errorCheckTimer;
+        private Timer? _errorCheckTimer;
         private bool _isReset = false;
-        private Timer _overnightTimer;
+        private Timer? _overnightTimer;
 
         private static readonly TimeSpan OvernightStart = new TimeSpan(3, 0, 0); // 3:00 AM
         private static readonly TimeSpan OvernightTaskDelay = TimeSpan.FromMinutes(15); // 15 minutes after start
@@ -511,7 +511,10 @@ namespace BacklashBot.Management
             _logger.LogDebug("Shutting down dependent services...");
             try
             {
-                _logger.LogDebug("BRAIN: Shutting down Dashboard for {InstanceName}", _brainInstance);
+                if (_brainInstance != null)
+                {
+                    _logger.LogDebug("BRAIN: Shutting down Dashboard for {InstanceName}", _brainInstance);
+                }
                 _statusTrackerService.CancelAll();
 
                 if (_snapshotTimer != null)

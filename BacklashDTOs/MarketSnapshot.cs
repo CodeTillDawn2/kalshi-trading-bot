@@ -285,7 +285,7 @@ namespace BacklashDTOs
 
         public DateTime Timestamp { get; set; }
 
-        public string MarketTicker { get; set; }
+        public string? MarketTicker { get; set; }
         public string? MarketCategory { get; set; }
 
         public string? MarketStatus { get; set; }
@@ -302,7 +302,7 @@ namespace BacklashDTOs
         /// </remarks>
         [JsonPropertyName("Orderbook")]
         [JsonConverter(typeof(OrderbookSlimConverter))]
-        public List<Dictionary<string, object>> OrderbookData { get; set; }
+        public List<Dictionary<string, object>>? OrderbookData { get; set; }
         #endregion
 
         #region Historical Prices
@@ -1471,6 +1471,7 @@ namespace BacklashDTOs
         public Dictionary<int, int> GetYesBids()
         {
             var dict = new Dictionary<int, int>();
+            if (OrderbookData is null) return dict;
             foreach (var entry in OrderbookData.Where(e => (e["side"]?.ToString()) == "yes"))
             {
                 int price = Int32.Parse(entry["price"]?.ToString() ?? "0");
@@ -1483,6 +1484,7 @@ namespace BacklashDTOs
         public Dictionary<int, int> GetNoBids()
         {
             var dict = new Dictionary<int, int>();
+            if (OrderbookData is null) return dict;
             foreach (var entry in OrderbookData.Where(e => (e["side"]?.ToString()) == "no"))
             {
                 int price = Int32.Parse(entry["price"]?.ToString() ?? "0");

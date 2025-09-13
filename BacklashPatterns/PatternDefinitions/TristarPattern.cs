@@ -72,7 +72,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Bullish Tristar: Potential reversal from downtrend to uptrend due to exhaustion of sellers.
         /// - Bearish Tristar: Potential reversal from uptrend to downtrend due to exhaustion of buyers.
         /// </summary>
-        public static TristarPattern IsPattern(
+        public static TristarPattern? IsPattern(
             int index,
             int trendLookback,
             bool isBullish,
@@ -137,4 +137,5 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 

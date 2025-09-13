@@ -49,7 +49,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static StalledPattern IsPattern(
+        public static StalledPattern? IsPattern(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -93,6 +93,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

@@ -62,7 +62,7 @@ public class GravestoneDojiPattern : PatternDefinition
     {
     }
 
-    public static GravestoneDojiPattern IsPattern(
+    public static GravestoneDojiPattern? IsPattern(
         Dictionary<int, CandleMetrics> metricsCache,
         int index,
         int trendLookback,
@@ -82,6 +82,7 @@ public class GravestoneDojiPattern : PatternDefinition
         return new GravestoneDojiPattern(candles);
     }
 }
+
 
 
 

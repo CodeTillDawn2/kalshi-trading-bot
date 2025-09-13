@@ -59,7 +59,7 @@ namespace BacklashPatterns.PatternDefinitions
          *   3. Third candle: Same direction, opens near second candle�s open, similar size.
          * - Indication: Bullish version confirms uptrend continuation; bearish version confirms downtrend continuation.
          */
-        public static UpDownGapSideBySideWhiteLinesPattern IsPattern(
+        public static UpDownGapSideBySideWhiteLinesPattern? IsPattern(
                     int index,
                     int trendLookback,
                     bool isBullish,
@@ -122,6 +122,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

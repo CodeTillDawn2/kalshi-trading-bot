@@ -151,7 +151,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="metricsCache">Cache of precomputed candle metrics.</param>
         /// <param name="isBullish">True to check for bullish pattern, false for bearish.</param>
         /// <returns>A BeltHoldPattern instance if the pattern is detected, otherwise null.</returns>
-        public static BeltHoldPattern IsPattern(
+        public static BeltHoldPattern? IsPattern(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -245,4 +245,5 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 

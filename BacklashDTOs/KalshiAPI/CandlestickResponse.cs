@@ -7,7 +7,7 @@ namespace BacklashDTOs.KalshiAPI
     /// </summary>
     public class CandlestickResponse
     {
-        [JsonPropertyName("ticker")] public string Ticker { get; set; }
-        [JsonPropertyName("candlesticks")] public List<APICandlestick> Candlesticks { get; set; } = new List<APICandlestick>();
+        [JsonPropertyName("ticker")] public string? Ticker { get; set; }
+        [JsonPropertyName("candlesticks")] public List<APICandlestick>? Candlesticks { get; set; } = new List<APICandlestick>();
     }
 }

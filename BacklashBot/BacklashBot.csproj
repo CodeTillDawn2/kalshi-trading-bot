@@ -9,6 +9,12 @@
     <FileVersion>0.2.5</FileVersion>
     <UserSecretsId>8404ee8d-67fb-44e1-8c03-a78c63766206</UserSecretsId>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="BackgroundServices\**" />
     <Compile Remove="Jupyter\**" />

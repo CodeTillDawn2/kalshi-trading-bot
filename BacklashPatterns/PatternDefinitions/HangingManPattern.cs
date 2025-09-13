@@ -57,7 +57,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static HangingManPattern IsPattern(
+        public static HangingManPattern? IsPattern(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             CandleMids[] prices,
@@ -81,6 +81,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

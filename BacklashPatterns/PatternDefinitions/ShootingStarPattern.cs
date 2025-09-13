@@ -66,7 +66,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static ShootingStarPattern IsPattern(
+        public static ShootingStarPattern? IsPattern(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
@@ -101,6 +101,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

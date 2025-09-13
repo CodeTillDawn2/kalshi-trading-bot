@@ -27,7 +27,7 @@ public class EngulfingPattern : PatternDefinition
         IsBullish = isBullish;
     }
 
-    public static EngulfingPattern IsPattern(
+    public static EngulfingPattern? IsPattern(
         int index,
         Dictionary<int, CandleMetrics> metricsCache,
         CandleMids[] prices,
@@ -64,6 +64,7 @@ public class EngulfingPattern : PatternDefinition
         return new EngulfingPattern(candles, isBullish);
     }
 }
+
 
 
 

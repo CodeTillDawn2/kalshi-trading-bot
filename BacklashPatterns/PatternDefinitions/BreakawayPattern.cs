@@ -84,7 +84,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="isBullish">True for bullish pattern, false for bearish.</param>
         /// <param name="trendLookback">Number of candles to look back for trend and average range.</param>
         /// <returns>A BreakawayPattern instance if detected, otherwise null.</returns>
-        public static BreakawayPattern IsPattern(
+        public static BreakawayPattern? IsPattern(
              int index,
              CandleMids[] prices,
              Dictionary<int, CandleMetrics> metricsCache,
@@ -153,6 +153,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

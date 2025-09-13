@@ -56,7 +56,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static IdenticalThreeCrowsPattern IsPattern(
+        public static IdenticalThreeCrowsPattern? IsPattern(
             int index,
             CandleMids[] prices,
             int trendLookback,
@@ -104,6 +104,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

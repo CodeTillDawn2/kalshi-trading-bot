@@ -47,7 +47,7 @@ namespace BacklashPatterns.PatternDefinitions
          *   3. Third candle: Bullish, opens below second close, closes above it.
          * - Indication: Indicates potential exhaustion of sellers, possible trend reversal upward.
          */
-        public static Unique3RiverPattern IsPattern(
+        public static Unique3RiverPattern? IsPattern(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -90,6 +90,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

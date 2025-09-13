@@ -60,7 +60,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Indicates a pause in a trend followed by continuation.
         /// Your original logic relaxes body sizes and containment strictness.
         /// </summary>
-        public static MatHoldPattern IsPattern(
+        public static MatHoldPattern? IsPattern(
             int index,
             int trendLookback,
             bool isBullish,
@@ -152,6 +152,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

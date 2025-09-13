@@ -3,7 +3,7 @@ namespace BacklashDTOs
     public class CandlestickData
     {
         public DateTime Date { get; set; }
-        public string MarketTicker { get; set; }
+        public string? MarketTicker { get; set; }
         public int IntervalType { get; set; }
         public int OpenInterest { get; set; }
         public int Volume { get; set; }

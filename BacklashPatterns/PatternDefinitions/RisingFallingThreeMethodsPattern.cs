@@ -61,7 +61,7 @@ namespace BacklashPatterns.PatternDefinitions
         ///   closing below the first.
         /// Indicates: Continuation of the prior trend (bullish for Rising, bearish for Falling) after a brief consolidation.
         /// </summary>
-        public static RisingFallingThreeMethodsPattern IsPattern(
+        public static RisingFallingThreeMethodsPattern? IsPattern(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -155,6 +155,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

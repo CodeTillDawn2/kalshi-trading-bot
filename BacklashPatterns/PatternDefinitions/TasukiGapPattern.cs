@@ -35,7 +35,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Indicates continuation of the prior trend after a brief pullback.
         /// Source: https://www.investopedia.com/terms/t/tasukigap.asp
         /// </summary>
-        public static TasukiGapPattern IsPattern(
+        public static TasukiGapPattern? IsPattern(
             int index,
             int trendLookback,
             bool isBullish,
@@ -105,6 +105,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

@@ -42,7 +42,7 @@ namespace BacklashPatterns.PatternDefinitions
          *   3. Third candle: Bearish, opens within the second candle�s range, closes near or below the first candle�s close.
          * - Indication: Suggests selling pressure overcoming buying momentum, potential reversal to downtrend.
          */
-        public static TwoCrowsPattern IsPattern(
+        public static TwoCrowsPattern? IsPattern(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -79,6 +79,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

@@ -47,7 +47,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static ThrustingPattern IsPattern(
+        public static ThrustingPattern? IsPattern(
             int index,
             int trendLookback,
             bool isBullish,
@@ -96,6 +96,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

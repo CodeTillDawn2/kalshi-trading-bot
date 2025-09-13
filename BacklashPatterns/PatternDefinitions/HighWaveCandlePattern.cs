@@ -57,7 +57,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static HighWaveCandlePattern IsPattern(int index, int trendLookback, CandleMids[] prices, Dictionary<int, CandleMetrics> metricsCache)
+        public static HighWaveCandlePattern? IsPattern(int index, int trendLookback, CandleMids[] prices, Dictionary<int, CandleMetrics> metricsCache)
         {
 
             if (index < 1) return null;
@@ -79,6 +79,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

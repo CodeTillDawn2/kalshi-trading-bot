@@ -43,7 +43,7 @@ public class HammerPattern : PatternDefinition
     {
     }
 
-    public static HammerPattern IsPattern(
+    public static HammerPattern? IsPattern(
         Dictionary<int, CandleMetrics> metricsCache,
         int index,
         int trendLookback,
@@ -69,6 +69,7 @@ public class HammerPattern : PatternDefinition
         return new HammerPattern(candles);
     }
 }
+
 
 
 

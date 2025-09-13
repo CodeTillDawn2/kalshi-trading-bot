@@ -75,10 +75,10 @@ namespace TradingStrategies
         /// <param name="initialCash">Starting cash amount for equity calculations.</param>
         /// <param name="writeToFile">Whether to write reports to the file system.</param>
         /// <returns>List of performance metrics and event logs for each path.</returns>
-        private List<(PathPerformance performance, List<EventLog> events)> GeneratePerformanceReportsAndMetrics(SnapshotGroupDTO group, List<SimulationPath> activePaths, List<MarketSnapshot> snapshots, double initialCash, bool writeToFile)
+        private List<(PathPerformance performance, List<EventLog> events)> GeneratePerformanceReportsAndMetrics(SnapshotGroupDTO? group, List<SimulationPath> activePaths, List<MarketSnapshot> snapshots, double initialCash, bool writeToFile)
         {
             string outputDir = _cacheDirectory;
-            string uniqueId = group != null ? Path.GetFileNameWithoutExtension(group.JsonPath) : snapshots.FirstOrDefault()?.MarketTicker;
+            string uniqueId = group != null ? Path.GetFileNameWithoutExtension(group.JsonPath) : snapshots.FirstOrDefault()?.MarketTicker ?? "Unknown";
 
             var finalSnapshot = snapshots.Last();
             var firstSnapshot = snapshots.First();

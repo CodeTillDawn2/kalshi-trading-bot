@@ -74,7 +74,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static ThreeStarsInTheSouthPattern IsPattern(
+        public static ThreeStarsInTheSouthPattern? IsPattern(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -108,6 +108,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

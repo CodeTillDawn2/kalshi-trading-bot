@@ -83,7 +83,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="trendLookback">Number of candles to look back for trend and average range.</param>
         /// <param name="prices">Array of candle price data.</param>
         /// <returns>A DojiPattern instance if detected, otherwise null.</returns>
-        public static DojiPattern IsPattern(
+        public static DojiPattern? IsPattern(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
@@ -125,6 +125,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

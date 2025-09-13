@@ -193,16 +193,17 @@ namespace TradingStrategies.Strategies.Strats
         public static Breakout FromJson(string json)
         {
             var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-            if ((string)data["type"] != "Breakout")
+            if (data == null || !data.TryGetValue("type", out var typeObj) || typeObj is not string type || type != "Breakout")
             {
                 throw new ArgumentException("Invalid strategy type");
             }
-            var name = (string)data["name"];
+            var name = (string?)data["name"];
             var weight = Convert.ToDouble(data["weight"]);
-            var defaultAction = Enum.Parse<ActionType>((string)data["defaultAction"]);
+            var defaultAction = Enum.Parse<ActionType>((string?)data["defaultAction"]);
             var mlParamsJson = (JsonElement)data["mlParams"];
-            var mlParams = mlParamsJson.Deserialize<Dictionary<string, double>>()
-                .ToDictionary(kv => Enum.Parse<ParamKey>(kv.Key), kv => kv.Value);
+            var mlParamsDict = mlParamsJson.Deserialize<Dictionary<string, double>>();
+            if (mlParamsDict == null) mlParamsDict = new Dictionary<string, double>();
+            var mlParams = mlParamsDict.ToDictionary(kv => Enum.Parse<ParamKey>(kv.Key), kv => kv.Value);
             return new Breakout(name, weight, mlParams);
         }
     }

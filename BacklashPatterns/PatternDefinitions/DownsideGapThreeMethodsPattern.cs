@@ -31,7 +31,7 @@ public class DownsideGapThreeMethodsPattern : PatternDefinition
     {
     }
 
-    public static DownsideGapThreeMethodsPattern IsPattern(
+    public static DownsideGapThreeMethodsPattern? IsPattern(
         int index,
         CandleMids[] prices,
         int trendLookback,
@@ -61,6 +61,7 @@ public class DownsideGapThreeMethodsPattern : PatternDefinition
         return new DownsideGapThreeMethodsPattern(candles);
     }
 }
+
 
 
 

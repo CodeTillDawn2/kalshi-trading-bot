@@ -60,7 +60,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static InNeckPattern IsPattern(
+        public static InNeckPattern? IsPattern(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -93,6 +93,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

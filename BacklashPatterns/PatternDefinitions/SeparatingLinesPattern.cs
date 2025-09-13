@@ -42,7 +42,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Bearish: Occurs in an uptrend; first candle is bullish, second is bearish, both open at nearly the same price.
         /// Indicates: Continuation of the existing trend (bullish or bearish) with a strong move after a brief pause.
         /// </summary>
-        public static SeparatingLinesPattern IsPattern(
+        public static SeparatingLinesPattern? IsPattern(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
@@ -94,6 +94,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

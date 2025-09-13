@@ -45,7 +45,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static ThreeOutsidePattern IsPattern(
+        public static ThreeOutsidePattern? IsPattern(
             int index,
             int trendLookback,
             bool isBullish,
@@ -106,6 +106,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

@@ -11,19 +11,19 @@ namespace BacklashDTOs.KalshiAPI
 
         public long Seq { get; set; }
 
-        public string OfferType { get; set; } // "SNP" or "DEL"
+        public string? OfferType { get; set; } // "SNP" or "DEL"
 
-        public string MarketTicker { get; set; }
+        public string? MarketTicker { get; set; }
 
-        public List<PriceLevel> YesOrders { get; set; } // For snapshot
+        public List<PriceLevel>? YesOrders { get; set; } // For snapshot
 
-        public List<PriceLevel> NoOrders { get; set; }  // For snapshot
+        public List<PriceLevel>? NoOrders { get; set; }  // For snapshot
 
         public int? Price { get; set; }                 // For delta
 
         public int? Delta { get; set; }                 // For delta
 
-        public string Side { get; set; }                // For delta
+        public string? Side { get; set; }                // For delta
 
         /// <summary>
         /// Initializes a new instance of the OrderbookMessage class from JSON data.

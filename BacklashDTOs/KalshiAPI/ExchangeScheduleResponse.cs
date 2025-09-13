@@ -59,9 +59,9 @@ namespace BacklashDTOs.KalshiAPI
     public class TradingSession
     {
         [JsonPropertyName("close_time")]
-        public string CloseTime { get; set; }
+        public string? CloseTime { get; set; }
 
         [JsonPropertyName("open_time")]
-        public string OpenTime { get; set; }
+        public string? OpenTime { get; set; }
     }
 }

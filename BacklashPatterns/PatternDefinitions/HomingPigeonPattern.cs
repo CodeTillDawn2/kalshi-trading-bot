@@ -50,7 +50,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static HomingPigeonPattern IsPattern(
+        public static HomingPigeonPattern? IsPattern(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -87,6 +87,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

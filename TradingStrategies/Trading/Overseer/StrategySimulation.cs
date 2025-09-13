@@ -11,7 +11,7 @@ namespace TradingStrategies.Trading.Overseer
         public int Position { get; private set; }
         public double Cash { get; private set; }
         public double InitialCash { get; private set; }
-        public SimulatedOrderbook? SimulatedBook { get; private set; }
+        public SimulatedOrderbook SimulatedBook { get; private set; }
         public List<(string action, string side, string type, int count, int price, DateTime? expiration)> SimulatedRestingOrders { get; private set; } = new List<(string, string, string, int, int, DateTime?)>();
 
         public StrategySimulation(Strategy strategy, double initialCash = 100.0)
@@ -20,7 +20,7 @@ namespace TradingStrategies.Trading.Overseer
             Position = 0;
             Cash = initialCash;
             InitialCash = initialCash;
-            SimulatedBook = null;
+            SimulatedBook = new SimulatedOrderbook();
         }
 
         public void ProcessSnapshot(MarketSnapshot snapshot, MarketSnapshot? prevSnapshot)
@@ -28,7 +28,7 @@ namespace TradingStrategies.Trading.Overseer
             // Apply deltas if previous snapshot provided
             Dictionary<int, int> yesDeltas = new Dictionary<int, int>();
             Dictionary<int, int> noDeltas = new Dictionary<int, int>();
-            if (prevSnapshot != null && SimulatedBook != null)
+            if (prevSnapshot != null)
             {
                 yesDeltas = ComputeDeltas(prevSnapshot.GetYesBids(), snapshot.GetYesBids());
                 noDeltas = ComputeDeltas(prevSnapshot.GetNoBids(), snapshot.GetNoBids());
@@ -38,9 +38,8 @@ namespace TradingStrategies.Trading.Overseer
             }
 
             // Initialize book if first snapshot
-            if (SimulatedBook == null)
+            if (SimulatedBook.YesBids.All(b => b == null || b.Count == 0) && SimulatedBook.NoBids.All(b => b == null || b.Count == 0))
             {
-                SimulatedBook = new SimulatedOrderbook();
                 SimulatedBook.InitializeFromSnapshot(snapshot);
             }
 
@@ -154,7 +153,7 @@ namespace TradingStrategies.Trading.Overseer
                 SimulatedRestingOrders.Clear();
             }
 
-            // Combo “take then rest” sized to 100% of current position
+            // Combo ï¿½take then restï¿½ sized to 100% of current position
             if (isComboLongPostAsk && Position > 0)
             {
                 int sellYesPrice = decision.Price;   // 1..99 (YES ask)

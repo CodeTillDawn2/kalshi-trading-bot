@@ -68,7 +68,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static InvertedHammerPattern IsPattern(
+        public static InvertedHammerPattern? IsPattern(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
@@ -98,6 +98,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

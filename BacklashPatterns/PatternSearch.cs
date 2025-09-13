@@ -70,14 +70,14 @@ namespace BacklashPatterns
                 var previous = i > 0 ? prices[i - 1] : null;
 
                 // Significance check to skip insignificant candles
-                bool isSignificant = IsPatternSignificant(current, previous);
+                bool isSignificant = IsPatternSignificant(current, previous) ?? false;
                 if (!isSignificant) continue;
 
                 // 1-Candle Patterns
                 if (i >= 1)
                 {
-                    bool hasContext = Math.Abs(current.Close - previous.Close) >= 1.0 ||
-                                     current.Volume > previous.Volume * 1.1;
+                    bool hasContext = previous != null && (Math.Abs(current.Close - previous.Close) >= 1.0 ||
+                                      current.Volume > previous.Volume * 1.1);
 
                     if (hasContext)
                     {
@@ -498,7 +498,7 @@ namespace BacklashPatterns
                 var candlePatterns = kvp.Value;
                 int index = kvp.Key;
 
-                string market = index < candles.Length ? candles[index].MarketTicker : "Unknown Market";
+                string market = index < candles.Length ? candles[index].MarketTicker ?? "Unknown Market" : "Unknown Market";
                 string timestamp = index < candles.Length ? candles[index].Timestamp.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown Timestamp";
 
                 _logger?.LogInformation($"Index {index} ({market}, {timestamp}): Patterns before filter: {string.Join(", ", candlePatterns.Select(p => p.Name))}");
@@ -862,6 +862,7 @@ namespace BacklashPatterns
 
 
 }
+
 
 
 

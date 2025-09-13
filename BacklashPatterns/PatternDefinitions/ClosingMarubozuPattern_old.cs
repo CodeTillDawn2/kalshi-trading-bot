@@ -31,7 +31,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static ClosingMarubozuPattern_old IsPattern(
+        public static ClosingMarubozuPattern_old? IsPattern(
             int index,
             Dictionary<int, CandleMetrics> metricsCache,
             CandleMids[] prices,
@@ -58,6 +58,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

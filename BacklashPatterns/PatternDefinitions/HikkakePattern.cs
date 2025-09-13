@@ -48,7 +48,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static HikkakePattern IsPattern(
+        public static HikkakePattern? IsPattern(
             int index,
             int trendLookback,
             bool isBullish,
@@ -104,6 +104,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

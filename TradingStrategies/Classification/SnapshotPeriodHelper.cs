@@ -116,7 +116,7 @@ namespace TradingStrategies.Classification
         /// The flattening process preserves the Orderbook structure while converting all other
         /// nested properties to a flat key-value format suitable for data analysis.
         /// </remarks>
-        private SnapshotGroupDTO CreateSnapshotGroup(List<SnapshotDTO> snapshots, int groupNumber, string snapshotDirectory)
+        private SnapshotGroupDTO? CreateSnapshotGroup(List<SnapshotDTO> snapshots, int groupNumber, string snapshotDirectory)
         {
             if (snapshots == null || !snapshots.Any())
                 return null;
@@ -140,10 +140,15 @@ namespace TradingStrategies.Classification
             {
                 var json = JObject.Parse(snapshot.RawJSON);
                 // Flatten all properties, preserving Orderbook
-                var flattenedMarket = FlattenDictionary(json.ToObject<Dictionary<string, object>>(), "");
+                var dict = json.ToObject<Dictionary<string, object>>();
+                if (dict == null) dict = new Dictionary<string, object>();
+                var flattenedMarket = FlattenDictionary(dict, "");
                 // Add MarketTicker as a single field
-                flattenedMarket["MarketTicker"] = snapshot.MarketTicker;
-                flattenedRows.Add(flattenedMarket);
+                if (flattenedMarket != null)
+                {
+                    flattenedMarket["MarketTicker"] = snapshot.MarketTicker;
+                    flattenedRows.Add(flattenedMarket);
+                }
             }
 
             // Convert to JSON string using Newtonsoft.Json
@@ -210,30 +215,54 @@ namespace TradingStrategies.Classification
                     {
                         for (int i = 0; i < list.Count; i++)
                         {
-                            var itemFlattened = FlattenDictionary(list[i], $"{key}_{i}");
-                            foreach (var itemKvp in itemFlattened)
-                                result[itemKvp.Key] = itemKvp.Value;
+                            if (list[i] != null)
+                            {
+                                var itemFlattened = FlattenDictionary(list[i], $"{key}_{i}");
+                                if (itemFlattened != null)
+                                {
+                                    foreach (var itemKvp in itemFlattened)
+                                        result[itemKvp.Key] = itemKvp.Value;
+                                }
+                            }
                         }
                     }
                     else if (kvp.Value is JObject jObject)
                     {
                         var jObjectDict = jObject.ToObject<Dictionary<string, object>>();
-                        var nestedFlattened = FlattenDictionary(jObjectDict, key);
-                        foreach (var nestedKvp in nestedFlattened)
-                            result[nestedKvp.Key] = nestedKvp.Value;
+                        if (jObjectDict != null)
+                        {
+                            var nestedFlattened = FlattenDictionary(jObjectDict, key);
+                            if (nestedFlattened != null)
+                            {
+                                foreach (var nestedKvp in nestedFlattened)
+                                    if (nestedKvp.Value != null)
+                                        result[nestedKvp.Key] = nestedKvp.Value;
+                            }
+                        }
                     }
                     else if (kvp.Value is JArray jArray)
                     {
                         for (int i = 0; i < jArray.Count; i++)
                         {
-                            var itemFlattened = FlattenDictionary(jArray[i].ToObject<object>(), $"{key}_{i}");
-                            foreach (var itemKvp in itemFlattened)
-                                result[itemKvp.Key] = itemKvp.Value;
+                            var item = jArray[i].ToObject<object>();
+                            if (item != null)
+                            {
+                                var itemFlattened = FlattenDictionary(item, $"{key}_{i}");
+                                if (itemFlattened != null)
+                                {
+                                    foreach (var itemKvp in itemFlattened)
+                                        if (itemKvp.Value != null)
+                                            result[itemKvp.Key] = itemKvp.Value;
+                                }
+                            }
                         }
                     }
                     else
                     {
-                        result[key] = kvp.Value?.ToString();
+                        if (kvp.Value != null)
+                        {
+                            result[key] = kvp.Value.ToString();
+                        }
                     }
                 }
             }
@@ -241,30 +270,55 @@ namespace TradingStrategies.Classification
             {
                 for (int i = 0; i < list.Count; i++)
                 {
-                    var itemFlattened = FlattenDictionary(list[i], $"{prefix}_{i}");
-                    foreach (var itemKvp in itemFlattened)
-                        result[itemKvp.Key] = itemKvp.Value;
+                    if (list[i] != null)
+                    {
+                        var itemFlattened = FlattenDictionary(list[i], $"{prefix}_{i}");
+                        if (itemFlattened != null)
+                        {
+                            foreach (var itemKvp in itemFlattened)
+                                if (itemKvp.Value != null)
+                                    result[itemKvp.Key] = itemKvp.Value;
+                        }
+                    }
                 }
             }
             else if (data is JObject jObject)
             {
                 var jObjectDict = jObject.ToObject<Dictionary<string, object>>();
-                var nestedFlattened = FlattenDictionary(jObjectDict, prefix);
-                foreach (var nestedKvp in nestedFlattened)
-                    result[nestedKvp.Key] = nestedKvp.Value;
+                if (jObjectDict != null)
+                {
+                    var nestedFlattened = FlattenDictionary(jObjectDict, prefix);
+                    if (nestedFlattened != null)
+                    {
+                        foreach (var nestedKvp in nestedFlattened)
+                            if (nestedKvp.Value != null)
+                                result[nestedKvp.Key] = nestedKvp.Value;
+                    }
+                }
             }
             else if (data is JArray jArray)
             {
                 for (int i = 0; i < jArray.Count; i++)
                 {
-                    var itemFlattened = FlattenDictionary(jArray[i].ToObject<object>(), $"{prefix}_{i}");
-                    foreach (var itemKvp in itemFlattened)
-                        result[itemKvp.Key] = itemKvp.Value;
+                    var item = jArray[i].ToObject<object>();
+                    if (item != null)
+                    {
+                        var itemFlattened = FlattenDictionary(item, $"{prefix}_{i}");
+                        if (itemFlattened != null)
+                        {
+                            foreach (var itemKvp in itemFlattened)
+                                if (itemKvp.Value != null)
+                                    result[itemKvp.Key] = itemKvp.Value;
+                        }
+                    }
                 }
             }
             else
             {
-                result[prefix] = data?.ToString();
+                if (data != null)
+                {
+                    result[prefix] = data.ToString();
+                }
             }
             return result;
         }
@@ -298,6 +352,7 @@ namespace TradingStrategies.Classification
 
                 // Deserialize into list of dictionaries
                 var flattenedRows = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonContent);
+                if (flattenedRows == null) flattenedRows = new List<Dictionary<string, string>>();
 
                 foreach (var row in flattenedRows)
                 {
@@ -310,9 +365,9 @@ namespace TradingStrategies.Classification
                 { "BestNoBid", int.Parse(row["BestNoBid"]) },
                 { "CumulativeYesBidDepth", double.Parse(row["CumulativeYesBidDepth"]) },
                 { "CumulativeNoBidDepth", double.Parse(row["CumulativeNoBidDepth"]) },
-                { "LastWebSocketMessageReceived", row.ContainsKey("LastWebSocketMessageReceived") ? DateTime.Parse(row["LastWebSocketMessageReceived"]) : DateTime.MinValue },
-                { "SnapshotSchemaVersion", row.ContainsKey("SnapshotSchemaVersion") ? int.Parse(row["SnapshotSchemaVersion"]) : 21 },
-                { "Orderbook", row.ContainsKey("Orderbook") ? JsonConvert.DeserializeObject(row["Orderbook"]) : null }
+                { "LastWebSocketMessageReceived", row.ContainsKey("LastWebSocketMessageReceived") && row["LastWebSocketMessageReceived"] != null ? DateTime.Parse(row["LastWebSocketMessageReceived"]) : DateTime.MinValue },
+                { "SnapshotSchemaVersion", row.ContainsKey("SnapshotSchemaVersion") && row["SnapshotSchemaVersion"] != null ? int.Parse(row["SnapshotSchemaVersion"]) : 21 },
+                { "Orderbook", row.ContainsKey("Orderbook") && row["Orderbook"] != null ? JsonConvert.DeserializeObject(row["Orderbook"]) : null }
             };
 
                     var snapshot = new SnapshotDTO
@@ -338,9 +393,15 @@ namespace TradingStrategies.Classification
             foreach (var dto in orderedSnapshots)
             {
                 // Parse RawJSON to MarketSnapshot and determine market type
-                var marketSnapshot = JsonConvert.DeserializeObject<MarketSnapshot>(dto.RawJSON);
-                marketSnapshot.MarketType = helper.GetMarketType(marketSnapshot).ToString();
-                // Market type information is now available in the snapshot for analysis
+                if (dto.RawJSON != null)
+                {
+                    var marketSnapshot = JsonConvert.DeserializeObject<MarketSnapshot>(dto.RawJSON);
+                    if (marketSnapshot != null)
+                    {
+                        marketSnapshot.MarketType = helper.GetMarketType(marketSnapshot).ToString();
+                        // Market type information is now available in the snapshot for analysis
+                    }
+                }
             }
 
             return orderedSnapshots;

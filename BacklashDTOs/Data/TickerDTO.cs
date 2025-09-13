@@ -3,7 +3,7 @@ namespace BacklashDTOs.Data
     public class TickerDTO
     {
         public Guid market_id { get; set; }
-        public string market_ticker { get; set; }
+        public string? market_ticker { get; set; }
         public int price { get; set; }
         public int yes_bid { get; set; }
         public int yes_ask { get; set; }

@@ -56,7 +56,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// and little to no upper wick. Indicates strong buying pressure after a decline, suggesting a potential reversal.
         /// Source: https://www.babypips.com/learn/forex/takuri-line-candlestick-pattern
         /// </summary>
-        public static TakuriPattern IsPattern(
+        public static TakuriPattern? IsPattern(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -83,6 +83,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

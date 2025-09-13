@@ -33,7 +33,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static ThreeLineStrikePattern IsPattern(
+        public static ThreeLineStrikePattern? IsPattern(
             int index,
             int trendLookback,
             bool isBullish,
@@ -90,6 +90,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

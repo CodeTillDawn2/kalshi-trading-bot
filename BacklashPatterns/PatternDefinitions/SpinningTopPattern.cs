@@ -58,7 +58,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static SpinningTopPattern IsPattern(
+        public static SpinningTopPattern? IsPattern(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
@@ -88,6 +88,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

@@ -138,7 +138,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="metricsCache">Cache of candle metrics.</param>
         /// <param name="isBullish">True for bullish pattern, false for bearish.</param>
         /// <returns>A CounterattackPattern instance if detected, otherwise null.</returns>
-        public static CounterattackPattern IsPattern(
+        public static CounterattackPattern? IsPattern(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -216,4 +216,5 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 

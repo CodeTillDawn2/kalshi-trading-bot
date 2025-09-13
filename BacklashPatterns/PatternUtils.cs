@@ -123,7 +123,7 @@ namespace BacklashPatterns
         /// <param name="current">The current candle to evaluate for significance.</param>
         /// <param name="previous">The previous candle for comparison (null for the first candle, which is always considered significant).</param>
         /// <returns>True if the candle shows significant movement, false otherwise.</returns>
-        public static bool IsPatternSignificant(CandleMids current, CandleMids? previous)
+        public static bool? IsPatternSignificant(CandleMids current, CandleMids? previous)
         {
             if (previous == null) return true; // Always process the first candle
 
@@ -153,6 +153,7 @@ namespace BacklashPatterns
 
     }
 }
+
 
 
 

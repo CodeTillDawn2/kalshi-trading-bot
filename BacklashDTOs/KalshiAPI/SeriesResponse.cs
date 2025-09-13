@@ -5,6 +5,6 @@ namespace BacklashDTOs.KalshiAPI
     public class SeriesResponse
     {
         [JsonPropertyName("series")]
-        public KalshiSeries Series { get; set; }
+        public KalshiSeries? Series { get; set; }
     }
 }

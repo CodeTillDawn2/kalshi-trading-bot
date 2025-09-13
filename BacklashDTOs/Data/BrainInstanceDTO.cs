@@ -2,7 +2,7 @@ namespace BacklashDTOs.Data
 {
     public class BrainInstanceDTO
     {
-        public string BrainInstanceName { get; set; }
+        public string? BrainInstanceName { get; set; }
         public Guid? BrainLock { get; set; }
         public bool WatchPositions { get; set; }
         public bool WatchOrders { get; set; }

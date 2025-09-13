@@ -70,7 +70,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="trendLookback">Number of candles to look back for trend and average range.</param>
         /// <param name="isBullish">True for bullish pattern, false for bearish.</param>
         /// <returns>A ClosingMarubozuPattern instance if detected, otherwise null.</returns>
-        public static ClosingMarubozuPattern IsPattern(
+        public static ClosingMarubozuPattern? IsPattern(
             int index,
             Dictionary<int, CandleMetrics> metricsCache,
             CandleMids[] prices,
@@ -116,6 +116,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

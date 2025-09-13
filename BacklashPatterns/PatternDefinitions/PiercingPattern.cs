@@ -65,7 +65,7 @@ namespace BacklashPatterns.PatternDefinitions
         ///   and closes above the midpoint of the first candle�s body but below its open.
         /// Indicates: Potential reversal from bearish to bullish momentum as buyers step in after a gap down.
         /// </summary>
-        public static PiercingPattern IsPattern(
+        public static PiercingPattern? IsPattern(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -107,6 +107,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

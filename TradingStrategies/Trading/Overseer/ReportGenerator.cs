@@ -81,9 +81,9 @@ namespace TradingStrategies.Trading.Overseer
 
         public class PathPerformance
         {
-            public string MarketId { get; set; }
-            public string PathTaken { get; set; }
-            public Dictionary<string, int> SnapshotsPerType { get; set; }
+            public string? MarketId { get; set; }
+            public string? PathTaken { get; set; }
+            public Dictionary<string, int>? SnapshotsPerType { get; set; }
             public double PnL { get; set; }
             public double Equity { get; set; }
             public int Trades { get; set; }
@@ -91,12 +91,12 @@ namespace TradingStrategies.Trading.Overseer
             public int StartNoBid { get; set; }
             public int EndYesBid { get; set; }
             public int EndNoBid { get; set; }
-            public string EndType { get; set; }
+            public string? EndType { get; set; }
             public int SimulatedPosition { get; set; }
             public double AverageCost { get; set; }
         }
 
-        public string GenerateDetailedPerformanceReport(string marketId, List<EventLog> events, double initialCash, Dictionary<string, PathInfo> paths, bool writeToFile, string outputDir = @"C:\Users\Peter\Documents\GitHub\TestingOutput")
+        public string GenerateDetailedPerformanceReport(string? marketId, List<EventLog> events, double initialCash, Dictionary<string, PathInfo> paths, bool writeToFile, string outputDir = @"C:\Users\Peter\Documents\GitHub\TestingOutput")
         {
             if (events == null || events.Count == 0) return "No events to report.";
 
@@ -451,7 +451,7 @@ namespace TradingStrategies.Trading.Overseer
             return string.Join("; ", nuance);
         }
 
-        public string GenerateFinalPerformanceReport(string marketId, string pathTaken, Dictionary<string, int> snapshotsPerType, double pnl, double finalEquity, string notes, bool writeToFile, string outputDir = @"C:\Users\Peter\Documents\GitHub\TestingOutput")
+        public string GenerateFinalPerformanceReport(string? marketId, string pathTaken, Dictionary<string, int> snapshotsPerType, double pnl, double finalEquity, string notes, bool writeToFile, string outputDir = @"C:\Users\Peter\Documents\GitHub\TestingOutput")
         {
             var sb = new StringBuilder();
             sb.AppendLine("Market,Path Taken,Snapshots per Type,Final P&L,Final Equity,Notes");

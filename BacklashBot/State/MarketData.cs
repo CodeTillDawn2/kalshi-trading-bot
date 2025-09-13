@@ -41,8 +41,8 @@ namespace BacklashBot.State
         private readonly ILogger<IMarketData> _logger;
         private readonly IOrderbookChangeTracker _changeTracker;
         private readonly ITradingCalculator _tradingCalculator;
-        private string _marketTicker;
-        private MarketDTO _marketInfo;
+        private string _marketTicker = "";
+        private MarketDTO _marketInfo = null!;
         private readonly Dictionary<string, List<CandlestickData>> _candlesticks;
         private ConcurrentBag<TickerDTO> _tickers;
         private List<MarketPositionDTO> _positions;
@@ -54,7 +54,7 @@ namespace BacklashBot.State
 
         public string MarketCategory { get => _marketCategory; set => _marketCategory = value; }
 
-        private string _marketStatus;
+        private string _marketStatus = "";
         public string MarketStatus
         {
             get => _marketStatus;
@@ -97,7 +97,7 @@ namespace BacklashBot.State
         private long _totalpositionTraded;
         private double _realizedPnl;
         private double _feesPaid;
-        private List<OrderDTO> _restingOrders;
+        private List<OrderDTO> _restingOrders = new List<OrderDTO>();
         private double _positionROI;
         private double _positionROIAmt;
         private double _expectedFees;
@@ -111,7 +111,7 @@ namespace BacklashBot.State
         public double YesBidSlopePerMinute_Medium { get { return _yesBidSlopePerMinute_Medium; } set { _yesBidSlopePerMinute_Medium = value; } }
         public double NoBidSlopePerMinute_Medium { get { return _noBidSlopePerMinute_Medium; } set { _noBidSlopePerMinute_Medium = value; } }
 
-        public string MarketType { get; set; }
+        public string MarketType { get; set; } = "";
 
         private double _tolerancePercentage = 10.0;
 
@@ -135,10 +135,10 @@ namespace BacklashBot.State
             IOptions<CalculationConfig> calculationConfig)
         {
             _calculationConfig = calculationConfig?.Value ?? throw new ArgumentNullException(nameof(calculationConfig));
-            _marketTicker = market.market_ticker;
-            _marketCategory = market.category;
+            _marketTicker = market.market_ticker ?? "";
+            _marketCategory = market.category ?? "";
             _marketInfo = market;
-            _marketStatus = market.status;
+            _marketStatus = market.status ?? "";
             _tradingCalculator = tradingCalculator ?? throw new ArgumentNullException(nameof(tradingCalculator));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _changeTracker = changeTracker ?? throw new ArgumentNullException(nameof(changeTracker));
@@ -978,7 +978,7 @@ namespace BacklashBot.State
         }
 
         public List<PseudoCandlestick> RecentCandlesticks { get { return _recentCandlesticks; } set { _recentCandlesticks = value; } }
-        private List<PseudoCandlestick> _recentCandlesticks;
+        private List<PseudoCandlestick> _recentCandlesticks = new List<PseudoCandlestick>();
 
         private List<PseudoCandlestick> _minutePseudoCandlesticks = new List<PseudoCandlestick>();
         private List<PseudoCandlestick> _hourPseudoCandlesticks = new List<PseudoCandlestick>();
@@ -1016,7 +1016,7 @@ namespace BacklashBot.State
             get { return _marketInfo.can_close_early; }
         }
 
-        private List<SupportResistanceLevel> _allSupportResistanceLevels;
+        private List<SupportResistanceLevel> _allSupportResistanceLevels = new List<SupportResistanceLevel>();
 
 
         public List<SupportResistanceLevel> AllSupportResistanceLevels

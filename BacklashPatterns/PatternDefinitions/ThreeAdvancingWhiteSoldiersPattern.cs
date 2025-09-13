@@ -38,7 +38,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// each closing higher than the previous. Signals strong buying pressure and a potential trend reversal.
         /// Source: https://www.investopedia.com/terms/t/three_white_soldiers.asp
         /// </summary>
-        public static ThreeAdvancingWhiteSoldiersPattern IsPattern(
+        public static ThreeAdvancingWhiteSoldiersPattern? IsPattern(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -79,6 +79,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

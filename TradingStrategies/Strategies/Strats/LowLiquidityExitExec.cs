@@ -157,7 +157,11 @@ namespace TradingStrategies.Strategies.Strats
         }
         internal class DescendingComparer<T> : IComparer<T> where T : IComparable<T>
         {
-            public int Compare(T x, T y) => y.CompareTo(x);
+            public int Compare(T? x, T? y)
+            {
+                if (x is null || y is null) return 0;
+                return y.CompareTo(x);
+            }
         }
 
     }

@@ -50,7 +50,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static UpsideGapTwoCrowsPattern IsPattern(
+        public static UpsideGapTwoCrowsPattern? IsPattern(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -91,6 +91,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

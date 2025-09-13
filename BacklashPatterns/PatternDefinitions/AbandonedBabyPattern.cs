@@ -52,7 +52,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static AbandonedBabyPattern IsPattern(
+        public static AbandonedBabyPattern? IsPattern(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -163,6 +163,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

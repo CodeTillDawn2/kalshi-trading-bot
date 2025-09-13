@@ -41,7 +41,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Indicates a potential reversal as the middle candle�s move is rejected.
         /// Source: https://www.tradingview.com/education/stick-sandwich/
         /// </summary>
-        public static StickSandwichPattern IsPattern(
+        public static StickSandwichPattern? IsPattern(
             int index,
             bool isBullish,
             CandleMids[] prices,
@@ -104,6 +104,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

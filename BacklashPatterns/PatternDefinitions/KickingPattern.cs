@@ -57,7 +57,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Bullish Kicking follows a downtrend; Bearish Kicking follows an uptrend.
         /// Indicates: Strong reversal signal due to abrupt momentum shift.
         /// </summary>
-        public static KickingPattern IsPattern(
+        public static KickingPattern? IsPattern(
         int index, bool isBullish, int trendLookback,
         Dictionary<int, CandleMetrics> metricsCache, CandleMids[] prices)
         {
@@ -87,6 +87,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

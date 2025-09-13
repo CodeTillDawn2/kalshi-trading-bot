@@ -55,7 +55,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static BreakawayPattern IsPattern(
+        public static BreakawayPattern? IsPattern(
             int index,
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -114,6 +114,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

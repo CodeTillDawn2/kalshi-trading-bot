@@ -63,7 +63,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Wicks roughly balanced, though slight asymmetry is allowed.
         /// Indicates: Potential reversal or continuation depending on prior trend, due to high indecision.
         /// </summary>
-        public static LongLeggedDojiPattern IsPattern(
+        public static LongLeggedDojiPattern? IsPattern(
              Dictionary<int, CandleMetrics> metricsCache,
              int index,
              int trendLookback,
@@ -98,6 +98,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

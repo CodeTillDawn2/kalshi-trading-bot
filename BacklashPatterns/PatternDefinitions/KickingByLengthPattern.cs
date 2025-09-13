@@ -58,7 +58,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Indicates: A strong reversal due to an abrupt momentum shift, supported by large bodies and a gap.
         /// Note: Original logic relaxed strictness from pure Marubozu and adjusted trend thresholds.
         /// </summary>
-        public static KickingByLengthPattern IsPattern(
+        public static KickingByLengthPattern? IsPattern(
                 int index, int trendLookback, bool isBullish,
                 Dictionary<int, CandleMetrics> metricsCache, CandleMids[] prices)
         {
@@ -87,6 +87,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

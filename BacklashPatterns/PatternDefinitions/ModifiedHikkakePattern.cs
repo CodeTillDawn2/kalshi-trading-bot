@@ -32,7 +32,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Indicates a potential reversal with minimal trend confirmation.
         /// Your original logic uses a very loose definition compared to the standard Hikkake.
         /// </summary>
-        public static ModifiedHikkakePattern IsPattern(
+        public static ModifiedHikkakePattern? IsPattern(
             int index,
             bool isBullish,
             CandleMids[] prices,
@@ -80,6 +80,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

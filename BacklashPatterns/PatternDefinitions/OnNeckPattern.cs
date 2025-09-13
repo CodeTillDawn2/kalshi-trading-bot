@@ -52,7 +52,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static OnNeckPattern IsPattern(
+        public static OnNeckPattern? IsPattern(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -88,6 +88,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

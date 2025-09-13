@@ -27,7 +27,7 @@ public class UpsideDownsideGapThreeMethodsPattern : PatternDefinition
     {
     }
 
-    public static UpsideDownsideGapThreeMethodsPattern IsPattern(
+    public static UpsideDownsideGapThreeMethodsPattern? IsPattern(
         int index,
         int trendLookback,
         bool isBullish,
@@ -75,6 +75,7 @@ public class UpsideDownsideGapThreeMethodsPattern : PatternDefinition
         return new UpsideDownsideGapThreeMethodsPattern(candles);
     }
 }
+
 
 
 

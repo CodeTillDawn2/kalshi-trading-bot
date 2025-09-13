@@ -44,7 +44,7 @@ public class DragonflyDojiPattern : PatternDefinition
     {
     }
 
-    public static DragonflyDojiPattern IsPattern(
+    public static DragonflyDojiPattern? IsPattern(
         Dictionary<int, CandleMetrics> metricsCache,
         int index,
         int trendLookback,
@@ -64,6 +64,7 @@ public class DragonflyDojiPattern : PatternDefinition
         return new DragonflyDojiPattern(candles);
     }
 }
+
 
 
 

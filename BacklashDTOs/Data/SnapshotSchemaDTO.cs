@@ -5,7 +5,7 @@ namespace BacklashDTOs.Data
     public class SnapshotSchemaDTO
     {
         public int SchemaVersion { get; set; }
-        public string SchemaDefinition { get; set; }
+        public string? SchemaDefinition { get; set; }
 
     }
 

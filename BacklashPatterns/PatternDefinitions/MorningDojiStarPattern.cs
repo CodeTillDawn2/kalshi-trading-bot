@@ -59,7 +59,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static MorningDojiStarPattern IsPattern(
+        public static MorningDojiStarPattern? IsPattern(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -105,6 +105,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

@@ -71,13 +71,14 @@ namespace BacklashDTOs
             }
 
             DateTime initTime = snapshot.Timestamp; // Assume all initial orders at snapshot time
+            if (snapshot.OrderbookData is null) return;
             foreach (var entry in snapshot.OrderbookData)
             {
-                int price = Int32.Parse(entry["price"].ToString());
-                int contracts = Int32.Parse(entry["resting_contracts"].ToString());
-                string side = entry["side"].ToString();
+                if (entry["price"]?.ToString() is not string priceStr || !Int32.TryParse(priceStr, out int price)) continue;
+                if (entry["resting_contracts"]?.ToString() is not string contractsStr || !Int32.TryParse(contractsStr, out int contracts)) continue;
+                string? side = entry["side"]?.ToString();
 
-                if (price < 1 || price > 99) continue;
+                if (price < 1 || price > 99 || side is null) continue;
 
                 var ordersList = new List<(int count, DateTime timestamp)> { (contracts, initTime) }; // Single aggregated order for init
 

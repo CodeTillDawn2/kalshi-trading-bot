@@ -43,7 +43,7 @@ public class EveningStarPattern : PatternDefinition
     {
     }
 
-    public static EveningStarPattern IsPattern(
+    public static EveningStarPattern? IsPattern(
         int index,
         CandleMids[] prices,
         int trendLookback,
@@ -73,6 +73,7 @@ public class EveningStarPattern : PatternDefinition
         return new EveningStarPattern(candles);
     }
 }
+
 
 
 

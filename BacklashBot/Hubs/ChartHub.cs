@@ -49,7 +49,7 @@ namespace BacklashBot.Hubs
             }
         }
 
-        public override async Task OnDisconnectedAsync(Exception? exception)
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
             lock (_connectedClients)
             {
@@ -312,10 +312,10 @@ namespace BacklashBot.Hubs
     public class CheckInData
     {
         // Basic brain info
-        public string? BrainInstanceName { get; set; }
+        public string BrainInstanceName { get; set; }
 
         // Basic market data
-        public List<string>? Markets { get; set; }
+        public List<string> Markets { get; set; }
         public long ErrorCount { get; set; }
         public DateTime? LastSnapshot { get; set; }
         public bool IsStartingUp { get; set; }

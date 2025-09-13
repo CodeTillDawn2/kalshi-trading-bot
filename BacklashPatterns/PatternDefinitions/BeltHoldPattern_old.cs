@@ -80,7 +80,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static BeltHoldPattern IsPattern(
+        public static BeltHoldPattern? IsPattern(
         int index,
         int trendLookback,
         CandleMids[] prices,
@@ -113,4 +113,5 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 

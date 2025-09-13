@@ -45,7 +45,7 @@ public class DojiStarPattern : PatternDefinition
         IsBullish = isBullish;
     }
 
-    public static DojiStarPattern IsPattern(
+    public static DojiStarPattern? IsPattern(
         int index,
         int trendLookback,
         CandleMids[] prices,
@@ -77,6 +77,7 @@ public class DojiStarPattern : PatternDefinition
         return null;
     }
 }
+
 
 
 

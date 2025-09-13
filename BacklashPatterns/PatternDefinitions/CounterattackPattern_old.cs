@@ -56,7 +56,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static CounterattackPattern IsPattern(
+        public static CounterattackPattern? IsPattern(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -111,6 +111,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

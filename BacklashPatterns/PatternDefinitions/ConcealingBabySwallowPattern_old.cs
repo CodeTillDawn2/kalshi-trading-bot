@@ -53,7 +53,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static ConcealingBabySwallowPattern IsPattern(
+        public static ConcealingBabySwallowPattern? IsPattern(
             int index,
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -102,6 +102,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

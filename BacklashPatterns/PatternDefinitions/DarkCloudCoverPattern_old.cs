@@ -43,7 +43,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static DarkCloudCoverPattern IsPattern(
+        public static DarkCloudCoverPattern? IsPattern(
             int index,
             CandleMids[] prices,
             int trendLookback,
@@ -80,6 +80,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

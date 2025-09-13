@@ -50,7 +50,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static ShortLineCandlePattern IsPattern(
+        public static ShortLineCandlePattern? IsPattern(
             int index,
             int trendLookback,
             bool isBullish,
@@ -91,6 +91,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 

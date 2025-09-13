@@ -37,7 +37,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Typically appears in a trend context (bullish after downtrend, bearish after uptrend).
         /// Your original logic matches this strict definition with a minimum range and trend check.
         /// </summary>
-        public static MarubozuPattern IsPattern(
+        public static MarubozuPattern? IsPattern(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
@@ -76,6 +76,7 @@ namespace BacklashPatterns.PatternDefinitions
         }
     }
 }
+
 
 
 
