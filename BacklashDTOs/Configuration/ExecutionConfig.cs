@@ -10,6 +10,10 @@ namespace BacklashDTOs.Configuration
         public required string HardDataStorageLocation { get; set; }
         public int QueuesTargetCount { get; set; }
         public double QueuesTargetPercentage { get; set; }
+        public int NotificationQueueLimit { get; set; } = 50;
+        public int OrderbookQueueLimit { get; set; } = 50;
+        public int EventQueueLimit { get; set; } = 50;
+        public int TickerQueueLimit { get; set; } = 50;
 
     }
 }

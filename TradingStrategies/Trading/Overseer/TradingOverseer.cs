@@ -58,30 +58,30 @@ namespace TradingStrategies
         /// <param name="initialCash">Starting cash amount for the simulation (default: 100.0).</param>
         /// <param name="group">Optional snapshot group metadata for organizing results.</param>
         /// <returns>A task that returns a list of tuples containing performance metrics and event logs for each simulation path.</returns>
-        public async Task<List<(ReportGenerator.PathPerformance performance, List<ReportGenerator.EventLog> events)>> TestScenario(Scenario scenario, List<MarketSnapshot> snapshots, bool writeToFile, double initialCash = 100.0, SnapshotGroupDTO? group = null)
+        public async Task<List<(PathPerformance performance, List<SimulationEventLog> events)>> TestScenario(Scenario scenario, List<MarketSnapshot> snapshots, bool writeToFile, double initialCash = 100.0, SnapshotGroupDTO? group = null)
         {
             if (scenario == null)
             {
                 _logger.LogWarning("Scenario parameter is null. Returning empty results.");
-                return new List<(PathPerformance, List<EventLog>)>();
+                return new List<(PathPerformance, List<SimulationEventLog>)>();
             }
 
             if (scenario.StrategiesByMarketConditions == null || !scenario.StrategiesByMarketConditions.Any())
             {
                 _logger.LogWarning("Scenario does not contain valid strategies. Returning empty results.");
-                return new List<(PathPerformance, List<EventLog>)>();
+                return new List<(PathPerformance, List<SimulationEventLog>)>();
             }
 
             if (snapshots == null)
             {
                 _logger.LogWarning("Snapshots list is null. Returning empty results.");
-                return new List<(PathPerformance, List<EventLog>)>();
+                return new List<(PathPerformance, List<SimulationEventLog>)>();
             }
 
             if (snapshots.Count == 0)
             {
                 _logger.LogWarning("Snapshots list is empty. Returning empty results.");
-                return new List<(ReportGenerator.PathPerformance, List<ReportGenerator.EventLog>)>();
+                return new List<(PathPerformance, List<SimulationEventLog>)>();
             }
 
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -113,7 +113,7 @@ namespace TradingStrategies
         /// <param name="initialCash">Starting cash amount for equity calculations.</param>
         /// <param name="writeToFile">Whether to write reports to the file system.</param>
         /// <returns>A task that returns a list of performance metrics and event logs for each path.</returns>
-        private async Task<List<(ReportGenerator.PathPerformance performance, List<ReportGenerator.EventLog> events)>> GeneratePerformanceReportsAndMetrics(SnapshotGroupDTO? group, List<SimulationPath> activePaths, List<MarketSnapshot> snapshots, double initialCash, bool writeToFile)
+        private async Task<List<(PathPerformance performance, List<SimulationEventLog> events)>> GeneratePerformanceReportsAndMetrics(SnapshotGroupDTO? group, List<SimulationPath> activePaths, List<MarketSnapshot> snapshots, double initialCash, bool writeToFile)
         {
             string outputDir = _cacheDirectory;
             string uniqueId = group != null ? Path.GetFileNameWithoutExtension(group.JsonPath) : snapshots.FirstOrDefault()?.MarketTicker ?? "Unknown";
@@ -123,7 +123,7 @@ namespace TradingStrategies
             var sortedPaths = activePaths.OrderByDescending(p => GetEquity(p, finalSnapshot)).ToList();
             var topPaths = sortedPaths.Take(3).ToList();
 
-            var pathData = new List<(ReportGenerator.PathPerformance, List<ReportGenerator.EventLog>)>();
+            var pathData = new List<(PathPerformance, List<SimulationEventLog>)>();
 
             for (int i = 0; i < sortedPaths.Count; i++)
             {

@@ -76,6 +76,7 @@ builder.Services.AddSingleton<IMarketManagerService, MarketManagerService>();
 builder.Services.AddSingleton<IStatusTrackerService, KalshiBotStatusTracker>();
 builder.Services.AddSingleton<IBotReadyStatus, KalshiBotReadyStatus>();
 builder.Services.AddSingleton<IBrainStatusService, BrainStatusService>();
+builder.Services.AddSingleton<ITargetCalculationService, TargetCalculationService>();
 builder.Services.AddTransient<BacklashInterfaces.SmokehouseBot.Timers.ITimer, BacklashBot.Timers.SystemTimer>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<ICentralBrain>());
 

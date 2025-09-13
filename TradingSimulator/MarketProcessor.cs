@@ -1,6 +1,7 @@
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using TradingStrategies;
+using static TradingStrategies.Trading.Overseer.ReportGenerator;
 using TradingStrategies.Trading.Overseer;
 using TradingStrategies.Trading.Helpers;
 using System.Text.Json;
@@ -159,7 +160,7 @@ namespace TradingSimulator
             List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>)
         ProcessEventLogs(
             List<MarketSnapshot> marketSnapshots,
-            List<ReportGenerator.EventLog> eventLogs,
+            List<SimulationEventLog> eventLogs,
             string marketTicker,
             bool writeToFile,
             string progressPrefix,
@@ -215,7 +216,7 @@ namespace TradingSimulator
         /// <param name="eventLogs">The event logs from the trading simulation to analyze.</param>
         /// <returns>A tuple containing lists of buy, sell, exit, intended long, and intended short price points.</returns>
         private (List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>)
-        CreateTradePoints(List<ReportGenerator.EventLog> eventLogs)
+        CreateTradePoints(List<SimulationEventLog> eventLogs)
         {
             var buyPoints = new List<PricePoint>();
             var sellPoints = new List<PricePoint>();
@@ -268,7 +269,7 @@ namespace TradingSimulator
         /// </summary>
         /// <param name="eventLogs">The event logs containing market events and memos.</param>
         /// <returns>A list of price points representing significant market events.</returns>
-        private List<PricePoint> CreateEventPoints(List<ReportGenerator.EventLog> eventLogs)
+        private List<PricePoint> CreateEventPoints(List<SimulationEventLog> eventLogs)
         {
             return eventLogs
                 .Select(ev => new PricePoint(ev.Timestamp, (ev.BestYesBid + ev.BestYesAsk) / 2.0, " " + ev.Memo))
@@ -282,7 +283,7 @@ namespace TradingSimulator
         /// </summary>
         /// <param name="eventLogs">The event logs containing position and cost information.</param>
         /// <returns>A tuple containing lists of position and average cost price points.</returns>
-        private (List<PricePoint>, List<PricePoint>) CreatePositionPoints(List<ReportGenerator.EventLog> eventLogs)
+        private (List<PricePoint>, List<PricePoint>) CreatePositionPoints(List<SimulationEventLog> eventLogs)
         {
             var positionPoints = eventLogs
                 .Select(ev => new PricePoint(ev.Timestamp, ev.Position, $"Position: {ev.Position}"))
@@ -302,7 +303,7 @@ namespace TradingSimulator
         /// </summary>
         /// <param name="eventLogs">The event logs containing resting orders information.</param>
         /// <returns>A list of price points representing resting orders count over time.</returns>
-        private List<PricePoint> CreateRestingOrdersPoints(List<ReportGenerator.EventLog> eventLogs)
+        private List<PricePoint> CreateRestingOrdersPoints(List<SimulationEventLog> eventLogs)
         {
             return eventLogs
                 .Select(ev =>
@@ -349,7 +350,7 @@ namespace TradingSimulator
         /// </summary>
         /// <param name="eventLogs">The event logs containing pattern detection information.</param>
         /// <returns>A list of price points representing detected patterns.</returns>
-        private List<PricePoint> CreatePatternPoints(List<ReportGenerator.EventLog> eventLogs)
+        private List<PricePoint> CreatePatternPoints(List<SimulationEventLog> eventLogs)
         {
             var patternPoints = new List<PricePoint>();
             foreach (var ev in eventLogs)

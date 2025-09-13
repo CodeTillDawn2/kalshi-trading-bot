@@ -3,6 +3,7 @@ using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashPatterns;
+using static TradingStrategies.Trading.Overseer.ReportGenerator;
 using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
 using TradingStrategies.Trading.Helpers;
@@ -73,7 +74,7 @@ namespace TradingStrategies.Trading.Overseer
             );
             var initialPath = new SimulationPath(initialStrategiesByMarketConditions, 0, 100.0)
             {
-                Events = new List<ReportGenerator.EventLog>(),
+                Events = new List<SimulationEventLog>(),
                 SimulatedBook = null,
                 SimulatedRestingOrders = new List<(string action, string side, string type, int count, int price, DateTime? expiration)>()
             };
@@ -292,7 +293,7 @@ namespace TradingStrategies.Trading.Overseer
             Dictionary<MarketType, HashSet<Strategy>> newStrategiesByMarketConditions;
             SimulatedOrderbook actionBook;
             List<(string, string, string, int, int, DateTime?)> actionResting;
-            List<ReportGenerator.EventLog> actionEvents;
+            List<SimulationEventLog> actionEvents;
 
             if (isSingleStrategy)
             {
@@ -311,7 +312,7 @@ namespace TradingStrategies.Trading.Overseer
                 );
                 actionBook = book.Clone();
                 actionResting = path.SimulatedRestingOrders.Select(o => o).ToList();
-                actionEvents = new List<ReportGenerator.EventLog>(path.Events);
+                actionEvents = new List<SimulationEventLog>(path.Events);
             }
 
             path.CurrentRisk = path.CurrentRisk;
@@ -320,7 +321,7 @@ namespace TradingStrategies.Trading.Overseer
 
             var patterns = DetectPatterns(effectiveSnapshot);
 
-            var eventLog = new ReportGenerator.EventLog
+            var eventLog = new SimulationEventLog
             {
                 Timestamp = effectiveSnapshot.Timestamp,
                 MarketType = effectiveSnapshot.MarketType ?? "Unknown",
@@ -435,7 +436,7 @@ namespace TradingStrategies.Trading.Overseer
 
             SimulatedOrderbook actionBook;
             List<(string action, string side, string type, int count, int price, DateTime? expiration)> actionResting;
-            List<ReportGenerator.EventLog> actionEvents;
+            List<SimulationEventLog> actionEvents;
             Dictionary<MarketType, HashSet<Strategy>> newStrategiesByMarketConditions;
 
             if (isSingleStrategy)
@@ -451,7 +452,7 @@ namespace TradingStrategies.Trading.Overseer
             {
                 actionBook = book.Clone();
                 actionResting = path.SimulatedRestingOrders.Select(o => o).ToList();
-                actionEvents = new List<ReportGenerator.EventLog>(path.Events);
+                actionEvents = new List<SimulationEventLog>(path.Events);
                 newStrategiesByMarketConditions = path.StrategiesByMarketConditions.ToDictionary(
                     kvp => kvp.Key,
                     kvp => new HashSet<Strategy>(kvp.Value)
@@ -483,7 +484,7 @@ namespace TradingStrategies.Trading.Overseer
 
             var patterns = DetectPatterns(effectiveSnapshot);
 
-            var eventLog = new ReportGenerator.EventLog
+            var eventLog = new SimulationEventLog
             {
                 Timestamp = effectiveSnapshot.Timestamp,
                 MarketType = effectiveSnapshot.MarketType ?? "Unknown",
