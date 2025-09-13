@@ -1,5 +1,5 @@
 {
-  "source_base_path": "/home/runner/work/kalshi-trading-bot/kalshi-trading-bot/docfx_project",
+  "source_base_path": "c:/Users/Peter/Documents/GitHub/kalshi-trading-bot/docfx_project",
   "xrefmap": "xrefmap.yml",
   "files": [
     {
@@ -5848,11 +5848,11 @@
       "type": "Toc",
       "source_relative_path": "api/toc.yml",
       "output": {
-        ".json": {
-          "relative_path": "api/toc.json"
-        },
         ".html": {
           "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
         }
       },
       "version": ""
@@ -5881,11 +5881,11 @@
       "type": "Toc",
       "source_relative_path": "toc.yml",
       "output": {
-        ".json": {
-          "relative_path": "toc.json"
-        },
         ".html": {
           "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
         }
       },
       "version": ""
