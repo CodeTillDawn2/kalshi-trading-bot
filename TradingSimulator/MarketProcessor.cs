@@ -10,6 +10,7 @@ using static TradingStrategies.Trading.Overseer.ReportGenerator;
 using TradingSimulator.Simulator;
 using Microsoft.Extensions.DependencyInjection;
 using TradingStrategies.Strategies;
+using System.Threading;
 
 namespace TradingSimulator
 {
@@ -46,6 +47,11 @@ namespace TradingSimulator
         private readonly SimulatorReporting _simulatorReporting;
 
         /// <summary>
+        /// Timeout in seconds for processing operations to prevent hanging in high-throughput scenarios.
+        /// </summary>
+        private readonly int _processingTimeoutSeconds;
+
+        /// <summary>
         /// Event raised to report progress during market processing operations.
         /// </summary>
         public event Action<string> OnTestProgress;
@@ -58,18 +64,21 @@ namespace TradingSimulator
         /// <param name="processedMarkets">Set of already processed market tickers.</param>
         /// <param name="cacheDirectory">Directory for caching processed data.</param>
         /// <param name="simulatorReporting">Reporting service for discrepancy detection.</param>
+        /// <param name="processingTimeoutSeconds">Timeout in seconds for processing operations.</param>
         public MarketProcessor(
             TradingOverseer overseer,
             IServiceScopeFactory scopeFactory,
             HashSet<string> processedMarkets,
             string cacheDirectory,
-            SimulatorReporting simulatorReporting)
+            SimulatorReporting simulatorReporting,
+            int processingTimeoutSeconds)
         {
             _overseer = overseer;
             _scopeFactory = scopeFactory;
             _processedMarkets = processedMarkets;
             _cacheDirectory = cacheDirectory;
             _simulatorReporting = simulatorReporting;
+            _processingTimeoutSeconds = processingTimeoutSeconds;
         }
 
         /// <summary>
@@ -123,9 +132,22 @@ namespace TradingSimulator
                     OnTestProgress?.Invoke($"{progressPrefix}Detected {discrepancyPoints.Count} orderbook discrepancies in {marketTicker}.");
                 }
 
-                // Run simulation
+                // Run simulation with timeout
                 var scenario = new Scenario(strategiesDict);
-                var pathData = await Task.Run(() => _overseer.TestScenario(scenario, marketSnapshots, writeToFile, 100, group));
+                var simulationTask = Task.Run(() => _overseer.TestScenario(scenario, marketSnapshots, writeToFile, 100, group));
+                var timeoutTask = Task.Delay(TimeSpan.FromSeconds(_processingTimeoutSeconds));
+                var completedTask = await Task.WhenAny(simulationTask, timeoutTask);
+
+                var pathData = new List<(PathPerformance performance, List<SimulationEventLog> events)>();
+                if (completedTask == simulationTask)
+                {
+                    pathData = await simulationTask;
+                }
+                else
+                {
+                    OnTestProgress?.Invoke($"{progressPrefix}Processing timeout exceeded ({_processingTimeoutSeconds}s) for {marketTicker}. Skipping.");
+                    return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
+                }
 
                 if (pathData.Any())
                 {

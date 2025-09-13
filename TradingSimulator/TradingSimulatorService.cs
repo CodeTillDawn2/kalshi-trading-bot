@@ -138,7 +138,7 @@ namespace TradingSimulator
 
             // Initialize helper classes
             _dataLoader = new DataLoader(_snapshotService);
-            _marketProcessor = new MarketProcessor(_overseer, _scopeFactory, _processedMarkets, _cacheDirectory, _simulatorReporting);
+            _marketProcessor = new MarketProcessor(_overseer, _scopeFactory, _processedMarkets, _cacheDirectory, _simulatorReporting, _simulatorOptions.Value.ProcessingTimeoutSeconds);
             _marketProcessor.OnTestProgress += msg => OnTestProgress?.Invoke(msg);
             _strategyResolver = new StrategyResolver();
 
