@@ -1,4 +1,5 @@
 using KalshiBotAPI.WebSockets.Interfaces;
+using KalshiBotAPI.Configuration;
 using Microsoft.Extensions.Logging;
 using BacklashDTOs;
 using BacklashDTOs.Exceptions;
@@ -12,13 +13,17 @@ using System.Text.Json;
 using BacklashBot.Services.Interfaces;
 using BacklashInterfaces.SmokehouseBot.Services;
 using BacklashBot.KalshiAPI.Interfaces;
+using System.Threading;
+using System.Diagnostics;
 
 namespace KalshiBotAPI.Websockets
 {
     /// <summary>
     /// Processes incoming WebSocket messages from Kalshi's trading platform, routing them to appropriate handlers
-    /// based on message type. Manages event counting, order book message queuing, and integrates with data
-    /// persistence and API services for comprehensive market data processing.
+    /// based on message type. Features configurable message batching for high-volume scenarios, performance
+    /// metrics collection, sophisticated locking mechanisms, and enhanced message deduplication with warnings.
+    /// Manages event counting, order book message queuing, and integrates with data persistence and API services
+    /// for comprehensive market data processing.
     /// </summary>
     public class MessageProcessor : IMessageProcessor
     {
@@ -28,16 +33,79 @@ namespace KalshiBotAPI.Websockets
         private readonly IStatusTrackerService _statusTrackerService;
         private readonly ISqlDataService _sqlDataService;
         private readonly IKalshiAPIService _kalshiAPIService;
+        private readonly KalshiConfig _config;
         private bool _isDataPersistenceEnabled;
         private readonly ConcurrentDictionary<string, long> _messageTypeCounts;
         private readonly PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long> _orderBookUpdateQueue;
-        private readonly object _orderBookQueueSynchronizationLock = new object();
+        private readonly ReaderWriterLockSlim _orderBookQueueLock;
+        private readonly object _orderBookQueueSynchronizationLock = new object(); // Keep for backward compatibility
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, SubscriptionState>> _marketChannelSubscriptionStates;
         private readonly Dictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions;
         private readonly object _sequenceNumberSynchronizationLock = new object();
         private long _latestProcessedSequenceNumber = 0;
         private readonly HashSet<long> _processedSequenceNumbers = new HashSet<long>();
+        /// <summary>
+        /// Total count of duplicate messages detected and skipped.
+        /// </summary>
         private int _duplicateMessageCount = 0;
+
+        /// <summary>
+        /// Timestamp of the last duplicate message warning log.
+        /// </summary>
+        private DateTime _lastDuplicateWarningTime = DateTime.UtcNow;
+
+        /// <summary>
+        /// Count of duplicate messages detected within the current time window.
+        /// </summary>
+        private int _duplicateMessagesInWindow = 0;
+
+        // Message batching fields
+        /// <summary>
+        /// Queue for batching messages when message batching is enabled for high-volume scenarios.
+        /// </summary>
+        private readonly ConcurrentQueue<string> _messageBatchQueue = new();
+
+        /// <summary>
+        /// Semaphore to ensure thread-safe batch processing operations.
+        /// </summary>
+        private readonly SemaphoreSlim _batchProcessingSemaphore = new(1, 1);
+
+        /// <summary>
+        /// Background task that processes message batches at configured intervals.
+        /// </summary>
+        private Task _batchProcessingTask = null!;
+
+        /// <summary>
+        /// Cancellation token source for controlling the batch processing task lifecycle.
+        /// </summary>
+        private readonly CancellationTokenSource _batchCancellationSource = new();
+
+        // Performance metrics fields
+        /// <summary>
+        /// Stopwatch for measuring message processing performance.
+        /// </summary>
+        private readonly Stopwatch _processingStopwatch = new();
+
+        /// <summary>
+        /// Total number of messages processed since last metrics reset.
+        /// </summary>
+        private long _totalMessagesProcessed = 0;
+
+        /// <summary>
+        /// Total processing time in milliseconds since last metrics reset.
+        /// </summary>
+        private long _totalProcessingTimeMs = 0;
+
+        /// <summary>
+        /// Timestamp of the last performance metrics log.
+        /// </summary>
+        private DateTime _lastMetricsLogTime = DateTime.UtcNow;
+
+        /// <summary>
+        /// Lock object for thread-safe performance metrics operations.
+        /// </summary>
+        private readonly object _metricsLock = new object();
+
         // private int _orderBookSubscriptionId = 0; // Currently unused, reserved for future subscription ID tracking
         private Task _messageReceivingTask = null!;
         private CancellationToken _processingCancellationToken;
@@ -61,13 +129,15 @@ namespace KalshiBotAPI.Websockets
         /// <param name="statusTrackerService">Provides system status and cancellation token management.</param>
         /// <param name="sqlDataService">Handles data persistence to SQL database when enabled.</param>
         /// <param name="kalshiAPIService">Provides access to Kalshi API for market data retrieval and updates.</param>
+        /// <param name="config">Configuration settings for message processing behavior.</param>
         public MessageProcessor(
             ILogger<MessageProcessor> logger,
             IWebSocketConnectionManager connectionManager,
             ISubscriptionManager subscriptionManager,
             IStatusTrackerService statusTrackerService,
             ISqlDataService sqlDataService,
-            IKalshiAPIService kalshiAPIService)
+            IKalshiAPIService kalshiAPIService,
+            KalshiConfig config)
         {
             _logger = logger;
             _connectionManager = connectionManager;
@@ -75,8 +145,14 @@ namespace KalshiBotAPI.Websockets
             _statusTrackerService = statusTrackerService;
             _sqlDataService = sqlDataService;
             _kalshiAPIService = kalshiAPIService;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
             _isDataPersistenceEnabled = false; // Default to false, will be set by SetDataPersistenceEnabled method
             _processingCancellationToken = statusTrackerService.GetCancellationToken();
+
+            // Initialize locking mechanism based on configuration
+            _orderBookQueueLock = _config.MessageProcessor.UseAdvancedLocking
+                ? new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion)
+                : null;
 
             // Initialize internal state
             _messageTypeCounts = new ConcurrentDictionary<string, long>();
@@ -97,7 +173,14 @@ namespace KalshiBotAPI.Websockets
             _messageTypeCounts.TryAdd("Error", 0);
             _messageTypeCounts.TryAdd("Unknown", 0);
 
-            _logger.LogInformation("MessageProcessor initialized, data persistence will be configured later");
+            // Start batch processing task if enabled
+            if (_config.MessageProcessor.EnableMessageBatching)
+            {
+                _batchProcessingTask = Task.Run(() => ProcessMessageBatchAsync(), _batchCancellationSource.Token);
+            }
+
+            _logger.LogInformation("MessageProcessor initialized with configuration: Batching={BatchingEnabled}, AdvancedLocking={AdvancedLockingEnabled}, Metrics={MetricsEnabled}",
+                _config.MessageProcessor.EnableMessageBatching, _config.MessageProcessor.UseAdvancedLocking, _config.MessageProcessor.EnablePerformanceMetrics);
         }
 
         /// <summary>
@@ -115,6 +198,21 @@ namespace KalshiBotAPI.Websockets
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task StopProcessingAsync()
         {
+            // Cancel batch processing
+            _batchCancellationSource.Cancel();
+
+            if (_batchProcessingTask != null && !_batchProcessingTask.IsCompleted)
+            {
+                try
+                {
+                    await _batchProcessingTask.ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Expected when cancelling
+                }
+            }
+
             if (_messageReceivingTask != null && !_messageReceivingTask.IsCompleted)
             {
                 await _messageReceivingTask.ConfigureAwait(false);
@@ -123,8 +221,34 @@ namespace KalshiBotAPI.Websockets
 
         /// <summary>
         /// Gets the current count of order book update messages in the processing queue.
+        /// Uses ReaderWriterLockSlim for thread-safe access when advanced locking is enabled,
+        /// otherwise falls back to standard lock for backward compatibility.
         /// </summary>
-        public int OrderBookMessageQueueCount => _orderBookUpdateQueue.Count;
+        public int OrderBookMessageQueueCount
+        {
+            get
+            {
+                if (_config.MessageProcessor.UseAdvancedLocking && _orderBookQueueLock != null)
+                {
+                    _orderBookQueueLock.EnterReadLock();
+                    try
+                    {
+                        return _orderBookUpdateQueue.Count;
+                    }
+                    finally
+                    {
+                        _orderBookQueueLock.ExitReadLock();
+                    }
+                }
+                else
+                {
+                    lock (_orderBookQueueSynchronizationLock)
+                    {
+                        return _orderBookUpdateQueue.Count;
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the count of pending subscription confirmations. Always returns 0 as this is now managed by SubscriptionManager.
@@ -144,7 +268,7 @@ namespace KalshiBotAPI.Websockets
         private async Task ReceiveAsync()
         {
             _logger.LogInformation("WebSocket message receiving task started");
-            var buffer = new byte[16384]; // 16KB default buffer size
+            var buffer = new byte[_config.WebSocketBufferSize]; // Use configurable buffer size
             var messageBuilder = new StringBuilder();
             try
             {
@@ -171,7 +295,17 @@ namespace KalshiBotAPI.Websockets
                             var fullMessage = messageBuilder.ToString();
                             _lastMessageTimestamp = DateTime.UtcNow;
                             _logger.LogDebug("Received complete WebSocket message: Length={Length}", fullMessage.Length);
-                            await ProcessMessageAsync(fullMessage);
+
+                            // Use batching or direct processing based on configuration
+                            if (_config.MessageProcessor.EnableMessageBatching)
+                            {
+                                _messageBatchQueue.Enqueue(fullMessage);
+                            }
+                            else
+                            {
+                                await ProcessMessageAsync(fullMessage);
+                            }
+
                             messageBuilder.Clear();
                         }
                     }
@@ -208,6 +342,8 @@ namespace KalshiBotAPI.Websockets
         /// <returns>A task representing the asynchronous processing operation.</returns>
         public async Task ProcessMessageAsync(string message)
         {
+            var processingStartTime = _processingStopwatch.ElapsedMilliseconds;
+
             _logger.LogDebug("Processing WebSocket message: {Message}", message);
             try
             {
@@ -224,6 +360,8 @@ namespace KalshiBotAPI.Websockets
                         if (_processedSequenceNumbers.Contains(sequenceNumber))
                         {
                             _duplicateMessageCount++;
+                            _duplicateMessagesInWindow++;
+                            CheckDuplicateMessageWarnings();
                             _logger.LogWarning("Duplicate message detected with sequence number {SequenceNumber}. Total duplicates: {_DuplicateMessageCount}. Skipping processing.", sequenceNumber, _duplicateMessageCount);
                             return; // Skip processing duplicate messages
                         }
@@ -236,10 +374,9 @@ namespace KalshiBotAPI.Websockets
                         }
 
                         // Periodic cleanup of old sequence numbers to prevent memory leaks
-                        // Keep only the last 10000 sequence numbers
-                        if (_processedSequenceNumbers.Count > 10000)
+                        if (_processedSequenceNumbers.Count > _config.MessageProcessor.MaxSequenceNumbersToKeep)
                         {
-                            var oldestToKeep = _latestProcessedSequenceNumber - 5000;
+                            var oldestToKeep = _latestProcessedSequenceNumber - (_config.MessageProcessor.MaxSequenceNumbersToKeep / 2);
                             _processedSequenceNumbers.RemoveWhere(seq => seq < oldestToKeep);
                         }
                     }
@@ -288,6 +425,18 @@ namespace KalshiBotAPI.Websockets
                         _logger.LogWarning("Received unknown message type: {MsgType}, Message: {Message}", msgType, message);
                         break;
                 }
+
+                // Update performance metrics
+                if (_config.MessageProcessor.EnablePerformanceMetrics)
+                {
+                    var processingTime = _processingStopwatch.ElapsedMilliseconds - processingStartTime;
+                    lock (_metricsLock)
+                    {
+                        _totalMessagesProcessed++;
+                        _totalProcessingTimeMs += processingTime;
+                    }
+                    LogPerformanceMetrics();
+                }
             }
             catch (JsonException ex)
             {
@@ -332,24 +481,45 @@ namespace KalshiBotAPI.Websockets
         public void ClearOrderBookQueue(string marketTicker)
         {
             _logger.LogInformation("Clearing order book update queue for market: {MarketTicker}", marketTicker);
-            lock (_orderBookQueueSynchronizationLock)
+
+            if (_config.MessageProcessor.UseAdvancedLocking && _orderBookQueueLock != null)
             {
-                var tempQueue = new PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long>();
-                while (_orderBookUpdateQueue.TryDequeue(out var message, out var seq))
+                _orderBookQueueLock.EnterWriteLock();
+                try
                 {
-                    if (message.Data.TryGetProperty("msg", out var msg) &&
-                        msg.TryGetProperty("market_ticker", out var tickerProp) &&
-                        tickerProp.GetString() != marketTicker)
-                    {
-                        tempQueue.Enqueue(message, seq);
-                    }
+                    ClearOrderBookQueueInternal(marketTicker);
                 }
-                while (tempQueue.TryDequeue(out var message, out var seq))
+                finally
                 {
-                    _orderBookUpdateQueue.Enqueue(message, seq);
+                    _orderBookQueueLock.ExitWriteLock();
                 }
-                _logger.LogInformation("Cleared order book messages for {MarketTicker}. Remaining queue count: {Count}", marketTicker, _orderBookUpdateQueue.Count);
             }
+            else
+            {
+                lock (_orderBookQueueSynchronizationLock)
+                {
+                    ClearOrderBookQueueInternal(marketTicker);
+                }
+            }
+        }
+
+        private void ClearOrderBookQueueInternal(string marketTicker)
+        {
+            var tempQueue = new PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long>();
+            while (_orderBookUpdateQueue.TryDequeue(out var message, out var seq))
+            {
+                if (message.Data.TryGetProperty("msg", out var msg) &&
+                    msg.TryGetProperty("market_ticker", out var tickerProp) &&
+                    tickerProp.GetString() != marketTicker)
+                {
+                    tempQueue.Enqueue(message, seq);
+                }
+            }
+            while (tempQueue.TryDequeue(out var message, out var seq))
+            {
+                _orderBookUpdateQueue.Enqueue(message, seq);
+            }
+            _logger.LogInformation("Cleared order book messages for {MarketTicker}. Remaining queue count: {Count}", marketTicker, _orderBookUpdateQueue.Count);
         }
 
         /// <summary>
@@ -364,15 +534,33 @@ namespace KalshiBotAPI.Websockets
         {
             var startTime = DateTime.UtcNow;
             bool waited = false;
+            var configuredTimeout = TimeSpan.FromMilliseconds(_config.MessageProcessor.OrderBookQueueTimeoutMs);
+
+            // Use the shorter of the provided timeout or configured timeout
+            var effectiveTimeout = timeout < configuredTimeout ? timeout : configuredTimeout;
 
             while (!_processingCancellationToken.IsCancellationRequested)
             {
                 bool hasPendingUpdates;
-                lock (_orderBookQueueSynchronizationLock)
+
+                if (_config.MessageProcessor.UseAdvancedLocking && _orderBookQueueLock != null)
                 {
-                    hasPendingUpdates = _orderBookUpdateQueue.Count > 0 &&
-                                _orderBookUpdateQueue.UnorderedItems.Any(item =>
-                                    item.Element.Data.GetProperty("msg").GetProperty("market_ticker").GetString() == marketTicker);
+                    _orderBookQueueLock.EnterReadLock();
+                    try
+                    {
+                        hasPendingUpdates = CheckForPendingUpdates(marketTicker);
+                    }
+                    finally
+                    {
+                        _orderBookQueueLock.ExitReadLock();
+                    }
+                }
+                else
+                {
+                    lock (_orderBookQueueSynchronizationLock)
+                    {
+                        hasPendingUpdates = CheckForPendingUpdates(marketTicker);
+                    }
                 }
 
                 if (!hasPendingUpdates)
@@ -385,9 +573,9 @@ namespace KalshiBotAPI.Websockets
                     _logger.LogInformation("Waiting for order book queue to clear for market: {MarketTicker}", marketTicker);
                 }
 
-                if (DateTime.UtcNow - startTime > timeout)
+                if (DateTime.UtcNow - startTime > effectiveTimeout)
                 {
-                    _logger.LogWarning("Timeout waiting for order book queue to clear for market: {MarketTicker} after {TimeoutSeconds}s", marketTicker, timeout.TotalSeconds);
+                    _logger.LogWarning("Timeout waiting for order book queue to clear for market: {MarketTicker} after {TimeoutSeconds}s", marketTicker, effectiveTimeout.TotalSeconds);
                     return;
                 }
 
@@ -396,6 +584,22 @@ namespace KalshiBotAPI.Websockets
 
             if (waited)
                 _logger.LogInformation("Market {MarketTicker} waited {WaitTime}s before saving snapshot", marketTicker, (DateTime.UtcNow - startTime).TotalSeconds);
+        }
+
+        private bool CheckForPendingUpdates(string marketTicker)
+        {
+            if (_orderBookUpdateQueue.Count == 0)
+                return false;
+
+            return _orderBookUpdateQueue.UnorderedItems.Any(item =>
+            {
+                if (item.Element.Data.TryGetProperty("msg", out var msg) &&
+                    msg.TryGetProperty("market_ticker", out var tickerProp))
+                {
+                    return tickerProp.GetString() == marketTicker;
+                }
+                return false;
+            });
         }
 
         /// <summary>
@@ -881,6 +1085,119 @@ namespace KalshiBotAPI.Websockets
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing error message");
+            }
+        }
+
+        /// <summary>
+        /// Processes messages in batches for high-volume scenarios to reduce event overhead.
+        /// Runs continuously when message batching is enabled.
+        /// </summary>
+        /// <returns>A task representing the asynchronous batch processing operation.</returns>
+        private async Task ProcessMessageBatchAsync()
+        {
+            _logger.LogInformation("Message batch processing task started");
+
+            try
+            {
+                while (!_batchCancellationSource.Token.IsCancellationRequested)
+                {
+                    await Task.Delay(_config.MessageProcessor.BatchProcessingIntervalMs, _batchCancellationSource.Token);
+
+                    if (_messageBatchQueue.IsEmpty)
+                        continue;
+
+                    var messagesToProcess = new List<string>();
+
+                    // Collect batch of messages
+                    while (messagesToProcess.Count < _config.MessageProcessor.MaxBatchSize &&
+                           _messageBatchQueue.TryDequeue(out var message))
+                    {
+                        messagesToProcess.Add(message);
+                    }
+
+                    if (messagesToProcess.Count > 0)
+                    {
+                        await _batchProcessingSemaphore.WaitAsync(_batchCancellationSource.Token);
+
+                        try
+                        {
+                            // Process messages in parallel for better performance
+                            var processingTasks = messagesToProcess.Select(msg => ProcessMessageAsync(msg)).ToArray();
+                            await Task.WhenAll(processingTasks);
+
+                            _logger.LogDebug("Processed batch of {Count} messages", messagesToProcess.Count);
+                        }
+                        finally
+                        {
+                            _batchProcessingSemaphore.Release();
+                        }
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Message batch processing task cancelled");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in message batch processing task");
+            }
+            finally
+            {
+                _logger.LogInformation("Message batch processing task completed");
+            }
+        }
+
+        /// <summary>
+        /// Logs performance metrics for message processing rates and queue depths.
+        /// Called periodically when performance metrics are enabled.
+        /// </summary>
+        private void LogPerformanceMetrics()
+        {
+            if (!_config.MessageProcessor.EnablePerformanceMetrics)
+                return;
+
+            lock (_metricsLock)
+            {
+                var now = DateTime.UtcNow;
+                var timeSinceLastLog = now - _lastMetricsLogTime;
+
+                if (timeSinceLastLog.TotalMilliseconds >= _config.MessageProcessor.PerformanceMetricsLogIntervalMs)
+                {
+                    var messagesPerSecond = _totalMessagesProcessed / timeSinceLastLog.TotalSeconds;
+                    var avgProcessingTime = _totalMessagesProcessed > 0 ? _totalProcessingTimeMs / _totalMessagesProcessed : 0;
+
+                    _logger.LogInformation("Performance Metrics - Messages/sec: {MessagesPerSecond:F2}, Avg Processing Time: {AvgProcessingTime}ms, Queue Depth: {QueueDepth}, Total Processed: {TotalProcessed}",
+                        messagesPerSecond, avgProcessingTime, _orderBookUpdateQueue.Count, _totalMessagesProcessed);
+
+                    // Reset counters for next interval
+                    _totalMessagesProcessed = 0;
+                    _totalProcessingTimeMs = 0;
+                    _lastMetricsLogTime = now;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks and logs warnings for duplicate message detection.
+        /// Tracks duplicate messages within a time window and warns if threshold is exceeded.
+        /// </summary>
+        private void CheckDuplicateMessageWarnings()
+        {
+            var now = DateTime.UtcNow;
+            var timeSinceLastWarning = now - _lastDuplicateWarningTime;
+
+            if (timeSinceLastWarning.TotalMilliseconds >= _config.MessageProcessor.DuplicateMessageTimeWindowMs)
+            {
+                if (_duplicateMessagesInWindow >= _config.MessageProcessor.DuplicateMessageWarningThreshold)
+                {
+                    _logger.LogWarning("High duplicate message rate detected: {DuplicateCount} duplicates in {TimeWindow}ms window. This may indicate message processing issues.",
+                        _duplicateMessagesInWindow, _config.MessageProcessor.DuplicateMessageTimeWindowMs);
+                }
+
+                // Reset for next window
+                _duplicateMessagesInWindow = 0;
+                _lastDuplicateWarningTime = now;
             }
         }
     }

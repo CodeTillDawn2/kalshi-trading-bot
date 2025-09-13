@@ -174,7 +174,15 @@ builder.Services.AddScoped<IMarketRefreshService, MarketRefreshService>();
 builder.Services.AddScoped<IWebSocketMonitorService, WebSocketMonitorService>();
 builder.Services.AddSingleton<IOverseerClientService, OverseerClientService>();
 builder.Services.AddScoped<IWebSocketConnectionManager, WebSocketConnectionManager>();
-builder.Services.AddScoped<IMessageProcessor, MessageProcessor>();
+builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
+    sp.GetRequiredService<ILogger<MessageProcessor>>(),
+    sp.GetRequiredService<IWebSocketConnectionManager>(),
+    sp.GetRequiredService<ISubscriptionManager>(),
+    sp.GetRequiredService<IStatusTrackerService>(),
+    sp.GetRequiredService<ISqlDataService>(),
+    sp.GetRequiredService<IKalshiAPIService>(),
+    sp.GetRequiredService<IOptions<KalshiConfig>>().Value
+));
 builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
     sp.GetRequiredService<ILogger<SubscriptionManager>>(),
     sp.GetRequiredService<IWebSocketConnectionManager>(),

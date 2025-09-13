@@ -65,7 +65,15 @@ namespace KalshiBotOverseer
             // Register required services
             services.AddScoped<IKalshiAPIService, KalshiAPIService>();
             services.AddScoped<IWebSocketConnectionManager, WebSocketConnectionManager>();
-            services.AddScoped<IMessageProcessor, MessageProcessor>();
+            services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
+                sp.GetRequiredService<ILogger<MessageProcessor>>(),
+                sp.GetRequiredService<IWebSocketConnectionManager>(),
+                sp.GetRequiredService<ISubscriptionManager>(),
+                sp.GetRequiredService<IStatusTrackerService>(),
+                sp.GetRequiredService<ISqlDataService>(),
+                sp.GetRequiredService<IKalshiAPIService>(),
+                sp.GetRequiredService<IOptions<KalshiConfig>>().Value
+            ));
             services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
                 sp.GetRequiredService<ILogger<SubscriptionManager>>(),
                 sp.GetRequiredService<IWebSocketConnectionManager>(),
