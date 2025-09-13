@@ -51,6 +51,10 @@ namespace BacklashBot.Services
             }
         }
 
+        /// <summary>
+        /// Checks the health of the database connection.
+        /// </summary>
+        /// <returns>True if the database is accessible, false otherwise.</returns>
         private async Task<bool> CheckDatabaseHealthAsync()
         {
             try
