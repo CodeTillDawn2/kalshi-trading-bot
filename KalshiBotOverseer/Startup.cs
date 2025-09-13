@@ -181,6 +181,15 @@ namespace KalshiBotOverseer
 
             app.UseCors("AllowAll");
 
+            // Add request/response logging middleware
+            app.Use(async (context, next) =>
+            {
+                var logger = context.RequestServices.GetRequiredService<ILogger<Startup>>();
+                logger.LogInformation("Request: {Method} {Path}", context.Request.Method, context.Request.Path);
+                await next();
+                logger.LogInformation("Response: {StatusCode}", context.Response.StatusCode);
+            });
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
