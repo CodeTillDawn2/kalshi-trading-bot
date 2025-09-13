@@ -5,7 +5,9 @@
         {
           "src": ".",
           "files": [
-            "**/bin/Debug/net8.0/*.*"
+            "KalshiBotAPI/bin/Debug/net8.0/KalshiBotAPI.dll",
+            "BacklashBot/bin/Debug/net8.0/BacklashBot.exe",
+            "KalshiBotOverseer/bin/Debug/net8.0/KalshiBotOverseer.exe"
           ]
         }
       ],
