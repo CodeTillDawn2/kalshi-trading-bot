@@ -2,9 +2,116 @@ using BacklashDTOs;
 using BacklashPatterns.PatternDefinitions;
 using Microsoft.Extensions.Logging;
 using static BacklashPatterns.PatternUtils;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace BacklashPatterns
 {
+    /// <summary>
+    /// Configuration class for pattern detection thresholds and settings.
+    /// </summary>
+    public class PatternDetectionConfig
+    {
+        /// <summary>
+        /// Minimum price change threshold for significance check.
+        /// </summary>
+        public double SignificancePriceThreshold { get; set; } = 1.0;
+
+        /// <summary>
+        /// Minimum volume increase multiplier for context check.
+        /// </summary>
+        public double VolumeIncreaseMultiplier { get; set; } = 1.1;
+
+        /// <summary>
+        /// Initial capacity for patterns array per candle.
+        /// </summary>
+        public int InitialPatternCapacity { get; set; } = 10;
+
+        /// <summary>
+        /// Whether to enable parallel processing for pattern detection.
+        /// </summary>
+        public bool EnableParallelProcessing { get; set; } = false;
+
+        /// <summary>
+        /// Maximum degree of parallelism for pattern checks.
+        /// </summary>
+        public int MaxDegreeOfParallelism { get; set; } = Environment.ProcessorCount;
+    }
+
+    /// <summary>
+    /// Service for collecting performance metrics during pattern detection.
+    /// </summary>
+    public class PatternDetectionMetrics
+    {
+        private readonly Stopwatch _totalStopwatch = new Stopwatch();
+        private readonly Dictionary<string, long> _patternCheckTimes = new Dictionary<string, long>();
+        private readonly Dictionary<string, int> _patternCounts = new Dictionary<string, int>();
+        private int _totalCandlesProcessed;
+        private int _totalPatternsFound;
+
+        /// <summary>
+        /// Starts overall detection timing.
+        /// </summary>
+        public void StartDetection() => _totalStopwatch.Start();
+
+        /// <summary>
+        /// Stops overall detection timing.
+        /// </summary>
+        public void StopDetection() => _totalStopwatch.Stop();
+
+        /// <summary>
+        /// Records time taken for a specific pattern check.
+        /// </summary>
+        public void RecordPatternCheckTime(string patternName, long ticks)
+        {
+            if (!_patternCheckTimes.ContainsKey(patternName))
+                _patternCheckTimes[patternName] = 0;
+            _patternCheckTimes[patternName] += ticks;
+        }
+
+        /// <summary>
+        /// Records a pattern detection.
+        /// </summary>
+        public void RecordPatternFound(string patternName)
+        {
+            if (!_patternCounts.ContainsKey(patternName))
+                _patternCounts[patternName] = 0;
+            _patternCounts[patternName]++;
+            _totalPatternsFound++;
+        }
+
+        /// <summary>
+        /// Increments the candle processing count.
+        /// </summary>
+        public void IncrementCandlesProcessed() => _totalCandlesProcessed++;
+
+        /// <summary>
+        /// Gets the performance metrics summary.
+        /// </summary>
+        public PatternDetectionMetricsSummary GetSummary()
+        {
+            return new PatternDetectionMetricsSummary
+            {
+                TotalDetectionTimeMs = _totalStopwatch.ElapsedMilliseconds,
+                TotalCandlesProcessed = _totalCandlesProcessed,
+                TotalPatternsFound = _totalPatternsFound,
+                PatternCheckTimes = new Dictionary<string, long>(_patternCheckTimes),
+                PatternCounts = new Dictionary<string, int>(_patternCounts)
+            };
+        }
+    }
+
+    /// <summary>
+    /// Summary of pattern detection performance metrics.
+    /// </summary>
+    public class PatternDetectionMetricsSummary
+    {
+        public long TotalDetectionTimeMs { get; set; }
+        public int TotalCandlesProcessed { get; set; }
+        public int TotalPatternsFound { get; set; }
+        public Dictionary<string, long> PatternCheckTimes { get; set; } = new Dictionary<string, long>();
+        public Dictionary<string, int> PatternCounts { get; set; } = new Dictionary<string, int>();
+    }
     /// <summary>
     /// Provides functionality for detecting and filtering candlestick patterns in financial market data.
     /// This static class analyzes arrays of candle data to identify various technical analysis patterns,
@@ -37,28 +144,47 @@ namespace BacklashPatterns
         public static readonly List<int> CandidatePatternIndices = new List<int>();
 
         /// <summary>
-        /// Detects candlestick patterns in the provided price data array.
+        /// Detects candlestick patterns in the provided price data array (synchronous version for backward compatibility).
+        /// </summary>
+        /// <param name="prices">Array of candle data containing price and volume information.</param>
+        /// <param name="trendLookback">Number of candles to look back for trend analysis and pattern context.</param>
+        /// <returns>Dictionary mapping candle indices to lists of detected pattern definitions.</returns>
+        public static Dictionary<int, List<PatternDefinition>> DetectPatterns(CandleMids[] prices, int trendLookback)
+        {
+            var config = new PatternDetectionConfig();
+            var metrics = new PatternDetectionMetrics();
+            return DetectPatternsAsync(prices, trendLookback, config, metrics).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Detects candlestick patterns in the provided price data array asynchronously.
         /// Analyzes each candle position to identify various technical analysis patterns,
         /// from single-candle formations to complex multi-candle patterns.
         /// </summary>
         /// <param name="prices">Array of candle data containing price and volume information.</param>
         /// <param name="trendLookback">Number of candles to look back for trend analysis and pattern context.</param>
-        /// <returns>Dictionary mapping candle indices to lists of detected pattern definitions.</returns>
+        /// <param name="config">Configuration for pattern detection thresholds and settings.</param>
+        /// <param name="metrics">Metrics collector for performance tracking.</param>
+        /// <returns>Task containing dictionary mapping candle indices to lists of detected pattern definitions.</returns>
         /// <remarks>
         /// The method performs significance checks to skip insignificant candles and applies
         /// pattern detection algorithms for different candle counts (1-5 candles).
         /// Detected patterns are then filtered to remove redundancies and less significant formations.
         /// </remarks>
-        public static Dictionary<int, List<PatternDefinition>> DetectPatterns(CandleMids[] prices,
-                int trendLookback)
+        public static async Task<Dictionary<int, List<PatternDefinition>>> DetectPatternsAsync(CandleMids[] prices,
+                int trendLookback, PatternDetectionConfig config, PatternDetectionMetrics metrics)
         {
             if (prices == null || prices.Length < 2)
                 return new Dictionary<int, List<PatternDefinition>>();
 
-            Dictionary<int, CandleMetrics> metricsCache = new Dictionary<int, CandleMetrics>();
+            return await Task.Run(() =>
+            {
+                metrics.StartDetection();
 
-            var detailedPatterns = new Dictionary<int, List<PatternDefinition>>();
-            int initialCapacity = 10; // Reasonable initial size for patterns per candle
+                Dictionary<int, CandleMetrics> metricsCache = new Dictionary<int, CandleMetrics>();
+
+                var detailedPatterns = new Dictionary<int, List<PatternDefinition>>();
+                int initialCapacity = config.InitialPatternCapacity; // Configurable initial size for patterns per candle
 
             for (int i = 0; i < prices.Length; i++)
             {
@@ -76,62 +202,62 @@ namespace BacklashPatterns
                 // 1-Candle Patterns
                 if (i >= 1)
                 {
-                    bool hasContext = previous != null && (Math.Abs(current.Close - previous.Close) >= 1.0 ||
-                                      current.Volume > previous.Volume * 1.1);
+                    bool hasContext = previous != null && (Math.Abs(current.Close - previous.Close) >= config.SignificancePriceThreshold ||
+                                      current.Volume > previous.Volume * config.VolumeIncreaseMultiplier);
 
                     if (hasContext)
                     {
                         // RickshawMan check
-                        var rickshawMan = RickshawManPattern.IsPattern(metricsCache, i, trendLookback, prices);
+                        var rickshawMan = CheckPatternWithMetrics(() => RickshawManPattern.IsPattern(metricsCache, i, trendLookback, prices), "RickshawMan", metrics);
                         if (rickshawMan != null)
                             AddPattern(rickshawMan, patternsFound, ref patternCount, initialCapacity);
 
                         // LongLeggedDoji check
-                        var longLeggedDoji = LongLeggedDojiPattern.IsPattern(metricsCache, i, trendLookback, prices);
+                        var longLeggedDoji = CheckPatternWithMetrics(() => LongLeggedDojiPattern.IsPattern(metricsCache, i, trendLookback, prices), "LongLeggedDoji", metrics);
                         if (longLeggedDoji != null)
                             AddPattern(longLeggedDoji, patternsFound, ref patternCount, initialCapacity);
 
                         // DragonflyDoji check
-                        var dragonflyDoji = DragonflyDojiPattern.IsPattern(metricsCache, i, trendLookback, prices);
+                        var dragonflyDoji = CheckPatternWithMetrics(() => DragonflyDojiPattern.IsPattern(metricsCache, i, trendLookback, prices), "DragonflyDoji", metrics);
                         if (dragonflyDoji != null)
                             AddPattern(dragonflyDoji, patternsFound, ref patternCount, initialCapacity);
 
                         // GravestoneDoji check
-                        var gravestoneDoji = GravestoneDojiPattern.IsPattern(metricsCache, i, trendLookback, prices);
+                        var gravestoneDoji = CheckPatternWithMetrics(() => GravestoneDojiPattern.IsPattern(metricsCache, i, trendLookback, prices), "GravestoneDoji", metrics);
                         if (gravestoneDoji != null)
                             AddPattern(gravestoneDoji, patternsFound, ref patternCount, initialCapacity);
                     }
                 }
 
-                var doji = DojiPattern.IsPattern(metricsCache, i, trendLookback, prices);
+                var doji = CheckPatternWithMetrics(() => DojiPattern.IsPattern(metricsCache, i, trendLookback, prices), "Doji", metrics);
                 if (doji != null)
                     AddPattern(doji, patternsFound, ref patternCount, initialCapacity);
 
-                var hammer = HammerPattern.IsPattern(metricsCache, i, trendLookback, prices);
+                var hammer = CheckPatternWithMetrics(() => HammerPattern.IsPattern(metricsCache, i, trendLookback, prices), "Hammer", metrics);
                 if (hammer != null)
                     AddPattern(hammer, patternsFound, ref patternCount, initialCapacity);
 
-                var hangingMan = HangingManPattern.IsPattern(metricsCache, i, prices, trendLookback);
+                var hangingMan = CheckPatternWithMetrics(() => HangingManPattern.IsPattern(metricsCache, i, prices, trendLookback), "HangingMan", metrics);
                 if (hangingMan != null)
                     AddPattern(hangingMan, patternsFound, ref patternCount, initialCapacity);
 
-                var invertedHammer = InvertedHammerPattern.IsPattern(metricsCache, i, trendLookback, prices);
+                var invertedHammer = CheckPatternWithMetrics(() => InvertedHammerPattern.IsPattern(metricsCache, i, trendLookback, prices), "InvertedHammer", metrics);
                 if (invertedHammer != null)
                     AddPattern(invertedHammer, patternsFound, ref patternCount, initialCapacity);
 
-                var shootingStar = ShootingStarPattern.IsPattern(metricsCache, i, trendLookback, prices);
+                var shootingStar = CheckPatternWithMetrics(() => ShootingStarPattern.IsPattern(metricsCache, i, trendLookback, prices), "ShootingStar", metrics);
                 if (shootingStar != null)
                     AddPattern(shootingStar, patternsFound, ref patternCount, initialCapacity);
 
-                var takuri = TakuriPattern.IsPattern(i, trendLookback, metricsCache, prices);
+                var takuri = CheckPatternWithMetrics(() => TakuriPattern.IsPattern(i, trendLookback, metricsCache, prices), "Takuri", metrics);
                 if (takuri != null)
                     AddPattern(takuri, patternsFound, ref patternCount, initialCapacity);
 
-                var spinningTop = SpinningTopPattern.IsPattern(metricsCache, i, trendLookback, prices);
+                var spinningTop = CheckPatternWithMetrics(() => SpinningTopPattern.IsPattern(metricsCache, i, trendLookback, prices), "SpinningTop", metrics);
                 if (spinningTop != null)
                     AddPattern(spinningTop, patternsFound, ref patternCount, initialCapacity);
 
-                var highWaveCandle = HighWaveCandlePattern.IsPattern(i, trendLookback, prices, metricsCache);
+                var highWaveCandle = CheckPatternWithMetrics(() => HighWaveCandlePattern.IsPattern(i, trendLookback, prices, metricsCache), "HighWaveCandle", metrics);
                 if (highWaveCandle != null)
                     AddPattern(highWaveCandle, patternsFound, ref patternCount, initialCapacity);
 
@@ -445,9 +571,13 @@ namespace BacklashPatterns
                     if (filteredPatterns.Count > 0)
                         detailedPatterns[i] = filteredPatterns;
                 }
+
+                metrics.IncrementCandlesProcessed();
             }
 
+            metrics.StopDetection();
             return detailedPatterns;
+        });
         }
 
         private static void AddPattern(PatternDefinition pattern, PatternDefinition[] patternsFound, ref int count, int capacity)
@@ -461,6 +591,25 @@ namespace BacklashPatterns
         {
             capacity *= 2;
             Array.Resize(ref patternsFound, capacity);
+        }
+
+        /// <summary>
+        /// Helper method to check a pattern with timing and metrics recording.
+        /// </summary>
+        private static PatternDefinition? CheckPatternWithMetrics(Func<PatternDefinition?> patternCheck, string patternName, PatternDetectionMetrics metrics)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var result = patternCheck();
+            stopwatch.Stop();
+
+            metrics.RecordPatternCheckTime(patternName, stopwatch.ElapsedTicks);
+
+            if (result != null)
+            {
+                metrics.RecordPatternFound(patternName);
+            }
+
+            return result;
         }
 
         /// <summary>
