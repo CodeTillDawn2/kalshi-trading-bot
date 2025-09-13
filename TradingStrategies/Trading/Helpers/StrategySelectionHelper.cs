@@ -3,6 +3,8 @@ using TradingStrategies.Strategies.Strategies.Strats;
 using TradingStrategies.Strategies.Strats;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Strategies.Strats.BollingerBreakout;
+using System.Diagnostics;
+using System.Collections.Concurrent;
 
 namespace TradingStrategies.Trading.Helpers
 {
@@ -19,6 +21,67 @@ namespace TradingStrategies.Trading.Helpers
     /// </remarks>
     public class StrategySelectionHelper
     {
+        /// <summary>
+        /// Data structure to hold performance metrics for strategy instantiation.
+        /// </summary>
+        public class StrategyInstantiationMetrics
+        {
+            public string StrategyType { get; set; }
+            public int InstanceCount { get; set; }
+            public TimeSpan TotalInstantiationTime { get; set; }
+            public TimeSpan AverageInstantiationTime { get; set; }
+            public DateTime Timestamp { get; set; }
+        }
+
+        /// <summary>
+        /// Flag to enable/disable performance metrics collection.
+        /// Set to true to collect timing data during strategy instantiation.
+        /// </summary>
+        public static bool EnablePerformanceMetrics { get; set; } = false;
+
+        /// <summary>
+        /// Thread-safe collection to store performance metrics.
+        /// </summary>
+        private static readonly ConcurrentBag<StrategyInstantiationMetrics> _performanceMetrics = new();
+
+        /// <summary>
+        /// Records performance metrics for strategy instantiation.
+        /// </summary>
+        /// <param name="strategyType">The type of strategy being instantiated.</param>
+        /// <param name="instanceCount">Number of instances created.</param>
+        /// <param name="totalTime">Total time spent instantiating strategies.</param>
+        private static void RecordPerformanceMetrics(string strategyType, int instanceCount, TimeSpan totalTime)
+        {
+            if (!EnablePerformanceMetrics) return;
+
+            var metrics = new StrategyInstantiationMetrics
+            {
+                StrategyType = strategyType,
+                InstanceCount = instanceCount,
+                TotalInstantiationTime = totalTime,
+                AverageInstantiationTime = instanceCount > 0 ? TimeSpan.FromTicks(totalTime.Ticks / instanceCount) : TimeSpan.Zero,
+                Timestamp = DateTime.UtcNow
+            };
+
+            _performanceMetrics.Add(metrics);
+        }
+
+        /// <summary>
+        /// Retrieves all collected performance metrics.
+        /// </summary>
+        /// <returns>An enumerable collection of performance metrics.</returns>
+        public static IEnumerable<StrategyInstantiationMetrics> GetPerformanceMetrics()
+        {
+            return _performanceMetrics.ToArray();
+        }
+
+        /// <summary>
+        /// Clears all collected performance metrics.
+        /// </summary>
+        public static void ClearPerformanceMetrics()
+        {
+            while (_performanceMetrics.TryTake(out _)) { }
+        }
         /// <summary>
         /// Initializes a new instance of the StrategySelectionHelper class.
         /// </summary>
@@ -2368,9 +2431,13 @@ namespace TradingStrategies.Trading.Helpers
         public List<Dictionary<MarketType, List<Strategy>>> GetMLSharedStrategiesForTraining()
         {
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
+            var stopwatch = Stopwatch.StartNew();
+            int instanceCount = 0;
 
             foreach (var (name, parameters) in MLEntrySeekerShared.MLSharedParameterSets)
             {
+                var instantiationStopwatch = Stopwatch.StartNew();
+
                 var mlStrat = new MLEntrySeekerShared(
                     name: $"MLShared_{name}",
                     evaluationOnly: false,
@@ -2381,8 +2448,18 @@ namespace TradingStrategies.Trading.Helpers
 
                 var strategiesDict = CreateMarketStrategyMapping(mlStrategy);
 
+                instantiationStopwatch.Stop();
+                if (EnablePerformanceMetrics)
+                {
+                    // Record individual instantiation time if needed
+                }
+
                 returnList.Add(strategiesDict);
+                instanceCount++;
             }
+
+            stopwatch.Stop();
+            RecordPerformanceMetrics("MLEntrySeekerShared", instanceCount, stopwatch.Elapsed);
 
             return returnList;
         }
@@ -2533,76 +2610,132 @@ namespace TradingStrategies.Trading.Helpers
         public List<Dictionary<MarketType, List<Strategy>>> GetMomentumTradingStrategiesForTraining()
         {
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
+            var stopwatch = Stopwatch.StartNew();
+            int instanceCount = 0;
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in MomentumTradingParameterSets)
             {
-                // Create a new NothingEverHappensStrat with the current parameter set
+                var instantiationStopwatch = Stopwatch.StartNew();
+
+                // Create a new MomentumTrading strategy with the current parameter set
                 var momentumStrat = new MomentumTrading(name: name, mlParams: parameters);
                 var momentumStrategy = new Strategy(name, new List<Strat> { momentumStrat });
 
                 // Create the market-to-strategy mapping for this parameter set
                 var strategiesDict = CreateMarketStrategyMapping(momentumStrategy);
 
+                instantiationStopwatch.Stop();
+                if (EnablePerformanceMetrics)
+                {
+                    // Record individual instantiation time if needed
+                }
+
                 returnList.Add(strategiesDict);
+                instanceCount++;
             }
+
+            stopwatch.Stop();
+            RecordPerformanceMetrics("MomentumTrading", instanceCount, stopwatch.Elapsed);
 
             return returnList;
         }
         public List<Dictionary<MarketType, List<Strategy>>> GetFlowMomentumStrategiesForTraining()
         {
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
+            var stopwatch = Stopwatch.StartNew();
+            int instanceCount = 0;
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in FlowMomentumParameterSets)
             {
-                // Create a new NothingEverHappensStrat with the current parameter set
+                var instantiationStopwatch = Stopwatch.StartNew();
+
+                // Create a new FlowMomentumStrat with the current parameter set
                 var flowStrat = new FlowMomentumStrat(name: name, mlParams: parameters);
                 var flowStrategy = new Strategy(name, new List<Strat> { flowStrat });
 
                 // Create the market-to-strategy mapping for this parameter set
                 var strategiesDict = CreateMarketStrategyMapping(flowStrategy);
 
+                instantiationStopwatch.Stop();
+                if (EnablePerformanceMetrics)
+                {
+                    // Record individual instantiation time if needed
+                }
+
                 returnList.Add(strategiesDict);
+                instanceCount++;
             }
+
+            stopwatch.Stop();
+            RecordPerformanceMetrics("FlowMomentumStrat", instanceCount, stopwatch.Elapsed);
 
             return returnList;
         }
         public List<Dictionary<MarketType, List<Strategy>>> GetSlopeMomentumStrategiesForTraining()
         {
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
+            var stopwatch = Stopwatch.StartNew();
+            int instanceCount = 0;
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in SlopeMomentumStrat.SlopeMomentumParameterSets)
             {
-                // Create a new NothingEverHappensStrat with the current parameter set
-                var flowStrat = new SlopeMomentumStrat(name: name, mlParams: parameters);
-                var flowStrategy = new Strategy(name, new List<Strat> { flowStrat });
+                var instantiationStopwatch = Stopwatch.StartNew();
+
+                // Create a new SlopeMomentumStrat with the current parameter set
+                var slopeStrat = new SlopeMomentumStrat(name: name, mlParams: parameters);
+                var slopeStrategy = new Strategy(name, new List<Strat> { slopeStrat });
 
                 // Create the market-to-strategy mapping for this parameter set
-                var strategiesDict = CreateMarketStrategyMapping(flowStrategy);
+                var strategiesDict = CreateMarketStrategyMapping(slopeStrategy);
+
+                instantiationStopwatch.Stop();
+                if (EnablePerformanceMetrics)
+                {
+                    // Record individual instantiation time if needed
+                }
 
                 returnList.Add(strategiesDict);
+                instanceCount++;
             }
+
+            stopwatch.Stop();
+            RecordPerformanceMetrics("SlopeMomentumStrat", instanceCount, stopwatch.Elapsed);
 
             return returnList;
         }
         public List<Dictionary<MarketType, List<Strategy>>> GetTryAgainStrategiesForTraining()
         {
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
+            var stopwatch = Stopwatch.StartNew();
+            int instanceCount = 0;
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in TryAgainStrat.TryAgainStratParameterSets)
             {
-                // Create a new NothingEverHappensStrat with the current parameter set
-                var TryAgainiStrat = new TryAgainStrat(name: name, mlParams: parameters);
-                var TryAgainStrategy = new Strategy(name, new List<Strat> { TryAgainiStrat });
+                var instantiationStopwatch = Stopwatch.StartNew();
+
+                // Create a new TryAgainStrat with the current parameter set
+                var tryAgainStrat = new TryAgainStrat(name: name, mlParams: parameters);
+                var tryAgainStrategy = new Strategy(name, new List<Strat> { tryAgainStrat });
 
                 // Create the market-to-strategy mapping for this parameter set
-                var strategiesDict = CreateMarketStrategyMapping(TryAgainStrategy);
+                var strategiesDict = CreateMarketStrategyMapping(tryAgainStrategy);
+
+                instantiationStopwatch.Stop();
+                if (EnablePerformanceMetrics)
+                {
+                    // Record individual instantiation time if needed
+                }
 
                 returnList.Add(strategiesDict);
+                instanceCount++;
             }
+
+            stopwatch.Stop();
+            RecordPerformanceMetrics("TryAgainStrat", instanceCount, stopwatch.Elapsed);
 
             return returnList;
         }
@@ -2610,10 +2743,14 @@ namespace TradingStrategies.Trading.Helpers
         public List<Dictionary<MarketType, List<Strategy>>> GetBollingerBreakoutStrategiesForTraining()
         {
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
+            var stopwatch = Stopwatch.StartNew();
+            int instanceCount = 0;
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in BollingerParameterSets)
             {
+                var instantiationStopwatch = Stopwatch.StartNew();
+
                 // Create a new Bollinger Breakout strategy with the current parameter set
                 var bollingerStrat = new BollingerBreakout(mlParams: parameters);
                 var bollingerStrategy = new Strategy(name, new List<Strat> { bollingerStrat });
@@ -2621,8 +2758,18 @@ namespace TradingStrategies.Trading.Helpers
                 // Create the market-to-strategy mapping for this parameter set
                 var strategiesDict = CreateMarketStrategyMapping(bollingerStrategy);
 
+                instantiationStopwatch.Stop();
+                if (EnablePerformanceMetrics)
+                {
+                    // Record individual instantiation time if needed
+                }
+
                 returnList.Add(strategiesDict);
+                instanceCount++;
             }
+
+            stopwatch.Stop();
+            RecordPerformanceMetrics("BollingerBreakout", instanceCount, stopwatch.Elapsed);
 
             return returnList;
         }
@@ -2645,10 +2792,14 @@ namespace TradingStrategies.Trading.Helpers
         public List<Dictionary<MarketType, List<Strategy>>> GetBreakoutStrategiesForTraining()
         {
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
+            var stopwatch = Stopwatch.StartNew();
+            int instanceCount = 0;
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in BreakoutParameterSets)
             {
+                var instantiationStopwatch = Stopwatch.StartNew();
+
                 // Create a new Breakout strategy with the current parameter set
                 var breakoutStrat = new Breakout2(mlParams: parameters);
                 var breakoutStrategy = new Strategy(name, new List<Strat> { breakoutStrat });
@@ -2656,8 +2807,18 @@ namespace TradingStrategies.Trading.Helpers
                 // Create the market-to-strategy mapping for this parameter set
                 var strategiesDict = CreateMarketStrategyMapping(breakoutStrategy);
 
+                instantiationStopwatch.Stop();
+                if (EnablePerformanceMetrics)
+                {
+                    // Record individual instantiation time if needed
+                }
+
                 returnList.Add(strategiesDict);
+                instanceCount++;
             }
+
+            stopwatch.Stop();
+            RecordPerformanceMetrics("Breakout2", instanceCount, stopwatch.Elapsed);
 
             return returnList;
         }
@@ -2688,10 +2849,14 @@ namespace TradingStrategies.Trading.Helpers
         public List<Dictionary<MarketType, List<Strategy>>> GetNothingEverHappensStrategiesForTraining()
         {
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
+            var stopwatch = Stopwatch.StartNew();
+            int instanceCount = 0;
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in NothingEverHappensParameterSets)
             {
+                var instantiationStopwatch = Stopwatch.StartNew();
+
                 // Create a new NothingEverHappensStrat with the current parameter set
                 var nothingStrat = new NothingEverHappensStrat(name: name, mlParams: parameters);
                 var nothingStrategy = new Strategy(name, new List<Strat> { nothingStrat });
@@ -2699,8 +2864,18 @@ namespace TradingStrategies.Trading.Helpers
                 // Create the market-to-strategy mapping for this parameter set
                 var strategiesDict = CreateMarketStrategyMapping(nothingStrategy);
 
+                instantiationStopwatch.Stop();
+                if (EnablePerformanceMetrics)
+                {
+                    // Record individual instantiation time if needed
+                }
+
                 returnList.Add(strategiesDict);
+                instanceCount++;
             }
+
+            stopwatch.Stop();
+            RecordPerformanceMetrics("NothingEverHappensStrat", instanceCount, stopwatch.Elapsed);
 
             return returnList;
         }

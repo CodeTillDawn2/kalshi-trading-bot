@@ -176,13 +176,17 @@
             <summary>
             Provides asynchronous data persistence services for real-time market data from Kalshi's trading platform.
             This service manages concurrent queues for different data types (order book, trades, fills, lifecycle events)
-            and processes them using background worker tasks with retry logic for transient SQL errors.
-            Implements the ISqlDataService interface for dependency injection and proper resource management.
+            and processes them using configurable background worker tasks with retry logic for transient SQL errors.
+            Supports batch processing, performance metrics collection, input validation, and configurable queue sizes
+            to prevent resource exhaustion. Implements the ISqlDataService interface for dependency injection and proper resource management.
             </summary>
             <remarks>
             The service uses Polly for retry policies on SQL operations and maintains separate queues to ensure
             data integrity and prevent blocking between different data types. All operations are asynchronous
             to support high-throughput real-time data processing without impacting the main application flow.
+            Configuration options include retry counts, delays, queue sizes, worker counts, and batch sizes.
+            Performance metrics are collected for processing rates, queue depths, and success rates.
+            Input validation ensures JSON data integrity before queuing operations.
             </remarks>
         </member>
         <member name="F:KalshiBotData.Data.SqlDataService._connectionString">
@@ -230,6 +234,41 @@
             Array of background tasks processing the respective data queues asynchronously.
             </summary>
         </member>
+        <member name="F:KalshiBotData.Data.SqlDataService._retryCount">
+            <summary>
+            Number of retry attempts for transient SQL errors.
+            </summary>
+        </member>
+        <member name="F:KalshiBotData.Data.SqlDataService._retryDelay">
+            <summary>
+            Base delay between retry attempts.
+            </summary>
+        </member>
+        <member name="F:KalshiBotData.Data.SqlDataService._maxQueueSize">
+            <summary>
+            Maximum size for each queue to prevent resource exhaustion.
+            </summary>
+        </member>
+        <member name="F:KalshiBotData.Data.SqlDataService._workersPerQueue">
+            <summary>
+            Number of worker tasks per queue type.
+            </summary>
+        </member>
+        <member name="F:KalshiBotData.Data.SqlDataService._batchSize">
+            <summary>
+            Batch size for processing multiple operations together.
+            </summary>
+        </member>
+        <member name="F:KalshiBotData.Data.SqlDataService._totalProcessed">
+            <summary>
+            Total operations processed successfully.
+            </summary>
+        </member>
+        <member name="F:KalshiBotData.Data.SqlDataService._totalFailed">
+            <summary>
+            Total operations that failed.
+            </summary>
+        </member>
         <member name="M:KalshiBotData.Data.SqlDataService.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.ISqlDataService})">
             <summary>
             Initializes a new instance of the SqlDataService with configuration and logging dependencies.
@@ -252,6 +291,7 @@
             <summary>
             Asynchronously stores order book data from WebSocket messages into the database queue for processing.
             Handles both snapshot (SNP) and delta (DEL) order book updates, converting prices for "no" side orders.
+            Includes input validation and queue size checks.
             </summary>
             <param name="data">The JSON element containing the WebSocket message data.</param>
             <param name="offerType">The type of order book update: "SNP" for snapshots or "DEL" for deltas.</param>
@@ -261,6 +301,7 @@
             <summary>
             Asynchronously stores ticker data from WebSocket messages into the database queue for processing.
             Captures current market prices, bid/ask spreads, volume, and open interest information.
+            Includes input validation and queue size checks.
             </summary>
             <param name="data">The JSON element containing the WebSocket ticker message data.</param>
             <returns>A completed task since the operation is queued for background processing.</returns>
@@ -269,6 +310,7 @@
             <summary>
             Asynchronously stores trade execution data from WebSocket messages into the database queue for processing.
             Records trade details including prices, volumes, and taker side information.
+            Includes input validation and queue size checks.
             </summary>
             <param name="data">The JSON element containing the WebSocket trade message data.</param>
             <returns>A completed task since the operation is queued for background processing.</returns>
@@ -277,6 +319,7 @@
             <summary>
             Asynchronously stores order fill data from WebSocket messages into the database queue for processing.
             Records fill details including trade IDs, order IDs, prices, and execution information.
+            Includes input validation and queue size checks.
             </summary>
             <param name="data">The JSON element containing the WebSocket fill message data.</param>
             <returns>A completed task since the operation is queued for background processing.</returns>
@@ -285,6 +328,7 @@
             <summary>
             Asynchronously stores event lifecycle data from WebSocket messages into the database queue for processing.
             Records event metadata including titles, subtitles, collateral types, and timing information.
+            Includes input validation and queue size checks.
             </summary>
             <param name="data">The JSON element containing the WebSocket event lifecycle message data.</param>
             <returns>A completed task since the operation is queued for background processing.</returns>
@@ -293,11 +337,10 @@
             <summary>
             Asynchronously stores market lifecycle data from WebSocket messages into the database queue for processing.
             Records market state changes including open/close times, determination times, and settlement results.
-            Validates required market ticker presence before queuing the operation.
+            Includes input validation and queue size checks.
             </summary>
             <param name="data">The JSON element containing the WebSocket market lifecycle message data.</param>
             <returns>A completed task since the operation is queued for background processing.</returns>
-            <exception cref="T:System.ArgumentException">Thrown when required 'msg' or 'market_ticker' properties are missing.</exception>
         </member>
         <member name="M:KalshiBotData.Data.SqlDataService.Dispose">
             <summary>
@@ -317,6 +360,7 @@
             <summary>
             Background worker method that continuously processes database operations from a specific queue.
             Executes stored procedures with retry logic for transient SQL errors and handles specific error conditions.
+            Supports batch processing and collects performance metrics.
             </summary>
             <param name="queue">The concurrent queue containing database operations to process.</param>
             <param name="operationName">Descriptive name of the operation type for logging and error handling.</param>
@@ -1174,6 +1218,36 @@
             <summary>
             Gets or sets the timestamp when this brain instance was last seen active.
             This is used for monitoring brain health and detecting failed instances.
+            </summary>
+        </member>
+        <member name="T:KalshiBotData.Models.BrainPersistenceEntity">
+            <summary>
+            Database entity for storing BrainPersistence data.
+            Uses JSON serialization to store complex nested objects.
+            </summary>
+        </member>
+        <member name="P:KalshiBotData.Models.BrainPersistenceEntity.BrainInstanceName">
+            <summary>
+            Gets or sets the unique name identifier for this brain instance.
+            This serves as the primary key for the brain persistence data.
+            </summary>
+        </member>
+        <member name="P:KalshiBotData.Models.BrainPersistenceEntity.PersistenceData">
+            <summary>
+            Gets or sets the JSON serialized BrainPersistence data.
+            Contains all the configuration, state, and historical metrics.
+            </summary>
+        </member>
+        <member name="P:KalshiBotData.Models.BrainPersistenceEntity.LastUpdated">
+            <summary>
+            Gets or sets the timestamp when this data was last saved.
+            Used for tracking data freshness and cleanup operations.
+            </summary>
+        </member>
+        <member name="P:KalshiBotData.Models.BrainPersistenceEntity.Version">
+            <summary>
+            Gets or sets the version of the persistence format.
+            Allows for future schema migrations.
             </summary>
         </member>
         <member name="T:KalshiBotData.Models.EventLifecycle">

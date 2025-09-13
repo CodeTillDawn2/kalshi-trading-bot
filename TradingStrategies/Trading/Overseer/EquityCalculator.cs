@@ -1,4 +1,7 @@
 using BacklashDTOs;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -6,6 +9,7 @@ namespace TradingStrategies.Trading.Overseer
     /// Provides methods for calculating the total equity value of a trading simulation path.
     /// This class is responsible for determining the current market value of positions held in a simulated trading environment,
     /// taking into account both cash holdings and the unrealized value of open positions based on current order book data.
+    /// It includes performance metrics collection for timing analysis and async versions for high-throughput scenarios.
     /// </summary>
     /// <remarks>
     /// The EquityCalculator is a critical component in the trading simulation pipeline, used by the StrategySimulation engine
@@ -17,11 +21,17 @@ namespace TradingStrategies.Trading.Overseer
     /// - Handle natural markets where one side has no liquidity
     /// - Use mid-prices for non-natural markets to estimate fair value
     /// - Support both long and short positions
+    /// - Collect performance metrics for calculation timing to identify bottlenecks in high-frequency simulations
+    /// - Provide async versions of calculation methods for better performance in high-throughput scenarios
     ///
-    /// This class is stateless and thread-safe, making it suitable for concurrent simulation runs.
+    /// This class collects performance metrics and provides both synchronous and asynchronous calculation methods.
+    /// While the calculation logic itself is thread-safe, the performance metrics collection should be used carefully
+    /// in highly concurrent scenarios. The async methods help improve performance in high-throughput environments.
     /// </remarks>
     public class EquityCalculator
     {
+        private readonly List<long> _calculationTimes = new List<long>();
+
         /// <summary>
         /// Calculates the total equity value for a given simulation path at the current market snapshot.
         /// </summary>
@@ -43,14 +53,18 @@ namespace TradingStrategies.Trading.Overseer
         ///    - Use mid-prices (average of best bid and ask) to value positions
         ///    - Long positions valued at mid-price of the "Yes" side
         ///    - Short positions valued at mid-price of the "No" side
+        /// 7. Record the calculation execution time for performance monitoring
         ///
         /// The method ensures accurate valuation that reflects the current state of the simulated market,
         /// providing a realistic assessment of portfolio value for strategy evaluation and backtesting purposes.
+        /// Performance timing data is collected to help identify bottlenecks in high-frequency simulations.
         ///
         /// Example usage:
         /// <code>
         /// var calculator = new EquityCalculator();
         /// double totalEquity = calculator.GetEquity(simulationPath, marketSnapshot);
+        /// // Or asynchronously:
+        /// double totalEquityAsync = await calculator.GetEquityAsync(simulationPath, marketSnapshot);
         /// </code>
         /// </remarks>
         /// <exception cref="ArgumentNullException">Thrown if path is null.</exception>
@@ -61,9 +75,15 @@ namespace TradingStrategies.Trading.Overseer
             if (path == null)
                 throw new ArgumentNullException(nameof(path), "Simulation path cannot be null");
 
+            var stopwatch = Stopwatch.StartNew();
+
             double equity = path.Cash;
             if (path.SimulatedBook == null)
+            {
+                stopwatch.Stop();
+                _calculationTimes.Add(stopwatch.ElapsedMilliseconds);
                 return equity;
+            }
 
             int bestYesBid = path.SimulatedBook.GetBestYesBid();
             int bestNoBid = path.SimulatedBook.GetBestNoBid();
@@ -91,7 +111,23 @@ namespace TradingStrategies.Trading.Overseer
                 else if (path.Position < 0)
                     equity += Math.Abs(path.Position) * midNo;
             }
+
+            stopwatch.Stop();
+            _calculationTimes.Add(stopwatch.ElapsedMilliseconds);
             return equity;
+        }
+
+        /// <summary>
+        /// Asynchronously calculates the total equity value for a given simulation path at the current market snapshot.
+        /// </summary>
+        /// <param name="path">The simulation path containing cash, position, and order book state.</param>
+        /// <param name="lastSnapshot">The most recent market snapshot containing current market data.</param>
+        /// <returns>A task representing the asynchronous operation, with the total equity value as result.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if path is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the simulated order book data is corrupted.</exception>
+        public async Task<double> GetEquityAsync(SimulationPath path, MarketSnapshot lastSnapshot)
+        {
+            return await Task.Run(() => GetEquity(path, lastSnapshot));
         }
     }
 }

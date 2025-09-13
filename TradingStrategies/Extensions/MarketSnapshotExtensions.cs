@@ -1,4 +1,5 @@
 using BacklashDTOs;
+using System.Diagnostics;
 
 namespace TradingStrategies.Extensions
 {
@@ -16,6 +17,7 @@ namespace TradingStrategies.Extensions
         /// This method recalculates spreads, depths, volumes, ranges, imbalances, and center of mass values to reflect
         /// the latest order book state. It is typically called after order book modifications during trading simulations
         /// to ensure all derived metrics remain consistent with the underlying order book data.
+        /// Includes input validation and performance timing for robustness and monitoring.
         /// </summary>
         /// <param name="snapshot">The MarketSnapshot instance whose metrics will be updated.</param>
         /// <param name="book">The SimulatedOrderbook containing the current order book state to analyze.</param>
@@ -31,9 +33,16 @@ namespace TradingStrategies.Extensions
         ///
         /// All calculations use the snapshot's TolerancePercentage for range-based metrics and assume
         /// prices are in cents (1-99 range) as per Kalshi market conventions.
+        ///
+        /// Includes input validation to prevent null reference exceptions and performance timing
+        /// measurement for monitoring execution time in high-frequency scenarios.
         /// </remarks>
         public static void UpdateOrderbookMetricsFromSimulated(this MarketSnapshot snapshot, SimulatedOrderbook book)
         {
+            if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
+            if (book == null) throw new ArgumentNullException(nameof(book));
+            var stopwatch = Stopwatch.StartNew();
+
             // Update best prices from order book
             snapshot.BestYesBid = book.GetBestYesBid();
             snapshot.BestNoBid = book.GetBestNoBid();
@@ -72,6 +81,9 @@ namespace TradingStrategies.Extensions
             // Calculate center of mass (weighted average price) for order book distribution
             snapshot.YesBidCenterOfMass = CalculateCenterOfMass(book.YesBids);
             snapshot.NoBidCenterOfMass = CalculateCenterOfMass(book.NoBids);
+
+            stopwatch.Stop();
+            Console.WriteLine($"UpdateOrderbookMetricsFromSimulated took {stopwatch.ElapsedMilliseconds} ms");
         }
 
         /// <summary>
@@ -86,9 +98,11 @@ namespace TradingStrategies.Extensions
         /// calculated as bestBid * (1 - tolerancePct/100). It provides insight into the depth of
         /// the order book near the best bid, useful for assessing market liquidity and slippage potential.
         /// Only considers prices within the valid 1-99 range.
+        /// Handles null input arrays by returning 0.
         /// </remarks>
         private static int CalculateCumulativeDepth(List<(int count, DateTime timestamp)>[] bids, int bestBid, double tolerancePct)
         {
+            if (bids == null) return 0;
             int cumulative = 0;
             double minPrice = bestBid * (1 - tolerancePct / 100.0);
             for (int p = bestBid; p >= minPrice && p >= 1; p--)
@@ -111,9 +125,11 @@ namespace TradingStrategies.Extensions
         /// at least one resting order. The range indicates the spread of bid prices in the order book,
         /// which can be useful for assessing market concentration and liquidity distribution.
         /// Returns 0 if no active bids exist.
+        /// Handles null input arrays by returning 0.
         /// </remarks>
         private static int CalculateBidRange(List<(int count, DateTime timestamp)>[] bids)
         {
+            if (bids == null) return 0;
             int maxPrice = 0;
             int minPrice = 100;
             for (int p = 1; p <= 99; p++)
@@ -136,9 +152,11 @@ namespace TradingStrategies.Extensions
         /// This method sums the contract counts from all price levels that have active orders.
         /// It provides a measure of the total market participation at the bid side, useful for
         /// assessing overall market liquidity and order book size.
+        /// Handles null input arrays by returning 0.
         /// </remarks>
         private static int CalculateTotalContracts(List<(int count, DateTime timestamp)>[] bids)
         {
+            if (bids == null) return 0;
             int total = 0;
             for (int p = 1; p <= 99; p++)
             {
@@ -160,9 +178,11 @@ namespace TradingStrategies.Extensions
         /// Volume is calculated as the sum of (price * contract_count) for all orders at each price level.
         /// This provides the total dollar value of all resting bid orders, useful for liquidity analysis.
         /// Prices are assumed to be in cents (1-99 range) as per Kalshi market conventions.
+        /// Handles null input arrays by returning 0.0.
         /// </remarks>
         private static double CalculateTotalVolume(List<(int count, DateTime timestamp)>[] bids)
         {
+            if (bids == null) return 0.0;
             double total = 0;
             for (int p = 1; p <= 99; p++)
             {
@@ -185,9 +205,11 @@ namespace TradingStrategies.Extensions
         /// at each price level until it has processed N levels with active orders. It provides insight
         /// into the concentration of liquidity at the best bid prices, useful for assessing market depth
         /// and potential execution quality. If fewer than N levels have orders, it sums all available levels.
+        /// Handles null input arrays by returning 0.
         /// </remarks>
         private static int CalculateTopNDepth(List<(int count, DateTime timestamp)>[] bids, int n)
         {
+            if (bids == null) return 0;
             int depth = 0;
             int count = 0;
             for (int p = 99; p >= 1 && count < n; p--)
@@ -211,9 +233,11 @@ namespace TradingStrategies.Extensions
         /// This provides a measure of where the majority of the order book liquidity is concentrated,
         /// useful for understanding the distribution of bids and potential price levels of interest.
         /// A higher center of mass indicates bids are concentrated at higher prices, suggesting bullish sentiment.
+        /// Handles null input arrays by returning 0.0.
         /// </remarks>
         private static double CalculateCenterOfMass(List<(int count, DateTime timestamp)>[] bids)
         {
+            if (bids == null) return 0.0;
             double weightedSum = 0;
             int totalMass = 0;
             for (int p = 1; p <= 99; p++)
