@@ -1,4 +1,10 @@
-// Updated to avoid redundant data loads for markets, remove parallel operations, and maintain separate strategy set methods
+// <summary>
+// TradingSimulatorService is the core orchestrator for running trading strategy simulations and backtesting operations.
+// It manages the complete lifecycle of evaluating trading strategies against historical market snapshots, including
+// data loading, strategy execution, performance analysis, and result reporting. The service integrates with
+// DataLoader for data access, MarketProcessor for simulation execution, StrategyResolver for strategy configuration,
+// and provides comprehensive GUI integration through events and progress reporting.
+// </summary>
 
 using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
@@ -166,7 +172,7 @@ namespace TradingSimulator
         /// </summary>
         /// <param name="marketName">The name of the market to retrieve snapshots for.</param>
         /// <returns>A list of MarketSnapshot objects ordered by timestamp for the specified market.</returns>
-        public async Task<List<MarketSnapshot>> ReturnSnapshotsForMarket(string marketName)
+        public async Task<List<MarketSnapshot>> GetSnapshotsForMarket(string marketName)
         {
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
@@ -418,13 +424,13 @@ ResolveFamily(StrategyFamily family)
             var dataset = await _dataLoader.LoadSnapshotsForMarketsAsync(context, marketsToRun ?? new List<string>());
             foreach (var kvp in dataset)
             {
-                Console.WriteLine($"Loaded {kvp.Value.Count} snapshots for {kvp.Key}");
+                OnTestProgress?.Invoke($"Loaded {kvp.Value.Count} snapshots for {kvp.Key}");
             }
 
             if (!dataset.Any())
             {
                 OnTestProgress?.Invoke("No valid data found for ML training and simulation.");
-                Console.WriteLine("No snapshots loaded for any markets.");
+                OnTestProgress?.Invoke("No snapshots loaded for any markets.");
                 return;
             }
 
@@ -437,7 +443,7 @@ ResolveFamily(StrategyFamily family)
                 int splitIdx = (int)(snapshots.Count * 0.8);
                 trainData[kvp.Key] = snapshots.Take(splitIdx).ToList();
                 testData[kvp.Key] = snapshots.Skip(splitIdx).ToList();
-                Console.WriteLine($"Split for {kvp.Key}: {trainData[kvp.Key].Count} train, {testData[kvp.Key].Count} test");
+                OnTestProgress?.Invoke($"Split for {kvp.Key}: {trainData[kvp.Key].Count} train, {testData[kvp.Key].Count} test");
             }
 
             // Offline training and evaluation
@@ -492,7 +498,7 @@ ResolveFamily(StrategyFamily family)
             if (!ResearchBus.Entries.Any())
             {
                 OnTestProgress?.Invoke("No entries detected. Check dataset for price movements or adjust thresholds.");
-                Console.WriteLine("ResearchBus is empty. No entries logged during simulation.");
+                OnTestProgress?.Invoke("ResearchBus is empty. No entries logged during simulation.");
                 return;
             }
 
@@ -504,7 +510,6 @@ ResolveFamily(StrategyFamily family)
                     var avgPeakSize = g.Average(e => e.PeakSizeTicks);
                     var avgTimeToPeak = g.Average(e => e.TimeToPeak.TotalSeconds);
                     var composite = avgPeakSize / (avgTimeToPeak + 1e-6);
-                    Console.WriteLine($"Metrics for {g.Key}: AvgScore={avgScore:F3}, AvgPeakSize={avgPeakSize:F3}, AvgTimeToPeak={avgTimeToPeak:F3}, Composite={composite:F3}");
                     return (Name: g.Key, AvgEntryScore: avgScore, AvgPeakSize: avgPeakSize, AvgTimeToPeak: avgTimeToPeak, Composite: composite);
                 })
                 .ToList();
