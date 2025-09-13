@@ -4,6 +4,8 @@
 /// generating detailed performance reports, and calculating equity metrics. It integrates with the simulation engine,
 /// equity calculator, and report generator to provide comprehensive backtesting capabilities.
 /// Supports asynchronous operations for efficient performance monitoring and analysis.
+/// Includes input validation to prevent null reference exceptions with warning logs, performance metrics logging at debug level,
+/// and async method implementations for better performance in high-throughput scenarios.
 /// </summary>
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -51,6 +53,8 @@ namespace TradingStrategies
         /// Executes a trading scenario simulation against a series of market snapshots.
         /// This method orchestrates the complete simulation process, including running strategies,
         /// generating performance reports, and returning detailed results for analysis.
+        /// Includes input validation to prevent null reference exceptions, performance metrics logging,
+        /// and asynchronous execution for high-throughput scenarios.
         /// </summary>
         /// <param name="scenario">The trading scenario containing strategies and market conditions to simulate.</param>
         /// <param name="snapshots">List of market snapshots representing historical market data.</param>
@@ -84,16 +88,27 @@ namespace TradingStrategies
                 return new List<(PathPerformance, List<SimulationEventLog>)>();
             }
 
+            if (snapshots.Any(s => s == null))
+            {
+                _logger.LogWarning("Snapshots list contains null items. Filtering them out.");
+                snapshots = snapshots.Where(s => s != null).ToList();
+                if (snapshots.Count == 0)
+                {
+                    _logger.LogWarning("After filtering nulls, snapshots list is empty. Returning empty results.");
+                    return new List<(PathPerformance, List<SimulationEventLog>)>();
+                }
+            }
+
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
             bool isSingleStrategy = scenario.StrategiesByMarketConditions.Values.All(hs => hs.Count <= 1);
 
-            var activePaths = _simulationEngine.RunSimulation(scenario, snapshots, isSingleStrategy);
+            var activePaths = await Task.Run(() => _simulationEngine.RunSimulation(scenario, snapshots, isSingleStrategy));
 
             var pathData = await GeneratePerformanceReportsAndMetrics(group, activePaths, snapshots, initialCash, writeToFile);
 
             stopwatch.Stop();
-            _logger.LogDebug("Simulation execution time: {Elapsed} ms, Snapshots processed: {Count}, Memory usage: {Memory} bytes", stopwatch.Elapsed.TotalMilliseconds, snapshots.Count, GC.GetTotalMemory(true));
+            _logger.LogDebug("Simulation execution time: {Elapsed} ms, Snapshots processed: {Count}, Paths generated: {Paths}, Memory usage: {Memory} bytes", stopwatch.Elapsed.TotalMilliseconds, snapshots.Count, activePaths.Count, GC.GetTotalMemory(true));
 
             return pathData;
         }
@@ -105,7 +120,7 @@ namespace TradingStrategies
         /// then creates detailed CSV reports for top-performing paths and summary reports.
         /// Writes detailed performance reports to files if specified, sorts paths by final equity,
         /// and generates reports for the top three paths while outputting summary information to the console.
-        /// Utilizes asynchronous file I/O for efficient handling of large datasets.
+        /// Utilizes asynchronous file I/O and async calculations for efficient handling of large datasets.
         /// </summary>
         /// <param name="group">Snapshot group metadata for file naming and organization.</param>
         /// <param name="activePaths">List of simulation paths from the simulation engine.</param>
@@ -120,7 +135,18 @@ namespace TradingStrategies
 
             var finalSnapshot = snapshots.Last();
             var firstSnapshot = snapshots.First();
-            var sortedPaths = activePaths.OrderByDescending(p => GetEquity(p, finalSnapshot)).ToList();
+            if (activePaths == null)
+            {
+                _logger.LogWarning("ActivePaths is null. Returning empty results.");
+                return new List<(PathPerformance, List<SimulationEventLog>)>();
+            }
+            if (!activePaths.Any())
+            {
+                _logger.LogWarning("ActivePaths is empty. Returning empty results.");
+                return new List<(PathPerformance, List<SimulationEventLog>)>();
+            }
+            var equities = await Task.WhenAll(activePaths.Select(p => GetEquityAsync(p, finalSnapshot)));
+            var sortedPaths = activePaths.Zip(equities, (p, e) => (p, e)).OrderByDescending(x => x.e).Select(x => x.p).ToList();
             var topPaths = sortedPaths.Take(3).ToList();
 
             var pathData = new List<(PathPerformance, List<SimulationEventLog>)>();
@@ -134,7 +160,7 @@ namespace TradingStrategies
                 var snapshotsPerType = eventLogs.GroupBy(e => e.MarketType).ToDictionary(g => g.Key, g => g.Count());
 
                 var pathTaken = string.Join(" ? ", eventLogs.Select(e => e.MarketType).Distinct());
-                var finalEquity = GetEquity(path, finalSnapshot);
+                var finalEquity = await GetEquityAsync(path, finalSnapshot);
                 var pnl = finalEquity - initialCash;
                 int trades = 0;
                 for (int j = 1; j < eventLogs.Count; j++)
@@ -184,7 +210,7 @@ namespace TradingStrategies
                 var reportGen = new ReportGenerator();
                 var snapshotsPerType = eventLogs.GroupBy(e => e.MarketType ?? "Unknown").ToDictionary(g => g.Key, g => g.Count());
                 var pathTaken = string.Join(" - ", eventLogs.Select(e => e.MarketType ?? "Unknown").Distinct());
-                var finalEquity = GetEquity(bestPath, finalSnapshot);
+                var finalEquity = await GetEquityAsync(bestPath, finalSnapshot);
                 var finalPnl = finalEquity - initialCash;
                 var notes = "Best path selected based on final equity. Losses from price crash to $0.00 in LowLiquidity; no resolution gain on held position. Trending maintained equity; unwind partially mitigated.";
                 var finalReport = reportGen.GenerateFinalPerformanceReport(uniqueId, pathTaken, snapshotsPerType, finalPnl, finalEquity, notes, writeToFile, outputDir);
@@ -198,13 +224,24 @@ namespace TradingStrategies
         /// <summary>
         /// Calculates the current equity value for a simulation path at a given market snapshot.
         /// Delegates to the equity calculator to determine the total value including cash and position.
+        /// Includes validation to prevent null reference exceptions.
         /// </summary>
         /// <param name="path">The simulation path containing position and cash information.</param>
         /// <param name="lastSnapshot">The market snapshot to use for pricing calculations.</param>
-        /// <returns>The calculated equity value.</returns>
-        private double GetEquity(SimulationPath path, MarketSnapshot lastSnapshot)
+        /// <returns>A task that returns the calculated equity value.</returns>
+        private async Task<double> GetEquityAsync(SimulationPath path, MarketSnapshot lastSnapshot)
         {
-            return _equityCalculator.GetEquity(path, lastSnapshot);
+            if (path == null)
+            {
+                _logger.LogWarning("Path is null in GetEquityAsync.");
+                return 0;
+            }
+            if (lastSnapshot == null)
+            {
+                _logger.LogWarning("LastSnapshot is null in GetEquityAsync.");
+                return 0;
+            }
+            return await Task.Run(() => _equityCalculator.GetEquity(path, lastSnapshot));
         }
 
         /// <summary>
