@@ -1,4 +1,9 @@
 {
+  "api/index.html": {
+    "href": "api/index.html",
+    "title": "API landing | Kalshi Trading Bot Documentation",
+    "summary": "API landing (Optional extra content) API Reference"
+  },
   "articles/index.html": {
     "href": "articles/index.html",
     "title": "Welcome to Kalshi Trading Bot Documentation | Kalshi Trading Bot Documentation",
@@ -7,7 +12,7 @@
   "index.html": {
     "href": "index.html",
     "title": "Kalshi Trading Bot Docs | Kalshi Trading Bot Documentation",
-    "summary": "Kalshi Trading Bot [!include[](obj/api/index.md)] API Reference → API Guides → Articles"
+    "summary": "Kalshi Trading Bot API Reference → API Guides → Articles"
   },
   "obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.html": {
     "href": "obj/api/BacklashBot.Helpers.SnapshotDiscrepancyValidator.ValidationResult.html",
