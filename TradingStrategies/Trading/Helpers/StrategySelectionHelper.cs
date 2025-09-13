@@ -1,4 +1,5 @@
 using TradingStrategies.Strategies;
+using TradingStrategies.Strategies.Strategies.Strats;
 using TradingStrategies.Strategies.Strats;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Strategies.Strats.BollingerBreakout;
