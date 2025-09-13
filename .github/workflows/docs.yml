@@ -4,11 +4,17 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
@@ -43,18 +49,14 @@ jobs:
 
       - name: Commit Updated Documentation
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           if [ -d "docs" ]; then
             echo '!docs/**' >> .gitignore
-            git add docs/
-            if [ -n "$(git status --porcelain docs/)" ]; then
-              git commit -m "Update documentation"
-              git push
-            fi
+            git add docs .gitignore
+            git commit -m "Update DocFX site" || echo "No changes"
+            git push origin HEAD:main
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish artifact (optional)
         if: hashFiles('docs/index.html') != ''
