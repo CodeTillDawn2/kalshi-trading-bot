@@ -3,11 +3,43 @@ using TradingSimulator.TestObjects;
 
 namespace TradingSimulator.Simulator
 {
+    /// <summary>
+    /// Provides comprehensive reporting and analysis functionality for trading simulator operations.
+    /// This class serves as the core engine for detecting velocity discrepancies in market snapshots,
+    /// computing rolling observations, generating detailed memos, and coalescing discrepancy data.
+    /// It is designed to analyze orderbook flow patterns and identify potential anomalies in market data
+    /// that could indicate trading opportunities or data quality issues.
+    /// </summary>
     [TestFixture]
     public class SimulatorReporting
     {
         private readonly string _cacheDirectory = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
 
+        /// <summary>
+        /// Detects velocity discrepancies in market snapshots by analyzing orderbook flow patterns.
+        /// This method compares observed orderbook velocity changes against expected flows derived from
+        /// rolling window analysis, identifying potential anomalies that may indicate trading opportunities
+        /// or data quality issues. The analysis includes spike suppression, leakage tolerance, and
+        /// various statistical thresholds to reduce false positives.
+        /// </summary>
+        /// <param name="s">The list of market snapshots to analyze for velocity discrepancies.</param>
+        /// <param name="CreateLog">Whether to create log files for detected discrepancies.</param>
+        /// <param name="relativeSlack">Relative slack factor for threshold calculation (default: 1.5).</param>
+        /// <param name="averagingWindowMin">Time window in minutes for rolling average calculations (default: 5.0).</param>
+        /// <param name="minAbsChangeToFlag">Minimum absolute change in cents to consider for flagging (default: 500).</param>
+        /// <param name="shortIntervalExponent">Exponent for scaling thresholds on short intervals (default: 0.5).</param>
+        /// <param name="gapThresholdMin">Maximum gap in minutes to allow in rolling window (default: 1.5).</param>
+        /// <param name="leakageFactor">Factor for calculating leakage tolerance from previous intervals (default: 0.05).</param>
+        /// <param name="winsorPct">Percentage for Winsorization of extreme values in expected flows (default: 0.2).</param>
+        /// <param name="useMaxMagnitudeForThreshold">Whether to use maximum magnitude for threshold calculation (default: false).</param>
+        /// <param name="ratioSlack">Slack factor for ratio-based discrepancy detection (default: 0.5).</param>
+        /// <param name="hardFlagOnSignFlip">Whether to hard-flag sign flips in velocity (default: true).</param>
+        /// <param name="suppressSpikes">Whether to suppress spike-driven discrepancies (default: true).</param>
+        /// <param name="domRatio">Dominance ratio threshold for spike suppression (default: 0.90).</param>
+        /// <param name="gapShare">Gap share threshold for spike suppression (default: 0.85).</param>
+        /// <param name="edgeMult">Edge multiplier for spike suppression at window boundaries (default: 8.0).</param>
+        /// <param name="ratioFloor">Minimum ratio floor in $/min to avoid tiny-exp blowups (default: 0.5).</param>
+        /// <returns>A list of PricePoint objects representing detected velocity discrepancies.</returns>
         public List<PricePoint> DetectVelocityDiscrepancies(
     List<MarketSnapshot> s,
     bool CreateLog,
@@ -41,9 +73,9 @@ namespace TradingSimulator.Simulator
                 if (dtMin <= 0) continue;
 
                 var (rollObsYes5m, rollObsNo5m, rollObsYesWin, rollObsNoWin,
-                     windowDt, gapNote, windowDy, windowDn,
-                     instYesList, instNoList) =
-                    ComputeRollingObs(curr, s, averagingWindowMin, gapThresholdMin);
+                      windowDt, gapNote, windowDy, windowDn,
+                      instYesList, instNoList) =
+                    ComputeRollingObservations(curr, s, averagingWindowMin, gapThresholdMin);
 
                 if (windowDt <= 0) continue;
 
@@ -109,7 +141,7 @@ namespace TradingSimulator.Simulator
                 if (!(discYes || discNo)) continue;
 
                 // spike-driven suppression (parametric)
-                bool Suppress(List<double> flows, double obsRate, double expRate)
+                bool IsSpikeSuppressed(List<double> flows, double obsRate, double expRate)
                 {
                     if (!suppressSpikes || flows == null || flows.Count == 0) return false;
 
@@ -138,8 +170,8 @@ namespace TradingSimulator.Simulator
                     return ruleA || ruleB || ruleC;
                 }
 
-                bool suppressYes = discYes && Suppress(instYesList, rollObsYes5m, expYesRateWin);
-                bool suppressNo = discNo  && Suppress(instNoList, rollObsNo5m, expNoRateWin);
+                bool suppressYes = discYes && IsSpikeSuppressed(instYesList, rollObsYes5m, expYesRateWin);
+                bool suppressNo = discNo  && IsSpikeSuppressed(instNoList, rollObsNo5m, expNoRateWin);
 
                 if (suppressYes && !discNo) continue;
                 if (suppressNo  && !discYes) continue;
@@ -149,7 +181,7 @@ namespace TradingSimulator.Simulator
                 double expDepthNoC = expNoRateWin  * windowDt * 100.0;
 
                 var lastSnapshots = s.Skip(Math.Max(0, i - 6)).Take(7).ToList();
-                string memo = GenerateMemo(
+                string memo = GenerateDiscrepancyMemo(
                     curr, lastSnapshots, s,
                     averagingWindowMin, gapThresholdMin,
                     windowDt, windowDy, windowDn,
@@ -169,7 +201,16 @@ namespace TradingSimulator.Simulator
             return outPts;
         }
 
-        // Winsorized expected flows per window (clip extremes at percentile bounds, then average)
+        /// <summary>
+        /// Computes expected flows for Yes and No sides using Winsorized averaging to handle outliers.
+        /// This method applies Winsorization (clipping extreme values at percentile bounds) to the
+        /// per-minute flow data before averaging, providing a robust estimate of expected orderbook
+        /// velocity that is less sensitive to extreme outliers.
+        /// </summary>
+        /// <param name="perMinuteYes">List of per-minute flow rates for the Yes side.</param>
+        /// <param name="perMinuteNo">List of per-minute flow rates for the No side.</param>
+        /// <param name="winsorPct">Percentage of data to Winsorize at each tail (e.g., 0.2 for 20% at each end).</param>
+        /// <returns>A tuple containing the Winsorized average flows for Yes and No sides.</returns>
         private static (double expYes, double expNo) ComputeExpectedFlowsWinsorized(
             List<double> perMinuteYes, List<double> perMinuteNo, double winsorPct)
         {
@@ -201,11 +242,33 @@ namespace TradingSimulator.Simulator
             return (WinsorAvg(perMinuteYes, winsorPct), WinsorAvg(perMinuteNo, winsorPct));
         }
 
+        /// <summary>
+        /// Computes rolling observations of orderbook velocity over a specified time window.
+        /// This method analyzes the sequence of market snapshots to calculate observed flow rates
+        /// for both Yes and No sides, handling gaps in data and providing detailed window statistics.
+        /// The method builds a rolling window of snapshots within the averaging period, excluding
+        /// snapshots separated by gaps larger than the threshold.
+        /// </summary>
+        /// <param name="curr">The current market snapshot being analyzed.</param>
+        /// <param name="fullSnapshots">The complete list of market snapshots for the analysis period.</param>
+        /// <param name="averagingWindowMin">The time window in minutes for rolling calculations.</param>
+        /// <param name="gapThresholdMin">Maximum allowed gap in minutes between snapshots in the window.</param>
+        /// <returns>A tuple containing:
+        /// - RollObsYes5m: Rolling observed flow rate for Yes side ($/min)
+        /// - RollObsNo5m: Rolling observed flow rate for No side ($/min)
+        /// - RollObsYesWin: Winsorized rolling observation for Yes (same as RollObsYes5m in this implementation)
+        /// - RollObsNoWin: Winsorized rolling observation for No (same as RollObsNo5m in this implementation)
+        /// - WindowDt: Total duration of the rolling window in minutes
+        /// - GapNote: Description of any gaps detected in the window
+        /// - WindowDy: Total depth change for Yes side in cents
+        /// - WindowDn: Total depth change for No side in cents
+        /// - InstYesList: List of instantaneous flow rates for Yes side
+        /// - InstNoList: List of instantaneous flow rates for No side</returns>
         private (double RollObsYes5m, double RollObsNo5m, double RollObsYesWin, double RollObsNoWin,
-                 double WindowDt, string GapNote, double WindowDy, double WindowDn,
-                 List<double> InstYesList, List<double> InstNoList)
-            ComputeRollingObs(MarketSnapshot curr, List<MarketSnapshot> fullSnapshots,
-                              double averagingWindowMin, double gapThresholdMin)
+                  double WindowDt, string GapNote, double WindowDy, double WindowDn,
+                  List<double> InstYesList, List<double> InstNoList)
+            ComputeRollingObservations(MarketSnapshot curr, List<MarketSnapshot> fullSnapshots,
+                                       double averagingWindowMin, double gapThresholdMin)
         {
             int currIndex = fullSnapshots.IndexOf(curr);
             if (currIndex < 1)
@@ -254,6 +317,14 @@ namespace TradingSimulator.Simulator
                     windowDt, gapNote, windowDy, windowDn, instYes, instNo);
         }
 
+        /// <summary>
+        /// Appends a discrepancy log entry to a timestamped log file for the specified market.
+        /// This method creates or appends to a log file containing detailed information about
+        /// detected velocity discrepancies, including the market ticker and comprehensive memo data.
+        /// Log files are stored in the configured cache directory with timestamp-based filenames.
+        /// </summary>
+        /// <param name="marketTicker">The ticker symbol of the market where the discrepancy was detected.</param>
+        /// <param name="memo">The detailed memo containing discrepancy analysis and context information.</param>
         private void AppendDiscrepancyLog(string marketTicker, string memo)
         {
             string timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
@@ -262,6 +333,18 @@ namespace TradingSimulator.Simulator
             File.AppendAllText(logPath, $"Market: {marketTicker}\n{memo}\n\n");
         }
 
+        /// <summary>
+        /// Finds the oldest snapshot index that should be included in the rolling window analysis.
+        /// This method searches backwards from the current index to find the earliest snapshot
+        /// that falls within the averaging window and doesn't exceed gap thresholds between
+        /// consecutive snapshots. The method ensures the rolling window contains continuous
+        /// data suitable for velocity calculations.
+        /// </summary>
+        /// <param name="currIndex">The index of the current snapshot being analyzed.</param>
+        /// <param name="s">The complete list of market snapshots.</param>
+        /// <param name="averagingWindowMin">The time window in minutes for the analysis.</param>
+        /// <param name="gapThresholdMin">Maximum allowed gap in minutes between snapshots.</param>
+        /// <returns>The index of the oldest snapshot to include in the rolling window.</returns>
         private int FindOldestIncludedIndex(int currIndex, List<MarketSnapshot> s, double averagingWindowMin, double gapThresholdMin)
         {
             DateTime windowStart = s[currIndex].Timestamp.AddMinutes(-averagingWindowMin);
@@ -277,7 +360,39 @@ namespace TradingSimulator.Simulator
             return j + 1;
         }
 
-        private string GenerateMemo(
+        /// <summary>
+        /// Generates a comprehensive memo string containing detailed analysis of the velocity discrepancy.
+        /// This method creates a formatted report that includes discrepancy type, window statistics,
+        /// rolling observations, expected flows, computational details, and recent snapshot data.
+        /// The memo provides complete context for understanding why a particular snapshot was flagged
+        /// as having a velocity discrepancy.
+        /// </summary>
+        /// <param name="curr">The current market snapshot where the discrepancy was detected.</param>
+        /// <param name="lastSnapshots">The last 7 snapshots for context and detailed analysis.</param>
+        /// <param name="fullSnapshots">The complete list of snapshots for the analysis period.</param>
+        /// <param name="averagingWindowMin">The averaging window duration in minutes.</param>
+        /// <param name="gapThresholdMin">The gap threshold used in the analysis.</param>
+        /// <param name="windowDt">The actual duration of the rolling window in minutes.</param>
+        /// <param name="windowDy">The total depth change for Yes side in cents.</param>
+        /// <param name="windowDn">The total depth change for No side in cents.</param>
+        /// <param name="expYesRateWin">Expected flow rate for Yes side ($/min).</param>
+        /// <param name="expNoRateWin">Expected flow rate for No side ($/min).</param>
+        /// <param name="rollObsYes5m">Rolling observed flow rate for Yes side ($/min).</param>
+        /// <param name="rollObsNo5m">Rolling observed flow rate for No side ($/min).</param>
+        /// <param name="rollObsYesWin">Winsorized rolling observation for Yes side.</param>
+        /// <param name="rollObsNoWin">Winsorized rolling observation for No side.</param>
+        /// <param name="gapNote">Note about any gaps detected in the rolling window.</param>
+        /// <param name="scale">Scaling factor applied for short intervals.</param>
+        /// <param name="shortIntervalExponent">Exponent used for short interval scaling.</param>
+        /// <param name="zeroVelYesDisc">Flag for zero velocity discrepancy on Yes side.</param>
+        /// <param name="zeroVelNoDisc">Flag for zero velocity discrepancy on No side.</param>
+        /// <param name="toleranceYes">Leakage tolerance for Yes side ($/min).</param>
+        /// <param name="toleranceNo">Leakage tolerance for No side ($/min).</param>
+        /// <param name="leakageFactor">Factor used to calculate leakage tolerance.</param>
+        /// <param name="expDepthYesC">Expected depth change for Yes side in cents.</param>
+        /// <param name="expDepthNoC">Expected depth change for No side in cents.</param>
+        /// <returns>A formatted string containing the complete discrepancy analysis memo.</returns>
+        private string GenerateDiscrepancyMemo(
             MarketSnapshot curr,
             List<MarketSnapshot> lastSnapshots,
             List<MarketSnapshot> fullSnapshots,
@@ -320,10 +435,10 @@ namespace TradingSimulator.Simulator
                 "WinMin",
                 "Your Rolling Yes ($/min)",
                 "Orderbook Flow Yes (inst $/min)",
-                "YesDepth(¢)",
+                "YesDepth(ï¿½)",
                 "Your Rolling No ($/min)",
                 "Orderbook Flow No (inst $/min)",
-                "NoDepth(¢)");
+                "NoDepth(ï¿½)");
             sb.AppendLine("    " + header);
 
             string rowFormat = "{0,-35} {1,8:0.##} {2,28:0.##} {3,32:0.##} {4,12:0.##} {5,28:0.##} {6,32:0.##} {7,12:0.##}";
@@ -360,14 +475,14 @@ namespace TradingSimulator.Simulator
             }
 
             sb.AppendLine("Rolling math (end snapshot - orderbook flow):");
-            sb.AppendLine($"  Window: ?Yes(¢)={windowDy:0.##} ? {rollObsYes5m:0.##} $/min, ?No(¢)={windowDn:0.##} ? {rollObsNo5m:0.##} $/min (Sdt={windowDt:0.##} min)");
+            sb.AppendLine($"  Window: ?Yes(ï¿½)={windowDy:0.##} ? {rollObsYes5m:0.##} $/min, ?No(ï¿½)={windowDn:0.##} ? {rollObsNo5m:0.##} $/min (Sdt={windowDt:0.##} min)");
 
             sb.AppendLine($"  Detection Expected: Yes={expYesRateWin:0.##} $/min, No={expNoRateWin:0.##} $/min (ExpScale={scale:0.##})");
 
             sb.AppendLine("Computation details:");
             sb.AppendLine($"    Short-Window Scale = (Window Minutes<{averagingWindowMin:0.##}? ( {averagingWindowMin:0.##}/Window Minutes )^{shortIntervalExponent:0.###} : 1) = {scale:0.######}");
-            sb.AppendLine($"    Expected ?Depth (¢) = S(Expected Flow×min)×100 = {(expYesRateWin * windowDt):0.######}*100 = {expDepthYesC:0.##} c");
-            sb.AppendLine($"    Observed ?Depth (¢) = window? = {windowDy:0.##}");
+            sb.AppendLine($"    Expected ?Depth (ï¿½) = S(Expected Flowï¿½min)ï¿½100 = {(expYesRateWin * windowDt):0.######}*100 = {expDepthYesC:0.##} c");
+            sb.AppendLine($"    Observed ?Depth (ï¿½) = window? = {windowDy:0.##}");
             sb.AppendLine($"    Edge Tolerance (Leakage Factor={leakageFactor:0.###}): Yes={toleranceYes:0.##} $/min, No={toleranceNo:0.##} $/min");
             sb.AppendLine($"MID={(curr.BestYesBid + curr.BestYesAsk) / 2.0:0.##}");
 
@@ -377,6 +492,16 @@ namespace TradingSimulator.Simulator
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Coalesces overlapping or canceling discrepancy points to reduce noise in the output.
+        /// This method analyzes pairs of discrepancy points and removes those that cancel each other out
+        /// (i.e., opposite velocity changes that sum to near zero) or are too close together in time.
+        /// The process helps eliminate false positives and redundant signals from the discrepancy detection.
+        /// </summary>
+        /// <param name="pts">The list of discrepancy points to coalesce.</param>
+        /// <param name="maxPairGapMinutes">Maximum time gap in minutes between points to consider for coalescing.</param>
+        /// <param name="maxVelocityDiff">Maximum velocity difference to consider points as canceling each other.</param>
+        /// <returns>A filtered list of discrepancy points with overlapping/canceling points removed.</returns>
         private List<PricePoint> CoalesceDiscrepancies(
             List<PricePoint> pts,
             int maxPairGapMinutes,
