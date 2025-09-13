@@ -6,7 +6,9 @@ using BacklashDTOs.Exceptions;
 using BacklashInterfaces.Constants;
 using System.Collections.Concurrent;
 using System.Data;
+using System.Diagnostics;
 using System.Text.Json;
+using System.Threading;
 
 using Polly;
 using Polly.Retry;
@@ -16,13 +18,17 @@ namespace KalshiBotData.Data
     /// <summary>
     /// Provides asynchronous data persistence services for real-time market data from Kalshi's trading platform.
     /// This service manages concurrent queues for different data types (order book, trades, fills, lifecycle events)
-    /// and processes them using background worker tasks with retry logic for transient SQL errors.
-    /// Implements the ISqlDataService interface for dependency injection and proper resource management.
+    /// and processes them using configurable background worker tasks with retry logic for transient SQL errors.
+    /// Supports batch processing, performance metrics collection, input validation, and configurable queue sizes
+    /// to prevent resource exhaustion. Implements the ISqlDataService interface for dependency injection and proper resource management.
     /// </summary>
     /// <remarks>
     /// The service uses Polly for retry policies on SQL operations and maintains separate queues to ensure
     /// data integrity and prevent blocking between different data types. All operations are asynchronous
     /// to support high-throughput real-time data processing without impacting the main application flow.
+    /// Configuration options include retry counts, delays, queue sizes, worker counts, and batch sizes.
+    /// Performance metrics are collected for processing rates, queue depths, and success rates.
+    /// Input validation ensures JSON data integrity before queuing operations.
     /// </remarks>
     public class SqlDataService : ISqlDataService
     {
@@ -72,6 +78,41 @@ namespace KalshiBotData.Data
         private readonly Task[] _workerTasks;
 
         /// <summary>
+        /// Number of retry attempts for transient SQL errors.
+        /// </summary>
+        private readonly int _retryCount;
+
+        /// <summary>
+        /// Base delay between retry attempts.
+        /// </summary>
+        private readonly TimeSpan _retryDelay;
+
+        /// <summary>
+        /// Maximum size for each queue to prevent resource exhaustion.
+        /// </summary>
+        private readonly int _maxQueueSize;
+
+        /// <summary>
+        /// Number of worker tasks per queue type.
+        /// </summary>
+        private readonly int _workersPerQueue;
+
+        /// <summary>
+        /// Batch size for processing multiple operations together.
+        /// </summary>
+        private readonly int _batchSize;
+
+        /// <summary>
+        /// Total operations processed successfully.
+        /// </summary>
+        private long _totalProcessed;
+
+        /// <summary>
+        /// Total operations that failed.
+        /// </summary>
+        private long _totalFailed;
+
+        /// <summary>
         /// Initializes a new instance of the SqlDataService with configuration and logging dependencies.
         /// Sets up concurrent queues for different data types and starts background worker tasks for processing.
         /// </summary>
@@ -81,20 +122,33 @@ namespace KalshiBotData.Data
         {
             _logger = logger;
             _connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
+
+            // Load configuration options with defaults
+            var sqlDataConfig = configuration.GetSection("SqlDataService");
+            _retryCount = sqlDataConfig.GetValue<int>("RetryCount", 3);
+            _retryDelay = TimeSpan.FromSeconds(sqlDataConfig.GetValue<double>("RetryDelaySeconds", 1.0));
+            _maxQueueSize = sqlDataConfig.GetValue<int>("MaxQueueSize", 10000);
+            _workersPerQueue = sqlDataConfig.GetValue<int>("WorkersPerQueue", 1);
+            _batchSize = sqlDataConfig.GetValue<int>("BatchSize", 1);
+
             _orderBookQueue = new ConcurrentQueue<DatabaseOperation>();
             _tradeQueue = new ConcurrentQueue<DatabaseOperation>();
             _fillQueue = new ConcurrentQueue<DatabaseOperation>();
             _eventLifecycleQueue = new ConcurrentQueue<DatabaseOperation>();
             _marketLifecycleQueue = new ConcurrentQueue<DatabaseOperation>();
             _cts = new CancellationTokenSource();
-            _workerTasks = new[]
+
+            // Create worker tasks based on configuration
+            var workerTasks = new List<Task>();
+            for (int i = 0; i < _workersPerQueue; i++)
             {
-                Task.Run(() => ProcessQueueAsync(_orderBookQueue, "order_book", _cts.Token)),
-                Task.Run(() => ProcessQueueAsync(_tradeQueue, "trade", _cts.Token)),
-                Task.Run(() => ProcessQueueAsync(_fillQueue, "fill", _cts.Token)),
-                Task.Run(() => ProcessQueueAsync(_eventLifecycleQueue, "event_lifecycle", _cts.Token)),
-                Task.Run(() => ProcessQueueAsync(_marketLifecycleQueue, "market_lifecycle", _cts.Token))
-            };
+                workerTasks.Add(Task.Run(() => ProcessQueueAsync(_orderBookQueue, "order_book", _cts.Token)));
+                workerTasks.Add(Task.Run(() => ProcessQueueAsync(_tradeQueue, "trade", _cts.Token)));
+                workerTasks.Add(Task.Run(() => ProcessQueueAsync(_fillQueue, "fill", _cts.Token)));
+                workerTasks.Add(Task.Run(() => ProcessQueueAsync(_eventLifecycleQueue, "event_lifecycle", _cts.Token)));
+                workerTasks.Add(Task.Run(() => ProcessQueueAsync(_marketLifecycleQueue, "market_lifecycle", _cts.Token)));
+            }
+            _workerTasks = workerTasks.ToArray();
         }
 
         /// <summary>
@@ -109,7 +163,7 @@ namespace KalshiBotData.Data
         {
             const string jobName = "ImportSnapshots";
 
-            var retryPolicy = Policy.Handle<SqlException>(ex => IsTransient(ex)).WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(i));
+            var retryPolicy = Policy.Handle<SqlException>(ex => IsTransient(ex)).WaitAndRetryAsync(_retryCount, i => _retryDelay * i);
             await retryPolicy.ExecuteAsync(async () =>
             {
                 {
@@ -204,16 +258,39 @@ namespace KalshiBotData.Data
         /// <summary>
         /// Asynchronously stores order book data from WebSocket messages into the database queue for processing.
         /// Handles both snapshot (SNP) and delta (DEL) order book updates, converting prices for "no" side orders.
+        /// Includes input validation and queue size checks.
         /// </summary>
         /// <param name="data">The JSON element containing the WebSocket message data.</param>
         /// <param name="offerType">The type of order book update: "SNP" for snapshots or "DEL" for deltas.</param>
         /// <returns>A completed task since the operation is queued for background processing.</returns>
         public Task StoreOrderBookAsync(JsonElement data, string offerType)
         {
-            var msg = data.GetProperty("msg");
-            var marketTicker = msg.GetProperty("market_ticker").GetString() ?? string.Empty;
-            var sid = data.GetProperty("sid").GetInt32();
+            // Input validation
+            if (!data.TryGetProperty("msg", out var msg))
+            {
+                _logger.LogWarning("Invalid order book data: missing 'msg' property");
+                return Task.CompletedTask;
+            }
+            if (!msg.TryGetProperty("market_ticker", out var marketTickerProp) || string.IsNullOrEmpty(marketTickerProp.GetString()))
+            {
+                _logger.LogWarning("Invalid order book data: missing or empty 'market_ticker'");
+                return Task.CompletedTask;
+            }
+            if (!data.TryGetProperty("sid", out var sidProp) || !sidProp.TryGetInt32(out var sid))
+            {
+                _logger.LogWarning("Invalid order book data: missing or invalid 'sid'");
+                return Task.CompletedTask;
+            }
+
+            var marketTicker = marketTickerProp.GetString()!;
             var kalshiSeq = data.TryGetProperty("seq", out var seq) ? seq.GetInt64() : (long?)null;
+
+            // Queue size check
+            if (_orderBookQueue.Count >= _maxQueueSize)
+            {
+                _logger.LogWarning("Order book queue at max capacity ({MaxSize}), dropping operation for {MarketTicker}", _maxQueueSize, marketTicker);
+                return Task.CompletedTask;
+            }
 
             if (offerType == "SNP")
             {
@@ -223,6 +300,11 @@ namespace KalshiBotData.Data
                     {
                         foreach (var priceLevel in orders.EnumerateArray())
                         {
+                            if (priceLevel.ValueKind != JsonValueKind.Array || priceLevel.GetArrayLength() < 2)
+                            {
+                                _logger.LogWarning("Invalid price level in order book data for {MarketTicker}", marketTicker);
+                                continue;
+                            }
                             var price = side == "no" ? 100 - priceLevel[0].GetInt32() : priceLevel[0].GetInt32();
                             _orderBookQueue.Enqueue(new DatabaseOperation
                             {
@@ -234,17 +316,34 @@ namespace KalshiBotData.Data
                     }
                 }
             }
-            else // DEL
+            else if (offerType == "DEL")
             {
-                var price = msg.GetProperty("price").GetInt32();
-                if (msg.GetProperty("side").GetString() == "no") price = 100 - price;
+                if (!msg.TryGetProperty("price", out var priceProp) || !priceProp.TryGetInt32(out var price))
+                {
+                    _logger.LogWarning("Invalid delta order book data: missing or invalid 'price' for {MarketTicker}", marketTicker);
+                    return Task.CompletedTask;
+                }
+                if (!msg.TryGetProperty("side", out var sideProp) || sideProp.GetString() is not string side)
+                {
+                    _logger.LogWarning("Invalid delta order book data: missing or invalid 'side' for {MarketTicker}", marketTicker);
+                    return Task.CompletedTask;
+                }
+                if (!msg.TryGetProperty("delta", out var deltaProp) || !deltaProp.TryGetInt32(out var delta))
+                {
+                    _logger.LogWarning("Invalid delta order book data: missing or invalid 'delta' for {MarketTicker}", marketTicker);
+                    return Task.CompletedTask;
+                }
+                if (side == "no") price = 100 - price;
                 _orderBookQueue.Enqueue(new DatabaseOperation
                 {
                     StoredProcedure = "dbo.sp_InsertFeed_OrderBook",
                     Identifier = marketTicker,
-                    SetParameters = cmd => SetOrderBookParameters(cmd, msg, sid, kalshiSeq, marketTicker, offerType, price,
-                        msg.GetProperty("delta").GetInt32(), msg.GetProperty("side").GetString() ?? string.Empty, 0)
+                    SetParameters = cmd => SetOrderBookParameters(cmd, msg, sid, kalshiSeq, marketTicker, offerType, price, delta, side, 0)
                 });
+            }
+            else
+            {
+                _logger.LogWarning("Unknown offer type '{OfferType}' for order book data", offerType);
             }
             return Task.CompletedTask;
         }
@@ -252,13 +351,42 @@ namespace KalshiBotData.Data
         /// <summary>
         /// Asynchronously stores ticker data from WebSocket messages into the database queue for processing.
         /// Captures current market prices, bid/ask spreads, volume, and open interest information.
+        /// Includes input validation and queue size checks.
         /// </summary>
         /// <param name="data">The JSON element containing the WebSocket ticker message data.</param>
         /// <returns>A completed task since the operation is queued for background processing.</returns>
         public Task StoreTickerAsync(JsonElement data)
         {
-            var msg = data.GetProperty("msg");
-            var marketTicker = msg.GetProperty("market_ticker").GetString() ?? string.Empty;
+            // Input validation
+            if (!data.TryGetProperty("msg", out var msg))
+            {
+                _logger.LogWarning("Invalid ticker data: missing 'msg' property");
+                return Task.CompletedTask;
+            }
+            if (!msg.TryGetProperty("market_ticker", out var marketTickerProp) || string.IsNullOrEmpty(marketTickerProp.GetString()))
+            {
+                _logger.LogWarning("Invalid ticker data: missing or empty 'market_ticker'");
+                return Task.CompletedTask;
+            }
+            // Check required fields
+            if (!msg.TryGetProperty("price", out _) || !msg.TryGetProperty("yes_bid", out _) || !msg.TryGetProperty("yes_ask", out _) ||
+                !msg.TryGetProperty("volume", out _) || !msg.TryGetProperty("open_interest", out _) ||
+                !msg.TryGetProperty("dollar_volume", out _) || !msg.TryGetProperty("dollar_open_interest", out _) ||
+                !msg.TryGetProperty("ts", out _))
+            {
+                _logger.LogWarning("Invalid ticker data: missing required fields for {MarketTicker}", marketTickerProp.GetString());
+                return Task.CompletedTask;
+            }
+
+            var marketTicker = marketTickerProp.GetString()!;
+
+            // Queue size check
+            if (_tradeQueue.Count >= _maxQueueSize)
+            {
+                _logger.LogWarning("Trade queue at max capacity ({MaxSize}), dropping ticker operation for {MarketTicker}", _maxQueueSize, marketTicker);
+                return Task.CompletedTask;
+            }
+
             _tradeQueue.Enqueue(new DatabaseOperation
             {
                 StoredProcedure = "dbo.sp_InsertFeed_Ticker",
@@ -285,13 +413,41 @@ namespace KalshiBotData.Data
         /// <summary>
         /// Asynchronously stores trade execution data from WebSocket messages into the database queue for processing.
         /// Records trade details including prices, volumes, and taker side information.
+        /// Includes input validation and queue size checks.
         /// </summary>
         /// <param name="data">The JSON element containing the WebSocket trade message data.</param>
         /// <returns>A completed task since the operation is queued for background processing.</returns>
         public Task StoreTradeAsync(JsonElement data)
         {
-            var msg = data.GetProperty("msg");
-            var marketTicker = msg.GetProperty("market_ticker").GetString() ?? string.Empty;
+            // Input validation
+            if (!data.TryGetProperty("msg", out var msg))
+            {
+                _logger.LogWarning("Invalid trade data: missing 'msg' property");
+                return Task.CompletedTask;
+            }
+            if (!msg.TryGetProperty("market_ticker", out var marketTickerProp) || string.IsNullOrEmpty(marketTickerProp.GetString()))
+            {
+                _logger.LogWarning("Invalid trade data: missing or empty 'market_ticker'");
+                return Task.CompletedTask;
+            }
+            // Check required fields
+            if (!msg.TryGetProperty("yes_price", out _) || !msg.TryGetProperty("no_price", out _) ||
+                !msg.TryGetProperty("count", out _) || !msg.TryGetProperty("taker_side", out _) ||
+                !msg.TryGetProperty("ts", out _))
+            {
+                _logger.LogWarning("Invalid trade data: missing required fields for {MarketTicker}", marketTickerProp.GetString());
+                return Task.CompletedTask;
+            }
+
+            var marketTicker = marketTickerProp.GetString()!;
+
+            // Queue size check
+            if (_tradeQueue.Count >= _maxQueueSize)
+            {
+                _logger.LogWarning("Trade queue at max capacity ({MaxSize}), dropping trade operation for {MarketTicker}", _maxQueueSize, marketTicker);
+                return Task.CompletedTask;
+            }
+
             _tradeQueue.Enqueue(new DatabaseOperation
             {
                 StoredProcedure = "dbo.sp_InsertFeed_Trade",
@@ -313,13 +469,41 @@ namespace KalshiBotData.Data
         /// <summary>
         /// Asynchronously stores order fill data from WebSocket messages into the database queue for processing.
         /// Records fill details including trade IDs, order IDs, prices, and execution information.
+        /// Includes input validation and queue size checks.
         /// </summary>
         /// <param name="data">The JSON element containing the WebSocket fill message data.</param>
         /// <returns>A completed task since the operation is queued for background processing.</returns>
         public Task StoreFillAsync(JsonElement data)
         {
-            var msg = data.GetProperty("msg");
-            var marketTicker = msg.GetProperty("market_ticker").GetString() ?? string.Empty;
+            // Input validation
+            if (!data.TryGetProperty("msg", out var msg))
+            {
+                _logger.LogWarning("Invalid fill data: missing 'msg' property");
+                return Task.CompletedTask;
+            }
+            if (!msg.TryGetProperty("market_ticker", out var marketTickerProp) || string.IsNullOrEmpty(marketTickerProp.GetString()))
+            {
+                _logger.LogWarning("Invalid fill data: missing or empty 'market_ticker'");
+                return Task.CompletedTask;
+            }
+            // Check required fields
+            if (!msg.TryGetProperty("is_taker", out _) || !msg.TryGetProperty("side", out _) ||
+                !msg.TryGetProperty("count", out _) || !msg.TryGetProperty("action", out _) ||
+                !msg.TryGetProperty("ts", out _))
+            {
+                _logger.LogWarning("Invalid fill data: missing required fields for {MarketTicker}", marketTickerProp.GetString());
+                return Task.CompletedTask;
+            }
+
+            var marketTicker = marketTickerProp.GetString()!;
+
+            // Queue size check
+            if (_fillQueue.Count >= _maxQueueSize)
+            {
+                _logger.LogWarning("Fill queue at max capacity ({MaxSize}), dropping fill operation for {MarketTicker}", _maxQueueSize, marketTicker);
+                return Task.CompletedTask;
+            }
+
             _fillQueue.Enqueue(new DatabaseOperation
             {
                 StoredProcedure = "dbo.sp_InsertFeed_Fill",
@@ -349,13 +533,39 @@ namespace KalshiBotData.Data
         /// <summary>
         /// Asynchronously stores event lifecycle data from WebSocket messages into the database queue for processing.
         /// Records event metadata including titles, subtitles, collateral types, and timing information.
+        /// Includes input validation and queue size checks.
         /// </summary>
         /// <param name="data">The JSON element containing the WebSocket event lifecycle message data.</param>
         /// <returns>A completed task since the operation is queued for background processing.</returns>
         public Task StoreEventLifecycleAsync(JsonElement data)
         {
-            var msg = data.GetProperty("msg");
-            var eventTicker = msg.GetProperty("event_ticker").GetString() ?? string.Empty;
+            // Input validation
+            if (!data.TryGetProperty("msg", out var msg))
+            {
+                _logger.LogWarning("Invalid event lifecycle data: missing 'msg' property");
+                return Task.CompletedTask;
+            }
+            if (!msg.TryGetProperty("event_ticker", out var eventTickerProp) || string.IsNullOrEmpty(eventTickerProp.GetString()))
+            {
+                _logger.LogWarning("Invalid event lifecycle data: missing or empty 'event_ticker'");
+                return Task.CompletedTask;
+            }
+            // Check required fields
+            if (!msg.TryGetProperty("title", out _) || !msg.TryGetProperty("series_ticker", out _))
+            {
+                _logger.LogWarning("Invalid event lifecycle data: missing required fields for {EventTicker}", eventTickerProp.GetString());
+                return Task.CompletedTask;
+            }
+
+            var eventTicker = eventTickerProp.GetString()!;
+
+            // Queue size check
+            if (_eventLifecycleQueue.Count >= _maxQueueSize)
+            {
+                _logger.LogWarning("Event lifecycle queue at max capacity ({MaxSize}), dropping operation for {EventTicker}", _maxQueueSize, eventTicker);
+                return Task.CompletedTask;
+            }
+
             _eventLifecycleQueue.Enqueue(new DatabaseOperation
             {
                 StoredProcedure = "dbo.sp_InsertFeed_Lifecycle_Event",
@@ -382,28 +592,31 @@ namespace KalshiBotData.Data
         /// <summary>
         /// Asynchronously stores market lifecycle data from WebSocket messages into the database queue for processing.
         /// Records market state changes including open/close times, determination times, and settlement results.
-        /// Validates required market ticker presence before queuing the operation.
+        /// Includes input validation and queue size checks.
         /// </summary>
         /// <param name="data">The JSON element containing the WebSocket market lifecycle message data.</param>
         /// <returns>A completed task since the operation is queued for background processing.</returns>
-        /// <exception cref="ArgumentException">Thrown when required 'msg' or 'market_ticker' properties are missing.</exception>
         public Task StoreMarketLifecycleAsync(JsonElement data)
         {
-            // Check if "msg" property exists
+            // Input validation
             if (!data.TryGetProperty("msg", out var msg))
             {
-                return Task.FromException(new ArgumentException("The 'msg' property is missing in the provided JSON data."));
+                _logger.LogWarning("Invalid market lifecycle data: missing 'msg' property");
+                return Task.CompletedTask;
+            }
+            if (!msg.TryGetProperty("market_ticker", out var marketTickerProp) || string.IsNullOrEmpty(marketTickerProp.GetString()))
+            {
+                _logger.LogWarning("Invalid market lifecycle data: missing or empty 'market_ticker'");
+                return Task.CompletedTask;
             }
 
-            // Safely extract market_ticker with null as default
-            string? marketTicker = msg.TryGetProperty("market_ticker", out var marketTickerProp)
-                ? marketTickerProp.GetString()
-                : null;
+            var marketTicker = marketTickerProp.GetString()!;
 
-            // If market_ticker is null or empty, return an error as it appears critical
-            if (string.IsNullOrEmpty(marketTicker))
+            // Queue size check
+            if (_marketLifecycleQueue.Count >= _maxQueueSize)
             {
-                return Task.FromException(new ArgumentException("The 'market_ticker' property is missing or empty."));
+                _logger.LogWarning("Market lifecycle queue at max capacity ({MaxSize}), dropping operation for {MarketTicker}", _maxQueueSize, marketTicker);
+                return Task.CompletedTask;
             }
 
             _marketLifecycleQueue.Enqueue(new DatabaseOperation
@@ -492,6 +705,7 @@ namespace KalshiBotData.Data
         /// <summary>
         /// Background worker method that continuously processes database operations from a specific queue.
         /// Executes stored procedures with retry logic for transient SQL errors and handles specific error conditions.
+        /// Supports batch processing and collects performance metrics.
         /// </summary>
         /// <param name="queue">The concurrent queue containing database operations to process.</param>
         /// <param name="operationName">Descriptive name of the operation type for logging and error handling.</param>
@@ -499,38 +713,74 @@ namespace KalshiBotData.Data
         /// <returns>A task representing the asynchronous processing operation.</returns>
         private async Task ProcessQueueAsync(ConcurrentQueue<DatabaseOperation> queue, string operationName, CancellationToken cancellationToken)
         {
+            var operations = new List<DatabaseOperation>();
+            var stopwatch = new Stopwatch();
+            DateTime lastMetricsLog = DateTime.UtcNow;
+
             while (!cancellationToken.IsCancellationRequested)
             {
-                if (queue.TryDequeue(out var operation))
+                operations.Clear();
+                // Collect batch
+                for (int i = 0; i < _batchSize; i++)
                 {
-                    var retryPolicy = Policy.Handle<SqlException>(ex => IsTransient(ex)).WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(i));
+                    if (queue.TryDequeue(out var operation))
+                    {
+                        operations.Add(operation);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if (operations.Count > 0)
+                {
+                    stopwatch.Restart();
+                    var retryPolicy = Policy.Handle<SqlException>(ex => IsTransient(ex)).WaitAndRetryAsync(_retryCount, i => _retryDelay * i);
                     await retryPolicy.ExecuteAsync(async () =>
                     {
-                        try
+                        await using var conn = new SqlConnection(_connectionString);
+                        await conn.OpenAsync(cancellationToken);
+                        foreach (var operation in operations)
                         {
-                            await using var conn = new SqlConnection(_connectionString);
-                            await conn.OpenAsync(cancellationToken);
-                            await using var cmd = new SqlCommand(operation.StoredProcedure, conn) { CommandType = CommandType.StoredProcedure, CommandTimeout = 60 };
-                            operation.SetParameters(cmd);
-                            await cmd.ExecuteNonQueryAsync(cancellationToken);
-                        }
-                        catch (SqlException ex) when (ex.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase))
-                        {
-                            _logger.LogWarning(new KnownDuplicateInsertException(operationName, operation.Identifier,
-                                $"Duplicate insert attempted for {operationName}: {operation.Identifier}", ex),
-                                "Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
-                        }
-                        catch (SqlException ex) when (ex.Message.Contains("deadlocked", StringComparison.OrdinalIgnoreCase))
-                        {
-                            _logger.LogWarning(new MarketInterestScoreDeadlockException(
-                                $"Deadlock occurred for {operationName}: {operation.Identifier}. SQL error: {ex.Message}", ex),
-                                "Deadlock occurred for {OperationName}: {Identifier}. SQL error: {ex.Message}", operationName, operation.Identifier);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Failed to execute {OperationName} for {Identifier}", operationName, operation.Identifier);
+                            try
+                            {
+                                await using var cmd = new SqlCommand(operation.StoredProcedure, conn) { CommandType = CommandType.StoredProcedure, CommandTimeout = 60 };
+                                operation.SetParameters(cmd);
+                                await cmd.ExecuteNonQueryAsync(cancellationToken);
+                                Interlocked.Increment(ref _totalProcessed);
+                            }
+                            catch (SqlException ex) when (ex.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase))
+                            {
+                                _logger.LogWarning(new KnownDuplicateInsertException(operationName, operation.Identifier,
+                                    $"Duplicate insert attempted for {operationName}: {operation.Identifier}", ex),
+                                    "Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
+                                Interlocked.Increment(ref _totalFailed);
+                            }
+                            catch (SqlException ex) when (ex.Message.Contains("deadlocked", StringComparison.OrdinalIgnoreCase))
+                            {
+                                _logger.LogWarning(new MarketInterestScoreDeadlockException(
+                                    $"Deadlock occurred for {operationName}: {operation.Identifier}. SQL error: {ex.Message}", ex),
+                                    "Deadlock occurred for {OperationName}: {Identifier}. SQL error: {ex.Message}", operationName, operation.Identifier);
+                                Interlocked.Increment(ref _totalFailed);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Failed to execute {OperationName} for {Identifier}", operationName, operation.Identifier);
+                                Interlocked.Increment(ref _totalFailed);
+                            }
                         }
                     });
+                    stopwatch.Stop();
+                    _logger.LogInformation("Processed batch of {Count} {OperationName} operations in {ElapsedMs}ms", operations.Count, operationName, stopwatch.ElapsedMilliseconds);
+
+                    // Log metrics periodically
+                    if ((DateTime.UtcNow - lastMetricsLog).TotalMinutes >= 1)
+                    {
+                        _logger.LogInformation("Metrics - {OperationName}: Processed: {Processed}, Failed: {Failed}, Queue Depth: {Depth}",
+                            operationName, Interlocked.Read(ref _totalProcessed), Interlocked.Read(ref _totalFailed), queue.Count);
+                        lastMetricsLog = DateTime.UtcNow;
+                    }
                 }
                 else
                 {
