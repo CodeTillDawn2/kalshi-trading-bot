@@ -1,9 +1,13 @@
 using BacklashDTOs;
 using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
+using TradingStrategies.Configuration;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -19,7 +23,7 @@ namespace TradingStrategies.Trading.Overseer
     /// It applies realistic trading fees and ensures FIFO order matching for accurate simulation results.
     /// Key simulation mechanics include:
     /// - Delta-based order book updates for efficiency
-    /// - Realistic fee calculation (0.07% taker fees)
+    /// - Configurable fee calculation (default 0.07% taker fees)
     /// - Position and cash tracking with proper accounting
     /// - Resting order management with expiration handling
     /// - Combo actions (take then rest) for advanced strategies
@@ -76,18 +80,22 @@ namespace TradingStrategies.Trading.Overseer
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private readonly List<TimeSpan> _executionTimes = new List<TimeSpan>();
         private readonly List<long> _memoryUsages = new List<long>();
+        private readonly SimulationConfig _config;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StrategySimulation"/> class.
         /// Validates that the strategy parameter is not null to prevent runtime errors.
         /// </summary>
         /// <param name="strategy">The trading strategy to simulate. Cannot be null.</param>
+        /// <param name="config">The simulation configuration containing thresholds and settings.</param>
         /// <param name="initialCash">The initial cash balance for the simulation (default is 100.0).</param>
-        /// <exception cref="ArgumentNullException">Thrown when strategy is null.</exception>
-        public StrategySimulation(Strategy strategy, double initialCash = 100.0)
+        /// <exception cref="ArgumentNullException">Thrown when strategy or config is null.</exception>
+        public StrategySimulation(Strategy strategy, IOptions<SimulationConfig> config, double initialCash = 100.0)
         {
             if (strategy == null) throw new ArgumentNullException(nameof(strategy));
+            if (config == null) throw new ArgumentNullException(nameof(config));
             Strategy = strategy;
+            _config = config.Value;
             Position = 0;
             Cash = initialCash;
             InitialCash = initialCash;
@@ -156,6 +164,17 @@ namespace TradingStrategies.Trading.Overseer
             _executionTimes.Add(_stopwatch.Elapsed);
             long memoryAfter = GC.GetTotalMemory(true);
             _memoryUsages.Add(memoryAfter);
+
+            // Enhanced performance monitoring
+            if (_config.EnableDetailedPerformanceLogging && _stopwatch.Elapsed.TotalMilliseconds > _config.PerformanceThresholdMs)
+            {
+                Console.WriteLine($"Performance warning: ProcessSnapshot took {_stopwatch.Elapsed.TotalMilliseconds:F2}ms, Memory: {memoryAfter / 1024 / 1024}MB");
+            }
+
+            if (memoryAfter > _config.MemoryThresholdMB * 1024 * 1024)
+            {
+                Console.WriteLine($"Memory warning: Peak usage {memoryAfter / 1024 / 1024}MB exceeds threshold {_config.MemoryThresholdMB}MB");
+            }
         }
 
 
@@ -175,7 +194,7 @@ namespace TradingStrategies.Trading.Overseer
         ///
         /// Key implementation details for developers:
         /// - Uses FIFO order matching for realistic fill simulation
-        /// - Applies 0.07% taker fees on all market executions
+        /// - Applies configurable taker fees (default 0.07%) on all market executions
         /// - Handles position direction (positive = long, negative = short)
         /// - Manages resting orders with expiration and proper cleanup
         /// - Prevents invalid states (insufficient cash, invalid prices)
@@ -239,7 +258,7 @@ namespace TradingStrategies.Trading.Overseer
             }
 
             // taker fees
-            tempCash -= 0.07 * totalCost;
+            tempCash -= _config.TakerFeeRate * totalCost;
 
             int posDelta = longSide ? filled : -filled;
             tempPosition += posDelta;
@@ -279,12 +298,12 @@ namespace TradingStrategies.Trading.Overseer
                 SimulatedRestingOrders.Clear();
             }
 
-            // Combo  take then rest  sized to 100% of current position
+            // Combo  take then rest  sized to configurable percentage of current position
             if (isComboLongPostAsk && Position > 0)
             {
-                int sellYesPrice = decision.Price;   // 1..99 (YES ask)
+                int sellYesPrice = decision.Price;   // Configurable price range (default 1..99 YES ask)
                 int noBidPrice = 100 - sellYesPrice;
-                int postQuantity = Position;         // 100% of position
+                int postQuantity = (int)(Position * _config.ComboPositionSizePercentage);         // Configurable percentage of position
                 if (sellYesPrice > 0 && sellYesPrice < 100 && noBidPrice >= 1 && noBidPrice <= 99 && postQuantity > 0)
                 {
                     if (SimulatedBook.NoBids[noBidPrice] == null)
@@ -295,8 +314,8 @@ namespace TradingStrategies.Trading.Overseer
             }
             else if (isComboShortPostYes && Position < 0)
             {
-                int yesBidPrice = decision.Price;    // 1..99 (YES bid)
-                int postQuantity = -Position;         // 100% of position
+                int yesBidPrice = decision.Price;    // Configurable price range (default 1..99 YES bid)
+                int postQuantity = (int)(-Position * _config.ComboPositionSizePercentage);         // Configurable percentage of position
                 if (yesBidPrice > 0 && yesBidPrice < 100 && postQuantity > 0)
                 {
                     if (SimulatedBook.YesBids[yesBidPrice] == null)
@@ -320,7 +339,7 @@ namespace TradingStrategies.Trading.Overseer
         /// - PostYes: Places bid for YES at specified price, rests on YES bids side
         /// - PostAsk: Places ask for YES at specified price, rests on NO bids side (100 - price)
         /// - Cancel: Removes ALL resting orders from order book, clearing the resting list
-        /// - Validates price ranges (1-99) and quantity (>0) before processing
+        /// - Validates configurable price ranges (default 1-99) and quantity (>0) before processing
         /// - Uses reverse iteration for cancellation to handle removals safely
         /// - Maintains FIFO order in resting orders list by appending new orders
         /// - Updates both SimulatedOrderbook and SimulatedRestingOrders collections
@@ -349,7 +368,7 @@ namespace TradingStrategies.Trading.Overseer
                     else { book = SimulatedBook.YesBids; bookPrice = 100 - o.price; }
 
                     int toCancel = o.count;
-                    if (bookPrice >= 1 && bookPrice <= 99 && book[bookPrice] != null)
+                    if (bookPrice >= _config.MinContractPrice && bookPrice <= _config.MaxContractPrice && book[bookPrice] != null)
                     {
                         var lst = book[bookPrice];
                         for (int j = lst.Count - 1; j >= 0 && toCancel > 0; j--)
@@ -373,7 +392,7 @@ namespace TradingStrategies.Trading.Overseer
             int limitPrice = decision.Price;
             int qty = decision.Quantity;
             DateTime? exp = decision.Expiration;
-            if (limitPrice <= 0 || limitPrice >= 100 || qty <= 0) return;
+            if (limitPrice < _config.MinContractPrice || limitPrice > _config.MaxContractPrice || qty <= 0) return;
 
             if (action == ActionType.PostYes)
             {
@@ -384,7 +403,7 @@ namespace TradingStrategies.Trading.Overseer
             else // PostAsk (sell YES) => rests on NO bids at (100 - ask)
             {
                 int noBidPrice = 100 - limitPrice;
-                if (noBidPrice < 1 || noBidPrice > 99) return;
+                if (noBidPrice < _config.MinContractPrice || noBidPrice > _config.MaxContractPrice) return;
                 if (SimulatedBook.NoBids[noBidPrice] == null)
                     SimulatedBook.NoBids[noBidPrice] = new List<(int count, DateTime timestamp)>();
                 SimulatedBook.NoBids[noBidPrice].Add((qty, effectiveSnapshot.Timestamp));
@@ -474,7 +493,7 @@ namespace TradingStrategies.Trading.Overseer
                 if (o.expiration.HasValue && o.expiration < currentTime)
                 {
                     int toCancel = o.count;
-                    if (bookPrice >= 1 && bookPrice <= 99 && book[bookPrice] != null)
+                    if (bookPrice >= _config.MinContractPrice && bookPrice <= _config.MaxContractPrice && book[bookPrice] != null)
                     {
                         var lst = book[bookPrice];
                         for (int j = lst.Count - 1; j >= 0 && toCancel > 0; j--)
@@ -496,7 +515,7 @@ namespace TradingStrategies.Trading.Overseer
 
                 // Respect FIFO: your fill begins only after everything *ahead* of you has been consumed.
                 int totalDepth = 0;
-                if (bookPrice >= 1 && bookPrice <= 99 && book[bookPrice] != null)
+                if (bookPrice >= _config.MinContractPrice && bookPrice <= _config.MaxContractPrice && book[bookPrice] != null)
                     totalDepth = book[bookPrice].Sum(t => t.count);
 
                 int depthAhead = Math.Max(0, totalDepth - o.count);
@@ -605,6 +624,139 @@ namespace TradingStrategies.Trading.Overseer
                 }
             }
             return deltas;
+        }
+
+        /// <summary>
+        /// Asynchronous version of ProcessSnapshot for better performance with large snapshot sets.
+        /// Processes a market snapshot by applying deltas, updating the order book, and executing trading decisions.
+        /// </summary>
+        /// <param name="snapshot">The current market snapshot to process.</param>
+        /// <param name="prevSnapshot">The previous market snapshot for delta calculation (optional).</param>
+        /// <param name="cancellationToken">Cancellation token for async operation.</param>
+        /// <returns>A task representing the async operation.</returns>
+        public async Task ProcessSnapshotAsync(MarketSnapshot snapshot, MarketSnapshot? prevSnapshot, CancellationToken cancellationToken = default)
+        {
+            if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
+
+            // Check for cancellation early
+            cancellationToken.ThrowIfCancellationRequested();
+
+            _stopwatch.Restart();
+            long memoryBefore = GC.GetTotalMemory(true);
+
+            // Apply deltas if previous snapshot provided
+            Dictionary<int, int> yesDeltas = new Dictionary<int, int>();
+            Dictionary<int, int> noDeltas = new Dictionary<int, int>();
+            if (prevSnapshot != null)
+            {
+                yesDeltas = await Task.Run(() => CalculateOrderBookDepthChanges(prevSnapshot.GetYesBids(), snapshot.GetYesBids()), cancellationToken);
+                noDeltas = await Task.Run(() => CalculateOrderBookDepthChanges(prevSnapshot.GetNoBids(), snapshot.GetNoBids()), cancellationToken);
+                SimulatedBook.ApplyDeltas(yesDeltas, noDeltas);
+                await Task.Run(() => SimulateFillsFromDeltas(yesDeltas, noDeltas, snapshot.Timestamp), cancellationToken);
+            }
+
+            // Initialize book if first snapshot
+            if (SimulatedBook.YesBids.All(b => b == null || b.Count == 0) && SimulatedBook.NoBids.All(b => b == null || b.Count == 0))
+            {
+                SimulatedBook.InitializeFromSnapshot(snapshot);
+            }
+
+            // Effective snapshot with simulated state
+            var effectiveSnapshot = await Task.Run(() => snapshot.Clone(), cancellationToken);
+            effectiveSnapshot.UpdateOrderbookMetricsFromSimulated(SimulatedBook);
+            effectiveSnapshot.PositionSize = Position;
+            effectiveSnapshot.RestingOrders = SimulatedRestingOrders;
+
+            // Decision + execution
+            var decision = await Task.Run(() => Strategy.GetAction(effectiveSnapshot, prevSnapshot, Position), cancellationToken);
+            await Task.Run(() => ApplyAction(decision, effectiveSnapshot), cancellationToken);
+
+            _stopwatch.Stop();
+            _executionTimes.Add(_stopwatch.Elapsed);
+            long memoryAfter = GC.GetTotalMemory(true);
+            _memoryUsages.Add(memoryAfter);
+
+            // Enhanced performance monitoring
+            if (_config.EnableDetailedPerformanceLogging && _stopwatch.Elapsed.TotalMilliseconds > _config.PerformanceThresholdMs)
+            {
+                Console.WriteLine($"Performance warning: ProcessSnapshotAsync took {_stopwatch.Elapsed.TotalMilliseconds:F2}ms, Memory: {memoryAfter / 1024 / 1024}MB");
+            }
+
+            if (memoryAfter > _config.MemoryThresholdMB * 1024 * 1024)
+            {
+                Console.WriteLine($"Memory warning: Peak usage {memoryAfter / 1024 / 1024}MB exceeds threshold {_config.MemoryThresholdMB}MB");
+            }
+        }
+
+        /// <summary>
+        /// Processes multiple snapshots asynchronously in batches for improved performance.
+        /// </summary>
+        /// <param name="snapshots">The list of market snapshots to process.</param>
+        /// <param name="cancellationToken">Cancellation token for async operation.</param>
+        /// <returns>A task representing the async operation.</returns>
+        public async Task ProcessSnapshotsAsync(IEnumerable<MarketSnapshot> snapshots, CancellationToken cancellationToken = default)
+        {
+            if (snapshots == null) throw new ArgumentNullException(nameof(snapshots));
+
+            var snapshotList = snapshots.ToList();
+            if (snapshotList.Count == 0) return;
+
+            // Process in batches for better performance
+            var batches = snapshotList
+                .Select((snapshot, index) => new { snapshot, index })
+                .GroupBy(x => x.index / _config.AsyncBatchSize)
+                .Select(g => g.Select(x => x.snapshot).ToList())
+                .ToList();
+
+            foreach (var batch in batches)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var tasks = batch.Select(async (snapshot, index) =>
+                {
+                    var prevSnapshot = index > 0 ? batch[index - 1] : (snapshotList.IndexOf(snapshot) > 0 ? snapshotList[snapshotList.IndexOf(snapshot) - 1] : null);
+                    await ProcessSnapshotAsync(snapshot, prevSnapshot, cancellationToken);
+                });
+
+                await Task.WhenAll(tasks);
+
+                // Yield control to prevent blocking
+                await Task.Yield();
+            }
+        }
+
+        /// <summary>
+        /// Gets detailed performance metrics for analysis and optimization.
+        /// </summary>
+        /// <returns>A dictionary containing various performance metrics.</returns>
+        public Dictionary<string, object> GetDetailedPerformanceMetrics()
+        {
+            var metrics = new Dictionary<string, object>
+            {
+                ["TotalExecutionTime"] = TotalExecutionTime,
+                ["AverageExecutionTimeMs"] = AverageExecutionTimeMs,
+                ["PeakMemoryUsage"] = PeakMemoryUsage,
+                ["TotalSnapshotsProcessed"] = _executionTimes.Count,
+                ["PerformanceThresholdMs"] = _config.PerformanceThresholdMs,
+                ["MemoryThresholdMB"] = _config.MemoryThresholdMB,
+                ["SlowOperationsCount"] = _executionTimes.Count(t => t.TotalMilliseconds > _config.PerformanceThresholdMs),
+                ["HighMemoryOperationsCount"] = _memoryUsages.Count(m => m > _config.MemoryThresholdMB * 1024 * 1024),
+                ["RestingOrdersCount"] = SimulatedRestingOrders.Count,
+                ["CurrentPosition"] = Position,
+                ["CurrentCash"] = Cash
+            };
+
+            return metrics;
+        }
+
+        /// <summary>
+        /// Resets performance metrics for a new simulation run.
+        /// </summary>
+        public void ResetPerformanceMetrics()
+        {
+            _executionTimes.Clear();
+            _memoryUsages.Clear();
+            _stopwatch.Reset();
         }
     }
 }
