@@ -46,6 +46,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           if [ -d "docs" ]; then
+            echo '!docs/**' >> .gitignore
             git add docs/
             if [ -n "$(git status --porcelain docs/)" ]; then
               git commit -m "Update documentation"
