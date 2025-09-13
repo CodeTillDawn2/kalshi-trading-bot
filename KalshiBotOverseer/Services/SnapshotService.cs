@@ -1,5 +1,7 @@
 using KalshiBotData.Data.Interfaces;
 using BacklashDTOs.Data;
+using System;
+using System.Diagnostics;
 
 namespace KalshiBotOverseer.Services
 {
@@ -33,18 +35,22 @@ namespace KalshiBotOverseer.Services
 
             var relatedMarkets = await _context.GetMarketsFiltered(includedMarkets: snapshotGroups.Select(x => x.MarketTicker).Distinct().ToHashSet());
 
-            return GetSnapshotGroupsData(snapshotGroups, relatedMarkets);
+            return await GetSnapshotGroupsDataAsync(snapshotGroups, relatedMarkets);
         }
 
         /// <summary>
-        /// Processes a list of snapshot groups into aggregated market data without related market information.
+        /// Asynchronously processes a list of snapshot groups into aggregated market data without related market information.
         /// Groups snapshots by market ticker and calculates total recorded hours and other metrics.
         /// </summary>
         /// <param name="snapshotGroups">The list of snapshot groups to process.</param>
-        /// <returns>A list of anonymous objects containing aggregated snapshot data per market.</returns>
-        public List<object> GetSnapshotGroupsData(List<SnapshotGroupDTO> snapshotGroups)
+        /// <returns>A task representing the asynchronous operation, containing a list of anonymous objects with aggregated snapshot data per market.</returns>
+        public async Task<List<object>> GetSnapshotGroupsDataAsync(List<SnapshotGroupDTO> snapshotGroups)
         {
+            if (snapshotGroups == null)
+                throw new ArgumentNullException(nameof(snapshotGroups));
+
             // Group by MarketTicker and calculate aggregated data
+            var stopwatch = Stopwatch.StartNew();
             var groupedSnapshots = snapshotGroups
                 .GroupBy(sg => sg.MarketTicker)
                 .Select(group =>
@@ -84,23 +90,29 @@ namespace KalshiBotOverseer.Services
                 .OrderBy(s => s.MarketTicker)
                 .ToList();
 
-            return groupedSnapshots.Cast<object>().ToList();
+            return await Task.FromResult(groupedSnapshots.Cast<object>().ToList());
         }
 
         /// <summary>
-        /// Processes a list of snapshot groups into aggregated market data with related market information.
+        /// Asynchronously processes a list of snapshot groups into aggregated market data with related market information.
         /// Groups snapshots by market ticker, calculates recorded hours, market hours, and percentages
         /// using the provided market data for accurate calculations.
         /// </summary>
         /// <param name="snapshotGroups">The list of snapshot groups to process.</param>
         /// <param name="relatedMarkets">The list of related market data for percentage calculations.</param>
-        /// <returns>A list of anonymous objects containing aggregated snapshot data per market.</returns>
-        public List<object> GetSnapshotGroupsData(List<SnapshotGroupDTO> snapshotGroups, List<MarketDTO> relatedMarkets)
+        /// <returns>A task representing the asynchronous operation, containing a list of anonymous objects with aggregated snapshot data per market.</returns>
+        public async Task<List<object>> GetSnapshotGroupsDataAsync(List<SnapshotGroupDTO> snapshotGroups, List<MarketDTO> relatedMarkets)
         {
+            if (snapshotGroups == null)
+                throw new ArgumentNullException(nameof(snapshotGroups));
+            if (relatedMarkets == null)
+                throw new ArgumentNullException(nameof(relatedMarkets));
+
             // Create a lookup for markets for faster access
             var marketLookup = relatedMarkets.ToDictionary(m => m.market_ticker, m => m);
 
             // Group by MarketTicker and calculate aggregated data
+            var stopwatch = Stopwatch.StartNew();
             var groupedSnapshots = snapshotGroups
                 .GroupBy(sg => sg.MarketTicker)
                 .Select(group =>
@@ -117,8 +129,17 @@ namespace KalshiBotOverseer.Services
                         (decimal)(market.close_time - market.open_time).TotalSeconds / 3600.0m : 0;
 
                     // Calculate recorded hours percentage
-                    var recordedHoursPercentage = marketHours > 0 ?
-                        Math.Round((totalRecordedHours / marketHours) * 100, 2) : (decimal?)null;
+                    var recordedHoursPercentage = (decimal?)null;
+                    try
+                    {
+                        recordedHoursPercentage = marketHours > 0 ?
+                            Math.Round((totalRecordedHours / marketHours) * 100, 2) : (decimal?)null;
+                    }
+                    catch (DivideByZeroException)
+                    {
+                        // This should not occur due to the > 0 check, but added for robustness
+                        recordedHoursPercentage = null;
+                    }
 
                     // Check if any snapshot in the group recorded the end (YesEnd=0 or NoEnd=0)
                     var recordedEnd = group.Any(sg => sg.YesEnd == 0 || sg.NoEnd == 0);
@@ -145,7 +166,11 @@ namespace KalshiBotOverseer.Services
                 .OrderBy(s => s.MarketTicker)
                 .ToList();
 
-            return groupedSnapshots.Cast<object>().ToList();
+            stopwatch.Stop();
+            // Performance metric: Aggregation took {stopwatch.ElapsedMilliseconds} ms
+            // Consider logging this if performance becomes a bottleneck
+
+            return await Task.FromResult(groupedSnapshots.Cast<object>().ToList());
         }
     }
 }
