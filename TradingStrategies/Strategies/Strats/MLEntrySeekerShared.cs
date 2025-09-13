@@ -163,7 +163,7 @@ namespace TradingStrategies.Strategies.Strats
 
                 Console.WriteLine($"Entry logged for {ev.Market}: Score={score:F3}, PeakSize={ev.PeakSize}, TimeToPeak={(ev.PeakTime == default ? TimeSpan.FromMinutes(_horizonMin) : ev.PeakTime - ev.Entry).TotalSeconds:F3}");
 
-                ResearchBus.Log(new ResearchBus.EntryResearch(
+                ResearchBus.RecordEntry(new ResearchBus.EntryResearch(
                     MarketTicker: ev.Market,
                     Side: ev.Side,
                     EntryTime: ev.Entry,

@@ -1,4 +1,25 @@
-﻿# PseudoCandlestickExtensions Feedback
+﻿# ResearchBus Feedback
+**Class Analysis Summary:**
+- **Purpose**: ResearchBus is a static utility class that serves as a centralized data collection and export mechanism for machine learning research on trading entries during simulation and backtesting operations. It provides thread-safe logging of detailed entry metrics, including market conditions, timing, performance outcomes, and strategy parameters, enabling comprehensive analysis of trading signal effectiveness and parameter optimization. The class facilitates data export to CSV for external statistical analysis and supports the ML pipeline by aggregating research data from multiple strategy executions.
+- **Key Improvements Made**:
+  - Renamed Log method to RecordEntry for better clarity and descriptive naming
+  - Verified comprehensive XML documentation is already present for the entire class, all methods, and the EntryResearch record with detailed parameter descriptions
+  - Confirmed no unclear method or property names exist (RecordEntry, Clear, DumpCsv are descriptive and follow clear naming conventions)
+  - Verified no placeholders or incomplete implementation comments exist
+  - Confirmed all methods are actively used in MLEntrySeekerShared.cs and TradingSimulatorService.cs for research data collection and export
+  - No notes about removed functionality present
+  - No logging present in the class (appropriate for a data collection utility)
+- **Strengths**: Well-architected static utility with clear separation of concerns, thread-safe concurrent data collection, efficient CSV export with ordered output by score, actively used in production ML research pipeline, follows established patterns for data aggregation utilities, excellent integration with ML strategy classes, proper encapsulation of research data structures, clean API with simple method signatures.
+- **Areas for Improvement**:
+  - Consider implementing data validation for EntryResearch parameters to prevent invalid research entries
+  - Consider adding performance metrics collection for large entry collections if export becomes a bottleneck
+  - Consider implementing data filtering options for CSV export (e.g., by parameter set or score threshold)
+  - Add configuration options for CSV output format instead of hardcoded column order
+  - Consider implementing parallel processing for CSV export if dealing with very large datasets
+  - Add unit tests to validate CSV output format and data integrity
+- **Overall Assessment**: Excellent, production-ready research data collection utility that effectively serves as the core data aggregation component for the ML research pipeline. The class is well-architected with proper separation of concerns, comprehensive documentation, and robust data handling capabilities. No critical issues found - the implementation is sophisticated and serves as a reliable foundation for trading strategy research and analysis in the Kalshi bot system.
+
+# PseudoCandlestickExtensions Feedback
 **Class Analysis Summary:**
 - **Purpose**: PseudoCandlestickExtensions is a static extension class that provides a single method for converting sequences of PseudoCandlestick objects to standard CandleMids candlestick format. It serves as a data transformation utility that bridges simplified mid-price candlestick data (from tickers or existing candlesticks) to traditional OHLC candlestick data required for technical analysis and pattern detection algorithms. The class enables seamless integration of market data streams into trading strategy evaluation pipelines by transforming n PseudoCandlesticks into n-1 CandleMids, where each output candlestick represents the price transition between consecutive input periods.
 - **Key Improvements Made**:
