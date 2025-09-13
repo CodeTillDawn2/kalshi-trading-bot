@@ -51,6 +51,7 @@ namespace KalshiBotData.Data
         private DbSet<Snapshot> Snapshots { get; set; }
         private DbSet<SnapshotSchema> SnapshotSchemas { get; set; }
         private DbSet<BrainInstance> BrainInstances { get; set; }
+        private DbSet<BrainPersistenceEntity> BrainPersistenceEntities { get; set; }
         private DbSet<StratData> StratData { get; set; }
         private DbSet<MarketType> MarketTypes { get; set; }
         private DbSet<SnapshotGroup> SnapshotGroups { get; set; }
@@ -1139,6 +1140,60 @@ namespace KalshiBotData.Data
             }
             await SaveChangesAsync();
         }
+
+        public async Task SaveBrainPersistence(string brainInstanceName, string persistenceData)
+        {
+            BrainPersistenceEntity? entity = await BrainPersistenceEntities
+                .FirstOrDefaultAsync(x => x.BrainInstanceName == brainInstanceName);
+
+            if (entity == null)
+            {
+                entity = new BrainPersistenceEntity
+                {
+                    BrainInstanceName = brainInstanceName,
+                    PersistenceData = persistenceData,
+                    LastUpdated = DateTime.UtcNow,
+                    Version = 1
+                };
+                BrainPersistenceEntities.Add(entity);
+            }
+            else
+            {
+                entity.PersistenceData = persistenceData;
+                entity.LastUpdated = DateTime.UtcNow;
+            }
+
+            await SaveChangesAsync();
+        }
+
+        public async Task<string?> LoadBrainPersistence(string brainInstanceName)
+        {
+            BrainPersistenceEntity? entity = await BrainPersistenceEntities
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.BrainInstanceName == brainInstanceName);
+
+            return entity?.PersistenceData;
+        }
+
+        public async Task DeleteBrainPersistence(string brainInstanceName)
+        {
+            BrainPersistenceEntity? entity = await BrainPersistenceEntities
+                .FirstOrDefaultAsync(x => x.BrainInstanceName == brainInstanceName);
+
+            if (entity != null)
+            {
+                BrainPersistenceEntities.Remove(entity);
+                await SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<string>> GetAllBrainPersistenceNames()
+        {
+            return await BrainPersistenceEntities
+                .AsNoTracking()
+                .Select(x => x.BrainInstanceName)
+                .ToListAsync();
+        }
         #endregion
 
         #region Snapshot Groups
@@ -1764,6 +1819,28 @@ namespace KalshiBotData.Data
             modelBuilder.Entity<BrainInstance>()
                 .ToTable("t_BrainInstances")
                 .HasKey(m => m.BrainInstanceName);
+
+            modelBuilder.Entity<BrainPersistenceEntity>()
+                .ToTable("t_BrainPersistence")
+                .HasKey(m => m.BrainInstanceName);
+
+            modelBuilder.Entity<BrainPersistenceEntity>()
+                .Property(m => m.BrainInstanceName)
+                .HasMaxLength(25)
+                .IsRequired();
+
+            modelBuilder.Entity<BrainPersistenceEntity>()
+                .Property(m => m.PersistenceData)
+                .HasColumnType("nvarchar(max)")
+                .IsRequired();
+
+            modelBuilder.Entity<BrainPersistenceEntity>()
+                .Property(m => m.LastUpdated)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            modelBuilder.Entity<BrainPersistenceEntity>()
+                .Property(m => m.Version)
+                .HasDefaultValue(1);
 
             modelBuilder.Entity<Market>()
                 .ToTable("t_Markets")

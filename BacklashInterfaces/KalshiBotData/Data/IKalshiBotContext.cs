@@ -108,6 +108,10 @@ namespace KalshiBotData.Data.Interfaces
         Task<List<BrainInstanceDTO>> GetBrainInstancesFiltered(string? instanceName = null, bool? hasBrainLock = null);
         Task<List<BrainInstanceDTO>> GetStaleBrains(Guid brainLock);
         Task AddOrUpdateBrainInstance(BrainInstanceDTO dto);
+        Task SaveBrainPersistence(string brainInstanceName, string persistenceData);
+        Task<string?> LoadBrainPersistence(string brainInstanceName);
+        Task DeleteBrainPersistence(string brainInstanceName);
+        Task<List<string>> GetAllBrainPersistenceNames();
         #endregion
 
         #region Snapshot Groups
