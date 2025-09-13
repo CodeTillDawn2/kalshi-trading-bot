@@ -115,5 +115,59 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         /// <value>Default is 5 minutes.</value>
         public int MarketRefreshCircuitBreakerTimeoutMinutes { get; set; } = 5;
+
+        /// <summary>
+        /// Gets or sets the connection health check interval in seconds.
+        /// </summary>
+        /// <value>Default is 30 seconds.</value>
+        public int ConnectionHealthCheckIntervalSeconds { get; set; } = 30;
+
+        /// <summary>
+        /// Gets or sets the connection timeout in seconds for health monitoring.
+        /// </summary>
+        /// <value>Default is 60 seconds.</value>
+        public int ConnectionHealthTimeoutSeconds { get; set; } = 60;
+
+        /// <summary>
+        /// Gets or sets the authentication token validity duration in hours.
+        /// </summary>
+        /// <value>Default is 24 hours.</value>
+        public int AuthTokenValidityHours { get; set; } = 24;
+
+        /// <summary>
+        /// Gets or sets the rate limit for handshake operations per minute per IP.
+        /// </summary>
+        /// <value>Default is 10 handshakes per minute.</value>
+        public int HandshakeRateLimitPerMinute { get; set; } = 10;
+
+        /// <summary>
+        /// Gets or sets the rate limit for check-in operations per minute per client.
+        /// </summary>
+        /// <value>Default is 60 check-ins per minute.</value>
+        public int CheckInRateLimitPerMinute { get; set; } = 60;
+
+        /// <summary>
+        /// Gets or sets the message batch size for broadcast operations.
+        /// </summary>
+        /// <value>Default is 50 messages per batch.</value>
+        public int MessageBatchSize { get; set; } = 50;
+
+        /// <summary>
+        /// Gets or sets the message batch processing interval in milliseconds.
+        /// </summary>
+        /// <value>Default is 100 milliseconds.</value>
+        public int MessageBatchIntervalMs { get; set; } = 100;
+
+        /// <summary>
+        /// Gets or sets the stale connection cleanup interval in minutes.
+        /// </summary>
+        /// <value>Default is 5 minutes.</value>
+        public int StaleConnectionCleanupIntervalMinutes { get; set; } = 5;
+
+        /// <summary>
+        /// Gets or sets the maximum age for connections to be considered stale in minutes.
+        /// </summary>
+        /// <value>Default is 10 minutes.</value>
+        public int MaxConnectionAgeMinutes { get; set; } = 10;
     }
 }
