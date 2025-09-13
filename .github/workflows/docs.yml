@@ -50,16 +50,26 @@ jobs:
           ls -R docfx_project/obj || true
           test -f docfx_project/obj/api/index.yaml || true
 
-      - name: Generate API TOC
+      - name: Generate API toc.yml (by namespace)
         run: |
+          set -e
           mkdir -p docfx_project/api
+          # collect top-level namespace YAMLs emitted by docfx metadata
+          ns_files=$(find docfx_project/api -path "*/namespace/*.yml" -type f | sort)
+          # flat TOC (every namespace as an entry)
           {
             echo "items:"
-            find docfx_project/api -path "*/namespace/*.yml" -type f -print0 \
-              | xargs -0 -I{} awk '/^uid: /{print "  - uid: "$2; exit }' "{}" \
-              | sort -u
+            # first 'uid:' in each namespace file is the namespace uid
+            while IFS= read -r f; do
+              uid=$(awk '/^uid: /{print $2; exit}' "$f")
+              [ -n "$uid" ] && echo "  - uid: $uid"
+            done <<< "$ns_files"
           } > docfx_project/api/toc.yml
-          printf "# API Reference\n" > docfx_project/api/index.md
+
+          # minimal landing page so /api/index.html exists
+          printf "# API Reference\n\nBrowse namespaces and types.\n" > docfx_project/api/index.md
+
+          echo "Generated toc.yml:"
           cat docfx_project/api/toc.yml
 
       - name: Build site
