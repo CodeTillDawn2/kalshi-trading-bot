@@ -52,6 +52,21 @@ namespace TradingSimulator
         private readonly int _processingTimeoutSeconds;
 
         /// <summary>
+        /// Maximum number of markets to process concurrently in batch operations.
+        /// </summary>
+        private readonly int _maxConcurrentMarkets;
+
+        /// <summary>
+        /// Size of batches for processing multiple markets to reduce memory pressure.
+        /// </summary>
+        private readonly int _batchSize;
+
+        /// <summary>
+        /// Performance metrics for tracking processing rates and queue depths.
+        /// </summary>
+        private readonly PerformanceMetrics _performanceMetrics;
+
+        /// <summary>
         /// Event raised to report progress during market processing operations.
         /// </summary>
         public event Action<string> OnTestProgress;
@@ -65,13 +80,17 @@ namespace TradingSimulator
         /// <param name="cacheDirectory">Directory for caching processed data.</param>
         /// <param name="simulatorReporting">Reporting service for discrepancy detection.</param>
         /// <param name="processingTimeoutSeconds">Timeout in seconds for processing operations.</param>
+        /// <param name="maxConcurrentMarkets">Maximum number of markets to process concurrently in batch operations.</param>
+        /// <param name="batchSize">Size of batches for processing multiple markets to reduce memory pressure.</param>
         public MarketProcessor(
             TradingOverseer overseer,
             IServiceScopeFactory scopeFactory,
             HashSet<string> processedMarkets,
             string cacheDirectory,
             SimulatorReporting simulatorReporting,
-            int processingTimeoutSeconds)
+            int processingTimeoutSeconds,
+            int maxConcurrentMarkets = 5,
+            int batchSize = 10)
         {
             _overseer = overseer;
             _scopeFactory = scopeFactory;
@@ -79,6 +98,9 @@ namespace TradingSimulator
             _cacheDirectory = cacheDirectory;
             _simulatorReporting = simulatorReporting;
             _processingTimeoutSeconds = processingTimeoutSeconds;
+            _maxConcurrentMarkets = maxConcurrentMarkets;
+            _batchSize = batchSize;
+            _performanceMetrics = new PerformanceMetrics();
         }
 
         /// <summary>
@@ -118,6 +140,10 @@ namespace TradingSimulator
 
             OnTestProgress?.Invoke($"{progressPrefix}Processing market: {marketTicker}");
 
+            // Record performance metrics
+            var startTime = DateTime.UtcNow;
+            _performanceMetrics.StartMarketProcessing(marketTicker, marketSnapshots.Count);
+
             try
             {
                 // Set market types
@@ -146,6 +172,7 @@ namespace TradingSimulator
                 else
                 {
                     OnTestProgress?.Invoke($"{progressPrefix}Processing timeout exceeded ({_processingTimeoutSeconds}s) for {marketTicker}. Skipping.");
+                    _performanceMetrics.CompleteMarketProcessing(marketTicker, DateTime.UtcNow - startTime);
                     return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
                 }
 
@@ -154,7 +181,9 @@ namespace TradingSimulator
                     var bestPath = pathData.OrderByDescending(p => p.performance.Equity).First();
                     var eventLogs = bestPath.events;
 
-                    return ProcessEventLogs(marketSnapshots, eventLogs, marketTicker, writeToFile, progressPrefix, group);
+                    var result = ProcessEventLogs(marketSnapshots, eventLogs, marketTicker, writeToFile, progressPrefix, group);
+                    _performanceMetrics.CompleteMarketProcessing(marketTicker, DateTime.UtcNow - startTime);
+                    return result;
                 }
             }
             catch (Exception ex)
@@ -162,6 +191,7 @@ namespace TradingSimulator
                 OnTestProgress?.Invoke($"{progressPrefix}Error processing {marketTicker}: {ex.Message}");
             }
 
+            _performanceMetrics.CompleteMarketProcessing(marketTicker, DateTime.UtcNow - startTime);
             return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
         }
 
@@ -214,6 +244,97 @@ namespace TradingSimulator
             return (finalPnL, finalPosition, finalAverageCost, bidPoints, askPoints, buyPoints, sellPoints,
                 exitPoints, eventPoints, intendedLongPoints, intendedShortPoints, positionPoints,
                 averageCostPoints, restingOrdersPoints, new List<PricePoint>(), patternPoints);
+        }
+
+        /// <summary>
+        /// Processes multiple markets in batches for high-volume scenarios to reduce event overhead.
+        /// Markets are processed concurrently within each batch, with configurable batch sizes and concurrency limits.
+        /// </summary>
+        /// <param name="marketTickers">List of market tickers to process.</param>
+        /// <param name="marketSnapshots">Dictionary mapping market tickers to their historical snapshots.</param>
+        /// <param name="strategiesDict">Dictionary mapping market types to their associated trading strategies.</param>
+        /// <param name="progressPrefix">Optional prefix for progress reporting messages.</param>
+        /// <param name="writeToFile">Whether to save the processed data to cache files.</param>
+        /// <param name="detectVelocityDiscrepancies">Whether to detect and report orderbook velocity discrepancies.</param>
+        /// <param name="group">Optional snapshot group metadata for file naming and organization.</param>
+        /// <param name="ignoreProcessedCache">Whether to ignore the processed markets cache and reprocess.</param>
+        /// <returns>A dictionary mapping market tickers to their processing results.</returns>
+        public async Task<Dictionary<string, (double finalPnL, int finalPosition, double finalAverageCost, List<PricePoint> bidPoints, List<PricePoint> askPoints,
+            List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
+            List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
+            List<PricePoint> positionPoints, List<PricePoint> averageCostPoints, List<PricePoint> restingOrdersPoints,
+            List<PricePoint> discrepancyPoints, List<PricePoint> patternPoints)>> ProcessMarketsBatchAsync(
+            List<string> marketTickers,
+            Dictionary<string, List<MarketSnapshot>> marketSnapshots,
+            Dictionary<MarketType, List<Strategy>> strategiesDict,
+            string progressPrefix = "",
+            bool writeToFile = false,
+            bool detectVelocityDiscrepancies = false,
+            SnapshotGroupDTO? group = null,
+            bool ignoreProcessedCache = false)
+        {
+            var results = new Dictionary<string, (double, int, double, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>)>();
+
+            // Filter out already processed markets if not ignoring cache
+            var marketsToProcess = ignoreProcessedCache
+                ? marketTickers
+                : marketTickers.Where(ticker => !_processedMarkets.Contains(ticker)).ToList();
+
+            if (!marketsToProcess.Any())
+            {
+                OnTestProgress?.Invoke($"{progressPrefix}All markets already processed or cached.");
+                return results;
+            }
+
+            OnTestProgress?.Invoke($"{progressPrefix}Processing {marketsToProcess.Count} markets in batches (batch size: {_batchSize}, max concurrent: {_maxConcurrentMarkets})");
+
+            // Process markets in batches
+            for (int i = 0; i < marketsToProcess.Count; i += _batchSize)
+            {
+                var batchStartTime = DateTime.UtcNow;
+                var batch = marketsToProcess.Skip(i).Take(_batchSize).ToList();
+                OnTestProgress?.Invoke($"{progressPrefix}Processing batch {i / _batchSize + 1} with {batch.Count} markets");
+
+                // Process markets in this batch concurrently, but limit concurrency
+                var batchTasks = new List<Task>();
+                var semaphore = new SemaphoreSlim(_maxConcurrentMarkets);
+
+                foreach (var marketTicker in batch)
+                {
+                    if (!marketSnapshots.TryGetValue(marketTicker, out var snapshots))
+                    {
+                        OnTestProgress?.Invoke($"{progressPrefix}Warning: No snapshots found for market {marketTicker}, skipping.");
+                        continue;
+                    }
+
+                    batchTasks.Add(Task.Run(async () =>
+                    {
+                        await semaphore.WaitAsync();
+                        try
+                        {
+                            var result = await ProcessMarketAsync(marketTicker, snapshots, strategiesDict,
+                                progressPrefix, writeToFile, detectVelocityDiscrepancies, group, ignoreProcessedCache);
+                            lock (results)
+                            {
+                                results[marketTicker] = result;
+                            }
+                        }
+                        finally
+                        {
+                            semaphore.Release();
+                        }
+                    }));
+                }
+
+                // Wait for all tasks in this batch to complete
+                await Task.WhenAll(batchTasks);
+                var batchProcessingTime = DateTime.UtcNow - batchStartTime;
+                _performanceMetrics.RecordBatchProcessing(batch.Count, batchProcessingTime);
+                OnTestProgress?.Invoke($"{progressPrefix}Completed batch {i / _batchSize + 1} in {batchProcessingTime.TotalSeconds:F2}s");
+            }
+
+            OnTestProgress?.Invoke($"{progressPrefix}Batch processing completed. Processed {results.Count} markets.");
+            return results;
         }
 
         /// <summary>
@@ -445,6 +566,169 @@ namespace TradingSimulator
             Directory.CreateDirectory(_cacheDirectory);
             var filePath = Path.Combine(_cacheDirectory, $"{marketTicker}{fileNameSuffix}.json");
             File.WriteAllText(filePath, json);
+        }
+
+        /// <summary>
+        /// Gets the current performance metrics for monitoring processing efficiency.
+        /// </summary>
+        public PerformanceMetrics GetPerformanceMetrics() => _performanceMetrics;
+
+        /// <summary>
+        /// Resets all performance metrics counters.
+        /// </summary>
+        public void ResetPerformanceMetrics() => _performanceMetrics.Reset();
+    }
+
+    /// <summary>
+    /// Performance metrics class for tracking message processing rates and queue depths.
+    /// </summary>
+    public class PerformanceMetrics
+    {
+        private readonly object _metricsLock = new object();
+        private DateTime _startTime = DateTime.UtcNow;
+        private int _totalMarketsProcessed = 0;
+        private int _totalSnapshotsProcessed = 0;
+        private TimeSpan _totalProcessingTime = TimeSpan.Zero;
+        private int _currentQueueDepth = 0;
+        private int _maxQueueDepth = 0;
+        private int _batchProcessingCount = 0;
+        private TimeSpan _totalBatchProcessingTime = TimeSpan.Zero;
+
+        /// <summary>
+        /// Records the start of market processing for performance tracking.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker being processed.</param>
+        /// <param name="snapshotCount">Number of snapshots in this market.</param>
+        public void StartMarketProcessing(string marketTicker, int snapshotCount)
+        {
+            lock (_metricsLock)
+            {
+                _totalSnapshotsProcessed += snapshotCount;
+                _currentQueueDepth++;
+                if (_currentQueueDepth > _maxQueueDepth)
+                    _maxQueueDepth = _currentQueueDepth;
+            }
+        }
+
+        /// <summary>
+        /// Records the completion of market processing and updates timing metrics.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker that was processed.</param>
+        /// <param name="processingTime">Time taken to process this market.</param>
+        public void CompleteMarketProcessing(string marketTicker, TimeSpan processingTime)
+        {
+            lock (_metricsLock)
+            {
+                _totalMarketsProcessed++;
+                _totalProcessingTime += processingTime;
+                _currentQueueDepth--;
+            }
+        }
+
+        /// <summary>
+        /// Records batch processing metrics.
+        /// </summary>
+        /// <param name="batchSize">Number of markets in the batch.</param>
+        /// <param name="processingTime">Time taken to process the batch.</param>
+        public void RecordBatchProcessing(int batchSize, TimeSpan processingTime)
+        {
+            lock (_metricsLock)
+            {
+                _batchProcessingCount++;
+                _totalBatchProcessingTime += processingTime;
+            }
+        }
+
+        /// <summary>
+        /// Gets the average processing time per market.
+        /// </summary>
+        public TimeSpan AverageProcessingTimePerMarket =>
+            _totalMarketsProcessed > 0 ? _totalProcessingTime / _totalMarketsProcessed : TimeSpan.Zero;
+
+        /// <summary>
+        /// Gets the average processing time per batch.
+        /// </summary>
+        public TimeSpan AverageBatchProcessingTime =>
+            _batchProcessingCount > 0 ? _totalBatchProcessingTime / _batchProcessingCount : TimeSpan.Zero;
+
+        /// <summary>
+        /// Gets the processing rate in markets per second.
+        /// </summary>
+        public double MarketsPerSecond =>
+            _totalProcessingTime.TotalSeconds > 0 ? _totalMarketsProcessed / _totalProcessingTime.TotalSeconds : 0;
+
+        /// <summary>
+        /// Gets the processing rate in snapshots per second.
+        /// </summary>
+        public double SnapshotsPerSecond =>
+            _totalProcessingTime.TotalSeconds > 0 ? _totalSnapshotsProcessed / _totalProcessingTime.TotalSeconds : 0;
+
+        /// <summary>
+        /// Gets the current queue depth.
+        /// </summary>
+        public int CurrentQueueDepth => _currentQueueDepth;
+
+        /// <summary>
+        /// Gets the maximum queue depth recorded.
+        /// </summary>
+        public int MaxQueueDepth => _maxQueueDepth;
+
+        /// <summary>
+        /// Gets the total number of markets processed.
+        /// </summary>
+        public int TotalMarketsProcessed => _totalMarketsProcessed;
+
+        /// <summary>
+        /// Gets the total number of snapshots processed.
+        /// </summary>
+        public int TotalSnapshotsProcessed => _totalSnapshotsProcessed;
+
+        /// <summary>
+        /// Gets the total processing time.
+        /// </summary>
+        public TimeSpan TotalProcessingTime => _totalProcessingTime;
+
+        /// <summary>
+        /// Gets the uptime since metrics were started.
+        /// </summary>
+        public TimeSpan Uptime => DateTime.UtcNow - _startTime;
+
+        /// <summary>
+        /// Resets all performance metrics to their initial state.
+        /// </summary>
+        public void Reset()
+        {
+            lock (_metricsLock)
+            {
+                _startTime = DateTime.UtcNow;
+                _totalMarketsProcessed = 0;
+                _totalSnapshotsProcessed = 0;
+                _totalProcessingTime = TimeSpan.Zero;
+                _currentQueueDepth = 0;
+                _maxQueueDepth = 0;
+                _batchProcessingCount = 0;
+                _totalBatchProcessingTime = TimeSpan.Zero;
+            }
+        }
+
+        /// <summary>
+        /// Gets a summary of current performance metrics as a formatted string.
+        /// </summary>
+        public string GetMetricsSummary()
+        {
+            lock (_metricsLock)
+            {
+                return $"Performance Metrics:\n" +
+                       $"  Total Markets Processed: {_totalMarketsProcessed}\n" +
+                       $"  Total Snapshots Processed: {_totalSnapshotsProcessed}\n" +
+                       $"  Total Processing Time: {_totalProcessingTime.TotalSeconds:F2}s\n" +
+                       $"  Average Time per Market: {AverageProcessingTimePerMarket.TotalMilliseconds:F2}ms\n" +
+                       $"  Markets per Second: {MarketsPerSecond:F2}\n" +
+                       $"  Snapshots per Second: {SnapshotsPerSecond:F2}\n" +
+                       $"  Current Queue Depth: {_currentQueueDepth}\n" +
+                       $"  Max Queue Depth: {_maxQueueDepth}\n" +
+                       $"  Uptime: {_startTime.ToString()}";
+            }
         }
     }
 }

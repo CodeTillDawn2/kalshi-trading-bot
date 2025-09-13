@@ -36,6 +36,8 @@ namespace KalshiBotAPI.Websockets
         private readonly Dictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions;
         private readonly object _sequenceNumberSynchronizationLock = new object();
         private long _latestProcessedSequenceNumber = 0;
+        private readonly HashSet<long> _processedSequenceNumbers = new HashSet<long>();
+        private int _duplicateMessageCount = 0;
         // private int _orderBookSubscriptionId = 0; // Currently unused, reserved for future subscription ID tracking
         private Task _messageReceivingTask = null!;
         private CancellationToken _processingCancellationToken;
@@ -130,6 +132,11 @@ namespace KalshiBotAPI.Websockets
         public int PendingConfirmsCount => 0;
 
         /// <summary>
+        /// Gets the count of duplicate messages detected and skipped.
+        /// </summary>
+        public int DuplicateMessageCount => _duplicateMessageCount;
+
+        /// <summary>
         /// Continuously receives WebSocket messages and processes them until cancellation is requested.
         /// Handles message fragmentation, connection monitoring, and error recovery.
         /// </summary>
@@ -137,7 +144,7 @@ namespace KalshiBotAPI.Websockets
         private async Task ReceiveAsync()
         {
             _logger.LogInformation("WebSocket message receiving task started");
-            var buffer = new byte[1024 * 16];
+            var buffer = new byte[16384]; // 16KB default buffer size
             var messageBuilder = new StringBuilder();
             try
             {
@@ -208,7 +215,37 @@ namespace KalshiBotAPI.Websockets
                 var data = JsonSerializer.Deserialize<JsonElement>(message);
                 var msgType = data.GetProperty("type").GetString() ?? "unknown";
 
-                _logger.LogDebug("Received WebSocket message type: {MsgType}", msgType);
+                // Check for message deduplication based on sequence number
+                long sequenceNumber = 0;
+                if (data.TryGetProperty("seq", out var seqProp) && seqProp.TryGetInt64(out sequenceNumber))
+                {
+                    lock (_sequenceNumberSynchronizationLock)
+                    {
+                        if (_processedSequenceNumbers.Contains(sequenceNumber))
+                        {
+                            _duplicateMessageCount++;
+                            _logger.LogWarning("Duplicate message detected with sequence number {SequenceNumber}. Total duplicates: {_DuplicateMessageCount}. Skipping processing.", sequenceNumber, _duplicateMessageCount);
+                            return; // Skip processing duplicate messages
+                        }
+                        _processedSequenceNumbers.Add(sequenceNumber);
+
+                        // Update latest processed sequence number
+                        if (sequenceNumber > _latestProcessedSequenceNumber)
+                        {
+                            _latestProcessedSequenceNumber = sequenceNumber;
+                        }
+
+                        // Periodic cleanup of old sequence numbers to prevent memory leaks
+                        // Keep only the last 10000 sequence numbers
+                        if (_processedSequenceNumbers.Count > 10000)
+                        {
+                            var oldestToKeep = _latestProcessedSequenceNumber - 5000;
+                            _processedSequenceNumbers.RemoveWhere(seq => seq < oldestToKeep);
+                        }
+                    }
+                }
+
+                _logger.LogDebug("Received WebSocket message type: {MsgType}, Seq: {SequenceNumber}", msgType, sequenceNumber);
 
                 if (MessageReceived != null)
                     MessageReceived?.Invoke(this, DateTime.UtcNow);
