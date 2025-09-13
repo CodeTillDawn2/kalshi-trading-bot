@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Collections.Concurrent;
 using TradingStrategies.Strategies;
 using TradingStrategies.Strategies.Strategies.Strats;
 using TradingStrategies.Strategies.Strats;
@@ -14,14 +17,14 @@ namespace TradingStrategies.Trading.Helpers
     public static class StrategyConfiguration
     {
         /// <summary>
-        /// Represents a trading strategy with its name and factory method
+        /// Represents a trading strategy with its name and async factory method
         /// </summary>
         public class StrategyDefinition
         {
             public string Name { get; set; }
-            public Func<string, Dictionary<MarketType, List<Strategy>>> Factory { get; set; }
+            public Func<string, Task<Dictionary<MarketType, List<Strategy>>>> Factory { get; set; }
 
-            public StrategyDefinition(string name, Func<string, Dictionary<MarketType, List<Strategy>>> factory)
+            public StrategyDefinition(string name, Func<string, Task<Dictionary<MarketType, List<Strategy>>>> factory)
             {
                 Name = name;
                 Factory = factory;
@@ -44,6 +47,11 @@ namespace TradingStrategies.Trading.Helpers
         };
 
         /// <summary>
+        /// Performance metrics for strategy instantiation
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, List<TimeSpan>> _performanceMetrics = new();
+
+        /// <summary>
         /// Gets all available strategy names
         /// </summary>
         public static IEnumerable<string> GetStrategyNames()
@@ -64,11 +72,19 @@ namespace TradingStrategies.Trading.Helpers
         }
 
         /// <summary>
-        /// Gets the factory method for a given strategy name
+        /// Gets the async factory method for a given strategy name
         /// </summary>
-        public static Func<string, Dictionary<MarketType, List<Strategy>>> GetStrategyFactory(string strategyName)
+        public static Func<string, Task<Dictionary<MarketType, List<Strategy>>>> GetStrategyFactory(string strategyName)
         {
             return GetStrategyDefinition(strategyName).Factory;
+        }
+
+        /// <summary>
+        /// Gets the performance metrics for strategy instantiation
+        /// </summary>
+        public static IReadOnlyDictionary<string, List<TimeSpan>> GetPerformanceMetrics()
+        {
+            return _performanceMetrics;
         }
 
         /// <summary>
@@ -87,15 +103,19 @@ namespace TradingStrategies.Trading.Helpers
         /// </summary>
         /// <param name="weightName">The name of the parameter set to use for configuring the Bollinger Breakout strategy.</param>
         /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
-        private static Dictionary<MarketType, List<Strategy>> GetBollingerBreakoutStrategy(string weightName)
+        private static async Task<Dictionary<MarketType, List<Strategy>>> GetBollingerBreakoutStrategy(string weightName)
         {
+            var stopwatch = Stopwatch.StartNew();
             var defaultParams = StrategySelectionHelper.BollingerParameterSets
                 .Where(x => x.Name == weightName).First();
             var strat = new Strategy(
                 defaultParams.Name,
                 new List<Strat> { new BollingerBreakout(mlParams: defaultParams.Parameters) }
             );
-            return CreateMarketStrategyMapping(strat);
+            var result = CreateMarketStrategyMapping(strat);
+            stopwatch.Stop();
+            _performanceMetrics.GetOrAdd("Bollinger", _ => new List<TimeSpan>()).Add(stopwatch.Elapsed);
+            return result;
         }
 
         /// <summary>
@@ -105,15 +125,19 @@ namespace TradingStrategies.Trading.Helpers
         /// </summary>
         /// <param name="weightName">The name of the parameter set to use for configuring the Breakout strategy.</param>
         /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
-        private static Dictionary<MarketType, List<Strategy>> GetBreakoutStrategy(string weightName)
+        private static async Task<Dictionary<MarketType, List<Strategy>>> GetBreakoutStrategy(string weightName)
         {
+            var stopwatch = Stopwatch.StartNew();
             var defaultParams = StrategySelectionHelper.BreakoutParameterSets
                 .Where(x => x.Name == weightName).First();
             var strat = new Strategy(
                 defaultParams.Name,
                 new List<Strat> { new Breakout2(mlParams: defaultParams.Parameters) }
             );
-            return CreateMarketStrategyMapping(strat);
+            var result = CreateMarketStrategyMapping(strat);
+            stopwatch.Stop();
+            _performanceMetrics.GetOrAdd("Breakout2", _ => new List<TimeSpan>()).Add(stopwatch.Elapsed);
+            return result;
         }
 
         /// <summary>
@@ -123,15 +147,19 @@ namespace TradingStrategies.Trading.Helpers
         /// </summary>
         /// <param name="weightName">The name of the parameter set to use for configuring the Nothing Ever Happens strategy.</param>
         /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
-        private static Dictionary<MarketType, List<Strategy>> GetNothingEverHappensStrategy(string weightName)
+        private static async Task<Dictionary<MarketType, List<Strategy>>> GetNothingEverHappensStrategy(string weightName)
         {
+            var stopwatch = Stopwatch.StartNew();
             var defaultParams = StrategySelectionHelper.NothingEverHappensParameterSets
                 .Where(x => x.Name == weightName).First();
             var strat = new Strategy(
                 defaultParams.Name,
                 new List<Strat> { new NothingEverHappensStrat(mlParams: defaultParams.Parameters) }
             );
-            return CreateMarketStrategyMapping(strat);
+            var result = CreateMarketStrategyMapping(strat);
+            stopwatch.Stop();
+            _performanceMetrics.GetOrAdd("Nothing", _ => new List<TimeSpan>()).Add(stopwatch.Elapsed);
+            return result;
         }
 
         /// <summary>
@@ -141,15 +169,19 @@ namespace TradingStrategies.Trading.Helpers
         /// </summary>
         /// <param name="weightName">The name of the parameter set to use for configuring the Flow Momentum strategy.</param>
         /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
-        private static Dictionary<MarketType, List<Strategy>> GetFlowMomentumStrategy(string weightName)
+        private static async Task<Dictionary<MarketType, List<Strategy>>> GetFlowMomentumStrategy(string weightName)
         {
+            var stopwatch = Stopwatch.StartNew();
             var defaultParams = StrategySelectionHelper.FlowMomentumParameterSets
                 .Where(x => x.Name == weightName).First();
             var strat = new Strategy(
                 defaultParams.Name,
                 new List<Strat> { new FlowMomentumStrat(mlParams: defaultParams.Parameters) }
             );
-            return CreateMarketStrategyMapping(strat);
+            var result = CreateMarketStrategyMapping(strat);
+            stopwatch.Stop();
+            _performanceMetrics.GetOrAdd("FlowMo", _ => new List<TimeSpan>()).Add(stopwatch.Elapsed);
+            return result;
         }
 
         /// <summary>
@@ -159,8 +191,9 @@ namespace TradingStrategies.Trading.Helpers
         /// </summary>
         /// <param name="weightName">The name of the parameter set to use for configuring the ML Shared strategy.</param>
         /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
-        private static Dictionary<MarketType, List<Strategy>> GetMLSharedStrategy(string weightName)
+        private static async Task<Dictionary<MarketType, List<Strategy>>> GetMLSharedStrategy(string weightName)
         {
+            var stopwatch = Stopwatch.StartNew();
             var selectedParams = MLEntrySeekerShared.MLSharedParameterSets
                 .FirstOrDefault(x => x.Name == weightName);
 
@@ -171,7 +204,10 @@ namespace TradingStrategies.Trading.Helpers
                 p: selectedParams.Parameters);
 
             var strat = new Strategy(selectedParams.Name, new List<Strat> { mlStrat });
-            return CreateMarketStrategyMapping(strat);
+            var result = CreateMarketStrategyMapping(strat);
+            stopwatch.Stop();
+            _performanceMetrics.GetOrAdd("MLShared", _ => new List<TimeSpan>()).Add(stopwatch.Elapsed);
+            return result;
         }
 
         /// <summary>
@@ -181,15 +217,19 @@ namespace TradingStrategies.Trading.Helpers
         /// </summary>
         /// <param name="weightName">The name of the parameter set to use for configuring the Try Again strategy.</param>
         /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
-        private static Dictionary<MarketType, List<Strategy>> GetTryAgainStrategy(string weightName)
+        private static async Task<Dictionary<MarketType, List<Strategy>>> GetTryAgainStrategy(string weightName)
         {
+            var stopwatch = Stopwatch.StartNew();
             var defaultParams = TryAgainStrat.TryAgainStratParameterSets
                 .Where(x => x.Name == weightName).First();
             var strat = new Strategy(
                 defaultParams.Name,
                 new List<Strat> { new TryAgainStrat(mlParams: defaultParams.Parameters) }
             );
-            return CreateMarketStrategyMapping(strat);
+            var result = CreateMarketStrategyMapping(strat);
+            stopwatch.Stop();
+            _performanceMetrics.GetOrAdd("TryAgain", _ => new List<TimeSpan>()).Add(stopwatch.Elapsed);
+            return result;
         }
 
         /// <summary>
@@ -199,15 +239,19 @@ namespace TradingStrategies.Trading.Helpers
         /// </summary>
         /// <param name="weightName">The name of the parameter set to use for configuring the Slope Momentum strategy.</param>
         /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
-        private static Dictionary<MarketType, List<Strategy>> GetSlopeMomentumStrategy(string weightName)
+        private static async Task<Dictionary<MarketType, List<Strategy>>> GetSlopeMomentumStrategy(string weightName)
         {
+            var stopwatch = Stopwatch.StartNew();
             var defaultParams = SlopeMomentumStrat.SlopeMomentumParameterSets
                 .Where(x => x.Name == weightName).First();
             var strat = new Strategy(
                 defaultParams.Name,
                 new List<Strat> { new SlopeMomentumStrat(mlParams: defaultParams.Parameters) }
             );
-            return CreateMarketStrategyMapping(strat);
+            var result = CreateMarketStrategyMapping(strat);
+            stopwatch.Stop();
+            _performanceMetrics.GetOrAdd("SloMo", _ => new List<TimeSpan>()).Add(stopwatch.Elapsed);
+            return result;
         }
 
         /// <summary>
@@ -217,15 +261,19 @@ namespace TradingStrategies.Trading.Helpers
         /// </summary>
         /// <param name="weightName">The name of the parameter set to use for configuring the Momentum Trading strategy.</param>
         /// <returns>A dictionary mapping market types to lists of strategies configured for those market conditions.</returns>
-        private static Dictionary<MarketType, List<Strategy>> GetMomentumTradingStrategy(string weightName)
+        private static async Task<Dictionary<MarketType, List<Strategy>>> GetMomentumTradingStrategy(string weightName)
         {
+            var stopwatch = Stopwatch.StartNew();
             var defaultParams = StrategySelectionHelper.MomentumTradingParameterSets
                 .Where(x => x.Name == weightName).First();
             var strat = new Strategy(
                 defaultParams.Name,
                 new List<Strat> { new MomentumTrading(mlParams: defaultParams.Parameters) }
             );
-            return CreateMarketStrategyMapping(strat);
+            var result = CreateMarketStrategyMapping(strat);
+            stopwatch.Stop();
+            _performanceMetrics.GetOrAdd("Momentum", _ => new List<TimeSpan>()).Add(stopwatch.Elapsed);
+            return result;
         }
 
         /// <summary>
