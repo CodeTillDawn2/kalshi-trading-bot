@@ -11,7 +11,7 @@ namespace BacklashPatterns.PatternDefinitions
      * - Requirements (Source: Investopedia, BabyPips):
      *   - Occurs in a downtrend.
      *   - First candle: Bearish with a significant body.
-     *   - Second candle: Bullish, opens near the first candle�s close, closes at or near the first candle�s close.
+     *   - Second candle: Bullish, opens near the first candle s close, closes at or near the first candle s close.
      *   - Indicates: Continuation of the downtrend due to inability of bulls to push prices higher.
      */
     public class OnNeckPattern : PatternDefinition
@@ -24,8 +24,8 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MinBodySize { get; } = 0.5;
 
         /// <summary>
-        /// Maximum difference between the second candle�s open/close and the first candle�s close.
-        /// Purpose: Ensures the second candle closes very near the first candle�s close for continuation.
+        /// Maximum difference between the second candle s open/close and the first candle s close.
+        /// Purpose: Ensures the second candle closes very near the first candle s close for continuation.
         /// Loosest: 2.0 (wider tolerance for proximity); Strictest: 0.5 (very tight proximity).
         /// </summary>
         public static double MaxOpenCloseDifference { get; } = 1.5;
@@ -73,7 +73,7 @@ namespace BacklashPatterns.PatternDefinitions
             // Require a downtrend based on the mean trend (restored original threshold)
             if (currMetrics.GetLookbackMeanTrend(2) > TrendThreshold) return null;
 
-            // Check if the second candle�s open and close are sufficiently close to the first candle�s close
+            // Check if the second candle s open and close are sufficiently close to the first candle s close
             bool isPatternValid = Math.Abs(currentPrices.Open - previousPrices.Close) <= MaxOpenCloseDifference &&
                                  Math.Abs(currentPrices.Close - previousPrices.Close) <= MaxOpenCloseDifference &&
                                  currMetrics.UpperWick <= MaxUpperWick; // Restored wick check

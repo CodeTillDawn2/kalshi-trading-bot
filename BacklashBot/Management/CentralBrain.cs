@@ -657,12 +657,18 @@ namespace BacklashBot.Management
             _serviceFactory.Dispose();
         }
 
+        /// <summary>
+        /// Initializes the brain instance and performs initial setup tasks.
+        /// </summary>
         private void InitializeBrain()
         {
             InitializeOrUpdateBrainInstance();
             _logger.LogDebug("BRAIN: Checking snapshot schema...");
         }
 
+        /// <summary>
+        /// Initializes or updates the brain instance in the database.
+        /// </summary>
         private async void InitializeOrUpdateBrainInstance()
         {
             _logger.LogDebug("BRAIN: Checking in...");
@@ -674,6 +680,10 @@ namespace BacklashBot.Management
             CleanupStaleBrainLocks(_thisBrain);
         }
 
+        /// <summary>
+        /// Updates the status of the brain instance in the database.
+        /// </summary>
+        /// <param name="brainInstance">The brain instance to update.</param>
         private async void UpdateBrainInstanceStatus(BrainInstanceDTO? brainInstance)
         {
             using var scope = _scopeFactory.CreateScope();
@@ -694,6 +704,10 @@ namespace BacklashBot.Management
             await context.AddOrUpdateBrainInstance(brainInstance);
         }
 
+        /// <summary>
+        /// Cleans up stale brain locks from the database.
+        /// </summary>
+        /// <param name="brainInstance">The current brain instance.</param>
         private async void CleanupStaleBrainLocks(BrainInstanceDTO? brainInstance)
         {
             using var scope = _scopeFactory.CreateScope();
@@ -774,6 +788,10 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Determines if conditions are met to proceed with snapshot creation.
+        /// </summary>
+        /// <returns>True if all conditions are met, false otherwise.</returns>
         private bool AreConditionsMetForSnapshot()
         {
             var cancellationToken = _statusTrackerService.GetCancellationToken();
@@ -795,6 +813,10 @@ namespace BacklashBot.Management
             return true;
         }
 
+        /// <summary>
+        /// Executes the complete snapshot cycle, including market data capture and analysis.
+        /// </summary>
+        /// <param name="state">The state object passed to the timer callback.</param>
         private async Task ExecuteSnapshotCycle(object state)
         {
             try
@@ -836,6 +858,9 @@ namespace BacklashBot.Management
 
         }
 
+        /// <summary>
+        /// Generates market snapshots for all watched markets in parallel.
+        /// </summary>
         private async Task GenerateMarketSnapshots()
         {
 
@@ -979,7 +1004,12 @@ namespace BacklashBot.Management
             }
         }
 
-        // Extracted method for creating a single market snapshot (simplifies the main method)
+        /// <summary>
+        /// Creates a market snapshot for a specific market.
+        /// </summary>
+        /// <param name="snapshotDate">The date and time of the snapshot.</param>
+        /// <param name="kvp">The key-value pair containing market ticker and market data.</param>
+        /// <returns>A MarketSnapshot object containing the market data.</returns>
         private MarketSnapshot CreateMarketSnapshot(DateTime snapshotDate, KeyValuePair<string, IMarketData> kvp)
         {
             // Handle OrderbookData with null check
@@ -1154,6 +1184,10 @@ namespace BacklashBot.Management
         }
 
 
+        /// <summary>
+        /// Processes analysis for all markets in the snapshot.
+        /// </summary>
+        /// <param name="snapshot">The cache snapshot containing market data.</param>
         private void ProcessSnapshotAnalysis(CacheSnapshot snapshot)
         {
             try
@@ -1250,6 +1284,9 @@ namespace BacklashBot.Management
             return _serviceFactory.GetMarketRefreshService().IsRunning();
         }
 
+        /// <summary>
+        /// Configures scheduled tasks such as overnight maintenance.
+        /// </summary>
         private void ConfigureScheduledTasks()
         {
             if (IsServicesStopped)
@@ -1300,6 +1337,10 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Monitors for errors and handles them by potentially restarting the system.
+        /// </summary>
+        /// <param name="state">The state object passed to the timer callback.</param>
         private async void MonitorAndHandleErrors(object state)
         {
             if (await _errorHandler.HandleErrors())
@@ -1313,6 +1354,9 @@ namespace BacklashBot.Management
             }
         }
 
+        /// <summary>
+        /// Updates the performance metrics with current values.
+        /// </summary>
         private void UpdatePerformanceMetrics()
         {
             var (eventQueueAvg, tickerQueueAvg, notificationQueueAvg, orderBookQueueAvg) = _performanceTracker.GetQueueCountRollingAverages();
@@ -1324,6 +1368,9 @@ namespace BacklashBot.Management
             _performanceMetrics.CurrentCount = _performanceTracker.LastRefreshMarketCount;
         }
 
+        /// <summary>
+        /// Resets performance metrics to zero.
+        /// </summary>
         private void ResetPerformanceMetrics()
         {
             _performanceMetrics.EventQueueAvg = 0;

@@ -3,8 +3,10 @@
 /// This class serves as the central coordinator for running trading strategies against historical market snapshots,
 /// generating detailed performance reports, and calculating equity metrics. It integrates with the simulation engine,
 /// equity calculator, and report generator to provide comprehensive backtesting capabilities.
+/// Supports asynchronous operations for efficient performance monitoring and analysis.
 /// </summary>
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
@@ -13,6 +15,8 @@ using TradingStrategies.Trading.Overseer;
 using TradingStrategies.Extensions;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Trading.Overseer.ReportGenerator;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace TradingStrategies
 {
@@ -22,6 +26,7 @@ namespace TradingStrategies
         private readonly ITradingSnapshotService _snapshotService;
         private readonly SimulationEngine _simulationEngine;
         private readonly EquityCalculator _equityCalculator;
+        private readonly ILogger<TradingOverseer> _logger;
         private readonly string _cacheDirectory = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
 
         /// <summary>
@@ -30,15 +35,18 @@ namespace TradingStrategies
         /// </summary>
         /// <param name="scopeFactory">Factory for creating service scopes to resolve dependencies.</param>
         /// <param name="snapshotService">Service for managing trading snapshot data.</param>
-        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService)
+        /// <param name="logger">Logger for recording warnings and errors.</param>
+        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, ILogger<TradingOverseer> logger)
         {
             _scopeFactory = scopeFactory;
             _snapshotService = snapshotService;
+            _logger = logger;
             _simulationEngine = new SimulationEngine();
             _equityCalculator = new EquityCalculator();
         }
 
         private record SnapshotMetadata(string MarketTicker, DateTime StartTime, DateTime EndTime);
+
 
         /// <summary>
         /// Executes a trading scenario simulation against a series of market snapshots.
@@ -50,32 +58,63 @@ namespace TradingStrategies
         /// <param name="writeToFile">Whether to write detailed reports to file output.</param>
         /// <param name="initialCash">Starting cash amount for the simulation (default: 100.0).</param>
         /// <param name="group">Optional snapshot group metadata for organizing results.</param>
-        /// <returns>List of tuples containing performance metrics and event logs for each simulation path.</returns>
-        public List<(PathPerformance performance, List<EventLog> events)> TestScenario(Scenario scenario, List<MarketSnapshot> snapshots, bool writeToFile, double initialCash = 100.0, SnapshotGroupDTO? group = null)
+        /// <returns>A task that returns a list of tuples containing performance metrics and event logs for each simulation path.</returns>
+        public async Task<List<(PathPerformance performance, List<EventLog> events)>> TestScenario(Scenario scenario, List<MarketSnapshot> snapshots, bool writeToFile, double initialCash = 100.0, SnapshotGroupDTO? group = null)
         {
-            if (snapshots == null || snapshots.Count == 0) return new List<(PathPerformance, List<EventLog>)>();
+            if (scenario == null)
+            {
+                _logger.LogWarning("Scenario parameter is null. Returning empty results.");
+                return new List<(PathPerformance, List<EventLog>)>();
+            }
+
+            if (scenario.StrategiesByMarketConditions == null || !scenario.StrategiesByMarketConditions.Any())
+            {
+                _logger.LogWarning("Scenario does not contain valid strategies. Returning empty results.");
+                return new List<(PathPerformance, List<EventLog>)>();
+            }
+
+            if (snapshots == null)
+            {
+                _logger.LogWarning("Snapshots list is null. Returning empty results.");
+                return new List<(PathPerformance, List<EventLog>)>();
+            }
+
+            if (snapshots.Count == 0)
+            {
+                _logger.LogWarning("Snapshots list is empty. Returning empty results.");
+                return new List<(PathPerformance, List<EventLog>)>();
+            }
+
+            var stopwatch = Stopwatch.StartNew();
 
             bool isSingleStrategy = scenario.StrategiesByMarketConditions.Values.All(hs => hs.Count <= 1);
 
             var activePaths = _simulationEngine.RunSimulation(scenario, snapshots, isSingleStrategy);
 
-            var pathData = GeneratePerformanceReportsAndMetrics(group, activePaths, snapshots, initialCash, writeToFile);
+            var pathData = await GeneratePerformanceReportsAndMetrics(group, activePaths, snapshots, initialCash, writeToFile);
+
+            stopwatch.Stop();
+            _logger.LogDebug("Simulation execution time: {Elapsed} ms, Snapshots processed: {Count}, Memory usage: {Memory} bytes", stopwatch.Elapsed.TotalMilliseconds, snapshots.Count, GC.GetTotalMemory(true));
 
             return pathData;
         }
+
 
         /// <summary>
         /// Generates comprehensive performance reports and metrics for simulation paths.
         /// Processes each simulation path to calculate equity, trades, and market conditions,
         /// then creates detailed CSV reports for top-performing paths and summary reports.
+        /// Writes detailed performance reports to files if specified, sorts paths by final equity,
+        /// and generates reports for the top three paths while outputting summary information to the console.
+        /// Utilizes asynchronous file I/O for efficient handling of large datasets.
         /// </summary>
         /// <param name="group">Snapshot group metadata for file naming and organization.</param>
         /// <param name="activePaths">List of simulation paths from the simulation engine.</param>
         /// <param name="snapshots">Original market snapshots used in the simulation.</param>
         /// <param name="initialCash">Starting cash amount for equity calculations.</param>
         /// <param name="writeToFile">Whether to write reports to the file system.</param>
-        /// <returns>List of performance metrics and event logs for each path.</returns>
-        private List<(PathPerformance performance, List<EventLog> events)> GeneratePerformanceReportsAndMetrics(SnapshotGroupDTO? group, List<SimulationPath> activePaths, List<MarketSnapshot> snapshots, double initialCash, bool writeToFile)
+        /// <returns>A task that returns a list of performance metrics and event logs for each path.</returns>
+        private async Task<List<(PathPerformance performance, List<EventLog> events)>> GeneratePerformanceReportsAndMetrics(SnapshotGroupDTO? group, List<SimulationPath> activePaths, List<MarketSnapshot> snapshots, double initialCash, bool writeToFile)
         {
             string outputDir = _cacheDirectory;
             string uniqueId = group != null ? Path.GetFileNameWithoutExtension(group.JsonPath) : snapshots.FirstOrDefault()?.MarketTicker ?? "Unknown";
@@ -134,7 +173,7 @@ namespace TradingStrategies
                     var reportGen = new ReportGenerator();
                     var pathSpecificPaths = GetStrategyPathsByMarketType(path.StrategiesByMarketConditions);
                     var detailedReport = reportGen.GenerateDetailedPerformanceReport(uniqueId, eventLogs, initialCash, pathSpecificPaths, writeToFile, outputDir);
-                    if (writeToFile) File.WriteAllText(performanceFile, detailedReport);
+                    if (writeToFile) await File.WriteAllTextAsync(performanceFile, detailedReport);
                     Console.WriteLine(detailedReport);
                 }
             }

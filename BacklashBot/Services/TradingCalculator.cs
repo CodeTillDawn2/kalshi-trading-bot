@@ -1,6 +1,7 @@
 using BacklashBot.Helpers;
 using BacklashDTOs;
 using System.Text;
+using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
 
 namespace BacklashBot.Services
@@ -10,23 +11,30 @@ namespace BacklashBot.Services
     /// This class implements the ITradingCalculator interface and computes indicators such as RSI, MACD, Bollinger Bands,
     /// Stochastic Oscillator, ATR, VWAP, OBV, support/resistance levels, PSAR, and ADX based on pseudo-candlestick data.
     /// All calculations are designed for event-driven contracts with prices bounded between 1 and 99 cents.
+    /// Depends on CalculationConfig for indicator parameters, includes async methods for performance in high-frequency scenarios,
+    /// and incorporates comprehensive input validation including null checks, empty list handling, and data integrity checks with warnings.
     /// </summary>
     /// <remarks>
     /// Indicators are calculated using standard formulas adapted for Kalshi's binary outcome markets.
     /// Null values are returned when insufficient data is available for reliable calculations.
+    /// Input validation ensures data quality by checking for null lists, empty collections, and invalid candlestick data (e.g., negative prices, invalid timestamps).
     /// </remarks>
     public class TradingCalculator : ITradingCalculator
     {
         private readonly ILogger<ITradingCalculator> _logger;
+        private readonly CalculationConfig _config;
 
         /// <summary>
-        /// Initializes a new instance of the TradingCalculator class.
+        /// Initializes a new instance of the TradingCalculator class with the specified logger and configuration.
+        /// The CalculationConfig provides parameters for indicator calculations such as PSAR acceleration factors, ADX periods, and exponential multipliers.
         /// </summary>
         /// <param name="logger">The logger instance for recording calculation events and errors.</param>
-        /// <exception cref="ArgumentNullException">Thrown when logger is null.</exception>
-        public TradingCalculator(ILogger<ITradingCalculator> logger)
+        /// <param name="config">The CalculationConfig instance containing parameters for technical indicator calculations.</param>
+        /// <exception cref="ArgumentNullException">Thrown when logger or config is null.</exception>
+        public TradingCalculator(ILogger<ITradingCalculator> logger, CalculationConfig config)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
         /// <summary>
@@ -38,13 +46,35 @@ namespace BacklashBot.Services
         /// <param name="periods">The number of periods to use for the RSI calculation (typically 14).</param>
         /// <returns>The RSI value (0-100) or null if insufficient data or invalid calculation.</returns>
         /// <exception cref="ArgumentException">Thrown when periods is less than 1.</exception>
+        /// <remarks>
+        /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
+        /// <see cref="CalculateRSIAsync(List{PseudoCandlestick}, int)"/>
+        /// </remarks>
         public double? CalculateRSI(List<PseudoCandlestick> pseudoCandles, int periods)
-        {
-            if (periods < 1)
-            {
-                _logger.LogError("Invalid periods parameter: {Periods}. Must be at least 1.", periods);
-                throw new ArgumentException("Periods must be at least 1.", nameof(periods));
-            }
+                {
+                    if (pseudoCandles == null)
+                    {
+                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+                    }
+                    if (pseudoCandles.Count == 0)
+                    {
+                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for RSI calculation.");
+                        return null;
+                    }
+                    for (int i = 0; i < pseudoCandles.Count; i++)
+                    {
+                        var pc = pseudoCandles[i];
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        {
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                        }
+                    }
+                    if (periods < 1)
+                    {
+                        _logger.LogError("Invalid periods parameter: {Periods}. Must be at least 1.", periods);
+                        throw new ArgumentException("Periods must be at least 1.", nameof(periods));
+                    }
 
             if (pseudoCandles == null || pseudoCandles.Count < periods + 1)
             {
@@ -102,6 +132,23 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
+        /// Calculates the Relative Strength Index (RSI) asynchronously for a series of pseudo-candlesticks.
+        /// RSI measures the speed and change of price movements on a scale of 0 to 100.
+        /// Values above 70 indicate overbought conditions, below 30 indicate oversold conditions.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price data.</param>
+        /// <param name="periods">The number of periods to use for the RSI calculation (typically 14).</param>
+        /// <returns>A task that represents the asynchronous operation, containing the RSI value (0-100) or null if insufficient data or invalid calculation.</returns>
+        /// <remarks>
+        /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
+        /// <see cref="CalculateRSI(List{PseudoCandlestick}, int)"/>
+        /// </remarks>
+        public async Task<double?> CalculateRSIAsync(List<PseudoCandlestick> pseudoCandles, int periods)
+        {
+            return await Task.Run(() => CalculateRSI(pseudoCandles, periods));
+        }
+
+        /// <summary>
         /// Calculates the Moving Average Convergence Divergence (MACD) indicator.
         /// MACD shows the relationship between two moving averages of a security's price.
         /// The MACD line is the difference between short and long EMAs, signal line is EMA of MACD,
@@ -112,15 +159,37 @@ namespace BacklashBot.Services
         /// <param name="longPeriod">The period for the long EMA (typically 26).</param>
         /// <param name="signalPeriod">The period for the signal line EMA (typically 9).</param>
         /// <returns>A tuple containing MACD line, signal line, and histogram values, or nulls if insufficient data.</returns>
+        /// <remarks>
+        /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
+        /// <see cref="CalculateMACDAsync(List{PseudoCandlestick}, int, int, int)"/>
+        /// </remarks>
         public (double? MACD, double? Signal, double? Histogram) CalculateMACD(List<PseudoCandlestick> pseudoCandlesticks, int shortPeriod, int longPeriod, int signalPeriod)
-        {
-            int totalPeriods = longPeriod + signalPeriod - 1;
-            if (pseudoCandlesticks?.Count < totalPeriods)
-            {
-                _logger.LogDebug("Insufficient data for MACD calculation. Candles: {Count}, Required: {Required}.",
-                    pseudoCandlesticks?.Count ?? 0, totalPeriods);
-                return (null, null, null);
-            }
+                {
+                    if (pseudoCandlesticks == null)
+                    {
+                        throw new ArgumentNullException(nameof(pseudoCandlesticks), "The list of pseudo-candlesticks cannot be null.");
+                    }
+                    if (pseudoCandlesticks.Count == 0)
+                    {
+                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for MACD calculation.");
+                        return (null, null, null);
+                    }
+                    for (int i = 0; i < pseudoCandlesticks.Count; i++)
+                    {
+                        var pc = pseudoCandlesticks[i];
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandlesticks[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        {
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                        }
+                    }
+                    int totalPeriods = longPeriod + signalPeriod - 1;
+                    if (pseudoCandlesticks?.Count < totalPeriods)
+                    {
+                        _logger.LogDebug("Insufficient data for MACD calculation. Candles: {Count}, Required: {Required}.",
+                            pseudoCandlesticks?.Count ?? 0, totalPeriods);
+                        return (null, null, null);
+                    }
 
             var prices = pseudoCandlesticks.Select(pc => pc.MidClose).ToList();
 
@@ -162,6 +231,25 @@ namespace BacklashBot.Services
             return (macdLine, signalLine, histogram);
         }
 
+        /// <summary>
+        /// Calculates the Moving Average Convergence Divergence (MACD) indicator asynchronously.
+        /// MACD shows the relationship between two moving averages of a security's price.
+        /// The MACD line is the difference between short and long EMAs, signal line is EMA of MACD,
+        /// and histogram shows the difference between MACD and signal lines.
+        /// </summary>
+        /// <param name="pseudoCandlesticks">The list of pseudo-candlesticks containing price data.</param>
+        /// <param name="shortPeriod">The period for the short EMA (typically 12).</param>
+        /// <param name="longPeriod">The period for the long EMA (typically 26).</param>
+        /// <param name="signalPeriod">The period for the signal line EMA (typically 9).</param>
+        /// <returns>A task that represents the asynchronous operation, containing a tuple of MACD line, signal line, and histogram values, or nulls if insufficient data.</returns>
+        /// <remarks>
+        /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
+        /// <see cref="CalculateMACD(List{PseudoCandlestick}, int, int, int)"/>
+        /// </remarks>
+        public async Task<(double? MACD, double? Signal, double? Histogram)> CalculateMACDAsync(List<PseudoCandlestick> pseudoCandlesticks, int shortPeriod, int longPeriod, int signalPeriod)
+        {
+            return await Task.Run(() => CalculateMACD(pseudoCandlesticks, shortPeriod, longPeriod, signalPeriod));
+        }
 
         /// <summary>
         /// Calculates Bollinger Bands, which consist of a middle band (SMA) and upper/lower bands based on standard deviation.
@@ -173,11 +261,33 @@ namespace BacklashBot.Services
         /// <param name="stdDevMultiplier">The multiplier for standard deviation to determine band width (typically 2.0).</param>
         /// <returns>A tuple containing lower band, middle band (SMA), and upper band values, or nulls if insufficient data.</returns>
         /// <exception cref="ArgumentException">Thrown when period is less than 1 or multiplier is negative.</exception>
+        /// <remarks>
+        /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
+        /// <see cref="CalculateBollingerBandsAsync(List{PseudoCandlestick}, int, double)"/>
+        /// </remarks>
         public (double? Lower, double? Middle, double? Upper) CalculateBollingerBands(
-            List<PseudoCandlestick> pseudoCandles, int period, double stdDevMultiplier)
-        {
-            var log = new StringBuilder();
-            log.AppendLine($"Calculating Bollinger Bands for {period} periods with multiplier {stdDevMultiplier}");
+                    List<PseudoCandlestick> pseudoCandles, int period, double stdDevMultiplier)
+                {
+                    if (pseudoCandles == null)
+                    {
+                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+                    }
+                    if (pseudoCandles.Count == 0)
+                    {
+                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for Bollinger Bands calculation.");
+                        return (null, null, null);
+                    }
+                    for (int i = 0; i < pseudoCandles.Count; i++)
+                    {
+                        var pc = pseudoCandles[i];
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        {
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                        }
+                    }
+                    var log = new StringBuilder();
+                    log.AppendLine($"Calculating Bollinger Bands for {period} periods with multiplier {stdDevMultiplier}");
 
             if (period < 1)
             {
@@ -230,6 +340,24 @@ namespace BacklashBot.Services
             return (lower, sma, upper);
         }
 
+        /// <summary>
+        /// Calculates Bollinger Bands asynchronously, which consist of a middle band (SMA) and upper/lower bands based on standard deviation.
+        /// Bollinger Bands are used to identify volatility and potential price reversals.
+        /// Price touching the upper band may indicate overbought conditions, lower band oversold.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price data.</param>
+        /// <param name="period">The period for the moving average and standard deviation calculation (typically 20).</param>
+        /// <param name="stdDevMultiplier">The multiplier for standard deviation to determine band width (typically 2.0).</param>
+        /// <returns>A task that represents the asynchronous operation, containing a tuple of lower band, middle band (SMA), and upper band values, or nulls if insufficient data.</returns>
+        /// <remarks>
+        /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
+        /// <see cref="CalculateBollingerBands(List{PseudoCandlestick}, int, double)"/>
+        /// </remarks>
+        public async Task<(double? Lower, double? Middle, double? Upper)> CalculateBollingerBandsAsync(
+            List<PseudoCandlestick> pseudoCandles, int period, double stdDevMultiplier)
+        {
+            return await Task.Run(() => CalculateBollingerBands(pseudoCandles, period, stdDevMultiplier));
+        }
 
         /// <summary>
         /// Calculates the Stochastic Oscillator, which compares a closing price to its price range over a period.
@@ -241,10 +369,32 @@ namespace BacklashBot.Services
         /// <param name="dPeriod">The period for %D moving average (typically 3).</param>
         /// <returns>A tuple containing %K and %D values (0-100), or nulls if insufficient data.</returns>
         /// <exception cref="ArgumentException">Thrown when periods are less than 1.</exception>
+        /// <remarks>
+        /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
+        /// <see cref="CalculateStochasticAsync(List{PseudoCandlestick}, int, int)"/>
+        /// </remarks>
         public (double? K, double? D) CalculateStochastic(List<PseudoCandlestick> pseudoCandles, int kPeriod, int dPeriod)
-        {
-            var log = new StringBuilder();
-            log.AppendLine($"Calculating Stochastic for KPeriod={kPeriod}, DPeriod={dPeriod}");
+                {
+                    if (pseudoCandles == null)
+                    {
+                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+                    }
+                    if (pseudoCandles.Count == 0)
+                    {
+                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for Stochastic calculation.");
+                        return (null, null);
+                    }
+                    for (int i = 0; i < pseudoCandles.Count; i++)
+                    {
+                        var pc = pseudoCandles[i];
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        {
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                        }
+                    }
+                    var log = new StringBuilder();
+                    log.AppendLine($"Calculating Stochastic for KPeriod={kPeriod}, DPeriod={dPeriod}");
 
             if (kPeriod < 1 || dPeriod < 1)
             {
@@ -298,6 +448,23 @@ namespace BacklashBot.Services
             return (k, d);
         }
 
+        /// <summary>
+        /// Calculates the Stochastic Oscillator asynchronously, which compares a closing price to its price range over a period.
+        /// %K shows the current close relative to the high-low range, %D is the moving average of %K.
+        /// Values above 80 indicate overbought, below 20 indicate oversold.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price data.</param>
+        /// <param name="kPeriod">The period for %K calculation (typically 14).</param>
+        /// <param name="dPeriod">The period for %D moving average (typically 3).</param>
+        /// <returns>A task that represents the asynchronous operation, containing a tuple of %K and %D values (0-100), or nulls if insufficient data.</returns>
+        /// <remarks>
+        /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
+        /// <see cref="CalculateStochastic(List{PseudoCandlestick}, int, int)"/>
+        /// </remarks>
+        public async Task<(double? K, double? D)> CalculateStochasticAsync(List<PseudoCandlestick> pseudoCandles, int kPeriod, int dPeriod)
+        {
+            return await Task.Run(() => CalculateStochastic(pseudoCandles, kPeriod, dPeriod));
+        }
 
         /// <summary>
         /// Calculates the Average True Range (ATR), which measures volatility by averaging the true range over a period.
@@ -308,10 +475,33 @@ namespace BacklashBot.Services
         /// <param name="period">The period for averaging the true range (typically 14).</param>
         /// <returns>The ATR value or null if insufficient data or invalid calculation.</returns>
         /// <exception cref="ArgumentException">Thrown when period is less than 1.</exception>
+        /// <remarks>
+        /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
+        /// Parameters are sourced from configuration where applicable (e.g., ADX period).
+        /// <see cref="CalculateATRAsync(List{PseudoCandlestick}, int)"/>
+        /// </remarks>
         public double? CalculateATR(List<PseudoCandlestick> pseudoCandles, int period)
-        {
-            var log = new StringBuilder();
-            log.AppendLine($"Calculating ATR for {period} periods.");
+                {
+                    if (pseudoCandles == null)
+                    {
+                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+                    }
+                    if (pseudoCandles.Count == 0)
+                    {
+                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for ATR calculation.");
+                        return null;
+                    }
+                    for (int i = 0; i < pseudoCandles.Count; i++)
+                    {
+                        var pc = pseudoCandles[i];
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        {
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                        }
+                    }
+                    var log = new StringBuilder();
+                    log.AppendLine($"Calculating ATR for {period} periods.");
 
             if (period < 1)
             {
@@ -358,6 +548,23 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
+        /// Calculates the Average True Range (ATR) asynchronously, which measures volatility by averaging the true range over a period.
+        /// True range is the maximum of: current high - current low, |current high - previous close|, |current low - previous close|.
+        /// Higher ATR values indicate higher volatility.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price data.</param>
+        /// <param name="period">The period for averaging the true range (typically 14).</param>
+        /// <returns>A task that represents the asynchronous operation, containing the ATR value or null if insufficient data or invalid calculation.</returns>
+        /// <remarks>
+        /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
+        /// <see cref="CalculateATR(List{PseudoCandlestick}, int)"/>
+        /// </remarks>
+        public async Task<double?> CalculateATRAsync(List<PseudoCandlestick> pseudoCandles, int period)
+        {
+            return await Task.Run(() => CalculateATR(pseudoCandles, period));
+        }
+
+        /// <summary>
         /// Calculates the Volume Weighted Average Price (VWAP) over a specified number of periods.
         /// VWAP is the average price weighted by volume, providing insight into the average price paid by market participants.
         /// It's commonly used as a benchmark for intraday trading.
@@ -366,10 +573,32 @@ namespace BacklashBot.Services
         /// <param name="periods">The number of periods to include in the VWAP calculation.</param>
         /// <returns>The VWAP value or null if insufficient data or zero volume.</returns>
         /// <exception cref="ArgumentException">Thrown when periods is less than 1.</exception>
+        /// <remarks>
+        /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
+        /// <see cref="CalculateVWAPAsync(List{PseudoCandlestick}, int)"/>
+        /// </remarks>
         public decimal? CalculateVWAP(List<PseudoCandlestick> pseudoCandles, int periods)
-        {
-            var log = new StringBuilder();
-            log.AppendLine($"Calculating VWAP for {periods} periods.");
+                {
+                    if (pseudoCandles == null)
+                    {
+                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+                    }
+                    if (pseudoCandles.Count == 0)
+                    {
+                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for VWAP calculation.");
+                        return null;
+                    }
+                    for (int i = 0; i < pseudoCandles.Count; i++)
+                    {
+                        var pc = pseudoCandles[i];
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        {
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                        }
+                    }
+                    var log = new StringBuilder();
+                    log.AppendLine($"Calculating VWAP for {periods} periods.");
 
             if (periods < 1)
             {
@@ -407,16 +636,55 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
+        /// Calculates the Volume Weighted Average Price (VWAP) asynchronously over a specified number of periods.
+        /// VWAP is the average price weighted by volume, providing insight into the average price paid by market participants.
+        /// It's commonly used as a benchmark for intraday trading.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price and volume data.</param>
+        /// <param name="periods">The number of periods to include in the VWAP calculation.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the VWAP value or null if insufficient data or zero volume.</returns>
+        /// <remarks>
+        /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
+        /// <see cref="CalculateVWAP(List{PseudoCandlestick}, int)"/>
+        /// </remarks>
+        public async Task<decimal?> CalculateVWAPAsync(List<PseudoCandlestick> pseudoCandles, int periods)
+        {
+            return await Task.Run(() => CalculateVWAP(pseudoCandles, periods));
+        }
+
+        /// <summary>
         /// Calculates the On-Balance Volume (OBV), which accumulates volume based on price direction.
         /// Volume is added when price closes higher, subtracted when lower.
         /// Rising OBV indicates buying pressure, falling OBV indicates selling pressure.
         /// </summary>
         /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price and volume data.</param>
         /// <returns>The OBV value (can be positive or negative based on net volume flow).</returns>
+        /// <remarks>
+        /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
+        /// <see cref="CalculateOBVAsync(List{PseudoCandlestick})"/>
+        /// </remarks>
         public decimal CalculateOBV(List<PseudoCandlestick> pseudoCandles)
-        {
-            var log = new StringBuilder();
-            log.AppendLine($"Calculating OBV for {pseudoCandles?.Count ?? 0} candlesticks.");
+                {
+                    if (pseudoCandles == null)
+                    {
+                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+                    }
+                    if (pseudoCandles.Count == 0)
+                    {
+                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for OBV calculation.");
+                        return 0;
+                    }
+                    for (int i = 0; i < pseudoCandles.Count; i++)
+                    {
+                        var pc = pseudoCandles[i];
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        {
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                        }
+                    }
+                    var log = new StringBuilder();
+                    log.AppendLine($"Calculating OBV for {pseudoCandles?.Count ?? 0} candlesticks.");
 
             if (pseudoCandles == null || pseudoCandles.Count < 2)
             {
@@ -441,18 +709,34 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
+        /// Calculates the On-Balance Volume (OBV) asynchronously, which accumulates volume based on price direction.
+        /// Volume is added when price closes higher, subtracted when lower.
+        /// Rising OBV indicates buying pressure, falling OBV indicates selling pressure.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price and volume data.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the OBV value (can be positive or negative based on net volume flow).</returns>
+        /// <remarks>
+        /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
+        /// <see cref="CalculateOBV(List{PseudoCandlestick})"/>
+        /// </remarks>
+        public async Task<decimal> CalculateOBVAsync(List<PseudoCandlestick> pseudoCandles)
+        {
+            return await Task.Run(() => CalculateOBV(pseudoCandles));
+        }
+
+        /// <summary>
         /// Calculates statistically significant historical support and resistance levels for a given market ticker.
         /// 
         /// This method identifies key price levels by smoothing the frequency of price occurrences using a Gaussian filter,
         /// detecting peaks in the smoothed distribution, and ensuring a minimum distance between levels to avoid clustering.
         /// The strength of each level is calculated by combining the smoothed frequency with the total trading volume
-        /// around the peak price (�1 cent). It uses the average of AskClose and BidClose prices for normalization.
-        /// Price levels must have a minimum number of touches within �1 cent of the peak, defined as a percentage of total valid candlesticks.
+        /// around the peak price (±1 cent). It uses the average of AskClose and BidClose prices for normalization.
+        /// Price levels must have a minimum number of touches within ±1 cent of the peak, defined as a percentage of total valid candlesticks.
         /// Candlesticks with UTC timestamps between 07:00:00 and 11:59:00 (truncated to minutes) are excluded from the analysis.
         /// </summary>
         /// <param name="marketTicker">The market ticker symbol being analyzed (e.g., 'BTCUSD').</param>
         /// <param name="candlesticks">List of candlestick data points containing price, volume, and UTC timestamp information.</param>
-        /// <param name="minCandlestickPercentage">Minimum percentage of total valid candlesticks required for touches within �1 cent of a price level (default: 0.1 for 10%).</param>
+        /// <param name="minCandlestickPercentage">Minimum percentage of total valid candlesticks required for touches within ±1 cent of a price level (default: 0.1 for 10%).</param>
         /// <param name="maxLevels">Maximum number of support/resistance levels to return (default: 6).</param>
         /// <param name="sigma">Standard deviation for Gaussian smoothing, controlling the price range for consolidation (default: 2.0 cents).</param>
         /// <param name="minDistance">Minimum price distance (in cents) between selected levels to prevent clustering (default: 3).</param>
@@ -515,7 +799,7 @@ namespace BacklashBot.Services
 
                 // Calculate time-based weight (exponential decay favoring recent data)
                 var hoursSinceStart = (candle.Date - earliestDate).TotalHours;
-                var timeWeight = Math.Exp(hoursSinceStart / Math.Max(totalTimeSpan, 1.0) * 2.0); // Exponential weighting
+                var timeWeight = Math.Exp(hoursSinceStart / Math.Max(totalTimeSpan, 1.0) * _config.ResistanceLevels_ExponentialMultiplier); // Exponential weighting
 
                 if (priceFrequency.ContainsKey(normalizedPrice))
                 {
@@ -561,7 +845,7 @@ namespace BacklashBot.Services
                 if (selectedPrices.Any(p => Math.Abs(p - price) < minDistance))
                     continue;
 
-                // Check total touches within �1 cent of the peak price
+                // Check total touches within ±1 cent of the peak price
                 int totalTouches = 0;
                 for (int p = Math.Max(minPrice, price - 1); p <= Math.Min(maxPrice, price + 1); p++)
                 {
@@ -574,7 +858,7 @@ namespace BacklashBot.Services
                 // Calculate strength as smoothed frequency
                 double strength = smoothedFrequency[peakIndex];
 
-                // Calculate total volume within �1 cent of the peak price
+                // Calculate total volume within ±1 cent of the peak price
                 long totalVolume = 0;
                 for (int p = Math.Max(minPrice, price - 1); p <= Math.Min(maxPrice, price + 1); p++)
                 {
@@ -610,53 +894,85 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
+        /// Calculates statistically significant historical support and resistance levels asynchronously for a given market ticker.
+        ///
+        /// This method identifies key price levels by smoothing the frequency of price occurrences using a Gaussian filter,
+        /// detecting peaks in the smoothed distribution, and ensuring a minimum distance between levels to avoid clustering.
+        /// The strength of each level is calculated by combining the smoothed frequency with the total trading volume
+        /// around the peak price (±1 cent). It uses the average of AskClose and BidClose prices for normalization.
+        /// Price levels must have a minimum number of touches within ±1 cent of the peak, defined as a percentage of total valid candlesticks.
+        /// Candlesticks with UTC timestamps between 07:00:00 and 11:59:00 (truncated to minutes) are excluded from the analysis.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker symbol being analyzed (e.g., 'BTCUSD').</param>
+        /// <param name="candlesticks">List of candlestick data points containing price, volume, and UTC timestamp information.</param>
+        /// <param name="minCandlestickPercentage">Minimum percentage of total valid candlesticks required for touches within ±1 cent of a price level (default: 0.1 for 10%).</param>
+        /// <param name="maxLevels">Maximum number of support/resistance levels to return (default: 6).</param>
+        /// <param name="sigma">Standard deviation for Gaussian smoothing, controlling the price range for consolidation (default: 2.0 cents).</param>
+        /// <param name="minDistance">Minimum price distance (in cents) between selected levels to prevent clustering (default: 3).</param>
+        /// <returns>A task that represents the asynchronous operation, containing a list of <see cref="SupportResistanceLevel"/> objects, sorted by strength in descending order.</returns>
+        /// <remarks>
+        /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
+        /// <see cref="CalculateHistoricalSupportResistance(string, List{CandlestickData}, double, int, double, int)"/>
+        /// </remarks>
+        public async Task<List<SupportResistanceLevel>> CalculateHistoricalSupportResistanceAsync(
+            string marketTicker,
+            List<CandlestickData> candlesticks,
+            double minCandlestickPercentage,
+            int maxLevels,
+            double sigma,
+            int minDistance)
+        {
+            return await Task.Run(() => CalculateHistoricalSupportResistance(marketTicker, candlesticks, minCandlestickPercentage, maxLevels, sigma, minDistance));
+        }
+
+        /// <summary>
         /// Calculates the Parabolic Stop and Reverse (PSAR) value for a series of pseudo-candlesticks in the Kalshi marketplace.
         /// This indicator is valuable for event-driven contracts where price trends can emerge rapidly due to evolving news or data releases influencing outcome probabilities.
         /// It identifies trend directions and provides dynamic trailing stop levels, aiding risk management in volatile, bounded-price environments (1 to 99 cents per contract).
-        /// However, in ranging or sideways markets�common when events are distant or uncertain�PSAR may generate frequent false reversal signals (whipsaws), potentially leading to unnecessary trades.
+        /// However, in ranging or sideways markets common when events are distant or uncertain PSAR may generate frequent false reversal signals (whipsaws), potentially leading to unnecessary trades.
         /// It performs best when combined with trend-confirming indicators like the Average Directional Index (ADX) to filter signals.
         /// </summary>
         /// <param name="candlesticks">The list of candlesticks containing ask and bid prices for high, low, and close.</param>
-        /// <param name="initialAF">The initial acceleration factor (default: 0.02).</param>
-        /// <param name="maxAF">The maximum acceleration factor (default: 0.2).</param>
-        /// <param name="afStep">The step increment for the acceleration factor (default: 0.02).</param>
         /// <returns>The current PSAR value, or null if insufficient data or invalid computation.</returns>
         /// <remarks>
+        /// Input validation includes null check for the candlesticks list and parameter validation with exceptions.
+        /// Parameters are sourced from configuration where applicable (e.g., PSAR acceleration factors).
         /// Different PSAR values indicate the following in Kalshi's context:
         /// - A PSAR value below the current price (e.g., PSAR at 45 when the mid-close is 60) suggests an uptrend, signaling potential buying opportunities or holding long ("Yes") positions, with the PSAR serving as a rising trailing stop.
         /// - A PSAR value above the current price (e.g., PSAR at 75 when the mid-close is 60) indicates a downtrend, implying selling pressure or short ("No") positions, with the PSAR acting as a falling trailing stop.
         /// - Crossovers, where the price moves beyond the PSAR, denote potential trend reversals: a price rising above PSAR flips to bullish, while falling below flips to bearish.
         /// - Acceleration factor (AF) increases (up to the maximum, typically 0.20) amplify the PSAR's sensitivity in strong trends, tightening stops to lock in gains.
+        /// <see cref="CalculatePSARAsync(List{CandlestickData})"/>
         /// </remarks>
-        public double? CalculatePSAR(List<CandlestickData> candlesticks, double initialAF = 0.02, double maxAF = 0.2, double afStep = 0.02)
+        public double? CalculatePSAR(List<PseudoCandlestick> pseudoCandles)
         {
             var log = new StringBuilder();
-            log.AppendLine($"Calculating PSAR with InitialAF={initialAF}, MaxAF={maxAF}, AFStep={afStep}.");
+            log.AppendLine($"Calculating PSAR with InitialAF={_config.PSAR_InitialAF}, MaxAF={_config.PSAR_MaxAF}, AFStep={_config.PSAR_AFStep}.");
 
-            if (initialAF <= 0 || maxAF <= 0 || afStep <= 0 || initialAF > maxAF)
+            if (_config.PSAR_InitialAF <= 0 || _config.PSAR_MaxAF <= 0 || _config.PSAR_AFStep <= 0 || _config.PSAR_InitialAF > _config.PSAR_MaxAF)
             {
                 log.AppendLine("Invalid acceleration parameters.");
                 _logger.LogError("{Log}", log.ToString());
                 throw new ArgumentException("Acceleration factors must be positive and InitialAF <= MaxAF.");
             }
 
-            if (candlesticks == null || candlesticks.Count < 2)
+            if (pseudoCandles == null || pseudoCandles.Count < 2)
             {
-                log.AppendLine($"Insufficient data. Candles: {candlesticks?.Count ?? 0}, Required: 2.");
+                log.AppendLine($"Insufficient data. Candles: {pseudoCandles?.Count ?? 0}, Required: 2.");
                 _logger.LogDebug("{Log}", log.ToString());
                 return null;
             }
 
-            var highs = candlesticks.Select(c => (c.AskHigh + c.BidHigh) / 2.0).ToList();
-            var lows = candlesticks.Select(c => (c.AskLow + c.BidLow) / 2.0).ToList();
-            var closes = candlesticks.Select(c => (c.AskClose + c.BidClose) / 2.0).ToList();
+            var highs = pseudoCandles.Select(pc => pc.MidHigh).ToList();
+            var lows = pseudoCandles.Select(pc => pc.MidLow).ToList();
+            var closes = pseudoCandles.Select(pc => pc.MidClose).ToList();
 
             double psar = lows[0]; // Initialize with first low
             int trend = closes[1] > closes[0] ? 1 : -1; // 1 for uptrend, -1 for downtrend
             double ep = trend == 1 ? highs[0] : lows[0]; // Extreme point
-            double af = initialAF;
+            double af = _config.PSAR_InitialAF;
 
-            for (int i = 1; i < candlesticks.Count; i++)
+            for (int i = 1; i < pseudoCandles.Count; i++)
             {
                 double currentPsar = psar + af * (ep - psar);
 
@@ -667,7 +983,7 @@ namespace BacklashBot.Services
                         trend = -1;
                         psar = i > 0 ? Math.Max(highs[i - 1], highs[i]) : highs[i];
                         ep = lows[i];
-                        af = initialAF;
+                        af = _config.PSAR_InitialAF;
                     }
                     else
                     {
@@ -675,7 +991,7 @@ namespace BacklashBot.Services
                         if (highs[i] > ep)
                         {
                             ep = highs[i];
-                            af = Math.Min(af + afStep, maxAF);
+                            af = Math.Min(af + _config.PSAR_AFStep, _config.PSAR_MaxAF);
                         }
                     }
                 }
@@ -686,7 +1002,7 @@ namespace BacklashBot.Services
                         trend = 1;
                         psar = i > 0 ? Math.Min(lows[i - 1], lows[i]) : lows[i];
                         ep = highs[i];
-                        af = initialAF;
+                        af = _config.PSAR_InitialAF;
                     }
                     else
                     {
@@ -694,7 +1010,7 @@ namespace BacklashBot.Services
                         if (lows[i] < ep)
                         {
                             ep = lows[i];
-                            af = Math.Min(af + afStep, maxAF);
+                            af = Math.Min(af + _config.PSAR_AFStep, _config.PSAR_MaxAF);
                         }
                     }
                 }
@@ -714,6 +1030,24 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
+        /// Calculates the Parabolic Stop and Reverse (PSAR) value asynchronously for a series of pseudo-candlesticks in the Kalshi marketplace.
+        /// This indicator is valuable for event-driven contracts where price trends can emerge rapidly due to evolving news or data releases influencing outcome probabilities.
+        /// It identifies trend directions and provides dynamic trailing stop levels, aiding risk management in volatile, bounded-price environments (1 to 99 cents per contract).
+        /// However, in ranging or sideways marketscommon when events are distant or uncertainPSAR may generate frequent false reversal signals (whipsaws), potentially leading to unnecessary trades.
+        /// It performs best when combined with trend-confirming indicators like the Average Directional Index (ADX) to filter signals.
+        /// </summary>
+        /// <param name="candlesticks">The list of candlesticks containing ask and bid prices for high, low, and close.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the current PSAR value, or null if insufficient data or invalid computation.</returns>
+        /// <remarks>
+        /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
+        /// <see cref="CalculatePSAR(List{CandlestickData})"/>
+        /// </remarks>
+        public async Task<double?> CalculatePSARAsync(List<PseudoCandlestick> pseudoCandles)
+        {
+            return await Task.Run(() => CalculatePSAR(pseudoCandles));
+        }
+
+        /// <summary>
         /// Calculates the Average Directional Index (ADX) value along with +DI and -DI for a series of pseudo-candlesticks in the Kalshi marketplace.
         /// This indicator serves as a robust complementary metric, particularly when integrated with tools like the Parabolic Stop and Reverse (PSAR) to validate trend strength.
         /// It provides an objective measure of trend intensity, irrespective of direction, which aids in distinguishing genuine trends from periods of consolidation or volatility without momentum.
@@ -723,9 +1057,10 @@ namespace BacklashBot.Services
         /// Its utility diminishes in highly volatile, range-bound markets common to certain Kalshi contracts awaiting resolution.
         /// </summary>
         /// <param name="pseudoCandles">The list of pseudo-candlesticks containing mid-high, mid-low, and mid-close prices.</param>
-        /// <param name="period">The period for ADX calculation (default: 14).</param>
         /// <returns>A tuple containing ADX, +DI, and -DI values, or null values if insufficient data or invalid computation.</returns>
         /// <remarks>
+        /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
+        /// Parameters are sourced from configuration where applicable (e.g., ADX period).
         /// Interpretations of ADX values are as follows in Kalshi's context:
         /// - Below 20: Indicates a weak or absent trend, suggesting consolidation or choppy conditions; traders should exercise caution with trend-following strategies like PSAR, as signals may prove unreliable.
         /// - Between 20 and 25: Signals the potential emergence of a trend; this transitional range warrants monitoring for confirmation, such as a PSAR crossover aligned with rising ADX.
@@ -737,11 +1072,31 @@ namespace BacklashBot.Services
         /// - -DI > +DI: Suggests downward trend strength
         /// - +DI crossing above -DI: Potential bullish signal
         /// - -DI crossing above +DI: Potential bearish signal
+        /// <see cref="CalculateADXAsync(List{PseudoCandlestick})"/>
         /// </remarks>
-        public (double? ADX, double? PlusDI, double? MinusDI) CalculateADX(List<PseudoCandlestick> pseudoCandles, int period = 14)
-        {
-            var log = new StringBuilder();
-            log.AppendLine($"Calculating ADX for {period} periods.");
+        public (double? ADX, double? PlusDI, double? MinusDI) CalculateADX(List<PseudoCandlestick> pseudoCandles)
+                {
+                    if (pseudoCandles == null)
+                    {
+                        throw new ArgumentNullException(nameof(pseudoCandles), "The list of pseudo-candlesticks cannot be null.");
+                    }
+                    if (pseudoCandles.Count == 0)
+                    {
+                        _logger.LogWarning("Empty list of pseudo-candlesticks provided for ADX calculation.");
+                        return (null, null, null);
+                    }
+                    for (int i = 0; i < pseudoCandles.Count; i++)
+                    {
+                        var pc = pseudoCandles[i];
+                        double openPrice = i == 0 ? pc.MidClose : pseudoCandles[i-1].MidClose;
+                        if (pc.MidClose <= 0 || pc.MidHigh <= 0 || pc.MidLow <= 0 || openPrice <= 0 || pc.MidHigh < pc.MidLow || pc.Timestamp == DateTime.MinValue)
+                        {
+                            _logger.LogWarning("Invalid PseudoCandlestick at index {Index}: Close={Close}, High={High}, Low={Low}, Open={Open}, Timestamp={Timestamp}", i, pc.MidClose, pc.MidHigh, pc.MidLow, openPrice, pc.Timestamp);
+                        }
+                    }
+                    var log = new StringBuilder();
+                    int period = _config.ADX_Periods;
+                    log.AppendLine($"Calculating ADX for {period} periods.");
 
             if (period < 1)
             {
@@ -828,6 +1183,26 @@ namespace BacklashBot.Services
             log.AppendLine($"ADX: {adx:F2}, +DI: {latestPlusDI:F2}, -DI: {latestMinusDI:F2}");
             _logger.LogDebug("{Log}", log.ToString());
             return (adx, latestPlusDI, latestMinusDI);
+        }
+
+        /// <summary>
+        /// Calculates the Average Directional Index (ADX) value asynchronously along with +DI and -DI for a series of pseudo-candlesticks in the Kalshi marketplace.
+        /// This indicator serves as a robust complementary metric, particularly when integrated with tools like the Parabolic Stop and Reverse (PSAR) to validate trend strength.
+        /// It provides an objective measure of trend intensity, irrespective of direction, which aids in distinguishing genuine trends from periods of consolidation or volatility without momentum.
+        /// This is especially pertinent in Kalshi's event-driven environment, where contract prices may exhibit pronounced trends due to evolving probabilities influenced by economic announcements or other developments.
+        /// By confirming the presence of a strong trend (typically ADX values exceeding 25), it enhances the efficacy of PSAR signals, reducing the likelihood of whipsaws in non-trending conditions.
+        /// The +DI and -DI components provide directional information: +DI > -DI suggests uptrend, -DI > +DI suggests downtrend.
+        /// Its utility diminishes in highly volatile, range-bound markets common to certain Kalshi contracts awaiting resolution.
+        /// </summary>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing mid-high, mid-low, and mid-close prices.</param>
+        /// <returns>A task that represents the asynchronous operation, containing a tuple of ADX, +DI, and -DI values, or null values if insufficient data or invalid computation.</returns>
+        /// <remarks>
+        /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
+        /// <see cref="CalculateADX(List{PseudoCandlestick})"/>
+        /// </remarks>
+        public async Task<(double? ADX, double? PlusDI, double? MinusDI)> CalculateADXAsync(List<PseudoCandlestick> pseudoCandles)
+        {
+            return await Task.Run(() => CalculateADX(pseudoCandles));
         }
     }
 }

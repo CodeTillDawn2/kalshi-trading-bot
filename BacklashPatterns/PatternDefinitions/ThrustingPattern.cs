@@ -31,8 +31,8 @@ namespace BacklashPatterns.PatternDefinitions
 
         /// <summary>
         /// Represents a Thrusting pattern (Bullish or Bearish).
-        /// - Bullish Thrusting: A potential continuation or weak reversal in a downtrend. First candle is bearish, second is bullish but doesn�t close above the first�s open, indicating hesitation.
-        /// - Bearish Thrusting: A potential continuation or weak reversal in an uptrend. First candle is bullish, second is bearish but doesn�t close below the first�s open, showing indecision.
+        /// - Bullish Thrusting: A potential continuation or weak reversal in a downtrend. First candle is bearish, second is bullish but doesn t close above the first s open, indicating hesitation.
+        /// - Bearish Thrusting: A potential continuation or weak reversal in an uptrend. First candle is bullish, second is bearish but doesn t close below the first s open, showing indecision.
         /// Requirements sourced from: https://www.babypips.com/learn/forex/thrusting-pattern
         /// </summary>
         public const string BaseName = "Thrusting";

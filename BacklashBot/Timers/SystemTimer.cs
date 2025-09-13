@@ -8,7 +8,10 @@ namespace BacklashBot.Timers
     /// </summary>
     public class SystemTimer : BacklashInterfaces.SmokehouseBot.Timers.ITimer
     {
-        private readonly System.Timers.Timer _timer;
+        private System.Timers.Timer _timer;
+        private double _interval = 100.0;
+        private bool _autoReset = true;
+        private bool _enabled = false;
 
         /// <summary>
         /// Initializes a new instance of the SystemTimer class.
@@ -16,6 +19,10 @@ namespace BacklashBot.Timers
         public SystemTimer()
         {
             _timer = new System.Timers.Timer();
+            _timer.Elapsed += OnTimerElapsed;
+            _timer.AutoReset = _autoReset;
+            _timer.Interval = _interval;
+            _timer.Enabled = false;
         }
 
         /// <summary>
@@ -24,16 +31,26 @@ namespace BacklashBot.Timers
         /// <param name="interval">The interval at which to raise the Elapsed event.</param>
         public SystemTimer(double interval)
         {
-            _timer = new System.Timers.Timer(interval);
+            _interval = interval;
+            _timer = new System.Timers.Timer();
+            _timer.Elapsed += OnTimerElapsed;
+            _timer.AutoReset = _autoReset;
+            _timer.Interval = _interval;
+            _timer.Enabled = false;
         }
 
         /// <summary>
         /// Occurs when the interval elapses.
         /// </summary>
-        public event ElapsedEventHandler Elapsed
+        public event ElapsedEventHandler Elapsed;
+
+        private void OnTimerElapsed(object sender, ElapsedEventArgs e)
         {
-            add => _timer.Elapsed += value;
-            remove => _timer.Elapsed -= value;
+            Elapsed?.Invoke(this, e);
+            if (!_autoReset)
+            {
+                _enabled = false;
+            }
         }
 
         /// <summary>
@@ -41,8 +58,12 @@ namespace BacklashBot.Timers
         /// </summary>
         public double Interval
         {
-            get => _timer.Interval;
-            set => _timer.Interval = value;
+            get => _interval;
+            set
+            {
+                _interval = value;
+                _timer.Interval = value;
+            }
         }
 
         /// <summary>
@@ -50,8 +71,12 @@ namespace BacklashBot.Timers
         /// </summary>
         public bool AutoReset
         {
-            get => _timer.AutoReset;
-            set => _timer.AutoReset = value;
+            get => _autoReset;
+            set
+            {
+                _autoReset = value;
+                _timer.AutoReset = value;
+            }
         }
 
         /// <summary>
@@ -59,30 +84,66 @@ namespace BacklashBot.Timers
         /// </summary>
         public bool Enabled
         {
-            get => _timer.Enabled;
-            set => _timer.Enabled = value;
+            get => _enabled;
+            set
+            {
+                _enabled = value;
+                _timer.Enabled = value;
+            }
         }
 
         /// <summary>
         /// Starts the timer.
         /// </summary>
-        public void Start() => _timer.Start();
+        public void Start()
+        {
+            _enabled = true;
+            _timer.Start();
+        }
 
         /// <summary>
         /// Stops the timer.
         /// </summary>
-        public void Stop() => _timer.Stop();
+        public void Stop()
+        {
+            _enabled = false;
+            _timer.Stop();
+        }
 
         /// <summary>
         /// Changes the start time and the interval between method invocations for a timer, using 32-bit signed integers to measure time intervals.
         /// </summary>
         /// <param name="dueTime">The amount of time to delay before the invoking the callback method specified when the Timer was constructed, in milliseconds. Specify Timeout.Infinite to prevent the timer from restarting. Specify zero (0) to restart the timer immediately.</param>
         /// <param name="period">The time interval between invocations of the callback method specified when the Timer was constructed, in milliseconds. Specify Timeout.Infinite to disable periodic signaling.</param>
-        public void Change(double dueTime, double period) => _timer.Change(dueTime, period);
+        public void Change(int dueTime, int period)
+        {
+            if (period != Timeout.Infinite)
+            {
+                _timer.Interval = period;
+            }
+            if (dueTime == 0)
+            {
+                _timer.Start();
+            }
+            else if (dueTime == Timeout.Infinite)
+            {
+                _timer.Stop();
+            }
+            else
+            {
+                // Approximate by setting interval and starting
+                _timer.Interval = period;
+                _timer.Start();
+            }
+            _enabled = (dueTime != Timeout.Infinite);
+        }
 
         /// <summary>
         /// Releases all resources used by the Timer.
         /// </summary>
-        public void Dispose() => _timer.Dispose();
+        public void Dispose()
+        {
+            _timer?.Dispose();
+        }
     }
 }

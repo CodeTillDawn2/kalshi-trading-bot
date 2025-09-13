@@ -56,7 +56,7 @@ namespace BacklashPatterns.PatternDefinitions
          * - Requirements (Source: BabyPips):
          *   1. First candle: Strong candle in trend direction (bullish or bearish).
          *   2. Second candle: Same direction, gaps from first candle.
-         *   3. Third candle: Same direction, opens near second candle�s open, similar size.
+         *   3. Third candle: Same direction, opens near second candle s open, similar size.
          * - Indication: Bullish version confirms uptrend continuation; bearish version confirms downtrend continuation.
          */
         public static UpDownGapSideBySideWhiteLinesPattern? IsPattern(

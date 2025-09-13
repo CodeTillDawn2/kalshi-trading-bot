@@ -200,6 +200,34 @@ namespace TradingStrategies.Configuration
         public int ADX_Periods { get; set; }
 
         /// <summary>
+        /// Initial acceleration factor for PSAR (Parabolic Stop and Reverse) calculations.
+        /// Controls the starting sensitivity of the PSAR indicator to price movements.
+        /// Typical value is 0.02.
+        /// </summary>
+        public double PSAR_InitialAF { get; set; }
+
+        /// <summary>
+        /// Maximum acceleration factor for PSAR calculations.
+        /// Limits the maximum sensitivity of the PSAR indicator.
+        /// Typical value is 0.2.
+        /// </summary>
+        public double PSAR_MaxAF { get; set; }
+
+        /// <summary>
+        /// Acceleration factor step increment for PSAR calculations.
+        /// Determines how much the acceleration factor increases on each favorable move.
+        /// Typical value is 0.02.
+        /// </summary>
+        public double PSAR_AFStep { get; set; }
+
+        /// <summary>
+        /// Exponential multiplier for resistance levels calculations.
+        /// Controls the weighting decay in time-based exponential smoothing for support/resistance analysis.
+        /// Typical value is 2.0.
+        /// </summary>
+        public double ResistanceLevels_ExponentialMultiplier { get; set; }
+
+        /// <summary>
         /// Tolerance percentage used for depth calculations within a price range.
         /// Determines the percentage range around the best bid to include in depth calculations.
         /// Expressed as percentage (e.g., 10.0 for 10%).

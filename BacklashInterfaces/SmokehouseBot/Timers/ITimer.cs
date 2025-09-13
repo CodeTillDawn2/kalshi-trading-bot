@@ -42,6 +42,6 @@ namespace BacklashInterfaces.SmokehouseBot.Timers
         /// </summary>
         /// <param name="dueTime">The amount of time to delay before the invoking the callback method specified when the Timer was constructed, in milliseconds. Specify Timeout.Infinite to prevent the timer from restarting. Specify zero (0) to restart the timer immediately.</param>
         /// <param name="period">The time interval between invocations of the callback method specified when the Timer was constructed, in milliseconds. Specify Timeout.Infinite to disable periodic signaling.</param>
-        void Change(double dueTime, double period);
+        void Change(int dueTime, int period);
     }
 }

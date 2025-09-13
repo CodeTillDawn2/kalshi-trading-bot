@@ -14,13 +14,13 @@ namespace BacklashPatterns.PatternDefinitions
     public class HikkakePattern : PatternDefinition
     {
         /// <summary>
-        /// Maximum breach above the first candle�s high for the inside bar. Allows slight flexibility.
+        /// Maximum breach above the first candle s high for the inside bar. Allows slight flexibility.
         /// Strictest: 0.5 (original), Loosest: 1.0 (still inside with buffer, per loose Hikkake logic).
         /// </summary>
         public static double MaxInsideBarHighBuffer { get; } = 0.5;
 
         /// <summary>
-        /// Maximum breach below the first candle�s low for the inside bar. Allows slight flexibility.
+        /// Maximum breach below the first candle s low for the inside bar. Allows slight flexibility.
         /// Strictest: 0.5 (original), Loosest: 1.0 (still inside with buffer, per loose Hikkake logic).
         /// </summary>
         public static double MaxInsideBarLowBuffer { get; } = 0.5;
@@ -32,7 +32,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MinReversalBodySize { get; } = 1.0;
 
         /// <summary>
-        /// Minimum trend strength for the prior trend. Confirms the preceding trend�s validity.
+        /// Minimum trend strength for the prior trend. Confirms the preceding trend s validity.
         /// Strictest: 0.3 (original), Loosest: 0.1 (minimal trend still detectable, per loose definitions).
         /// </summary>
         public static double TrendThreshold { get; } = 0.3;

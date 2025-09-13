@@ -18,7 +18,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MaxBodySizeMinor { get; } = 1.5;
 
         /// <summary>
-        /// Maximum proportion of the fifth candle�s range that can be wicks, ensuring a strong body.
+        /// Maximum proportion of the fifth candle s range that can be wicks, ensuring a strong body.
         /// Loosest: 0.6 (more wick allowed); Strictest: 0.3 (minimal wicks).
         /// </summary>
         public static double WickRangeRatio { get; } = 0.5;
@@ -30,13 +30,13 @@ namespace BacklashPatterns.PatternDefinitions
         public static double TrendThreshold { get; } = 0.3;
 
         /// <summary>
-        /// Buffer factor as a percentage of the first candle�s range for middle candle containment.
+        /// Buffer factor as a percentage of the first candle s range for middle candle containment.
         /// Loosest: 0.15 (wider range); Strictest: 0.05 (tight containment).
         /// </summary>
         public static double RangeBufferFactor { get; } = 0.1;
 
         /// <summary>
-        /// Minimum buffer size for range containment when the first candle�s range is small.
+        /// Minimum buffer size for range containment when the first candle s range is small.
         /// Loosest: 0.3 (smaller buffer); Strictest: 1.0 (larger buffer).
         /// </summary>
         public static double MinRangeBuffer { get; } = 0.5;
@@ -54,10 +54,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// Identifies Rising/Falling Three Methods, a five-candle continuation pattern.
         /// Requirements (source: Investopedia, TradingView):
         /// - Rising: Occurs in a downtrend; first candle is bullish with a large body, followed by 
-        ///   three smaller bearish candles within the first candle�s range, and a final bullish candle 
+        ///   three smaller bearish candles within the first candle s range, and a final bullish candle 
         ///   closing above the first.
         /// - Falling: Occurs in an uptrend; first candle is bearish with a large body, followed by 
-        ///   three smaller bullish candles within the first candle�s range, and a final bearish candle 
+        ///   three smaller bullish candles within the first candle s range, and a final bearish candle 
         ///   closing below the first.
         /// Indicates: Continuation of the prior trend (bullish for Rising, bearish for Falling) after a brief consolidation.
         /// </summary>

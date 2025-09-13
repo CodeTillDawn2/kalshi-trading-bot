@@ -18,7 +18,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MinBodySizeFirst { get; } = 1.0;
 
         /// <summary>
-        /// Maximum body size for the second candle. Ensures it�s smaller and contained.
+        /// Maximum body size for the second candle. Ensures it s smaller and contained.
         /// Strictest: 1.0 (tight containment), Loosest: 3.0 (allows larger retracement).
         /// </summary>
         public static double MaxBodySizeSecond { get; } = 2.0;
@@ -81,7 +81,7 @@ namespace BacklashPatterns.PatternDefinitions
                 // First candle: Bearish, significant body
                 if (!metrics1.IsBearish || body1 < MinBodySizeFirst) return null;
 
-                // Second candle: Bullish, smaller, contained within first�s body (with buffer)
+                // Second candle: Bullish, smaller, contained within first s body (with buffer)
                 if (!metrics2.IsBullish || body2 > MaxBodySizeSecond) return null;
                 bool c2Inside = prices[c2].Open >= Math.Min(prices[c1].Open, prices[c1].Close) - ContainmentBuffer &&
                                 prices[c2].Open <= Math.Max(prices[c1].Open, prices[c1].Close) + ContainmentBuffer &&
@@ -89,7 +89,7 @@ namespace BacklashPatterns.PatternDefinitions
                                 prices[c2].Close <= Math.Max(prices[c1].Open, prices[c1].Close) + ContainmentBuffer;
                 if (!c2Inside) return null;
 
-                // Third candle: Bullish, closes above second�s high (relaxed from first�s open)
+                // Third candle: Bullish, closes above second s high (relaxed from first s open)
                 if (!metrics3.IsBullish || body3 < MinBodySizeThird) return null;
                 if (prices[c3].Close <= prices[c2].High) return null;
 
@@ -108,7 +108,7 @@ namespace BacklashPatterns.PatternDefinitions
                 // First candle: Bullish, significant body
                 if (!metrics1.IsBullish || body1 < MinBodySizeFirst) return null;
 
-                // Second candle: Bearish, smaller, contained within first�s body (with buffer)
+                // Second candle: Bearish, smaller, contained within first s body (with buffer)
                 if (!metrics2.IsBearish || body2 > MaxBodySizeSecond) return null;
                 bool c2Inside = prices[c2].Open >= Math.Min(prices[c1].Open, prices[c1].Close) - ContainmentBuffer &&
                                 prices[c2].Open <= Math.Max(prices[c1].Open, prices[c1].Close) + ContainmentBuffer &&
@@ -116,7 +116,7 @@ namespace BacklashPatterns.PatternDefinitions
                                 prices[c2].Close <= Math.Max(prices[c1].Open, prices[c1].Close) + ContainmentBuffer;
                 if (!c2Inside) return null;
 
-                // Third candle: Bearish, closes below second�s low (relaxed from first�s open)
+                // Third candle: Bearish, closes below second s low (relaxed from first s open)
                 if (!metrics3.IsBearish || body3 < MinBodySizeThird) return null;
                 if (prices[c3].Close >= prices[c2].Low) return null;
 

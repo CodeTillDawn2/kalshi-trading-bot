@@ -42,7 +42,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double CloseToleranceBase { get; } = 1.5;
 
         /// <summary>
-        /// Factor applied to the first candle�s range to adjust close tolerance dynamically.
+        /// Factor applied to the first candle s range to adjust close tolerance dynamically.
         /// Strictest: 0.1 (tight range-based tolerance), Loosest: 0.3 (broader range allowance).
         /// </summary>
         public static double CloseToleranceRangeFactor { get; } = 0.2;
@@ -115,7 +115,7 @@ namespace BacklashPatterns.PatternDefinitions
             bool closesMatch = Math.Abs(ask3.Close - ask1.Close) <= tolerance;
             if (!closesMatch) return null;
 
-            // Loosened trend check using CandleMetrics method (restored from original: �0.3)
+            // Loosened trend check using CandleMetrics method (restored from original:  0.3)
             bool trendValid = isBullish
                 ? (metrics3.GetLookbackMeanTrend(3) <= -TrendThreshold) // Downtrend for bullish
                 : (metrics3.GetLookbackMeanTrend(3) >= TrendThreshold);  // Uptrend for bearish

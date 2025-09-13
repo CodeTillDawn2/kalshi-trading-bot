@@ -88,7 +88,7 @@ namespace TradingSimulator.Tests
             _scopeFactory = new Mock<IServiceScopeFactory>().Object;
             _tradingSnapshotServiceLoggerMock = new Mock<ILogger<TradingSnapshotService>>();
             _tradingCalculatorLoggerMock = new Mock<ILogger<TradingCalculator>>();
-            _tradingCalculator = new TradingCalculator(_tradingCalculatorLoggerMock.Object);
+            _tradingCalculator = new TradingCalculator(_tradingCalculatorLoggerMock.Object, _calculationOptions.Value);
             _tradingOptions = TestHelper.GetTradingConfig();
             _calculationOptions = TestHelper.GetCalculationConfig();
             _marginFactor = 0.001; // 0.1% margin factor

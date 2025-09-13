@@ -12,15 +12,15 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MinBodySize { get; set; } = 0.5;
 
         /// <summary>
-        /// Threshold for confirming the strength of the preceding trend (� value).
+        /// Threshold for confirming the strength of the preceding trend (  value).
         /// Strictest: 0.5 (original logic), Loosest: 0.1 (minimal trend still detectable).
         /// </summary>
         public static double TrendThreshold { get; set; } = 0.1;
 
         /// <summary>
         /// Represents a Three Line Strike pattern (Bullish or Bearish).
-        /// - Bullish: A reversal pattern in a downtrend. Three bullish candles with ascending closes, followed by a bearish candle that strikes back, closing below the second candle�s close.
-        /// - Bearish: A reversal pattern in an uptrend. Three bearish candles with descending closes, followed by a bullish candle that strikes back, closing above the second candle�s close.
+        /// - Bullish: A reversal pattern in a downtrend. Three bullish candles with ascending closes, followed by a bearish candle that strikes back, closing below the second candle s close.
+        /// - Bearish: A reversal pattern in an uptrend. Three bearish candles with descending closes, followed by a bullish candle that strikes back, closing above the second candle s close.
         /// Requirements sourced from: https://www.investopedia.com/terms/t/three-line-strike.asp
         /// </summary>
         public const string BaseName = "ThreeLineStrike";

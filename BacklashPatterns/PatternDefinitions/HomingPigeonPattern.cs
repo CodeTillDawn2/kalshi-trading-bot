@@ -5,20 +5,20 @@ namespace BacklashPatterns.PatternDefinitions
 {
     /// <summary>
     /// The Homing Pigeon is a two-candle bullish reversal pattern occurring after a downtrend.
-    /// - Two bearish candles where the second is smaller and contained within the first�s range.
+    /// - Two bearish candles where the second is smaller and contained within the first s range.
     /// - Indicates slowing bearish momentum and potential reversal to the upside.
     /// Source: https://www.babypips.com/learn/forex/homing-pigeon
     /// </summary>
     public class HomingPigeonPattern : PatternDefinition
     {
         /// <summary>
-        /// Maximum increase in the second candle�s open relative to the first�s open.
+        /// Maximum increase in the second candle s open relative to the first s open.
         /// Strictest: 0.2 (tight range); Loosest: 1.0 (allows more separation).
         /// </summary>
         public static double MaxOpenBuffer { get; set; } = 0.5;
 
         /// <summary>
-        /// Maximum decrease in the second candle�s close relative to the first�s close.
+        /// Maximum decrease in the second candle s close relative to the first s close.
         /// Strictest: 0.2 (tight range); Loosest: 1.0 (allows more separation).
         /// </summary>
         public static double MaxCloseBuffer { get; set; } = 0.5;
@@ -30,7 +30,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double BaseMaxLowDifference { get; set; } = 3.0;
 
         /// <summary>
-        /// Maximum low difference as a percentage of the first candle�s range.
+        /// Maximum low difference as a percentage of the first candle s range.
         /// Strictest: 0.3 (tight range); Loosest: 0.7 (wider range).
         /// </summary>
         public static double LowRangeRatio { get; set; } = 0.5;

@@ -18,7 +18,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MaxBodySize { get; } = 2.0;
 
         /// <summary>
-        /// Tolerance for how close the second candle�s close must be to the first candle�s low.
+        /// Tolerance for how close the second candle s close must be to the first candle s low.
         /// Strictest: 0.1 (very close), Loosest: 1.0 (broader range for nearness).
         /// </summary>
         public static double LowCloseTolerance { get; } = 0.5;

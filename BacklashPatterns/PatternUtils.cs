@@ -75,7 +75,7 @@ namespace BacklashPatterns
 
                 // Calculate intervalType based on timestamp difference
                 int intervalType = 0; // Default value
-                if (index > 0) // Ensure there�s a previous candle to compare
+                if (index > 0) // Ensure there s a previous candle to compare
                 {
                     double timeDiff = (prices[index].Timestamp - prices[index - 1].Timestamp).TotalSeconds;
                     // Assuming Timestamp is in milliseconds (adjust if it's in seconds or another unit)

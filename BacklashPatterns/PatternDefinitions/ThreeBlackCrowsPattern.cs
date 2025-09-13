@@ -23,7 +23,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MaxWickSize { get; } = 1.5;
 
         /// <summary>
-        /// Maximum difference between a candle�s open and the previous close. Ensures continuity.
+        /// Maximum difference between a candle s open and the previous close. Ensures continuity.
         /// Strictest: 0.1 (very tight), Loosest: 1.0 (loose continuity).
         /// </summary>
         public static double MaxOpenCloseDiff { get; } = 0.5;

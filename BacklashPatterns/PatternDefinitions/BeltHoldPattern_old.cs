@@ -12,10 +12,10 @@ namespace BacklashPatterns.PatternDefinitions
     /// - Minimal shadows (small upper and lower wicks).
     /// - Occurs after a clear trend (downtrend for bullish, uptrend for bearish).
     /// Some traders require the next candle to confirm the reversal (e.g., a bullish candle after a Bullish Belt Hold). 
-    /// Your single-candle check doesn�t include this.
-    /// The pattern�s reliability often increases near support/resistance levels or after extreme price moves. Your code focuses solely on the candle and prior trend, not broader market context.
-    //Suggestion: This might be out of scope for raw pattern detection, but you could flag patterns near key levels(e.g., 25, 50, 75 on a 0�100 scale) for your ML model.
-    /// Many sources (e.g., Investopedia) suggest that a Belt Hold with higher-than-average volume strengthens the reversal signal. Your CandleMetrics calculates AvgVoumeVsLookback, but it�s not used in IsPattern.
+    /// Your single-candle check doesn t include this.
+    /// The pattern s reliability often increases near support/resistance levels or after extreme price moves. Your code focuses solely on the candle and prior trend, not broader market context.
+    //Suggestion: This might be out of scope for raw pattern detection, but you could flag patterns near key levels(e.g., 25, 50, 75 on a 0 100 scale) for your ML model.
+    /// Many sources (e.g., Investopedia) suggest that a Belt Hold with higher-than-average volume strengthens the reversal signal. Your CandleMetrics calculates AvgVoumeVsLookback, but it s not used in IsPattern.
     //Suggestion: Add an optional volume check(e.g., AvgVoumeVsLookback > 1.0) to filter for stronger signals, especially for machine learning where volume might be predictive.
     /// </summary>
     public class BeltHoldPattern_old : PatternDefinition
@@ -38,7 +38,7 @@ namespace BacklashPatterns.PatternDefinitions
 
         /// <summary>
         /// Maximum size of upper and lower shadows (wicks).
-        /// Purpose: Ensures minimal wicks, emphasizing the body�s dominance in the pattern.
+        /// Purpose: Ensures minimal wicks, emphasizing the body s dominance in the pattern.
         /// Default: 0.5
         /// Loosest Value: 1.0 (Investopedia suggests wicks up to 1.0 can still fit if the body is sufficiently large).
         /// </summary>
@@ -62,7 +62,7 @@ namespace BacklashPatterns.PatternDefinitions
 
         /// <summary>
         /// Minimum absolute body size for the candle to be considered a valid Belt Hold.
-        /// Purpose: Ensures the candle�s price movement (open to close) is significant enough to indicate a strong reversal, filtering out trivial changes.
+        /// Purpose: Ensures the candle s price movement (open to close) is significant enough to indicate a strong reversal, filtering out trivial changes.
         /// Default: 4.0
         /// Loosest Value: 3.0 (TradingView community notes that smaller bodies can still qualify in low-volatility markets with strong trend context).
         /// </summary>

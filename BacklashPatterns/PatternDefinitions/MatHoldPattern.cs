@@ -8,7 +8,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Minimum body size for the first and fifth candles, ensuring strong directional moves.
         /// - Strictest: 2.0 (very strong candles).
-        /// - Loosest: 1.0 (minimal significant body, per BabyPips� relaxed continuation patterns).
+        /// - Loosest: 1.0 (minimal significant body, per BabyPips  relaxed continuation patterns).
         /// </summary>
         public static double MinBodySize { get; } = 1.5;
 
@@ -22,19 +22,19 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Minimum trend strength required prior to the pattern. Positive for bullish, negative for bearish.
         /// - Strictest: 0.5 (strong trend).
-        /// - Loosest: 0.1 (minimal trend, per BabyPips� flexible continuation logic).
+        /// - Loosest: 0.1 (minimal trend, per BabyPips  flexible continuation logic).
         /// </summary>
         public static double TrendThreshold { get; } = 0.3;
 
         /// <summary>
-        /// Buffer allowing middle candles to slightly exceed the first candle�s range.
-        /// - Strictest: 0.0 (strict containment within first candle�s range).
+        /// Buffer allowing middle candles to slightly exceed the first candle s range.
+        /// - Strictest: 0.0 (strict containment within first candle s range).
         /// - Loosest: 1.0 (significant buffer, per loose consolidation definitions).
         /// </summary>
         public static double ContainmentBuffer { get; } = 0.5;
 
         /// <summary>
-        /// Minimum difference between the fifth candle�s close and the first candle�s close, confirming continuation.
+        /// Minimum difference between the fifth candle s close and the first candle s close, confirming continuation.
         /// - Strictest: 1.0 (strong continuation).
         /// - Loosest: 0.3 (minimal continuation move, per relaxed Mat Hold standards).
         /// </summary>
@@ -55,7 +55,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Identifies a Mat Hold pattern, a five-candle continuation pattern.
         /// Requirements (sourced from BabyPips and adapted to your logic):
         /// - First candle: Strong directional move (bullish or bearish).
-        /// - Middle three candles: Small-bodied, at least one opposing the trend, contained within the first candle�s range.
+        /// - Middle three candles: Small-bodied, at least one opposing the trend, contained within the first candle s range.
         /// - Fifth candle: Strong continuation of the initial trend, closing beyond the first candle.
         /// - Indicates a pause in a trend followed by continuation.
         /// Your original logic relaxes body sizes and containment strictness.
@@ -67,7 +67,7 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache)
         {
-            // Early exit if there aren�t enough candles for the pattern
+            // Early exit if there aren t enough candles for the pattern
             if (index < 4) return null;
 
             // Define candle indices for the five-candle pattern
@@ -102,7 +102,7 @@ namespace BacklashPatterns.PatternDefinitions
                 // At least one middle candle must oppose the trend
                 bool atLeastOneBearish = metrics2.IsBearish || metrics3.IsBearish || metrics4.IsBearish;
 
-                // Middle candles must be contained within the first candle�s range with buffer
+                // Middle candles must be contained within the first candle s range with buffer
                 bool containment = ask2.High <= ask1.High + ContainmentBuffer && ask2.Low >= ask1.Low - ContainmentBuffer &&
                                   ask3.High <= ask1.High + ContainmentBuffer && ask3.Low >= ask1.Low - ContainmentBuffer &&
                                   ask4.High <= ask1.High + ContainmentBuffer && ask4.Low >= ask1.Low - ContainmentBuffer;
@@ -131,7 +131,7 @@ namespace BacklashPatterns.PatternDefinitions
                 // At least one middle candle must oppose the trend
                 bool atLeastOneBullish = metrics2.IsBullish || metrics3.IsBullish || metrics4.IsBullish;
 
-                // Middle candles must be contained within the first candle�s range with buffer
+                // Middle candles must be contained within the first candle s range with buffer
                 bool containment = ask2.High <= ask1.High + ContainmentBuffer && ask2.Low >= ask1.Low - ContainmentBuffer &&
                                   ask3.High <= ask1.High + ContainmentBuffer && ask3.Low >= ask1.Low - ContainmentBuffer &&
                                   ask4.High <= ask1.High + ContainmentBuffer && ask4.Low >= ask1.Low - ContainmentBuffer;

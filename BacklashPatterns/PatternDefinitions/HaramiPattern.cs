@@ -7,7 +7,7 @@ namespace BacklashPatterns.PatternDefinitions
     /// The Harami pattern is a two-candle reversal pattern indicating a potential trend change.
     /// Requirements:
     /// - First candle: Large body in the direction of the prevailing trend (bullish in uptrend, bearish in downtrend).
-    /// - Second candle: Smaller body fully contained within the first candle�s body, opposite direction.
+    /// - Second candle: Smaller body fully contained within the first candle s body, opposite direction.
     /// - Trend: Occurs after a defined trend (downtrend for Bullish Harami, uptrend for Bearish Harami).
     /// Indicates:
     /// - Bullish Harami: Potential reversal from downtrend to uptrend.
@@ -23,19 +23,19 @@ namespace BacklashPatterns.PatternDefinitions
         public static double MinFirstBodySize { get; } = 1.5;
 
         /// <summary>
-        /// Maximum body size for the second candle. Limits the second candle�s body to remain small.
+        /// Maximum body size for the second candle. Limits the second candle s body to remain small.
         /// Strictest: 1.5 (original), Loosest: 2.0 (still smaller relative to first, per loose definitions).
         /// </summary>
         public static double MaxSecondBodySize { get; } = 1.5;
 
         /// <summary>
-        /// Maximum second body size as a percentage of the first candle�s body. Ensures proportionality.
+        /// Maximum second body size as a percentage of the first candle s body. Ensures proportionality.
         /// Strictest: 0.5 (original), Loosest: 0.75 (allows slightly larger second body, per loose Harami definitions).
         /// </summary>
         public static double BodySizeRatio { get; } = 0.5;
 
         /// <summary>
-        /// Minimum trend strength for the prior trend. Confirms the preceding trend�s validity.
+        /// Minimum trend strength for the prior trend. Confirms the preceding trend s validity.
         /// Strictest: 0.3 (original), Loosest: 0.1 (minimal trend still detectable, per broad reversal logic).
         /// </summary>
         public static double TrendThreshold { get; } = 0.3;

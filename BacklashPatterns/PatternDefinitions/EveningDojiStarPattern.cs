@@ -7,7 +7,7 @@ namespace BacklashPatterns.PatternDefinitions
     {
         /// <summary>
         /// Minimum body size for the first candle to ensure a significant uptrend.
-        /// Purpose: Filters out weak initial candles that don�t establish a strong bullish move.
+        /// Purpose: Filters out weak initial candles that don t establish a strong bullish move.
         /// Strictest: 3.0 (very strong candle), Loosest: 0.5 (minimal body size per loose interpretations).
         /// </summary>
         public static double MinBodySize { get; set; } = 2.0;
@@ -20,7 +20,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static double DojiBodyMax { get; set; } = 1.0;
 
         /// <summary>
-        /// Maximum ratio of the doji�s body size to its total range.
+        /// Maximum ratio of the doji s body size to its total range.
         /// Purpose: Ensures the doji has a small body relative to its wicks, reinforcing indecision.
         /// Strictest: 0.05 (extremely small body), Loosest: 0.25 (larger body allowed per loose standards).
         /// </summary>

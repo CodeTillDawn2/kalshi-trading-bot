@@ -29,13 +29,13 @@ namespace BacklashPatterns.PatternDefinitions
         public static double BodyRangeRatio { get; } = 0.4;
 
         /// <summary>
-        /// Minimum proportion of the total range that the upper wick must occupy, ensuring it�s long.
+        /// Minimum proportion of the total range that the upper wick must occupy, ensuring it s long.
         /// Loosest: 0.3 (shorter wick); Strictest: 0.5 (longer wick).
         /// </summary>
         public static double WickRangeRatio { get; } = 0.4;
 
         /// <summary>
-        /// Minimum ratio of the upper wick to the body size, emphasizing the wick�s dominance.
+        /// Minimum ratio of the upper wick to the body size, emphasizing the wick s dominance.
         /// Loosest: 1.0 (equal to body); Strictest: 2.0 (twice the body).
         /// </summary>
         public static double WickToBodyRatio { get; } = 1.5;
@@ -72,7 +72,7 @@ namespace BacklashPatterns.PatternDefinitions
             int trendLookback,
             CandleMids[] prices)
         {
-            // Early exit if there�s no prior candle
+            // Early exit if there s no prior candle
             if (index < 1) return null;
 
             // Lazy load metrics for the current candle

@@ -827,7 +827,7 @@ namespace BacklashBot.State
 
             _obv_Long = (long)_tradingCalculator.CalculateOBV(dayCopy);
 
-            var adxResult = _tradingCalculator.CalculateADX(minuteCopy, _calculationConfig.ADX_Periods);
+            var adxResult = _tradingCalculator.CalculateADX(minuteCopy);
             ADX = adxResult.ADX;
             PlusDI = adxResult.PlusDI;
             MinusDI = adxResult.MinusDI;
@@ -839,7 +839,7 @@ namespace BacklashBot.State
             CalculateSlope();
 
             RecentCandlesticks = minuteCopy.TakeLast(_calculationConfig.RecentCandlesticksCount).ToList();
-            PSAR = Math.Round((double)_tradingCalculator.CalculatePSAR(Candlesticks["minute"]), 2);
+            PSAR = Math.Round((double)_tradingCalculator.CalculatePSAR(minuteCopy), 2);
             _logger.LogDebug("**Ended updating trading metrics for {marketTicker}**", _marketTicker);
             });
         }
