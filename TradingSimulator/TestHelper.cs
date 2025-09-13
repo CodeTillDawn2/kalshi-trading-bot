@@ -3,9 +3,18 @@ using TradingStrategies.Configuration;
 
 namespace TradingSimulator.Tests
 {
+    /// <summary>
+    /// Provides utility methods for creating test configurations used in unit tests within the TradingSimulator project.
+    /// This class centralizes the creation of standardized configuration objects with typical values for testing trading and calculation logic.
+    /// </summary>
     public static class TestHelper
     {
-
+        /// <summary>
+        /// Creates and returns an IOptions<TradingConfig> instance with predefined test values for trading-related settings.
+        /// These values represent common configuration parameters used in testing scenarios, such as decision frequency and window durations.
+        /// The returned options object can be injected into services that depend on TradingConfig for isolated testing.
+        /// </summary>
+        /// <returns>An IOptions<TradingConfig> instance configured with standard test values.</returns>
         public static IOptions<TradingConfig> GetTradingConfig()
         {
             var tradingConfig = new TradingConfig
@@ -17,6 +26,13 @@ namespace TradingSimulator.Tests
             return Options.Create(tradingConfig);
         }
 
+        /// <summary>
+        /// Creates and returns an IOptions<CalculationConfig> instance with predefined test values for technical indicator and calculation settings.
+        /// These values represent standard periods and parameters for various trading indicators (RSI, MACD, EMA, Bollinger Bands, etc.) used in testing.
+        /// The configuration includes settings for short, medium, and long-term calculations across multiple technical analysis tools.
+        /// The returned options object enables consistent testing of calculation logic without external configuration dependencies.
+        /// </summary>
+        /// <returns>An IOptions<CalculationConfig> instance configured with comprehensive test values for technical indicators.</returns>
         public static IOptions<CalculationConfig> GetCalculationConfig()
         {
             var calculationConfig = new CalculationConfig
