@@ -372,6 +372,19 @@ This document outlines the performance metrics tracked across various classes in
 - `MarketRefreshFailureCount`: int - Number of market refresh failures
 - `LastMarketRefreshFailure`: DateTime? - Timestamp of last market refresh failure
 
+## KalshiBotContext.Data.KalshiBotContext
+
+### Methods
+- `GetPerformanceMetrics()`: IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> - Returns comprehensive performance metrics for all tracked database operations
+- `ResetPerformanceMetrics()`: void - Resets all performance metrics counters to zero
+- `TrackPerformanceMetric(string operationName, bool success, TimeSpan duration)`: void - Tracks performance metrics for individual database operations (private method)
+
+### Properties
+- `_performanceMetrics`: Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime)> - Internal dictionary storing performance metrics for each operation
+- `_maxRetryCount`: int - Configurable maximum number of retry attempts for database operations
+- `_retryDelay`: TimeSpan - Configurable delay between retry attempts
+- `_batchSize`: int - Configurable batch size for bulk database operations
+
 ## KalshiBotAPI.Websockets.WebSocketConnectionManager
 
 ### Properties
