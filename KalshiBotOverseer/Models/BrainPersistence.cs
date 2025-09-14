@@ -84,7 +84,7 @@ namespace KalshiBotOverseer.Models
         /// </summary>
         [Required]
         [JsonPropertyName("brainInstanceName")]
-        public string BrainInstanceName { get; set; }
+        public required string BrainInstanceName { get; set; }
 
         /// <summary>
         /// Gets or sets the unique GUID identifier for the brain.
@@ -317,7 +317,7 @@ namespace KalshiBotOverseer.Models
         public BrainPersistence Clone()
         {
             var json = JsonSerializer.Serialize(this);
-            return JsonSerializer.Deserialize<BrainPersistence>(json);
+            return JsonSerializer.Deserialize<BrainPersistence>(json)!;
         }
 
         /// <summary>
@@ -340,7 +340,7 @@ namespace KalshiBotOverseer.Models
         public static (BrainPersistence Instance, long Milliseconds) DeserializeWithMetrics(string json)
         {
             var stopwatch = Stopwatch.StartNew();
-            var instance = JsonSerializer.Deserialize<BrainPersistence>(json);
+            var instance = JsonSerializer.Deserialize<BrainPersistence>(json)!;
             stopwatch.Stop();
             return (instance, stopwatch.ElapsedMilliseconds);
         }

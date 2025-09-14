@@ -96,7 +96,7 @@ namespace KalshiBotOverseer.Controllers
                     entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
                     return (await _context.GetBrainInstancesFiltered(hasBrainLock: true))
                         .Where(bi => bi.BrainLock.HasValue)
-                        .ToDictionary(bi => bi.BrainLock.Value, bi => bi.BrainInstanceName);
+                        .ToDictionary(bi => bi.BrainLock!.Value, bi => bi.BrainInstanceName!);
                 });
 
                 // Get all brain instances for comprehensive lookup
@@ -107,11 +107,11 @@ namespace KalshiBotOverseer.Controllers
                 });
 
                 // Get market watches for active markets only
-                var activeMarketTickers = markets.Select(m => m.market_ticker).ToHashSet();
+                var activeMarketTickers = markets.Where(m => m.market_ticker != null).Select(m => m.market_ticker!).ToHashSet();
                 var marketWatches = (await _context.GetMarketWatches(marketTickers: activeMarketTickers)).ToList();
 
                 // Create a lookup for faster market access
-                var marketLookup = markets.ToDictionary(m => m.market_ticker, m => m);
+                var marketLookup = markets.Where(m => m.market_ticker != null).ToDictionary(m => m.market_ticker!, m => m);
 
                 var marketWatchData = marketWatches.Select(mw =>
                 {
@@ -198,7 +198,7 @@ namespace KalshiBotOverseer.Controllers
                 });
 
                 // Get market watches for active markets only
-                var activeMarketTickers = markets.Select(m => m.market_ticker).ToHashSet();
+                var activeMarketTickers = markets.Where(m => m.market_ticker != null).Select(m => m.market_ticker!).ToHashSet();
                 var marketWatches = (await _context.GetMarketWatches(marketTickers: activeMarketTickers)).ToList();
 
                 // Get snapshot and error data from LogEntry table for brain instances (optimized with caching)

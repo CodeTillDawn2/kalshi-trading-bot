@@ -11,7 +11,7 @@ namespace KalshiBotOverseer
     {
         private readonly ILogger<WebSocketMonitorServiceLite> _logger;
         private bool _isConnected = false;
-        private Task _monitorTask;
+        private Task? _monitorTask;
         private readonly IServiceScopeFactory _scopeFactory;
         private IKalshiWebSocketClient _webSocketClient;
 
