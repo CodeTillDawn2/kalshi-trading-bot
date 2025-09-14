@@ -75,7 +75,7 @@ namespace BacklashBot.Services
             var kalshiWebSocketLogger = sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>();
             var tradingSnapshotLogger = sp.GetRequiredService<ILogger<ITradingSnapshotService>>();
             var sqlDataServiceLogger = sp.GetRequiredService<ILogger<ISqlDataService>>();
-            var chartHub = sp.GetRequiredService<IHubContext<ChartHub>>();
+            var chartHub = sp.GetRequiredService<IHubContext<BacklashBotHub>>();
             var marketFactory = sp.GetRequiredService<Func<MarketDTO, MarketData>>();
             var marketDataService = sp.GetRequiredService<IMarketDataService>();
             var orderBookService = sp.GetRequiredService<IOrderBookService>();

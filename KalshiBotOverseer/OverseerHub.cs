@@ -1,19 +1,14 @@
-/// <summary>
-/// SignalR hub that manages real-time communication between the Kalshi trading bot overseer
-/// and connected brain instances. This hub handles client connections, authentication via
-/// handshakes, periodic status check-ins from brain instances, and broadcasting of trading
-/// data and updates. It serves as the central communication point for the overseer system,
-/// enabling real-time monitoring and control of trading bot operations.
-/// </summary>
 using Microsoft.AspNetCore.SignalR;
+using KalshiBotOverseer.Services;
+using KalshiBotAPI.Configuration;
+using KalshiBotAPI.KalshiAPI;
+using KalshiBotAPI.Websockets;
+using KalshiBotAPI.WebSockets.Interfaces;
+using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using BacklashDTOs;
-using BacklashDTOs.Configuration;
-using System.Security.Cryptography;
-using System.Text;
 using System.Collections.Concurrent;
 using KalshiBotOverseer.Models;
 using System.Threading;
@@ -22,138 +17,299 @@ using System.Diagnostics;
 namespace KalshiBotOverseer
 {
     /// <summary>
-    /// SignalR hub for managing real-time communication with brain instances in the
-    /// Kalshi trading bot overseer system. Handles authentication, status updates,
-    /// and data broadcasting between the overseer and distributed brain components.
+    /// Configuration options for the OverseerHub SignalR hub.
+    /// </summary>
+    public class OverseerHubConfig
+    {
+        /// <summary>
+        /// Gets or sets the timeout in seconds for connection health monitoring.
+        /// Default is 300 seconds (5 minutes).
+        /// </summary>
+        public int ConnectionHealthTimeoutSeconds { get; set; } = 300;
+
+        /// <summary>
+        /// Gets or sets the interval in seconds between health checks.
+        /// Default is 60 seconds (1 minute).
+        /// </summary>
+        public int HealthCheckIntervalSeconds { get; set; } = 60;
+
+        /// <summary>
+        /// Gets or sets the validity duration for authentication tokens in hours.
+        /// Default is 24 hours (1 day).
+        /// </summary>
+        public int AuthTokenValidityHours { get; set; } = 24;
+
+        /// <summary>
+        /// Gets or sets the maximum number of handshake requests allowed per minute per IP.
+        /// Default is 10.
+        /// </summary>
+        public int MaxHandshakeRequestsPerMinute { get; set; } = 10;
+
+        /// <summary>
+        /// Gets or sets the maximum number of check-in requests allowed per minute per client.
+        /// Default is 60.
+        /// </summary>
+        public int MaxCheckInRequestsPerMinute { get; set; } = 60;
+    }
+
+    /// <summary>
+    /// SignalR hub that manages real-time communication between the Kalshi trading bot overseer
+    /// and connected clients. This hub handles client connections, authentication via handshakes,
+    /// periodic status check-ins from brain instances, and broadcasting of trading data and updates.
+    /// It serves as the central communication point for the overseer system, enabling real-time
+    /// monitoring and control of trading bot operations.
     /// </summary>
     public class OverseerHub : Hub
     {
-        private readonly ILogger<OverseerHub> _logger;
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly ExecutionConfig _executionConfig;
-        private static readonly ConcurrentDictionary<string, BrainPersistence> _brainStateCache = new ConcurrentDictionary<string, BrainPersistence>();
+        private static readonly HashSet<string> _connectedClients = new HashSet<string>();
+        private static readonly ConcurrentDictionary<string, ClientInfo> _clientInfo = new();
 
         // Performance metrics
-        private readonly Stopwatch _uptimeStopwatch = Stopwatch.StartNew();
-        private long _totalMessagesProcessed;
-        private long _totalConnections;
-        private long _activeConnections;
-        private readonly ConcurrentDictionary<string, DateTime> _lastActivity = new();
+        private static long _totalMessagesProcessed = 0;
+        private static long _totalHandshakeRequests = 0;
+        private static long _totalCheckInRequests = 0;
+        private static DateTime _lastMetricsReset = DateTime.UtcNow;
+        private static readonly object _metricsLock = new object();
 
         // Rate limiting
-        private readonly ConcurrentDictionary<string, ConcurrentQueue<DateTime>> _handshakeRateLimit = new();
-        private readonly ConcurrentDictionary<string, ConcurrentQueue<DateTime>> _checkInRateLimit = new();
-
-        // Message batching
-        private readonly ConcurrentQueue<(string Method, object Data, string? ClientFilter)> _messageBatch = new();
-        private readonly Timer _messageBatchTimer;
-        private readonly SemaphoreSlim _messageBatchSemaphore = new(1, 1);
+        private static readonly ConcurrentDictionary<string, ClientRateLimit> _rateLimits = new();
+        private static readonly Timer _rateLimitCleanupTimer;
 
         // Connection health monitoring
-        private readonly Timer _healthCheckTimer;
-        private readonly ConcurrentDictionary<string, DateTime> _connectionHealth = new();
+        private static readonly Timer _healthCheckTimer;
 
-        // Session management
-        private readonly Timer _cleanupTimer;
+        private readonly ILogger<OverseerHub> _logger;
+        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly BrainPersistenceService _brainService;
+        private readonly OverseerHubConfig _config;
 
-        /// <summary>
-        /// Initializes a new instance of the OverseerHub with required dependencies.
-        /// </summary>
-        /// <param name="logger">Logger instance for recording hub operations and errors.</param>
-        /// <param name="scopeFactory">Factory for creating service scopes to access database context.</param>
-        /// <param name="executionConfig">Execution configuration options.</param>
-        public OverseerHub(ILogger<OverseerHub> logger, IServiceScopeFactory scopeFactory, IOptions<ExecutionConfig> executionConfig)
+        static OverseerHub()
         {
-            _logger = logger;
-            _scopeFactory = scopeFactory;
-            _executionConfig = executionConfig.Value;
-
             // Initialize timers
-            _messageBatchTimer = new Timer(ProcessMessageBatch, null,
-                _executionConfig.MessageBatchIntervalMs, _executionConfig.MessageBatchIntervalMs);
-
-            _healthCheckTimer = new Timer(PerformHealthChecks, null,
-                _executionConfig.ConnectionHealthCheckIntervalSeconds * 1000,
-                _executionConfig.ConnectionHealthCheckIntervalSeconds * 1000);
-
-            _cleanupTimer = new Timer(CleanupStaleConnections, null,
-                _executionConfig.StaleConnectionCleanupIntervalMinutes * 60 * 1000,
-                _executionConfig.StaleConnectionCleanupIntervalMinutes * 60 * 1000);
+            _healthCheckTimer = new Timer(PerformHealthChecks, null, 0, 60000); // 60 seconds
+            _rateLimitCleanupTimer = new Timer(CleanupRateLimits, null, 0, 300000); // 5 minutes
         }
 
         /// <summary>
-        /// Handles client connection events, performing authentication and connection setup.
-        /// Validates client credentials from query parameters and establishes the connection
-        /// if authentication succeeds. Aborts the connection for invalid or missing credentials.
+        /// Performs periodic health checks on connected clients.
+        /// Removes clients that have exceeded the configured timeout.
+        /// </summary>
+        private static void PerformHealthChecks(object? state)
+        {
+            try
+            {
+                var now = DateTime.UtcNow;
+                var timeout = TimeSpan.FromSeconds(300); // Default 5 minutes, should be configurable but static method can't access instance config
+
+                lock (_connectedClients)
+                {
+                    var clientsToRemove = new List<string>();
+                    foreach (var connectionId in _connectedClients)
+                    {
+                        if (_clientInfo.TryGetValue(connectionId, out var clientInfo))
+                        {
+                            if (now - clientInfo.LastSeen > timeout)
+                            {
+                                clientsToRemove.Add(connectionId);
+                            }
+                        }
+                    }
+
+                    foreach (var connectionId in clientsToRemove)
+                    {
+                        _connectedClients.Remove(connectionId);
+                        _clientInfo.TryRemove(connectionId, out _);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error - would need logger instance
+            }
+        }
+
+        /// <summary>
+        /// Cleans up expired rate limit entries.
+        /// </summary>
+        private static void CleanupRateLimits(object? state)
+        {
+            try
+            {
+                var now = DateTime.UtcNow;
+                var expiredKeys = new List<string>();
+
+                foreach (var kvp in _rateLimits)
+                {
+                    if (now - kvp.Value.WindowStart > TimeSpan.FromMinutes(1))
+                    {
+                        expiredKeys.Add(kvp.Key);
+                    }
+                }
+
+                foreach (var key in expiredKeys)
+                {
+                    _rateLimits.TryRemove(key, out _);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error
+            }
+        }
+
+        public OverseerHub(
+            ILogger<OverseerHub> logger,
+            IServiceScopeFactory scopeFactory,
+            BrainPersistenceService brainService,
+            IOptions<OverseerHubConfig> config)
+        {
+            _logger = logger;
+            _scopeFactory = scopeFactory;
+            _brainService = brainService;
+            _config = config.Value;
+        }
+
+        /// <summary>
+        /// Handles client connection events, tracking connected clients and logging connection details.
         /// </summary>
         /// <returns>A task representing the asynchronous operation.</returns>
         public override async Task OnConnectedAsync()
         {
-            Interlocked.Increment(ref _totalConnections);
-            Interlocked.Increment(ref _activeConnections);
+            lock (_connectedClients)
+            {
+                _connectedClients.Add(Context.ConnectionId);
+            }
 
             var httpContext = Context.GetHttpContext();
-            var clientId = httpContext?.Request.Query["clientId"].ToString();
-            var authToken = httpContext?.Request.Query["authToken"].ToString();
             var ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
-            if (!string.IsNullOrEmpty(clientId) && !string.IsNullOrEmpty(authToken))
-            {
-                // Check rate limiting for connections
-                if (IsRateLimitExceeded(_handshakeRateLimit, ipAddress, _executionConfig.HandshakeRateLimitPerMinute))
-                {
-                    LogAuditEvent("ConnectionRateLimited", clientId, ipAddress, false, "Connection rate limit exceeded");
-                    _logger.LogWarning("Connection rate limit exceeded for IP: {IPAddress}", ipAddress);
-                    Context.Abort();
-                    return;
-                }
-
-                if (await AuthenticateClient(clientId, authToken))
-                {
-                    await UpdateClientConnectionId(clientId, Context.ConnectionId);
-                    _connectionHealth[Context.ConnectionId] = DateTime.UtcNow;
-                    _lastActivity[Context.ConnectionId] = DateTime.UtcNow;
-                    LogAuditEvent("ConnectionAuthenticated", clientId, ipAddress, true);
-                    _logger.LogInformation("Authenticated client connected: {ClientId}", clientId);
-                }
-                else
-                {
-                    LogAuditEvent("ConnectionAuthenticationFailed", clientId, ipAddress, false);
-                    _logger.LogWarning("Failed authentication for client: {ClientId}", clientId);
-                    Context.Abort();
-                    return;
-                }
-            }
-            else
-            {
-                LogAuditEvent("ConnectionMissingCredentials", clientId ?? "unknown", ipAddress, false);
-                _logger.LogWarning("Missing authentication parameters for connection: {ConnectionId}", Context.ConnectionId);
-                Context.Abort();
-                return;
-            }
+            _logger.LogInformation("Client connected: {ConnectionId} from IP: {IPAddress}. Total clients: {ClientCount}",
+                Context.ConnectionId, ipAddress, _connectedClients.Count);
 
             await base.OnConnectedAsync();
         }
 
         /// <summary>
-        /// Handles client disconnection events, logging the disconnection for monitoring purposes.
+        /// Handles client disconnection events, cleaning up client tracking and logging disconnection details.
         /// </summary>
         /// <param name="exception">The exception that caused the disconnection, if any.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            Interlocked.Decrement(ref _activeConnections);
-            _connectionHealth.TryRemove(Context.ConnectionId, out _);
-            _lastActivity.TryRemove(Context.ConnectionId, out _);
+            string clientId = "";
+            lock (_connectedClients)
+            {
+                _connectedClients.Remove(Context.ConnectionId);
+                if (_clientInfo.TryGetValue(Context.ConnectionId, out var info))
+                {
+                    clientId = info.ClientId;
+                    _clientInfo.TryRemove(Context.ConnectionId, out _);
+                }
+            }
 
-            _logger.LogInformation("Client disconnected: {ConnectionId}", Context.ConnectionId);
+            _logger.LogInformation("Client disconnected: {ConnectionId} (ClientId: {ClientId}). Total clients: {ClientCount}",
+                Context.ConnectionId, clientId, _connectedClients.Count);
+
             await base.OnDisconnectedAsync(exception);
+        }
+
+        /// <summary>
+        /// Checks if there are any connected clients to the hub.
+        /// </summary>
+        /// <returns>True if there are connected clients, false otherwise.</returns>
+        public static bool HasConnectedClients()
+        {
+            lock (_connectedClients)
+            {
+                return _connectedClients.Any();
+            }
+        }
+
+        /// <summary>
+        /// Clears all connected client tracking, useful for testing or reset scenarios.
+        /// </summary>
+        public static void ClearConnectedClients()
+        {
+            lock (_connectedClients)
+            {
+                _connectedClients.Clear();
+                _clientInfo.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Gets the current performance metrics for the hub.
+        /// </summary>
+        /// <returns>A dictionary containing performance metrics.</returns>
+        public static Dictionary<string, object> GetPerformanceMetrics()
+        {
+            lock (_metricsLock)
+            {
+                var now = DateTime.UtcNow;
+                var timeSinceReset = now - _lastMetricsReset;
+                var minutesSinceReset = timeSinceReset.TotalMinutes;
+
+                return new Dictionary<string, object>
+                {
+                    ["TotalMessagesProcessed"] = _totalMessagesProcessed,
+                    ["TotalHandshakeRequests"] = _totalHandshakeRequests,
+                    ["TotalCheckInRequests"] = _totalCheckInRequests,
+                    ["MessagesPerMinute"] = minutesSinceReset > 0 ? _totalMessagesProcessed / minutesSinceReset : 0,
+                    ["HandshakeRequestsPerMinute"] = minutesSinceReset > 0 ? _totalHandshakeRequests / minutesSinceReset : 0,
+                    ["CheckInRequestsPerMinute"] = minutesSinceReset > 0 ? _totalCheckInRequests / minutesSinceReset : 0,
+                    ["CurrentConnectionCount"] = _connectedClients.Count,
+                    ["LastMetricsReset"] = _lastMetricsReset
+                };
+            }
+        }
+
+        /// <summary>
+        /// Resets the performance metrics counters.
+        /// </summary>
+        public static void ResetPerformanceMetrics()
+        {
+            lock (_metricsLock)
+            {
+                _totalMessagesProcessed = 0;
+                _totalHandshakeRequests = 0;
+                _totalCheckInRequests = 0;
+                _lastMetricsReset = DateTime.UtcNow;
+            }
+        }
+
+        /// <summary>
+        /// Checks if a client has exceeded rate limits for a specific operation.
+        /// </summary>
+        private bool IsRateLimited(string key, string operation, int maxRequestsPerMinute)
+        {
+            var now = DateTime.UtcNow;
+            var rateLimit = _rateLimits.GetOrAdd(key, _ => new ClientRateLimit { Key = key, WindowStart = now });
+
+            // Reset window if it's been more than a minute
+            if (now - rateLimit.WindowStart > TimeSpan.FromMinutes(1))
+            {
+                rateLimit.WindowStart = now;
+                rateLimit.HandshakeCount = 0;
+                rateLimit.CheckInCount = 0;
+            }
+
+            // Check limits
+            if (operation == "handshake" && rateLimit.HandshakeCount >= maxRequestsPerMinute)
+                return true;
+            if (operation == "checkin" && rateLimit.CheckInCount >= maxRequestsPerMinute)
+                return true;
+
+            // Increment counter
+            if (operation == "handshake") rateLimit.HandshakeCount++;
+            else if (operation == "checkin") rateLimit.CheckInCount++;
+
+            return false;
         }
 
         /// <summary>
         /// Performs initial handshake with a client, validating and storing client information,
         /// generating an authentication token, and logging the client to the database.
-        /// This establishes the client's identity and prepares it for authenticated operations.
+        /// Includes rate limiting to prevent abuse.
         /// </summary>
         /// <param name="clientId">Unique identifier for the client.</param>
         /// <param name="clientName">Name of the client (typically the brain instance name).</param>
@@ -164,10 +320,9 @@ namespace KalshiBotOverseer
             var httpContext = Context.GetHttpContext();
             var ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
-            // Check rate limiting
-            if (IsRateLimitExceeded(_handshakeRateLimit, ipAddress, _executionConfig.HandshakeRateLimitPerMinute))
+            // Rate limiting check
+            if (IsRateLimited(ipAddress, "handshake", _config.MaxHandshakeRequestsPerMinute))
             {
-                LogAuditEvent("HandshakeRateLimited", clientId, ipAddress, false, "Handshake rate limit exceeded");
                 _logger.LogWarning("Handshake rate limit exceeded for IP: {IPAddress}", ipAddress);
                 await Clients.Caller.SendAsync("HandshakeResponse", new
                 {
@@ -177,20 +332,35 @@ namespace KalshiBotOverseer
                 return;
             }
 
+            Interlocked.Increment(ref _totalHandshakeRequests);
+            Interlocked.Increment(ref _totalMessagesProcessed);
+
             _logger.LogInformation("Handshake request from client: {ClientId}, Name: {ClientName}, Type: {ClientType}",
                 clientId, clientName, clientType);
 
             try
             {
-                using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
-                // Check if client already exists
-                var existingClient = await context.GetSignalRClient(clientId);
-                if (existingClient == null)
+                // Store client information
+                var clientInfo = new ClientInfo
                 {
-                    // Register new client
-                    var newClient = new BacklashDTOs.SignalRClient
+                    ClientId = clientId,
+                    ClientName = clientName,
+                    ClientType = clientType,
+                    IPAddress = ipAddress,
+                    ConnectionId = Context.ConnectionId,
+                    LastSeen = DateTime.UtcNow
+                };
+
+                _clientInfo[Context.ConnectionId] = clientInfo;
+
+                // Log to database if available
+                try
+                {
+                    using var scope = _scopeFactory.CreateScope();
+                    var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+
+                    var signalRClient = new BacklashDTOs.SignalRClient
                     {
                         ClientId = clientId,
                         ClientName = clientName,
@@ -202,37 +372,27 @@ namespace KalshiBotOverseer
                         LastSeen = DateTime.UtcNow
                     };
 
-                    await context.AddOrUpdateSignalRClient(newClient);
-                    LogAuditEvent("HandshakeNewClient", clientId, ipAddress, true, $"Client type: {clientType}");
-                    _logger.LogInformation("New client registered: {ClientId}", clientId);
+                    await context.AddOrUpdateSignalRClient(signalRClient);
+                    _logger.LogInformation("Client registered in database: {ClientId} from {IPAddress}", clientId, ipAddress);
                 }
-                else
+                catch (Exception dbEx)
                 {
-                    // Update existing client
-                    existingClient.ConnectionId = Context.ConnectionId;
-                    existingClient.LastSeen = DateTime.UtcNow;
-                    existingClient.IsActive = true;
-                    await context.AddOrUpdateSignalRClient(existingClient);
-                    LogAuditEvent("HandshakeExistingClient", clientId, ipAddress, true, $"Client type: {clientType}");
-                    _logger.LogInformation("Existing client updated: {ClientId}", clientId);
+                    _logger.LogWarning(dbEx, "Failed to log client to database: {ClientId}", clientId);
                 }
 
-                // Update activity tracking
-                _lastActivity[Context.ConnectionId] = DateTime.UtcNow;
-
-                // Send handshake response with auth token
+                // Send handshake response
                 var response = new
                 {
                     Success = true,
-                    AuthToken = existingClient?.AuthToken ?? GenerateAuthToken(clientId, clientName),
+                    AuthToken = GenerateAuthToken(clientId, clientName),
                     Message = "Handshake successful"
                 };
 
                 await Clients.Caller.SendAsync("HandshakeResponse", response);
+                _logger.LogInformation("Handshake completed for client: {ClientId}", clientId);
             }
             catch (Exception ex)
             {
-                LogAuditEvent("HandshakeError", clientId, ipAddress, false, ex.Message);
                 _logger.LogError(ex, "Error during handshake for client: {ClientId}", clientId);
                 await Clients.Caller.SendAsync("HandshakeResponse", new
                 {
@@ -242,21 +402,14 @@ namespace KalshiBotOverseer
             }
         }
 
-        /// <summary>
-        /// Processes periodic check-in data from a brain instance, updating its state in memory
-        /// and broadcasting the updated status to all connected clients. This method handles
-        /// comprehensive brain status updates including market data, performance metrics,
-        /// and operational state information.
-        /// </summary>
-        /// <param name="checkInData">The check-in data containing brain status and metrics.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task CheckIn(CheckInData checkInData)
+        public async Task ProcessCheckIn(CheckInData checkInData)
         {
-            // Check rate limiting
-            if (IsRateLimitExceeded(_checkInRateLimit, Context.ConnectionId, _executionConfig.CheckInRateLimitPerMinute))
+            // Rate limiting check
+            var clientId = Context.ConnectionId;
+            if (IsRateLimited(clientId, "checkin", _config.MaxCheckInRequestsPerMinute))
             {
-                _logger.LogWarning("CheckIn rate limit exceeded for client: {ConnectionId}", Context.ConnectionId);
-                await Clients.Caller.SendAsync("CheckInReceived", new
+                _logger.LogWarning("CheckIn rate limit exceeded for client: {ConnectionId}", clientId);
+                await Clients.Caller.SendAsync("CheckInResponse", new
                 {
                     Success = false,
                     Message = "Rate limit exceeded. Please try again later."
@@ -264,88 +417,155 @@ namespace KalshiBotOverseer
                 return;
             }
 
-            _logger.LogInformation("Received CheckIn from client: {ConnectionId}", Context.ConnectionId);
+            Interlocked.Increment(ref _totalCheckInRequests);
             Interlocked.Increment(ref _totalMessagesProcessed);
 
-            // Update activity tracking
-            _lastActivity[Context.ConnectionId] = DateTime.UtcNow;
+            _logger.LogInformation("CheckIn received from connection: {ConnectionId}", Context.ConnectionId);
 
             try
             {
-                // Update in-memory BrainPersistence
-                var brainInstanceName = checkInData.BrainInstanceName;
-                var brainPersistence = _brainStateCache.GetOrAdd(brainInstanceName, _ => new BrainPersistence
+                if (!_clientInfo.TryGetValue(Context.ConnectionId, out var clientInfo))
                 {
-                    BrainInstanceName = brainInstanceName,
-                    LastSeen = DateTime.UtcNow
-                });
-
-                // Update all properties
-                brainPersistence.CurrentMarketTickers = new List<string>(checkInData.Markets ?? new List<string>());
-                brainPersistence.ErrorCount = checkInData.ErrorCount;
-                brainPersistence.LastSnapshot = checkInData.LastSnapshot;
-                brainPersistence.IsStartingUp = checkInData.IsStartingUp;
-                brainPersistence.IsShuttingDown = checkInData.IsShuttingDown;
-                brainPersistence.WatchPositions = checkInData.WatchPositions;
-                brainPersistence.WatchOrders = checkInData.WatchOrders;
-                brainPersistence.ManagedWatchList = checkInData.ManagedWatchList;
-                brainPersistence.CaptureSnapshots = checkInData.CaptureSnapshots;
-                brainPersistence.TargetWatches = checkInData.TargetWatches;
-                brainPersistence.MinimumInterest = checkInData.MinimumInterest;
-                brainPersistence.UsageMin = checkInData.UsageMin;
-                brainPersistence.UsageMax = checkInData.UsageMax;
-                brainPersistence.IsWebSocketConnected = checkInData.IsWebSocketConnected;
-
-                // Update metric histories with deduplication based on LastPerformanceSampleDate or current time
-                var timestamp = checkInData.LastPerformanceSampleDate ?? DateTime.UtcNow;
-
-                // Helper method to add metric if not duplicate
-                void AddMetric(List<MetricHistory> history, double value)
-                {
-                    if (!history.Any(m => m.Timestamp == timestamp))
+                    _logger.LogWarning("CheckIn received from unregistered client: {ConnectionId}", Context.ConnectionId);
+                    await Clients.Caller.SendAsync("CheckInResponse", new
                     {
-                        history.Add(new MetricHistory { Timestamp = timestamp, Value = value });
+                        Success = false,
+                        Message = "Client not registered. Please perform handshake first."
+                    });
+                    return;
+                }
+
+                // Validate CheckInData
+                if (checkInData == null)
+                {
+                    _logger.LogWarning("CheckIn received with null data from client: {ConnectionId}", Context.ConnectionId);
+                    await Clients.Caller.SendAsync("CheckInResponse", new
+                    {
+                        Success = false,
+                        Message = "CheckIn data is null."
+                    });
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(checkInData.BrainInstanceName))
+                {
+                    _logger.LogWarning("CheckIn received with missing BrainInstanceName from client: {ConnectionId}", Context.ConnectionId);
+                    await Clients.Caller.SendAsync("CheckInResponse", new
+                    {
+                        Success = false,
+                        Message = "BrainInstanceName is required."
+                    });
+                    return;
+                }
+
+                _logger.LogInformation("CheckIn received from {ClientId} ({ClientName}): {MarketCount} markets, ErrorCount: {ErrorCount}, LastSnapshot: {LastSnapshot}",
+                    clientInfo.ClientId, clientInfo.ClientName,
+                    checkInData.Markets?.Count ?? 0,
+                    checkInData.ErrorCount,
+                    checkInData.LastSnapshot);
+
+                // Verify brain name consistency between handshake and CheckIn
+                if (clientInfo.ClientName != checkInData.BrainInstanceName)
+                {
+                    _logger.LogWarning("Brain name mismatch! Handshake: '{HandshakeName}', CheckIn: '{CheckInName}' for client {ClientId}",
+                        clientInfo.ClientName, checkInData.BrainInstanceName, clientInfo.ClientId);
+                }
+
+                // Log database brain data availability
+                var dbBrainExists = _brainService.GetBrain(clientInfo.ClientName ?? "") != null;
+                _logger.LogInformation("Database brain data check: ClientName='{ClientName}', ExistsInDB={Exists}",
+                    clientInfo.ClientName, dbBrainExists);
+
+                // Update current market tickers in persistence service
+                if (!string.IsNullOrEmpty(clientInfo.ClientName))
+                {
+                    try
+                    {
+                        await _brainService.UpdateCurrentMarketTickersAsync(clientInfo.ClientName, checkInData.Markets ?? new List<string>());
+
+                        // Update historical metrics
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "CpuUsage", checkInData.CurrentCpuUsage);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "EventQueue", checkInData.EventQueueAvg);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "TickerQueue", checkInData.TickerQueueAvg);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "NotificationQueue", checkInData.NotificationQueueAvg);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "OrderbookQueue", checkInData.OrderbookQueueAvg);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "MarketCount", checkInData.Markets?.Count ?? 0);
+                        await _brainService.UpdateMetricHistoryAsync(clientInfo.ClientName, "Error", checkInData.ErrorCount);
+                    }
+                    catch (Exception brainEx)
+                    {
+                        _logger.LogWarning(brainEx, "Failed to update brain service for {ClientName}", clientInfo.ClientName);
                     }
                 }
 
-                // Add queue and CPU metrics
-                AddMetric(brainPersistence.CpuUsageHistory, checkInData.CurrentCpuUsage);
-                AddMetric(brainPersistence.EventQueueHistory, checkInData.EventQueueAvg);
-                AddMetric(brainPersistence.TickerQueueHistory, checkInData.TickerQueueAvg);
-                AddMetric(brainPersistence.NotificationQueueHistory, checkInData.NotificationQueueAvg);
-                AddMetric(brainPersistence.OrderbookQueueHistory, checkInData.OrderbookQueueAvg);
+                // Update client last seen
+                clientInfo.LastSeen = DateTime.UtcNow;
 
-                // Add market count and error count to histories
-                AddMetric(brainPersistence.MarketCountHistory, checkInData.Markets?.Count ?? 0);
-                AddMetric(brainPersistence.ErrorHistory, checkInData.ErrorCount);
-
-                // Add refresh metrics
-                AddMetric(brainPersistence.RefreshCycleSecondsHistory, checkInData.LastRefreshCycleSeconds);
-                AddMetric(brainPersistence.RefreshCycleIntervalHistory, checkInData.LastRefreshCycleInterval);
-                AddMetric(brainPersistence.RefreshMarketCountHistory, checkInData.LastRefreshMarketCount);
-                AddMetric(brainPersistence.RefreshUsagePercentageHistory, checkInData.LastRefreshUsagePercentage);
-                AddMetric(brainPersistence.PerformanceSampleDateHistory, checkInData.LastPerformanceSampleDate?.Ticks ?? DateTime.UtcNow.Ticks);
-
-                brainPersistence.LastRefreshTimeAcceptable = checkInData.LastRefreshTimeAcceptable;
-
-                // Send response to caller
-                await Clients.Caller.SendAsync("CheckInReceived", new
+                // Get target market tickers for this brain
+                var targetTickers = new string[0];
+                if (!string.IsNullOrEmpty(clientInfo.ClientName))
                 {
-                    Success = true,
-                    Timestamp = DateTime.UtcNow,
-                    Message = "CheckIn processed successfully"
-                });
+                    try
+                    {
+                        targetTickers = _brainService.GetTargetMarketTickers(clientInfo.ClientName).ToArray();
+                    }
+                    catch (Exception tickerEx)
+                    {
+                        _logger.LogWarning(tickerEx, "Failed to get target tickers for {ClientName}", clientInfo.ClientName);
+                        targetTickers = new string[0];
+                    }
+                }
 
-                // Queue CheckInUpdate for batched broadcasting
-                var checkInUpdate = new
+                // Update client last seen in database
+                try
                 {
-                    BrainInstanceName = brainInstanceName,
-                    MarketCount = checkInData.Markets?.Count ?? 0,
+                    using var scope = _scopeFactory.CreateScope();
+                    var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+
+                    // Update client last seen
+                    var signalRClient = await context.GetSignalRClient(clientInfo.ClientId);
+                    if (signalRClient != null)
+                    {
+                        signalRClient.LastSeen = DateTime.UtcNow;
+                        await context.AddOrUpdateSignalRClient(signalRClient);
+                    }
+                }
+                catch (Exception dbEx)
+                {
+                    _logger.LogWarning(dbEx, "Failed to log CheckIn to database for client: {ClientId}", clientInfo.ClientId);
+                }
+
+                // Get existing brain data for historical metrics
+                BrainPersistence existingBrain;
+                if (!string.IsNullOrEmpty(clientInfo.ClientName))
+                {
+                    existingBrain = _brainService.GetBrain(clientInfo.ClientName);
+                    _logger.LogInformation("Retrieved brain persistence data for '{BrainName}': CpuHistory={CpuCount}, EventHistory={EventCount}, ErrorHistory={ErrorCount}",
+                        clientInfo.ClientName,
+                        existingBrain.CpuUsageHistory?.Count ?? 0,
+                        existingBrain.EventQueueHistory?.Count ?? 0,
+                        existingBrain.ErrorHistory?.Count ?? 0);
+                }
+                else
+                {
+                    _logger.LogWarning("ClientName is null or empty, using default brain data");
+                    existingBrain = new BrainPersistence { BrainInstanceName = "" };
+                }
+
+                // Create comprehensive brain status data
+                var brainStatus = new BrainStatusData
+                {
+                    BrainInstanceName = checkInData.BrainInstanceName,
+
+                    // Basic market data
+                    Markets = checkInData.Markets,
                     ErrorCount = checkInData.ErrorCount,
                     LastSnapshot = checkInData.LastSnapshot,
-                    LastCheckIn = DateTime.UtcNow,
+                    LastCheckIn = DateTime.UtcNow, // Add lastCheckIn timestamp
                     IsStartingUp = checkInData.IsStartingUp,
                     IsShuttingDown = checkInData.IsShuttingDown,
+
+                    // Brain configuration
                     WatchPositions = checkInData.WatchPositions,
                     WatchOrders = checkInData.WatchOrders,
                     ManagedWatchList = checkInData.ManagedWatchList,
@@ -354,28 +574,47 @@ namespace KalshiBotOverseer
                     MinimumInterest = checkInData.MinimumInterest,
                     UsageMin = checkInData.UsageMin,
                     UsageMax = checkInData.UsageMax,
+
+                    // Performance metrics
                     CurrentCpuUsage = checkInData.CurrentCpuUsage,
                     EventQueueAvg = checkInData.EventQueueAvg,
                     TickerQueueAvg = checkInData.TickerQueueAvg,
                     NotificationQueueAvg = checkInData.NotificationQueueAvg,
                     OrderbookQueueAvg = checkInData.OrderbookQueueAvg,
-                    IsWebSocketConnected = checkInData.IsWebSocketConnected,
                     LastRefreshCycleSeconds = checkInData.LastRefreshCycleSeconds,
                     LastRefreshCycleInterval = checkInData.LastRefreshCycleInterval,
                     LastRefreshMarketCount = checkInData.LastRefreshMarketCount,
                     LastRefreshUsagePercentage = checkInData.LastRefreshUsagePercentage,
                     LastRefreshTimeAcceptable = checkInData.LastRefreshTimeAcceptable,
-                    LastPerformanceSampleDate = checkInData.LastPerformanceSampleDate
+                    LastPerformanceSampleDate = checkInData.LastPerformanceSampleDate,
+
+                    // Connection status
+                    IsWebSocketConnected = checkInData.IsWebSocketConnected,
+
+                    // Market watch data
+                    WatchedMarkets = checkInData.WatchedMarkets
                 };
 
-                QueueMessage("CheckInUpdate", checkInUpdate);
+                // Broadcast comprehensive brain status to all connected clients (including web UI)
+                var connections = _connectedClients.Count;
+                _logger.LogInformation("Broadcasting BrainStatusUpdate for {Brain} to {Count} connections",
+                    brainStatus.BrainInstanceName, connections);
 
-                _logger.LogInformation("Processed CheckIn for bot {BrainInstanceName} with {MarketCount} markets", brainInstanceName, checkInData.Markets?.Count ?? 0);
+                await Clients.All.SendAsync("BrainStatusUpdate", brainStatus);
+
+                await Clients.All.SendAsync("BroadcastTrace", new
+                {
+                    kind = "BrainStatusUpdate",
+                    brain = brainStatus.BrainInstanceName,
+                    marketCount = brainStatus.Markets?.Count ?? 0,
+                    serverUtc = DateTime.UtcNow
+                });
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing CheckIn from client: {ConnectionId}", Context.ConnectionId);
-                await Clients.Caller.SendAsync("CheckInReceived", new
+                await Clients.Caller.SendAsync("CheckInResponse", new
                 {
                     Success = false,
                     Message = $"CheckIn processing failed: {ex.Message}"
@@ -383,279 +622,265 @@ namespace KalshiBotOverseer
             }
         }
 
-        /// <summary>
-        /// Authenticates a client by validating their credentials against the database
-        /// and verifying the provided authentication token. Updates the client's last
-        /// seen timestamp upon successful authentication.
-        /// </summary>
-        /// <param name="clientId">The unique identifier of the client to authenticate.</param>
-        /// <param name="authToken">The authentication token provided by the client.</param>
-        /// <returns>True if authentication succeeds, false otherwise.</returns>
-        private async Task<bool> AuthenticateClient(string clientId, string authToken)
-        {
-            try
-            {
-                using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-
-                var client = await context.GetSignalRClient(clientId);
-                if (client == null || !client.IsActive)
-                    return false;
-
-                // Validate auth token
-                var expectedToken = GenerateAuthToken(client.ClientId, client.ClientName);
-                if (authToken != expectedToken)
-                    return false;
-
-                // Update last seen
-                await context.UpdateSignalRClientLastSeen(clientId);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error authenticating client credentials for {ClientId}", clientId);
-                return false;
-            }
-        }
 
         /// <summary>
-        /// Updates the connection ID for a client in the database to maintain
-        /// the mapping between client identity and SignalR connection.
+        /// Processes messages from overseer clients, handling different message types
+        /// such as data refresh requests.
         /// </summary>
-        /// <param name="clientId">The unique identifier of the client.</param>
-        /// <param name="connectionId">The new SignalR connection ID for the client.</param>
+        /// <param name="messageType">The type of message being sent (e.g., "refresh_data").</param>
+        /// <param name="message">The message content or payload.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task UpdateClientConnectionId(string clientId, string connectionId)
+        public async Task HandleOverseerMessage(string messageType, string message)
         {
+            _logger.LogInformation("Received SendOverseerMessage: {MessageType} - {Message}", messageType, message);
+
             try
             {
-                using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-                await context.UpdateSignalRClientConnection(clientId, connectionId);
+                // Handle different message types
+                switch (messageType.ToLower())
+                {
+                    case "refresh_data":
+                        // Broadcast refresh request to all connected clients
+                        await Clients.All.SendAsync("DataRefreshRequested", new
+                        {
+                            MessageType = messageType,
+                            Message = message,
+                            Timestamp = DateTime.UtcNow,
+                            RequestedBy = Context.ConnectionId
+                        });
+                        break;
+
+                    default:
+                        _logger.LogWarning("Unknown message type received: {MessageType}", messageType);
+                        break;
+                }
+
+                // Send confirmation back to caller
+                await Clients.Caller.SendAsync("OverseerMessageReceived", new
+                {
+                    Success = true,
+                    MessageType = messageType,
+                    Timestamp = DateTime.UtcNow,
+                    Message = "Message processed successfully"
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating client connection for {ClientId}", clientId);
+                _logger.LogError(ex, "Error processing SendOverseerMessage: {MessageType}", messageType);
+                await Clients.Caller.SendAsync("OverseerMessageReceived", new
+                {
+                    Success = false,
+                    MessageType = messageType,
+                    Message = $"Failed to process message: {ex.Message}"
+                });
             }
         }
 
         /// <summary>
-        /// Generates a simple authentication token based on client ID, name, and validity period.
-        /// This provides basic authentication for client connections and should be replaced
-        /// with more secure token generation in production environments.
+        /// Generates a configurable authentication token based on client ID, name, and validity period.
+        /// This is used for basic client validation during the handshake process.
         /// </summary>
         /// <param name="clientId">The client's unique identifier.</param>
         /// <param name="clientName">The client's name.</param>
         /// <returns>A base64-encoded hash string serving as the auth token.</returns>
         private string GenerateAuthToken(string clientId, string clientName)
         {
-            using var sha256 = SHA256.Create();
-            var validityDate = DateTime.UtcNow.AddHours(_executionConfig.AuthTokenValidityHours).Date;
-            var input = $"{clientId}:{clientName}:{validityDate:yyyy-MM-dd}";
-            var bytes = Encoding.UTF8.GetBytes(input);
+            using var sha256 = System.Security.Cryptography.SHA256.Create();
+            var expiry = DateTime.UtcNow.AddHours(_config.AuthTokenValidityHours);
+            var input = $"{clientId}:{clientName}:{expiry:yyyy-MM-ddTHH:mm:ssZ}";
+            var bytes = System.Text.Encoding.UTF8.GetBytes(input);
             var hash = sha256.ComputeHash(bytes);
             return Convert.ToBase64String(hash);
         }
 
         /// <summary>
-        /// Processes batched messages for efficient broadcasting.
+        /// Represents information about a connected client, including identification,
+        /// connection details, and last activity timestamp.
         /// </summary>
-        /// <param name="state">Timer state (unused).</param>
-        private async void ProcessMessageBatch(object? state)
+        public class ClientInfo
         {
-            if (_messageBatch.IsEmpty)
-                return;
+            /// <summary>
+            /// Gets or sets the unique identifier for the client.
+            /// </summary>
+            public string ClientId { get; set; } = "";
 
-            await _messageBatchSemaphore.WaitAsync();
-            try
-            {
-                var batch = new List<(string Method, object Data, string? ClientFilter)>();
-                while (_messageBatch.TryDequeue(out var message) && batch.Count < _executionConfig.MessageBatchSize)
-                {
-                    batch.Add(message);
-                }
+            /// <summary>
+            /// Gets or sets the name of the client (typically the brain instance name).
+            /// </summary>
+            public string ClientName { get; set; } = "";
 
-                if (batch.Count > 0)
-                {
-                    // Group messages by method and client filter for efficient sending
-                    var groupedMessages = batch.GroupBy(m => (m.Method, m.ClientFilter));
+            /// <summary>
+            /// Gets or sets the type of client (e.g., brain, dashboard).
+            /// </summary>
+            public string ClientType { get; set; } = "";
 
-                    foreach (var group in groupedMessages)
-                    {
-                        var method = group.Key.Method;
-                        var clientFilter = group.Key.ClientFilter;
+            /// <summary>
+            /// Gets or sets the IP address of the connecting client.
+            /// </summary>
+            public string IPAddress { get; set; } = "";
 
-                        if (string.IsNullOrEmpty(clientFilter))
-                        {
-                            // Broadcast to all clients
-                            await Clients.All.SendAsync(method, group.Select(g => g.Data).ToArray());
-                        }
-                        else
-                        {
-                            // Send to specific client
-                            await Clients.Client(clientFilter).SendAsync(method, group.Select(g => g.Data).ToArray());
-                        }
-                    }
+            /// <summary>
+            /// Gets or sets the SignalR connection ID for this client.
+            /// </summary>
+            public string ConnectionId { get; set; } = "";
 
-                    Interlocked.Add(ref _totalMessagesProcessed, batch.Count);
-                }
+            /// <summary>
+            /// Gets or sets the timestamp of the client's last activity.
+            /// </summary>
+            public DateTime LastSeen { get; set; }
             }
-            finally
+    
+            /// <summary>
+            /// Represents rate limiting information for a client.
+            /// </summary>
+            private class ClientRateLimit
             {
-                _messageBatchSemaphore.Release();
+                public string Key { get; set; } = "";
+                public int HandshakeCount { get; set; }
+                public int CheckInCount { get; set; }
+                public DateTime WindowStart { get; set; } = DateTime.UtcNow;
             }
         }
+
+    /// <summary>
+    /// Data structure containing comprehensive information about a brain instance's current state,
+    /// used during periodic check-in operations to report status to the overseer system.
+    /// </summary>
+    public class CheckInData
+    {
+        /// <summary>
+        /// Gets or sets the name of the brain instance performing the check-in.
+        /// </summary>
+        public string? BrainInstanceName { get; set; }
 
         /// <summary>
-        /// Performs health checks on active connections.
+        /// Gets or sets the list of market tickers currently being monitored by the brain.
         /// </summary>
-        /// <param name="state">Timer state (unused).</param>
-        private async void PerformHealthChecks(object? state)
-        {
-            var now = DateTime.UtcNow;
-            var timeout = TimeSpan.FromSeconds(_executionConfig.ConnectionHealthTimeoutSeconds);
-
-            foreach (var connection in _connectionHealth)
-            {
-                if (now - connection.Value > timeout)
-                {
-                    _logger.LogWarning("Connection {ConnectionId} failed health check", connection.Key);
-                    // Could implement connection termination or notification here
-                }
-            }
-
-            // Update connection health metrics
-            _connectionHealth[Context.ConnectionId] = now;
-        }
+        public List<string>? Markets { get; set; }
 
         /// <summary>
-        /// Cleans up stale connections and sessions.
+        /// Gets or sets the total count of errors encountered by the brain since startup.
         /// </summary>
-        /// <param name="state">Timer state (unused).</param>
-        private async void CleanupStaleConnections(object? state)
-        {
-            var now = DateTime.UtcNow;
-            var maxAge = TimeSpan.FromMinutes(_executionConfig.MaxConnectionAgeMinutes);
-
-            // Clean up stale activity records
-            var staleKeys = _lastActivity.Where(kvp => now - kvp.Value > maxAge).Select(kvp => kvp.Key).ToList();
-            foreach (var key in staleKeys)
-            {
-                _lastActivity.TryRemove(key, out _);
-            }
-
-            // Clean up stale rate limit records
-            var staleRateLimitKeys = _handshakeRateLimit.Keys.Where(key =>
-                _handshakeRateLimit[key].IsEmpty || now - _handshakeRateLimit[key].Last() > TimeSpan.FromMinutes(1)).ToList();
-            foreach (var key in staleRateLimitKeys)
-            {
-                _handshakeRateLimit.TryRemove(key, out _);
-            }
-
-            var staleCheckInKeys = _checkInRateLimit.Keys.Where(key =>
-                _checkInRateLimit[key].IsEmpty || now - _checkInRateLimit[key].Last() > TimeSpan.FromMinutes(1)).ToList();
-            foreach (var key in staleCheckInKeys)
-            {
-                _checkInRateLimit.TryRemove(key, out _);
-            }
-
-            _logger.LogInformation("Cleaned up {StaleConnections} stale connections", staleKeys.Count);
-        }
+        public long ErrorCount { get; set; }
 
         /// <summary>
-        /// Checks if the rate limit has been exceeded for a given operation.
+        /// Gets or sets the timestamp of the last snapshot taken by the brain.
         /// </summary>
-        /// <param name="rateLimitDict">The rate limit dictionary to check.</param>
-        /// <param name="key">The key to check (IP or client ID).</param>
-        /// <param name="limit">The rate limit per minute.</param>
-        /// <returns>True if rate limit exceeded, false otherwise.</returns>
-        private bool IsRateLimitExceeded(ConcurrentDictionary<string, ConcurrentQueue<DateTime>> rateLimitDict, string key, int limit)
-        {
-            var now = DateTime.UtcNow;
-            var queue = rateLimitDict.GetOrAdd(key, _ => new ConcurrentQueue<DateTime>());
-
-            // Remove old entries outside the 1-minute window
-            while (queue.TryPeek(out var oldest) && now - oldest > TimeSpan.FromMinutes(1))
-            {
-                queue.TryDequeue(out _);
-            }
-
-            if (queue.Count >= limit)
-            {
-                return true;
-            }
-
-            queue.Enqueue(now);
-            return false;
-        }
+        public DateTime? LastSnapshot { get; set; }
 
         /// <summary>
-        /// Queues a message for batched sending.
+        /// Gets or sets a value indicating whether the brain is currently starting up.
         /// </summary>
-        /// <param name="method">The SignalR method to call.</param>
-        /// <param name="data">The data to send.</param>
-        /// <param name="clientFilter">Optional client ID filter.</param>
-        private void QueueMessage(string method, object data, string? clientFilter = null)
-        {
-            _messageBatch.Enqueue((method, data, clientFilter));
-        }
+        public bool IsStartingUp { get; set; }
 
         /// <summary>
-        /// Logs an audit event for authentication operations.
+        /// Gets or sets a value indicating whether the brain is currently shutting down.
         /// </summary>
-        /// <param name="eventType">The type of authentication event.</param>
-        /// <param name="clientId">The client ID involved.</param>
-        /// <param name="ipAddress">The IP address of the client.</param>
-        /// <param name="success">Whether the operation was successful.</param>
-        /// <param name="details">Additional details about the event.</param>
-        private void LogAuditEvent(string eventType, string clientId, string ipAddress, bool success, string details = "")
-        {
-            _logger.LogInformation("AUDIT: {EventType} - Client: {ClientId}, IP: {IPAddress}, Success: {Success}, Details: {Details}",
-                eventType, clientId, ipAddress, success, details);
-        }
+        public bool IsShuttingDown { get; set; }
 
         /// <summary>
-        /// Gets current hub performance metrics.
+        /// Gets or sets a value indicating whether the brain is monitoring positions.
         /// </summary>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task GetHubMetrics()
-        {
-            var metrics = new
-            {
-                Uptime = _uptimeStopwatch.Elapsed,
-                TotalConnections = _totalConnections,
-                ActiveConnections = _activeConnections,
-                TotalMessagesProcessed = _totalMessagesProcessed,
-                MessagesPerSecond = _totalMessagesProcessed / Math.Max(1, _uptimeStopwatch.Elapsed.TotalSeconds),
-                ConnectionHealthCount = _connectionHealth.Count,
-                MessageBatchQueueSize = _messageBatch.Count,
-                HandshakeRateLimitCount = _handshakeRateLimit.Count,
-                CheckInRateLimitCount = _checkInRateLimit.Count
-            };
-
-            await Clients.Caller.SendAsync("HubMetrics", metrics);
-        }
+        public bool WatchPositions { get; set; }
 
         /// <summary>
-        /// Broadcasts a message to all clients or filtered clients based on permissions.
+        /// Gets or sets a value indicating whether the brain is monitoring orders.
         /// </summary>
-        /// <param name="method">The SignalR method to call.</param>
-        /// <param name="data">The data to broadcast.</param>
-        /// <param name="clientFilter">Optional client type filter (e.g., "brain", "dashboard").</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task BroadcastMessage(string method, object data, string? clientFilter = null)
-        {
-            // Basic client filtering - in a real implementation, this would check permissions
-            if (string.IsNullOrEmpty(clientFilter))
-            {
-                QueueMessage(method, data);
-            }
-            else
-            {
-                // For filtered broadcasts, we'd need to look up clients by type
-                // This is a simplified implementation
-                QueueMessage(method, data);
-            }
-        }
+        public bool WatchOrders { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the brain uses a managed watch list.
+        /// </summary>
+        public bool ManagedWatchList { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the brain captures snapshots.
+        /// </summary>
+        public bool CaptureSnapshots { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target number of markets to watch.
+        /// </summary>
+        public int TargetWatches { get; set; }
+
+        /// <summary>
+        /// Gets or sets the minimum interest threshold for market selection.
+        /// </summary>
+        public double MinimumInterest { get; set; }
+
+        /// <summary>
+        /// Gets or sets the minimum usage threshold for the brain.
+        /// </summary>
+        public double UsageMin { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum usage threshold for the brain.
+        /// </summary>
+        public double UsageMax { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current CPU usage percentage of the brain process.
+        /// </summary>
+        public double CurrentCpuUsage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the average size of the event processing queue.
+        /// </summary>
+        public double EventQueueAvg { get; set; }
+
+        /// <summary>
+        /// Gets or sets the average size of the ticker processing queue.
+        /// </summary>
+        public double TickerQueueAvg { get; set; }
+
+        /// <summary>
+        /// Gets or sets the average size of the notification processing queue.
+        /// </summary>
+        public double NotificationQueueAvg { get; set; }
+
+        /// <summary>
+        /// Gets or sets the average size of the orderbook processing queue.
+        /// </summary>
+        public double OrderbookQueueAvg { get; set; }
+
+        /// <summary>
+        /// Gets or sets the duration in seconds of the last refresh cycle.
+        /// </summary>
+        public double LastRefreshCycleSeconds { get; set; }
+
+        /// <summary>
+        /// Gets or sets the interval between refresh cycles.
+        /// </summary>
+        public double LastRefreshCycleInterval { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of markets processed in the last refresh cycle.
+        /// </summary>
+        public double LastRefreshMarketCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CPU usage percentage during the last refresh cycle.
+        /// </summary>
+        public double LastRefreshUsagePercentage { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the last refresh cycle completed within acceptable time limits.
+        /// </summary>
+        public bool LastRefreshTimeAcceptable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp of the last performance sample.
+        /// </summary>
+        public DateTime? LastPerformanceSampleDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the brain is connected to the WebSocket feed.
+        /// </summary>
+        public bool IsWebSocketConnected { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of markets currently being watched with detailed information.
+        /// </summary>
+        public List<MarketWatchData>? WatchedMarkets { get; set; }
     }
 }

@@ -106,6 +106,9 @@ namespace KalshiBotOverseer
             // Configure Kalshi settings with fallback
             services.Configure<KalshiConfig>(Configuration.GetSection("Kalshi"));
 
+            // Configure OverseerHub settings
+            services.Configure<OverseerHubConfig>(Configuration.GetSection("OverseerHub"));
+
             // Optional: Manual override if configuration binding fails
             services.PostConfigure<KalshiConfig>(config =>
             {
@@ -203,7 +206,7 @@ namespace KalshiBotOverseer
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<ChartHub>("/chartHub");
+                endpoints.MapHub<OverseerHub>("/chartHub");
 
                 // Add health check endpoint for overseer discovery
                 endpoints.MapGet("/health", async context =>

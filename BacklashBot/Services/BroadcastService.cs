@@ -21,7 +21,7 @@ namespace BacklashBot.Services
     /// </summary>
     public class BroadcastService : IBroadcastService
     {
-        private readonly IHubContext<ChartHub> _hubContext;
+        private readonly IHubContext<BacklashBotHub> _hubContext;
         private readonly IServiceFactory _serviceFactory;
         private readonly ILogger<IBroadcastService> _logger;
         private Task? _statusBroadcastTask;
@@ -76,7 +76,7 @@ namespace BacklashBot.Services
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="executionConfig">Configuration options for execution parameters</param>
         public BroadcastService(
-            IHubContext<ChartHub> hubContext,
+            IHubContext<BacklashBotHub> hubContext,
             IServiceFactory serviceFactory,
             IStatusTrackerService statusTracker,
             IServiceScopeFactory scopeFactory,
@@ -117,7 +117,7 @@ namespace BacklashBot.Services
                     {
                         try
                         {
-                            if (ChartHub.HasConnectedClients())
+                            if (BacklashBotHub.HasConnectedClients())
                             {
                                 await BroadcastCheckInAsync();
                             }
@@ -162,7 +162,7 @@ namespace BacklashBot.Services
             bool broadcastSuccessful = false;
             var cancellationToken = _statusTracker.GetCancellationToken();
             cancellationToken.ThrowIfCancellationRequested();
-            if (!ChartHub.HasConnectedClients())
+            if (!BacklashBotHub.HasConnectedClients())
             {
                 _logger.LogDebug("No clients connected, skipping status broadcast.");
                 return;
@@ -299,7 +299,7 @@ namespace BacklashBot.Services
                 {
                     await Task.WhenAll(tasksToWait).ConfigureAwait(false);
                 }
-                ChartHub.ClearConnectedClients();
+                BacklashBotHub.ClearConnectedClients();
             }
             catch (OperationCanceledException)
             {

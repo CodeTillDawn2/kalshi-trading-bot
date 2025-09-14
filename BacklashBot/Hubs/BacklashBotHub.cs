@@ -15,15 +15,15 @@ namespace BacklashBot.Hubs
     /// Handles client connections, handshakes, check-ins, and message routing to the Overseer system.
     /// Provides methods for broadcasting trading data, confirming target tickers, and processing overseer responses.
     /// </summary>
-    public class ChartHub : Hub
+    public class BacklashBotHub : Hub
     {
         private static readonly HashSet<string> _connectedClients = new HashSet<string>();
-        private readonly ILogger<ChartHub> _logger;
+        private readonly ILogger<BacklashBotHub> _logger;
         private readonly IServiceFactory _serviceFactory;
 
-        public ChartHub(
+        public BacklashBotHub(
             IServiceFactory serviceFactory,
-            ILogger<ChartHub> logger)
+            ILogger<BacklashBotHub> logger)
         {
             _logger = logger;
             _serviceFactory = serviceFactory;
