@@ -226,7 +226,7 @@ This logger provides comprehensive logging functionality by:</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IDisposable BeginScope&lt;TState&gt;(TState state)</code></pre>
+    <pre><code class="lang-csharp hljs">public IDisposable? BeginScope&lt;TState&gt;(TState state) where TState : notnull</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -336,7 +336,7 @@ This logger provides comprehensive logging functionality by:</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotLogging/DatabaseLogger.cs/#L93">View Source</a>
   </span>
   <a id="KalshiBotLogging_DatabaseLogger_Log_" data-uid="KalshiBotLogging.DatabaseLogger.Log*"></a>
-  <h4 id="KalshiBotLogging_DatabaseLogger_Log__1_Microsoft_Extensions_Logging_LogLevel_Microsoft_Extensions_Logging_EventId___0_System_Exception_System_Func___0_System_Exception_System_String__" data-uid="KalshiBotLogging.DatabaseLogger.Log``1(Microsoft.Extensions.Logging.LogLevel,Microsoft.Extensions.Logging.EventId,``0,System.Exception,System.Func{``0,System.Exception,System.String})">Log&lt;TState&gt;(LogLevel, EventId, TState, Exception, Func&lt;TState, Exception, string&gt;)</h4>
+  <h4 id="KalshiBotLogging_DatabaseLogger_Log__1_Microsoft_Extensions_Logging_LogLevel_Microsoft_Extensions_Logging_EventId___0_System_Exception_System_Func___0_System_Exception_System_String__" data-uid="KalshiBotLogging.DatabaseLogger.Log``1(Microsoft.Extensions.Logging.LogLevel,Microsoft.Extensions.Logging.EventId,``0,System.Exception,System.Func{``0,System.Exception,System.String})">Log&lt;TState&gt;(LogLevel, EventId, TState, Exception?, Func&lt;TState, Exception?, string&gt;)</h4>
   <div class="markdown level1 summary"><p>Logs a message with the specified log level, event ID, state, and optional exception.
 The message is formatted, logged to console if above min console level, enqueued asynchronously for database storage if appropriate,
 and forwarded to the error handler for centralized error management.</p>
@@ -344,7 +344,7 @@ and forwarded to the error handler for centralized error management.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Log&lt;TState&gt;(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func&lt;TState, Exception, string&gt; formatter)</code></pre>
+    <pre><code class="lang-csharp hljs">public void Log&lt;TState&gt;(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func&lt;TState, Exception?, string&gt; formatter)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">

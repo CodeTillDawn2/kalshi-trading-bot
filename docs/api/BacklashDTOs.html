@@ -106,7 +106,21 @@ Classes
       <h4><a class="xref" href="BacklashDTOs.MarketLiquidityStatsDTO.html">MarketLiquidityStatsDTO</a></h4>
       <section></section>
       <h4><a class="xref" href="BacklashDTOs.MarketSnapshot.html">MarketSnapshot</a></h4>
-      <section></section>
+      <section><p>Represents a complete snapshot of market data at a specific point in time, used for historical record storage
+and trading strategy analysis. This DTO captures all relevant market state including order book, positions,
+technical indicators, and calculated metrics.</p>
+<p>MarketSnapshot is created from MarketData instances and serialized for persistence. It includes:</p>
+<ul>
+<li>Market identification and metadata (ticker, category, status)</li>
+<li>Current order book state with bid/ask prices and depths</li>
+<li>Position information and P&amp;L calculations</li>
+<li>Technical indicators and trading metrics</li>
+<li>Historical price data and support/resistance levels</li>
+<li>Calculated velocities, spreads, and market statistics</li>
+</ul>
+<p>The snapshot schema evolves over time, with version tracking to ensure backward compatibility
+during upgrades and data migration.</p>
+</section>
       <h4><a class="xref" href="BacklashDTOs.MarketSnapshot.Difference.html">MarketSnapshot.Difference</a></h4>
       <section></section>
       <h4><a class="xref" href="BacklashDTOs.MarketSnapshotDelta.html">MarketSnapshotDelta</a></h4>

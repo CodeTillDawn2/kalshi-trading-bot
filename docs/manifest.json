@@ -2052,7 +2052,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.BalanceResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.BalanceResponse.yml\" sourcestartlinenumber=\"1\">Represents a user's account balance response from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2794,7 +2794,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.MarketSnapshot",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.MarketSnapshot.yml\" sourcestartlinenumber=\"1\">Represents a complete snapshot of market data at a specific point in time, used for historical record storage\nand trading strategy analysis. This DTO captures all relevant market state including order book, positions,\ntechnical indicators, and calculated metrics.</p>\n<p sourcefile=\"api/BacklashDTOs.MarketSnapshot.yml\" sourcestartlinenumber=\"5\">MarketSnapshot is created from MarketData instances and serialized for persistence. It includes:</p>\n<ul sourcefile=\"api/BacklashDTOs.MarketSnapshot.yml\" sourcestartlinenumber=\"6\">\n<li sourcefile=\"api/BacklashDTOs.MarketSnapshot.yml\" sourcestartlinenumber=\"6\">Market identification and metadata (ticker, category, status)</li>\n<li sourcefile=\"api/BacklashDTOs.MarketSnapshot.yml\" sourcestartlinenumber=\"7\">Current order book state with bid/ask prices and depths</li>\n<li sourcefile=\"api/BacklashDTOs.MarketSnapshot.yml\" sourcestartlinenumber=\"8\">Position information and P&amp;L calculations</li>\n<li sourcefile=\"api/BacklashDTOs.MarketSnapshot.yml\" sourcestartlinenumber=\"9\">Technical indicators and trading metrics</li>\n<li sourcefile=\"api/BacklashDTOs.MarketSnapshot.yml\" sourcestartlinenumber=\"10\">Historical price data and support/resistance levels</li>\n<li sourcefile=\"api/BacklashDTOs.MarketSnapshot.yml\" sourcestartlinenumber=\"11\">Calculated velocities, spreads, and market statistics</li>\n</ul>\n<p sourcefile=\"api/BacklashDTOs.MarketSnapshot.yml\" sourcestartlinenumber=\"13\">The snapshot schema evolves over time, with version tracking to ensure backward compatibility\nduring upgrades and data migration.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4152,7 +4152,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Models.MarketPosition",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.MarketPosition.yml\" sourcestartlinenumber=\"1\">Represents the current trading position and performance metrics for a specific market.\nThis entity tracks real-time position information including exposure, P&amp;L, and order status\nfor individual markets. It serves as the primary source of position data for risk management,\nperformance monitoring, and trading decision making throughout the bot system.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4446,7 +4446,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotLogging.DatabaseLoggerProvider",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/KalshiBotLogging.DatabaseLoggerProvider.yml\" sourcestartlinenumber=\"1\">Provides logging to a database via a queue.</p>\n"
     },
     {
       "type": "ManagedReference",

@@ -491,11 +491,14 @@ references:
   fullName: BacklashBot.Hubs.BacklashBotHub.OnConnectedAsync
   nameWithType: BacklashBotHub.OnConnectedAsync
 - uid: BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync(System.Exception)
-  name: OnDisconnectedAsync(Exception)
+  name: OnDisconnectedAsync(Exception?)
   href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_OnDisconnectedAsync_System_Exception_
   commentId: M:BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync(System.Exception)
-  fullName: BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync(System.Exception)
-  nameWithType: BacklashBotHub.OnDisconnectedAsync(Exception)
+  name.vb: OnDisconnectedAsync(Exception)
+  fullName: BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync(System.Exception?)
+  fullName.vb: BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync(System.Exception)
+  nameWithType: BacklashBotHub.OnDisconnectedAsync(Exception?)
+  nameWithType.vb: BacklashBotHub.OnDisconnectedAsync(Exception)
 - uid: BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync*
   name: OnDisconnectedAsync
   href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_OnDisconnectedAsync_
@@ -13654,13 +13657,13 @@ references:
   fullName: BacklashDTOs.Configuration.MarketDataConfig.TickerBatchSize
   nameWithType: MarketDataConfig.TickerBatchSize
 - uid: BacklashDTOs.Configuration.MarketDataConfig.Validate(System.String,BacklashDTOs.Configuration.MarketDataConfig)
-  name: Validate(string, MarketDataConfig)
+  name: Validate(string?, MarketDataConfig)
   href: api/BacklashDTOs.Configuration.MarketDataConfig.html#BacklashDTOs_Configuration_MarketDataConfig_Validate_System_String_BacklashDTOs_Configuration_MarketDataConfig_
   commentId: M:BacklashDTOs.Configuration.MarketDataConfig.Validate(System.String,BacklashDTOs.Configuration.MarketDataConfig)
   name.vb: Validate(String, MarketDataConfig)
-  fullName: BacklashDTOs.Configuration.MarketDataConfig.Validate(string, BacklashDTOs.Configuration.MarketDataConfig)
+  fullName: BacklashDTOs.Configuration.MarketDataConfig.Validate(string?, BacklashDTOs.Configuration.MarketDataConfig)
   fullName.vb: BacklashDTOs.Configuration.MarketDataConfig.Validate(String, BacklashDTOs.Configuration.MarketDataConfig)
-  nameWithType: MarketDataConfig.Validate(string, MarketDataConfig)
+  nameWithType: MarketDataConfig.Validate(string?, MarketDataConfig)
   nameWithType.vb: MarketDataConfig.Validate(String, MarketDataConfig)
 - uid: BacklashDTOs.Configuration.MarketDataConfig.Validate*
   name: Validate
@@ -42048,13 +42051,13 @@ references:
   fullName: KalshiBotLogging.DatabaseLogger.Log
   nameWithType: DatabaseLogger.Log
 - uid: KalshiBotLogging.DatabaseLogger.Log``1(Microsoft.Extensions.Logging.LogLevel,Microsoft.Extensions.Logging.EventId,``0,System.Exception,System.Func{``0,System.Exception,System.String})
-  name: Log<TState>(LogLevel, EventId, TState, Exception, Func<TState, Exception, string>)
+  name: Log<TState>(LogLevel, EventId, TState, Exception?, Func<TState, Exception?, string>)
   href: api/KalshiBotLogging.DatabaseLogger.html#KalshiBotLogging_DatabaseLogger_Log__1_Microsoft_Extensions_Logging_LogLevel_Microsoft_Extensions_Logging_EventId___0_System_Exception_System_Func___0_System_Exception_System_String__
   commentId: M:KalshiBotLogging.DatabaseLogger.Log``1(Microsoft.Extensions.Logging.LogLevel,Microsoft.Extensions.Logging.EventId,``0,System.Exception,System.Func{``0,System.Exception,System.String})
   name.vb: Log(Of TState)(LogLevel, EventId, TState, Exception, Func(Of TState, Exception, String))
-  fullName: KalshiBotLogging.DatabaseLogger.Log<TState>(Microsoft.Extensions.Logging.LogLevel, Microsoft.Extensions.Logging.EventId, TState, System.Exception, System.Func<TState, System.Exception, string>)
+  fullName: KalshiBotLogging.DatabaseLogger.Log<TState>(Microsoft.Extensions.Logging.LogLevel, Microsoft.Extensions.Logging.EventId, TState, System.Exception?, System.Func<TState, System.Exception?, string>)
   fullName.vb: KalshiBotLogging.DatabaseLogger.Log(Of TState)(Microsoft.Extensions.Logging.LogLevel, Microsoft.Extensions.Logging.EventId, TState, System.Exception, System.Func(Of TState, System.Exception, String))
-  nameWithType: DatabaseLogger.Log<TState>(LogLevel, EventId, TState, Exception, Func<TState, Exception, string>)
+  nameWithType: DatabaseLogger.Log<TState>(LogLevel, EventId, TState, Exception?, Func<TState, Exception?, string>)
   nameWithType.vb: DatabaseLogger.Log(Of TState)(LogLevel, EventId, TState, Exception, Func(Of TState, Exception, String))
 - uid: KalshiBotLogging.DatabaseLoggerProvider
   name: DatabaseLoggerProvider

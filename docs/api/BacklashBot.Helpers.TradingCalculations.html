@@ -405,7 +405,10 @@ Includes validation for null orderbook and invalid values.</p>
   </span>
   <a id="BacklashBot_Helpers_TradingCalculations_CalculateIterativeEMA_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateIterativeEMA*"></a>
   <h4 id="BacklashBot_Helpers_TradingCalculations_CalculateIterativeEMA_System_Collections_Generic_List_System_Double__System_Int32_System_Int32_" data-uid="BacklashBot.Helpers.TradingCalculations.CalculateIterativeEMA(System.Collections.Generic.List{System.Double},System.Int32,System.Int32)">CalculateIterativeEMA(List&lt;double&gt;, int, int)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Calculates the Exponential Moving Average (EMA) iteratively up to a specified end index.
+This method computes EMA for a subset of prices ending at the given index.
+Includes validation for null prices, invalid period, indices, and NaN/Infinity values.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -424,17 +427,20 @@ Includes validation for null orderbook and invalid values.</p>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</td>
         <td><span class="parametername">prices</span></td>
-        <td></td>
+        <td><p>The list of price values. Must not be null, contain valid indices, and not contain NaN or Infinity.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">period</span></td>
-        <td></td>
+        <td><p>The period for the EMA calculation. Must be at least 1.</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
         <td><span class="parametername">endIndex</span></td>
-        <td></td>
+        <td><p>The end index in the prices list to calculate EMA up to. Must be &gt;= period-1 and &lt; prices.Count.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -449,7 +455,24 @@ Includes validation for null orderbook and invalid values.</p>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
-        <td></td>
+        <td><p>The calculated EMA value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Thrown if inputs are invalid.</p>
+</td>
       </tr>
     </tbody>
   </table>

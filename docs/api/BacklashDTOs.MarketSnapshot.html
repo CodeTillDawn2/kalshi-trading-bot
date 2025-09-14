@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class MarketSnapshot | Kalshi Trading Bot Documentation ">
     
-    
+    <meta name="description" content="Represents a complete snapshot of market data at a specific point in time, used for historical record storage and trading strategy analysis. This DTO captures all relevant market state including order book, positions, technical indicators, and calculated metrics. MarketSnapshot is created from MarketData instances and serialized for persistence. It includes:  Market identification and metadata (ticker, category, status) Current order book state with bid/ask prices and depths Position information and P&amp;amp;L calculations Technical indicators and trading metrics Historical price data and support/resistance levels Calculated velocities, spreads, and market statistics  The snapshot schema evolves over time, with version tracking to ensure backward compatibility during upgrades and data migration.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,21 @@
 
 
   <h1 id="BacklashDTOs_MarketSnapshot" data-uid="BacklashDTOs.MarketSnapshot" class="text-break">Class MarketSnapshot</h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Represents a complete snapshot of market data at a specific point in time, used for historical record storage
+and trading strategy analysis. This DTO captures all relevant market state including order book, positions,
+technical indicators, and calculated metrics.</p>
+<p>MarketSnapshot is created from MarketData instances and serialized for persistence. It includes:</p>
+<ul>
+<li>Market identification and metadata (ticker, category, status)</li>
+<li>Current order book state with bid/ask prices and depths</li>
+<li>Position information and P&amp;L calculations</li>
+<li>Technical indicators and trading metrics</li>
+<li>Historical price data and support/resistance levels</li>
+<li>Calculated velocities, spreads, and market statistics</li>
+</ul>
+<p>The snapshot schema evolves over time, with version tracking to ensure backward compatibility
+during upgrades and data migration.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
@@ -833,7 +847,8 @@
   </span>
   <a id="BacklashDTOs_MarketSnapshot_ATR_Long_" data-uid="BacklashDTOs.MarketSnapshot.ATR_Long*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_ATR_Long" data-uid="BacklashDTOs.MarketSnapshot.ATR_Long">ATR_Long</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the long-term ATR (14 periods, day candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -854,6 +869,11 @@
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_ATR_Long_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Average price range for volatility, in cents.
+Sourced from MarketData.ATR_Long, computed by TradingCalculator.CalculateATR.
+Null if less than 15 candlesticks or invalid.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_ATR_Medium.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.ATR_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -863,7 +883,8 @@
   </span>
   <a id="BacklashDTOs_MarketSnapshot_ATR_Medium_" data-uid="BacklashDTOs.MarketSnapshot.ATR_Medium*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_ATR_Medium" data-uid="BacklashDTOs.MarketSnapshot.ATR_Medium">ATR_Medium</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the medium-term ATR (14 periods, hour candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -884,6 +905,11 @@
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_ATR_Medium_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Average price range for volatility, in cents.
+Sourced from MarketData.ATR_Medium, computed by TradingCalculator.CalculateATR.
+Null if less than 15 candlesticks or invalid.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_AllSupportResistanceLevels.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.AllSupportResistanceLevels%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -954,7 +980,7 @@ public (int Bid, DateTime When) AllTimeHighNo_Bid { get; set; }</code></pre>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_AllTimeHighNo_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Highest bid price recorded, in cents (e.g., 72 = $0.72).
-Sourced from MarketData.AllTimeHighNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_BidHigh">BidHigh</a>.
+Sourced from MarketData.AllTimeHighNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidHigh.
 Default is (0, DateTime.MinValue) if no data. Skips initial candles with zero volume.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -991,7 +1017,7 @@ public (int Bid, DateTime When) AllTimeHighYes_Bid { get; set; }</code></pre>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_AllTimeHighYes_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Highest bid price recorded, in cents (e.g., 72 = $0.72).
-Sourced from MarketData.AllTimeHighYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_BidHigh">BidHigh</a>.
+Sourced from MarketData.AllTimeHighYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidHigh.
 Default is (0, DateTime.MinValue) if no data. Skips initial candles with zero volume.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -1028,7 +1054,7 @@ public (int Bid, DateTime When) AllTimeLowNo_Bid { get; set; }</code></pre>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_AllTimeLowNo_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Lowest bid price recorded, in cents (e.g., 28 = $0.28).
-Sourced from MarketData.AllTimeLowNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_BidLow">BidLow</a>.
+Sourced from MarketData.AllTimeLowNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidLow.
 Default is (0, DateTime.MinValue) if no data. Skips initial candles with zero volume.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -1065,7 +1091,7 @@ public (int Bid, DateTime When) AllTimeLowYes_Bid { get; set; }</code></pre>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_AllTimeLowYes_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Lowest bid price recorded, in cents (e.g., 28 = $0.28).
-Sourced from MarketData.AllTimeLowYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_BidLow">BidLow</a>.
+Sourced from MarketData.AllTimeLowYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidLow.
 Default is (0, DateTime.MinValue) if no data. Skips initial candles with zero volume.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -1102,7 +1128,7 @@ Default is (0, DateTime.MinValue) if no data. Skips initial candles with zero vo
   <h5 id="BacklashDTOs_MarketSnapshot_AverageTradeSize_No_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Average dollar value per &quot;No&quot; side trade (taker side = &quot;yes&quot;).
 Sourced from MarketData.AverageTradeSize_No, computed by OrderbookChangeTracker.GetAverageTradeSize_MakerNo.
-Sums dollar value (price/100 * |delta contracts|) divided by trade count. 0 if no trades. Trade count in <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_TradeCount_No">TradeCount_No</a>.</p>
+Sums dollar value (price/100 * |delta contracts|) divided by trade count. 0 if no trades. Trade count in TradeCount_No.</p>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
@@ -1138,7 +1164,7 @@ Sums dollar value (price/100 * |delta contracts|) divided by trade count. 0 if n
   <h5 id="BacklashDTOs_MarketSnapshot_AverageTradeSize_Yes_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Average dollar value per &quot;Yes&quot; side trade (taker side = &quot;no&quot;).
 Sourced from MarketData.AverageTradeSize_Yes, computed by OrderbookChangeTracker.GetAverageTradeSize_MakerYes.
-Sums dollar value (price/100 * |delta contracts|) divided by trade count. 0 if no trades. Trade count in <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_TradeCount_Yes">TradeCount_Yes</a>.</p>
+Sums dollar value (price/100 * |delta contracts|) divided by trade count. 0 if no trades. Trade count in TradeCount_Yes.</p>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
@@ -1388,7 +1414,7 @@ Sourced from MarketData.BestYesBid, computed from MarketData.OrderbookData using
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_BidCountImbalance_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Difference: <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_TotalBidContracts_Yes">TotalBidContracts_Yes</a> - <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_TotalBidContracts_No">TotalBidContracts_No</a>.
+  <div class="markdown level1 remarks"><p>Difference: TotalBidContracts_Yes - TotalBidContracts_No.
 Sourced from MarketData.BidImbalance. Positive for &quot;Yes&quot; dominance, negative for &quot;No&quot;.
 0 if no bid orders.</p>
 </div>
@@ -1496,7 +1522,7 @@ Sourced from MarketData.BidRange_Yes, computed from MarketData.OrderbookData usi
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_BidVolumeImbalance_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Difference: <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_TotalBidContracts_Yes">TotalBidContracts_Yes</a> - <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_TotalBidContracts_No">TotalBidContracts_No</a>.
+  <div class="markdown level1 remarks"><p>Difference: TotalBidContracts_Yes - TotalBidContracts_No.
 Sourced from MarketData.BidImbalance. Positive for &quot;Yes&quot; dominance, negative for &quot;No&quot;.
 0 if no bid orders.</p>
 </div>
@@ -1509,7 +1535,8 @@ Sourced from MarketData.BidImbalance. Positive for &quot;Yes&quot; dominance, ne
   </span>
   <a id="BacklashDTOs_MarketSnapshot_BollingerBands_Long_" data-uid="BacklashDTOs.MarketSnapshot.BollingerBands_Long*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_BollingerBands_Long" data-uid="BacklashDTOs.MarketSnapshot.BollingerBands_Long">BollingerBands_Long</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the long-term Bollinger Bands (20 periods, day candlesticks, 2 std dev).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -1531,6 +1558,11 @@ public (double? Lower, double? Middle, double? Upper) BollingerBands_Long { get;
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_BollingerBands_Long_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>SMA (Middle), Upper, and Lower bands for volatility.
+Sourced from MarketData.BollingerBands_Long, computed by TradingCalculator.CalculateBollingerBands.
+Upper/Lower null if less than 20 candlesticks or invalid, Middle may be valid. In cents. Uses BollingerBandsConverter for JSON.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_BollingerBands_Medium.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.BollingerBands_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -1540,7 +1572,8 @@ public (double? Lower, double? Middle, double? Upper) BollingerBands_Long { get;
   </span>
   <a id="BacklashDTOs_MarketSnapshot_BollingerBands_Medium_" data-uid="BacklashDTOs.MarketSnapshot.BollingerBands_Medium*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_BollingerBands_Medium" data-uid="BacklashDTOs.MarketSnapshot.BollingerBands_Medium">BollingerBands_Medium</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the medium-term Bollinger Bands (20 periods, hour candlesticks, 2 std dev).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -1562,6 +1595,11 @@ public (double? Lower, double? Middle, double? Upper) BollingerBands_Medium { ge
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_BollingerBands_Medium_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>SMA (Middle), Upper, and Lower bands for volatility.
+Sourced from MarketData.BollingerBands_Medium, computed by TradingCalculator.CalculateBollingerBands.
+Upper/Lower null if less than 20 candlesticks or invalid, Middle may be valid. In cents. Uses BollingerBandsConverter for JSON.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_BuyinPrice.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.BuyinPrice%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -2060,7 +2098,7 @@ Sourced from MarketData.ChangeMetricsMature, determined by OrderbookChangeTracke
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_DepthAtBestNoBid_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Total contracts at <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_BestNoBid">BestNoBid</a>.
+  <div class="markdown level1 remarks"><p>Total contracts at BestNoBid.
 Sourced from MarketData.DepthAtBestNoBid, computed from MarketData.OrderbookData using MarketData.GetBids.
 0 if no &quot;No&quot; bid orders.</p>
 </div>
@@ -2096,7 +2134,7 @@ Sourced from MarketData.DepthAtBestNoBid, computed from MarketData.OrderbookData
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_DepthAtBestYesBid_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Total contracts at <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_BestYesBid">BestYesBid</a>.
+  <div class="markdown level1 remarks"><p>Total contracts at BestYesBid.
 Sourced from MarketData.DepthAtBestYesBid, computed from MarketData.OrderbookData using MarketData.GetBids.
 0 if no &quot;Yes&quot; bid orders.</p>
 </div>
@@ -2181,7 +2219,8 @@ Sums all levels if fewer than four. 0 if no &quot;Yes&quot; bid orders.</p>
   </span>
   <a id="BacklashDTOs_MarketSnapshot_EMA_Long_" data-uid="BacklashDTOs.MarketSnapshot.EMA_Long*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_EMA_Long" data-uid="BacklashDTOs.MarketSnapshot.EMA_Long">EMA_Long</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the long-term EMA (14 periods, day candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -2202,6 +2241,11 @@ Sums all levels if fewer than four. 0 if no &quot;Yes&quot; bid orders.</p>
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_EMA_Long_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Weighted moving average for &quot;Yes&quot; side, in cents.
+Sourced from MarketData.EMA_Long, computed by TradingCalculator.CalculateEMA.
+Null if less than 14 candlesticks or invalid.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_EMA_Medium.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.EMA_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -2211,7 +2255,8 @@ Sums all levels if fewer than four. 0 if no &quot;Yes&quot; bid orders.</p>
   </span>
   <a id="BacklashDTOs_MarketSnapshot_EMA_Medium_" data-uid="BacklashDTOs.MarketSnapshot.EMA_Medium*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_EMA_Medium" data-uid="BacklashDTOs.MarketSnapshot.EMA_Medium">EMA_Medium</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the medium-term EMA (14 periods, hour candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -2232,6 +2277,11 @@ Sums all levels if fewer than four. 0 if no &quot;Yes&quot; bid orders.</p>
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_EMA_Medium_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Weighted moving average for &quot;Yes&quot; side, in cents.
+Sourced from MarketData.EMA_Medium, computed by TradingCalculator.CalculateEMA.
+Null if less than 14 candlesticks or invalid.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_ExpectedFees.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.ExpectedFees%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -2401,7 +2451,7 @@ Non-negative, 0 if no trades.</p>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_HighestVolume_Day_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Maximum volume traded in a single day, in contracts.
-Sourced from MarketData.HighestVolume_Day, calculated by CandlestickService.PopulateMarketDataAsync using day candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_Volume">Volume</a>.
+Sourced from MarketData.HighestVolume_Day, calculated by CandlestickService.PopulateMarketDataAsync using day candlesticks' CandlestickData.Volume.
 0 if no day candlesticks or volume data.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -2437,7 +2487,7 @@ Sourced from MarketData.HighestVolume_Day, calculated by CandlestickService.Popu
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_HighestVolume_Hour_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Maximum volume traded in a single hour, in contracts.
-Sourced from MarketData.HighestVolume_Hour, calculated by CandlestickService.PopulateMarketDataAsync using hour candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_Volume">Volume</a>.
+Sourced from MarketData.HighestVolume_Hour, calculated by CandlestickService.PopulateMarketDataAsync using hour candlesticks' CandlestickData.Volume.
 0 if no hour candlesticks or volume data.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -2473,7 +2523,7 @@ Sourced from MarketData.HighestVolume_Hour, calculated by CandlestickService.Pop
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_HighestVolume_Minute_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Maximum volume traded in a single minute, in contracts.
-Sourced from MarketData.HighestVolume_Minute, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_Volume">Volume</a>.
+Sourced from MarketData.HighestVolume_Minute, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.Volume.
 0 if no minute candlesticks or volume data.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -2578,7 +2628,7 @@ Sourced from MarketData.LastWebSocketMessageReceived. MinValue if no messages.</
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_LevelCount_Bottom_No_Bid_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Count of &quot;No&quot; bid price levels below 90% of MarketData.BestNoBid used in <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_VelocityPerMinute_Bottom_No_Bid">VelocityPerMinute_Bottom_No_Bid</a>.
+  <div class="markdown level1 remarks"><p>Count of &quot;No&quot; bid price levels below 90% of MarketData.BestNoBid used in VelocityPerMinute_Bottom_No_Bid.
 Sourced from MarketData.LevelCount_Bottom_No_Bid, computed by OrderbookChangeTracker.GetBottomNoVelocityPerMinute.
 0 if no relevant orders.</p>
 </div>
@@ -2614,7 +2664,7 @@ Sourced from MarketData.LevelCount_Bottom_No_Bid, computed by OrderbookChangeTra
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_LevelCount_Bottom_Yes_Bid_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Count of &quot;Yes&quot; bid price levels below 90% of MarketData.BestYesBid used in <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_VelocityPerMinute_Bottom_Yes_Bid">VelocityPerMinute_Bottom_Yes_Bid</a>.
+  <div class="markdown level1 remarks"><p>Count of &quot;Yes&quot; bid price levels below 90% of MarketData.BestYesBid used in VelocityPerMinute_Bottom_Yes_Bid.
 Sourced from MarketData.LevelCount_Bottom_Yes_Bid, computed by OrderbookChangeTracker.GetBottomYesVelocityPerMinute.
 0 if no relevant orders.</p>
 </div>
@@ -2650,7 +2700,7 @@ Sourced from MarketData.LevelCount_Bottom_Yes_Bid, computed by OrderbookChangeTr
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_LevelCount_Top_No_Bid_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Count of &quot;No&quot; bid price levels at or above 90% of MarketData.BestNoBid used in <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_VelocityPerMinute_Top_No_Bid">VelocityPerMinute_Top_No_Bid</a>.
+  <div class="markdown level1 remarks"><p>Count of &quot;No&quot; bid price levels at or above 90% of MarketData.BestNoBid used in VelocityPerMinute_Top_No_Bid.
 Sourced from MarketData.LevelCount_Top_No_Bid, computed by OrderbookChangeTracker.GetTopNoVelocityPerMinute.
 0 if no relevant orders.</p>
 </div>
@@ -2686,7 +2736,7 @@ Sourced from MarketData.LevelCount_Top_No_Bid, computed by OrderbookChangeTracke
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_LevelCount_Top_Yes_Bid_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Count of &quot;Yes&quot; bid price levels at or above 90% of MarketData.BestYesBid used in <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_VelocityPerMinute_Top_Yes_Bid">VelocityPerMinute_Top_Yes_Bid</a>.
+  <div class="markdown level1 remarks"><p>Count of &quot;Yes&quot; bid price levels at or above 90% of MarketData.BestYesBid used in VelocityPerMinute_Top_Yes_Bid.
 Sourced from MarketData.LevelCount_Top_Yes_Bid, computed by OrderbookChangeTracker.GetTopYesVelocityPerMinute.
 0 if no relevant orders.</p>
 </div>
@@ -2699,7 +2749,8 @@ Sourced from MarketData.LevelCount_Top_Yes_Bid, computed by OrderbookChangeTrack
   </span>
   <a id="BacklashDTOs_MarketSnapshot_MACD_Long_" data-uid="BacklashDTOs.MarketSnapshot.MACD_Long*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_MACD_Long" data-uid="BacklashDTOs.MarketSnapshot.MACD_Long">MACD_Long</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the long-term MACD (12, 26, 9 periods, day candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -2721,6 +2772,11 @@ public (double? MACD, double? Signal, double? Histogram) MACD_Long { get; set; }
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_MACD_Long_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>MACD line, signal line, and histogram for trend and momentum.
+Sourced from MarketData.MACD_Long, computed by TradingCalculator.CalculateMACD.
+Null if less than 35 candlesticks or invalid. Uses MACDConverter for JSON.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_MACD_Medium.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.MACD_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -2730,7 +2786,8 @@ public (double? MACD, double? Signal, double? Histogram) MACD_Long { get; set; }
   </span>
   <a id="BacklashDTOs_MarketSnapshot_MACD_Medium_" data-uid="BacklashDTOs.MarketSnapshot.MACD_Medium*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_MACD_Medium" data-uid="BacklashDTOs.MarketSnapshot.MACD_Medium">MACD_Medium</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the medium-term MACD (12, 26, 9 periods, hour candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -2752,6 +2809,11 @@ public (double? MACD, double? Signal, double? Histogram) MACD_Medium { get; set;
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_MACD_Medium_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>MACD line, signal line, and histogram for trend and momentum.
+Sourced from MarketData.MACD_Medium, computed by TradingCalculator.CalculateMACD.
+Null if less than 35 candlesticks or invalid. Uses MACDConverter for JSON.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_MarketAge.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.MarketAge%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -3163,7 +3225,7 @@ Sourced from MarketData.NoBidCenterOfMass, computed from MarketData.OrderbookDat
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_NoSpread_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Difference between <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_BestNoAsk">BestNoAsk</a> and <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_BestNoBid">BestNoBid</a>, in cents.
+  <div class="markdown level1 remarks"><p>Difference between BestNoAsk and BestNoBid, in cents.
 Sourced from MarketData.NoSpread. 0 if no orders.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -3247,7 +3309,8 @@ Tracks changes in OrderbookChangeTracker.OrderbookChange with OrderbookChangeTra
   </span>
   <a id="BacklashDTOs_MarketSnapshot_OBV_Long_" data-uid="BacklashDTOs.MarketSnapshot.OBV_Long*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_OBV_Long" data-uid="BacklashDTOs.MarketSnapshot.OBV_Long">OBV_Long</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the long-term OBV (day candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -3268,6 +3331,11 @@ Tracks changes in OrderbookChangeTracker.OrderbookChange with OrderbookChangeTra
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_OBV_Long_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Cumulative volume based on price direction.
+Sourced from MarketData.OBV_Long, computed by TradingCalculator.CalculateOBV.
+0 if less than 2 candlesticks. Positive/negative for buying/selling pressure.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_OBV_Medium.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.OBV_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -3277,7 +3345,8 @@ Tracks changes in OrderbookChangeTracker.OrderbookChange with OrderbookChangeTra
   </span>
   <a id="BacklashDTOs_MarketSnapshot_OBV_Medium_" data-uid="BacklashDTOs.MarketSnapshot.OBV_Medium*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_OBV_Medium" data-uid="BacklashDTOs.MarketSnapshot.OBV_Medium">OBV_Medium</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the medium-term OBV (hour candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -3298,6 +3367,11 @@ Tracks changes in OrderbookChangeTracker.OrderbookChange with OrderbookChangeTra
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_OBV_Medium_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Cumulative volume based on price direction.
+Sourced from MarketData.OBV_Medium, computed by TradingCalculator.CalculateOBV.
+0 if less than 2 candlesticks. Positive/negative for buying/selling pressure.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_OrderVolumePerMinute_NoBid.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.OrderVolumePerMinute_NoBid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -3655,7 +3729,8 @@ Uses order book or current prices. 0 if no position or data unavailable.</p>
   </span>
   <a id="BacklashDTOs_MarketSnapshot_RSI_Long_" data-uid="BacklashDTOs.MarketSnapshot.RSI_Long*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_RSI_Long" data-uid="BacklashDTOs.MarketSnapshot.RSI_Long">RSI_Long</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the long-term RSI (14 periods, day candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -3676,6 +3751,11 @@ Uses order book or current prices. 0 if no position or data unavailable.</p>
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_RSI_Long_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Momentum indicator (0-100) for &quot;Yes&quot; side, using day candlesticks.
+Sourced from MarketData.RSI_Long, computed by TradingCalculator.CalculateRSI.
+Null if less than 15 candlesticks or invalid. greater than 70 overbought, less than 30 oversold.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_RSI_Medium.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.RSI_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -3685,7 +3765,8 @@ Uses order book or current prices. 0 if no position or data unavailable.</p>
   </span>
   <a id="BacklashDTOs_MarketSnapshot_RSI_Medium_" data-uid="BacklashDTOs.MarketSnapshot.RSI_Medium*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_RSI_Medium" data-uid="BacklashDTOs.MarketSnapshot.RSI_Medium">RSI_Medium</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the medium-term RSI (14 periods, hour candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -3706,6 +3787,11 @@ Uses order book or current prices. 0 if no position or data unavailable.</p>
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_RSI_Medium_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Momentum indicator (0-100) for &quot;Yes&quot; side, using hour candlesticks.
+Sourced from MarketData.RSI_Medium, computed by TradingCalculator.CalculateRSI.
+Null if less than 15 candlesticks or invalid. greater than 70 overbought, less than 30 oversold.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_RSI_Short.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.RSI_Short%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -3715,7 +3801,8 @@ Uses order book or current prices. 0 if no position or data unavailable.</p>
   </span>
   <a id="BacklashDTOs_MarketSnapshot_RSI_Short_" data-uid="BacklashDTOs.MarketSnapshot.RSI_Short*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_RSI_Short" data-uid="BacklashDTOs.MarketSnapshot.RSI_Short">RSI_Short</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the short-term RSI (14 periods, minute candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -3736,6 +3823,11 @@ Uses order book or current prices. 0 if no position or data unavailable.</p>
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_RSI_Short_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Momentum indicator (0-100) for &quot;Yes&quot; side, using minute candlesticks.
+Sourced from MarketData.RSI_Short, computed by TradingCalculator.CalculateRSI.
+Null if less than 15 candlesticks or invalid. greater than 70 overbought, less than 30 oversold.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_RealizedPnl.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.RealizedPnl%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -3836,7 +3928,7 @@ public (int Bid, DateTime When) RecentHighNo_Bid { get; set; }</code></pre>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_RecentHighNo_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Highest bid price in the last 3 months, in cents (e.g., 68 = $0.68).
-Sourced from MarketData.RecentHighNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_BidHigh">BidHigh</a>.
+Sourced from MarketData.RecentHighNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidHigh.
 Default is (0, DateTime.MinValue) if no recent data.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -3873,7 +3965,7 @@ public (int Bid, DateTime When) RecentHighYes_Bid { get; set; }</code></pre>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_RecentHighYes_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Highest bid price in the last 3 months, in cents (e.g., 68 = $0.68).
-Sourced from MarketData.RecentHighYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_BidHigh">BidHigh</a>.
+Sourced from MarketData.RecentHighYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidHigh.
 Default is (0, DateTime.MinValue) if no recent data.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -3910,7 +4002,7 @@ public (int Bid, DateTime When) RecentLowNo_Bid { get; set; }</code></pre>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_RecentLowNo_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Lowest bid price in the last 3 months, in cents (e.g., 32 = $0.32).
-Sourced from MarketData.RecentLowNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_BidLow">BidLow</a>.
+Sourced from MarketData.RecentLowNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidLow.
 Default is (0, DateTime.MinValue) if no recent data.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -3947,7 +4039,7 @@ public (int Bid, DateTime When) RecentLowYes_Bid { get; set; }</code></pre>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_RecentLowYes_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Lowest bid price in the last 3 months, in cents (e.g., 32 = $0.32).
-Sourced from MarketData.RecentLowYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_BidLow">BidLow</a>.
+Sourced from MarketData.RecentLowYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidLow.
 Default is (0, DateTime.MinValue) if no recent data.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -3983,7 +4075,7 @@ Default is (0, DateTime.MinValue) if no recent data.</p>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_RecentVolume_LastHour_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Sum of volumes from minute candlesticks in the last hour, in contracts.
-Sourced from MarketData.RecentVolume_LastHour, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_Volume">Volume</a>.
+Sourced from MarketData.RecentVolume_LastHour, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.Volume.
 0 if no recent data or volume.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -4019,7 +4111,7 @@ Sourced from MarketData.RecentVolume_LastHour, calculated by CandlestickService.
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_RecentVolume_LastMonth_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Sum of volumes from minute candlesticks in the last month, in contracts.
-Sourced from MarketData.RecentVolume_LastMonth, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_Volume">Volume</a>.
+Sourced from MarketData.RecentVolume_LastMonth, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.Volume.
 0 if no recent data or volume.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -4055,7 +4147,7 @@ Sourced from MarketData.RecentVolume_LastMonth, calculated by CandlestickService
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_RecentVolume_LastThreeHours_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Sum of volumes from minute candlesticks in the last three hours, in contracts.
-Sourced from MarketData.RecentVolume_LastThreeHours, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' <a class="xref" href="BacklashDTOs.CandlestickData.html#BacklashDTOs_CandlestickData_Volume">Volume</a>.
+Sourced from MarketData.RecentVolume_LastThreeHours, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.Volume.
 0 if no recent data or volume.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -4133,7 +4225,8 @@ Sourced from MarketData.RestingOrders, retrieved by MarketData.RefreshPositionMe
   </span>
   <a id="BacklashDTOs_MarketSnapshot_StochasticOscillator_Long_" data-uid="BacklashDTOs.MarketSnapshot.StochasticOscillator_Long*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_StochasticOscillator_Long" data-uid="BacklashDTOs.MarketSnapshot.StochasticOscillator_Long">StochasticOscillator_Long</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the long-term Stochastic Oscillator (K=14, D=3, day candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -4155,6 +4248,11 @@ public (double? K, double? D) StochasticOscillator_Long { get; set; }</code></pr
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_StochasticOscillator_Long_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Momentum indicator (%K, %D, 0-100) for price range.
+Sourced from MarketData.StochasticOscillator_Long, computed by TradingCalculator.CalculateStochastic.
+%D null if less than 14 candlesticks or invalid; %K computed if possible. Uses StochasticOscillatorConverter for JSON.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_StochasticOscillator_Medium.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.StochasticOscillator_Medium%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -4164,7 +4262,8 @@ public (double? K, double? D) StochasticOscillator_Long { get; set; }</code></pr
   </span>
   <a id="BacklashDTOs_MarketSnapshot_StochasticOscillator_Medium_" data-uid="BacklashDTOs.MarketSnapshot.StochasticOscillator_Medium*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_StochasticOscillator_Medium" data-uid="BacklashDTOs.MarketSnapshot.StochasticOscillator_Medium">StochasticOscillator_Medium</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the medium-term Stochastic Oscillator (K=14, D=3, hour candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -4186,6 +4285,11 @@ public (double? K, double? D) StochasticOscillator_Medium { get; set; }</code></
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_StochasticOscillator_Medium_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Momentum indicator (%K, %D, 0-100) for price range.
+Sourced from MarketData.StochasticOscillator_Medium, computed by TradingCalculator.CalculateStochastic.
+%D null if less than 14 candlesticks or invalid; %K computed if possible. Uses StochasticOscillatorConverter for JSON.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_StochasticOscillator_Short.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.StochasticOscillator_Short%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -4195,7 +4299,8 @@ public (double? K, double? D) StochasticOscillator_Medium { get; set; }</code></
   </span>
   <a id="BacklashDTOs_MarketSnapshot_StochasticOscillator_Short_" data-uid="BacklashDTOs.MarketSnapshot.StochasticOscillator_Short*"></a>
   <h4 id="BacklashDTOs_MarketSnapshot_StochasticOscillator_Short" data-uid="BacklashDTOs.MarketSnapshot.StochasticOscillator_Short">StochasticOscillator_Short</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Gets or sets the short-term Stochastic Oscillator (K=14, D=3, minute candlesticks).</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
@@ -4217,6 +4322,11 @@ public (double? K, double? D) StochasticOscillator_Short { get; set; }</code></p
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashDTOs_MarketSnapshot_StochasticOscillator_Short_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Momentum indicator (%K, %D, 0-100) for price range.
+Sourced from MarketData.StochasticOscillator_Short, computed by TradingCalculator.CalculateStochastic.
+%D null if less than 14 candlesticks or invalid; %K computed if possible. Uses StochasticOscillatorConverter for JSON.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_MarketSnapshot_TimeLeft.md&amp;value=---%0Auid%3A%20BacklashDTOs.MarketSnapshot.TimeLeft%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
@@ -4314,7 +4424,7 @@ Sourced from MarketData.TimeLeft. Negative if market is closed.</p>
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_TolerancePercentage_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Percentage (e.g., 5%) used to define price range for <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_TopTenPercentLevelDepth_Yes">TopTenPercentLevelDepth_Yes</a> and <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_TopTenPercentLevelDepth_No">TopTenPercentLevelDepth_No</a>.
+  <div class="markdown level1 remarks"><p>Percentage (e.g., 5%) used to define price range for TopTenPercentLevelDepth_Yes and TopTenPercentLevelDepth_No.
 Sourced from MarketData.TolerancePercentage. Typically 5%.</p>
 </div>
   <span class="small pull-right mobile-hide">
@@ -4349,7 +4459,7 @@ Sourced from MarketData.TolerancePercentage. Typically 5%.</p>
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_TopTenPercentLevelDepth_No_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Total contracts for &quot;No&quot; bids within <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_TolerancePercentage">TolerancePercentage</a> below <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_BestNoBid">BestNoBid</a>.
+  <div class="markdown level1 remarks"><p>Total contracts for &quot;No&quot; bids within TolerancePercentage below BestNoBid.
 Sourced from MarketData.TopTenPercentLevelDepth_No, computed by MarketData.CalculateCumulativeDepth.
 0 if no orders within range.</p>
 </div>
@@ -4385,7 +4495,7 @@ Sourced from MarketData.TopTenPercentLevelDepth_No, computed by MarketData.Calcu
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_TopTenPercentLevelDepth_Yes_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Total contracts for &quot;Yes&quot; bids within <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_TolerancePercentage">TolerancePercentage</a> below <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_BestYesBid">BestYesBid</a>.
+  <div class="markdown level1 remarks"><p>Total contracts for &quot;Yes&quot; bids within TolerancePercentage below BestYesBid.
 Sourced from MarketData.TopTenPercentLevelDepth_Yes, computed by MarketData.CalculateCumulativeDepth.
 0 if no orders within range.</p>
 </div>
@@ -4951,7 +5061,7 @@ Null if insufficient data, zero volume, or invalid.</p>
   <h5 id="BacklashDTOs_MarketSnapshot_VelocityPerMinute_Bottom_No_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Rate of change for &quot;No&quot; bid prices below 90% of MarketData.BestNoBid.
 Sourced from MarketData.VelocityPerMinute_Bottom_No_Bid, computed by OrderbookChangeTracker.GetBottomNoVelocityPerMinute.
-Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_LevelCount_Bottom_No_Bid">LevelCount_Bottom_No_Bid</a>.</p>
+Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in LevelCount_Bottom_No_Bid.</p>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
@@ -4987,7 +5097,7 @@ Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed m
   <h5 id="BacklashDTOs_MarketSnapshot_VelocityPerMinute_Bottom_Yes_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Rate of change for &quot;Yes&quot; bid prices below 90% of MarketData.BestYesBid.
 Sourced from MarketData.VelocityPerMinute_Bottom_Yes_Bid, computed by OrderbookChangeTracker.GetBottomYesVelocityPerMinute.
-Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_LevelCount_Bottom_Yes_Bid">LevelCount_Bottom_Yes_Bid</a>.</p>
+Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in LevelCount_Bottom_Yes_Bid.</p>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
@@ -5023,7 +5133,7 @@ Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed m
   <h5 id="BacklashDTOs_MarketSnapshot_VelocityPerMinute_Top_No_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Rate of change for &quot;No&quot; bid prices at or above 90% of MarketData.BestNoBid.
 Sourced from MarketData.VelocityPerMinute_Top_No_Bid, computed by OrderbookChangeTracker.GetTopNoVelocityPerMinute.
-Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_LevelCount_Top_No_Bid">LevelCount_Top_No_Bid</a>.</p>
+Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in LevelCount_Top_No_Bid.</p>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
@@ -5059,7 +5169,7 @@ Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed m
   <h5 id="BacklashDTOs_MarketSnapshot_VelocityPerMinute_Top_Yes_Bid_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Rate of change for &quot;Yes&quot; bid prices at or above 90% of MarketData.BestYesBid.
 Sourced from MarketData.VelocityPerMinute_Top_Yes_Bid, computed by OrderbookChangeTracker.GetTopYesVelocityPerMinute.
-Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_LevelCount_Top_Yes_Bid">LevelCount_Top_Yes_Bid</a>.</p>
+Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in LevelCount_Top_Yes_Bid.</p>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
@@ -5189,7 +5299,7 @@ Sourced from MarketData.YesBidCenterOfMass, computed from MarketData.OrderbookDa
     </tbody>
   </table>
   <h5 id="BacklashDTOs_MarketSnapshot_YesSpread_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Difference between <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_BestYesAsk">BestYesAsk</a> and <a class="xref" href="BacklashDTOs.MarketSnapshot.html#BacklashDTOs_MarketSnapshot_BestYesBid">BestYesBid</a>, in cents.
+  <div class="markdown level1 remarks"><p>Difference between BestYesAsk and BestYesBid, in cents.
 Sourced from MarketData.YesSpread. 0 if no orders.</p>
 </div>
   <h3 id="methods">Methods
