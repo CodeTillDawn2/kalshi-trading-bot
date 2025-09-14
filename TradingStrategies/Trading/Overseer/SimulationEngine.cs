@@ -32,7 +32,7 @@ namespace TradingStrategies.Trading.Overseer
     {
         private readonly MarketTypeService _marketTypeService;
         private readonly PatternDetectionService _patternDetectionService;
-        private readonly PatternPerformanceMonitor? _performanceMonitor;
+        private readonly PerformanceMonitor? _performanceMonitor;
 
         /// <summary>
         /// Initializes a new instance of the SimulationEngine with required services.
@@ -43,7 +43,7 @@ namespace TradingStrategies.Trading.Overseer
         /// Creates instances of MarketTypeService and PatternDetectionService for
         /// market classification and pattern recognition during simulation.
         /// </remarks>
-        public SimulationEngine(IConfiguration configuration, PatternPerformanceMonitor? performanceMonitor = null)
+        public SimulationEngine(IConfiguration configuration, PerformanceMonitor? performanceMonitor = null)
         {
             _marketTypeService = new MarketTypeService();
             _patternDetectionService = new PatternDetectionService(configuration);
@@ -63,7 +63,7 @@ namespace TradingStrategies.Trading.Overseer
        /// <summary>
        /// Gets the pattern performance monitor for accessing performance metrics.
        /// </summary>
-       public PatternPerformanceMonitor? PerformanceMonitor => _performanceMonitor;
+       public PerformanceMonitor? PerformanceMonitor => _performanceMonitor;
 
        /// <summary>
         /// Executes a complete trading simulation against a sequence of market snapshots.
@@ -960,12 +960,12 @@ namespace TradingStrategies.Trading.Overseer
             // Record comprehensive performance metrics if monitor is available and metrics were collected
             if (_performanceMonitor != null && result.ExecutionTimeMs.HasValue)
             {
-                _performanceMonitor.RecordPatternDetectionMetrics(
+                _performanceMonitor.RecordPerformanceMetrics(
                     methodName: "PatternDetectionService.DetectPatterns",
-                    totalDetectionTimeMs: result.ExecutionTimeMs.Value,
-                    totalCandlesProcessed: result.TotalCandlesProcessed ?? 0,
-                    totalPatternsFound: result.TotalPatternsFound ?? 0,
-                    patternCheckTimes: result.PatternCheckTimes
+                    totalExecutionTimeMs: result.ExecutionTimeMs.Value,
+                    totalItemsProcessed: result.TotalCandlesProcessed ?? 0,
+                    totalItemsFound: result.TotalPatternsFound ?? 0,
+                    itemCheckTimes: result.PatternCheckTimes
                 );
             }
 
