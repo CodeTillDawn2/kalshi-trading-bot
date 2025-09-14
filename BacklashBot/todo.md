@@ -385,6 +385,29 @@ This document outlines the performance metrics tracked across various classes in
 - `_retryDelay`: TimeSpan - Configurable delay between retry attempts
 - `_batchSize`: int - Configurable batch size for bulk database operations
 
+## BacklashBot.Services.WebSocketMonitorService
+
+### Properties
+- `_monitoringIntervalMinutes`: int - Configurable interval in minutes between exchange status checks (default: 1)
+- `_retryDelayMinutes`: int - Configurable delay in minutes before retrying after errors (default: 5)
+- `_exchangeStatusCheckCount`: int - Total number of exchange status checks performed since service start
+- `_exchangeStatusSuccessCount`: int - Number of successful exchange status checks
+- `_connectionAttemptCount`: int - Total number of WebSocket connection attempts
+- `_connectionSuccessCount`: int - Number of successful WebSocket connections
+- `_monitoringStopwatch`: System.Diagnostics.Stopwatch - Timer for measuring individual operation durations
+
+### Methods
+- `GetMetrics()`: (int ExchangeStatusChecks, int ExchangeStatusSuccesses, int ConnectionAttempts, int ConnectionSuccesses) - Returns current performance metrics as a tuple with exchange status check counts and connection attempt statistics
+- `MonitorAndManageWebSocketConnectionAsync(bool immediate)`: Task - Core monitoring method that checks exchange status and manages WebSocket connections with configurable intervals and comprehensive metrics collection
+- `TriggerConnectionCheckAsync()`: Task - Triggers an immediate WebSocket connection check outside the normal monitoring cycle
+
+### Notes
+- Exchange status check frequency and success rates are tracked and logged on errors and shutdown
+- Connection attempt success rates are monitored and reported for reliability analysis
+- Operation timing is measured for each exchange status check to identify performance bottlenecks
+- Configurable intervals allow tuning monitoring frequency based on operational requirements
+- Metrics are logged during error conditions and final metrics are reported on service shutdown
+
 ## KalshiBotAPI.Websockets.WebSocketConnectionManager
 
 ### Properties
