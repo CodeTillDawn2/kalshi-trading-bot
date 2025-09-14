@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class StrategyConfiguration.StrategyDefinition | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Represents a trading strategy with its name and factory method">
+    <meta name="description" content="Represents a trading strategy with its name and async factory method">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,7 @@
 
 
   <h1 id="TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition" data-uid="TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition" class="text-break">Class StrategyConfiguration.StrategyDefinition</h1>
-  <div class="markdown level0 summary"><p>Represents a trading strategy with its name and factory method</p>
+  <div class="markdown level0 summary"><p>Represents a trading strategy with its name and async factory method</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -123,18 +123,18 @@
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition__ctor_System_String_System_Func_System_String_System_Collections_Generic_Dictionary_BacklashInterfaces_Enums_StrategyEnums_MarketType_System_Collections_Generic_List_TradingStrategies_Strategies_Strategy____.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.%23ctor(System.String%2CSystem.Func%7BSystem.String%2CSystem.Collections.Generic.Dictionary%7BBacklashInterfaces.Enums.StrategyEnums.MarketType%2CSystem.Collections.Generic.List%7BTradingStrategies.Strategies.Strategy%7D%7D%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition__ctor_System_String_System_Func_System_String_System_Threading_Tasks_Task_System_Collections_Generic_Dictionary_BacklashInterfaces_Enums_StrategyEnums_MarketType_System_Collections_Generic_List_TradingStrategies_Strategies_Strategy_____.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.%23ctor(System.String%2CSystem.Func%7BSystem.String%2CSystem.Threading.Tasks.Task%7BSystem.Collections.Generic.Dictionary%7BBacklashInterfaces.Enums.StrategyEnums.MarketType%2CSystem.Collections.Generic.List%7BTradingStrategies.Strategies.Strategy%7D%7D%7D%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategyConfiguration.cs/#L24">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategyConfiguration.cs/#L27">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition__ctor_" data-uid="TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.#ctor*"></a>
-  <h4 id="TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition__ctor_System_String_System_Func_System_String_System_Collections_Generic_Dictionary_BacklashInterfaces_Enums_StrategyEnums_MarketType_System_Collections_Generic_List_TradingStrategies_Strategies_Strategy____" data-uid="TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.#ctor(System.String,System.Func{System.String,System.Collections.Generic.Dictionary{BacklashInterfaces.Enums.StrategyEnums.MarketType,System.Collections.Generic.List{TradingStrategies.Strategies.Strategy}}})">StrategyDefinition(string, Func&lt;string, Dictionary&lt;MarketType, List&lt;Strategy&gt;&gt;&gt;)</h4>
+  <h4 id="TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition__ctor_System_String_System_Func_System_String_System_Threading_Tasks_Task_System_Collections_Generic_Dictionary_BacklashInterfaces_Enums_StrategyEnums_MarketType_System_Collections_Generic_List_TradingStrategies_Strategies_Strategy_____" data-uid="TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.#ctor(System.String,System.Func{System.String,System.Threading.Tasks.Task{System.Collections.Generic.Dictionary{BacklashInterfaces.Enums.StrategyEnums.MarketType,System.Collections.Generic.List{TradingStrategies.Strategies.Strategy}}}})">StrategyDefinition(string, Func&lt;string, Task&lt;Dictionary&lt;MarketType, List&lt;Strategy&gt;&gt;&gt;&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StrategyDefinition(string name, Func&lt;string, Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt; factory)</code></pre>
+    <pre><code class="lang-csharp hljs">public StrategyDefinition(string name, Func&lt;string, Task&lt;Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt;&gt; factory)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -152,7 +152,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;</td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;&gt;</td>
         <td><span class="parametername">factory</span></td>
         <td></td>
       </tr>
@@ -165,7 +165,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition_Factory.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.Factory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategyConfiguration.cs/#L22">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategyConfiguration.cs/#L25">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition_Factory_" data-uid="TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.Factory*"></a>
   <h4 id="TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition_Factory" data-uid="TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.Factory">Factory</h4>
@@ -173,7 +173,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Func&lt;string, Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt; Factory { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Func&lt;string, Task&lt;Dictionary&lt;StrategyEnums.MarketType, List&lt;Strategy&gt;&gt;&gt;&gt; Factory { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-condensed">
@@ -185,7 +185,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;</td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.html">StrategyEnums</a>.<a class="xref" href="BacklashInterfaces.Enums.StrategyEnums.MarketType.html">MarketType</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="TradingStrategies.Strategies.Strategy.html">Strategy</a>&gt;&gt;&gt;&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -195,7 +195,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition_Name.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.Name%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategyConfiguration.cs/#L21">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategyConfiguration.cs/#L24">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition_Name_" data-uid="TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.Name*"></a>
   <h4 id="TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition_Name" data-uid="TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.Name">Name</h4>
@@ -232,7 +232,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategyConfiguration.cs/#L19" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Helpers/StrategyConfiguration.cs/#L22" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

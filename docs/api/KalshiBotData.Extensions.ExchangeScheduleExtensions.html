@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class ExchangeScheduleExtensions | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Provides extension methods for converting between ExchangeSchedule model and ExchangeScheduleDTO, including nested maintenance windows and standard hours collections for comprehensive schedule data transfer.">
+    <meta name="description" content="Provides extension methods for converting between ExchangeSchedule model and ExchangeScheduleDTO, including nested maintenance windows and standard hours collections for comprehensive schedule data transfer. Includes performance metrics collection and batch transformation capabilities.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -82,7 +82,8 @@
 
   <h1 id="KalshiBotData_Extensions_ExchangeScheduleExtensions" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions" class="text-break">Class ExchangeScheduleExtensions</h1>
   <div class="markdown level0 summary"><p>Provides extension methods for converting between ExchangeSchedule model and ExchangeScheduleDTO,
-including nested maintenance windows and standard hours collections for comprehensive schedule data transfer.</p>
+including nested maintenance windows and standard hours collections for comprehensive schedule data transfer.
+Includes performance metrics collection and batch transformation capabilities.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -124,10 +125,173 @@ including nested maintenance windows and standard hours collections for comprehe
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_ExchangeScheduleExtensions_DeepClone_BacklashDTOs_Data_ExchangeScheduleDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone(BacklashDTOs.Data.ExchangeScheduleDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L216">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_ExchangeScheduleExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_ExchangeScheduleExtensions_DeepClone_BacklashDTOs_Data_ExchangeScheduleDTO_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone(BacklashDTOs.Data.ExchangeScheduleDTO)">DeepClone(ExchangeScheduleDTO)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of an ExchangeScheduleDTO to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ExchangeScheduleDTO DeepClone(this ExchangeScheduleDTO exchangeScheduleDTO)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.ExchangeScheduleDTO.html">ExchangeScheduleDTO</a></td>
+        <td><span class="parametername">exchangeScheduleDTO</span></td>
+        <td><p>The ExchangeScheduleDTO to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.ExchangeScheduleDTO.html">ExchangeScheduleDTO</a></td>
+        <td><p>A new ExchangeScheduleDTO instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when exchangeScheduleDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_ExchangeScheduleExtensions_DeepClone_KalshiBotData_Models_ExchangeSchedule_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone(KalshiBotData.Models.ExchangeSchedule)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L168">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_ExchangeScheduleExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_ExchangeScheduleExtensions_DeepClone_KalshiBotData_Models_ExchangeSchedule_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone(KalshiBotData.Models.ExchangeSchedule)">DeepClone(ExchangeSchedule)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of an ExchangeSchedule model to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ExchangeSchedule DeepClone(this ExchangeSchedule exchangeSchedule)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.ExchangeSchedule.html">ExchangeSchedule</a></td>
+        <td><span class="parametername">exchangeSchedule</span></td>
+        <td><p>The ExchangeSchedule model to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.ExchangeSchedule.html">ExchangeSchedule</a></td>
+        <td><p>A new ExchangeSchedule instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when exchangeSchedule is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_ExchangeScheduleExtensions_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.ExchangeScheduleExtensions.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L23">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_ExchangeScheduleExtensions_GetPerformanceMetrics_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.GetPerformanceMetrics*"></a>
+  <h4 id="KalshiBotData_Extensions_ExchangeScheduleExtensions_GetPerformanceMetrics" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets the performance metrics for transformation operations</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyDictionary&lt;string, List&lt;TimeSpan&gt;&gt; GetPerformanceMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeSchedule_BacklashDTOs_Data_ExchangeScheduleDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedule(BacklashDTOs.Data.ExchangeScheduleDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L37">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L64">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeSchedule_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedule*"></a>
   <h4 id="KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeSchedule_BacklashDTOs_Data_ExchangeScheduleDTO_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedule(BacklashDTOs.Data.ExchangeScheduleDTO)">ToExchangeSchedule(ExchangeScheduleDTO)</h4>
@@ -173,12 +337,28 @@ creating a new ExchangeSchedule with all properties and nested collections mappe
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when exchangeScheduleDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeScheduleDTO_KalshiBotData_Models_ExchangeSchedule_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTO(KalshiBotData.Models.ExchangeSchedule)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L34">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeScheduleDTO_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTO*"></a>
   <h4 id="KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeScheduleDTO_KalshiBotData_Models_ExchangeSchedule_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTO(KalshiBotData.Models.ExchangeSchedule)">ToExchangeScheduleDTO(ExchangeSchedule)</h4>
@@ -224,12 +404,160 @@ including all nested maintenance windows and standard hours data.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when exchangeScheduleModel is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeScheduleDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_ExchangeSchedule__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTOs(System.Collections.Generic.IEnumerable%7BKalshiBotData.Models.ExchangeSchedule%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L126">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeScheduleDTOs_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTOs*"></a>
+  <h4 id="KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeScheduleDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_ExchangeSchedule__" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.ExchangeSchedule})">ToExchangeScheduleDTOs(IEnumerable&lt;ExchangeSchedule&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of ExchangeSchedule models to their corresponding DTO representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;ExchangeScheduleDTO&gt; ToExchangeScheduleDTOs(this IEnumerable&lt;ExchangeSchedule&gt; exchangeSchedules)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="KalshiBotData.Models.ExchangeSchedule.html">ExchangeSchedule</a>&gt;</td>
+        <td><span class="parametername">exchangeSchedules</span></td>
+        <td><p>The collection of ExchangeSchedule models to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.Data.ExchangeScheduleDTO.html">ExchangeScheduleDTO</a>&gt;</td>
+        <td><p>A list of ExchangeScheduleDTOs with all properties mapped from the models.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when exchangeSchedules is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeSchedules_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_ExchangeScheduleDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedules(System.Collections.Generic.IEnumerable%7BBacklashDTOs.Data.ExchangeScheduleDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L147">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeSchedules_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedules*"></a>
+  <h4 id="KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeSchedules_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_ExchangeScheduleDTO__" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedules(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.ExchangeScheduleDTO})">ToExchangeSchedules(IEnumerable&lt;ExchangeScheduleDTO&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of ExchangeScheduleDTOs to their corresponding model representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;ExchangeSchedule&gt; ToExchangeSchedules(this IEnumerable&lt;ExchangeScheduleDTO&gt; exchangeScheduleDTOs)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BacklashDTOs.Data.ExchangeScheduleDTO.html">ExchangeScheduleDTO</a>&gt;</td>
+        <td><span class="parametername">exchangeScheduleDTOs</span></td>
+        <td><p>The collection of ExchangeScheduleDTOs to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="KalshiBotData.Models.ExchangeSchedule.html">ExchangeSchedule</a>&gt;</td>
+        <td><p>A list of ExchangeSchedule models with all properties mapped from the DTOs.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when exchangeScheduleDTOs is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_ExchangeScheduleExtensions_UpdateExchangeSchedule_KalshiBotData_Models_ExchangeSchedule_BacklashDTOs_Data_ExchangeScheduleDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.ExchangeScheduleExtensions.UpdateExchangeSchedule(KalshiBotData.Models.ExchangeSchedule%2CBacklashDTOs.Data.ExchangeScheduleDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L58">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L96">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_ExchangeScheduleExtensions_UpdateExchangeSchedule_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.UpdateExchangeSchedule*"></a>
   <h4 id="KalshiBotData_Extensions_ExchangeScheduleExtensions_UpdateExchangeSchedule_KalshiBotData_Models_ExchangeSchedule_BacklashDTOs_Data_ExchangeScheduleDTO_" data-uid="KalshiBotData.Extensions.ExchangeScheduleExtensions.UpdateExchangeSchedule(KalshiBotData.Models.ExchangeSchedule,BacklashDTOs.Data.ExchangeScheduleDTO)">UpdateExchangeSchedule(ExchangeSchedule, ExchangeScheduleDTO)</h4>
@@ -291,7 +619,12 @@ validating schedule ID match before applying changes and updating the modificati
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">Exception</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when exchangeScheduleModel or exchangeScheduleDTO is null.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
         <td><p>Thrown when exchange schedule IDs do not match.</p>
 </td>
       </tr>
@@ -309,7 +642,7 @@ validating schedule ID match before applying changes and updating the modificati
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_ExchangeScheduleExtensions.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.ExchangeScheduleExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L10" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/ExchangeScheduleExtensions.cs/#L16" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class SeriesSettlementSourceExtensions | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Provides extension methods for converting between SeriesSettlementSource model and SeriesSettlementSourceDTO, supporting settlement source data transfer for series validation and reference.">
+    <meta name="description" content="Provides extension methods for converting between SeriesSettlementSource model and SeriesSettlementSourceDTO, supporting settlement source data transfer for series validation and reference. Includes performance metrics collection and batch transformation capabilities.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -82,7 +82,8 @@
 
   <h1 id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions" class="text-break">Class SeriesSettlementSourceExtensions</h1>
   <div class="markdown level0 summary"><p>Provides extension methods for converting between SeriesSettlementSource model and SeriesSettlementSourceDTO,
-supporting settlement source data transfer for series validation and reference.</p>
+supporting settlement source data transfer for series validation and reference.
+Includes performance metrics collection and batch transformation capabilities.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -124,10 +125,173 @@ supporting settlement source data transfer for series validation and reference.<
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_SeriesSettlementSourceExtensions_DeepClone_BacklashDTOs_Data_SeriesSettlementSourceDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone(BacklashDTOs.Data.SeriesSettlementSourceDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/SeriesSettlementSourceExtensions.cs/#L148">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_DeepClone_BacklashDTOs_Data_SeriesSettlementSourceDTO_" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone(BacklashDTOs.Data.SeriesSettlementSourceDTO)">DeepClone(SeriesSettlementSourceDTO)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of a SeriesSettlementSourceDTO to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static SeriesSettlementSourceDTO DeepClone(this SeriesSettlementSourceDTO sourceDTO)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.SeriesSettlementSourceDTO.html">SeriesSettlementSourceDTO</a></td>
+        <td><span class="parametername">sourceDTO</span></td>
+        <td><p>The SeriesSettlementSourceDTO to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.SeriesSettlementSourceDTO.html">SeriesSettlementSourceDTO</a></td>
+        <td><p>A new SeriesSettlementSourceDTO instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when sourceDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_SeriesSettlementSourceExtensions_DeepClone_KalshiBotData_Models_SeriesSettlementSource_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone(KalshiBotData.Models.SeriesSettlementSource)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/SeriesSettlementSourceExtensions.cs/#L129">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_DeepClone_KalshiBotData_Models_SeriesSettlementSource_" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone(KalshiBotData.Models.SeriesSettlementSource)">DeepClone(SeriesSettlementSource)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of a SeriesSettlementSource model to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static SeriesSettlementSource DeepClone(this SeriesSettlementSource source)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.SeriesSettlementSource.html">SeriesSettlementSource</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The SeriesSettlementSource model to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.SeriesSettlementSource.html">SeriesSettlementSource</a></td>
+        <td><p>A new SeriesSettlementSource instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when source is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_SeriesSettlementSourceExtensions_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.SeriesSettlementSourceExtensions.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/SeriesSettlementSourceExtensions.cs/#L23">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_GetPerformanceMetrics_" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.GetPerformanceMetrics*"></a>
+  <h4 id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_GetPerformanceMetrics" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets the performance metrics for transformation operations</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyDictionary&lt;string, List&lt;TimeSpan&gt;&gt; GetPerformanceMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSource_BacklashDTOs_Data_SeriesSettlementSourceDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSource(BacklashDTOs.Data.SeriesSettlementSourceDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/SeriesSettlementSourceExtensions.cs/#L34">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/SeriesSettlementSourceExtensions.cs/#L61">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSource_" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSource*"></a>
   <h4 id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSource_BacklashDTOs_Data_SeriesSettlementSourceDTO_" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSource(BacklashDTOs.Data.SeriesSettlementSourceDTO)">ToSeriesSettlementSource(SeriesSettlementSourceDTO)</h4>
@@ -173,12 +337,28 @@ creating a new SeriesSettlementSource with all properties mapped from the DTO.</
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when sourceDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSourceDTO_KalshiBotData_Models_SeriesSettlementSource_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTO(KalshiBotData.Models.SeriesSettlementSource)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/SeriesSettlementSourceExtensions.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/SeriesSettlementSourceExtensions.cs/#L34">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSourceDTO_" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTO*"></a>
   <h4 id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSourceDTO_KalshiBotData_Models_SeriesSettlementSource_" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTO(KalshiBotData.Models.SeriesSettlementSource)">ToSeriesSettlementSourceDTO(SeriesSettlementSource)</h4>
@@ -224,6 +404,154 @@ mapping all settlement source properties for data transfer.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when source is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSourceDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_SeriesSettlementSource__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs(System.Collections.Generic.IEnumerable%7BKalshiBotData.Models.SeriesSettlementSource%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/SeriesSettlementSourceExtensions.cs/#L87">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSourceDTOs_" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs*"></a>
+  <h4 id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSourceDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_SeriesSettlementSource__" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.SeriesSettlementSource})">ToSeriesSettlementSourceDTOs(IEnumerable&lt;SeriesSettlementSource&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of SeriesSettlementSource models to their corresponding DTO representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;SeriesSettlementSourceDTO&gt; ToSeriesSettlementSourceDTOs(this IEnumerable&lt;SeriesSettlementSource&gt; sources)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="KalshiBotData.Models.SeriesSettlementSource.html">SeriesSettlementSource</a>&gt;</td>
+        <td><span class="parametername">sources</span></td>
+        <td><p>The collection of SeriesSettlementSource models to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.Data.SeriesSettlementSourceDTO.html">SeriesSettlementSourceDTO</a>&gt;</td>
+        <td><p>A list of SeriesSettlementSourceDTOs with all properties mapped from the models.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when sources is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSources_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_SeriesSettlementSourceDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSources(System.Collections.Generic.IEnumerable%7BBacklashDTOs.Data.SeriesSettlementSourceDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/SeriesSettlementSourceExtensions.cs/#L108">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSources_" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSources*"></a>
+  <h4 id="KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSources_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_SeriesSettlementSourceDTO__" data-uid="KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSources(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SeriesSettlementSourceDTO})">ToSeriesSettlementSources(IEnumerable&lt;SeriesSettlementSourceDTO&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of SeriesSettlementSourceDTOs to their corresponding model representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;SeriesSettlementSource&gt; ToSeriesSettlementSources(this IEnumerable&lt;SeriesSettlementSourceDTO&gt; sourceDTOs)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BacklashDTOs.Data.SeriesSettlementSourceDTO.html">SeriesSettlementSourceDTO</a>&gt;</td>
+        <td><span class="parametername">sourceDTOs</span></td>
+        <td><p>The collection of SeriesSettlementSourceDTOs to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="KalshiBotData.Models.SeriesSettlementSource.html">SeriesSettlementSource</a>&gt;</td>
+        <td><p>A list of SeriesSettlementSource models with all properties mapped from the DTOs.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when sourceDTOs is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
 
 </article>
           </div>
@@ -236,7 +564,7 @@ mapping all settlement source properties for data transfer.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_SeriesSettlementSourceExtensions.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.SeriesSettlementSourceExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/SeriesSettlementSourceExtensions.cs/#L10" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/SeriesSettlementSourceExtensions.cs/#L16" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

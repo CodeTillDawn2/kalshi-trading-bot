@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class EventExtensions | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Provides extension methods for converting between Event model and EventDTO, handling event data transfer including associated series information.">
+    <meta name="description" content="Provides extension methods for converting between Event model and EventDTO, handling event data transfer including associated series information. Includes performance metrics collection and batch transformation capabilities.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -82,7 +82,8 @@
 
   <h1 id="KalshiBotData_Extensions_EventExtensions" data-uid="KalshiBotData.Extensions.EventExtensions" class="text-break">Class EventExtensions</h1>
   <div class="markdown level0 summary"><p>Provides extension methods for converting between Event model and EventDTO,
-handling event data transfer including associated series information.</p>
+handling event data transfer including associated series information.
+Includes performance metrics collection and batch transformation capabilities.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -124,10 +125,173 @@ handling event data transfer including associated series information.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_EventExtensions_DeepClone_BacklashDTOs_Data_EventDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.EventExtensions.DeepClone(BacklashDTOs.Data.EventDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L210">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_EventExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.EventExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_EventExtensions_DeepClone_BacklashDTOs_Data_EventDTO_" data-uid="KalshiBotData.Extensions.EventExtensions.DeepClone(BacklashDTOs.Data.EventDTO)">DeepClone(EventDTO)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of an EventDTO to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static EventDTO DeepClone(this EventDTO eventDTO)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.EventDTO.html">EventDTO</a></td>
+        <td><span class="parametername">eventDTO</span></td>
+        <td><p>The EventDTO to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.EventDTO.html">EventDTO</a></td>
+        <td><p>A new EventDTO instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when eventDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_EventExtensions_DeepClone_KalshiBotData_Models_Event_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.EventExtensions.DeepClone(KalshiBotData.Models.Event)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L185">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_EventExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.EventExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_EventExtensions_DeepClone_KalshiBotData_Models_Event_" data-uid="KalshiBotData.Extensions.EventExtensions.DeepClone(KalshiBotData.Models.Event)">DeepClone(Event)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of an Event model to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Event DeepClone(this Event eventModel)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.Event.html">Event</a></td>
+        <td><span class="parametername">eventModel</span></td>
+        <td><p>The Event model to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.Event.html">Event</a></td>
+        <td><p>A new Event instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when eventModel is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_EventExtensions_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.EventExtensions.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L23">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_EventExtensions_GetPerformanceMetrics_" data-uid="KalshiBotData.Extensions.EventExtensions.GetPerformanceMetrics*"></a>
+  <h4 id="KalshiBotData_Extensions_EventExtensions_GetPerformanceMetrics" data-uid="KalshiBotData.Extensions.EventExtensions.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets the performance metrics for transformation operations</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyDictionary&lt;string, List&lt;TimeSpan&gt;&gt; GetPerformanceMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_EventExtensions_ToEvent_BacklashDTOs_Data_EventDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.EventExtensions.ToEvent(BacklashDTOs.Data.EventDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L45">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L72">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_EventExtensions_ToEvent_" data-uid="KalshiBotData.Extensions.EventExtensions.ToEvent*"></a>
   <h4 id="KalshiBotData_Extensions_EventExtensions_ToEvent_BacklashDTOs_Data_EventDTO_" data-uid="KalshiBotData.Extensions.EventExtensions.ToEvent(BacklashDTOs.Data.EventDTO)">ToEvent(EventDTO)</h4>
@@ -173,12 +337,28 @@ creating a new Event with all properties mapped from the DTO.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when eventDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_EventExtensions_ToEventDTO_KalshiBotData_Models_Event_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.EventExtensions.ToEventDTO(KalshiBotData.Models.Event)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L34">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_EventExtensions_ToEventDTO_" data-uid="KalshiBotData.Extensions.EventExtensions.ToEventDTO*"></a>
   <h4 id="KalshiBotData_Extensions_EventExtensions_ToEventDTO_KalshiBotData_Models_Event_" data-uid="KalshiBotData.Extensions.EventExtensions.ToEventDTO(KalshiBotData.Models.Event)">ToEventDTO(Event)</h4>
@@ -224,17 +404,166 @@ including optional series data if the event has an associated series.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when eventModel is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_EventExtensions_ToEventDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_Event__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.EventExtensions.ToEventDTOs(System.Collections.Generic.IEnumerable%7BKalshiBotData.Models.Event%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L143">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_EventExtensions_ToEventDTOs_" data-uid="KalshiBotData.Extensions.EventExtensions.ToEventDTOs*"></a>
+  <h4 id="KalshiBotData_Extensions_EventExtensions_ToEventDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_Event__" data-uid="KalshiBotData.Extensions.EventExtensions.ToEventDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Event})">ToEventDTOs(IEnumerable&lt;Event&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of Event models to their corresponding DTO representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;EventDTO&gt; ToEventDTOs(this IEnumerable&lt;Event&gt; events)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="KalshiBotData.Models.Event.html">Event</a>&gt;</td>
+        <td><span class="parametername">events</span></td>
+        <td><p>The collection of Event models to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.Data.EventDTO.html">EventDTO</a>&gt;</td>
+        <td><p>A list of EventDTOs with all properties mapped from the models.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when events is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_EventExtensions_ToEvents_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_EventDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.EventExtensions.ToEvents(System.Collections.Generic.IEnumerable%7BBacklashDTOs.Data.EventDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L164">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_EventExtensions_ToEvents_" data-uid="KalshiBotData.Extensions.EventExtensions.ToEvents*"></a>
+  <h4 id="KalshiBotData_Extensions_EventExtensions_ToEvents_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_EventDTO__" data-uid="KalshiBotData.Extensions.EventExtensions.ToEvents(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.EventDTO})">ToEvents(IEnumerable&lt;EventDTO&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of EventDTOs to their corresponding model representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;Event&gt; ToEvents(this IEnumerable&lt;EventDTO&gt; eventDTOs)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BacklashDTOs.Data.EventDTO.html">EventDTO</a>&gt;</td>
+        <td><span class="parametername">eventDTOs</span></td>
+        <td><p>The collection of EventDTOs to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="KalshiBotData.Models.Event.html">Event</a>&gt;</td>
+        <td><p>A list of Event models with all properties mapped from the DTOs.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when eventDTOs is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_EventExtensions_UpdateEvent_KalshiBotData_Models_Event_BacklashDTOs_Data_EventDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.EventExtensions.UpdateEvent(KalshiBotData.Models.Event%2CBacklashDTOs.Data.EventDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L69">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L108">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_EventExtensions_UpdateEvent_" data-uid="KalshiBotData.Extensions.EventExtensions.UpdateEvent*"></a>
   <h4 id="KalshiBotData_Extensions_EventExtensions_UpdateEvent_KalshiBotData_Models_Event_BacklashDTOs_Data_EventDTO_" data-uid="KalshiBotData.Extensions.EventExtensions.UpdateEvent(KalshiBotData.Models.Event,BacklashDTOs.Data.EventDTO)">UpdateEvent(Event, EventDTO)</h4>
   <div class="markdown level1 summary"><p>Updates an existing Event model with data from an EventDTO,
-validating event ticker match before applying changes and updating the modification timestamp.</p>
+validating event ticker match before applying changes and updating the modification timestamp.
+Only updates mutable fields; CreatedDate is preserved from the original model.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -291,7 +620,12 @@ validating event ticker match before applying changes and updating the modificat
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">Exception</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when eventModel or eventDTO is null.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
         <td><p>Thrown when event tickers do not match.</p>
 </td>
       </tr>
@@ -309,7 +643,7 @@ validating event ticker match before applying changes and updating the modificat
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_EventExtensions.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.EventExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L10" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/EventExtensions.cs/#L16" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

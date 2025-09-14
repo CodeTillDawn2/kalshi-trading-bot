@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class MarketWatchExtensions | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Provides extension methods for converting between MarketWatch model and MarketWatchDTO, supporting market monitoring and interest scoring data transfer operations.">
+    <meta name="description" content="Provides extension methods for converting between MarketWatch model and MarketWatchDTO, supporting market monitoring and interest scoring data transfer operations. Includes performance metrics collection and batch transformation capabilities.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -82,7 +82,8 @@
 
   <h1 id="KalshiBotData_Extensions_MarketWatchExtensions" data-uid="KalshiBotData.Extensions.MarketWatchExtensions" class="text-break">Class MarketWatchExtensions</h1>
   <div class="markdown level0 summary"><p>Provides extension methods for converting between MarketWatch model and MarketWatchDTO,
-supporting market monitoring and interest scoring data transfer operations.</p>
+supporting market monitoring and interest scoring data transfer operations.
+Includes performance metrics collection and batch transformation capabilities.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -124,10 +125,173 @@ supporting market monitoring and interest scoring data transfer operations.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_MarketWatchExtensions_DeepClone_BacklashDTOs_Data_MarketWatchDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.MarketWatchExtensions.DeepClone(BacklashDTOs.Data.MarketWatchDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L192">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_MarketWatchExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_MarketWatchExtensions_DeepClone_BacklashDTOs_Data_MarketWatchDTO_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.DeepClone(BacklashDTOs.Data.MarketWatchDTO)">DeepClone(MarketWatchDTO)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of a MarketWatchDTO to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static MarketWatchDTO DeepClone(this MarketWatchDTO marketWatchDTO)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.MarketWatchDTO.html">MarketWatchDTO</a></td>
+        <td><span class="parametername">marketWatchDTO</span></td>
+        <td><p>The MarketWatchDTO to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.MarketWatchDTO.html">MarketWatchDTO</a></td>
+        <td><p>A new MarketWatchDTO instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when marketWatchDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_MarketWatchExtensions_DeepClone_KalshiBotData_Models_MarketWatch_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.MarketWatchExtensions.DeepClone(KalshiBotData.Models.MarketWatch)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L170">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_MarketWatchExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_MarketWatchExtensions_DeepClone_KalshiBotData_Models_MarketWatch_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.DeepClone(KalshiBotData.Models.MarketWatch)">DeepClone(MarketWatch)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of a MarketWatch model to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static MarketWatch DeepClone(this MarketWatch marketWatch)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.MarketWatch.html">MarketWatch</a></td>
+        <td><span class="parametername">marketWatch</span></td>
+        <td><p>The MarketWatch model to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.MarketWatch.html">MarketWatch</a></td>
+        <td><p>A new MarketWatch instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when marketWatch is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_MarketWatchExtensions_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.MarketWatchExtensions.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L23">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_MarketWatchExtensions_GetPerformanceMetrics_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.GetPerformanceMetrics*"></a>
+  <h4 id="KalshiBotData_Extensions_MarketWatchExtensions_GetPerformanceMetrics" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets the performance metrics for transformation operations</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyDictionary&lt;string, List&lt;TimeSpan&gt;&gt; GetPerformanceMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatch_BacklashDTOs_Data_MarketWatchDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatch(BacklashDTOs.Data.MarketWatchDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L37">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L64">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatch_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatch*"></a>
   <h4 id="KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatch_BacklashDTOs_Data_MarketWatchDTO_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatch(BacklashDTOs.Data.MarketWatchDTO)">ToMarketWatch(MarketWatchDTO)</h4>
@@ -173,12 +337,28 @@ creating a new MarketWatch with all properties mapped from the DTO.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when marketWatchDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatchDTO_KalshiBotData_Models_MarketWatch_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTO(KalshiBotData.Models.MarketWatch)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L34">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatchDTO_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTO*"></a>
   <h4 id="KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatchDTO_KalshiBotData_Models_MarketWatch_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTO(KalshiBotData.Models.MarketWatch)">ToMarketWatchDTO(MarketWatch)</h4>
@@ -224,12 +404,160 @@ mapping all market watch properties for data transfer.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when marketWatch is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatchDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_MarketWatch__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTOs(System.Collections.Generic.IEnumerable%7BKalshiBotData.Models.MarketWatch%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L128">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatchDTOs_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTOs*"></a>
+  <h4 id="KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatchDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_MarketWatch__" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.MarketWatch})">ToMarketWatchDTOs(IEnumerable&lt;MarketWatch&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of MarketWatch models to their corresponding DTO representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;MarketWatchDTO&gt; ToMarketWatchDTOs(this IEnumerable&lt;MarketWatch&gt; marketWatches)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="KalshiBotData.Models.MarketWatch.html">MarketWatch</a>&gt;</td>
+        <td><span class="parametername">marketWatches</span></td>
+        <td><p>The collection of MarketWatch models to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.Data.MarketWatchDTO.html">MarketWatchDTO</a>&gt;</td>
+        <td><p>A list of MarketWatchDTOs with all properties mapped from the models.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when marketWatches is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatches_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_MarketWatchDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatches(System.Collections.Generic.IEnumerable%7BBacklashDTOs.Data.MarketWatchDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L149">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatches_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatches*"></a>
+  <h4 id="KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatches_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_MarketWatchDTO__" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatches(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.MarketWatchDTO})">ToMarketWatches(IEnumerable&lt;MarketWatchDTO&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of MarketWatchDTOs to their corresponding model representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;MarketWatch&gt; ToMarketWatches(this IEnumerable&lt;MarketWatchDTO&gt; marketWatchDTOs)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BacklashDTOs.Data.MarketWatchDTO.html">MarketWatchDTO</a>&gt;</td>
+        <td><span class="parametername">marketWatchDTOs</span></td>
+        <td><p>The collection of MarketWatchDTOs to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="KalshiBotData.Models.MarketWatch.html">MarketWatch</a>&gt;</td>
+        <td><p>A list of MarketWatch models with all properties mapped from the DTOs.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when marketWatchDTOs is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_MarketWatchExtensions_UpdateMarketWatch_KalshiBotData_Models_MarketWatch_BacklashDTOs_Data_MarketWatchDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.MarketWatchExtensions.UpdateMarketWatch(KalshiBotData.Models.MarketWatch%2CBacklashDTOs.Data.MarketWatchDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L58">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L96">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_MarketWatchExtensions_UpdateMarketWatch_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.UpdateMarketWatch*"></a>
   <h4 id="KalshiBotData_Extensions_MarketWatchExtensions_UpdateMarketWatch_KalshiBotData_Models_MarketWatch_BacklashDTOs_Data_MarketWatchDTO_" data-uid="KalshiBotData.Extensions.MarketWatchExtensions.UpdateMarketWatch(KalshiBotData.Models.MarketWatch,BacklashDTOs.Data.MarketWatchDTO)">UpdateMarketWatch(MarketWatch, MarketWatchDTO)</h4>
@@ -291,7 +619,12 @@ validating market ticker match before applying selective property updates.</p>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">Exception</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when marketWatch or marketWatchDTO is null.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
         <td><p>Thrown when market tickers do not match.</p>
 </td>
       </tr>
@@ -309,7 +642,7 @@ validating market ticker match before applying selective property updates.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_MarketWatchExtensions.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.MarketWatchExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L10" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/MarketWatchExtensions.cs/#L16" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

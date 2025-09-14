@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class WeightSetMarketExtensions | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Provides extension methods for converting between WeightSetMarket model and WeightSetMarketDTO, supporting market-specific performance tracking within weight set configurations.">
+    <meta name="description" content="Provides extension methods for converting between WeightSetMarket model and WeightSetMarketDTO, supporting market-specific performance tracking within weight set configurations. Includes performance metrics collection and batch transformation capabilities.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -82,7 +82,8 @@
 
   <h1 id="KalshiBotData_Extensions_WeightSetMarketExtensions" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions" class="text-break">Class WeightSetMarketExtensions</h1>
   <div class="markdown level0 summary"><p>Provides extension methods for converting between WeightSetMarket model and WeightSetMarketDTO,
-supporting market-specific performance tracking within weight set configurations.</p>
+supporting market-specific performance tracking within weight set configurations.
+Includes performance metrics collection and batch transformation capabilities.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -124,10 +125,173 @@ supporting market-specific performance tracking within weight set configurations
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_WeightSetMarketExtensions_DeepClone_BacklashDTOs_Data_WeightSetMarketDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone(BacklashDTOs.Data.WeightSetMarketDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L177">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_WeightSetMarketExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_WeightSetMarketExtensions_DeepClone_BacklashDTOs_Data_WeightSetMarketDTO_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone(BacklashDTOs.Data.WeightSetMarketDTO)">DeepClone(WeightSetMarketDTO)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of a WeightSetMarketDTO to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WeightSetMarketDTO DeepClone(this WeightSetMarketDTO weightSetMarketDTO)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.WeightSetMarketDTO.html">WeightSetMarketDTO</a></td>
+        <td><span class="parametername">weightSetMarketDTO</span></td>
+        <td><p>The WeightSetMarketDTO to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.WeightSetMarketDTO.html">WeightSetMarketDTO</a></td>
+        <td><p>A new WeightSetMarketDTO instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when weightSetMarketDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_WeightSetMarketExtensions_DeepClone_KalshiBotData_Models_WeightSetMarket_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone(KalshiBotData.Models.WeightSetMarket)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L157">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_WeightSetMarketExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_WeightSetMarketExtensions_DeepClone_KalshiBotData_Models_WeightSetMarket_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone(KalshiBotData.Models.WeightSetMarket)">DeepClone(WeightSetMarket)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of a WeightSetMarket model to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static WeightSetMarket DeepClone(this WeightSetMarket market)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.WeightSetMarket.html">WeightSetMarket</a></td>
+        <td><span class="parametername">market</span></td>
+        <td><p>The WeightSetMarket model to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.WeightSetMarket.html">WeightSetMarket</a></td>
+        <td><p>A new WeightSetMarket instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when market is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_WeightSetMarketExtensions_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.WeightSetMarketExtensions.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L23">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_WeightSetMarketExtensions_GetPerformanceMetrics_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.GetPerformanceMetrics*"></a>
+  <h4 id="KalshiBotData_Extensions_WeightSetMarketExtensions_GetPerformanceMetrics" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets the performance metrics for transformation operations</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyDictionary&lt;string, List&lt;TimeSpan&gt;&gt; GetPerformanceMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarket_BacklashDTOs_Data_WeightSetMarketDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarket(BacklashDTOs.Data.WeightSetMarketDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L35">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L62">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarket_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarket*"></a>
   <h4 id="KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarket_BacklashDTOs_Data_WeightSetMarketDTO_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarket(BacklashDTOs.Data.WeightSetMarketDTO)">ToWeightSetMarket(WeightSetMarketDTO)</h4>
@@ -173,12 +337,28 @@ creating a new WeightSetMarket with all properties mapped from the DTO.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when weightSetMarketDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarketDTO_KalshiBotData_Models_WeightSetMarket_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTO(KalshiBotData.Models.WeightSetMarket)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L34">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarketDTO_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTO*"></a>
   <h4 id="KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarketDTO_KalshiBotData_Models_WeightSetMarket_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTO(KalshiBotData.Models.WeightSetMarket)">ToWeightSetMarketDTO(WeightSetMarket)</h4>
@@ -224,12 +404,160 @@ mapping all market-specific weight set properties for data transfer.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when market is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarketDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_WeightSetMarket__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTOs(System.Collections.Generic.IEnumerable%7BKalshiBotData.Models.WeightSetMarket%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L115">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarketDTOs_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTOs*"></a>
+  <h4 id="KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarketDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_WeightSetMarket__" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.WeightSetMarket})">ToWeightSetMarketDTOs(IEnumerable&lt;WeightSetMarket&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of WeightSetMarket models to their corresponding DTO representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;WeightSetMarketDTO&gt; ToWeightSetMarketDTOs(this IEnumerable&lt;WeightSetMarket&gt; markets)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="KalshiBotData.Models.WeightSetMarket.html">WeightSetMarket</a>&gt;</td>
+        <td><span class="parametername">markets</span></td>
+        <td><p>The collection of WeightSetMarket models to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.Data.WeightSetMarketDTO.html">WeightSetMarketDTO</a>&gt;</td>
+        <td><p>A list of WeightSetMarketDTOs with all properties mapped from the models.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when markets is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarkets_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_WeightSetMarketDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarkets(System.Collections.Generic.IEnumerable%7BBacklashDTOs.Data.WeightSetMarketDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L136">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarkets_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarkets*"></a>
+  <h4 id="KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarkets_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_WeightSetMarketDTO__" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarkets(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.WeightSetMarketDTO})">ToWeightSetMarkets(IEnumerable&lt;WeightSetMarketDTO&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of WeightSetMarketDTOs to their corresponding model representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;WeightSetMarket&gt; ToWeightSetMarkets(this IEnumerable&lt;WeightSetMarketDTO&gt; weightSetMarketDTOs)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BacklashDTOs.Data.WeightSetMarketDTO.html">WeightSetMarketDTO</a>&gt;</td>
+        <td><span class="parametername">weightSetMarketDTOs</span></td>
+        <td><p>The collection of WeightSetMarketDTOs to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="KalshiBotData.Models.WeightSetMarket.html">WeightSetMarket</a>&gt;</td>
+        <td><p>A list of WeightSetMarket models with all properties mapped from the DTOs.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when weightSetMarketDTOs is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_WeightSetMarketExtensions_UpdateWeightSetMarket_KalshiBotData_Models_WeightSetMarket_BacklashDTOs_Data_WeightSetMarketDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.WeightSetMarketExtensions.UpdateWeightSetMarket(KalshiBotData.Models.WeightSetMarket%2CBacklashDTOs.Data.WeightSetMarketDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L53">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L91">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_WeightSetMarketExtensions_UpdateWeightSetMarket_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.UpdateWeightSetMarket*"></a>
   <h4 id="KalshiBotData_Extensions_WeightSetMarketExtensions_UpdateWeightSetMarket_KalshiBotData_Models_WeightSetMarket_BacklashDTOs_Data_WeightSetMarketDTO_" data-uid="KalshiBotData.Extensions.WeightSetMarketExtensions.UpdateWeightSetMarket(KalshiBotData.Models.WeightSetMarket,BacklashDTOs.Data.WeightSetMarketDTO)">UpdateWeightSetMarket(WeightSetMarket, WeightSetMarketDTO)</h4>
@@ -281,6 +609,22 @@ applying performance and timing updates for market tracking.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when market or weightSetMarketDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
 
 </article>
           </div>
@@ -293,7 +637,7 @@ applying performance and timing updates for market tracking.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_WeightSetMarketExtensions.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.WeightSetMarketExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L10" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/WeightSetMarketExtensions.cs/#L16" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

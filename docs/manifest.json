@@ -3662,7 +3662,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.AnnouncementExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.AnnouncementExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Announcement model and AnnouncementDTO,\nenabling seamless data transfer between the database layer and external interfaces.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.AnnouncementExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Announcement model and AnnouncementDTO,\nenabling seamless data transfer between the database layer and external interfaces.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3676,7 +3676,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.BrainInstanceExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.BrainInstanceExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between BrainInstance model and BrainInstanceDTO,\nfacilitating data transfer for brain instance management and monitoring operations.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.BrainInstanceExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between BrainInstance model and BrainInstanceDTO,\nfacilitating data transfer for brain instance management and monitoring operations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3690,7 +3690,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.CandlestickExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.CandlestickExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Candlestick model and CandlestickDTO,\nsupporting market data analysis and historical price information transfer.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.CandlestickExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Candlestick model and CandlestickDTO,\nsupporting market data analysis and historical price information transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3704,7 +3704,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.EventExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.EventExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Event model and EventDTO,\nhandling event data transfer including associated series information.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.EventExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Event model and EventDTO,\nhandling event data transfer including associated series information.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3718,7 +3718,21 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.ExchangeScheduleExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.ExchangeScheduleExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between ExchangeSchedule model and ExchangeScheduleDTO,\nincluding nested maintenance windows and standard hours collections for comprehensive schedule data transfer.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.ExchangeScheduleExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between ExchangeSchedule model and ExchangeScheduleDTO,\nincluding nested maintenance windows and standard hours collections for comprehensive schedule data transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotData.Extensions.ExtensionConfiguration.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotData.Extensions.ExtensionConfiguration.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotData.Extensions.ExtensionConfiguration",
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.ExtensionConfiguration.yml\" sourcestartlinenumber=\"1\">Configuration class for extension methods, providing customizable options\nfor timestamp handling and other extension behaviors.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3732,7 +3746,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.LogEntryExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.LogEntryExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between LogEntry models and DTOs,\nsupporting both standard log entries and overseer-specific log entry variants for comprehensive logging data transfer.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.LogEntryExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between LogEntry models and DTOs,\nsupporting both standard log entries and overseer-specific log entry variants for comprehensive logging data transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3746,7 +3760,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.MaintenanceWindowExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MaintenanceWindowExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between MaintenanceWindow model and MaintenanceWindowDTO,\nsupporting exchange maintenance schedule data transfer operations.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MaintenanceWindowExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between MaintenanceWindow model and MaintenanceWindowDTO,\nsupporting exchange maintenance schedule data transfer operations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3760,7 +3774,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.MarketExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MarketExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Market model and MarketDTO,\nsupporting comprehensive market data transfer including trading information and associated events.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MarketExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Market model and MarketDTO,\nsupporting comprehensive market data transfer including trading information and associated events.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3774,7 +3788,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.MarketPositionExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MarketPositionExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between MarketPosition model and MarketPositionDTO,\nsupporting trading position data transfer and portfolio management operations.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MarketPositionExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between MarketPosition model and MarketPositionDTO,\nsupporting trading position data transfer and portfolio management operations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3788,7 +3802,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.MarketWatchExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MarketWatchExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between MarketWatch model and MarketWatchDTO,\nsupporting market monitoring and interest scoring data transfer operations.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MarketWatchExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between MarketWatch model and MarketWatchDTO,\nsupporting market monitoring and interest scoring data transfer operations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3802,7 +3816,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.OrderExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.OrderExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Order model and OrderDTO,\nsupporting comprehensive order management and trading operation data transfer.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.OrderExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Order model and OrderDTO,\nsupporting comprehensive order management and trading operation data transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3816,7 +3830,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.SeriesExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SeriesExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Series model and SeriesDTO,\nincluding nested tags and settlement sources for comprehensive series data transfer.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SeriesExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Series model and SeriesDTO,\nincluding nested tags and settlement sources for comprehensive series data transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3830,7 +3844,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.SeriesSettlementSourceExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SeriesSettlementSource model and SeriesSettlementSourceDTO,\nsupporting settlement source data transfer for series validation and reference.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SeriesSettlementSource model and SeriesSettlementSourceDTO,\nsupporting settlement source data transfer for series validation and reference.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3844,7 +3858,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.SeriesTagExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SeriesTagExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SeriesTag model and SeriesTagDTO,\nsupporting series categorization and tagging data transfer operations.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SeriesTagExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SeriesTag model and SeriesTagDTO,\nsupporting series categorization and tagging data transfer operations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3858,7 +3872,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.SnapshotExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SnapshotExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Snapshot model and SnapshotDTO,\nsupporting market snapshot data transfer for analysis and historical record keeping.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SnapshotExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Snapshot model and SnapshotDTO,\nsupporting market snapshot data transfer for analysis and historical record keeping.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3872,7 +3886,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.SnapshotGroupExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SnapshotGroupExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SnapshotGroup model and SnapshotGroupDTO,\nsupporting grouped snapshot data transfer for market analysis over time periods.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SnapshotGroupExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SnapshotGroup model and SnapshotGroupDTO,\nsupporting grouped snapshot data transfer for market analysis over time periods.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3886,7 +3900,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.SnapshotSchemaExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SnapshotSchemaExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SnapshotSchema model and SnapshotSchemaDTO,\nsupporting schema versioning and definition data transfer for snapshot validation.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SnapshotSchemaExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SnapshotSchema model and SnapshotSchemaDTO,\nsupporting schema versioning and definition data transfer for snapshot validation.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3900,7 +3914,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.StandardHoursExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.StandardHoursExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between StandardHours model and StandardHoursDTO,\nincluding nested sessions collection for comprehensive exchange hours data transfer.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.StandardHoursExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between StandardHours model and StandardHoursDTO,\nincluding nested sessions collection for comprehensive exchange hours data transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3914,7 +3928,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.StandardHoursSessionExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.StandardHoursSessionExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between StandardHoursSession model and StandardHoursSessionDTO,\nsupporting individual session data transfer within exchange standard hours.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.StandardHoursSessionExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between StandardHoursSession model and StandardHoursSessionDTO,\nsupporting individual session data transfer within exchange standard hours.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3928,7 +3942,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.TickerExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.TickerExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Ticker model and TickerDTO,\nsupporting real-time market ticker data transfer and price information updates.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.TickerExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Ticker model and TickerDTO,\nsupporting real-time market ticker data transfer and price information updates.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3942,7 +3956,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.WeightSetExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.WeightSetExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between WeightSet model and WeightSetDTO,\nsupporting trading strategy weight configuration data transfer and management.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.WeightSetExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between WeightSet model and WeightSetDTO,\nsupporting trading strategy weight configuration data transfer and management.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3956,7 +3970,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotData.Extensions.WeightSetMarketExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.WeightSetMarketExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between WeightSetMarket model and WeightSetMarketDTO,\nsupporting market-specific performance tracking within weight set configurations.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.WeightSetMarketExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between WeightSetMarket model and WeightSetMarketDTO,\nsupporting market-specific performance tracking within weight set configurations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5860,7 +5874,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.yml\" sourcestartlinenumber=\"1\">Represents a trading strategy with its name and factory method</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.yml\" sourcestartlinenumber=\"1\">Represents a trading strategy with its name and async factory method</p>\n"
     },
     {
       "type": "ManagedReference",

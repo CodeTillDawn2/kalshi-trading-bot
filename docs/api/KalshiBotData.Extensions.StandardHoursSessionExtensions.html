@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class StandardHoursSessionExtensions | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Provides extension methods for converting between StandardHoursSession model and StandardHoursSessionDTO, supporting individual session data transfer within exchange standard hours.">
+    <meta name="description" content="Provides extension methods for converting between StandardHoursSession model and StandardHoursSessionDTO, supporting individual session data transfer within exchange standard hours. Includes performance metrics collection and batch transformation capabilities.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -82,7 +82,8 @@
 
   <h1 id="KalshiBotData_Extensions_StandardHoursSessionExtensions" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions" class="text-break">Class StandardHoursSessionExtensions</h1>
   <div class="markdown level0 summary"><p>Provides extension methods for converting between StandardHoursSession model and StandardHoursSessionDTO,
-supporting individual session data transfer within exchange standard hours.</p>
+supporting individual session data transfer within exchange standard hours.
+Includes performance metrics collection and batch transformation capabilities.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -124,10 +125,173 @@ supporting individual session data transfer within exchange standard hours.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_StandardHoursSessionExtensions_DeepClone_BacklashDTOs_Data_StandardHoursSessionDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone(BacklashDTOs.Data.StandardHoursSessionDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L196">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_StandardHoursSessionExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_StandardHoursSessionExtensions_DeepClone_BacklashDTOs_Data_StandardHoursSessionDTO_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone(BacklashDTOs.Data.StandardHoursSessionDTO)">DeepClone(StandardHoursSessionDTO)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of a StandardHoursSessionDTO to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static StandardHoursSessionDTO DeepClone(this StandardHoursSessionDTO standardHoursSessionDTO)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.StandardHoursSessionDTO.html">StandardHoursSessionDTO</a></td>
+        <td><span class="parametername">standardHoursSessionDTO</span></td>
+        <td><p>The StandardHoursSessionDTO to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.StandardHoursSessionDTO.html">StandardHoursSessionDTO</a></td>
+        <td><p>A new StandardHoursSessionDTO instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when standardHoursSessionDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_StandardHoursSessionExtensions_DeepClone_KalshiBotData_Models_StandardHoursSession_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone(KalshiBotData.Models.StandardHoursSession)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L173">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_StandardHoursSessionExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_StandardHoursSessionExtensions_DeepClone_KalshiBotData_Models_StandardHoursSession_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone(KalshiBotData.Models.StandardHoursSession)">DeepClone(StandardHoursSession)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of a StandardHoursSession model to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static StandardHoursSession DeepClone(this StandardHoursSession standardHoursSession)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.StandardHoursSession.html">StandardHoursSession</a></td>
+        <td><span class="parametername">standardHoursSession</span></td>
+        <td><p>The StandardHoursSession model to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.StandardHoursSession.html">StandardHoursSession</a></td>
+        <td><p>A new StandardHoursSession instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when standardHoursSession is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_StandardHoursSessionExtensions_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.StandardHoursSessionExtensions.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L23">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_StandardHoursSessionExtensions_GetPerformanceMetrics_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.GetPerformanceMetrics*"></a>
+  <h4 id="KalshiBotData_Extensions_StandardHoursSessionExtensions_GetPerformanceMetrics" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets the performance metrics for transformation operations</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyDictionary&lt;string, List&lt;TimeSpan&gt;&gt; GetPerformanceMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSession_BacklashDTOs_Data_StandardHoursSessionDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSession(BacklashDTOs.Data.StandardHoursSessionDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L38">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L65">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSession_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSession*"></a>
   <h4 id="KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSession_BacklashDTOs_Data_StandardHoursSessionDTO_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSession(BacklashDTOs.Data.StandardHoursSessionDTO)">ToStandardHoursSession(StandardHoursSessionDTO)</h4>
@@ -173,12 +337,28 @@ creating a new StandardHoursSession with all properties mapped from the DTO.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when standardHoursSessionDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessionDTO_KalshiBotData_Models_StandardHoursSession_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTO(KalshiBotData.Models.StandardHoursSession)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L34">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessionDTO_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTO*"></a>
   <h4 id="KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessionDTO_KalshiBotData_Models_StandardHoursSession_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTO(KalshiBotData.Models.StandardHoursSession)">ToStandardHoursSessionDTO(StandardHoursSession)</h4>
@@ -224,12 +404,160 @@ mapping all session properties for data transfer.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when standardHoursSessionModel is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessionDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_StandardHoursSession__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTOs(System.Collections.Generic.IEnumerable%7BKalshiBotData.Models.StandardHoursSession%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L131">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessionDTOs_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTOs*"></a>
+  <h4 id="KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessionDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_StandardHoursSession__" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.StandardHoursSession})">ToStandardHoursSessionDTOs(IEnumerable&lt;StandardHoursSession&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of StandardHoursSession models to their corresponding DTO representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;StandardHoursSessionDTO&gt; ToStandardHoursSessionDTOs(this IEnumerable&lt;StandardHoursSession&gt; standardHoursSessions)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="KalshiBotData.Models.StandardHoursSession.html">StandardHoursSession</a>&gt;</td>
+        <td><span class="parametername">standardHoursSessions</span></td>
+        <td><p>The collection of StandardHoursSession models to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.Data.StandardHoursSessionDTO.html">StandardHoursSessionDTO</a>&gt;</td>
+        <td><p>A list of StandardHoursSessionDTOs with all properties mapped from the models.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when standardHoursSessions is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessions_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_StandardHoursSessionDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessions(System.Collections.Generic.IEnumerable%7BBacklashDTOs.Data.StandardHoursSessionDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L152">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessions_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessions*"></a>
+  <h4 id="KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessions_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_StandardHoursSessionDTO__" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessions(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.StandardHoursSessionDTO})">ToStandardHoursSessions(IEnumerable&lt;StandardHoursSessionDTO&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of StandardHoursSessionDTOs to their corresponding model representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;StandardHoursSession&gt; ToStandardHoursSessions(this IEnumerable&lt;StandardHoursSessionDTO&gt; standardHoursSessionDTOs)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BacklashDTOs.Data.StandardHoursSessionDTO.html">StandardHoursSessionDTO</a>&gt;</td>
+        <td><span class="parametername">standardHoursSessionDTOs</span></td>
+        <td><p>The collection of StandardHoursSessionDTOs to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="KalshiBotData.Models.StandardHoursSession.html">StandardHoursSession</a>&gt;</td>
+        <td><p>A list of StandardHoursSession models with all properties mapped from the DTOs.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when standardHoursSessionDTOs is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_StandardHoursSessionExtensions_UpdateStandardHoursSession_KalshiBotData_Models_StandardHoursSession_BacklashDTOs_Data_StandardHoursSessionDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.StandardHoursSessionExtensions.UpdateStandardHoursSession(KalshiBotData.Models.StandardHoursSession%2CBacklashDTOs.Data.StandardHoursSessionDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L60">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L98">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_StandardHoursSessionExtensions_UpdateStandardHoursSession_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.UpdateStandardHoursSession*"></a>
   <h4 id="KalshiBotData_Extensions_StandardHoursSessionExtensions_UpdateStandardHoursSession_KalshiBotData_Models_StandardHoursSession_BacklashDTOs_Data_StandardHoursSessionDTO_" data-uid="KalshiBotData.Extensions.StandardHoursSessionExtensions.UpdateStandardHoursSession(KalshiBotData.Models.StandardHoursSession,BacklashDTOs.Data.StandardHoursSessionDTO)">UpdateStandardHoursSession(StandardHoursSession, StandardHoursSessionDTO)</h4>
@@ -291,7 +619,12 @@ validating session ID match before applying changes and updating the modificatio
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">Exception</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when standardHoursSessionModel or standardHoursSessionDTO is null.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
         <td><p>Thrown when session IDs do not match.</p>
 </td>
       </tr>
@@ -309,7 +642,7 @@ validating session ID match before applying changes and updating the modificatio
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_StandardHoursSessionExtensions.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.StandardHoursSessionExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L10" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/StandardHoursSessionExtensions.cs/#L16" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

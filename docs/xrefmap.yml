@@ -34507,6 +34507,38 @@ references:
   commentId: T:KalshiBotData.Extensions.AnnouncementExtensions
   fullName: KalshiBotData.Extensions.AnnouncementExtensions
   nameWithType: AnnouncementExtensions
+- uid: KalshiBotData.Extensions.AnnouncementExtensions.DeepClone(BacklashDTOs.Data.AnnouncementDTO)
+  name: DeepClone(AnnouncementDTO)
+  href: api/KalshiBotData.Extensions.AnnouncementExtensions.html#KalshiBotData_Extensions_AnnouncementExtensions_DeepClone_BacklashDTOs_Data_AnnouncementDTO_
+  commentId: M:KalshiBotData.Extensions.AnnouncementExtensions.DeepClone(BacklashDTOs.Data.AnnouncementDTO)
+  fullName: KalshiBotData.Extensions.AnnouncementExtensions.DeepClone(BacklashDTOs.Data.AnnouncementDTO)
+  nameWithType: AnnouncementExtensions.DeepClone(AnnouncementDTO)
+- uid: KalshiBotData.Extensions.AnnouncementExtensions.DeepClone(KalshiBotData.Models.Announcement)
+  name: DeepClone(Announcement)
+  href: api/KalshiBotData.Extensions.AnnouncementExtensions.html#KalshiBotData_Extensions_AnnouncementExtensions_DeepClone_KalshiBotData_Models_Announcement_
+  commentId: M:KalshiBotData.Extensions.AnnouncementExtensions.DeepClone(KalshiBotData.Models.Announcement)
+  fullName: KalshiBotData.Extensions.AnnouncementExtensions.DeepClone(KalshiBotData.Models.Announcement)
+  nameWithType: AnnouncementExtensions.DeepClone(Announcement)
+- uid: KalshiBotData.Extensions.AnnouncementExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.AnnouncementExtensions.html#KalshiBotData_Extensions_AnnouncementExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.AnnouncementExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.AnnouncementExtensions.DeepClone
+  nameWithType: AnnouncementExtensions.DeepClone
+- uid: KalshiBotData.Extensions.AnnouncementExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.AnnouncementExtensions.html#KalshiBotData_Extensions_AnnouncementExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.AnnouncementExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.AnnouncementExtensions.GetPerformanceMetrics()
+  nameWithType: AnnouncementExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.AnnouncementExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.AnnouncementExtensions.html#KalshiBotData_Extensions_AnnouncementExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.AnnouncementExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.AnnouncementExtensions.GetPerformanceMetrics
+  nameWithType: AnnouncementExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncement(BacklashDTOs.Data.AnnouncementDTO)
   name: ToAnnouncement(AnnouncementDTO)
   href: api/KalshiBotData.Extensions.AnnouncementExtensions.html#KalshiBotData_Extensions_AnnouncementExtensions_ToAnnouncement_BacklashDTOs_Data_AnnouncementDTO_
@@ -34533,6 +34565,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncementDTO
   nameWithType: AnnouncementExtensions.ToAnnouncementDTO
+- uid: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncementDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Announcement})
+  name: ToAnnouncementDTOs(IEnumerable<Announcement>)
+  href: api/KalshiBotData.Extensions.AnnouncementExtensions.html#KalshiBotData_Extensions_AnnouncementExtensions_ToAnnouncementDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_Announcement__
+  commentId: M:KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncementDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Announcement})
+  name.vb: ToAnnouncementDTOs(IEnumerable(Of Announcement))
+  fullName: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncementDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.Announcement>)
+  fullName.vb: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncementDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.Announcement))
+  nameWithType: AnnouncementExtensions.ToAnnouncementDTOs(IEnumerable<Announcement>)
+  nameWithType.vb: AnnouncementExtensions.ToAnnouncementDTOs(IEnumerable(Of Announcement))
+- uid: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncementDTOs*
+  name: ToAnnouncementDTOs
+  href: api/KalshiBotData.Extensions.AnnouncementExtensions.html#KalshiBotData_Extensions_AnnouncementExtensions_ToAnnouncementDTOs_
+  commentId: Overload:KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncementDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncementDTOs
+  nameWithType: AnnouncementExtensions.ToAnnouncementDTOs
+- uid: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncements(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.AnnouncementDTO})
+  name: ToAnnouncements(IEnumerable<AnnouncementDTO>)
+  href: api/KalshiBotData.Extensions.AnnouncementExtensions.html#KalshiBotData_Extensions_AnnouncementExtensions_ToAnnouncements_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_AnnouncementDTO__
+  commentId: M:KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncements(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.AnnouncementDTO})
+  name.vb: ToAnnouncements(IEnumerable(Of AnnouncementDTO))
+  fullName: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncements(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.AnnouncementDTO>)
+  fullName.vb: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncements(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.AnnouncementDTO))
+  nameWithType: AnnouncementExtensions.ToAnnouncements(IEnumerable<AnnouncementDTO>)
+  nameWithType.vb: AnnouncementExtensions.ToAnnouncements(IEnumerable(Of AnnouncementDTO))
+- uid: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncements*
+  name: ToAnnouncements
+  href: api/KalshiBotData.Extensions.AnnouncementExtensions.html#KalshiBotData_Extensions_AnnouncementExtensions_ToAnnouncements_
+  commentId: Overload:KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncements
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.AnnouncementExtensions.ToAnnouncements
+  nameWithType: AnnouncementExtensions.ToAnnouncements
 - uid: KalshiBotData.Extensions.AnnouncementExtensions.UpdateAnnouncement(KalshiBotData.Models.Announcement,BacklashDTOs.Data.AnnouncementDTO)
   name: UpdateAnnouncement(Announcement, AnnouncementDTO)
   href: api/KalshiBotData.Extensions.AnnouncementExtensions.html#KalshiBotData_Extensions_AnnouncementExtensions_UpdateAnnouncement_KalshiBotData_Models_Announcement_BacklashDTOs_Data_AnnouncementDTO_
@@ -34552,6 +34616,38 @@ references:
   commentId: T:KalshiBotData.Extensions.BrainInstanceExtensions
   fullName: KalshiBotData.Extensions.BrainInstanceExtensions
   nameWithType: BrainInstanceExtensions
+- uid: KalshiBotData.Extensions.BrainInstanceExtensions.DeepClone(BacklashDTOs.Data.BrainInstanceDTO)
+  name: DeepClone(BrainInstanceDTO)
+  href: api/KalshiBotData.Extensions.BrainInstanceExtensions.html#KalshiBotData_Extensions_BrainInstanceExtensions_DeepClone_BacklashDTOs_Data_BrainInstanceDTO_
+  commentId: M:KalshiBotData.Extensions.BrainInstanceExtensions.DeepClone(BacklashDTOs.Data.BrainInstanceDTO)
+  fullName: KalshiBotData.Extensions.BrainInstanceExtensions.DeepClone(BacklashDTOs.Data.BrainInstanceDTO)
+  nameWithType: BrainInstanceExtensions.DeepClone(BrainInstanceDTO)
+- uid: KalshiBotData.Extensions.BrainInstanceExtensions.DeepClone(KalshiBotData.Models.BrainInstance)
+  name: DeepClone(BrainInstance)
+  href: api/KalshiBotData.Extensions.BrainInstanceExtensions.html#KalshiBotData_Extensions_BrainInstanceExtensions_DeepClone_KalshiBotData_Models_BrainInstance_
+  commentId: M:KalshiBotData.Extensions.BrainInstanceExtensions.DeepClone(KalshiBotData.Models.BrainInstance)
+  fullName: KalshiBotData.Extensions.BrainInstanceExtensions.DeepClone(KalshiBotData.Models.BrainInstance)
+  nameWithType: BrainInstanceExtensions.DeepClone(BrainInstance)
+- uid: KalshiBotData.Extensions.BrainInstanceExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.BrainInstanceExtensions.html#KalshiBotData_Extensions_BrainInstanceExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.BrainInstanceExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.BrainInstanceExtensions.DeepClone
+  nameWithType: BrainInstanceExtensions.DeepClone
+- uid: KalshiBotData.Extensions.BrainInstanceExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.BrainInstanceExtensions.html#KalshiBotData_Extensions_BrainInstanceExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.BrainInstanceExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.BrainInstanceExtensions.GetPerformanceMetrics()
+  nameWithType: BrainInstanceExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.BrainInstanceExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.BrainInstanceExtensions.html#KalshiBotData_Extensions_BrainInstanceExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.BrainInstanceExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.BrainInstanceExtensions.GetPerformanceMetrics
+  nameWithType: BrainInstanceExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstance(BacklashDTOs.Data.BrainInstanceDTO)
   name: ToBrainInstance(BrainInstanceDTO)
   href: api/KalshiBotData.Extensions.BrainInstanceExtensions.html#KalshiBotData_Extensions_BrainInstanceExtensions_ToBrainInstance_BacklashDTOs_Data_BrainInstanceDTO_
@@ -34578,6 +34674,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstanceDTO
   nameWithType: BrainInstanceExtensions.ToBrainInstanceDTO
+- uid: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstanceDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.BrainInstance})
+  name: ToBrainInstanceDTOs(IEnumerable<BrainInstance>)
+  href: api/KalshiBotData.Extensions.BrainInstanceExtensions.html#KalshiBotData_Extensions_BrainInstanceExtensions_ToBrainInstanceDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_BrainInstance__
+  commentId: M:KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstanceDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.BrainInstance})
+  name.vb: ToBrainInstanceDTOs(IEnumerable(Of BrainInstance))
+  fullName: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstanceDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.BrainInstance>)
+  fullName.vb: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstanceDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.BrainInstance))
+  nameWithType: BrainInstanceExtensions.ToBrainInstanceDTOs(IEnumerable<BrainInstance>)
+  nameWithType.vb: BrainInstanceExtensions.ToBrainInstanceDTOs(IEnumerable(Of BrainInstance))
+- uid: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstanceDTOs*
+  name: ToBrainInstanceDTOs
+  href: api/KalshiBotData.Extensions.BrainInstanceExtensions.html#KalshiBotData_Extensions_BrainInstanceExtensions_ToBrainInstanceDTOs_
+  commentId: Overload:KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstanceDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstanceDTOs
+  nameWithType: BrainInstanceExtensions.ToBrainInstanceDTOs
+- uid: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstances(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.BrainInstanceDTO})
+  name: ToBrainInstances(IEnumerable<BrainInstanceDTO>)
+  href: api/KalshiBotData.Extensions.BrainInstanceExtensions.html#KalshiBotData_Extensions_BrainInstanceExtensions_ToBrainInstances_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_BrainInstanceDTO__
+  commentId: M:KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstances(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.BrainInstanceDTO})
+  name.vb: ToBrainInstances(IEnumerable(Of BrainInstanceDTO))
+  fullName: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstances(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.BrainInstanceDTO>)
+  fullName.vb: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstances(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.BrainInstanceDTO))
+  nameWithType: BrainInstanceExtensions.ToBrainInstances(IEnumerable<BrainInstanceDTO>)
+  nameWithType.vb: BrainInstanceExtensions.ToBrainInstances(IEnumerable(Of BrainInstanceDTO))
+- uid: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstances*
+  name: ToBrainInstances
+  href: api/KalshiBotData.Extensions.BrainInstanceExtensions.html#KalshiBotData_Extensions_BrainInstanceExtensions_ToBrainInstances_
+  commentId: Overload:KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstances
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.BrainInstanceExtensions.ToBrainInstances
+  nameWithType: BrainInstanceExtensions.ToBrainInstances
 - uid: KalshiBotData.Extensions.BrainInstanceExtensions.UpdateBrainInstance(KalshiBotData.Models.BrainInstance,BacklashDTOs.Data.BrainInstanceDTO)
   name: UpdateBrainInstance(BrainInstance, BrainInstanceDTO)
   href: api/KalshiBotData.Extensions.BrainInstanceExtensions.html#KalshiBotData_Extensions_BrainInstanceExtensions_UpdateBrainInstance_KalshiBotData_Models_BrainInstance_BacklashDTOs_Data_BrainInstanceDTO_
@@ -34597,6 +34725,38 @@ references:
   commentId: T:KalshiBotData.Extensions.CandlestickExtensions
   fullName: KalshiBotData.Extensions.CandlestickExtensions
   nameWithType: CandlestickExtensions
+- uid: KalshiBotData.Extensions.CandlestickExtensions.DeepClone(BacklashDTOs.Data.CandlestickDTO)
+  name: DeepClone(CandlestickDTO)
+  href: api/KalshiBotData.Extensions.CandlestickExtensions.html#KalshiBotData_Extensions_CandlestickExtensions_DeepClone_BacklashDTOs_Data_CandlestickDTO_
+  commentId: M:KalshiBotData.Extensions.CandlestickExtensions.DeepClone(BacklashDTOs.Data.CandlestickDTO)
+  fullName: KalshiBotData.Extensions.CandlestickExtensions.DeepClone(BacklashDTOs.Data.CandlestickDTO)
+  nameWithType: CandlestickExtensions.DeepClone(CandlestickDTO)
+- uid: KalshiBotData.Extensions.CandlestickExtensions.DeepClone(KalshiBotData.Models.Candlestick)
+  name: DeepClone(Candlestick)
+  href: api/KalshiBotData.Extensions.CandlestickExtensions.html#KalshiBotData_Extensions_CandlestickExtensions_DeepClone_KalshiBotData_Models_Candlestick_
+  commentId: M:KalshiBotData.Extensions.CandlestickExtensions.DeepClone(KalshiBotData.Models.Candlestick)
+  fullName: KalshiBotData.Extensions.CandlestickExtensions.DeepClone(KalshiBotData.Models.Candlestick)
+  nameWithType: CandlestickExtensions.DeepClone(Candlestick)
+- uid: KalshiBotData.Extensions.CandlestickExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.CandlestickExtensions.html#KalshiBotData_Extensions_CandlestickExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.CandlestickExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.CandlestickExtensions.DeepClone
+  nameWithType: CandlestickExtensions.DeepClone
+- uid: KalshiBotData.Extensions.CandlestickExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.CandlestickExtensions.html#KalshiBotData_Extensions_CandlestickExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.CandlestickExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.CandlestickExtensions.GetPerformanceMetrics()
+  nameWithType: CandlestickExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.CandlestickExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.CandlestickExtensions.html#KalshiBotData_Extensions_CandlestickExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.CandlestickExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.CandlestickExtensions.GetPerformanceMetrics
+  nameWithType: CandlestickExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.CandlestickExtensions.ToCandlestick(BacklashDTOs.Data.CandlestickDTO)
   name: ToCandlestick(CandlestickDTO)
   href: api/KalshiBotData.Extensions.CandlestickExtensions.html#KalshiBotData_Extensions_CandlestickExtensions_ToCandlestick_BacklashDTOs_Data_CandlestickDTO_
@@ -34623,6 +34783,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.CandlestickExtensions.ToCandlestickDTO
   nameWithType: CandlestickExtensions.ToCandlestickDTO
+- uid: KalshiBotData.Extensions.CandlestickExtensions.ToCandlestickDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Candlestick})
+  name: ToCandlestickDTOs(IEnumerable<Candlestick>)
+  href: api/KalshiBotData.Extensions.CandlestickExtensions.html#KalshiBotData_Extensions_CandlestickExtensions_ToCandlestickDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_Candlestick__
+  commentId: M:KalshiBotData.Extensions.CandlestickExtensions.ToCandlestickDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Candlestick})
+  name.vb: ToCandlestickDTOs(IEnumerable(Of Candlestick))
+  fullName: KalshiBotData.Extensions.CandlestickExtensions.ToCandlestickDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.Candlestick>)
+  fullName.vb: KalshiBotData.Extensions.CandlestickExtensions.ToCandlestickDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.Candlestick))
+  nameWithType: CandlestickExtensions.ToCandlestickDTOs(IEnumerable<Candlestick>)
+  nameWithType.vb: CandlestickExtensions.ToCandlestickDTOs(IEnumerable(Of Candlestick))
+- uid: KalshiBotData.Extensions.CandlestickExtensions.ToCandlestickDTOs*
+  name: ToCandlestickDTOs
+  href: api/KalshiBotData.Extensions.CandlestickExtensions.html#KalshiBotData_Extensions_CandlestickExtensions_ToCandlestickDTOs_
+  commentId: Overload:KalshiBotData.Extensions.CandlestickExtensions.ToCandlestickDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.CandlestickExtensions.ToCandlestickDTOs
+  nameWithType: CandlestickExtensions.ToCandlestickDTOs
+- uid: KalshiBotData.Extensions.CandlestickExtensions.ToCandlesticks(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.CandlestickDTO})
+  name: ToCandlesticks(IEnumerable<CandlestickDTO>)
+  href: api/KalshiBotData.Extensions.CandlestickExtensions.html#KalshiBotData_Extensions_CandlestickExtensions_ToCandlesticks_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_CandlestickDTO__
+  commentId: M:KalshiBotData.Extensions.CandlestickExtensions.ToCandlesticks(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.CandlestickDTO})
+  name.vb: ToCandlesticks(IEnumerable(Of CandlestickDTO))
+  fullName: KalshiBotData.Extensions.CandlestickExtensions.ToCandlesticks(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.CandlestickDTO>)
+  fullName.vb: KalshiBotData.Extensions.CandlestickExtensions.ToCandlesticks(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.CandlestickDTO))
+  nameWithType: CandlestickExtensions.ToCandlesticks(IEnumerable<CandlestickDTO>)
+  nameWithType.vb: CandlestickExtensions.ToCandlesticks(IEnumerable(Of CandlestickDTO))
+- uid: KalshiBotData.Extensions.CandlestickExtensions.ToCandlesticks*
+  name: ToCandlesticks
+  href: api/KalshiBotData.Extensions.CandlestickExtensions.html#KalshiBotData_Extensions_CandlestickExtensions_ToCandlesticks_
+  commentId: Overload:KalshiBotData.Extensions.CandlestickExtensions.ToCandlesticks
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.CandlestickExtensions.ToCandlesticks
+  nameWithType: CandlestickExtensions.ToCandlesticks
 - uid: KalshiBotData.Extensions.CandlestickExtensions.UpdateCandlestick(KalshiBotData.Models.Candlestick,BacklashDTOs.Data.CandlestickDTO)
   name: UpdateCandlestick(Candlestick, CandlestickDTO)
   href: api/KalshiBotData.Extensions.CandlestickExtensions.html#KalshiBotData_Extensions_CandlestickExtensions_UpdateCandlestick_KalshiBotData_Models_Candlestick_BacklashDTOs_Data_CandlestickDTO_
@@ -34642,6 +34834,38 @@ references:
   commentId: T:KalshiBotData.Extensions.EventExtensions
   fullName: KalshiBotData.Extensions.EventExtensions
   nameWithType: EventExtensions
+- uid: KalshiBotData.Extensions.EventExtensions.DeepClone(BacklashDTOs.Data.EventDTO)
+  name: DeepClone(EventDTO)
+  href: api/KalshiBotData.Extensions.EventExtensions.html#KalshiBotData_Extensions_EventExtensions_DeepClone_BacklashDTOs_Data_EventDTO_
+  commentId: M:KalshiBotData.Extensions.EventExtensions.DeepClone(BacklashDTOs.Data.EventDTO)
+  fullName: KalshiBotData.Extensions.EventExtensions.DeepClone(BacklashDTOs.Data.EventDTO)
+  nameWithType: EventExtensions.DeepClone(EventDTO)
+- uid: KalshiBotData.Extensions.EventExtensions.DeepClone(KalshiBotData.Models.Event)
+  name: DeepClone(Event)
+  href: api/KalshiBotData.Extensions.EventExtensions.html#KalshiBotData_Extensions_EventExtensions_DeepClone_KalshiBotData_Models_Event_
+  commentId: M:KalshiBotData.Extensions.EventExtensions.DeepClone(KalshiBotData.Models.Event)
+  fullName: KalshiBotData.Extensions.EventExtensions.DeepClone(KalshiBotData.Models.Event)
+  nameWithType: EventExtensions.DeepClone(Event)
+- uid: KalshiBotData.Extensions.EventExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.EventExtensions.html#KalshiBotData_Extensions_EventExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.EventExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.EventExtensions.DeepClone
+  nameWithType: EventExtensions.DeepClone
+- uid: KalshiBotData.Extensions.EventExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.EventExtensions.html#KalshiBotData_Extensions_EventExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.EventExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.EventExtensions.GetPerformanceMetrics()
+  nameWithType: EventExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.EventExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.EventExtensions.html#KalshiBotData_Extensions_EventExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.EventExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.EventExtensions.GetPerformanceMetrics
+  nameWithType: EventExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.EventExtensions.ToEvent(BacklashDTOs.Data.EventDTO)
   name: ToEvent(EventDTO)
   href: api/KalshiBotData.Extensions.EventExtensions.html#KalshiBotData_Extensions_EventExtensions_ToEvent_BacklashDTOs_Data_EventDTO_
@@ -34668,6 +34892,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.EventExtensions.ToEventDTO
   nameWithType: EventExtensions.ToEventDTO
+- uid: KalshiBotData.Extensions.EventExtensions.ToEventDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Event})
+  name: ToEventDTOs(IEnumerable<Event>)
+  href: api/KalshiBotData.Extensions.EventExtensions.html#KalshiBotData_Extensions_EventExtensions_ToEventDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_Event__
+  commentId: M:KalshiBotData.Extensions.EventExtensions.ToEventDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Event})
+  name.vb: ToEventDTOs(IEnumerable(Of Event))
+  fullName: KalshiBotData.Extensions.EventExtensions.ToEventDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.Event>)
+  fullName.vb: KalshiBotData.Extensions.EventExtensions.ToEventDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.Event))
+  nameWithType: EventExtensions.ToEventDTOs(IEnumerable<Event>)
+  nameWithType.vb: EventExtensions.ToEventDTOs(IEnumerable(Of Event))
+- uid: KalshiBotData.Extensions.EventExtensions.ToEventDTOs*
+  name: ToEventDTOs
+  href: api/KalshiBotData.Extensions.EventExtensions.html#KalshiBotData_Extensions_EventExtensions_ToEventDTOs_
+  commentId: Overload:KalshiBotData.Extensions.EventExtensions.ToEventDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.EventExtensions.ToEventDTOs
+  nameWithType: EventExtensions.ToEventDTOs
+- uid: KalshiBotData.Extensions.EventExtensions.ToEvents(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.EventDTO})
+  name: ToEvents(IEnumerable<EventDTO>)
+  href: api/KalshiBotData.Extensions.EventExtensions.html#KalshiBotData_Extensions_EventExtensions_ToEvents_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_EventDTO__
+  commentId: M:KalshiBotData.Extensions.EventExtensions.ToEvents(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.EventDTO})
+  name.vb: ToEvents(IEnumerable(Of EventDTO))
+  fullName: KalshiBotData.Extensions.EventExtensions.ToEvents(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.EventDTO>)
+  fullName.vb: KalshiBotData.Extensions.EventExtensions.ToEvents(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.EventDTO))
+  nameWithType: EventExtensions.ToEvents(IEnumerable<EventDTO>)
+  nameWithType.vb: EventExtensions.ToEvents(IEnumerable(Of EventDTO))
+- uid: KalshiBotData.Extensions.EventExtensions.ToEvents*
+  name: ToEvents
+  href: api/KalshiBotData.Extensions.EventExtensions.html#KalshiBotData_Extensions_EventExtensions_ToEvents_
+  commentId: Overload:KalshiBotData.Extensions.EventExtensions.ToEvents
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.EventExtensions.ToEvents
+  nameWithType: EventExtensions.ToEvents
 - uid: KalshiBotData.Extensions.EventExtensions.UpdateEvent(KalshiBotData.Models.Event,BacklashDTOs.Data.EventDTO)
   name: UpdateEvent(Event, EventDTO)
   href: api/KalshiBotData.Extensions.EventExtensions.html#KalshiBotData_Extensions_EventExtensions_UpdateEvent_KalshiBotData_Models_Event_BacklashDTOs_Data_EventDTO_
@@ -34687,6 +34943,38 @@ references:
   commentId: T:KalshiBotData.Extensions.ExchangeScheduleExtensions
   fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions
   nameWithType: ExchangeScheduleExtensions
+- uid: KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone(BacklashDTOs.Data.ExchangeScheduleDTO)
+  name: DeepClone(ExchangeScheduleDTO)
+  href: api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html#KalshiBotData_Extensions_ExchangeScheduleExtensions_DeepClone_BacklashDTOs_Data_ExchangeScheduleDTO_
+  commentId: M:KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone(BacklashDTOs.Data.ExchangeScheduleDTO)
+  fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone(BacklashDTOs.Data.ExchangeScheduleDTO)
+  nameWithType: ExchangeScheduleExtensions.DeepClone(ExchangeScheduleDTO)
+- uid: KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone(KalshiBotData.Models.ExchangeSchedule)
+  name: DeepClone(ExchangeSchedule)
+  href: api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html#KalshiBotData_Extensions_ExchangeScheduleExtensions_DeepClone_KalshiBotData_Models_ExchangeSchedule_
+  commentId: M:KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone(KalshiBotData.Models.ExchangeSchedule)
+  fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone(KalshiBotData.Models.ExchangeSchedule)
+  nameWithType: ExchangeScheduleExtensions.DeepClone(ExchangeSchedule)
+- uid: KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html#KalshiBotData_Extensions_ExchangeScheduleExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions.DeepClone
+  nameWithType: ExchangeScheduleExtensions.DeepClone
+- uid: KalshiBotData.Extensions.ExchangeScheduleExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html#KalshiBotData_Extensions_ExchangeScheduleExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.ExchangeScheduleExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions.GetPerformanceMetrics()
+  nameWithType: ExchangeScheduleExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.ExchangeScheduleExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html#KalshiBotData_Extensions_ExchangeScheduleExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.ExchangeScheduleExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions.GetPerformanceMetrics
+  nameWithType: ExchangeScheduleExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedule(BacklashDTOs.Data.ExchangeScheduleDTO)
   name: ToExchangeSchedule(ExchangeScheduleDTO)
   href: api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html#KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeSchedule_BacklashDTOs_Data_ExchangeScheduleDTO_
@@ -34713,6 +35001,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTO
   nameWithType: ExchangeScheduleExtensions.ToExchangeScheduleDTO
+- uid: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.ExchangeSchedule})
+  name: ToExchangeScheduleDTOs(IEnumerable<ExchangeSchedule>)
+  href: api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html#KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeScheduleDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_ExchangeSchedule__
+  commentId: M:KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.ExchangeSchedule})
+  name.vb: ToExchangeScheduleDTOs(IEnumerable(Of ExchangeSchedule))
+  fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.ExchangeSchedule>)
+  fullName.vb: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.ExchangeSchedule))
+  nameWithType: ExchangeScheduleExtensions.ToExchangeScheduleDTOs(IEnumerable<ExchangeSchedule>)
+  nameWithType.vb: ExchangeScheduleExtensions.ToExchangeScheduleDTOs(IEnumerable(Of ExchangeSchedule))
+- uid: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTOs*
+  name: ToExchangeScheduleDTOs
+  href: api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html#KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeScheduleDTOs_
+  commentId: Overload:KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeScheduleDTOs
+  nameWithType: ExchangeScheduleExtensions.ToExchangeScheduleDTOs
+- uid: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedules(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.ExchangeScheduleDTO})
+  name: ToExchangeSchedules(IEnumerable<ExchangeScheduleDTO>)
+  href: api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html#KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeSchedules_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_ExchangeScheduleDTO__
+  commentId: M:KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedules(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.ExchangeScheduleDTO})
+  name.vb: ToExchangeSchedules(IEnumerable(Of ExchangeScheduleDTO))
+  fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedules(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.ExchangeScheduleDTO>)
+  fullName.vb: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedules(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.ExchangeScheduleDTO))
+  nameWithType: ExchangeScheduleExtensions.ToExchangeSchedules(IEnumerable<ExchangeScheduleDTO>)
+  nameWithType.vb: ExchangeScheduleExtensions.ToExchangeSchedules(IEnumerable(Of ExchangeScheduleDTO))
+- uid: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedules*
+  name: ToExchangeSchedules
+  href: api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html#KalshiBotData_Extensions_ExchangeScheduleExtensions_ToExchangeSchedules_
+  commentId: Overload:KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedules
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions.ToExchangeSchedules
+  nameWithType: ExchangeScheduleExtensions.ToExchangeSchedules
 - uid: KalshiBotData.Extensions.ExchangeScheduleExtensions.UpdateExchangeSchedule(KalshiBotData.Models.ExchangeSchedule,BacklashDTOs.Data.ExchangeScheduleDTO)
   name: UpdateExchangeSchedule(ExchangeSchedule, ExchangeScheduleDTO)
   href: api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html#KalshiBotData_Extensions_ExchangeScheduleExtensions_UpdateExchangeSchedule_KalshiBotData_Models_ExchangeSchedule_BacklashDTOs_Data_ExchangeScheduleDTO_
@@ -34726,12 +35046,127 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.ExchangeScheduleExtensions.UpdateExchangeSchedule
   nameWithType: ExchangeScheduleExtensions.UpdateExchangeSchedule
+- uid: KalshiBotData.Extensions.ExtensionConfiguration
+  name: ExtensionConfiguration
+  href: api/KalshiBotData.Extensions.ExtensionConfiguration.html
+  commentId: T:KalshiBotData.Extensions.ExtensionConfiguration
+  fullName: KalshiBotData.Extensions.ExtensionConfiguration
+  nameWithType: ExtensionConfiguration
+- uid: KalshiBotData.Extensions.ExtensionConfiguration.ResetToUtc
+  name: ResetToUtc()
+  href: api/KalshiBotData.Extensions.ExtensionConfiguration.html#KalshiBotData_Extensions_ExtensionConfiguration_ResetToUtc
+  commentId: M:KalshiBotData.Extensions.ExtensionConfiguration.ResetToUtc
+  fullName: KalshiBotData.Extensions.ExtensionConfiguration.ResetToUtc()
+  nameWithType: ExtensionConfiguration.ResetToUtc()
+- uid: KalshiBotData.Extensions.ExtensionConfiguration.ResetToUtc*
+  name: ResetToUtc
+  href: api/KalshiBotData.Extensions.ExtensionConfiguration.html#KalshiBotData_Extensions_ExtensionConfiguration_ResetToUtc_
+  commentId: Overload:KalshiBotData.Extensions.ExtensionConfiguration.ResetToUtc
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.ExtensionConfiguration.ResetToUtc
+  nameWithType: ExtensionConfiguration.ResetToUtc
+- uid: KalshiBotData.Extensions.ExtensionConfiguration.SetCustomTimestampProvider(System.Func{System.DateTime})
+  name: SetCustomTimestampProvider(Func<DateTime>)
+  href: api/KalshiBotData.Extensions.ExtensionConfiguration.html#KalshiBotData_Extensions_ExtensionConfiguration_SetCustomTimestampProvider_System_Func_System_DateTime__
+  commentId: M:KalshiBotData.Extensions.ExtensionConfiguration.SetCustomTimestampProvider(System.Func{System.DateTime})
+  name.vb: SetCustomTimestampProvider(Func(Of Date))
+  fullName: KalshiBotData.Extensions.ExtensionConfiguration.SetCustomTimestampProvider(System.Func<System.DateTime>)
+  fullName.vb: KalshiBotData.Extensions.ExtensionConfiguration.SetCustomTimestampProvider(System.Func(Of Date))
+  nameWithType: ExtensionConfiguration.SetCustomTimestampProvider(Func<DateTime>)
+  nameWithType.vb: ExtensionConfiguration.SetCustomTimestampProvider(Func(Of Date))
+- uid: KalshiBotData.Extensions.ExtensionConfiguration.SetCustomTimestampProvider*
+  name: SetCustomTimestampProvider
+  href: api/KalshiBotData.Extensions.ExtensionConfiguration.html#KalshiBotData_Extensions_ExtensionConfiguration_SetCustomTimestampProvider_
+  commentId: Overload:KalshiBotData.Extensions.ExtensionConfiguration.SetCustomTimestampProvider
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.ExtensionConfiguration.SetCustomTimestampProvider
+  nameWithType: ExtensionConfiguration.SetCustomTimestampProvider
+- uid: KalshiBotData.Extensions.ExtensionConfiguration.TimestampProvider
+  name: TimestampProvider
+  href: api/KalshiBotData.Extensions.ExtensionConfiguration.html#KalshiBotData_Extensions_ExtensionConfiguration_TimestampProvider
+  commentId: P:KalshiBotData.Extensions.ExtensionConfiguration.TimestampProvider
+  fullName: KalshiBotData.Extensions.ExtensionConfiguration.TimestampProvider
+  nameWithType: ExtensionConfiguration.TimestampProvider
+- uid: KalshiBotData.Extensions.ExtensionConfiguration.TimestampProvider*
+  name: TimestampProvider
+  href: api/KalshiBotData.Extensions.ExtensionConfiguration.html#KalshiBotData_Extensions_ExtensionConfiguration_TimestampProvider_
+  commentId: Overload:KalshiBotData.Extensions.ExtensionConfiguration.TimestampProvider
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.ExtensionConfiguration.TimestampProvider
+  nameWithType: ExtensionConfiguration.TimestampProvider
+- uid: KalshiBotData.Extensions.ExtensionConfiguration.UseLocalTime
+  name: UseLocalTime()
+  href: api/KalshiBotData.Extensions.ExtensionConfiguration.html#KalshiBotData_Extensions_ExtensionConfiguration_UseLocalTime
+  commentId: M:KalshiBotData.Extensions.ExtensionConfiguration.UseLocalTime
+  fullName: KalshiBotData.Extensions.ExtensionConfiguration.UseLocalTime()
+  nameWithType: ExtensionConfiguration.UseLocalTime()
+- uid: KalshiBotData.Extensions.ExtensionConfiguration.UseLocalTime*
+  name: UseLocalTime
+  href: api/KalshiBotData.Extensions.ExtensionConfiguration.html#KalshiBotData_Extensions_ExtensionConfiguration_UseLocalTime_
+  commentId: Overload:KalshiBotData.Extensions.ExtensionConfiguration.UseLocalTime
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.ExtensionConfiguration.UseLocalTime
+  nameWithType: ExtensionConfiguration.UseLocalTime
 - uid: KalshiBotData.Extensions.LogEntryExtensions
   name: LogEntryExtensions
   href: api/KalshiBotData.Extensions.LogEntryExtensions.html
   commentId: T:KalshiBotData.Extensions.LogEntryExtensions
   fullName: KalshiBotData.Extensions.LogEntryExtensions
   nameWithType: LogEntryExtensions
+- uid: KalshiBotData.Extensions.LogEntryExtensions.DeepClone(BacklashDTOs.Data.LogEntryDTO)
+  name: DeepClone(LogEntryDTO)
+  href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_DeepClone_BacklashDTOs_Data_LogEntryDTO_
+  commentId: M:KalshiBotData.Extensions.LogEntryExtensions.DeepClone(BacklashDTOs.Data.LogEntryDTO)
+  fullName: KalshiBotData.Extensions.LogEntryExtensions.DeepClone(BacklashDTOs.Data.LogEntryDTO)
+  nameWithType: LogEntryExtensions.DeepClone(LogEntryDTO)
+- uid: KalshiBotData.Extensions.LogEntryExtensions.DeepClone(KalshiBotData.Models.LogEntry)
+  name: DeepClone(LogEntry)
+  href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_DeepClone_KalshiBotData_Models_LogEntry_
+  commentId: M:KalshiBotData.Extensions.LogEntryExtensions.DeepClone(KalshiBotData.Models.LogEntry)
+  fullName: KalshiBotData.Extensions.LogEntryExtensions.DeepClone(KalshiBotData.Models.LogEntry)
+  nameWithType: LogEntryExtensions.DeepClone(LogEntry)
+- uid: KalshiBotData.Extensions.LogEntryExtensions.DeepClone(KalshiBotData.Models.OverseerLogEntry)
+  name: DeepClone(OverseerLogEntry)
+  href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_DeepClone_KalshiBotData_Models_OverseerLogEntry_
+  commentId: M:KalshiBotData.Extensions.LogEntryExtensions.DeepClone(KalshiBotData.Models.OverseerLogEntry)
+  fullName: KalshiBotData.Extensions.LogEntryExtensions.DeepClone(KalshiBotData.Models.OverseerLogEntry)
+  nameWithType: LogEntryExtensions.DeepClone(OverseerLogEntry)
+- uid: KalshiBotData.Extensions.LogEntryExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.LogEntryExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.LogEntryExtensions.DeepClone
+  nameWithType: LogEntryExtensions.DeepClone
+- uid: KalshiBotData.Extensions.LogEntryExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.LogEntryExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.LogEntryExtensions.GetPerformanceMetrics()
+  nameWithType: LogEntryExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.LogEntryExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.LogEntryExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.LogEntryExtensions.GetPerformanceMetrics
+  nameWithType: LogEntryExtensions.GetPerformanceMetrics
+- uid: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntries(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.LogEntryDTO})
+  name: ToLogEntries(IEnumerable<LogEntryDTO>)
+  href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_ToLogEntries_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_LogEntryDTO__
+  commentId: M:KalshiBotData.Extensions.LogEntryExtensions.ToLogEntries(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.LogEntryDTO})
+  name.vb: ToLogEntries(IEnumerable(Of LogEntryDTO))
+  fullName: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntries(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.LogEntryDTO>)
+  fullName.vb: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntries(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.LogEntryDTO))
+  nameWithType: LogEntryExtensions.ToLogEntries(IEnumerable<LogEntryDTO>)
+  nameWithType.vb: LogEntryExtensions.ToLogEntries(IEnumerable(Of LogEntryDTO))
+- uid: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntries*
+  name: ToLogEntries
+  href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_ToLogEntries_
+  commentId: Overload:KalshiBotData.Extensions.LogEntryExtensions.ToLogEntries
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntries
+  nameWithType: LogEntryExtensions.ToLogEntries
 - uid: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntry(BacklashDTOs.Data.LogEntryDTO)
   name: ToLogEntry(LogEntryDTO)
   href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_ToLogEntry_BacklashDTOs_Data_LogEntryDTO_
@@ -34758,6 +35193,22 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTO
   nameWithType: LogEntryExtensions.ToLogEntryDTO
+- uid: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.LogEntry})
+  name: ToLogEntryDTOs(IEnumerable<LogEntry>)
+  href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_ToLogEntryDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_LogEntry__
+  commentId: M:KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.LogEntry})
+  name.vb: ToLogEntryDTOs(IEnumerable(Of LogEntry))
+  fullName: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.LogEntry>)
+  fullName.vb: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.LogEntry))
+  nameWithType: LogEntryExtensions.ToLogEntryDTOs(IEnumerable<LogEntry>)
+  nameWithType.vb: LogEntryExtensions.ToLogEntryDTOs(IEnumerable(Of LogEntry))
+- uid: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTOs*
+  name: ToLogEntryDTOs
+  href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_ToLogEntryDTOs_
+  commentId: Overload:KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTOs
+  nameWithType: LogEntryExtensions.ToLogEntryDTOs
 - uid: KalshiBotData.Extensions.LogEntryExtensions.ToOverseerLogEntry(BacklashDTOs.Data.LogEntryDTO)
   name: ToOverseerLogEntry(LogEntryDTO)
   href: api/KalshiBotData.Extensions.LogEntryExtensions.html#KalshiBotData_Extensions_LogEntryExtensions_ToOverseerLogEntry_BacklashDTOs_Data_LogEntryDTO_
@@ -34803,6 +35254,38 @@ references:
   commentId: T:KalshiBotData.Extensions.MaintenanceWindowExtensions
   fullName: KalshiBotData.Extensions.MaintenanceWindowExtensions
   nameWithType: MaintenanceWindowExtensions
+- uid: KalshiBotData.Extensions.MaintenanceWindowExtensions.DeepClone(BacklashDTOs.Data.MaintenanceWindowDTO)
+  name: DeepClone(MaintenanceWindowDTO)
+  href: api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html#KalshiBotData_Extensions_MaintenanceWindowExtensions_DeepClone_BacklashDTOs_Data_MaintenanceWindowDTO_
+  commentId: M:KalshiBotData.Extensions.MaintenanceWindowExtensions.DeepClone(BacklashDTOs.Data.MaintenanceWindowDTO)
+  fullName: KalshiBotData.Extensions.MaintenanceWindowExtensions.DeepClone(BacklashDTOs.Data.MaintenanceWindowDTO)
+  nameWithType: MaintenanceWindowExtensions.DeepClone(MaintenanceWindowDTO)
+- uid: KalshiBotData.Extensions.MaintenanceWindowExtensions.DeepClone(KalshiBotData.Models.MaintenanceWindow)
+  name: DeepClone(MaintenanceWindow)
+  href: api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html#KalshiBotData_Extensions_MaintenanceWindowExtensions_DeepClone_KalshiBotData_Models_MaintenanceWindow_
+  commentId: M:KalshiBotData.Extensions.MaintenanceWindowExtensions.DeepClone(KalshiBotData.Models.MaintenanceWindow)
+  fullName: KalshiBotData.Extensions.MaintenanceWindowExtensions.DeepClone(KalshiBotData.Models.MaintenanceWindow)
+  nameWithType: MaintenanceWindowExtensions.DeepClone(MaintenanceWindow)
+- uid: KalshiBotData.Extensions.MaintenanceWindowExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html#KalshiBotData_Extensions_MaintenanceWindowExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.MaintenanceWindowExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MaintenanceWindowExtensions.DeepClone
+  nameWithType: MaintenanceWindowExtensions.DeepClone
+- uid: KalshiBotData.Extensions.MaintenanceWindowExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html#KalshiBotData_Extensions_MaintenanceWindowExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.MaintenanceWindowExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.MaintenanceWindowExtensions.GetPerformanceMetrics()
+  nameWithType: MaintenanceWindowExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.MaintenanceWindowExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html#KalshiBotData_Extensions_MaintenanceWindowExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.MaintenanceWindowExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MaintenanceWindowExtensions.GetPerformanceMetrics
+  nameWithType: MaintenanceWindowExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindow(BacklashDTOs.Data.MaintenanceWindowDTO)
   name: ToMaintenanceWindow(MaintenanceWindowDTO)
   href: api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html#KalshiBotData_Extensions_MaintenanceWindowExtensions_ToMaintenanceWindow_BacklashDTOs_Data_MaintenanceWindowDTO_
@@ -34829,6 +35312,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindowDTO
   nameWithType: MaintenanceWindowExtensions.ToMaintenanceWindowDTO
+- uid: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindowDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.MaintenanceWindow})
+  name: ToMaintenanceWindowDTOs(IEnumerable<MaintenanceWindow>)
+  href: api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html#KalshiBotData_Extensions_MaintenanceWindowExtensions_ToMaintenanceWindowDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_MaintenanceWindow__
+  commentId: M:KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindowDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.MaintenanceWindow})
+  name.vb: ToMaintenanceWindowDTOs(IEnumerable(Of MaintenanceWindow))
+  fullName: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindowDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.MaintenanceWindow>)
+  fullName.vb: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindowDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.MaintenanceWindow))
+  nameWithType: MaintenanceWindowExtensions.ToMaintenanceWindowDTOs(IEnumerable<MaintenanceWindow>)
+  nameWithType.vb: MaintenanceWindowExtensions.ToMaintenanceWindowDTOs(IEnumerable(Of MaintenanceWindow))
+- uid: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindowDTOs*
+  name: ToMaintenanceWindowDTOs
+  href: api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html#KalshiBotData_Extensions_MaintenanceWindowExtensions_ToMaintenanceWindowDTOs_
+  commentId: Overload:KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindowDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindowDTOs
+  nameWithType: MaintenanceWindowExtensions.ToMaintenanceWindowDTOs
+- uid: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindows(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.MaintenanceWindowDTO})
+  name: ToMaintenanceWindows(IEnumerable<MaintenanceWindowDTO>)
+  href: api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html#KalshiBotData_Extensions_MaintenanceWindowExtensions_ToMaintenanceWindows_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_MaintenanceWindowDTO__
+  commentId: M:KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindows(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.MaintenanceWindowDTO})
+  name.vb: ToMaintenanceWindows(IEnumerable(Of MaintenanceWindowDTO))
+  fullName: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindows(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.MaintenanceWindowDTO>)
+  fullName.vb: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindows(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.MaintenanceWindowDTO))
+  nameWithType: MaintenanceWindowExtensions.ToMaintenanceWindows(IEnumerable<MaintenanceWindowDTO>)
+  nameWithType.vb: MaintenanceWindowExtensions.ToMaintenanceWindows(IEnumerable(Of MaintenanceWindowDTO))
+- uid: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindows*
+  name: ToMaintenanceWindows
+  href: api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html#KalshiBotData_Extensions_MaintenanceWindowExtensions_ToMaintenanceWindows_
+  commentId: Overload:KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindows
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MaintenanceWindowExtensions.ToMaintenanceWindows
+  nameWithType: MaintenanceWindowExtensions.ToMaintenanceWindows
 - uid: KalshiBotData.Extensions.MaintenanceWindowExtensions.UpdateMaintenanceWindow(KalshiBotData.Models.MaintenanceWindow,BacklashDTOs.Data.MaintenanceWindowDTO)
   name: UpdateMaintenanceWindow(MaintenanceWindow, MaintenanceWindowDTO)
   href: api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html#KalshiBotData_Extensions_MaintenanceWindowExtensions_UpdateMaintenanceWindow_KalshiBotData_Models_MaintenanceWindow_BacklashDTOs_Data_MaintenanceWindowDTO_
@@ -34848,6 +35363,38 @@ references:
   commentId: T:KalshiBotData.Extensions.MarketExtensions
   fullName: KalshiBotData.Extensions.MarketExtensions
   nameWithType: MarketExtensions
+- uid: KalshiBotData.Extensions.MarketExtensions.DeepClone(BacklashDTOs.Data.MarketDTO)
+  name: DeepClone(MarketDTO)
+  href: api/KalshiBotData.Extensions.MarketExtensions.html#KalshiBotData_Extensions_MarketExtensions_DeepClone_BacklashDTOs_Data_MarketDTO_
+  commentId: M:KalshiBotData.Extensions.MarketExtensions.DeepClone(BacklashDTOs.Data.MarketDTO)
+  fullName: KalshiBotData.Extensions.MarketExtensions.DeepClone(BacklashDTOs.Data.MarketDTO)
+  nameWithType: MarketExtensions.DeepClone(MarketDTO)
+- uid: KalshiBotData.Extensions.MarketExtensions.DeepClone(KalshiBotData.Models.Market)
+  name: DeepClone(Market)
+  href: api/KalshiBotData.Extensions.MarketExtensions.html#KalshiBotData_Extensions_MarketExtensions_DeepClone_KalshiBotData_Models_Market_
+  commentId: M:KalshiBotData.Extensions.MarketExtensions.DeepClone(KalshiBotData.Models.Market)
+  fullName: KalshiBotData.Extensions.MarketExtensions.DeepClone(KalshiBotData.Models.Market)
+  nameWithType: MarketExtensions.DeepClone(Market)
+- uid: KalshiBotData.Extensions.MarketExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.MarketExtensions.html#KalshiBotData_Extensions_MarketExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.MarketExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketExtensions.DeepClone
+  nameWithType: MarketExtensions.DeepClone
+- uid: KalshiBotData.Extensions.MarketExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.MarketExtensions.html#KalshiBotData_Extensions_MarketExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.MarketExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.MarketExtensions.GetPerformanceMetrics()
+  nameWithType: MarketExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.MarketExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.MarketExtensions.html#KalshiBotData_Extensions_MarketExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.MarketExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketExtensions.GetPerformanceMetrics
+  nameWithType: MarketExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.MarketExtensions.ToMarket(BacklashDTOs.Data.MarketDTO)
   name: ToMarket(MarketDTO)
   href: api/KalshiBotData.Extensions.MarketExtensions.html#KalshiBotData_Extensions_MarketExtensions_ToMarket_BacklashDTOs_Data_MarketDTO_
@@ -34874,6 +35421,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.MarketExtensions.ToMarketDTO
   nameWithType: MarketExtensions.ToMarketDTO
+- uid: KalshiBotData.Extensions.MarketExtensions.ToMarketDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Market})
+  name: ToMarketDTOs(IEnumerable<Market>)
+  href: api/KalshiBotData.Extensions.MarketExtensions.html#KalshiBotData_Extensions_MarketExtensions_ToMarketDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_Market__
+  commentId: M:KalshiBotData.Extensions.MarketExtensions.ToMarketDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Market})
+  name.vb: ToMarketDTOs(IEnumerable(Of Market))
+  fullName: KalshiBotData.Extensions.MarketExtensions.ToMarketDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.Market>)
+  fullName.vb: KalshiBotData.Extensions.MarketExtensions.ToMarketDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.Market))
+  nameWithType: MarketExtensions.ToMarketDTOs(IEnumerable<Market>)
+  nameWithType.vb: MarketExtensions.ToMarketDTOs(IEnumerable(Of Market))
+- uid: KalshiBotData.Extensions.MarketExtensions.ToMarketDTOs*
+  name: ToMarketDTOs
+  href: api/KalshiBotData.Extensions.MarketExtensions.html#KalshiBotData_Extensions_MarketExtensions_ToMarketDTOs_
+  commentId: Overload:KalshiBotData.Extensions.MarketExtensions.ToMarketDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketExtensions.ToMarketDTOs
+  nameWithType: MarketExtensions.ToMarketDTOs
+- uid: KalshiBotData.Extensions.MarketExtensions.ToMarkets(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.MarketDTO})
+  name: ToMarkets(IEnumerable<MarketDTO>)
+  href: api/KalshiBotData.Extensions.MarketExtensions.html#KalshiBotData_Extensions_MarketExtensions_ToMarkets_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_MarketDTO__
+  commentId: M:KalshiBotData.Extensions.MarketExtensions.ToMarkets(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.MarketDTO})
+  name.vb: ToMarkets(IEnumerable(Of MarketDTO))
+  fullName: KalshiBotData.Extensions.MarketExtensions.ToMarkets(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.MarketDTO>)
+  fullName.vb: KalshiBotData.Extensions.MarketExtensions.ToMarkets(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.MarketDTO))
+  nameWithType: MarketExtensions.ToMarkets(IEnumerable<MarketDTO>)
+  nameWithType.vb: MarketExtensions.ToMarkets(IEnumerable(Of MarketDTO))
+- uid: KalshiBotData.Extensions.MarketExtensions.ToMarkets*
+  name: ToMarkets
+  href: api/KalshiBotData.Extensions.MarketExtensions.html#KalshiBotData_Extensions_MarketExtensions_ToMarkets_
+  commentId: Overload:KalshiBotData.Extensions.MarketExtensions.ToMarkets
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketExtensions.ToMarkets
+  nameWithType: MarketExtensions.ToMarkets
 - uid: KalshiBotData.Extensions.MarketExtensions.UpdateMarket(KalshiBotData.Models.Market,BacklashDTOs.Data.MarketDTO)
   name: UpdateMarket(Market, MarketDTO)
   href: api/KalshiBotData.Extensions.MarketExtensions.html#KalshiBotData_Extensions_MarketExtensions_UpdateMarket_KalshiBotData_Models_Market_BacklashDTOs_Data_MarketDTO_
@@ -34893,6 +35472,38 @@ references:
   commentId: T:KalshiBotData.Extensions.MarketPositionExtensions
   fullName: KalshiBotData.Extensions.MarketPositionExtensions
   nameWithType: MarketPositionExtensions
+- uid: KalshiBotData.Extensions.MarketPositionExtensions.DeepClone(BacklashDTOs.Data.MarketPositionDTO)
+  name: DeepClone(MarketPositionDTO)
+  href: api/KalshiBotData.Extensions.MarketPositionExtensions.html#KalshiBotData_Extensions_MarketPositionExtensions_DeepClone_BacklashDTOs_Data_MarketPositionDTO_
+  commentId: M:KalshiBotData.Extensions.MarketPositionExtensions.DeepClone(BacklashDTOs.Data.MarketPositionDTO)
+  fullName: KalshiBotData.Extensions.MarketPositionExtensions.DeepClone(BacklashDTOs.Data.MarketPositionDTO)
+  nameWithType: MarketPositionExtensions.DeepClone(MarketPositionDTO)
+- uid: KalshiBotData.Extensions.MarketPositionExtensions.DeepClone(KalshiBotData.Models.MarketPosition)
+  name: DeepClone(MarketPosition)
+  href: api/KalshiBotData.Extensions.MarketPositionExtensions.html#KalshiBotData_Extensions_MarketPositionExtensions_DeepClone_KalshiBotData_Models_MarketPosition_
+  commentId: M:KalshiBotData.Extensions.MarketPositionExtensions.DeepClone(KalshiBotData.Models.MarketPosition)
+  fullName: KalshiBotData.Extensions.MarketPositionExtensions.DeepClone(KalshiBotData.Models.MarketPosition)
+  nameWithType: MarketPositionExtensions.DeepClone(MarketPosition)
+- uid: KalshiBotData.Extensions.MarketPositionExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.MarketPositionExtensions.html#KalshiBotData_Extensions_MarketPositionExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.MarketPositionExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketPositionExtensions.DeepClone
+  nameWithType: MarketPositionExtensions.DeepClone
+- uid: KalshiBotData.Extensions.MarketPositionExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.MarketPositionExtensions.html#KalshiBotData_Extensions_MarketPositionExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.MarketPositionExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.MarketPositionExtensions.GetPerformanceMetrics()
+  nameWithType: MarketPositionExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.MarketPositionExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.MarketPositionExtensions.html#KalshiBotData_Extensions_MarketPositionExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.MarketPositionExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketPositionExtensions.GetPerformanceMetrics
+  nameWithType: MarketPositionExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPosition(BacklashDTOs.Data.MarketPositionDTO)
   name: ToMarketPosition(MarketPositionDTO)
   href: api/KalshiBotData.Extensions.MarketPositionExtensions.html#KalshiBotData_Extensions_MarketPositionExtensions_ToMarketPosition_BacklashDTOs_Data_MarketPositionDTO_
@@ -34919,6 +35530,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositionDTO
   nameWithType: MarketPositionExtensions.ToMarketPositionDTO
+- uid: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositionDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.MarketPosition})
+  name: ToMarketPositionDTOs(IEnumerable<MarketPosition>)
+  href: api/KalshiBotData.Extensions.MarketPositionExtensions.html#KalshiBotData_Extensions_MarketPositionExtensions_ToMarketPositionDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_MarketPosition__
+  commentId: M:KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositionDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.MarketPosition})
+  name.vb: ToMarketPositionDTOs(IEnumerable(Of MarketPosition))
+  fullName: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositionDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.MarketPosition>)
+  fullName.vb: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositionDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.MarketPosition))
+  nameWithType: MarketPositionExtensions.ToMarketPositionDTOs(IEnumerable<MarketPosition>)
+  nameWithType.vb: MarketPositionExtensions.ToMarketPositionDTOs(IEnumerable(Of MarketPosition))
+- uid: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositionDTOs*
+  name: ToMarketPositionDTOs
+  href: api/KalshiBotData.Extensions.MarketPositionExtensions.html#KalshiBotData_Extensions_MarketPositionExtensions_ToMarketPositionDTOs_
+  commentId: Overload:KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositionDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositionDTOs
+  nameWithType: MarketPositionExtensions.ToMarketPositionDTOs
+- uid: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositions(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.MarketPositionDTO})
+  name: ToMarketPositions(IEnumerable<MarketPositionDTO>)
+  href: api/KalshiBotData.Extensions.MarketPositionExtensions.html#KalshiBotData_Extensions_MarketPositionExtensions_ToMarketPositions_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_MarketPositionDTO__
+  commentId: M:KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositions(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.MarketPositionDTO})
+  name.vb: ToMarketPositions(IEnumerable(Of MarketPositionDTO))
+  fullName: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositions(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.MarketPositionDTO>)
+  fullName.vb: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositions(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.MarketPositionDTO))
+  nameWithType: MarketPositionExtensions.ToMarketPositions(IEnumerable<MarketPositionDTO>)
+  nameWithType.vb: MarketPositionExtensions.ToMarketPositions(IEnumerable(Of MarketPositionDTO))
+- uid: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositions*
+  name: ToMarketPositions
+  href: api/KalshiBotData.Extensions.MarketPositionExtensions.html#KalshiBotData_Extensions_MarketPositionExtensions_ToMarketPositions_
+  commentId: Overload:KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositions
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketPositionExtensions.ToMarketPositions
+  nameWithType: MarketPositionExtensions.ToMarketPositions
 - uid: KalshiBotData.Extensions.MarketPositionExtensions.UpdateMarketPosition(KalshiBotData.Models.MarketPosition,BacklashDTOs.Data.MarketPositionDTO)
   name: UpdateMarketPosition(MarketPosition, MarketPositionDTO)
   href: api/KalshiBotData.Extensions.MarketPositionExtensions.html#KalshiBotData_Extensions_MarketPositionExtensions_UpdateMarketPosition_KalshiBotData_Models_MarketPosition_BacklashDTOs_Data_MarketPositionDTO_
@@ -34938,6 +35581,38 @@ references:
   commentId: T:KalshiBotData.Extensions.MarketWatchExtensions
   fullName: KalshiBotData.Extensions.MarketWatchExtensions
   nameWithType: MarketWatchExtensions
+- uid: KalshiBotData.Extensions.MarketWatchExtensions.DeepClone(BacklashDTOs.Data.MarketWatchDTO)
+  name: DeepClone(MarketWatchDTO)
+  href: api/KalshiBotData.Extensions.MarketWatchExtensions.html#KalshiBotData_Extensions_MarketWatchExtensions_DeepClone_BacklashDTOs_Data_MarketWatchDTO_
+  commentId: M:KalshiBotData.Extensions.MarketWatchExtensions.DeepClone(BacklashDTOs.Data.MarketWatchDTO)
+  fullName: KalshiBotData.Extensions.MarketWatchExtensions.DeepClone(BacklashDTOs.Data.MarketWatchDTO)
+  nameWithType: MarketWatchExtensions.DeepClone(MarketWatchDTO)
+- uid: KalshiBotData.Extensions.MarketWatchExtensions.DeepClone(KalshiBotData.Models.MarketWatch)
+  name: DeepClone(MarketWatch)
+  href: api/KalshiBotData.Extensions.MarketWatchExtensions.html#KalshiBotData_Extensions_MarketWatchExtensions_DeepClone_KalshiBotData_Models_MarketWatch_
+  commentId: M:KalshiBotData.Extensions.MarketWatchExtensions.DeepClone(KalshiBotData.Models.MarketWatch)
+  fullName: KalshiBotData.Extensions.MarketWatchExtensions.DeepClone(KalshiBotData.Models.MarketWatch)
+  nameWithType: MarketWatchExtensions.DeepClone(MarketWatch)
+- uid: KalshiBotData.Extensions.MarketWatchExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.MarketWatchExtensions.html#KalshiBotData_Extensions_MarketWatchExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.MarketWatchExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketWatchExtensions.DeepClone
+  nameWithType: MarketWatchExtensions.DeepClone
+- uid: KalshiBotData.Extensions.MarketWatchExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.MarketWatchExtensions.html#KalshiBotData_Extensions_MarketWatchExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.MarketWatchExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.MarketWatchExtensions.GetPerformanceMetrics()
+  nameWithType: MarketWatchExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.MarketWatchExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.MarketWatchExtensions.html#KalshiBotData_Extensions_MarketWatchExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.MarketWatchExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketWatchExtensions.GetPerformanceMetrics
+  nameWithType: MarketWatchExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatch(BacklashDTOs.Data.MarketWatchDTO)
   name: ToMarketWatch(MarketWatchDTO)
   href: api/KalshiBotData.Extensions.MarketWatchExtensions.html#KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatch_BacklashDTOs_Data_MarketWatchDTO_
@@ -34964,6 +35639,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTO
   nameWithType: MarketWatchExtensions.ToMarketWatchDTO
+- uid: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.MarketWatch})
+  name: ToMarketWatchDTOs(IEnumerable<MarketWatch>)
+  href: api/KalshiBotData.Extensions.MarketWatchExtensions.html#KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatchDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_MarketWatch__
+  commentId: M:KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.MarketWatch})
+  name.vb: ToMarketWatchDTOs(IEnumerable(Of MarketWatch))
+  fullName: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.MarketWatch>)
+  fullName.vb: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.MarketWatch))
+  nameWithType: MarketWatchExtensions.ToMarketWatchDTOs(IEnumerable<MarketWatch>)
+  nameWithType.vb: MarketWatchExtensions.ToMarketWatchDTOs(IEnumerable(Of MarketWatch))
+- uid: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTOs*
+  name: ToMarketWatchDTOs
+  href: api/KalshiBotData.Extensions.MarketWatchExtensions.html#KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatchDTOs_
+  commentId: Overload:KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatchDTOs
+  nameWithType: MarketWatchExtensions.ToMarketWatchDTOs
+- uid: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatches(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.MarketWatchDTO})
+  name: ToMarketWatches(IEnumerable<MarketWatchDTO>)
+  href: api/KalshiBotData.Extensions.MarketWatchExtensions.html#KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatches_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_MarketWatchDTO__
+  commentId: M:KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatches(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.MarketWatchDTO})
+  name.vb: ToMarketWatches(IEnumerable(Of MarketWatchDTO))
+  fullName: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatches(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.MarketWatchDTO>)
+  fullName.vb: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatches(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.MarketWatchDTO))
+  nameWithType: MarketWatchExtensions.ToMarketWatches(IEnumerable<MarketWatchDTO>)
+  nameWithType.vb: MarketWatchExtensions.ToMarketWatches(IEnumerable(Of MarketWatchDTO))
+- uid: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatches*
+  name: ToMarketWatches
+  href: api/KalshiBotData.Extensions.MarketWatchExtensions.html#KalshiBotData_Extensions_MarketWatchExtensions_ToMarketWatches_
+  commentId: Overload:KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatches
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.MarketWatchExtensions.ToMarketWatches
+  nameWithType: MarketWatchExtensions.ToMarketWatches
 - uid: KalshiBotData.Extensions.MarketWatchExtensions.UpdateMarketWatch(KalshiBotData.Models.MarketWatch,BacklashDTOs.Data.MarketWatchDTO)
   name: UpdateMarketWatch(MarketWatch, MarketWatchDTO)
   href: api/KalshiBotData.Extensions.MarketWatchExtensions.html#KalshiBotData_Extensions_MarketWatchExtensions_UpdateMarketWatch_KalshiBotData_Models_MarketWatch_BacklashDTOs_Data_MarketWatchDTO_
@@ -34983,6 +35690,38 @@ references:
   commentId: T:KalshiBotData.Extensions.OrderExtensions
   fullName: KalshiBotData.Extensions.OrderExtensions
   nameWithType: OrderExtensions
+- uid: KalshiBotData.Extensions.OrderExtensions.DeepClone(BacklashDTOs.Data.OrderDTO)
+  name: DeepClone(OrderDTO)
+  href: api/KalshiBotData.Extensions.OrderExtensions.html#KalshiBotData_Extensions_OrderExtensions_DeepClone_BacklashDTOs_Data_OrderDTO_
+  commentId: M:KalshiBotData.Extensions.OrderExtensions.DeepClone(BacklashDTOs.Data.OrderDTO)
+  fullName: KalshiBotData.Extensions.OrderExtensions.DeepClone(BacklashDTOs.Data.OrderDTO)
+  nameWithType: OrderExtensions.DeepClone(OrderDTO)
+- uid: KalshiBotData.Extensions.OrderExtensions.DeepClone(KalshiBotData.Models.Order)
+  name: DeepClone(Order)
+  href: api/KalshiBotData.Extensions.OrderExtensions.html#KalshiBotData_Extensions_OrderExtensions_DeepClone_KalshiBotData_Models_Order_
+  commentId: M:KalshiBotData.Extensions.OrderExtensions.DeepClone(KalshiBotData.Models.Order)
+  fullName: KalshiBotData.Extensions.OrderExtensions.DeepClone(KalshiBotData.Models.Order)
+  nameWithType: OrderExtensions.DeepClone(Order)
+- uid: KalshiBotData.Extensions.OrderExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.OrderExtensions.html#KalshiBotData_Extensions_OrderExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.OrderExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.OrderExtensions.DeepClone
+  nameWithType: OrderExtensions.DeepClone
+- uid: KalshiBotData.Extensions.OrderExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.OrderExtensions.html#KalshiBotData_Extensions_OrderExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.OrderExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.OrderExtensions.GetPerformanceMetrics()
+  nameWithType: OrderExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.OrderExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.OrderExtensions.html#KalshiBotData_Extensions_OrderExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.OrderExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.OrderExtensions.GetPerformanceMetrics
+  nameWithType: OrderExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.OrderExtensions.ToOrder(BacklashDTOs.Data.OrderDTO)
   name: ToOrder(OrderDTO)
   href: api/KalshiBotData.Extensions.OrderExtensions.html#KalshiBotData_Extensions_OrderExtensions_ToOrder_BacklashDTOs_Data_OrderDTO_
@@ -35009,6 +35748,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.OrderExtensions.ToOrderDTO
   nameWithType: OrderExtensions.ToOrderDTO
+- uid: KalshiBotData.Extensions.OrderExtensions.ToOrderDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Order})
+  name: ToOrderDTOs(IEnumerable<Order>)
+  href: api/KalshiBotData.Extensions.OrderExtensions.html#KalshiBotData_Extensions_OrderExtensions_ToOrderDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_Order__
+  commentId: M:KalshiBotData.Extensions.OrderExtensions.ToOrderDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Order})
+  name.vb: ToOrderDTOs(IEnumerable(Of Order))
+  fullName: KalshiBotData.Extensions.OrderExtensions.ToOrderDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.Order>)
+  fullName.vb: KalshiBotData.Extensions.OrderExtensions.ToOrderDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.Order))
+  nameWithType: OrderExtensions.ToOrderDTOs(IEnumerable<Order>)
+  nameWithType.vb: OrderExtensions.ToOrderDTOs(IEnumerable(Of Order))
+- uid: KalshiBotData.Extensions.OrderExtensions.ToOrderDTOs*
+  name: ToOrderDTOs
+  href: api/KalshiBotData.Extensions.OrderExtensions.html#KalshiBotData_Extensions_OrderExtensions_ToOrderDTOs_
+  commentId: Overload:KalshiBotData.Extensions.OrderExtensions.ToOrderDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.OrderExtensions.ToOrderDTOs
+  nameWithType: OrderExtensions.ToOrderDTOs
+- uid: KalshiBotData.Extensions.OrderExtensions.ToOrders(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.OrderDTO})
+  name: ToOrders(IEnumerable<OrderDTO>)
+  href: api/KalshiBotData.Extensions.OrderExtensions.html#KalshiBotData_Extensions_OrderExtensions_ToOrders_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_OrderDTO__
+  commentId: M:KalshiBotData.Extensions.OrderExtensions.ToOrders(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.OrderDTO})
+  name.vb: ToOrders(IEnumerable(Of OrderDTO))
+  fullName: KalshiBotData.Extensions.OrderExtensions.ToOrders(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.OrderDTO>)
+  fullName.vb: KalshiBotData.Extensions.OrderExtensions.ToOrders(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.OrderDTO))
+  nameWithType: OrderExtensions.ToOrders(IEnumerable<OrderDTO>)
+  nameWithType.vb: OrderExtensions.ToOrders(IEnumerable(Of OrderDTO))
+- uid: KalshiBotData.Extensions.OrderExtensions.ToOrders*
+  name: ToOrders
+  href: api/KalshiBotData.Extensions.OrderExtensions.html#KalshiBotData_Extensions_OrderExtensions_ToOrders_
+  commentId: Overload:KalshiBotData.Extensions.OrderExtensions.ToOrders
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.OrderExtensions.ToOrders
+  nameWithType: OrderExtensions.ToOrders
 - uid: KalshiBotData.Extensions.OrderExtensions.UpdateOrder(KalshiBotData.Models.Order,BacklashDTOs.Data.OrderDTO)
   name: UpdateOrder(Order, OrderDTO)
   href: api/KalshiBotData.Extensions.OrderExtensions.html#KalshiBotData_Extensions_OrderExtensions_UpdateOrder_KalshiBotData_Models_Order_BacklashDTOs_Data_OrderDTO_
@@ -35028,6 +35799,38 @@ references:
   commentId: T:KalshiBotData.Extensions.SeriesExtensions
   fullName: KalshiBotData.Extensions.SeriesExtensions
   nameWithType: SeriesExtensions
+- uid: KalshiBotData.Extensions.SeriesExtensions.DeepClone(BacklashDTOs.Data.SeriesDTO)
+  name: DeepClone(SeriesDTO)
+  href: api/KalshiBotData.Extensions.SeriesExtensions.html#KalshiBotData_Extensions_SeriesExtensions_DeepClone_BacklashDTOs_Data_SeriesDTO_
+  commentId: M:KalshiBotData.Extensions.SeriesExtensions.DeepClone(BacklashDTOs.Data.SeriesDTO)
+  fullName: KalshiBotData.Extensions.SeriesExtensions.DeepClone(BacklashDTOs.Data.SeriesDTO)
+  nameWithType: SeriesExtensions.DeepClone(SeriesDTO)
+- uid: KalshiBotData.Extensions.SeriesExtensions.DeepClone(KalshiBotData.Models.Series)
+  name: DeepClone(Series)
+  href: api/KalshiBotData.Extensions.SeriesExtensions.html#KalshiBotData_Extensions_SeriesExtensions_DeepClone_KalshiBotData_Models_Series_
+  commentId: M:KalshiBotData.Extensions.SeriesExtensions.DeepClone(KalshiBotData.Models.Series)
+  fullName: KalshiBotData.Extensions.SeriesExtensions.DeepClone(KalshiBotData.Models.Series)
+  nameWithType: SeriesExtensions.DeepClone(Series)
+- uid: KalshiBotData.Extensions.SeriesExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.SeriesExtensions.html#KalshiBotData_Extensions_SeriesExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.SeriesExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesExtensions.DeepClone
+  nameWithType: SeriesExtensions.DeepClone
+- uid: KalshiBotData.Extensions.SeriesExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.SeriesExtensions.html#KalshiBotData_Extensions_SeriesExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.SeriesExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.SeriesExtensions.GetPerformanceMetrics()
+  nameWithType: SeriesExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.SeriesExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.SeriesExtensions.html#KalshiBotData_Extensions_SeriesExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.SeriesExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesExtensions.GetPerformanceMetrics
+  nameWithType: SeriesExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.SeriesExtensions.ToSeries(BacklashDTOs.Data.SeriesDTO)
   name: ToSeries(SeriesDTO)
   href: api/KalshiBotData.Extensions.SeriesExtensions.html#KalshiBotData_Extensions_SeriesExtensions_ToSeries_BacklashDTOs_Data_SeriesDTO_
@@ -35054,6 +35857,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.SeriesExtensions.ToSeriesDTO
   nameWithType: SeriesExtensions.ToSeriesDTO
+- uid: KalshiBotData.Extensions.SeriesExtensions.ToSeriesDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Series})
+  name: ToSeriesDTOs(IEnumerable<Series>)
+  href: api/KalshiBotData.Extensions.SeriesExtensions.html#KalshiBotData_Extensions_SeriesExtensions_ToSeriesDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_Series__
+  commentId: M:KalshiBotData.Extensions.SeriesExtensions.ToSeriesDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Series})
+  name.vb: ToSeriesDTOs(IEnumerable(Of Series))
+  fullName: KalshiBotData.Extensions.SeriesExtensions.ToSeriesDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.Series>)
+  fullName.vb: KalshiBotData.Extensions.SeriesExtensions.ToSeriesDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.Series))
+  nameWithType: SeriesExtensions.ToSeriesDTOs(IEnumerable<Series>)
+  nameWithType.vb: SeriesExtensions.ToSeriesDTOs(IEnumerable(Of Series))
+- uid: KalshiBotData.Extensions.SeriesExtensions.ToSeriesDTOs*
+  name: ToSeriesDTOs
+  href: api/KalshiBotData.Extensions.SeriesExtensions.html#KalshiBotData_Extensions_SeriesExtensions_ToSeriesDTOs_
+  commentId: Overload:KalshiBotData.Extensions.SeriesExtensions.ToSeriesDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesExtensions.ToSeriesDTOs
+  nameWithType: SeriesExtensions.ToSeriesDTOs
+- uid: KalshiBotData.Extensions.SeriesExtensions.ToSeriesList(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SeriesDTO})
+  name: ToSeriesList(IEnumerable<SeriesDTO>)
+  href: api/KalshiBotData.Extensions.SeriesExtensions.html#KalshiBotData_Extensions_SeriesExtensions_ToSeriesList_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_SeriesDTO__
+  commentId: M:KalshiBotData.Extensions.SeriesExtensions.ToSeriesList(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SeriesDTO})
+  name.vb: ToSeriesList(IEnumerable(Of SeriesDTO))
+  fullName: KalshiBotData.Extensions.SeriesExtensions.ToSeriesList(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.SeriesDTO>)
+  fullName.vb: KalshiBotData.Extensions.SeriesExtensions.ToSeriesList(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.SeriesDTO))
+  nameWithType: SeriesExtensions.ToSeriesList(IEnumerable<SeriesDTO>)
+  nameWithType.vb: SeriesExtensions.ToSeriesList(IEnumerable(Of SeriesDTO))
+- uid: KalshiBotData.Extensions.SeriesExtensions.ToSeriesList*
+  name: ToSeriesList
+  href: api/KalshiBotData.Extensions.SeriesExtensions.html#KalshiBotData_Extensions_SeriesExtensions_ToSeriesList_
+  commentId: Overload:KalshiBotData.Extensions.SeriesExtensions.ToSeriesList
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesExtensions.ToSeriesList
+  nameWithType: SeriesExtensions.ToSeriesList
 - uid: KalshiBotData.Extensions.SeriesExtensions.UpdateSeries(KalshiBotData.Models.Series,BacklashDTOs.Data.SeriesDTO)
   name: UpdateSeries(Series, SeriesDTO)
   href: api/KalshiBotData.Extensions.SeriesExtensions.html#KalshiBotData_Extensions_SeriesExtensions_UpdateSeries_KalshiBotData_Models_Series_BacklashDTOs_Data_SeriesDTO_
@@ -35073,6 +35908,38 @@ references:
   commentId: T:KalshiBotData.Extensions.SeriesSettlementSourceExtensions
   fullName: KalshiBotData.Extensions.SeriesSettlementSourceExtensions
   nameWithType: SeriesSettlementSourceExtensions
+- uid: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone(BacklashDTOs.Data.SeriesSettlementSourceDTO)
+  name: DeepClone(SeriesSettlementSourceDTO)
+  href: api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html#KalshiBotData_Extensions_SeriesSettlementSourceExtensions_DeepClone_BacklashDTOs_Data_SeriesSettlementSourceDTO_
+  commentId: M:KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone(BacklashDTOs.Data.SeriesSettlementSourceDTO)
+  fullName: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone(BacklashDTOs.Data.SeriesSettlementSourceDTO)
+  nameWithType: SeriesSettlementSourceExtensions.DeepClone(SeriesSettlementSourceDTO)
+- uid: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone(KalshiBotData.Models.SeriesSettlementSource)
+  name: DeepClone(SeriesSettlementSource)
+  href: api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html#KalshiBotData_Extensions_SeriesSettlementSourceExtensions_DeepClone_KalshiBotData_Models_SeriesSettlementSource_
+  commentId: M:KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone(KalshiBotData.Models.SeriesSettlementSource)
+  fullName: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone(KalshiBotData.Models.SeriesSettlementSource)
+  nameWithType: SeriesSettlementSourceExtensions.DeepClone(SeriesSettlementSource)
+- uid: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html#KalshiBotData_Extensions_SeriesSettlementSourceExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.DeepClone
+  nameWithType: SeriesSettlementSourceExtensions.DeepClone
+- uid: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html#KalshiBotData_Extensions_SeriesSettlementSourceExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.SeriesSettlementSourceExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.GetPerformanceMetrics()
+  nameWithType: SeriesSettlementSourceExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html#KalshiBotData_Extensions_SeriesSettlementSourceExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.SeriesSettlementSourceExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.GetPerformanceMetrics
+  nameWithType: SeriesSettlementSourceExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSource(BacklashDTOs.Data.SeriesSettlementSourceDTO)
   name: ToSeriesSettlementSource(SeriesSettlementSourceDTO)
   href: api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html#KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSource_BacklashDTOs_Data_SeriesSettlementSourceDTO_
@@ -35099,12 +35966,76 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTO
   nameWithType: SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTO
+- uid: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.SeriesSettlementSource})
+  name: ToSeriesSettlementSourceDTOs(IEnumerable<SeriesSettlementSource>)
+  href: api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html#KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSourceDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_SeriesSettlementSource__
+  commentId: M:KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.SeriesSettlementSource})
+  name.vb: ToSeriesSettlementSourceDTOs(IEnumerable(Of SeriesSettlementSource))
+  fullName: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.SeriesSettlementSource>)
+  fullName.vb: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.SeriesSettlementSource))
+  nameWithType: SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs(IEnumerable<SeriesSettlementSource>)
+  nameWithType.vb: SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs(IEnumerable(Of SeriesSettlementSource))
+- uid: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs*
+  name: ToSeriesSettlementSourceDTOs
+  href: api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html#KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSourceDTOs_
+  commentId: Overload:KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs
+  nameWithType: SeriesSettlementSourceExtensions.ToSeriesSettlementSourceDTOs
+- uid: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSources(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SeriesSettlementSourceDTO})
+  name: ToSeriesSettlementSources(IEnumerable<SeriesSettlementSourceDTO>)
+  href: api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html#KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSources_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_SeriesSettlementSourceDTO__
+  commentId: M:KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSources(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SeriesSettlementSourceDTO})
+  name.vb: ToSeriesSettlementSources(IEnumerable(Of SeriesSettlementSourceDTO))
+  fullName: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSources(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.SeriesSettlementSourceDTO>)
+  fullName.vb: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSources(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.SeriesSettlementSourceDTO))
+  nameWithType: SeriesSettlementSourceExtensions.ToSeriesSettlementSources(IEnumerable<SeriesSettlementSourceDTO>)
+  nameWithType.vb: SeriesSettlementSourceExtensions.ToSeriesSettlementSources(IEnumerable(Of SeriesSettlementSourceDTO))
+- uid: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSources*
+  name: ToSeriesSettlementSources
+  href: api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html#KalshiBotData_Extensions_SeriesSettlementSourceExtensions_ToSeriesSettlementSources_
+  commentId: Overload:KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSources
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesSettlementSourceExtensions.ToSeriesSettlementSources
+  nameWithType: SeriesSettlementSourceExtensions.ToSeriesSettlementSources
 - uid: KalshiBotData.Extensions.SeriesTagExtensions
   name: SeriesTagExtensions
   href: api/KalshiBotData.Extensions.SeriesTagExtensions.html
   commentId: T:KalshiBotData.Extensions.SeriesTagExtensions
   fullName: KalshiBotData.Extensions.SeriesTagExtensions
   nameWithType: SeriesTagExtensions
+- uid: KalshiBotData.Extensions.SeriesTagExtensions.DeepClone(BacklashDTOs.Data.SeriesTagDTO)
+  name: DeepClone(SeriesTagDTO)
+  href: api/KalshiBotData.Extensions.SeriesTagExtensions.html#KalshiBotData_Extensions_SeriesTagExtensions_DeepClone_BacklashDTOs_Data_SeriesTagDTO_
+  commentId: M:KalshiBotData.Extensions.SeriesTagExtensions.DeepClone(BacklashDTOs.Data.SeriesTagDTO)
+  fullName: KalshiBotData.Extensions.SeriesTagExtensions.DeepClone(BacklashDTOs.Data.SeriesTagDTO)
+  nameWithType: SeriesTagExtensions.DeepClone(SeriesTagDTO)
+- uid: KalshiBotData.Extensions.SeriesTagExtensions.DeepClone(KalshiBotData.Models.SeriesTag)
+  name: DeepClone(SeriesTag)
+  href: api/KalshiBotData.Extensions.SeriesTagExtensions.html#KalshiBotData_Extensions_SeriesTagExtensions_DeepClone_KalshiBotData_Models_SeriesTag_
+  commentId: M:KalshiBotData.Extensions.SeriesTagExtensions.DeepClone(KalshiBotData.Models.SeriesTag)
+  fullName: KalshiBotData.Extensions.SeriesTagExtensions.DeepClone(KalshiBotData.Models.SeriesTag)
+  nameWithType: SeriesTagExtensions.DeepClone(SeriesTag)
+- uid: KalshiBotData.Extensions.SeriesTagExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.SeriesTagExtensions.html#KalshiBotData_Extensions_SeriesTagExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.SeriesTagExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesTagExtensions.DeepClone
+  nameWithType: SeriesTagExtensions.DeepClone
+- uid: KalshiBotData.Extensions.SeriesTagExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.SeriesTagExtensions.html#KalshiBotData_Extensions_SeriesTagExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.SeriesTagExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.SeriesTagExtensions.GetPerformanceMetrics()
+  nameWithType: SeriesTagExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.SeriesTagExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.SeriesTagExtensions.html#KalshiBotData_Extensions_SeriesTagExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.SeriesTagExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesTagExtensions.GetPerformanceMetrics
+  nameWithType: SeriesTagExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTag(BacklashDTOs.Data.SeriesTagDTO)
   name: ToSeriesTag(SeriesTagDTO)
   href: api/KalshiBotData.Extensions.SeriesTagExtensions.html#KalshiBotData_Extensions_SeriesTagExtensions_ToSeriesTag_BacklashDTOs_Data_SeriesTagDTO_
@@ -35131,12 +36062,76 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTagDTO
   nameWithType: SeriesTagExtensions.ToSeriesTagDTO
+- uid: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTagDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.SeriesTag})
+  name: ToSeriesTagDTOs(IEnumerable<SeriesTag>)
+  href: api/KalshiBotData.Extensions.SeriesTagExtensions.html#KalshiBotData_Extensions_SeriesTagExtensions_ToSeriesTagDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_SeriesTag__
+  commentId: M:KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTagDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.SeriesTag})
+  name.vb: ToSeriesTagDTOs(IEnumerable(Of SeriesTag))
+  fullName: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTagDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.SeriesTag>)
+  fullName.vb: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTagDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.SeriesTag))
+  nameWithType: SeriesTagExtensions.ToSeriesTagDTOs(IEnumerable<SeriesTag>)
+  nameWithType.vb: SeriesTagExtensions.ToSeriesTagDTOs(IEnumerable(Of SeriesTag))
+- uid: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTagDTOs*
+  name: ToSeriesTagDTOs
+  href: api/KalshiBotData.Extensions.SeriesTagExtensions.html#KalshiBotData_Extensions_SeriesTagExtensions_ToSeriesTagDTOs_
+  commentId: Overload:KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTagDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTagDTOs
+  nameWithType: SeriesTagExtensions.ToSeriesTagDTOs
+- uid: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTags(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SeriesTagDTO})
+  name: ToSeriesTags(IEnumerable<SeriesTagDTO>)
+  href: api/KalshiBotData.Extensions.SeriesTagExtensions.html#KalshiBotData_Extensions_SeriesTagExtensions_ToSeriesTags_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_SeriesTagDTO__
+  commentId: M:KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTags(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SeriesTagDTO})
+  name.vb: ToSeriesTags(IEnumerable(Of SeriesTagDTO))
+  fullName: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTags(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.SeriesTagDTO>)
+  fullName.vb: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTags(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.SeriesTagDTO))
+  nameWithType: SeriesTagExtensions.ToSeriesTags(IEnumerable<SeriesTagDTO>)
+  nameWithType.vb: SeriesTagExtensions.ToSeriesTags(IEnumerable(Of SeriesTagDTO))
+- uid: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTags*
+  name: ToSeriesTags
+  href: api/KalshiBotData.Extensions.SeriesTagExtensions.html#KalshiBotData_Extensions_SeriesTagExtensions_ToSeriesTags_
+  commentId: Overload:KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTags
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SeriesTagExtensions.ToSeriesTags
+  nameWithType: SeriesTagExtensions.ToSeriesTags
 - uid: KalshiBotData.Extensions.SnapshotExtensions
   name: SnapshotExtensions
   href: api/KalshiBotData.Extensions.SnapshotExtensions.html
   commentId: T:KalshiBotData.Extensions.SnapshotExtensions
   fullName: KalshiBotData.Extensions.SnapshotExtensions
   nameWithType: SnapshotExtensions
+- uid: KalshiBotData.Extensions.SnapshotExtensions.DeepClone(BacklashDTOs.Data.SnapshotDTO)
+  name: DeepClone(SnapshotDTO)
+  href: api/KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_DeepClone_BacklashDTOs_Data_SnapshotDTO_
+  commentId: M:KalshiBotData.Extensions.SnapshotExtensions.DeepClone(BacklashDTOs.Data.SnapshotDTO)
+  fullName: KalshiBotData.Extensions.SnapshotExtensions.DeepClone(BacklashDTOs.Data.SnapshotDTO)
+  nameWithType: SnapshotExtensions.DeepClone(SnapshotDTO)
+- uid: KalshiBotData.Extensions.SnapshotExtensions.DeepClone(KalshiBotData.Models.Snapshot)
+  name: DeepClone(Snapshot)
+  href: api/KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_DeepClone_KalshiBotData_Models_Snapshot_
+  commentId: M:KalshiBotData.Extensions.SnapshotExtensions.DeepClone(KalshiBotData.Models.Snapshot)
+  fullName: KalshiBotData.Extensions.SnapshotExtensions.DeepClone(KalshiBotData.Models.Snapshot)
+  nameWithType: SnapshotExtensions.DeepClone(Snapshot)
+- uid: KalshiBotData.Extensions.SnapshotExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotExtensions.DeepClone
+  nameWithType: SnapshotExtensions.DeepClone
+- uid: KalshiBotData.Extensions.SnapshotExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.SnapshotExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.SnapshotExtensions.GetPerformanceMetrics()
+  nameWithType: SnapshotExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.SnapshotExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotExtensions.GetPerformanceMetrics
+  nameWithType: SnapshotExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshot(BacklashDTOs.Data.SnapshotDTO)
   name: ToSnapshot(SnapshotDTO)
   href: api/KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_ToSnapshot_BacklashDTOs_Data_SnapshotDTO_
@@ -35163,6 +36158,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshotDTO
   nameWithType: SnapshotExtensions.ToSnapshotDTO
+- uid: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshotDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Snapshot})
+  name: ToSnapshotDTOs(IEnumerable<Snapshot>)
+  href: api/KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_ToSnapshotDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_Snapshot__
+  commentId: M:KalshiBotData.Extensions.SnapshotExtensions.ToSnapshotDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Snapshot})
+  name.vb: ToSnapshotDTOs(IEnumerable(Of Snapshot))
+  fullName: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshotDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.Snapshot>)
+  fullName.vb: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshotDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.Snapshot))
+  nameWithType: SnapshotExtensions.ToSnapshotDTOs(IEnumerable<Snapshot>)
+  nameWithType.vb: SnapshotExtensions.ToSnapshotDTOs(IEnumerable(Of Snapshot))
+- uid: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshotDTOs*
+  name: ToSnapshotDTOs
+  href: api/KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_ToSnapshotDTOs_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotExtensions.ToSnapshotDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshotDTOs
+  nameWithType: SnapshotExtensions.ToSnapshotDTOs
+- uid: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshots(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SnapshotDTO})
+  name: ToSnapshots(IEnumerable<SnapshotDTO>)
+  href: api/KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_ToSnapshots_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_SnapshotDTO__
+  commentId: M:KalshiBotData.Extensions.SnapshotExtensions.ToSnapshots(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SnapshotDTO})
+  name.vb: ToSnapshots(IEnumerable(Of SnapshotDTO))
+  fullName: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshots(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.SnapshotDTO>)
+  fullName.vb: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshots(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.SnapshotDTO))
+  nameWithType: SnapshotExtensions.ToSnapshots(IEnumerable<SnapshotDTO>)
+  nameWithType.vb: SnapshotExtensions.ToSnapshots(IEnumerable(Of SnapshotDTO))
+- uid: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshots*
+  name: ToSnapshots
+  href: api/KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_ToSnapshots_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotExtensions.ToSnapshots
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotExtensions.ToSnapshots
+  nameWithType: SnapshotExtensions.ToSnapshots
 - uid: KalshiBotData.Extensions.SnapshotExtensions.UpdateSnapshot(KalshiBotData.Models.Snapshot,BacklashDTOs.Data.SnapshotDTO)
   name: UpdateSnapshot(Snapshot, SnapshotDTO)
   href: api/KalshiBotData.Extensions.SnapshotExtensions.html#KalshiBotData_Extensions_SnapshotExtensions_UpdateSnapshot_KalshiBotData_Models_Snapshot_BacklashDTOs_Data_SnapshotDTO_
@@ -35182,6 +36209,38 @@ references:
   commentId: T:KalshiBotData.Extensions.SnapshotGroupExtensions
   fullName: KalshiBotData.Extensions.SnapshotGroupExtensions
   nameWithType: SnapshotGroupExtensions
+- uid: KalshiBotData.Extensions.SnapshotGroupExtensions.DeepClone(BacklashDTOs.Data.SnapshotGroupDTO)
+  name: DeepClone(SnapshotGroupDTO)
+  href: api/KalshiBotData.Extensions.SnapshotGroupExtensions.html#KalshiBotData_Extensions_SnapshotGroupExtensions_DeepClone_BacklashDTOs_Data_SnapshotGroupDTO_
+  commentId: M:KalshiBotData.Extensions.SnapshotGroupExtensions.DeepClone(BacklashDTOs.Data.SnapshotGroupDTO)
+  fullName: KalshiBotData.Extensions.SnapshotGroupExtensions.DeepClone(BacklashDTOs.Data.SnapshotGroupDTO)
+  nameWithType: SnapshotGroupExtensions.DeepClone(SnapshotGroupDTO)
+- uid: KalshiBotData.Extensions.SnapshotGroupExtensions.DeepClone(KalshiBotData.Models.SnapshotGroup)
+  name: DeepClone(SnapshotGroup)
+  href: api/KalshiBotData.Extensions.SnapshotGroupExtensions.html#KalshiBotData_Extensions_SnapshotGroupExtensions_DeepClone_KalshiBotData_Models_SnapshotGroup_
+  commentId: M:KalshiBotData.Extensions.SnapshotGroupExtensions.DeepClone(KalshiBotData.Models.SnapshotGroup)
+  fullName: KalshiBotData.Extensions.SnapshotGroupExtensions.DeepClone(KalshiBotData.Models.SnapshotGroup)
+  nameWithType: SnapshotGroupExtensions.DeepClone(SnapshotGroup)
+- uid: KalshiBotData.Extensions.SnapshotGroupExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.SnapshotGroupExtensions.html#KalshiBotData_Extensions_SnapshotGroupExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotGroupExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotGroupExtensions.DeepClone
+  nameWithType: SnapshotGroupExtensions.DeepClone
+- uid: KalshiBotData.Extensions.SnapshotGroupExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.SnapshotGroupExtensions.html#KalshiBotData_Extensions_SnapshotGroupExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.SnapshotGroupExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.SnapshotGroupExtensions.GetPerformanceMetrics()
+  nameWithType: SnapshotGroupExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.SnapshotGroupExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.SnapshotGroupExtensions.html#KalshiBotData_Extensions_SnapshotGroupExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotGroupExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotGroupExtensions.GetPerformanceMetrics
+  nameWithType: SnapshotGroupExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroup(BacklashDTOs.Data.SnapshotGroupDTO)
   name: ToSnapshotGroup(SnapshotGroupDTO)
   href: api/KalshiBotData.Extensions.SnapshotGroupExtensions.html#KalshiBotData_Extensions_SnapshotGroupExtensions_ToSnapshotGroup_BacklashDTOs_Data_SnapshotGroupDTO_
@@ -35208,6 +36267,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroupDTO
   nameWithType: SnapshotGroupExtensions.ToSnapshotGroupDTO
+- uid: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroupDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.SnapshotGroup})
+  name: ToSnapshotGroupDTOs(IEnumerable<SnapshotGroup>)
+  href: api/KalshiBotData.Extensions.SnapshotGroupExtensions.html#KalshiBotData_Extensions_SnapshotGroupExtensions_ToSnapshotGroupDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_SnapshotGroup__
+  commentId: M:KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroupDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.SnapshotGroup})
+  name.vb: ToSnapshotGroupDTOs(IEnumerable(Of SnapshotGroup))
+  fullName: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroupDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.SnapshotGroup>)
+  fullName.vb: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroupDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.SnapshotGroup))
+  nameWithType: SnapshotGroupExtensions.ToSnapshotGroupDTOs(IEnumerable<SnapshotGroup>)
+  nameWithType.vb: SnapshotGroupExtensions.ToSnapshotGroupDTOs(IEnumerable(Of SnapshotGroup))
+- uid: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroupDTOs*
+  name: ToSnapshotGroupDTOs
+  href: api/KalshiBotData.Extensions.SnapshotGroupExtensions.html#KalshiBotData_Extensions_SnapshotGroupExtensions_ToSnapshotGroupDTOs_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroupDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroupDTOs
+  nameWithType: SnapshotGroupExtensions.ToSnapshotGroupDTOs
+- uid: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroups(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SnapshotGroupDTO})
+  name: ToSnapshotGroups(IEnumerable<SnapshotGroupDTO>)
+  href: api/KalshiBotData.Extensions.SnapshotGroupExtensions.html#KalshiBotData_Extensions_SnapshotGroupExtensions_ToSnapshotGroups_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_SnapshotGroupDTO__
+  commentId: M:KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroups(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SnapshotGroupDTO})
+  name.vb: ToSnapshotGroups(IEnumerable(Of SnapshotGroupDTO))
+  fullName: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroups(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.SnapshotGroupDTO>)
+  fullName.vb: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroups(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.SnapshotGroupDTO))
+  nameWithType: SnapshotGroupExtensions.ToSnapshotGroups(IEnumerable<SnapshotGroupDTO>)
+  nameWithType.vb: SnapshotGroupExtensions.ToSnapshotGroups(IEnumerable(Of SnapshotGroupDTO))
+- uid: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroups*
+  name: ToSnapshotGroups
+  href: api/KalshiBotData.Extensions.SnapshotGroupExtensions.html#KalshiBotData_Extensions_SnapshotGroupExtensions_ToSnapshotGroups_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroups
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotGroupExtensions.ToSnapshotGroups
+  nameWithType: SnapshotGroupExtensions.ToSnapshotGroups
 - uid: KalshiBotData.Extensions.SnapshotGroupExtensions.UpdateSnapshotGroup(KalshiBotData.Models.SnapshotGroup,BacklashDTOs.Data.SnapshotGroupDTO)
   name: UpdateSnapshotGroup(SnapshotGroup, SnapshotGroupDTO)
   href: api/KalshiBotData.Extensions.SnapshotGroupExtensions.html#KalshiBotData_Extensions_SnapshotGroupExtensions_UpdateSnapshotGroup_KalshiBotData_Models_SnapshotGroup_BacklashDTOs_Data_SnapshotGroupDTO_
@@ -35227,6 +36318,38 @@ references:
   commentId: T:KalshiBotData.Extensions.SnapshotSchemaExtensions
   fullName: KalshiBotData.Extensions.SnapshotSchemaExtensions
   nameWithType: SnapshotSchemaExtensions
+- uid: KalshiBotData.Extensions.SnapshotSchemaExtensions.DeepClone(BacklashDTOs.Data.SnapshotSchemaDTO)
+  name: DeepClone(SnapshotSchemaDTO)
+  href: api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html#KalshiBotData_Extensions_SnapshotSchemaExtensions_DeepClone_BacklashDTOs_Data_SnapshotSchemaDTO_
+  commentId: M:KalshiBotData.Extensions.SnapshotSchemaExtensions.DeepClone(BacklashDTOs.Data.SnapshotSchemaDTO)
+  fullName: KalshiBotData.Extensions.SnapshotSchemaExtensions.DeepClone(BacklashDTOs.Data.SnapshotSchemaDTO)
+  nameWithType: SnapshotSchemaExtensions.DeepClone(SnapshotSchemaDTO)
+- uid: KalshiBotData.Extensions.SnapshotSchemaExtensions.DeepClone(KalshiBotData.Models.SnapshotSchema)
+  name: DeepClone(SnapshotSchema)
+  href: api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html#KalshiBotData_Extensions_SnapshotSchemaExtensions_DeepClone_KalshiBotData_Models_SnapshotSchema_
+  commentId: M:KalshiBotData.Extensions.SnapshotSchemaExtensions.DeepClone(KalshiBotData.Models.SnapshotSchema)
+  fullName: KalshiBotData.Extensions.SnapshotSchemaExtensions.DeepClone(KalshiBotData.Models.SnapshotSchema)
+  nameWithType: SnapshotSchemaExtensions.DeepClone(SnapshotSchema)
+- uid: KalshiBotData.Extensions.SnapshotSchemaExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html#KalshiBotData_Extensions_SnapshotSchemaExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotSchemaExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotSchemaExtensions.DeepClone
+  nameWithType: SnapshotSchemaExtensions.DeepClone
+- uid: KalshiBotData.Extensions.SnapshotSchemaExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html#KalshiBotData_Extensions_SnapshotSchemaExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.SnapshotSchemaExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.SnapshotSchemaExtensions.GetPerformanceMetrics()
+  nameWithType: SnapshotSchemaExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.SnapshotSchemaExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html#KalshiBotData_Extensions_SnapshotSchemaExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotSchemaExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotSchemaExtensions.GetPerformanceMetrics
+  nameWithType: SnapshotSchemaExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchema(BacklashDTOs.Data.SnapshotSchemaDTO)
   name: ToSnapshotSchema(SnapshotSchemaDTO)
   href: api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html#KalshiBotData_Extensions_SnapshotSchemaExtensions_ToSnapshotSchema_BacklashDTOs_Data_SnapshotSchemaDTO_
@@ -35253,12 +36376,76 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemaDTO
   nameWithType: SnapshotSchemaExtensions.ToSnapshotSchemaDTO
+- uid: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemaDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.SnapshotSchema})
+  name: ToSnapshotSchemaDTOs(IEnumerable<SnapshotSchema>)
+  href: api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html#KalshiBotData_Extensions_SnapshotSchemaExtensions_ToSnapshotSchemaDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_SnapshotSchema__
+  commentId: M:KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemaDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.SnapshotSchema})
+  name.vb: ToSnapshotSchemaDTOs(IEnumerable(Of SnapshotSchema))
+  fullName: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemaDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.SnapshotSchema>)
+  fullName.vb: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemaDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.SnapshotSchema))
+  nameWithType: SnapshotSchemaExtensions.ToSnapshotSchemaDTOs(IEnumerable<SnapshotSchema>)
+  nameWithType.vb: SnapshotSchemaExtensions.ToSnapshotSchemaDTOs(IEnumerable(Of SnapshotSchema))
+- uid: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemaDTOs*
+  name: ToSnapshotSchemaDTOs
+  href: api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html#KalshiBotData_Extensions_SnapshotSchemaExtensions_ToSnapshotSchemaDTOs_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemaDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemaDTOs
+  nameWithType: SnapshotSchemaExtensions.ToSnapshotSchemaDTOs
+- uid: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemas(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SnapshotSchemaDTO})
+  name: ToSnapshotSchemas(IEnumerable<SnapshotSchemaDTO>)
+  href: api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html#KalshiBotData_Extensions_SnapshotSchemaExtensions_ToSnapshotSchemas_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_SnapshotSchemaDTO__
+  commentId: M:KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemas(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.SnapshotSchemaDTO})
+  name.vb: ToSnapshotSchemas(IEnumerable(Of SnapshotSchemaDTO))
+  fullName: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemas(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.SnapshotSchemaDTO>)
+  fullName.vb: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemas(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.SnapshotSchemaDTO))
+  nameWithType: SnapshotSchemaExtensions.ToSnapshotSchemas(IEnumerable<SnapshotSchemaDTO>)
+  nameWithType.vb: SnapshotSchemaExtensions.ToSnapshotSchemas(IEnumerable(Of SnapshotSchemaDTO))
+- uid: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemas*
+  name: ToSnapshotSchemas
+  href: api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html#KalshiBotData_Extensions_SnapshotSchemaExtensions_ToSnapshotSchemas_
+  commentId: Overload:KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemas
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.SnapshotSchemaExtensions.ToSnapshotSchemas
+  nameWithType: SnapshotSchemaExtensions.ToSnapshotSchemas
 - uid: KalshiBotData.Extensions.StandardHoursExtensions
   name: StandardHoursExtensions
   href: api/KalshiBotData.Extensions.StandardHoursExtensions.html
   commentId: T:KalshiBotData.Extensions.StandardHoursExtensions
   fullName: KalshiBotData.Extensions.StandardHoursExtensions
   nameWithType: StandardHoursExtensions
+- uid: KalshiBotData.Extensions.StandardHoursExtensions.DeepClone(BacklashDTOs.Data.StandardHoursDTO)
+  name: DeepClone(StandardHoursDTO)
+  href: api/KalshiBotData.Extensions.StandardHoursExtensions.html#KalshiBotData_Extensions_StandardHoursExtensions_DeepClone_BacklashDTOs_Data_StandardHoursDTO_
+  commentId: M:KalshiBotData.Extensions.StandardHoursExtensions.DeepClone(BacklashDTOs.Data.StandardHoursDTO)
+  fullName: KalshiBotData.Extensions.StandardHoursExtensions.DeepClone(BacklashDTOs.Data.StandardHoursDTO)
+  nameWithType: StandardHoursExtensions.DeepClone(StandardHoursDTO)
+- uid: KalshiBotData.Extensions.StandardHoursExtensions.DeepClone(KalshiBotData.Models.StandardHours)
+  name: DeepClone(StandardHours)
+  href: api/KalshiBotData.Extensions.StandardHoursExtensions.html#KalshiBotData_Extensions_StandardHoursExtensions_DeepClone_KalshiBotData_Models_StandardHours_
+  commentId: M:KalshiBotData.Extensions.StandardHoursExtensions.DeepClone(KalshiBotData.Models.StandardHours)
+  fullName: KalshiBotData.Extensions.StandardHoursExtensions.DeepClone(KalshiBotData.Models.StandardHours)
+  nameWithType: StandardHoursExtensions.DeepClone(StandardHours)
+- uid: KalshiBotData.Extensions.StandardHoursExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.StandardHoursExtensions.html#KalshiBotData_Extensions_StandardHoursExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.StandardHoursExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.StandardHoursExtensions.DeepClone
+  nameWithType: StandardHoursExtensions.DeepClone
+- uid: KalshiBotData.Extensions.StandardHoursExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.StandardHoursExtensions.html#KalshiBotData_Extensions_StandardHoursExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.StandardHoursExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.StandardHoursExtensions.GetPerformanceMetrics()
+  nameWithType: StandardHoursExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.StandardHoursExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.StandardHoursExtensions.html#KalshiBotData_Extensions_StandardHoursExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.StandardHoursExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.StandardHoursExtensions.GetPerformanceMetrics
+  nameWithType: StandardHoursExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHours(BacklashDTOs.Data.StandardHoursDTO)
   name: ToStandardHours(StandardHoursDTO)
   href: api/KalshiBotData.Extensions.StandardHoursExtensions.html#KalshiBotData_Extensions_StandardHoursExtensions_ToStandardHours_BacklashDTOs_Data_StandardHoursDTO_
@@ -35285,6 +36472,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursDTO
   nameWithType: StandardHoursExtensions.ToStandardHoursDTO
+- uid: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.StandardHours})
+  name: ToStandardHoursDTOs(IEnumerable<StandardHours>)
+  href: api/KalshiBotData.Extensions.StandardHoursExtensions.html#KalshiBotData_Extensions_StandardHoursExtensions_ToStandardHoursDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_StandardHours__
+  commentId: M:KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.StandardHours})
+  name.vb: ToStandardHoursDTOs(IEnumerable(Of StandardHours))
+  fullName: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.StandardHours>)
+  fullName.vb: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.StandardHours))
+  nameWithType: StandardHoursExtensions.ToStandardHoursDTOs(IEnumerable<StandardHours>)
+  nameWithType.vb: StandardHoursExtensions.ToStandardHoursDTOs(IEnumerable(Of StandardHours))
+- uid: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursDTOs*
+  name: ToStandardHoursDTOs
+  href: api/KalshiBotData.Extensions.StandardHoursExtensions.html#KalshiBotData_Extensions_StandardHoursExtensions_ToStandardHoursDTOs_
+  commentId: Overload:KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursDTOs
+  nameWithType: StandardHoursExtensions.ToStandardHoursDTOs
+- uid: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursList(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.StandardHoursDTO})
+  name: ToStandardHoursList(IEnumerable<StandardHoursDTO>)
+  href: api/KalshiBotData.Extensions.StandardHoursExtensions.html#KalshiBotData_Extensions_StandardHoursExtensions_ToStandardHoursList_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_StandardHoursDTO__
+  commentId: M:KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursList(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.StandardHoursDTO})
+  name.vb: ToStandardHoursList(IEnumerable(Of StandardHoursDTO))
+  fullName: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursList(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.StandardHoursDTO>)
+  fullName.vb: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursList(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.StandardHoursDTO))
+  nameWithType: StandardHoursExtensions.ToStandardHoursList(IEnumerable<StandardHoursDTO>)
+  nameWithType.vb: StandardHoursExtensions.ToStandardHoursList(IEnumerable(Of StandardHoursDTO))
+- uid: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursList*
+  name: ToStandardHoursList
+  href: api/KalshiBotData.Extensions.StandardHoursExtensions.html#KalshiBotData_Extensions_StandardHoursExtensions_ToStandardHoursList_
+  commentId: Overload:KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursList
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.StandardHoursExtensions.ToStandardHoursList
+  nameWithType: StandardHoursExtensions.ToStandardHoursList
 - uid: KalshiBotData.Extensions.StandardHoursExtensions.UpdateStandardHours(KalshiBotData.Models.StandardHours,BacklashDTOs.Data.StandardHoursDTO)
   name: UpdateStandardHours(StandardHours, StandardHoursDTO)
   href: api/KalshiBotData.Extensions.StandardHoursExtensions.html#KalshiBotData_Extensions_StandardHoursExtensions_UpdateStandardHours_KalshiBotData_Models_StandardHours_BacklashDTOs_Data_StandardHoursDTO_
@@ -35304,6 +36523,38 @@ references:
   commentId: T:KalshiBotData.Extensions.StandardHoursSessionExtensions
   fullName: KalshiBotData.Extensions.StandardHoursSessionExtensions
   nameWithType: StandardHoursSessionExtensions
+- uid: KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone(BacklashDTOs.Data.StandardHoursSessionDTO)
+  name: DeepClone(StandardHoursSessionDTO)
+  href: api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html#KalshiBotData_Extensions_StandardHoursSessionExtensions_DeepClone_BacklashDTOs_Data_StandardHoursSessionDTO_
+  commentId: M:KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone(BacklashDTOs.Data.StandardHoursSessionDTO)
+  fullName: KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone(BacklashDTOs.Data.StandardHoursSessionDTO)
+  nameWithType: StandardHoursSessionExtensions.DeepClone(StandardHoursSessionDTO)
+- uid: KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone(KalshiBotData.Models.StandardHoursSession)
+  name: DeepClone(StandardHoursSession)
+  href: api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html#KalshiBotData_Extensions_StandardHoursSessionExtensions_DeepClone_KalshiBotData_Models_StandardHoursSession_
+  commentId: M:KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone(KalshiBotData.Models.StandardHoursSession)
+  fullName: KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone(KalshiBotData.Models.StandardHoursSession)
+  nameWithType: StandardHoursSessionExtensions.DeepClone(StandardHoursSession)
+- uid: KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html#KalshiBotData_Extensions_StandardHoursSessionExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.StandardHoursSessionExtensions.DeepClone
+  nameWithType: StandardHoursSessionExtensions.DeepClone
+- uid: KalshiBotData.Extensions.StandardHoursSessionExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html#KalshiBotData_Extensions_StandardHoursSessionExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.StandardHoursSessionExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.StandardHoursSessionExtensions.GetPerformanceMetrics()
+  nameWithType: StandardHoursSessionExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.StandardHoursSessionExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html#KalshiBotData_Extensions_StandardHoursSessionExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.StandardHoursSessionExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.StandardHoursSessionExtensions.GetPerformanceMetrics
+  nameWithType: StandardHoursSessionExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSession(BacklashDTOs.Data.StandardHoursSessionDTO)
   name: ToStandardHoursSession(StandardHoursSessionDTO)
   href: api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html#KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSession_BacklashDTOs_Data_StandardHoursSessionDTO_
@@ -35330,6 +36581,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTO
   nameWithType: StandardHoursSessionExtensions.ToStandardHoursSessionDTO
+- uid: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.StandardHoursSession})
+  name: ToStandardHoursSessionDTOs(IEnumerable<StandardHoursSession>)
+  href: api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html#KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessionDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_StandardHoursSession__
+  commentId: M:KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.StandardHoursSession})
+  name.vb: ToStandardHoursSessionDTOs(IEnumerable(Of StandardHoursSession))
+  fullName: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.StandardHoursSession>)
+  fullName.vb: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.StandardHoursSession))
+  nameWithType: StandardHoursSessionExtensions.ToStandardHoursSessionDTOs(IEnumerable<StandardHoursSession>)
+  nameWithType.vb: StandardHoursSessionExtensions.ToStandardHoursSessionDTOs(IEnumerable(Of StandardHoursSession))
+- uid: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTOs*
+  name: ToStandardHoursSessionDTOs
+  href: api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html#KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessionDTOs_
+  commentId: Overload:KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessionDTOs
+  nameWithType: StandardHoursSessionExtensions.ToStandardHoursSessionDTOs
+- uid: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessions(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.StandardHoursSessionDTO})
+  name: ToStandardHoursSessions(IEnumerable<StandardHoursSessionDTO>)
+  href: api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html#KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessions_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_StandardHoursSessionDTO__
+  commentId: M:KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessions(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.StandardHoursSessionDTO})
+  name.vb: ToStandardHoursSessions(IEnumerable(Of StandardHoursSessionDTO))
+  fullName: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessions(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.StandardHoursSessionDTO>)
+  fullName.vb: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessions(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.StandardHoursSessionDTO))
+  nameWithType: StandardHoursSessionExtensions.ToStandardHoursSessions(IEnumerable<StandardHoursSessionDTO>)
+  nameWithType.vb: StandardHoursSessionExtensions.ToStandardHoursSessions(IEnumerable(Of StandardHoursSessionDTO))
+- uid: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessions*
+  name: ToStandardHoursSessions
+  href: api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html#KalshiBotData_Extensions_StandardHoursSessionExtensions_ToStandardHoursSessions_
+  commentId: Overload:KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessions
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.StandardHoursSessionExtensions.ToStandardHoursSessions
+  nameWithType: StandardHoursSessionExtensions.ToStandardHoursSessions
 - uid: KalshiBotData.Extensions.StandardHoursSessionExtensions.UpdateStandardHoursSession(KalshiBotData.Models.StandardHoursSession,BacklashDTOs.Data.StandardHoursSessionDTO)
   name: UpdateStandardHoursSession(StandardHoursSession, StandardHoursSessionDTO)
   href: api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html#KalshiBotData_Extensions_StandardHoursSessionExtensions_UpdateStandardHoursSession_KalshiBotData_Models_StandardHoursSession_BacklashDTOs_Data_StandardHoursSessionDTO_
@@ -35349,6 +36632,38 @@ references:
   commentId: T:KalshiBotData.Extensions.TickerExtensions
   fullName: KalshiBotData.Extensions.TickerExtensions
   nameWithType: TickerExtensions
+- uid: KalshiBotData.Extensions.TickerExtensions.DeepClone(BacklashDTOs.Data.TickerDTO)
+  name: DeepClone(TickerDTO)
+  href: api/KalshiBotData.Extensions.TickerExtensions.html#KalshiBotData_Extensions_TickerExtensions_DeepClone_BacklashDTOs_Data_TickerDTO_
+  commentId: M:KalshiBotData.Extensions.TickerExtensions.DeepClone(BacklashDTOs.Data.TickerDTO)
+  fullName: KalshiBotData.Extensions.TickerExtensions.DeepClone(BacklashDTOs.Data.TickerDTO)
+  nameWithType: TickerExtensions.DeepClone(TickerDTO)
+- uid: KalshiBotData.Extensions.TickerExtensions.DeepClone(KalshiBotData.Models.Ticker)
+  name: DeepClone(Ticker)
+  href: api/KalshiBotData.Extensions.TickerExtensions.html#KalshiBotData_Extensions_TickerExtensions_DeepClone_KalshiBotData_Models_Ticker_
+  commentId: M:KalshiBotData.Extensions.TickerExtensions.DeepClone(KalshiBotData.Models.Ticker)
+  fullName: KalshiBotData.Extensions.TickerExtensions.DeepClone(KalshiBotData.Models.Ticker)
+  nameWithType: TickerExtensions.DeepClone(Ticker)
+- uid: KalshiBotData.Extensions.TickerExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.TickerExtensions.html#KalshiBotData_Extensions_TickerExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.TickerExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.TickerExtensions.DeepClone
+  nameWithType: TickerExtensions.DeepClone
+- uid: KalshiBotData.Extensions.TickerExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.TickerExtensions.html#KalshiBotData_Extensions_TickerExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.TickerExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.TickerExtensions.GetPerformanceMetrics()
+  nameWithType: TickerExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.TickerExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.TickerExtensions.html#KalshiBotData_Extensions_TickerExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.TickerExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.TickerExtensions.GetPerformanceMetrics
+  nameWithType: TickerExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.TickerExtensions.ToTicker(BacklashDTOs.Data.TickerDTO)
   name: ToTicker(TickerDTO)
   href: api/KalshiBotData.Extensions.TickerExtensions.html#KalshiBotData_Extensions_TickerExtensions_ToTicker_BacklashDTOs_Data_TickerDTO_
@@ -35375,6 +36690,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.TickerExtensions.ToTickerDTO
   nameWithType: TickerExtensions.ToTickerDTO
+- uid: KalshiBotData.Extensions.TickerExtensions.ToTickerDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Ticker})
+  name: ToTickerDTOs(IEnumerable<Ticker>)
+  href: api/KalshiBotData.Extensions.TickerExtensions.html#KalshiBotData_Extensions_TickerExtensions_ToTickerDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_Ticker__
+  commentId: M:KalshiBotData.Extensions.TickerExtensions.ToTickerDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.Ticker})
+  name.vb: ToTickerDTOs(IEnumerable(Of Ticker))
+  fullName: KalshiBotData.Extensions.TickerExtensions.ToTickerDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.Ticker>)
+  fullName.vb: KalshiBotData.Extensions.TickerExtensions.ToTickerDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.Ticker))
+  nameWithType: TickerExtensions.ToTickerDTOs(IEnumerable<Ticker>)
+  nameWithType.vb: TickerExtensions.ToTickerDTOs(IEnumerable(Of Ticker))
+- uid: KalshiBotData.Extensions.TickerExtensions.ToTickerDTOs*
+  name: ToTickerDTOs
+  href: api/KalshiBotData.Extensions.TickerExtensions.html#KalshiBotData_Extensions_TickerExtensions_ToTickerDTOs_
+  commentId: Overload:KalshiBotData.Extensions.TickerExtensions.ToTickerDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.TickerExtensions.ToTickerDTOs
+  nameWithType: TickerExtensions.ToTickerDTOs
+- uid: KalshiBotData.Extensions.TickerExtensions.ToTickers(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.TickerDTO})
+  name: ToTickers(IEnumerable<TickerDTO>)
+  href: api/KalshiBotData.Extensions.TickerExtensions.html#KalshiBotData_Extensions_TickerExtensions_ToTickers_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_TickerDTO__
+  commentId: M:KalshiBotData.Extensions.TickerExtensions.ToTickers(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.TickerDTO})
+  name.vb: ToTickers(IEnumerable(Of TickerDTO))
+  fullName: KalshiBotData.Extensions.TickerExtensions.ToTickers(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.TickerDTO>)
+  fullName.vb: KalshiBotData.Extensions.TickerExtensions.ToTickers(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.TickerDTO))
+  nameWithType: TickerExtensions.ToTickers(IEnumerable<TickerDTO>)
+  nameWithType.vb: TickerExtensions.ToTickers(IEnumerable(Of TickerDTO))
+- uid: KalshiBotData.Extensions.TickerExtensions.ToTickers*
+  name: ToTickers
+  href: api/KalshiBotData.Extensions.TickerExtensions.html#KalshiBotData_Extensions_TickerExtensions_ToTickers_
+  commentId: Overload:KalshiBotData.Extensions.TickerExtensions.ToTickers
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.TickerExtensions.ToTickers
+  nameWithType: TickerExtensions.ToTickers
 - uid: KalshiBotData.Extensions.TickerExtensions.UpdateTicker(KalshiBotData.Models.Ticker,BacklashDTOs.Data.TickerDTO)
   name: UpdateTicker(Ticker, TickerDTO)
   href: api/KalshiBotData.Extensions.TickerExtensions.html#KalshiBotData_Extensions_TickerExtensions_UpdateTicker_KalshiBotData_Models_Ticker_BacklashDTOs_Data_TickerDTO_
@@ -35394,6 +36741,38 @@ references:
   commentId: T:KalshiBotData.Extensions.WeightSetExtensions
   fullName: KalshiBotData.Extensions.WeightSetExtensions
   nameWithType: WeightSetExtensions
+- uid: KalshiBotData.Extensions.WeightSetExtensions.DeepClone(BacklashDTOs.Data.WeightSetDTO)
+  name: DeepClone(WeightSetDTO)
+  href: api/KalshiBotData.Extensions.WeightSetExtensions.html#KalshiBotData_Extensions_WeightSetExtensions_DeepClone_BacklashDTOs_Data_WeightSetDTO_
+  commentId: M:KalshiBotData.Extensions.WeightSetExtensions.DeepClone(BacklashDTOs.Data.WeightSetDTO)
+  fullName: KalshiBotData.Extensions.WeightSetExtensions.DeepClone(BacklashDTOs.Data.WeightSetDTO)
+  nameWithType: WeightSetExtensions.DeepClone(WeightSetDTO)
+- uid: KalshiBotData.Extensions.WeightSetExtensions.DeepClone(KalshiBotData.Models.WeightSet)
+  name: DeepClone(WeightSet)
+  href: api/KalshiBotData.Extensions.WeightSetExtensions.html#KalshiBotData_Extensions_WeightSetExtensions_DeepClone_KalshiBotData_Models_WeightSet_
+  commentId: M:KalshiBotData.Extensions.WeightSetExtensions.DeepClone(KalshiBotData.Models.WeightSet)
+  fullName: KalshiBotData.Extensions.WeightSetExtensions.DeepClone(KalshiBotData.Models.WeightSet)
+  nameWithType: WeightSetExtensions.DeepClone(WeightSet)
+- uid: KalshiBotData.Extensions.WeightSetExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.WeightSetExtensions.html#KalshiBotData_Extensions_WeightSetExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.WeightSetExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.WeightSetExtensions.DeepClone
+  nameWithType: WeightSetExtensions.DeepClone
+- uid: KalshiBotData.Extensions.WeightSetExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.WeightSetExtensions.html#KalshiBotData_Extensions_WeightSetExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.WeightSetExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.WeightSetExtensions.GetPerformanceMetrics()
+  nameWithType: WeightSetExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.WeightSetExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.WeightSetExtensions.html#KalshiBotData_Extensions_WeightSetExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.WeightSetExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.WeightSetExtensions.GetPerformanceMetrics
+  nameWithType: WeightSetExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSet(BacklashDTOs.Data.WeightSetDTO)
   name: ToWeightSet(WeightSetDTO)
   href: api/KalshiBotData.Extensions.WeightSetExtensions.html#KalshiBotData_Extensions_WeightSetExtensions_ToWeightSet_BacklashDTOs_Data_WeightSetDTO_
@@ -35420,6 +36799,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSetDTO
   nameWithType: WeightSetExtensions.ToWeightSetDTO
+- uid: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSetDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.WeightSet})
+  name: ToWeightSetDTOs(IEnumerable<WeightSet>)
+  href: api/KalshiBotData.Extensions.WeightSetExtensions.html#KalshiBotData_Extensions_WeightSetExtensions_ToWeightSetDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_WeightSet__
+  commentId: M:KalshiBotData.Extensions.WeightSetExtensions.ToWeightSetDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.WeightSet})
+  name.vb: ToWeightSetDTOs(IEnumerable(Of WeightSet))
+  fullName: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSetDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.WeightSet>)
+  fullName.vb: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSetDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.WeightSet))
+  nameWithType: WeightSetExtensions.ToWeightSetDTOs(IEnumerable<WeightSet>)
+  nameWithType.vb: WeightSetExtensions.ToWeightSetDTOs(IEnumerable(Of WeightSet))
+- uid: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSetDTOs*
+  name: ToWeightSetDTOs
+  href: api/KalshiBotData.Extensions.WeightSetExtensions.html#KalshiBotData_Extensions_WeightSetExtensions_ToWeightSetDTOs_
+  commentId: Overload:KalshiBotData.Extensions.WeightSetExtensions.ToWeightSetDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSetDTOs
+  nameWithType: WeightSetExtensions.ToWeightSetDTOs
+- uid: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSets(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.WeightSetDTO})
+  name: ToWeightSets(IEnumerable<WeightSetDTO>)
+  href: api/KalshiBotData.Extensions.WeightSetExtensions.html#KalshiBotData_Extensions_WeightSetExtensions_ToWeightSets_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_WeightSetDTO__
+  commentId: M:KalshiBotData.Extensions.WeightSetExtensions.ToWeightSets(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.WeightSetDTO})
+  name.vb: ToWeightSets(IEnumerable(Of WeightSetDTO))
+  fullName: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSets(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.WeightSetDTO>)
+  fullName.vb: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSets(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.WeightSetDTO))
+  nameWithType: WeightSetExtensions.ToWeightSets(IEnumerable<WeightSetDTO>)
+  nameWithType.vb: WeightSetExtensions.ToWeightSets(IEnumerable(Of WeightSetDTO))
+- uid: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSets*
+  name: ToWeightSets
+  href: api/KalshiBotData.Extensions.WeightSetExtensions.html#KalshiBotData_Extensions_WeightSetExtensions_ToWeightSets_
+  commentId: Overload:KalshiBotData.Extensions.WeightSetExtensions.ToWeightSets
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.WeightSetExtensions.ToWeightSets
+  nameWithType: WeightSetExtensions.ToWeightSets
 - uid: KalshiBotData.Extensions.WeightSetExtensions.UpdateWeightSet(KalshiBotData.Models.WeightSet,BacklashDTOs.Data.WeightSetDTO)
   name: UpdateWeightSet(WeightSet, WeightSetDTO)
   href: api/KalshiBotData.Extensions.WeightSetExtensions.html#KalshiBotData_Extensions_WeightSetExtensions_UpdateWeightSet_KalshiBotData_Models_WeightSet_BacklashDTOs_Data_WeightSetDTO_
@@ -35439,6 +36850,38 @@ references:
   commentId: T:KalshiBotData.Extensions.WeightSetMarketExtensions
   fullName: KalshiBotData.Extensions.WeightSetMarketExtensions
   nameWithType: WeightSetMarketExtensions
+- uid: KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone(BacklashDTOs.Data.WeightSetMarketDTO)
+  name: DeepClone(WeightSetMarketDTO)
+  href: api/KalshiBotData.Extensions.WeightSetMarketExtensions.html#KalshiBotData_Extensions_WeightSetMarketExtensions_DeepClone_BacklashDTOs_Data_WeightSetMarketDTO_
+  commentId: M:KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone(BacklashDTOs.Data.WeightSetMarketDTO)
+  fullName: KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone(BacklashDTOs.Data.WeightSetMarketDTO)
+  nameWithType: WeightSetMarketExtensions.DeepClone(WeightSetMarketDTO)
+- uid: KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone(KalshiBotData.Models.WeightSetMarket)
+  name: DeepClone(WeightSetMarket)
+  href: api/KalshiBotData.Extensions.WeightSetMarketExtensions.html#KalshiBotData_Extensions_WeightSetMarketExtensions_DeepClone_KalshiBotData_Models_WeightSetMarket_
+  commentId: M:KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone(KalshiBotData.Models.WeightSetMarket)
+  fullName: KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone(KalshiBotData.Models.WeightSetMarket)
+  nameWithType: WeightSetMarketExtensions.DeepClone(WeightSetMarket)
+- uid: KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone*
+  name: DeepClone
+  href: api/KalshiBotData.Extensions.WeightSetMarketExtensions.html#KalshiBotData_Extensions_WeightSetMarketExtensions_DeepClone_
+  commentId: Overload:KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.WeightSetMarketExtensions.DeepClone
+  nameWithType: WeightSetMarketExtensions.DeepClone
+- uid: KalshiBotData.Extensions.WeightSetMarketExtensions.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Extensions.WeightSetMarketExtensions.html#KalshiBotData_Extensions_WeightSetMarketExtensions_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Extensions.WeightSetMarketExtensions.GetPerformanceMetrics
+  fullName: KalshiBotData.Extensions.WeightSetMarketExtensions.GetPerformanceMetrics()
+  nameWithType: WeightSetMarketExtensions.GetPerformanceMetrics()
+- uid: KalshiBotData.Extensions.WeightSetMarketExtensions.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Extensions.WeightSetMarketExtensions.html#KalshiBotData_Extensions_WeightSetMarketExtensions_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Extensions.WeightSetMarketExtensions.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.WeightSetMarketExtensions.GetPerformanceMetrics
+  nameWithType: WeightSetMarketExtensions.GetPerformanceMetrics
 - uid: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarket(BacklashDTOs.Data.WeightSetMarketDTO)
   name: ToWeightSetMarket(WeightSetMarketDTO)
   href: api/KalshiBotData.Extensions.WeightSetMarketExtensions.html#KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarket_BacklashDTOs_Data_WeightSetMarketDTO_
@@ -35465,6 +36908,38 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTO
   nameWithType: WeightSetMarketExtensions.ToWeightSetMarketDTO
+- uid: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.WeightSetMarket})
+  name: ToWeightSetMarketDTOs(IEnumerable<WeightSetMarket>)
+  href: api/KalshiBotData.Extensions.WeightSetMarketExtensions.html#KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarketDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_WeightSetMarket__
+  commentId: M:KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.WeightSetMarket})
+  name.vb: ToWeightSetMarketDTOs(IEnumerable(Of WeightSetMarket))
+  fullName: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTOs(System.Collections.Generic.IEnumerable<KalshiBotData.Models.WeightSetMarket>)
+  fullName.vb: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTOs(System.Collections.Generic.IEnumerable(Of KalshiBotData.Models.WeightSetMarket))
+  nameWithType: WeightSetMarketExtensions.ToWeightSetMarketDTOs(IEnumerable<WeightSetMarket>)
+  nameWithType.vb: WeightSetMarketExtensions.ToWeightSetMarketDTOs(IEnumerable(Of WeightSetMarket))
+- uid: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTOs*
+  name: ToWeightSetMarketDTOs
+  href: api/KalshiBotData.Extensions.WeightSetMarketExtensions.html#KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarketDTOs_
+  commentId: Overload:KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTOs
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarketDTOs
+  nameWithType: WeightSetMarketExtensions.ToWeightSetMarketDTOs
+- uid: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarkets(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.WeightSetMarketDTO})
+  name: ToWeightSetMarkets(IEnumerable<WeightSetMarketDTO>)
+  href: api/KalshiBotData.Extensions.WeightSetMarketExtensions.html#KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarkets_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_WeightSetMarketDTO__
+  commentId: M:KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarkets(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.WeightSetMarketDTO})
+  name.vb: ToWeightSetMarkets(IEnumerable(Of WeightSetMarketDTO))
+  fullName: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarkets(System.Collections.Generic.IEnumerable<BacklashDTOs.Data.WeightSetMarketDTO>)
+  fullName.vb: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarkets(System.Collections.Generic.IEnumerable(Of BacklashDTOs.Data.WeightSetMarketDTO))
+  nameWithType: WeightSetMarketExtensions.ToWeightSetMarkets(IEnumerable<WeightSetMarketDTO>)
+  nameWithType.vb: WeightSetMarketExtensions.ToWeightSetMarkets(IEnumerable(Of WeightSetMarketDTO))
+- uid: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarkets*
+  name: ToWeightSetMarkets
+  href: api/KalshiBotData.Extensions.WeightSetMarketExtensions.html#KalshiBotData_Extensions_WeightSetMarketExtensions_ToWeightSetMarkets_
+  commentId: Overload:KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarkets
+  isSpec: "True"
+  fullName: KalshiBotData.Extensions.WeightSetMarketExtensions.ToWeightSetMarkets
+  nameWithType: WeightSetMarketExtensions.ToWeightSetMarkets
 - uid: KalshiBotData.Extensions.WeightSetMarketExtensions.UpdateWeightSetMarket(KalshiBotData.Models.WeightSetMarket,BacklashDTOs.Data.WeightSetMarketDTO)
   name: UpdateWeightSetMarket(WeightSetMarket, WeightSetMarketDTO)
   href: api/KalshiBotData.Extensions.WeightSetMarketExtensions.html#KalshiBotData_Extensions_WeightSetMarketExtensions_UpdateWeightSetMarket_KalshiBotData_Models_WeightSetMarket_BacklashDTOs_Data_WeightSetMarketDTO_
@@ -49397,6 +50872,19 @@ references:
   commentId: T:TradingStrategies.Trading.Helpers.StrategyConfiguration
   fullName: TradingStrategies.Trading.Helpers.StrategyConfiguration
   nameWithType: StrategyConfiguration
+- uid: TradingStrategies.Trading.Helpers.StrategyConfiguration.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/TradingStrategies.Trading.Helpers.StrategyConfiguration.html#TradingStrategies_Trading_Helpers_StrategyConfiguration_GetPerformanceMetrics
+  commentId: M:TradingStrategies.Trading.Helpers.StrategyConfiguration.GetPerformanceMetrics
+  fullName: TradingStrategies.Trading.Helpers.StrategyConfiguration.GetPerformanceMetrics()
+  nameWithType: StrategyConfiguration.GetPerformanceMetrics()
+- uid: TradingStrategies.Trading.Helpers.StrategyConfiguration.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/TradingStrategies.Trading.Helpers.StrategyConfiguration.html#TradingStrategies_Trading_Helpers_StrategyConfiguration_GetPerformanceMetrics_
+  commentId: Overload:TradingStrategies.Trading.Helpers.StrategyConfiguration.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Helpers.StrategyConfiguration.GetPerformanceMetrics
+  nameWithType: StrategyConfiguration.GetPerformanceMetrics
 - uid: TradingStrategies.Trading.Helpers.StrategyConfiguration.GetStrategiesWithParameterSets
   name: GetStrategiesWithParameterSets()
   href: api/TradingStrategies.Trading.Helpers.StrategyConfiguration.html#TradingStrategies_Trading_Helpers_StrategyConfiguration_GetStrategiesWithParameterSets
@@ -49461,15 +50949,15 @@ references:
   commentId: T:TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition
   fullName: TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition
   nameWithType: StrategyConfiguration.StrategyDefinition
-- uid: TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.#ctor(System.String,System.Func{System.String,System.Collections.Generic.Dictionary{BacklashInterfaces.Enums.StrategyEnums.MarketType,System.Collections.Generic.List{TradingStrategies.Strategies.Strategy}}})
-  name: StrategyDefinition(string, Func<string, Dictionary<MarketType, List<Strategy>>>)
-  href: api/TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.html#TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition__ctor_System_String_System_Func_System_String_System_Collections_Generic_Dictionary_BacklashInterfaces_Enums_StrategyEnums_MarketType_System_Collections_Generic_List_TradingStrategies_Strategies_Strategy____
-  commentId: M:TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.#ctor(System.String,System.Func{System.String,System.Collections.Generic.Dictionary{BacklashInterfaces.Enums.StrategyEnums.MarketType,System.Collections.Generic.List{TradingStrategies.Strategies.Strategy}}})
-  name.vb: New(String, Func(Of String, Dictionary(Of MarketType, List(Of Strategy))))
-  fullName: TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.StrategyDefinition(string, System.Func<string, System.Collections.Generic.Dictionary<BacklashInterfaces.Enums.StrategyEnums.MarketType, System.Collections.Generic.List<TradingStrategies.Strategies.Strategy>>>)
-  fullName.vb: TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.New(String, System.Func(Of String, System.Collections.Generic.Dictionary(Of BacklashInterfaces.Enums.StrategyEnums.MarketType, System.Collections.Generic.List(Of TradingStrategies.Strategies.Strategy))))
-  nameWithType: StrategyConfiguration.StrategyDefinition.StrategyDefinition(string, Func<string, Dictionary<StrategyEnums.MarketType, List<Strategy>>>)
-  nameWithType.vb: StrategyConfiguration.StrategyDefinition.New(String, Func(Of String, Dictionary(Of StrategyEnums.MarketType, List(Of Strategy))))
+- uid: TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.#ctor(System.String,System.Func{System.String,System.Threading.Tasks.Task{System.Collections.Generic.Dictionary{BacklashInterfaces.Enums.StrategyEnums.MarketType,System.Collections.Generic.List{TradingStrategies.Strategies.Strategy}}}})
+  name: StrategyDefinition(string, Func<string, Task<Dictionary<MarketType, List<Strategy>>>>)
+  href: api/TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.html#TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition__ctor_System_String_System_Func_System_String_System_Threading_Tasks_Task_System_Collections_Generic_Dictionary_BacklashInterfaces_Enums_StrategyEnums_MarketType_System_Collections_Generic_List_TradingStrategies_Strategies_Strategy_____
+  commentId: M:TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.#ctor(System.String,System.Func{System.String,System.Threading.Tasks.Task{System.Collections.Generic.Dictionary{BacklashInterfaces.Enums.StrategyEnums.MarketType,System.Collections.Generic.List{TradingStrategies.Strategies.Strategy}}}})
+  name.vb: New(String, Func(Of String, Task(Of Dictionary(Of MarketType, List(Of Strategy)))))
+  fullName: TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.StrategyDefinition(string, System.Func<string, System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<BacklashInterfaces.Enums.StrategyEnums.MarketType, System.Collections.Generic.List<TradingStrategies.Strategies.Strategy>>>>)
+  fullName.vb: TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.New(String, System.Func(Of String, System.Threading.Tasks.Task(Of System.Collections.Generic.Dictionary(Of BacklashInterfaces.Enums.StrategyEnums.MarketType, System.Collections.Generic.List(Of TradingStrategies.Strategies.Strategy)))))
+  nameWithType: StrategyConfiguration.StrategyDefinition.StrategyDefinition(string, Func<string, Task<Dictionary<StrategyEnums.MarketType, List<Strategy>>>>)
+  nameWithType.vb: StrategyConfiguration.StrategyDefinition.New(String, Func(Of String, Task(Of Dictionary(Of StrategyEnums.MarketType, List(Of Strategy)))))
 - uid: TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.#ctor*
   name: StrategyDefinition
   href: api/TradingStrategies.Trading.Helpers.StrategyConfiguration.StrategyDefinition.html#TradingStrategies_Trading_Helpers_StrategyConfiguration_StrategyDefinition__ctor_

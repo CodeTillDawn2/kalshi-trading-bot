@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class LogEntryExtensions | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Provides extension methods for converting between LogEntry models and DTOs, supporting both standard log entries and overseer-specific log entry variants for comprehensive logging data transfer.">
+    <meta name="description" content="Provides extension methods for converting between LogEntry models and DTOs, supporting both standard log entries and overseer-specific log entry variants for comprehensive logging data transfer. Includes performance metrics collection and batch transformation capabilities.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -82,7 +82,8 @@
 
   <h1 id="KalshiBotData_Extensions_LogEntryExtensions" data-uid="KalshiBotData.Extensions.LogEntryExtensions" class="text-break">Class LogEntryExtensions</h1>
   <div class="markdown level0 summary"><p>Provides extension methods for converting between LogEntry models and DTOs,
-supporting both standard log entries and overseer-specific log entry variants for comprehensive logging data transfer.</p>
+supporting both standard log entries and overseer-specific log entry variants for comprehensive logging data transfer.
+Includes performance metrics collection and batch transformation capabilities.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -124,10 +125,305 @@ supporting both standard log entries and overseer-specific log entry variants fo
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions_DeepClone_BacklashDTOs_Data_LogEntryDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions.DeepClone(BacklashDTOs.Data.LogEntryDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L270">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_LogEntryExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_LogEntryExtensions_DeepClone_BacklashDTOs_Data_LogEntryDTO_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.DeepClone(BacklashDTOs.Data.LogEntryDTO)">DeepClone(LogEntryDTO)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of a LogEntryDTO to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static LogEntryDTO DeepClone(this LogEntryDTO logEntryDTO)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.LogEntryDTO.html">LogEntryDTO</a></td>
+        <td><span class="parametername">logEntryDTO</span></td>
+        <td><p>The LogEntryDTO to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashDTOs.Data.LogEntryDTO.html">LogEntryDTO</a></td>
+        <td><p>A new LogEntryDTO instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when logEntryDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions_DeepClone_KalshiBotData_Models_LogEntry_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions.DeepClone(KalshiBotData.Models.LogEntry)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L245">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_LogEntryExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_LogEntryExtensions_DeepClone_KalshiBotData_Models_LogEntry_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.DeepClone(KalshiBotData.Models.LogEntry)">DeepClone(LogEntry)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of a LogEntry model to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static LogEntry DeepClone(this LogEntry logEntry)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.LogEntry.html">LogEntry</a></td>
+        <td><span class="parametername">logEntry</span></td>
+        <td><p>The LogEntry model to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.LogEntry.html">LogEntry</a></td>
+        <td><p>A new LogEntry instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when logEntry is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions_DeepClone_KalshiBotData_Models_OverseerLogEntry_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions.DeepClone(KalshiBotData.Models.OverseerLogEntry)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L295">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_LogEntryExtensions_DeepClone_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.DeepClone*"></a>
+  <h4 id="KalshiBotData_Extensions_LogEntryExtensions_DeepClone_KalshiBotData_Models_OverseerLogEntry_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.DeepClone(KalshiBotData.Models.OverseerLogEntry)">DeepClone(OverseerLogEntry)</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of an OverseerLogEntry model to prevent unintended mutations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static OverseerLogEntry DeepClone(this OverseerLogEntry overseerLogEntry)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.OverseerLogEntry.html">OverseerLogEntry</a></td>
+        <td><span class="parametername">overseerLogEntry</span></td>
+        <td><p>The OverseerLogEntry model to clone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="KalshiBotData.Models.OverseerLogEntry.html">OverseerLogEntry</a></td>
+        <td><p>A new OverseerLogEntry instance with all properties copied from the original.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when overseerLogEntry is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L23">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_LogEntryExtensions_GetPerformanceMetrics_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.GetPerformanceMetrics*"></a>
+  <h4 id="KalshiBotData_Extensions_LogEntryExtensions_GetPerformanceMetrics" data-uid="KalshiBotData.Extensions.LogEntryExtensions.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets the performance metrics for transformation operations</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyDictionary&lt;string, List&lt;TimeSpan&gt;&gt; GetPerformanceMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions_ToLogEntries_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_LogEntryDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions.ToLogEntries(System.Collections.Generic.IEnumerable%7BBacklashDTOs.Data.LogEntryDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L224">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_LogEntryExtensions_ToLogEntries_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToLogEntries*"></a>
+  <h4 id="KalshiBotData_Extensions_LogEntryExtensions_ToLogEntries_System_Collections_Generic_IEnumerable_BacklashDTOs_Data_LogEntryDTO__" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToLogEntries(System.Collections.Generic.IEnumerable{BacklashDTOs.Data.LogEntryDTO})">ToLogEntries(IEnumerable&lt;LogEntryDTO&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of LogEntryDTOs to their corresponding model representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;LogEntry&gt; ToLogEntries(this IEnumerable&lt;LogEntryDTO&gt; logEntryDTOs)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BacklashDTOs.Data.LogEntryDTO.html">LogEntryDTO</a>&gt;</td>
+        <td><span class="parametername">logEntryDTOs</span></td>
+        <td><p>The collection of LogEntryDTOs to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="KalshiBotData.Models.LogEntry.html">LogEntry</a>&gt;</td>
+        <td><p>A list of LogEntry models with all properties mapped from the DTOs.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when logEntryDTOs is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions_ToLogEntry_BacklashDTOs_Data_LogEntryDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions.ToLogEntry(BacklashDTOs.Data.LogEntryDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L40">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L67">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_LogEntryExtensions_ToLogEntry_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToLogEntry*"></a>
   <h4 id="KalshiBotData_Extensions_LogEntryExtensions_ToLogEntry_BacklashDTOs_Data_LogEntryDTO_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToLogEntry(BacklashDTOs.Data.LogEntryDTO)">ToLogEntry(LogEntryDTO)</h4>
@@ -173,12 +469,28 @@ creating a new LogEntry with all properties mapped from the DTO.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when logEntryDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions_ToLogEntryDTO_KalshiBotData_Models_LogEntry_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTO(KalshiBotData.Models.LogEntry)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L34">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_LogEntryExtensions_ToLogEntryDTO_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTO*"></a>
   <h4 id="KalshiBotData_Extensions_LogEntryExtensions_ToLogEntryDTO_KalshiBotData_Models_LogEntry_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTO(KalshiBotData.Models.LogEntry)">ToLogEntryDTO(LogEntry)</h4>
@@ -224,12 +536,94 @@ mapping all log entry properties for data transfer operations.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when logEntry is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions_ToLogEntryDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_LogEntry__.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTOs(System.Collections.Generic.IEnumerable%7BKalshiBotData.Models.LogEntry%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L203">View Source</a>
+  </span>
+  <a id="KalshiBotData_Extensions_LogEntryExtensions_ToLogEntryDTOs_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTOs*"></a>
+  <h4 id="KalshiBotData_Extensions_LogEntryExtensions_ToLogEntryDTOs_System_Collections_Generic_IEnumerable_KalshiBotData_Models_LogEntry__" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToLogEntryDTOs(System.Collections.Generic.IEnumerable{KalshiBotData.Models.LogEntry})">ToLogEntryDTOs(IEnumerable&lt;LogEntry&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a collection of LogEntry models to their corresponding DTO representations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static List&lt;LogEntryDTO&gt; ToLogEntryDTOs(this IEnumerable&lt;LogEntry&gt; logEntries)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="KalshiBotData.Models.LogEntry.html">LogEntry</a>&gt;</td>
+        <td><span class="parametername">logEntries</span></td>
+        <td><p>The collection of LogEntry models to convert.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashDTOs.Data.LogEntryDTO.html">LogEntryDTO</a>&gt;</td>
+        <td><p>A list of LogEntryDTOs with all properties mapped from the models.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when logEntries is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions_ToOverseerLogEntry_BacklashDTOs_Data_LogEntryDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions.ToOverseerLogEntry(BacklashDTOs.Data.LogEntryDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L87">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L138">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_LogEntryExtensions_ToOverseerLogEntry_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToOverseerLogEntry*"></a>
   <h4 id="KalshiBotData_Extensions_LogEntryExtensions_ToOverseerLogEntry_BacklashDTOs_Data_LogEntryDTO_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToOverseerLogEntry(BacklashDTOs.Data.LogEntryDTO)">ToOverseerLogEntry(LogEntryDTO)</h4>
@@ -275,12 +669,28 @@ creating a specialized log entry variant for overseer system operations.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when logEntryDTO is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions_ToOverseerLogEntryDTO_KalshiBotData_Models_OverseerLogEntry_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions.ToOverseerLogEntryDTO(KalshiBotData.Models.OverseerLogEntry)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L109">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L171">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_LogEntryExtensions_ToOverseerLogEntryDTO_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToOverseerLogEntryDTO*"></a>
   <h4 id="KalshiBotData_Extensions_LogEntryExtensions_ToOverseerLogEntryDTO_KalshiBotData_Models_OverseerLogEntry_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.ToOverseerLogEntryDTO(KalshiBotData.Models.OverseerLogEntry)">ToOverseerLogEntryDTO(OverseerLogEntry)</h4>
@@ -326,12 +736,28 @@ mapping all overseer log entry properties for data transfer.</p>
       </tr>
     </tbody>
   </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when overseerLogEntry is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions_UpdateLogEntry_KalshiBotData_Models_LogEntry_BacklashDTOs_Data_LogEntryDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions.UpdateLogEntry(KalshiBotData.Models.LogEntry%2CBacklashDTOs.Data.LogEntryDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L64">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L102">View Source</a>
   </span>
   <a id="KalshiBotData_Extensions_LogEntryExtensions_UpdateLogEntry_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.UpdateLogEntry*"></a>
   <h4 id="KalshiBotData_Extensions_LogEntryExtensions_UpdateLogEntry_KalshiBotData_Models_LogEntry_BacklashDTOs_Data_LogEntryDTO_" data-uid="KalshiBotData.Extensions.LogEntryExtensions.UpdateLogEntry(KalshiBotData.Models.LogEntry,BacklashDTOs.Data.LogEntryDTO)">UpdateLogEntry(LogEntry, LogEntryDTO)</h4>
@@ -393,7 +819,12 @@ validating log entry ID match before applying all property changes.</p>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">Exception</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
+        <td><p>Thrown when logEntry or logEntryDTO is null.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
         <td><p>Thrown when log entry IDs do not match.</p>
 </td>
       </tr>
@@ -411,7 +842,7 @@ validating log entry ID match before applying all property changes.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Extensions_LogEntryExtensions.md&amp;value=---%0Auid%3A%20KalshiBotData.Extensions.LogEntryExtensions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L10" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Extensions/LogEntryExtensions.cs/#L16" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>
