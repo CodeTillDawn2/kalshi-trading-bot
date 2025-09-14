@@ -5948,6 +5948,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.IPerformanceMonitor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.IPerformanceMonitor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.IPerformanceMonitor",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.IPerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Interface for recording performance metrics.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Overseer.MarketTypeService.yml",
       "output": {
         ".html": {
@@ -5987,6 +6001,48 @@
       "IsMRef": true,
       "Title": "TradingStrategies.Trading.Overseer.PatternDetectionService",
       "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"1\">Service responsible for detecting candlestick patterns from market snapshots in the Kalshi trading bot system.\nThis service acts as a bridge between market data and pattern recognition algorithms, enabling trading\nstrategies to incorporate technical analysis based on historical price movements.</p>\n<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"5\">The service processes market snapshots containing recent candlestick data, converts them to a format\nsuitable for pattern analysis, and applies comprehensive pattern detection algorithms to identify\nvarious technical analysis formations including single-candle, multi-candle, and complex patterns.</p>\n<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"9\">Key responsibilities:</p>\n<ul sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"10\">\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"10\">Convert market snapshot candlestick data to pattern analysis format</li>\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"11\">Execute pattern detection algorithms across multiple timeframes and pattern types</li>\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"12\">Filter and return the most relevant patterns for trading decision making</li>\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"13\">Handle edge cases and provide graceful fallbacks for data processing errors</li>\n<li sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"14\">Collect performance metrics for timing analysis in high-frequency scenarios</li>\n</ul>\n<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternDetectionService.yml\" sourcestartlinenumber=\"16\">This service is used by the SimulationEngine during backtesting and strategy evaluation to enrich\nmarket analysis with technical pattern recognition capabilities.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.PerformanceMonitor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.PerformanceMonitor",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Generic performance monitor for tracking various metrics\nin the trading simulator. This class collects comprehensive performance data\nincluding execution times, memory usage, trade counts, and detailed metrics.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.PerformanceRecord.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.PerformanceRecord.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.PerformanceRecord",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PerformanceRecord.yml\" sourcestartlinenumber=\"1\">Represents a single performance record.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.PerformanceStats.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.PerformanceStats.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.PerformanceStats",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PerformanceStats.yml\" sourcestartlinenumber=\"1\">Comprehensive performance statistics for operations.</p>\n"
     },
     {
       "type": "ManagedReference",

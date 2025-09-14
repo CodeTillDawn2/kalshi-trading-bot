@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class PerformanceMonitor | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class PerformanceMonitor | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Generic performance monitor for tracking various metrics in the trading simulator. This class collects comprehensive performance data including execution times, memory usage, trade counts, and detailed metrics.">
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle" data-toggle="collapse" href="#sidetoggle" aria-expanded="true" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor">
+
+
+
+  <h1 id="TradingStrategies_Trading_Overseer_PerformanceMonitor" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor" class="text-break">Class PerformanceMonitor</h1>
+  <div class="markdown level0 summary"><p>Generic performance monitor for tracking various metrics
+in the trading simulator. This class collects comprehensive performance data
+including execution times, memory usage, trade counts, and detailed metrics.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">PerformanceMonitor</span></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="TradingStrategies.Trading.Overseer.IPerformanceMonitor.html">IPerformanceMonitor</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="TradingStrategies.html">TradingStrategies</a>.<a class="xref" href="TradingStrategies.Trading.html">Trading</a>.<a class="xref" href="TradingStrategies.Trading.Overseer.html">Overseer</a></h6>
+  <h6><strong>Assembly</strong>: TradingStrategies.dll</h6>
+  <h5 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class PerformanceMonitor : IPerformanceMonitor</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor__ctor.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L18">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor__ctor_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.#ctor*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor__ctor" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.#ctor">PerformanceMonitor()</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the PerformanceMonitor.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PerformanceMonitor()</code></pre>
+  </div>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_Clear.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L176">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_Clear_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_Clear" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear">Clear()</h4>
+  <div class="markdown level1 summary"><p>Clears all recorded performance data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Clear()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetAllPerformanceStats.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L186">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetAllPerformanceStats_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetAllPerformanceStats" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats">GetAllPerformanceStats()</h4>
+  <div class="markdown level1 summary"><p>Gets a summary of all performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;string, PerformanceStats&gt; GetAllPerformanceStats()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="TradingStrategies.Trading.Overseer.PerformanceStats.html">PerformanceStats</a>&gt;</td>
+        <td><p>A dictionary mapping method names to their comprehensive performance statistics.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetExecutionTimes_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L200">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetExecutionTimes_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetExecutionTimes_System_String_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes(System.String)">GetExecutionTimes(string)</h4>
+  <div class="markdown level1 summary"><p>Gets all recorded execution times for a specific method (for backward compatibility).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;(DateTime Timestamp, long Milliseconds)&gt; GetExecutionTimes(string methodName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">methodName</span></td>
+        <td><p>The name of the method to get times for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.datetime,system.int64-.timestamp">Timestamp</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.datetime,system.int64-.milliseconds">Milliseconds</a>)&gt;</td>
+        <td><p>A list of execution time records with timestamps.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredMethods.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L159">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredMethods_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredMethods" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods">GetMonitoredMethods()</h4>
+  <div class="markdown level1 summary"><p>Gets all method names that have recorded performance data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;string&gt; GetMonitoredMethods()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><p>A collection of method names.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredSimulations.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L168">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredSimulations_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredSimulations" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations">GetMonitoredSimulations()</h4>
+  <div class="markdown level1 summary"><p>Gets all simulation names that have recorded metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;string&gt; GetMonitoredSimulations()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><p>A collection of simulation names.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceRecords_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L86">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceRecords_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceRecords_System_String_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords(System.String)">GetPerformanceRecords(string)</h4>
+  <div class="markdown level1 summary"><p>Gets all recorded performance records for a specific method.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;PerformanceRecord&gt; GetPerformanceRecords(string methodName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">methodName</span></td>
+        <td><p>The name of the method to get records for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="TradingStrategies.Trading.Overseer.PerformanceRecord.html">PerformanceRecord</a>&gt;</td>
+        <td><p>A list of performance records.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceStats_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L106">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceStats_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceStats_System_String_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats(System.String)">GetPerformanceStats(string)</h4>
+  <div class="markdown level1 summary"><p>Gets comprehensive performance statistics for a specific method.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PerformanceStats GetPerformanceStats(string methodName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">methodName</span></td>
+        <td><p>The name of the method to get statistics for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="TradingStrategies.Trading.Overseer.PerformanceStats.html">PerformanceStats</a></td>
+        <td><p>A comprehensive performance statistics object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetSimulationMetrics_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L96">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetSimulationMetrics_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetSimulationMetrics_System_String_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics(System.String)">GetSimulationMetrics(string)</h4>
+  <div class="markdown level1 summary"><p>Gets simulation metrics for a specific simulation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;string, object&gt; GetSimulationMetrics(string simulationName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">simulationName</span></td>
+        <td><p>The name of the simulation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td><p>The metrics dictionary.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordExecutionTime_System_String_System_Int64_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime(System.String%2CSystem.Int64)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L76">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordExecutionTime_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordExecutionTime_System_String_System_Int64_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime(System.String,System.Int64)">RecordExecutionTime(string, long)</h4>
+  <div class="markdown level1 summary"><p>Records the execution time for a specific method or operation (for backward compatibility).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RecordExecutionTime(string methodName, long milliseconds)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">methodName</span></td>
+        <td><p>The name of the method or operation.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td><span class="parametername">milliseconds</span></td>
+        <td><p>The execution time in milliseconds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordExecutionTime_System_String_System_Int64__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method is provided for backward compatibility with the IPerformanceMonitor interface.
+For comprehensive metrics, use RecordPerformanceMetrics.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPerformanceMetrics_System_String_System_Int64_System_Int32_System_Int32_System_Collections_Generic_Dictionary_System_String_System_Int64__.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics(System.String%2CSystem.Int64%2CSystem.Int32%2CSystem.Int32%2CSystem.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Int64%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L36">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPerformanceMetrics_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPerformanceMetrics_System_String_System_Int64_System_Int32_System_Int32_System_Collections_Generic_Dictionary_System_String_System_Int64__" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics(System.String,System.Int64,System.Int32,System.Int32,System.Collections.Generic.Dictionary{System.String,System.Int64})">RecordPerformanceMetrics(string, long, int, int, Dictionary&lt;string, long&gt;?)</h4>
+  <div class="markdown level1 summary"><p>Records comprehensive performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RecordPerformanceMetrics(string methodName, long totalExecutionTimeMs, int totalItemsProcessed, int totalItemsFound, Dictionary&lt;string, long&gt;? itemCheckTimes = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">methodName</span></td>
+        <td><p>The name of the method or operation.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td><span class="parametername">totalExecutionTimeMs</span></td>
+        <td><p>Total time spent on execution.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">totalItemsProcessed</span></td>
+        <td><p>Number of items processed.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">totalItemsFound</span></td>
+        <td><p>Number of items found.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>&gt;</td>
+        <td><span class="parametername">itemCheckTimes</span></td>
+        <td><p>Dictionary of item names to their processing times.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPerformanceMetrics_System_String_System_Int64_System_Int32_System_Int32_System_Collections_Generic_Dictionary_System_String_System_Int64___remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>All performance metrics are stored in a thread-safe concurrent dictionary with timestamps.
+This data can be used for detailed performance analysis and optimization.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object__.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics(System.String%2CSystem.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Object%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L62">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordSimulationMetrics_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object__" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics(System.String,System.Collections.Generic.Dictionary{System.String,System.Object})">RecordSimulationMetrics(string, Dictionary&lt;string, object&gt;)</h4>
+  <div class="markdown level1 summary"><p>Records simulation performance metrics from StrategySimulation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RecordSimulationMetrics(string simulationName, Dictionary&lt;string, object&gt; metrics)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">simulationName</span></td>
+        <td><p>The name of the simulation.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td><span class="parametername">metrics</span></td>
+        <td><p>The detailed metrics dictionary from StrategySimulation.GetDetailedPerformanceMetrics().</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="TradingStrategies.Trading.Overseer.IPerformanceMonitor.html">IPerformanceMonitor</a>
+  </div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L10" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

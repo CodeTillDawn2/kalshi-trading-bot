@@ -48529,6 +48529,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Configuration.SimulationConfig.PerformanceThresholdMs
   nameWithType: SimulationConfig.PerformanceThresholdMs
+- uid: TradingStrategies.Configuration.SimulationConfig.Simulation_EnablePerformanceMetrics
+  name: Simulation_EnablePerformanceMetrics
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_Simulation_EnablePerformanceMetrics
+  commentId: P:TradingStrategies.Configuration.SimulationConfig.Simulation_EnablePerformanceMetrics
+  fullName: TradingStrategies.Configuration.SimulationConfig.Simulation_EnablePerformanceMetrics
+  nameWithType: SimulationConfig.Simulation_EnablePerformanceMetrics
+- uid: TradingStrategies.Configuration.SimulationConfig.Simulation_EnablePerformanceMetrics*
+  name: Simulation_EnablePerformanceMetrics
+  href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_Simulation_EnablePerformanceMetrics_
+  commentId: Overload:TradingStrategies.Configuration.SimulationConfig.Simulation_EnablePerformanceMetrics
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SimulationConfig.Simulation_EnablePerformanceMetrics
+  nameWithType: SimulationConfig.Simulation_EnablePerformanceMetrics
 - uid: TradingStrategies.Configuration.SimulationConfig.TakerFeeRate
   name: TakerFeeRate
   href: api/TradingStrategies.Configuration.SimulationConfig.html#TradingStrategies_Configuration_SimulationConfig_TakerFeeRate
@@ -52396,6 +52409,28 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.EquityCalculator.GetEquityAsync
   nameWithType: EquityCalculator.GetEquityAsync
+- uid: TradingStrategies.Trading.Overseer.IPerformanceMonitor
+  name: IPerformanceMonitor
+  href: api/TradingStrategies.Trading.Overseer.IPerformanceMonitor.html
+  commentId: T:TradingStrategies.Trading.Overseer.IPerformanceMonitor
+  fullName: TradingStrategies.Trading.Overseer.IPerformanceMonitor
+  nameWithType: IPerformanceMonitor
+- uid: TradingStrategies.Trading.Overseer.IPerformanceMonitor.RecordExecutionTime(System.String,System.Int64)
+  name: RecordExecutionTime(string, long)
+  href: api/TradingStrategies.Trading.Overseer.IPerformanceMonitor.html#TradingStrategies_Trading_Overseer_IPerformanceMonitor_RecordExecutionTime_System_String_System_Int64_
+  commentId: M:TradingStrategies.Trading.Overseer.IPerformanceMonitor.RecordExecutionTime(System.String,System.Int64)
+  name.vb: RecordExecutionTime(String, Long)
+  fullName: TradingStrategies.Trading.Overseer.IPerformanceMonitor.RecordExecutionTime(string, long)
+  fullName.vb: TradingStrategies.Trading.Overseer.IPerformanceMonitor.RecordExecutionTime(String, Long)
+  nameWithType: IPerformanceMonitor.RecordExecutionTime(string, long)
+  nameWithType.vb: IPerformanceMonitor.RecordExecutionTime(String, Long)
+- uid: TradingStrategies.Trading.Overseer.IPerformanceMonitor.RecordExecutionTime*
+  name: RecordExecutionTime
+  href: api/TradingStrategies.Trading.Overseer.IPerformanceMonitor.html#TradingStrategies_Trading_Overseer_IPerformanceMonitor_RecordExecutionTime_
+  commentId: Overload:TradingStrategies.Trading.Overseer.IPerformanceMonitor.RecordExecutionTime
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.IPerformanceMonitor.RecordExecutionTime
+  nameWithType: IPerformanceMonitor.RecordExecutionTime
 - uid: TradingStrategies.Trading.Overseer.MarketTypeService
   name: MarketTypeService
   href: api/TradingStrategies.Trading.Overseer.MarketTypeService.html
@@ -52521,6 +52556,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnableParallelProcessing
   nameWithType: PatternDetectionConfig.EnableParallelProcessing
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnablePatternDetectionMetrics
+  name: EnablePatternDetectionMetrics
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_EnablePatternDetectionMetrics
+  commentId: P:TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnablePatternDetectionMetrics
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnablePatternDetectionMetrics
+  nameWithType: PatternDetectionConfig.EnablePatternDetectionMetrics
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnablePatternDetectionMetrics*
+  name: EnablePatternDetectionMetrics
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_EnablePatternDetectionMetrics_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnablePatternDetectionMetrics
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnablePatternDetectionMetrics
+  nameWithType: PatternDetectionConfig.EnablePatternDetectionMetrics
 - uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.InitialPatternCapacity
   name: InitialPatternCapacity
   href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_InitialPatternCapacity
@@ -52659,6 +52707,436 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatternsAsync
   nameWithType: PatternDetectionService.DetectPatternsAsync
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor
+  name: PerformanceMonitor
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html
+  commentId: T:TradingStrategies.Trading.Overseer.PerformanceMonitor
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor
+  nameWithType: PerformanceMonitor
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.#ctor
+  name: PerformanceMonitor()
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor__ctor
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.#ctor
+  name.vb: New()
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.PerformanceMonitor()
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceMonitor.New()
+  nameWithType: PerformanceMonitor.PerformanceMonitor()
+  nameWithType.vb: PerformanceMonitor.New()
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.#ctor*
+  name: PerformanceMonitor
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor__ctor_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.PerformanceMonitor
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceMonitor.New
+  nameWithType: PerformanceMonitor.PerformanceMonitor
+  nameWithType.vb: PerformanceMonitor.New
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear
+  name: Clear()
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_Clear
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear()
+  nameWithType: PerformanceMonitor.Clear()
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear*
+  name: Clear
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_Clear_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear
+  nameWithType: PerformanceMonitor.Clear
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats
+  name: GetAllPerformanceStats()
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetAllPerformanceStats
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats()
+  nameWithType: PerformanceMonitor.GetAllPerformanceStats()
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats*
+  name: GetAllPerformanceStats
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetAllPerformanceStats_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats
+  nameWithType: PerformanceMonitor.GetAllPerformanceStats
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes(System.String)
+  name: GetExecutionTimes(string)
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetExecutionTimes_System_String_
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes(System.String)
+  name.vb: GetExecutionTimes(String)
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes(string)
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes(String)
+  nameWithType: PerformanceMonitor.GetExecutionTimes(string)
+  nameWithType.vb: PerformanceMonitor.GetExecutionTimes(String)
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes*
+  name: GetExecutionTimes
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetExecutionTimes_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes
+  nameWithType: PerformanceMonitor.GetExecutionTimes
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods
+  name: GetMonitoredMethods()
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredMethods
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods()
+  nameWithType: PerformanceMonitor.GetMonitoredMethods()
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods*
+  name: GetMonitoredMethods
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredMethods_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods
+  nameWithType: PerformanceMonitor.GetMonitoredMethods
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations
+  name: GetMonitoredSimulations()
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredSimulations
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations()
+  nameWithType: PerformanceMonitor.GetMonitoredSimulations()
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations*
+  name: GetMonitoredSimulations
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredSimulations_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations
+  nameWithType: PerformanceMonitor.GetMonitoredSimulations
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords(System.String)
+  name: GetPerformanceRecords(string)
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceRecords_System_String_
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords(System.String)
+  name.vb: GetPerformanceRecords(String)
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords(string)
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords(String)
+  nameWithType: PerformanceMonitor.GetPerformanceRecords(string)
+  nameWithType.vb: PerformanceMonitor.GetPerformanceRecords(String)
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords*
+  name: GetPerformanceRecords
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceRecords_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords
+  nameWithType: PerformanceMonitor.GetPerformanceRecords
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats(System.String)
+  name: GetPerformanceStats(string)
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceStats_System_String_
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats(System.String)
+  name.vb: GetPerformanceStats(String)
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats(string)
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats(String)
+  nameWithType: PerformanceMonitor.GetPerformanceStats(string)
+  nameWithType.vb: PerformanceMonitor.GetPerformanceStats(String)
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats*
+  name: GetPerformanceStats
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceStats_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats
+  nameWithType: PerformanceMonitor.GetPerformanceStats
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics(System.String)
+  name: GetSimulationMetrics(string)
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetSimulationMetrics_System_String_
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics(System.String)
+  name.vb: GetSimulationMetrics(String)
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics(string)
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics(String)
+  nameWithType: PerformanceMonitor.GetSimulationMetrics(string)
+  nameWithType.vb: PerformanceMonitor.GetSimulationMetrics(String)
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics*
+  name: GetSimulationMetrics
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_GetSimulationMetrics_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics
+  nameWithType: PerformanceMonitor.GetSimulationMetrics
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime(System.String,System.Int64)
+  name: RecordExecutionTime(string, long)
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordExecutionTime_System_String_System_Int64_
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime(System.String,System.Int64)
+  name.vb: RecordExecutionTime(String, Long)
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime(string, long)
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime(String, Long)
+  nameWithType: PerformanceMonitor.RecordExecutionTime(string, long)
+  nameWithType.vb: PerformanceMonitor.RecordExecutionTime(String, Long)
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime*
+  name: RecordExecutionTime
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordExecutionTime_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime
+  nameWithType: PerformanceMonitor.RecordExecutionTime
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics(System.String,System.Int64,System.Int32,System.Int32,System.Collections.Generic.Dictionary{System.String,System.Int64})
+  name: RecordPerformanceMetrics(string, long, int, int, Dictionary<string, long>?)
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPerformanceMetrics_System_String_System_Int64_System_Int32_System_Int32_System_Collections_Generic_Dictionary_System_String_System_Int64__
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics(System.String,System.Int64,System.Int32,System.Int32,System.Collections.Generic.Dictionary{System.String,System.Int64})
+  name.vb: RecordPerformanceMetrics(String, Long, Integer, Integer, Dictionary(Of String, Long))
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics(string, long, int, int, System.Collections.Generic.Dictionary<string, long>?)
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics(String, Long, Integer, Integer, System.Collections.Generic.Dictionary(Of String, Long))
+  nameWithType: PerformanceMonitor.RecordPerformanceMetrics(string, long, int, int, Dictionary<string, long>?)
+  nameWithType.vb: PerformanceMonitor.RecordPerformanceMetrics(String, Long, Integer, Integer, Dictionary(Of String, Long))
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics*
+  name: RecordPerformanceMetrics
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPerformanceMetrics_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics
+  nameWithType: PerformanceMonitor.RecordPerformanceMetrics
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics(System.String,System.Collections.Generic.Dictionary{System.String,System.Object})
+  name: RecordSimulationMetrics(string, Dictionary<string, object>)
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object__
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics(System.String,System.Collections.Generic.Dictionary{System.String,System.Object})
+  name.vb: RecordSimulationMetrics(String, Dictionary(Of String, Object))
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics(string, System.Collections.Generic.Dictionary<string, object>)
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics(String, System.Collections.Generic.Dictionary(Of String, Object))
+  nameWithType: PerformanceMonitor.RecordSimulationMetrics(string, Dictionary<string, object>)
+  nameWithType.vb: PerformanceMonitor.RecordSimulationMetrics(String, Dictionary(Of String, Object))
+- uid: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics*
+  name: RecordSimulationMetrics
+  href: api/TradingStrategies.Trading.Overseer.PerformanceMonitor.html#TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordSimulationMetrics_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics
+  nameWithType: PerformanceMonitor.RecordSimulationMetrics
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord
+  name: PerformanceRecord
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html
+  commentId: T:TradingStrategies.Trading.Overseer.PerformanceRecord
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord
+  nameWithType: PerformanceRecord
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.#ctor(System.DateTime,System.Int64,System.Int32,System.Int32,System.Collections.Generic.Dictionary{System.String,System.Int64})
+  name: PerformanceRecord(DateTime, long, int, int, Dictionary<string, long>)
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord__ctor_System_DateTime_System_Int64_System_Int32_System_Int32_System_Collections_Generic_Dictionary_System_String_System_Int64__
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceRecord.#ctor(System.DateTime,System.Int64,System.Int32,System.Int32,System.Collections.Generic.Dictionary{System.String,System.Int64})
+  name.vb: New(Date, Long, Integer, Integer, Dictionary(Of String, Long))
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.PerformanceRecord(System.DateTime, long, int, int, System.Collections.Generic.Dictionary<string, long>)
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceRecord.New(Date, Long, Integer, Integer, System.Collections.Generic.Dictionary(Of String, Long))
+  nameWithType: PerformanceRecord.PerformanceRecord(DateTime, long, int, int, Dictionary<string, long>)
+  nameWithType.vb: PerformanceRecord.New(Date, Long, Integer, Integer, Dictionary(Of String, Long))
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.#ctor*
+  name: PerformanceRecord
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord__ctor_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceRecord.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.PerformanceRecord
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceRecord.New
+  nameWithType: PerformanceRecord.PerformanceRecord
+  nameWithType.vb: PerformanceRecord.New
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.ItemCheckTimes
+  name: ItemCheckTimes
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord_ItemCheckTimes
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceRecord.ItemCheckTimes
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.ItemCheckTimes
+  nameWithType: PerformanceRecord.ItemCheckTimes
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.ItemCheckTimes*
+  name: ItemCheckTimes
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord_ItemCheckTimes_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceRecord.ItemCheckTimes
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.ItemCheckTimes
+  nameWithType: PerformanceRecord.ItemCheckTimes
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.Timestamp
+  name: Timestamp
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord_Timestamp
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceRecord.Timestamp
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.Timestamp
+  nameWithType: PerformanceRecord.Timestamp
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.Timestamp*
+  name: Timestamp
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord_Timestamp_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceRecord.Timestamp
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.Timestamp
+  nameWithType: PerformanceRecord.Timestamp
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalExecutionTimeMs
+  name: TotalExecutionTimeMs
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord_TotalExecutionTimeMs
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceRecord.TotalExecutionTimeMs
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalExecutionTimeMs
+  nameWithType: PerformanceRecord.TotalExecutionTimeMs
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalExecutionTimeMs*
+  name: TotalExecutionTimeMs
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord_TotalExecutionTimeMs_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceRecord.TotalExecutionTimeMs
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalExecutionTimeMs
+  nameWithType: PerformanceRecord.TotalExecutionTimeMs
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsFound
+  name: TotalItemsFound
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord_TotalItemsFound
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsFound
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsFound
+  nameWithType: PerformanceRecord.TotalItemsFound
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsFound*
+  name: TotalItemsFound
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord_TotalItemsFound_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsFound
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsFound
+  nameWithType: PerformanceRecord.TotalItemsFound
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsProcessed
+  name: TotalItemsProcessed
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord_TotalItemsProcessed
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsProcessed
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsProcessed
+  nameWithType: PerformanceRecord.TotalItemsProcessed
+- uid: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsProcessed*
+  name: TotalItemsProcessed
+  href: api/TradingStrategies.Trading.Overseer.PerformanceRecord.html#TradingStrategies_Trading_Overseer_PerformanceRecord_TotalItemsProcessed_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsProcessed
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceRecord.TotalItemsProcessed
+  nameWithType: PerformanceRecord.TotalItemsProcessed
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats
+  name: PerformanceStats
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html
+  commentId: T:TradingStrategies.Trading.Overseer.PerformanceStats
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats
+  nameWithType: PerformanceStats
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.#ctor
+  name: PerformanceStats()
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats__ctor
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceStats.#ctor
+  name.vb: New()
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.PerformanceStats()
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceStats.New()
+  nameWithType: PerformanceStats.PerformanceStats()
+  nameWithType.vb: PerformanceStats.New()
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.#ctor(System.Int32,System.Double,System.Int64,System.Int64,System.Double,System.Int64,System.Double,System.Int64,System.Collections.Generic.Dictionary{System.String,System.ValueTuple{System.Int32,System.Double,System.Int64,System.Int64}})
+  name: PerformanceStats(int, double, long, long, double, long, double, long, Dictionary<string, (int Count, double AverageMs, long MinMs, long MaxMs)>)
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats__ctor_System_Int32_System_Double_System_Int64_System_Int64_System_Double_System_Int64_System_Double_System_Int64_System_Collections_Generic_Dictionary_System_String_System_ValueTuple_System_Int32_System_Double_System_Int64_System_Int64___
+  commentId: M:TradingStrategies.Trading.Overseer.PerformanceStats.#ctor(System.Int32,System.Double,System.Int64,System.Int64,System.Double,System.Int64,System.Double,System.Int64,System.Collections.Generic.Dictionary{System.String,System.ValueTuple{System.Int32,System.Double,System.Int64,System.Int64}})
+  name.vb: New(Integer, Double, Long, Long, Double, Long, Double, Long, Dictionary(Of String, (Count As Integer, AverageMs As Double, MinMs As Long, MaxMs As Long)))
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.PerformanceStats(int, double, long, long, double, long, double, long, System.Collections.Generic.Dictionary<string, (int Count, double AverageMs, long MinMs, long MaxMs)>)
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceStats.New(Integer, Double, Long, Long, Double, Long, Double, Long, System.Collections.Generic.Dictionary(Of String, (Count As Integer, AverageMs As Double, MinMs As Long, MaxMs As Long)))
+  nameWithType: PerformanceStats.PerformanceStats(int, double, long, long, double, long, double, long, Dictionary<string, (int Count, double AverageMs, long MinMs, long MaxMs)>)
+  nameWithType.vb: PerformanceStats.New(Integer, Double, Long, Long, Double, Long, Double, Long, Dictionary(Of String, (Count As Integer, AverageMs As Double, MinMs As Long, MaxMs As Long)))
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.#ctor*
+  name: PerformanceStats
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats__ctor_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceStats.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.PerformanceStats
+  fullName.vb: TradingStrategies.Trading.Overseer.PerformanceStats.New
+  nameWithType: PerformanceStats.PerformanceStats
+  nameWithType.vb: PerformanceStats.New
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.AverageExecutionTimeMs
+  name: AverageExecutionTimeMs
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_AverageExecutionTimeMs
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceStats.AverageExecutionTimeMs
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.AverageExecutionTimeMs
+  nameWithType: PerformanceStats.AverageExecutionTimeMs
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.AverageExecutionTimeMs*
+  name: AverageExecutionTimeMs
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_AverageExecutionTimeMs_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceStats.AverageExecutionTimeMs
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.AverageExecutionTimeMs
+  nameWithType: PerformanceStats.AverageExecutionTimeMs
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsFound
+  name: AverageItemsFound
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_AverageItemsFound
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsFound
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsFound
+  nameWithType: PerformanceStats.AverageItemsFound
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsFound*
+  name: AverageItemsFound
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_AverageItemsFound_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsFound
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsFound
+  nameWithType: PerformanceStats.AverageItemsFound
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsProcessed
+  name: AverageItemsProcessed
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_AverageItemsProcessed
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsProcessed
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsProcessed
+  nameWithType: PerformanceStats.AverageItemsProcessed
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsProcessed*
+  name: AverageItemsProcessed
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_AverageItemsProcessed_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsProcessed
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.AverageItemsProcessed
+  nameWithType: PerformanceStats.AverageItemsProcessed
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.ItemCheckStats
+  name: ItemCheckStats
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_ItemCheckStats
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceStats.ItemCheckStats
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.ItemCheckStats
+  nameWithType: PerformanceStats.ItemCheckStats
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.ItemCheckStats*
+  name: ItemCheckStats
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_ItemCheckStats_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceStats.ItemCheckStats
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.ItemCheckStats
+  nameWithType: PerformanceStats.ItemCheckStats
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.MaxExecutionTimeMs
+  name: MaxExecutionTimeMs
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_MaxExecutionTimeMs
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceStats.MaxExecutionTimeMs
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.MaxExecutionTimeMs
+  nameWithType: PerformanceStats.MaxExecutionTimeMs
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.MaxExecutionTimeMs*
+  name: MaxExecutionTimeMs
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_MaxExecutionTimeMs_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceStats.MaxExecutionTimeMs
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.MaxExecutionTimeMs
+  nameWithType: PerformanceStats.MaxExecutionTimeMs
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.MinExecutionTimeMs
+  name: MinExecutionTimeMs
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_MinExecutionTimeMs
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceStats.MinExecutionTimeMs
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.MinExecutionTimeMs
+  nameWithType: PerformanceStats.MinExecutionTimeMs
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.MinExecutionTimeMs*
+  name: MinExecutionTimeMs
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_MinExecutionTimeMs_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceStats.MinExecutionTimeMs
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.MinExecutionTimeMs
+  nameWithType: PerformanceStats.MinExecutionTimeMs
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.RecordCount
+  name: RecordCount
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_RecordCount
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceStats.RecordCount
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.RecordCount
+  nameWithType: PerformanceStats.RecordCount
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.RecordCount*
+  name: RecordCount
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_RecordCount_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceStats.RecordCount
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.RecordCount
+  nameWithType: PerformanceStats.RecordCount
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsFound
+  name: TotalItemsFound
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_TotalItemsFound
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsFound
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsFound
+  nameWithType: PerformanceStats.TotalItemsFound
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsFound*
+  name: TotalItemsFound
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_TotalItemsFound_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsFound
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsFound
+  nameWithType: PerformanceStats.TotalItemsFound
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsProcessed
+  name: TotalItemsProcessed
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_TotalItemsProcessed
+  commentId: P:TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsProcessed
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsProcessed
+  nameWithType: PerformanceStats.TotalItemsProcessed
+- uid: TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsProcessed*
+  name: TotalItemsProcessed
+  href: api/TradingStrategies.Trading.Overseer.PerformanceStats.html#TradingStrategies_Trading_Overseer_PerformanceStats_TotalItemsProcessed_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsProcessed
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PerformanceStats.TotalItemsProcessed
+  nameWithType: PerformanceStats.TotalItemsProcessed
 - uid: TradingStrategies.Trading.Overseer.ReportGenerator
   name: ReportGenerator
   href: api/TradingStrategies.Trading.Overseer.ReportGenerator.html
@@ -53666,15 +54144,15 @@ references:
   commentId: T:TradingStrategies.Trading.Overseer.SimulationEngine
   fullName: TradingStrategies.Trading.Overseer.SimulationEngine
   nameWithType: SimulationEngine
-- uid: TradingStrategies.Trading.Overseer.SimulationEngine.#ctor(Microsoft.Extensions.Configuration.IConfiguration)
-  name: SimulationEngine(IConfiguration)
-  href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine__ctor_Microsoft_Extensions_Configuration_IConfiguration_
-  commentId: M:TradingStrategies.Trading.Overseer.SimulationEngine.#ctor(Microsoft.Extensions.Configuration.IConfiguration)
-  name.vb: New(IConfiguration)
-  fullName: TradingStrategies.Trading.Overseer.SimulationEngine.SimulationEngine(Microsoft.Extensions.Configuration.IConfiguration)
-  fullName.vb: TradingStrategies.Trading.Overseer.SimulationEngine.New(Microsoft.Extensions.Configuration.IConfiguration)
-  nameWithType: SimulationEngine.SimulationEngine(IConfiguration)
-  nameWithType.vb: SimulationEngine.New(IConfiguration)
+- uid: TradingStrategies.Trading.Overseer.SimulationEngine.#ctor(Microsoft.Extensions.Configuration.IConfiguration,TradingStrategies.Trading.Overseer.PerformanceMonitor)
+  name: SimulationEngine(IConfiguration, PerformanceMonitor?)
+  href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine__ctor_Microsoft_Extensions_Configuration_IConfiguration_TradingStrategies_Trading_Overseer_PerformanceMonitor_
+  commentId: M:TradingStrategies.Trading.Overseer.SimulationEngine.#ctor(Microsoft.Extensions.Configuration.IConfiguration,TradingStrategies.Trading.Overseer.PerformanceMonitor)
+  name.vb: New(IConfiguration, PerformanceMonitor)
+  fullName: TradingStrategies.Trading.Overseer.SimulationEngine.SimulationEngine(Microsoft.Extensions.Configuration.IConfiguration, TradingStrategies.Trading.Overseer.PerformanceMonitor?)
+  fullName.vb: TradingStrategies.Trading.Overseer.SimulationEngine.New(Microsoft.Extensions.Configuration.IConfiguration, TradingStrategies.Trading.Overseer.PerformanceMonitor)
+  nameWithType: SimulationEngine.SimulationEngine(IConfiguration, PerformanceMonitor?)
+  nameWithType.vb: SimulationEngine.New(IConfiguration, PerformanceMonitor)
 - uid: TradingStrategies.Trading.Overseer.SimulationEngine.#ctor*
   name: SimulationEngine
   href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine__ctor_
@@ -53711,6 +54189,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.SimulationEngine.LastMemoryUsed
   nameWithType: SimulationEngine.LastMemoryUsed
+- uid: TradingStrategies.Trading.Overseer.SimulationEngine.PerformanceMonitor
+  name: PerformanceMonitor
+  href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine_PerformanceMonitor
+  commentId: P:TradingStrategies.Trading.Overseer.SimulationEngine.PerformanceMonitor
+  fullName: TradingStrategies.Trading.Overseer.SimulationEngine.PerformanceMonitor
+  nameWithType: SimulationEngine.PerformanceMonitor
+- uid: TradingStrategies.Trading.Overseer.SimulationEngine.PerformanceMonitor*
+  name: PerformanceMonitor
+  href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine_PerformanceMonitor_
+  commentId: Overload:TradingStrategies.Trading.Overseer.SimulationEngine.PerformanceMonitor
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.SimulationEngine.PerformanceMonitor
+  nameWithType: SimulationEngine.PerformanceMonitor
 - uid: TradingStrategies.Trading.Overseer.SimulationEngine.RunSimulation(TradingStrategies.Strategies.Scenario,System.Collections.Generic.List{BacklashDTOs.MarketSnapshot},System.Boolean)
   name: RunSimulation(Scenario, List<MarketSnapshot>, bool)
   href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine_RunSimulation_TradingStrategies_Strategies_Scenario_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_

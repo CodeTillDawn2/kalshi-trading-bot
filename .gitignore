@@ -123,3 +123,4 @@ docfx_project/api/
 !docs/**
 jwt-secret.txt
 !docs/**
+!docs/**

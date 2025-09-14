@@ -118,6 +118,17 @@ various technical analysis formations including single-candle, multi-candle, and
 <p>This service is used by the SimulationEngine during backtesting and strategy evaluation to enrich
 market analysis with technical pattern recognition capabilities.</p>
 </section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PerformanceMonitor.html">PerformanceMonitor</a></h4>
+      <section><p>Generic performance monitor for tracking various metrics
+in the trading simulator. This class collects comprehensive performance data
+including execution times, memory usage, trade counts, and detailed metrics.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PerformanceRecord.html">PerformanceRecord</a></h4>
+      <section><p>Represents a single performance record.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PerformanceStats.html">PerformanceStats</a></h4>
+      <section><p>Comprehensive performance statistics for operations.</p>
+</section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.ReportGenerator.html">ReportGenerator</a></h4>
       <section><p>Provides static methods for generating comprehensive performance reports from trading simulation event logs.
 This class processes collections of SimulationEventLog objects to produce detailed CSV-formatted reports that analyze
@@ -163,6 +174,12 @@ This class processes market data sequentially, applies trading decisions from st
 It maintains a simulated order book and resting orders to accurately model market interactions during backtesting.
 As a developer, this class is the core execution engine for strategy evaluation, handling the complex interplay
 between market data, strategy decisions, order book dynamics, and position management.</p>
+</section>
+    <h3 id="interfaces">
+Interfaces
+</h3>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.IPerformanceMonitor.html">IPerformanceMonitor</a></h4>
+      <section><p>Interface for recording performance metrics.</p>
 </section>
 
 
