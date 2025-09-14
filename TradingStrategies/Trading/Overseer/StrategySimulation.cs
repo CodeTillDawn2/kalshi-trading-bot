@@ -151,7 +151,7 @@ namespace TradingStrategies.Trading.Overseer
         {
             if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
             _stopwatch.Restart();
-            long memoryBefore = GC.GetTotalMemory(true);
+            long memoryBefore = _config.Simulation_EnablePerformanceMetrics ? GC.GetTotalMemory(true) : 0;
             _tradeCountThisSnapshot = 0;
 
             // Apply deltas if previous snapshot provided
@@ -194,12 +194,15 @@ namespace TradingStrategies.Trading.Overseer
             applyStopwatch.Start();
             ApplyAction(decision, effectiveSnapshot);
             applyStopwatch.Stop();
-            _applyTimes.Add(applyStopwatch.Elapsed);
+            if (_config.Simulation_EnablePerformanceMetrics)
+                _applyTimes.Add(applyStopwatch.Elapsed);
 
             _stopwatch.Stop();
-            _executionTimes.Add(_stopwatch.Elapsed);
-            long memoryAfter = GC.GetTotalMemory(true);
-            _memoryUsages.Add(memoryAfter);
+            if (_config.Simulation_EnablePerformanceMetrics)
+                _executionTimes.Add(_stopwatch.Elapsed);
+            long memoryAfter = _config.Simulation_EnablePerformanceMetrics ? GC.GetTotalMemory(true) : 0;
+            if (_config.Simulation_EnablePerformanceMetrics)
+                _memoryUsages.Add(memoryAfter);
 
             // Enhanced performance monitoring
             if (_config.EnableDetailedPerformanceLogging && _stopwatch.Elapsed.TotalMilliseconds > _config.PerformanceThresholdMs)
@@ -282,8 +285,11 @@ namespace TradingStrategies.Trading.Overseer
             int filled = qty - remainingQuantity;
             if (filled == 0) return;
 
-            _totalTradesExecuted++;
-            _tradeCountThisSnapshot++;
+            if (_config.Simulation_EnablePerformanceMetrics)
+            {
+                _totalTradesExecuted++;
+                _tradeCountThisSnapshot++;
+            }
 
             if (_tradeCountThisSnapshot > _config.TradeRateLimitPerSnapshot)
             {

@@ -24,12 +24,6 @@ This document outlines the performance metrics tracked across various classes in
 - `BrainPersistence` (KalshiBotOverseer.Models.BrainPersistence.DeserializeWithMetrics)
 
 
-## TradingStrategies.Trading.Overseer.PatternDetectionService
-
-### Methods
-- `DetectPatterns()`: TimeSpan - Execution time for pattern detection operations
-- `DetectPatternsAsync()`: TimeSpan - Execution time for async pattern detection operations
-
 ## TradingStrategies.Trading.Overseer.StrategySimulation
 
 ### Properties
@@ -82,15 +76,6 @@ This document outlines the performance metrics tracked across various classes in
 - `GetCacheStatistics()`: (long Hits, long Misses) - Returns tuple of cache statistics
 - `GetAverageClassificationTime()`: TimeSpan - Returns average classification time
 - `GetClassificationCount()`: int - Returns total classifications performed
-
-## KalshiBotOverseer.Services.SnapshotService
-
-### Methods
-- `GetAggregationTimes()`: long[] - Returns array of all recorded aggregation times
-- `GetAggregationStatistics()`: (int Count, double AverageMs, long MinMs, long MaxMs) - Returns tuple with aggregation statistics
-- `GetTotalAggregationTime()`: long - Returns total time in milliseconds
-- `GetAggregationCount()`: int - Returns count of operations
-- `ClearAggregationMetrics()`: void - Clears all recorded performance metrics
 
 ## TradingSimulator.CachedMarketData
 
@@ -580,7 +565,7 @@ CS1571: Duplicate XML param tags
 - [ ] userdatatimestamp endpoint (https://docs.kalshi.com/api-reference/get-user-data-timestamp). Make system that monitors this and, beyond a defined threshold, cancels all resting orders and shuts down until it improves. 
 
 
-# v0.2.6
+# v0.3.0
 - [ ] Automate data cleanup
 - [ ] Make database logging of debug work
 - [ ] Was forced to upgrade to market lifecycle v2, need to update code to capture new fields if necessary

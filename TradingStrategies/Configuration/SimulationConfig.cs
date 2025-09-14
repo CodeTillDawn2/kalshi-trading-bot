@@ -134,5 +134,12 @@ namespace TradingStrategies.Configuration
         /// </summary>
         [Range(1, 100, ErrorMessage = "TradeRateLimitPerSnapshot must be between 1 and 100.")]
         public int TradeRateLimitPerSnapshot { get; set; } = 10;
+
+        /// <summary>
+        /// Enable collection of performance metrics in StrategySimulation.
+        /// When disabled, skips collection of execution timing, memory usage, trade counts, and apply timing
+        /// to improve performance in high-throughput scenarios. Decision timing is controlled separately.
+        /// </summary>
+        public bool Simulation_EnablePerformanceMetrics { get; set; } = true;
     }
 }
