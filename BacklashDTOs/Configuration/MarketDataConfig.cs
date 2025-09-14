@@ -29,7 +29,7 @@ public class MarketDataConfig : IValidateOptions<MarketDataConfig>
     /// <param name="name">The name of the options instance being validated.</param>
     /// <param name="options">The options instance.</param>
     /// <returns>A <see cref="ValidateOptionsResult"/> indicating success or failure.</returns>
-    public ValidateOptionsResult Validate(string name, MarketDataConfig options)
+    public ValidateOptionsResult Validate(string? name, MarketDataConfig options)
     {
         var failures = new List<string>();
 
