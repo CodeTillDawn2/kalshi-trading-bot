@@ -70,7 +70,7 @@ namespace KalshiBotLogging
         /// <typeparam name="TState">The type of the state object associated with the scope.</typeparam>
         /// <param name="state">The state object for the scope.</param>
         /// <returns>A disposable object that ends the scope, or null if not supported.</returns>
-        public IDisposable BeginScope<TState>(TState state) => null;
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
 
         /// <summary>
         /// Determines whether logging is enabled for the specified log level.
@@ -90,7 +90,7 @@ namespace KalshiBotLogging
         /// <param name="state">The state object containing additional information.</param>
         /// <param name="exception">The exception associated with the log message, if any.</param>
         /// <param name="formatter">A function to format the state and exception into a string message.</param>
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             var message = formatter(state, exception);
 

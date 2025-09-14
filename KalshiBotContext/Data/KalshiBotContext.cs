@@ -553,7 +553,7 @@ namespace KalshiBotData.Data
                         throw;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // For other exceptions, retry once
                     try

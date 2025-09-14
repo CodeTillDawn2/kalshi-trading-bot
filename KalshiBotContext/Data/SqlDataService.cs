@@ -806,16 +806,12 @@ namespace KalshiBotData.Data
                             }
                             catch (SqlException ex) when (ex.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase))
                             {
-                                _logger.LogWarning(new KnownDuplicateInsertException(operationName, operation.Identifier,
-                                    $"Duplicate insert attempted for {operationName}: {operation.Identifier}", ex),
-                                    "Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
+                                _logger.LogWarning(ex, "Duplicate insert attempted for {OperationName}: {Identifier}", operationName, operation.Identifier);
                                 Interlocked.Increment(ref _totalFailed);
                             }
                             catch (SqlException ex) when (ex.Message.Contains("deadlocked", StringComparison.OrdinalIgnoreCase))
                             {
-                                _logger.LogWarning(new MarketInterestScoreDeadlockException(
-                                    $"Deadlock occurred for {operationName}: {operation.Identifier}. SQL error: {ex.Message}", ex),
-                                    "Deadlock occurred for {OperationName}: {Identifier}. SQL error: {ex.Message}", operationName, operation.Identifier);
+                                _logger.LogWarning(ex, "Deadlock occurred for {OperationName}: {Identifier}. SQL error: {SqlError}", operationName, operation.Identifier, ex.Message);
                                 Interlocked.Increment(ref _totalFailed);
                             }
                             catch (Exception ex)
@@ -862,7 +858,7 @@ namespace KalshiBotData.Data
             cmd.Parameters.AddWithValue("@market_id", msg.TryGetProperty("market_id", out var mid)
                 ? mid.GetString() : "00000000-0000-0000-0000-000000000000");
             cmd.Parameters.AddWithValue("@sid", sid);
-            cmd.Parameters.AddWithValue("@kalshi_seq", (object)kalshiSeq ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@kalshi_seq", kalshiSeq.HasValue ? kalshiSeq.Value : DBNull.Value);
             cmd.Parameters.AddWithValue("@market_ticker", marketTicker);
             cmd.Parameters.AddWithValue("@offer_type", offerType);
             cmd.Parameters.AddWithValue("@price", price);

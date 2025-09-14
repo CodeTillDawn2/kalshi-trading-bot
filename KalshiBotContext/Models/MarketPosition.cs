@@ -2,7 +2,7 @@ namespace KalshiBotData.Models
 {
     /// <summary>
     /// Represents the current trading position and performance metrics for a specific market.
-    /// This entity tracks real-time position information including exposure, P&L, and order status
+    /// This entity tracks real-time position information including exposure, P&amp;L, and order status
     /// for individual markets. It serves as the primary source of position data for risk management,
     /// performance monitoring, and trading decision making throughout the bot system.
     /// </summary>
