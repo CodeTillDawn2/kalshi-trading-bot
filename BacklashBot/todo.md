@@ -3,60 +3,32 @@
 This document outlines the performance metrics tracked across various classes in the Kalshi Trading Bot project.
 
 
-## Primitive Types
+## Distinct Return Types (Broken Down by Constituents)
+
+### Primitive Types
 - `bool`
-- `double`
+- `double` 
 - `int`
-- `long`
-- `string`
-- `void`
+- `long` 
+- `string` 
+- `void` (TradingStrategies.Trading.Overseer.StrategySimulation.ResetPerformanceMetrics, KalshiBotOverseer.Services.SnapshotService.ClearAggregationMetrics, TradingStrategies.Trading.Overseer.EquityCalculator.ClearCalculationTimes, TradingStrategies.Trading.Helpers.StrategySelectionHelper.ClearPerformanceMetrics, KalshiBotAPI.Websockets.MessageProcessor.ResetEventCounts, KalshiBotAPI.Websockets.KalshiWebSocketClient.ResetEventCounts, KalshiBotAPI.Websockets.SubscriptionManager.ResetEventCounts)
 
-## Complex Types
-- `CachedMarketData`
-- `class`
-- `DateTime`
-- `DateTime?`
-- `Dictionary<string, ClientMetrics>`
-- `Dictionary<string, double>`
-- `Dictionary<string, int>`
-- `Dictionary<string, object>`
-- `Dictionary<string, TimeSpan>`
-- `Dictionary<MarketType, int>`
-- `dynamic`
-- `IReadOnlyDictionary<string, int>`
-- `IReadOnlyDictionary<string, long>`
-- `List<double>`
-- `List<MetricHistory>`
-- `long[]`
-- `object`
-- `PerformanceMetrics`
-- `PatternDetectionMetricsSummary`
-- `TimeSpan`
-- `tuple`
-
-## Tuple Types
-- `(int CacheHits, int CacheMisses, double AverageOperationTimeMs, int TotalOperations)`
-- `(int Count, double AverageMs, long MinMs, long MaxMs)`
-- `(int EventQueueCount, int TickerQueueCount, int NotificationQueueCount)`
-- `(int orderbookEvents, int tradeEvents, int tickerEvents)`
-- `(int TotalCalculations, int CacheHits, int CacheMisses, double AverageCalculationTimeMs)`
-- `(int TotalMarketsProcessed, long TotalProcessingTimeMs, double AverageTimePerMarketMs, int ErrorCount)`
-- `(long AverageBytes, long PeakBytes)`
-- `(long Hits, long Misses)`
-- `(long TotalAllocated, long AveragePerStrategy)`
-- `(long TotalMemoryBytes, int BrainCount, long TotalHistoryEntries, TimeSpan ServiceUptime)`
-- `(ResourceMetrics)`
-- `(string Json, long Milliseconds)`
-- `(TimeSpan AverageQueryTime, int QueryCount)`
-- `(double AverageProcessingTimeMs, int TotalOperations)`
-- `(double AverageWaitTimeMs, int TotalOperations)`
-- `(double InitializationTimeMs, int InitializationAttempts)`
-- `(BrainPersistence Instance, long Milliseconds)`
-
-## Concurrent Types
-- `ConcurrentDictionary<string, ConcurrentBag<long>>`
-- `ConcurrentDictionary<string, long>`
-- `ConcurrentDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)>`
+### Non-Primitive Types
+- `CachedMarketData` (TradingSimulator.CachedMarketData.DeserializeWithMetrics)
+- `PatternDetectionMetrics` (BacklashPatterns.PatternSearch.PatternDetectionMetrics)
+- `ClientMetrics` (KalshiBotOverseer.OverseerHub.ClientSpecificMetrics)
+- `DateTime` (KalshiBotAPI.Websockets.MessageProcessor.LastMetricsLogTime)
+- `DateTime?` (KalshiBotOverseer.OvernightActivitiesHelper.LastMarketRefreshFailure)
+- `dynamic` (KalshiBotOverseer.OverseerHub.GetHubMetrics)
+- `MarketType` (TradingStrategies.Trading.Overseer.MarketTypeService.GetCacheStatistics)
+- `MetricHistory` (KalshiBotOverseer.Models.BrainPersistence.CpuUsageHistory)
+- `object` (TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetPerformanceMetrics)
+- `PerformanceMetrics` (TradingSimulator.MarketProcessor.GetPerformanceMetrics, TradingSimulator.Simulator.SimulatorReporting.GetPerformanceMetrics)
+- `PatternDetectionMetricsSummary` (BacklashPatterns.PatternSearch.GetSummary)
+- `ResourceMetrics` (KalshiBotOverseer.OvernightActivitiesHelper.ResourceConsumptionTrend)
+- `TimeSpan` (multiple properties: TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatterns, TradingStrategies.Trading.Overseer.StrategySimulation.TotalExecutionTime, etc.)
+- `tuple` (KalshiBotOverseer.OvernightActivitiesHelper.GetPerformanceMetrics)
+- `BrainPersistence` (KalshiBotOverseer.Models.BrainPersistence.DeserializeWithMetrics)
 
 
 ## TradingStrategies.Trading.Overseer.PatternDetectionService
