@@ -1,3 +1,94 @@
+TradingStrategies.Trading.Overseer.PatternDetectionService:
+- DetectPatterns() - TimeSpan - Execution time for pattern detection operations
+- DetectPatternsAsync() - TimeSpan - Execution time for async pattern detection operations
+
+TradingStrategies.Trading.Overseer.StrategySimulation:
+- TotalExecutionTime - TimeSpan - Aggregate execution time of all ProcessSnapshot calls
+- AverageExecutionTimeMs - double - Average execution time per snapshot in milliseconds
+- PeakMemoryUsage - long - Maximum memory usage recorded during simulation
+- TotalTradesExecuted - int - Total number of trades executed during simulation
+- AverageDecisionTimeMs - double - Average strategy decision time in milliseconds
+- AverageApplyTimeMs - double - Average action application time in milliseconds
+- GetDetailedPerformanceMetrics() - Dictionary<string, object> - Comprehensive metrics dictionary with execution details
+- ResetPerformanceMetrics() - void - Resets all performance metrics for new simulation runs
+
+TradingStrategies.Trading.Overseer.SimulationEngine:
+- LastExecutionTime - TimeSpan - Execution time of the last simulation run
+- LastMemoryUsed - long - Memory usage difference of the last simulation run
+
+TradingStrategies.Extensions.MarketSnapshotExtensions:
+- UpdateOrderbookMetricsFromSimulated() - TimeSpan - Execution time for order book metrics update
+
+TradingStrategies.Extensions.PseudoCandlestickExtensions:
+- ToCandleMids() - TimeSpan - Execution time for candlestick conversion (logged when >100ms)
+
+TradingStrategies.Trading.Overseer.EquityCalculator:
+- GetCalculationTimes(): Returns long[] of all recorded calculation times
+- GetCalculationStatistics(): Returns (int Count, double AverageMs, long MinMs, long MaxMs)
+- ClearCalculationTimes(): Clears all recorded performance metrics
+
+TradingStrategies.Trading.Helpers.StrategySelectionHelper:
+- EnablePerformanceMetrics: Configurable flag for performance metrics collection
+- GetPerformanceMetrics(): Retrieves all collected performance metrics
+- ClearPerformanceMetrics(): Clears all collected performance metrics
+
+TradingStrategies.Trading.Overseer.MarketTypeService:
+- GetCacheStatistics(): Returns tuple of (long Hits, long Misses)
+- GetAverageClassificationTime(): Returns TimeSpan of average classification time
+- GetClassificationCount(): Returns int of total classifications performed
+
+KalshiBotOverseer.Services.SnapshotService:
+- GetAggregationTimes(): Returns long[] of all recorded aggregation times
+- GetAggregationStatistics(): Returns (int Count, double AverageMs, long MinMs, long MaxMs)
+- GetTotalAggregationTime(): Returns long total time in milliseconds
+- GetAggregationCount(): Returns int count of operations
+- ClearAggregationMetrics(): Clears all recorded performance metrics
+
+TradingSimulator.CachedMarketData:
+- SerializeWithMetrics(): Public method returning string with out TimeSpan serializationTime parameter
+- DeserializeWithMetrics(): Public static method returning CachedMarketData with out TimeSpan deserializationTime parameter
+
+
+
+
+
+
+
+
+
+Remove from this list:
+
+EquityCalculator
+StrategySelectionHelper
+MarketTypeService
+SnapshotService.cs
+CachedMarketData
+SimulatorReporting
+MarketProcessor
+OverseerHub.cs
+OvernightActivitiesHelper.cs
+WebSocketConnectionManager.cs
+MessageProcessor.cs
+SqlDataService.cs
+BrainPersistenceService.cs
+MarketWatchController.cs
+BrainPersistence.cs
+KalshiWebSocketClient.cs
+SubscriptionManager.cs
+OverseerClientService
+PatternSearch.cs
+KalshiAPIService
+PatternUtils
+BrainStatusService
+MarketAnalysisHelper
+OrderBookService
+InterestScoreService
+KaslhiBotScopeManagerService
+MarketRefreshService
+MarketDataInitializer
+BroadcastService
+TradingOverseer
+
 
 # Backlog
 - [ ] Fix build warnings
