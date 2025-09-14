@@ -4716,17 +4716,31 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Services.SnapshotService.yml",
+      "source_relative_path": "api/KalshiBotOverseer.Services.PerformanceMetricsService.yml",
       "output": {
         ".html": {
-          "relative_path": "api/KalshiBotOverseer.Services.SnapshotService.html"
+          "relative_path": "api/KalshiBotOverseer.Services.PerformanceMetricsService.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "KalshiBotOverseer.Services.SnapshotService",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Services.SnapshotService.yml\" sourcestartlinenumber=\"1\">Provides services for retrieving and processing snapshot group data from the database.\nThis service aggregates snapshot groups by market ticker, calculates recorded hours,\nmarket hours, and recorded hours percentages, and returns structured data for analysis.</p>\n"
+      "Title": "KalshiBotOverseer.Services.PerformanceMetricsService",
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Services.PerformanceMetricsService.yml\" sourcestartlinenumber=\"1\">Centralized service for collecting and managing performance metrics across the KalshiBot Overseer system.\nThis service aggregates metrics from various components including WebSocket operations, API calls,\nSignalR communications, overnight tasks, and snapshot processing.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotOverseer.Services.SnapshotAggregationService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotOverseer.Services.SnapshotAggregationService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotOverseer.Services.SnapshotAggregationService",
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Services.SnapshotAggregationService.yml\" sourcestartlinenumber=\"1\">Provides services for retrieving and processing snapshot group data from the database.\nThis service aggregates snapshot groups by market ticker, calculates recorded hours,\nmarket hours, and recorded hours percentages, and returns structured data for analysis.</p>\n"
     },
     {
       "type": "ManagedReference",
