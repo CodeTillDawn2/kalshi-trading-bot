@@ -41,7 +41,9 @@ namespace KalshiBotAPI.Websockets
         private readonly ISubscriptionManager _subscriptionManager;
         private readonly IMessageProcessor _messageProcessor;
         private readonly IDataCache _dataCache;
+#pragma warning disable CS0414 // The field is assigned but its value is never used
         private bool _allowReconnect = true;
+#pragma warning restore CS0414
 
         /// <summary>
         /// Configurable WebSocket buffer size in bytes. Default is 16KB.
@@ -574,6 +576,8 @@ namespace KalshiBotAPI.Websockets
             {
                 _logger.LogError(ex, "Error starting WebSocket message receiving");
             }
+
+            await Task.CompletedTask;
         }
 
 
