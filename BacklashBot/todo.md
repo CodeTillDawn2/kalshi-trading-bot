@@ -24,12 +24,6 @@ This document outlines the performance metrics tracked across various classes in
 - `BrainPersistence` (KalshiBotOverseer.Models.BrainPersistence.DeserializeWithMetrics)
 
 
-## TradingStrategies.Trading.Overseer.PatternDetectionService
-
-### Methods
-- `DetectPatterns()`: TimeSpan - Execution time for pattern detection operations
-- `DetectPatternsAsync()`: TimeSpan - Execution time for async pattern detection operations
-
 ## TradingStrategies.Trading.Overseer.StrategySimulation
 
 ### Properties
@@ -82,15 +76,6 @@ This document outlines the performance metrics tracked across various classes in
 - `GetCacheStatistics()`: (long Hits, long Misses) - Returns tuple of cache statistics
 - `GetAverageClassificationTime()`: TimeSpan - Returns average classification time
 - `GetClassificationCount()`: int - Returns total classifications performed
-
-## KalshiBotOverseer.Services.SnapshotService
-
-### Methods
-- `GetAggregationTimes()`: long[] - Returns array of all recorded aggregation times
-- `GetAggregationStatistics()`: (int Count, double AverageMs, long MinMs, long MaxMs) - Returns tuple with aggregation statistics
-- `GetTotalAggregationTime()`: long - Returns total time in milliseconds
-- `GetAggregationCount()`: int - Returns count of operations
-- `ClearAggregationMetrics()`: void - Clears all recorded performance metrics
 
 ## TradingSimulator.CachedMarketData
 
