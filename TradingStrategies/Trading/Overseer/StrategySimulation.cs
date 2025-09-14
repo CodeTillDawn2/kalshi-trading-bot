@@ -153,7 +153,6 @@ namespace TradingStrategies.Trading.Overseer
             _stopwatch.Restart();
             long memoryBefore = GC.GetTotalMemory(true);
             _tradeCountThisSnapshot = 0;
-            _tradeCountThisSnapshot = 0;
 
             // Apply deltas if previous snapshot provided
             Dictionary<int, int> yesDeltas = new Dictionary<int, int>();
@@ -219,9 +218,10 @@ namespace TradingStrategies.Trading.Overseer
         /// Applies a trading action decision to the simulation state, updating position, cash, and order book.
         /// This method is the central execution point for strategy decisions, handling all action types with proper accounting.
         /// </summary>
-        /// <param name="decision">The action decision to apply, containing type, price, quantity, and expiration details.</param>
+        /// <param name="decision">The action decision to apply, containing type, price, quantity, and expiration details. Cannot be null.</param>
         /// <param name="effectiveSnapshot">The market snapshot with simulated order book state, used for price reference and timestamp.</param>
         /// <remarks>
+        /// Input validation ensures the decision parameter is not null to prevent runtime errors.
         /// Handles different action types with specific logic:
         /// - Market orders (Long/Short): Execute immediately against order book, update position/cash
         /// - Limit orders (PostYes/PostAsk): Add to simulated order book and resting orders list
@@ -239,6 +239,7 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         private void ApplyAction(ActionDecision decision, MarketSnapshot effectiveSnapshot)
         {
+            if (decision == null) throw new ArgumentNullException(nameof(decision));
             var action = decision.Type;
             if (action == ActionType.None) return;
 
@@ -462,9 +463,10 @@ namespace TradingStrategies.Trading.Overseer
         /// Calculates the final equity value at the end of simulation by liquidating the current position.
         /// This method provides the total portfolio value for performance evaluation and reporting.
         /// </summary>
-        /// <param name="lastSnapshot">The final market snapshot for valuation, though not directly used in current implementation.</param>
+        /// <param name="lastSnapshot">The final market snapshot for valuation, though not directly used in current implementation. Cannot be null.</param>
         /// <returns>The total equity value including cash and position value, representing the final portfolio worth.</returns>
         /// <remarks>
+        /// Input validation ensures the lastSnapshot parameter is not null to maintain robustness.
         /// Implementation computes liquidation value as follows:
         /// - For long positions (Position > 0): Uses best YES bid price from simulated order book
         /// - For short positions (Position < 0): Uses best NO bid price from simulated order book
@@ -476,6 +478,7 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         public double GetFinalEquity(MarketSnapshot lastSnapshot)
         {
+            if (lastSnapshot == null) throw new ArgumentNullException(nameof(lastSnapshot));
             double value = 0;
             if (Position > 0)
             {
