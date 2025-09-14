@@ -22,7 +22,7 @@
  * CONTENTS:
  * - Global error handling setup for debugging and error reporting
  * - Application initialization sequence with proper async coordination
- * - Auto-refresh scheduling for real-time data updates
+ * - Active tab refresh scheduling for real-time data updates
  * - Tab switching and navigation coordination
  * - Compatibility functions for legacy brain data handling
  * - SignalR connection establishment for real-time updates
