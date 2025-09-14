@@ -6,28 +6,19 @@ This document outlines the performance metrics tracked across various classes in
 ## Distinct Return Types (Broken Down by Constituents)
 
 ### Primitive Types
-- `bool`
-- `double` 
-- `int`
-- `long` 
-- `string` 
-- `void` (TradingStrategies.Trading.Overseer.StrategySimulation.ResetPerformanceMetrics, KalshiBotOverseer.Services.SnapshotService.ClearAggregationMetrics, TradingStrategies.Trading.Overseer.EquityCalculator.ClearCalculationTimes, TradingStrategies.Trading.Helpers.StrategySelectionHelper.ClearPerformanceMetrics, KalshiBotAPI.Websockets.MessageProcessor.ResetEventCounts, KalshiBotAPI.Websockets.KalshiWebSocketClient.ResetEventCounts, KalshiBotAPI.Websockets.SubscriptionManager.ResetEventCounts)
+- `bool` (multiple classes)
+- `double` (multiple classes)
+- `int` (multiple classes)
+- `long` (multiple classes)
 
 ### Non-Primitive Types
-- `CachedMarketData` (TradingSimulator.CachedMarketData.DeserializeWithMetrics)
 - `PatternDetectionMetrics` (BacklashPatterns.PatternSearch.PatternDetectionMetrics)
 - `ClientMetrics` (KalshiBotOverseer.OverseerHub.ClientSpecificMetrics)
-- `DateTime` (KalshiBotAPI.Websockets.MessageProcessor.LastMetricsLogTime)
-- `DateTime?` (KalshiBotOverseer.OvernightActivitiesHelper.LastMarketRefreshFailure)
-- `dynamic` (KalshiBotOverseer.OverseerHub.GetHubMetrics)
-- `MarketType` (TradingStrategies.Trading.Overseer.MarketTypeService.GetCacheStatistics)
 - `MetricHistory` (KalshiBotOverseer.Models.BrainPersistence.CpuUsageHistory)
-- `object` (TradingStrategies.Trading.Helpers.StrategySelectionHelper.GetPerformanceMetrics)
 - `PerformanceMetrics` (TradingSimulator.MarketProcessor.GetPerformanceMetrics, TradingSimulator.Simulator.SimulatorReporting.GetPerformanceMetrics)
 - `PatternDetectionMetricsSummary` (BacklashPatterns.PatternSearch.GetSummary)
 - `ResourceMetrics` (KalshiBotOverseer.OvernightActivitiesHelper.ResourceConsumptionTrend)
 - `TimeSpan` (multiple properties: TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatterns, TradingStrategies.Trading.Overseer.StrategySimulation.TotalExecutionTime, etc.)
-- `tuple` (KalshiBotOverseer.OvernightActivitiesHelper.GetPerformanceMetrics)
 - `BrainPersistence` (KalshiBotOverseer.Models.BrainPersistence.DeserializeWithMetrics)
 
 
