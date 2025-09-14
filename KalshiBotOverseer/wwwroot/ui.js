@@ -407,7 +407,106 @@ function createBrainCard(item) {
     return cardHtml;
 }
 
-// NAVIGATION AND TAB MANAGEMENT
+/**
+ * NAVIGATION AND TAB MANAGEMENT
+ */
+
+// Active tab refresh timer
+let activeTabRefreshTimer = null;
+
+/**
+ * Clears the active tab refresh timer
+ */
+function clearActiveTabRefreshTimer() {
+    if (activeTabRefreshTimer) {
+        clearInterval(activeTabRefreshTimer);
+        activeTabRefreshTimer = null;
+    }
+}
+
+/**
+ * Immediately refreshes data for the specified tab
+ * @param {string} tabName - Name of the tab to refresh
+ */
+function refreshTabData(tabName) {
+    switch (tabName) {
+        case 'markets':
+            loadMarketWatchData();
+            loadAccountData();
+            break;
+        case 'brainlocks':
+            loadBrainsData();
+            loadAccountData();
+            break;
+        case 'positions':
+            loadPositionsData();
+            loadAccountData();
+            break;
+        case 'orders':
+            loadOrdersData();
+            loadAccountData();
+            break;
+        case 'snapshots':
+            loadSnapshotsData();
+            loadAccountData();
+            break;
+    }
+    logWithTimestamp('info', `Immediate refresh triggered for ${tabName} tab`);
+}
+
+/**
+ * Sets up refresh timer for the currently active tab
+ * @param {string} tabName - Name of the active tab
+ */
+function setupActiveTabRefresh(tabName) {
+    // Clear existing timer
+    clearActiveTabRefreshTimer();
+
+    let refreshFunction;
+
+    // Determine which data to refresh based on active tab
+    switch (tabName) {
+        case 'markets':
+            refreshFunction = () => {
+                loadMarketWatchData();
+                loadAccountData(); // Account data is always relevant
+            };
+            break;
+        case 'brainlocks':
+            refreshFunction = () => {
+                loadBrainsData();
+                loadAccountData(); // Account data is always relevant
+            };
+            break;
+        case 'positions':
+            refreshFunction = () => {
+                loadPositionsData();
+                loadAccountData(); // Account data is always relevant
+            };
+            break;
+        case 'orders':
+            refreshFunction = () => {
+                loadOrdersData();
+                loadAccountData(); // Account data is always relevant
+            };
+            break;
+        case 'snapshots':
+            refreshFunction = () => {
+                loadSnapshotsData();
+                loadAccountData(); // Account data is always relevant
+            };
+            break;
+        default:
+            return; // No refresh for unknown tabs
+    }
+
+    // Set up the refresh timer using the configured interval
+    const refreshInterval = CONFIG.REFRESH_INTERVALS.GLOBAL; // Use the global interval (30 seconds)
+    if (refreshInterval > 0) {
+        activeTabRefreshTimer = setInterval(refreshFunction, refreshInterval);
+        logWithTimestamp('info', `Set up active tab refresh for ${tabName}: ${refreshInterval}ms`);
+    }
+}
 
 /**
  * Switches between different tabs in the application
@@ -442,6 +541,12 @@ function switchTab(tabName) {
     } else {
         console.error('Could not find tab content for:', tabName + '-tab');
     }
+
+    // Immediately refresh data for the newly selected tab
+    refreshTabData(tabName);
+
+    // Set up refresh timer for the newly active tab
+    setupActiveTabRefresh(tabName);
 
     // If switching to snapshots tab and data is already loaded, render it
     if (tabName === 'snapshots' && snapshotsData && snapshotsData.length > 0) {

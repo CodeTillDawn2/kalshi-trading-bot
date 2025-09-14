@@ -41,6 +41,20 @@ const CONFIG = {
 
     // Default application behavior settings
     DEFAULT_PAGE_SIZE: 50,              // Default items per page in grids
+
+    // UI Refresh Intervals (in milliseconds)
+    REFRESH_INTERVALS: {
+        GLOBAL: 30000,                  // 30 seconds - Global data refresh interval
+        MARKETS: 30000,                 // 30 seconds - Markets tab refresh interval
+        BRAINS: 30000,                  // 30 seconds - Brains tab refresh interval
+        POSITIONS: 30000,               // 30 seconds - Positions tab refresh interval
+        ORDERS: 30000,                  // 30 seconds - Orders tab refresh interval
+        SNAPSHOTS: 30000,               // 30 seconds - Snapshots tab refresh interval
+        CHART: 30000,                   // 30 seconds - Chart modal refresh interval
+        ACCOUNT: 30000                  // 30 seconds - Account data refresh interval
+    },
+
+    // Legacy compatibility - maintain existing intervals
     AUTO_REFRESH_INTERVAL: 30000,       // 30 seconds - how often to refresh data
     CHART_AUTO_REFRESH_INTERVAL: 30000, // Chart modal auto-refresh interval
 
@@ -104,6 +118,45 @@ const CONFIG = {
         POSITIONS: 'positions',  // Trading positions tab
         ORDERS: 'orders',        // Trading orders tab
         SNAPSHOTS: 'snapshots'   // Market snapshots tab
+    },
+
+    // Logging configuration for consistent logging behavior
+    // PERFORMANCE CONSIDERATIONS:
+    // - Set VERBOSITY to 'error' in production to reduce console noise
+    // - Use 'json' format for log aggregation systems
+    // - MAX_MESSAGE_LENGTH prevents memory issues with large log messages
+    // - BACKEND logging can be disabled to reduce server load during debugging
+    LOGGING: {
+        // Log levels: 'debug', 'info', 'warn', 'error', 'none'
+        // Lower levels include higher levels (debug includes info, warn, error)
+        VERBOSITY: 'info',       // Default: show info and above (warn, error)
+
+        // Log formats: 'simple', 'detailed', 'json'
+        // 'simple': [DASHBOARD] message
+        // 'detailed': [timestamp] [DASHBOARD] [LEVEL] message
+        // 'json': {"timestamp": "...", "level": "...", "message": "...", "source": "..."}
+        FORMAT: 'simple',        // Default: clean, readable format
+
+        // Enable/disable specific log types for fine-grained control
+        ENABLED_TYPES: {
+            DEBUG: true,         // Debug messages (development only)
+            INFO: true,          // Info messages (general application flow)
+            WARN: true,          // Warning messages (potential issues)
+            ERROR: true,         // Error messages (failures that need attention)
+            BACKEND: true        // Backend logging (server-side persistence)
+        },
+
+        // Maximum log message length in characters (0 = unlimited)
+        // Prevents memory issues and log file bloat from large objects
+        MAX_MESSAGE_LENGTH: 500,
+
+        // Include ISO timestamps in log output
+        // Essential for debugging timing issues and log correlation
+        INCLUDE_TIMESTAMP: true,
+
+        // Include source identifier in logs
+        // Helps identify which part of the application generated the log
+        INCLUDE_SOURCE: true
     }
 };
 

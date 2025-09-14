@@ -50,8 +50,8 @@ window.onload = async () => {
         // Load initial data from all API endpoints
         await refreshAllData();
 
-        // Set up periodic data refresh every 30 seconds for real-time updates
-        setInterval(refreshAllData, 30000);
+        // Initialize active tab refresh for the default tab
+        setupActiveTabRefresh('brainlocks');
 
         console.log('[APP] Application initialized successfully');
     } catch (error) {
