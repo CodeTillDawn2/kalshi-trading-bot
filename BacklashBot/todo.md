@@ -398,6 +398,16 @@ This document outlines the performance metrics tracked across various classes in
 - `_retryDelay`: TimeSpan - Configurable delay between retry attempts
 - `_batchSize`: int - Configurable batch size for bulk database operations
 
+## BacklashBot.Services.TradingSnapshotService
+
+### Methods
+- `SaveSnapshotAsync()`: TimeSpan - Execution time for snapshot save operations, logged with count of snapshots saved
+- `LoadManySnapshots()`: TimeSpan - Execution time for snapshot load operations, logged with total snapshots and market count
+
+### Properties
+- `MaxParallelism`: int - Configurable limit for parallel processing during snapshot loading (default: Environment.ProcessorCount)
+- `StorageDirectory`: string - Configurable directory path for storing snapshot files
+
 ## BacklashBot.Services.WebSocketMonitorService
 
 ### Properties

@@ -8,6 +8,7 @@ using BacklashDTOs.Converters;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashInterfaces.Constants;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -46,7 +47,7 @@ namespace BacklashBot.Services
         private readonly TimeSpan _decisionFrequencyInterval;
         private readonly TimeSpan _snapshotTimingTolerance;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly string _snapshotStorageDirectory = @"\\DESKTOP-ITC50UT\SmokehouseDataStorage\NewSnapshots"; // Hardcoded directory path
+        private readonly string _snapshotStorageDirectory;
 
         /// <summary>
         /// Initializes a new instance of the TradingSnapshotService with required dependencies.
@@ -67,6 +68,9 @@ namespace BacklashBot.Services
             _serviceScopeFactory = scopeFactory;
             _decisionFrequencyInterval = TimeSpan.FromSeconds(tradingConfig.Value.DecisionFrequencySeconds);
             _snapshotTimingTolerance = TimeSpan.FromSeconds(snapshotConfig.Value.SnapshotToleranceSeconds);
+
+            // Use configurable storage directory or fallback to default
+            _snapshotStorageDirectory = snapshotConfig.Value.StorageDirectory ?? @"\\DESKTOP-ITC50UT\SmokehouseDataStorage\NewSnapshots";
 
             // Ensure the directory exists
             if (!Directory.Exists(_snapshotStorageDirectory))
@@ -92,8 +96,31 @@ namespace BacklashBot.Services
         /// </remarks>
         public async Task<List<string>> SaveSnapshotAsync(string BrainInstance, CacheSnapshot cacheSnapshot)
         {
+            var stopwatch = Stopwatch.StartNew();
             try
             {
+                // Input validation for snapshot data integrity
+                if (cacheSnapshot == null)
+                {
+                    _logger.LogWarning("CacheSnapshot is null, cannot save snapshot");
+                    return new List<string>();
+                }
+                if (string.IsNullOrWhiteSpace(BrainInstance))
+                {
+                    _logger.LogWarning("BrainInstance is null or empty, cannot save snapshot");
+                    return new List<string>();
+                }
+                if (cacheSnapshot.Markets == null || !cacheSnapshot.Markets.Any())
+                {
+                    _logger.LogWarning("CacheSnapshot contains no markets, cannot save snapshot");
+                    return new List<string>();
+                }
+                if (cacheSnapshot.Timestamp == default)
+                {
+                    _logger.LogWarning("CacheSnapshot timestamp is default value, cannot save snapshot");
+                    return new List<string>();
+                }
+
                 List<string> snapshotsActuallySaved = new List<string>();
                 var timestamp = cacheSnapshot.Timestamp;
                 var timestampString = timestamp.ToString("yyyyMMddTHHmmssZ");
@@ -214,11 +241,14 @@ namespace BacklashBot.Services
                     _isFirstSnapshotTaken = false;
                 }
 
+                stopwatch.Stop();
+                _logger.LogInformation("Snapshot save operation completed in {ElapsedMilliseconds}ms for {Count} snapshots", stopwatch.ElapsedMilliseconds, snapshotsActuallySaved.Count);
                 return snapshotsActuallySaved;
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error saving snapshot at {Timestamp}", cacheSnapshot.Timestamp);
+                stopwatch.Stop();
+                _logger.LogWarning(ex, "Error saving snapshot at {Timestamp} after {ElapsedMilliseconds}ms", cacheSnapshot.Timestamp, stopwatch.ElapsedMilliseconds);
                 return new List<string>();
             }
         }
@@ -238,6 +268,7 @@ namespace BacklashBot.Services
         /// </remarks>
         public async Task<Dictionary<string, List<MarketSnapshot>>> LoadManySnapshots(List<SnapshotDTO> snapshots, bool forceLoad = false)
         {
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 var result = new Dictionary<string, List<MarketSnapshot>>();
@@ -252,8 +283,13 @@ namespace BacklashBot.Services
                     .GroupBy(s => s.MarketTicker)
                     .ToDictionary(g => g.Key, g => g.ToList());
 
-                // Process each market group in parallel
-                Parallel.ForEach(groupedSnapshots, group =>
+                // Process each market group in parallel with configurable limits
+                var parallelOptions = new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = _snapshotConfig.Value.MaxParallelism > 0 ? _snapshotConfig.Value.MaxParallelism : -1
+                };
+
+                Parallel.ForEach(groupedSnapshots, parallelOptions, group =>
                 {
                     var marketTicker = group.Key;
                     var newCacheSnapshots = new List<MarketSnapshot>(group.Value.Count);  // Pre-allocate
@@ -299,11 +335,15 @@ namespace BacklashBot.Services
                     }
                 });
 
+                stopwatch.Stop();
+                _logger.LogInformation("Snapshot load operation completed in {ElapsedMilliseconds}ms for {TotalSnapshots} snapshots across {MarketCount} markets",
+                    stopwatch.ElapsedMilliseconds, snapshots.Count, result.Count);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading multiple snapshots");
+                stopwatch.Stop();
+                _logger.LogError(ex, "Error loading multiple snapshots after {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return new Dictionary<string, List<MarketSnapshot>>();
             }
         }
