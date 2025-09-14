@@ -28,7 +28,7 @@ namespace KalshiBotOverseer.Controllers
         private readonly IKalshiBotContext _context;
         private readonly IMemoryCache _cache;
         private readonly IKalshiAPIService _apiService;
-        private readonly SnapshotService _snapshotService;
+        private readonly SnapshotAggregationService _snapshotService;
         private readonly ILogger<MarketWatchController> _logger;
         private readonly IConfiguration _configuration;
         private const string MarketsCacheKey = "ActiveMarkets";
@@ -47,7 +47,7 @@ namespace KalshiBotOverseer.Controllers
         /// <param name="snapshotService">Service for managing market snapshots.</param>
         /// <param name="logger">Logger for recording operational information and errors.</param>
         /// <param name="configuration">Configuration for cache durations and other settings.</param>
-        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotService snapshotService, ILogger<MarketWatchController> logger, IConfiguration configuration)
+        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotAggregationService snapshotService, ILogger<MarketWatchController> logger, IConfiguration configuration)
         {
             _context = context;
             _cache = cache;

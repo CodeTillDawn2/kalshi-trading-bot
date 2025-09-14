@@ -14,6 +14,7 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
+using KalshiBotOverseer.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,16 +33,11 @@ namespace KalshiBotOverseer
         private readonly IMarketAnalysisHelper _analysisHelper;
         private readonly ExecutionConfig _executionConfig;
         private readonly ISqlDataService _sqlDataService;
+        private readonly PerformanceMetricsService _performanceMetrics;
 
-        // Performance metrics
-        private readonly Stopwatch _overnightStopwatch = new();
-        private int _totalTasks;
-        private int _successfulTasks;
-        private readonly Dictionary<string, TimeSpan> _taskTimings = new();
+        // Performance metrics are now handled by PerformanceMetricsService
 
-        // Circuit breaker for market refresh
-        private int _marketRefreshFailureCount;
-        private DateTime? _lastMarketRefreshFailure;
+        // Circuit breaker for market refresh is now handled by PerformanceMetricsService
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OvernightActivitiesHelper"/> class.
@@ -52,12 +48,14 @@ namespace KalshiBotOverseer
         /// <param name="executionConfig">The execution configuration options.</param>
         /// <param name="sqlDataService">The SQL data service for snapshot operations.</param>
         public OvernightActivitiesHelper(ILogger<OvernightActivitiesHelper> logger, IInterestScoreService interestScoreHelper,
-            IMarketAnalysisHelper analysisHelper, IOptions<ExecutionConfig> executionConfig, ISqlDataService sqlDataService)
+            IMarketAnalysisHelper analysisHelper, IOptions<ExecutionConfig> executionConfig, ISqlDataService sqlDataService,
+            PerformanceMetricsService performanceMetrics)
         {
             _logger = logger;
             _analysisHelper = analysisHelper;
             _executionConfig = executionConfig.Value;
             _sqlDataService = sqlDataService;
+            _performanceMetrics = performanceMetrics;
         }
 
         /// <summary>
@@ -66,16 +64,17 @@ namespace KalshiBotOverseer
         /// <returns>True if the circuit is open and operations should be skipped.</returns>
         private bool IsMarketRefreshCircuitOpen()
         {
-            if (_marketRefreshFailureCount >= _executionConfig.MarketRefreshCircuitBreakerFailureThreshold)
+            var healthMetrics = _performanceMetrics.GetHealthMetrics();
+            if (healthMetrics.MarketRefreshFailureCount >= _executionConfig.MarketRefreshCircuitBreakerFailureThreshold)
             {
-                if (_lastMarketRefreshFailure.HasValue &&
-                    (DateTime.UtcNow - _lastMarketRefreshFailure.Value).TotalMinutes < _executionConfig.MarketRefreshCircuitBreakerTimeoutMinutes)
+                if (healthMetrics.LastMarketRefreshFailure.HasValue &&
+                    (DateTime.UtcNow - healthMetrics.LastMarketRefreshFailure.Value).TotalMinutes < _executionConfig.MarketRefreshCircuitBreakerTimeoutMinutes)
                 {
                     return true;
                 }
                 else
                 {
-                    _marketRefreshFailureCount = 0; // Reset after timeout
+                    _performanceMetrics.ResetMarketRefreshFailures(); // Reset after timeout
                 }
             }
             return false;
@@ -92,10 +91,6 @@ namespace KalshiBotOverseer
         public async Task RunOvernightTasks(IServiceScopeFactory scopeFactory, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Running overnight tasks.");
-            _overnightStopwatch.Restart();
-            _totalTasks = 0;
-            _successfulTasks = 0;
-            _taskTimings.Clear();
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -116,27 +111,21 @@ namespace KalshiBotOverseer
             var sw = Stopwatch.StartNew();
             await RefreshMarketsByStatus(scopeFactory, KalshiConstants.Status_Open, cancellationToken);
             sw.Stop();
-            _taskTimings["RefreshOpenMarkets"] = sw.Elapsed;
-            _totalTasks++;
-            _successfulTasks++;
+            _performanceMetrics.RecordOvernightTask("RefreshOpenMarkets", sw.Elapsed, true);
             _logger.LogInformation("Refreshed all open markets. Duration: {Duration}", sw.Elapsed);
 
             // Refresh likely closed markets
             sw.Restart();
             await RefreshLikelyClosedMarkets(scopeFactory, cutoff, false, cancellationToken);
             sw.Stop();
-            _taskTimings["RefreshLikelyClosedMarkets"] = sw.Elapsed;
-            _totalTasks++;
-            _successfulTasks++;
+            _performanceMetrics.RecordOvernightTask("RefreshLikelyClosedMarkets", sw.Elapsed, true);
             _logger.LogInformation("Refreshed all likely closed markets. Duration: {Duration}", sw.Elapsed);
 
             // Calculate interest scores
             sw.Restart();
             await CalculateOvernightMarketInterestScores(scopeFactory, cancellationToken);
             sw.Stop();
-            _taskTimings["CalculateInterestScores"] = sw.Elapsed;
-            _totalTasks++;
-            _successfulTasks++;
+            _performanceMetrics.RecordOvernightTask("CalculateInterestScores", sw.Elapsed, true);
             _logger.LogInformation("Calculated missing market interest scores. Duration: {Duration}", sw.Elapsed);
 
             // Import snapshots
@@ -144,43 +133,35 @@ namespace KalshiBotOverseer
             await _sqlDataService.ExecuteSnapshotImportJobAsync(cancellationToken);
             await _sqlDataService.ExecuteSnapshotImportJobAsync(cancellationToken); // Execute twice to ensure minimal outstanding snapshots before generating groups
             sw.Stop();
-            _taskTimings["ImportSnapshots"] = sw.Elapsed;
-            _totalTasks++;
-            _successfulTasks++;
+            _performanceMetrics.RecordOvernightTask("ImportSnapshots", sw.Elapsed, true);
             _logger.LogInformation("Imported snapshots from files. Duration: {Duration}", sw.Elapsed);
 
             // Remove old watches
             sw.Restart();
             await RemoveOldWatches(scopeFactory);
             sw.Stop();
-            _taskTimings["RemoveOldWatches"] = sw.Elapsed;
-            _totalTasks++;
-            _successfulTasks++;
+            _performanceMetrics.RecordOvernightTask("RemoveOldWatches", sw.Elapsed, true);
             _logger.LogInformation("Removed old market watches. Duration: {Duration}", sw.Elapsed);
 
             // Generate snapshot groups
             sw.Restart();
             await _analysisHelper.GenerateSnapshotGroups();
             sw.Stop();
-            _taskTimings["GenerateSnapshotGroups"] = sw.Elapsed;
-            _totalTasks++;
-            _successfulTasks++;
+            _performanceMetrics.RecordOvernightTask("GenerateSnapshotGroups", sw.Elapsed, true);
             _logger.LogInformation("Generated snapshot groups. Duration: {Duration}", sw.Elapsed);
 
             // Delete unrecorded markets
             sw.Restart();
             await DeleteUnrecordedMarkets(scopeFactory, cancellationToken);
             sw.Stop();
-            _taskTimings["DeleteUnrecordedMarkets"] = sw.Elapsed;
-            _totalTasks++;
-            _successfulTasks++;
+            _performanceMetrics.RecordOvernightTask("DeleteUnrecordedMarkets", sw.Elapsed, true);
             _logger.LogInformation("Deleted ended markets which were never recorded. Duration: {Duration}", sw.Elapsed);
 
             // Log performance metrics
-            _overnightStopwatch.Stop();
+            var overnightMetrics = _performanceMetrics.GetOvernightMetrics();
             _logger.LogInformation("Overnight tasks completed. Total duration: {TotalDuration}, Tasks: {TotalTasks}, Successful: {SuccessfulTasks}, Success rate: {SuccessRate:P}",
-                _overnightStopwatch.Elapsed, _totalTasks, _successfulTasks, _successfulTasks / (double)_totalTasks);
-            foreach (var timing in _taskTimings)
+                overnightMetrics.TotalDuration, overnightMetrics.TotalTasks, overnightMetrics.SuccessfulTasks, overnightMetrics.SuccessRate);
+            foreach (var timing in overnightMetrics.TaskTimings)
             {
                 _logger.LogInformation("Task {TaskName}: {Duration}", timing.Key, timing.Value);
             }
@@ -271,8 +252,7 @@ namespace KalshiBotOverseer
             }
             if (errors > 0)
             {
-                _marketRefreshFailureCount++;
-                _lastMarketRefreshFailure = DateTime.UtcNow;
+                _performanceMetrics.RecordMarketRefreshFailure();
                 if (isRetry)
                 {
                     _logger.LogWarning("Logged {0} errors during overnight market retry.", errors);
@@ -287,8 +267,7 @@ namespace KalshiBotOverseer
             else
             {
                 // Reset on success
-                _marketRefreshFailureCount = 0;
-                _lastMarketRefreshFailure = null;
+                _performanceMetrics.ResetMarketRefreshFailures();
             }
         }
 
@@ -334,10 +313,11 @@ namespace KalshiBotOverseer
         /// <returns>A tuple containing performance metrics and task timings.</returns>
         public (int TotalTasks, int SuccessfulTasks, double SuccessRate, TimeSpan TotalDuration, Dictionary<string, TimeSpan> TaskTimings, int MarketRefreshFailureCount, DateTime? LastMarketRefreshFailure) GetPerformanceMetrics()
         {
-            return (_totalTasks, _successfulTasks,
-                    _totalTasks > 0 ? (double)_successfulTasks / _totalTasks : 0.0,
-                    _overnightStopwatch.Elapsed, new Dictionary<string, TimeSpan>(_taskTimings),
-                    _marketRefreshFailureCount, _lastMarketRefreshFailure);
+            var overnightMetrics = _performanceMetrics.GetOvernightMetrics();
+            var healthMetrics = _performanceMetrics.GetHealthMetrics();
+            return (overnightMetrics.TotalTasks, overnightMetrics.SuccessfulTasks, overnightMetrics.SuccessRate,
+                    overnightMetrics.TotalDuration, overnightMetrics.TaskTimings,
+                    healthMetrics.MarketRefreshFailureCount, healthMetrics.LastMarketRefreshFailure);
         }
 
         /// <summary>

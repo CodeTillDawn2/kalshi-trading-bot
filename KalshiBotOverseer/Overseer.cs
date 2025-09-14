@@ -74,6 +74,7 @@ namespace KalshiBotOverseer
         private readonly ILogger<Overseer> _logger;
         private readonly IHubContext<OverseerHub> _hubContext;
         private readonly OverseerConfig _config;
+        private readonly PerformanceMetricsService _performanceMetrics;
         private Timer? _apiFetchTimer;
         private CancellationTokenSource? _apiFetchCancellationTokenSource;
         private Timer? _systemInfoLogTimer;
@@ -86,10 +87,7 @@ namespace KalshiBotOverseer
         private readonly int _signalRBatchSize; // Configurable SignalR broadcast batch size
         private readonly int _brainBatchSize; // Configurable batch size for brain persistence logging
 
-        // Performance metrics
-        private int _webSocketEventCount = 0;
-        private TimeSpan _totalApiFetchTime = TimeSpan.Zero;
-        private int _apiFetchCount = 0;
+        // Performance metrics are now handled by PerformanceMetricsService
 
         // SignalR batching
         private readonly List<object> _pendingCheckInUpdates = new();
@@ -103,13 +101,14 @@ namespace KalshiBotOverseer
         /// <param name="logger">Logger for recording system events and diagnostics.</param>
         /// <param name="hubContext">SignalR hub context for real-time client communication.</param>
         /// <param name="config">Configuration options for the overseer system.</param>
-        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, IHubContext<OverseerHub> hubContext, IOptions<OverseerConfig> config)
+        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, IHubContext<OverseerHub> hubContext, IOptions<OverseerConfig> config, PerformanceMetricsService performanceMetrics)
         {
             _webSocketClient = webSocketClient;
             _scopeFactory = scopeFactory;
             _logger = logger;
             _hubContext = hubContext;
             _config = config.Value;
+            _performanceMetrics = performanceMetrics;
 
             // Initialize configuration-based intervals
             _apiFetchInterval = TimeSpan.FromMinutes(_config.ApiFetchIntervalMinutes);
@@ -176,7 +175,7 @@ namespace KalshiBotOverseer
                 return;
             }
 
-            _webSocketEventCount++;
+            _performanceMetrics.RecordWebSocketEvent();
             _logger?.LogInformation("Received Fill event: {EventData}", e);
         }
 
@@ -194,7 +193,7 @@ namespace KalshiBotOverseer
                 return;
             }
 
-            _webSocketEventCount++;
+            _performanceMetrics.RecordWebSocketEvent();
             _logger?.LogInformation("Received MarketLifecycle event: {EventData}", e);
         }
 
@@ -212,7 +211,7 @@ namespace KalshiBotOverseer
                 return;
             }
 
-            _webSocketEventCount++;
+            _performanceMetrics.RecordWebSocketEvent();
             _logger?.LogInformation("Received EventLifecycle event: {EventData}", e);
 
             // Process check-in data from brain instances
@@ -370,8 +369,7 @@ namespace KalshiBotOverseer
                     exchangeScheduleResult.ProcessedCount, exchangeScheduleResult.ErrorCount);
 
                 stopwatch.Stop();
-                _totalApiFetchTime += stopwatch.Elapsed;
-                _apiFetchCount++;
+                _performanceMetrics.RecordApiFetch(stopwatch.Elapsed);
 
                 _logger?.LogInformation("Periodic API data fetch completed successfully at {Timestamp} in {Duration}ms", DateTime.UtcNow, stopwatch.ElapsedMilliseconds);
             }

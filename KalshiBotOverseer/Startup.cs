@@ -147,7 +147,10 @@ namespace KalshiBotOverseer
             services.AddMemoryCache();
 
             // Register SnapshotService
-            services.AddScoped<SnapshotService>();
+            services.AddScoped<SnapshotAggregationService>();
+
+            // Register PerformanceMetricsService
+            services.AddSingleton<PerformanceMetricsService>();
 
             // Register BrainPersistenceService
             services.AddSingleton<BrainPersistenceService>();
