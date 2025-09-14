@@ -12,9 +12,11 @@ This document outlines the performance metrics tracked across various classes in
 - `long` (multiple classes)
 
 ### Non-Primitive Types
+- `ClientRateLimit` (KalshiBotOverseer.OverseerHub.ClientRateLimit) - Internal class for tracking rate limiting information per client, containing HandshakeCount (int), CheckInCount (int), and WindowStart (DateTime)
 - `PatternDetectionMetrics` (BacklashPatterns.PatternSearch.PatternDetectionMetrics)
 - `ClientMetrics` (KalshiBotOverseer.OverseerHub.ClientSpecificMetrics)
 - `MetricHistory` (KalshiBotOverseer.Models.BrainPersistence.CpuUsageHistory)
+- `OverseerHubConfig` (KalshiBotOverseer.OverseerHubConfig) - Configuration class containing settings for connection health monitoring, authentication token validity, and rate limiting parameters
 - `PerformanceMetrics` (TradingSimulator.MarketProcessor.GetPerformanceMetrics, TradingSimulator.Simulator.SimulatorReporting.GetPerformanceMetrics)
 - `PatternDetectionMetricsSummary` (BacklashPatterns.PatternSearch.GetSummary)
 - `ResourceMetrics` (KalshiBotOverseer.OvernightActivitiesHelper.ResourceConsumptionTrend)
@@ -346,6 +348,8 @@ This document outlines the performance metrics tracked across various classes in
 
 ### Methods
 - `GetHubMetrics()`: dynamic - Returns comprehensive hub metrics object
+- `GetPerformanceMetrics()`: Dictionary<string, object> - Returns real-time performance metrics including message processing rates, connection counts, and request statistics. Dictionary keys include: TotalMessagesProcessed (long), TotalHandshakeRequests (long), TotalCheckInRequests (long), MessagesPerMinute (double), HandshakeRequestsPerMinute (double), CheckInRequestsPerMinute (double), CurrentConnectionCount (int), LastMetricsReset (DateTime)
+- `ResetPerformanceMetrics()`: void - Resets all performance metrics counters to zero and updates the last reset timestamp
 
 ### Properties
 - `Uptime`: TimeSpan - Time since hub started
@@ -357,6 +361,15 @@ This document outlines the performance metrics tracked across various classes in
 - `MessageBatchQueueSize`: int - Size of message batch queue
 - `HandshakeRateLimitCount`: int - Number of rate-limited handshakes
 - `CheckInRateLimitCount`: int - Number of rate-limited check-ins
+
+## KalshiBotOverseer.OverseerHubConfig
+
+### Properties
+- `ConnectionHealthTimeoutSeconds`: int - Timeout in seconds for connection health monitoring (default: 300)
+- `HealthCheckIntervalSeconds`: int - Interval in seconds between health checks (default: 60)
+- `AuthTokenValidityHours`: int - Validity duration for authentication tokens in hours (default: 24)
+- `MaxHandshakeRequestsPerMinute`: int - Maximum number of handshake requests allowed per minute per IP (default: 10)
+- `MaxCheckInRequestsPerMinute`: int - Maximum number of check-in requests allowed per minute per client (default: 60)
 
 ## KalshiBotOverseer.OvernightActivitiesHelper
 
