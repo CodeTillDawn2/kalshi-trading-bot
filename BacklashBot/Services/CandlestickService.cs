@@ -12,6 +12,7 @@ using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace BacklashBot.Services
 {
@@ -60,6 +61,137 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
+        /// Performs cleanup of old candlestick data based on retention policies.
+        /// </summary>
+        /// <returns>A task representing the asynchronous cleanup operation</returns>
+        public async Task PerformDataCleanupAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                _logger.LogInformation("Starting candlestick data cleanup");
+
+                var retentionCutoff = DateTime.UtcNow.AddDays(-_executionConfig.CandlestickDataRetentionDays);
+                int totalCleaned = 0;
+
+                // Clean up old Parquet files
+                var hardDataStorageLocation = _executionConfig.HardDataStorageLocation;
+                if (Directory.Exists(hardDataStorageLocation))
+                {
+                    var candlestickDir = Path.Combine(hardDataStorageLocation, "Candlesticks");
+                    if (Directory.Exists(candlestickDir))
+                    {
+                        foreach (var marketDir in Directory.GetDirectories(candlestickDir))
+                        {
+                            var marketTicker = Path.GetFileName(marketDir);
+                            var filesCleaned = await CleanupOldParquetFilesAsync(marketDir, retentionCutoff);
+                            totalCleaned += filesCleaned;
+                        }
+                    }
+                }
+
+                stopwatch.Stop();
+                LogPerformanceMetric("PerformDataCleanupAsync", stopwatch.ElapsedMilliseconds, $"Total cleaned: {totalCleaned}");
+
+                _logger.LogInformation("Completed candlestick data cleanup: {TotalCleaned} items removed", totalCleaned);
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                LogPerformanceMetric("PerformDataCleanupAsync", stopwatch.ElapsedMilliseconds, "Failed");
+                _logger.LogError(ex, "Error during candlestick data cleanup");
+            }
+        }
+
+        /// <summary>
+        /// Cleans up old Parquet files for a specific market based on retention policy.
+        /// </summary>
+        /// <param name="marketDir">Market directory path</param>
+        /// <param name="retentionCutoff">Date cutoff for retention</param>
+        /// <returns>Number of files cleaned up</returns>
+        private async Task<int> CleanupOldParquetFilesAsync(string marketDir, DateTime retentionCutoff)
+        {
+            int filesCleaned = 0;
+            try
+            {
+                foreach (var yearDir in Directory.GetDirectories(marketDir))
+                {
+                    var year = int.Parse(Path.GetFileName(yearDir));
+                    if (year < retentionCutoff.Year)
+                    {
+                        // Delete entire year directory if it's before retention cutoff
+                        Directory.Delete(yearDir, true);
+                        _logger.LogDebug("Deleted old year directory: {YearDir}", yearDir);
+                        continue;
+                    }
+                    else if (year == retentionCutoff.Year)
+                    {
+                        // Clean up files within the retention year
+                        foreach (var monthDir in Directory.GetDirectories(yearDir))
+                        {
+                            var month = int.Parse(Path.GetFileName(monthDir));
+                            if (month < retentionCutoff.Month)
+                            {
+                                Directory.Delete(monthDir, true);
+                                _logger.LogDebug("Deleted old month directory: {MonthDir}", monthDir);
+                            }
+                            else if (month == retentionCutoff.Month)
+                            {
+                                // Clean up individual files in the retention month
+                                foreach (var file in Directory.GetFiles(monthDir, "*.parquet"))
+                                {
+                                    var fileName = Path.GetFileNameWithoutExtension(file);
+                                    var parts = fileName.Split('_');
+                                    if (parts.Length >= 2 && int.TryParse(parts[0], out var day))
+                                    {
+                                        if (day < retentionCutoff.Day)
+                                        {
+                                            await Task.Run(() => File.Delete(file));
+                                            filesCleaned++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error cleaning up Parquet files in {MarketDir}", marketDir);
+            }
+            return filesCleaned;
+        }
+
+        /// <summary>
+        /// Logs performance metrics for operations if enabled in configuration.
+        /// </summary>
+        /// <param name="operationName">Name of the operation being measured</param>
+        /// <param name="elapsedMilliseconds">Time elapsed in milliseconds</param>
+        /// <param name="additionalData">Optional additional data to log</param>
+        private void LogPerformanceMetric(string operationName, long elapsedMilliseconds, string? additionalData = null)
+        {
+            if (!_executionConfig.EnableCandlestickPerformanceMetrics) return;
+
+            var logLevel = _executionConfig.CandlestickPerformanceMetricsLogLevel.ToLower() switch
+            {
+                "debug" => LogLevel.Debug,
+                "information" => LogLevel.Information,
+                "warning" => LogLevel.Warning,
+                "error" => LogLevel.Error,
+                _ => LogLevel.Information
+            };
+
+            var message = $"Performance: {operationName} completed in {elapsedMilliseconds}ms";
+            if (!string.IsNullOrEmpty(additionalData))
+            {
+                message += $" - {additionalData}";
+            }
+
+            _logger.Log(logLevel, message);
+        }
+
+        /// <summary>
         /// Updates candlestick data for a specific market by fetching the latest data from the API.
         /// Synchronizes minute, hour, and day interval candlesticks and updates market metadata.
         /// </summary>
@@ -67,6 +199,7 @@ namespace BacklashBot.Services
         /// <returns>A task representing the asynchronous update operation</returns>
         public async Task UpdateCandlesticksAsync(string marketTicker)
         {
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -132,9 +265,14 @@ namespace BacklashBot.Services
                 }
 
                 marketData.RefreshCandlestickMetadata();
+
+                stopwatch.Stop();
+                LogPerformanceMetric("UpdateCandlesticksAsync", stopwatch.ElapsedMilliseconds, $"Market: {marketTicker}");
             }
             catch (OperationCanceledException)
             {
+                stopwatch.Stop();
+                LogPerformanceMetric("UpdateCandlesticksAsync", stopwatch.ElapsedMilliseconds, $"Market: {marketTicker} (cancelled)");
                 _logger.LogInformation("Candlestick update was cancelled for {MarketTicker}", marketTicker);
             }
             catch (InvalidOperationException ex)
@@ -176,6 +314,7 @@ namespace BacklashBot.Services
         /// <returns>A task representing the asynchronous population operation</returns>
         public async Task PopulateMarketDataAsync(string marketTicker)
         {
+            var stopwatch = Stopwatch.StartNew();
             try
             {
                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -203,10 +342,12 @@ namespace BacklashBot.Services
                 }
                 marketData.MarketInfo = market;
 
-                // Process all intervals in parallel
+                // Process all intervals in parallel with concurrency limit
+                using var semaphore = new SemaphoreSlim(_executionConfig.MaxParallelCandlestickTasks);
                 var intervalTasks = new[] { "minute", "hour", "day" }
                     .Select(interval => Task.Run(async () =>
                     {
+                        await semaphore.WaitAsync(_statusTracker.GetCancellationToken());
                         try
                         {
                             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
@@ -289,6 +430,10 @@ namespace BacklashBot.Services
                         {
                             _logger.LogError(ex, "Error processing {interval} for market {market}.", interval, marketTicker);
                             return (Interval: interval, Candlesticks: new List<CandlestickData>());
+                        }
+                        finally
+                        {
+                            semaphore.Release();
                         }
                     }, _statusTracker.GetCancellationToken())).ToList();
 
@@ -396,9 +541,14 @@ namespace BacklashBot.Services
                 _logger.LogDebug("Refreshing metadata for {MarketTicker}", marketTicker);
                 marketData.RefreshAllMetadata();
                 _logger.LogInformation("Completed market data population for {MarketTicker}", marketTicker);
+
+                stopwatch.Stop();
+                LogPerformanceMetric("PopulateMarketDataAsync", stopwatch.ElapsedMilliseconds, $"Market: {marketTicker}");
             }
             catch (OperationCanceledException)
             {
+                stopwatch.Stop();
+                LogPerformanceMetric("PopulateMarketDataAsync", stopwatch.ElapsedMilliseconds, $"Market: {marketTicker} (cancelled)");
                 _logger.LogInformation("Market data population was cancelled for {MarketTicker}", marketTicker);
             }
             catch (InvalidOperationException ex)
@@ -429,6 +579,7 @@ namespace BacklashBot.Services
         /// <returns>A list of processed and validated candlestick data</returns>
         private async Task<List<CandlestickData>> LoadAndProcessCandlesticksAsync(List<CandlestickData> existingCandlesticks, string marketTicker, string interval, string hardDataStorageLocation, DateTime? latestExistingDate, DateTime marketOpenTime)
         {
+            var stopwatch = Stopwatch.StartNew();
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
             int intervalType = interval == "minute" ? 1 : interval == "hour" ? 2 : 3;
             string intervalSuffix = interval == "minute" ? "_Minute" : interval == "hour" ? "_Hour" : "_Day";
@@ -613,6 +764,19 @@ namespace BacklashBot.Services
                 .OrderBy(c => c.Date)
                 .ToList();
 
+            // Apply data retention limit
+            if (finalCandlesticks.Count > _executionConfig.MaxCandlesticksPerMarket)
+            {
+                var retentionCutoff = DateTime.UtcNow.AddDays(-_executionConfig.CandlestickDataRetentionDays);
+                finalCandlesticks = finalCandlesticks
+                    .Where(c => c.Date >= retentionCutoff)
+                    .Take(_executionConfig.MaxCandlesticksPerMarket)
+                    .ToList();
+
+                _logger.LogDebug("Applied data retention limit for {MarketTicker} at {Interval}: Kept {Count} candlesticks after filtering",
+                    marketTicker, interval, finalCandlesticks.Count);
+            }
+
             _logger.LogDebug("Processed candlesticks for {MarketTicker} at {Interval}: ForwardFilledAdded={ForwardFilledCount}, TotalAfterFill={TotalCount}",
                 marketTicker, interval, forwardFilledCount, finalCandlesticks.Count);
 
@@ -636,6 +800,10 @@ namespace BacklashBot.Services
                               finalCandlesticks.Count, ex.Message, ex.InnerException?.Message);
 
             }
+
+            stopwatch.Stop();
+            LogPerformanceMetric("LoadAndProcessCandlesticksAsync", stopwatch.ElapsedMilliseconds,
+                $"Market: {marketTicker}, Interval: {interval}, Loaded: {finalCandlesticks.Count}");
 
             return finalCandlesticks;
         }

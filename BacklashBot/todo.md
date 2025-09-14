@@ -432,6 +432,30 @@ This document outlines the performance metrics tracked across various classes in
 - `CurrentTradeQueueDepth`: int - Current trade event queue depth
 - `OperationsPerSecond`: double - Rate of matching operations per second
 
+## BacklashBot.Services.CandlestickService
+
+### Methods
+- `UpdateCandlesticksAsync()`: TimeSpan - Execution time for updating candlesticks for a specific market, logged with market ticker and operation details
+- `PopulateMarketDataAsync()`: TimeSpan - Execution time for populating market data including parallel processing of minute/hour/day intervals, logged with market ticker
+- `LoadAndProcessCandlesticksAsync()`: TimeSpan - Execution time for loading and processing candlestick data from Parquet files and SQL database, logged with market ticker, interval, and count of loaded candlesticks
+- `PerformDataCleanupAsync()`: TimeSpan - Execution time for performing data cleanup operations on old candlestick data, logged with total items cleaned
+
+### Properties
+- `EnableCandlestickPerformanceMetrics`: bool - Configurable flag to enable/disable performance metrics collection for candlestick operations (default: true)
+- `CandlestickPerformanceMetricsLogLevel`: string - Configurable log level for performance metrics ("Debug", "Information", "Warning", "Error") (default: "Information")
+- `MaxParallelCandlestickTasks`: int - Maximum number of parallel tasks for candlestick processing to prevent resource exhaustion (default: 4)
+- `MaxDegreeOfParallelismDataLoading`: int - Maximum degree of parallelism for data loading operations (default: 2)
+- `CandlestickDataRetentionDays`: int - Number of days to retain candlestick data before cleanup (default: 365)
+- `CandlestickCleanupIntervalHours`: int - Interval in hours between cleanup operations (default: 24)
+- `MaxCandlesticksPerMarket`: int - Maximum number of candlesticks to keep per market per interval (default: 10000)
+
+### Performance Metrics Features
+- **Parallel Processing Control**: Uses SemaphoreSlim to limit concurrent interval processing based on `MaxParallelCandlestickTasks` configuration
+- **Data Retention Management**: Automatically applies retention policies based on `CandlestickDataRetentionDays` and limits data size with `MaxCandlesticksPerMarket`
+- **Configurable Logging**: Performance metrics are logged at the configured log level when `EnableCandlestickPerformanceMetrics` is true
+- **Resource Protection**: Parallel processing limits prevent system resource exhaustion during high-volume data operations
+- **Cleanup Automation**: Scheduled cleanup operations remove old data based on retention policies and configurable intervals
+
 ## BacklashBot.Services.WebSocketMonitorService
 
 ### Properties
