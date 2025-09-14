@@ -438,6 +438,58 @@ namespace BacklashBot.Services
             return (_eventQueue.Count, _tickerQueue.Count, _notificationQueue.Count);
         }
 
+        /// <summary>
+        /// Gets performance metrics for event queue processing operations.
+        /// Returns the average processing time and total operations count for the last MaxWaitTimeSamples operations.
+        /// </summary>
+        /// <returns>A tuple containing average processing time in milliseconds and total operations count.</returns>
+        public (double AverageProcessingTimeMs, int TotalOperations) GetEventQueueProcessingMetrics()
+        {
+            var times = _eventQueueProcessingTimes.GetOrAdd("event", _ => new List<long>());
+            if (times.Count == 0) return (0.0, 0);
+            return (times.Average(), times.Count);
+        }
+
+        /// <summary>
+        /// Gets performance metrics for ticker queue processing operations.
+        /// Returns the average processing time and total operations count for the last MaxWaitTimeSamples operations.
+        /// </summary>
+        /// <returns>A tuple containing average processing time in milliseconds and total operations count.</returns>
+        public (double AverageProcessingTimeMs, int TotalOperations) GetTickerQueueProcessingMetrics()
+        {
+            var times = _tickerQueueProcessingTimes.GetOrAdd("ticker", _ => new List<long>());
+            if (times.Count == 0) return (0.0, 0);
+            return (times.Average(), times.Count);
+        }
+
+        /// <summary>
+        /// Gets performance metrics for notification queue processing operations.
+        /// Returns the average processing time and total operations count for the last MaxWaitTimeSamples operations.
+        /// </summary>
+        /// <returns>A tuple containing average processing time in milliseconds and total operations count.</returns>
+        public (double AverageProcessingTimeMs, int TotalOperations) GetNotificationQueueProcessingMetrics()
+        {
+            var times = _notificationQueueProcessingTimes.GetOrAdd("notification", _ => new List<long>());
+            if (times.Count == 0) return (0.0, 0);
+            return (times.Average(), times.Count);
+        }
+
+        /// <summary>
+        /// Gets performance metrics for market lock wait times.
+        /// Returns the average wait time and total operations count for the last MaxWaitTimeSamples operations per market.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to get metrics for.</param>
+        /// <returns>A tuple containing average wait time in milliseconds and total operations count.</returns>
+        public (double AverageWaitTimeMs, int TotalOperations) GetMarketLockWaitMetrics(string marketTicker)
+        {
+            if (_marketLockWaitDurations.TryGetValue(marketTicker, out var times))
+            {
+                if (times.Count == 0) return (0.0, 0);
+                return (times.Average(), times.Count);
+            }
+            return (0.0, 0);
+        }
+
         private void HandleTradeReceived(object sender, TradeEventArgs args)
         {
             _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();

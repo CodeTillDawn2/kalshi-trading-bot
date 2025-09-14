@@ -330,6 +330,79 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
+        /// Gets the total number of successful broadcast operations.
+        /// </summary>
+        public long SuccessfulBroadcasts
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _successfulBroadcasts;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the total number of failed broadcast operations.
+        /// </summary>
+        public long FailedBroadcasts
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _failedBroadcasts;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the cumulative total time spent on broadcast operations in milliseconds.
+        /// </summary>
+        public double TotalBroadcastTimeMs
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _totalBroadcastTime;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the average broadcast time per operation in milliseconds.
+        /// </summary>
+        public double AverageBroadcastTimeMs
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _successfulBroadcasts + _failedBroadcasts > 0
+                        ? _totalBroadcastTime / (_successfulBroadcasts + _failedBroadcasts)
+                        : 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the broadcast success rate as a percentage (0-100).
+        /// </summary>
+        public double BroadcastSuccessRate
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    var total = _successfulBroadcasts + _failedBroadcasts;
+                    return total > 0 ? (_successfulBroadcasts * 100.0) / total : 0;
+                }
+            }
+        }
+
+        /// <summary>
         /// Disposes of the broadcast service resources.
         /// </summary>
         public void Dispose()

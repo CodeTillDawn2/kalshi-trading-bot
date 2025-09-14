@@ -22,6 +22,9 @@ namespace BacklashBot.Management
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ITradingSnapshotService _snapshotService;
         private readonly ILogger<MarketAnalysisHelper> _logger;
+        private int _totalMarketsProcessed = 0;
+        private long _totalProcessingTimeMs = 0;
+        private int _errorCount = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarketAnalysisHelper"/> class.
@@ -97,6 +100,7 @@ namespace BacklashBot.Management
                 }
                 catch (Exception ex)
                 {
+                    Interlocked.Increment(ref _errorCount);
                     _logger.LogWarning(ex, "Failed to retrieve snapshots for market {MarketTicker}. Retrying after delay.", marketTicker);
                     stopwatch.Stop();
                     _logger.LogWarning("Initial failure for market {MarketTicker} in {ElapsedMs} ms.", marketTicker, stopwatch.ElapsedMilliseconds);
@@ -109,6 +113,7 @@ namespace BacklashBot.Management
                     }
                     catch (Exception retryEx)
                     {
+                        Interlocked.Increment(ref _errorCount);
                         _logger.LogError(retryEx, "Failed to retrieve snapshots for market {MarketTicker} after retry. Skipping.", marketTicker);
                         stopwatch.Stop();
                         _logger.LogWarning("Failed to process market {MarketTicker} in {ElapsedMs} ms.", marketTicker, stopwatch.ElapsedMilliseconds);
@@ -149,6 +154,8 @@ namespace BacklashBot.Management
                 await context.AddOrUpdateSnapshotGroups(validPeriods);
                 stopwatch.Stop();
                 totalProcessingTime += stopwatch.ElapsedMilliseconds;
+                Interlocked.Increment(ref _totalMarketsProcessed);
+                Interlocked.Add(ref _totalProcessingTimeMs, stopwatch.ElapsedMilliseconds);
                 _logger.LogInformation("Successfully processed {Count} snapshot groups for market {MarketTicker} in {ElapsedMs} ms.", validPeriods.Count, marketTicker, stopwatch.ElapsedMilliseconds);
             }
 
@@ -156,6 +163,20 @@ namespace BacklashBot.Management
             double averageTimePerMarket = totalMarketsProcessed > 0 ? (double)totalProcessingTime / totalMarketsProcessed : 0;
             _logger.LogInformation("Completed snapshot group generation process. Total markets processed: {TotalMarkets}, Total processing time: {TotalTime} ms, Average time per market: {AverageTime} ms, Overall duration: {OverallDuration} ms.",
                 totalMarketsProcessed, totalProcessingTime, averageTimePerMarket, totalStopwatch.ElapsedMilliseconds);
+        }
+
+        /// <summary>
+        /// Gets current performance metrics for the market analysis helper.
+        /// Returns processing statistics and error counts.
+        /// </summary>
+        /// <returns>A tuple containing total markets processed, total processing time in milliseconds, average time per market, and error count.</returns>
+        public (int TotalMarketsProcessed, long TotalProcessingTimeMs, double AverageTimePerMarketMs, int ErrorCount) GetPerformanceMetrics()
+        {
+            var total = _totalMarketsProcessed;
+            var time = _totalProcessingTimeMs;
+            var avg = total > 0 ? (double)time / total : 0.0;
+            var errors = _errorCount;
+            return (total, time, avg, errors);
         }
     }
 }

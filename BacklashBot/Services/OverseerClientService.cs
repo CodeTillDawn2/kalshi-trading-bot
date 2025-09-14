@@ -729,6 +729,31 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
+        /// Gets the total number of connection attempts made to overseer servers.
+        /// </summary>
+        public int ConnectionAttemptCount => _connectionAttemptCount;
+
+        /// <summary>
+        /// Gets the number of successful connections to overseer servers.
+        /// </summary>
+        public int ConnectionSuccessCount => _connectionSuccessCount;
+
+        /// <summary>
+        /// Gets the total time spent on overseer discovery operations.
+        /// </summary>
+        public TimeSpan TotalDiscoveryTime => _totalDiscoveryTime;
+
+        /// <summary>
+        /// Gets the number of overseer discovery operations performed.
+        /// </summary>
+        public int DiscoveryOperationCount => _discoveryOperationCount;
+
+        /// <summary>
+        /// Gets the current count of circuit breaker failures.
+        /// </summary>
+        public int CircuitBreakerFailureCount => _circuitBreakerFailureCount;
+
+        /// <summary>
         /// Gets the current performance metrics for the overseer client service.
         /// Includes connection success rates, discovery timing, and circuit breaker status.
         /// </summary>

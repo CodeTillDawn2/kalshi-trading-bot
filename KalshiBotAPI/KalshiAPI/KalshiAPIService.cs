@@ -2266,5 +2266,71 @@ namespace KalshiBotAPI.KalshiAPI
             var bag = _calculationExecutionDurations.GetOrAdd(calculationName, _ => new ConcurrentBag<long>());
             bag.Add(elapsedMs);
         }
+
+        /// <summary>
+        /// Gets the method execution durations for performance monitoring.
+        /// Returns a dictionary mapping method names to their execution time measurements.
+        /// </summary>
+        /// <returns>A concurrent dictionary containing method execution durations.</returns>
+        public ConcurrentDictionary<string, ConcurrentBag<long>> GetMethodExecutionDurations()
+        {
+            return _methodExecutionDurations;
+        }
+
+        /// <summary>
+        /// Gets the calculation execution durations for performance monitoring.
+        /// Returns a dictionary mapping calculation names to their execution time measurements.
+        /// </summary>
+        /// <returns>A concurrent dictionary containing calculation execution durations.</returns>
+        public ConcurrentDictionary<string, ConcurrentBag<long>> GetCalculationExecutionDurations()
+        {
+            return _calculationExecutionDurations;
+        }
+
+        /// <summary>
+        /// Gets aggregated performance metrics for method executions.
+        /// Returns statistics like average, min, max execution times for each method.
+        /// </summary>
+        /// <returns>A dictionary containing aggregated method performance metrics.</returns>
+        public Dictionary<string, (int Count, double AverageMs, long MinMs, long MaxMs)> GetMethodPerformanceMetrics()
+        {
+            var metrics = new Dictionary<string, (int, double, long, long)>();
+            foreach (var kvp in _methodExecutionDurations)
+            {
+                var durations = kvp.Value.ToArray();
+                if (durations.Length > 0)
+                {
+                    var count = durations.Length;
+                    var average = durations.Average();
+                    var min = durations.Min();
+                    var max = durations.Max();
+                    metrics[kvp.Key] = (count, average, min, max);
+                }
+            }
+            return metrics;
+        }
+
+        /// <summary>
+        /// Gets aggregated performance metrics for calculation executions.
+        /// Returns statistics like average, min, max execution times for each calculation.
+        /// </summary>
+        /// <returns>A dictionary containing aggregated calculation performance metrics.</returns>
+        public Dictionary<string, (int Count, double AverageMs, long MinMs, long MaxMs)> GetCalculationPerformanceMetrics()
+        {
+            var metrics = new Dictionary<string, (int, double, long, long)>();
+            foreach (var kvp in _calculationExecutionDurations)
+            {
+                var durations = kvp.Value.ToArray();
+                if (durations.Length > 0)
+                {
+                    var count = durations.Length;
+                    var average = durations.Average();
+                    var min = durations.Min();
+                    var max = durations.Max();
+                    metrics[kvp.Key] = (count, average, min, max);
+                }
+            }
+            return metrics;
+        }
     }
 }
