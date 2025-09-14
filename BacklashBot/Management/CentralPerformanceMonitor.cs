@@ -68,6 +68,30 @@ namespace BacklashBot.Management
         public bool IsShuttingDown { get; set; } = false;
 
         /// <summary>
+        /// Gets or sets whether WebSocketConnectionManager performance metrics are being recorded.
+        /// This flag indicates if the WebSocketConnectionManager is actively collecting and posting metrics.
+        /// </summary>
+        public bool WebSocketConnectionManagerMetricsRecording { get; private set; } = false;
+
+        /// <summary>
+        /// Updates the WebSocket metrics recording status and logs the change.
+        /// </summary>
+        /// <param name="isRecording">True if WebSocket metrics are being recorded, false otherwise.</param>
+        /// <remarks>
+        /// This method should be called by WebSocketConnectionManager when metrics collection starts or stops.
+        /// It provides visibility into the WebSocket performance monitoring state.
+        /// </remarks>
+        public void UpdateWebSocketMetricsRecordingStatus(bool isRecording)
+        {
+            if (WebSocketConnectionManagerMetricsRecording != isRecording)
+            {
+                WebSocketConnectionManagerMetricsRecording = isRecording;
+                _logger.LogInformation("WebSocket metrics recording status changed: {Status}",
+                    isRecording ? "ENABLED" : "DISABLED");
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the CentralPerformanceMonitor class.
         /// </summary>
         /// <param name="logger">Logger instance for recording performance monitoring operations.</param>

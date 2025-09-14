@@ -3,6 +3,7 @@ using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Exceptions;
+using BacklashBot.Management.Interfaces;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
@@ -51,6 +52,7 @@ namespace KalshiBotAPI.Websockets
         private readonly ILogger<WebSocketConnectionManager> _logger;
         private readonly KalshiConfig _kalshiConfig;
         private readonly RSA _privateKey;
+        private readonly ICentralPerformanceMonitor? _performanceMonitor;
         private ClientWebSocket? _webSocket = null!;
         private readonly object _webSocketLock = new object();
         private bool _isConnected = false;
@@ -74,6 +76,21 @@ namespace KalshiBotAPI.Websockets
         private int _bufferUtilizationCount = 0;
         private double _averageBufferUtilization = 0;
 
+        // Additional network-level metrics
+        private long _totalConnectedTimeMs = 0;
+        private DateTime _lastConnectionStart = DateTime.MinValue;
+        private double _bandwidthBps = 0; // bytes per second
+        private readonly Queue<long> _bandwidthWindow = new Queue<long>(); // for bandwidth calculation
+        private int _messageErrors = 0;
+
+        // Operational metrics
+        private double _errorRate = 0; // messages with errors / total messages
+        private int _queueDepth = 0; // current queue depth if implemented
+
+        // Performance monitoring
+        private DateTime _lastMetricsPost = DateTime.MinValue;
+        private readonly TimeSpan _metricsPostInterval = TimeSpan.FromMinutes(1); // Post metrics every minute
+
         // Configuration options
         private readonly int _maxRetryAttempts;
         private readonly int[] _retryDelays;
@@ -86,10 +103,33 @@ namespace KalshiBotAPI.Websockets
         private readonly TimeSpan _signatureCacheDuration;
 
         /// <summary>
+        /// Gets or sets whether performance metrics collection is enabled.
+        /// When disabled, metric tracking is skipped to reduce overhead.
+        /// </summary>
+        public bool EnableMetrics
+        {
+            get => _enableMetrics;
+            set
+            {
+                if (_enableMetrics != value)
+                {
+                    _enableMetrics = value;
+                    _performanceMonitor?.UpdateWebSocketMetricsRecordingStatus(_enableMetrics);
+                    if (_enableMetrics && _performanceMonitor == null)
+                    {
+                        _logger.LogWarning("Performance metrics enabled but no ICentralPerformanceMonitor was provided. Metrics will be collected locally but not posted to central monitoring.");
+                    }
+                }
+            }
+        }
+        private bool _enableMetrics = true;
+
+        /// <summary>
         /// Initializes a new instance of the WebSocketConnectionManager class.
         /// </summary>
         /// <param name="kalshiConfig">Configuration options containing API credentials and connection settings.</param>
         /// <param name="logger">Logger instance for recording connection operations and errors.</param>
+        /// <param name="performanceMonitor">Optional performance monitor for recording WebSocket metrics.</param>
         /// <remarks>
         /// The constructor sets up the RSA private key for authentication by loading it from the
         /// configured key file. This key is used to generate signatures for WebSocket connection
@@ -98,12 +138,20 @@ namespace KalshiBotAPI.Websockets
         /// </remarks>
         public WebSocketConnectionManager(
             IOptions<KalshiConfig> kalshiConfig,
-            ILogger<WebSocketConnectionManager> logger)
+            ILogger<WebSocketConnectionManager> logger,
+            ICentralPerformanceMonitor? performanceMonitor = null)
         {
             _kalshiConfig = kalshiConfig.Value;
             _logger = logger;
+            _performanceMonitor = performanceMonitor;
             _privateKey = RSA.Create();
             _privateKey.ImportFromPem(File.ReadAllText(_kalshiConfig.KeyFile));
+
+            // Warn if metrics are enabled but no performance monitor is provided
+            if (EnableMetrics && _performanceMonitor == null)
+            {
+                _logger.LogWarning("Performance metrics are enabled but no ICentralPerformanceMonitor was provided. Metrics will be collected locally but not posted to central monitoring.");
+            }
 
             // Initialize configuration values
             _maxRetryAttempts = _kalshiConfig.WebSocketMaxRetryAttempts;
@@ -112,6 +160,12 @@ namespace KalshiBotAPI.Websockets
             _resetDelayMs = _kalshiConfig.WebSocketResetDelayMs;
             _semaphoreTimeoutMs = _kalshiConfig.WebSocketSemaphoreTimeoutMs;
             _signatureCacheDuration = TimeSpan.FromMinutes(_kalshiConfig.WebSocketSignatureCacheDurationMinutes);
+
+            // Initialize metrics configuration (defaults to true if not specified)
+            EnableMetrics = _kalshiConfig.WebSocketEnableMetrics ?? true;
+
+            // Notify performance monitor of initial metrics status
+            _performanceMonitor?.UpdateWebSocketMetricsRecordingStatus(EnableMetrics);
         }
 
         /// <summary>
@@ -150,7 +204,7 @@ namespace KalshiBotAPI.Websockets
             }
 
             _logger.LogInformation("Connecting WebSocket, retry attempt: {RetryCount}", retryCount);
-            _connectionAttempts++;
+            if (_enableMetrics) _connectionAttempts++;
             bool semaphoreAcquired = false;
             var stopwatch = Stopwatch.StartNew();
             try
@@ -159,7 +213,7 @@ namespace KalshiBotAPI.Websockets
                 if (!semaphoreAcquired)
                 {
                     _logger.LogError("Failed to acquire connect semaphore within {Timeout}ms", _semaphoreTimeoutMs);
-                    TrackConnectionFailure("SemaphoreTimeout");
+                    if (_enableMetrics) TrackConnectionFailure("SemaphoreTimeout");
                     return;
                 }
 
@@ -192,9 +246,14 @@ namespace KalshiBotAPI.Websockets
 
                 await newWebSocket.ConnectAsync(uri, CancellationToken.None);
                 stopwatch.Stop();
-                _connectionLatencies.Add(stopwatch.ElapsedMilliseconds);
-                _connectionSuccesses++;
-                if (retryCount > 0) _reconnectionCount++;
+                if (_enableMetrics)
+                {
+                    _connectionLatencies.Add(stopwatch.ElapsedMilliseconds);
+                    _connectionSuccesses++;
+                    if (retryCount > 0) _reconnectionCount++;
+                    _lastConnectionStart = DateTime.UtcNow; // Start tracking uptime
+                }
+                PostPerformanceMetric("Connect", stopwatch.ElapsedMilliseconds);
                 _logger.LogInformation("WebSocket connection established to {Uri}", uri);
                 _isConnected = true;
 
@@ -206,12 +265,28 @@ namespace KalshiBotAPI.Websockets
             catch (WebSocketException ex) when (ex.Message.Contains("Failed to connect WebSocket on retry"))
             {
                 _logger.LogWarning(new WebSocketRetryFailedException(ex.Message, ex), "Failed to connect to a websocket");
-                TrackConnectionFailure("WebSocketException");
+                if (_enableMetrics)
+                {
+                    TrackConnectionFailure("WebSocketException");
+                    if (_isConnected)
+                    {
+                        _totalConnectedTimeMs += (long)(DateTime.UtcNow - _lastConnectionStart).TotalMilliseconds;
+                        _isConnected = false;
+                    }
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to connect WebSocket on retry {RetryCount}", retryCount);
-                TrackConnectionFailure(ex.GetType().Name);
+                if (_enableMetrics)
+                {
+                    TrackConnectionFailure(ex.GetType().Name);
+                    if (_isConnected)
+                    {
+                        _totalConnectedTimeMs += (long)(DateTime.UtcNow - _lastConnectionStart).TotalMilliseconds;
+                        _isConnected = false;
+                    }
+                }
                 if (retryCount < _maxRetryAttempts && _allowReconnect)
                 {
                     int delay = retryCount < _retryDelays.Length ? _retryDelays[retryCount] : _retryDelays[_retryDelays.Length - 1];
@@ -221,7 +296,6 @@ namespace KalshiBotAPI.Websockets
                 }
                 else
                 {
-                    _isConnected = false;
                     throw new InvalidOperationException("Failed to establish WebSocket connection after maximum retries", ex);
                 }
             }
@@ -468,25 +542,42 @@ namespace KalshiBotAPI.Websockets
                         if (result.EndOfMessage)
                         {
                             var fullMessage = messageBuilder.ToString();
-                            _messagesReceived++;
-                            var now = DateTime.UtcNow;
-                            var messageLength = fullMessage.Length;
-
-                            // Track buffer utilization
-                            _totalBytesReceived += messageLength;
-                            _bufferUtilizationCount++;
-                            _averageBufferUtilization = (_averageBufferUtilization * (_bufferUtilizationCount - 1) + (double)messageLength / _bufferSize) / _bufferUtilizationCount;
-
-                            // Update throughput with sliding window
-                            _throughputWindow.Enqueue((now, 1));
-                            while (_throughputWindow.Count > 0 && (now - _throughputWindow.Peek().timestamp).TotalSeconds > 60)
+                            if (_enableMetrics)
                             {
-                                _throughputWindow.Dequeue();
-                            }
-                            _messageThroughput = _throughputWindow.Count / 60.0; // messages per second over last 60 seconds
+                                _messagesReceived++;
+                                var now = DateTime.UtcNow;
+                                var messageLength = fullMessage.Length;
 
-                            _lastMessageTime = now;
-                            _logger.LogDebug("Received complete WebSocket message: Length={Length}", messageLength);
+                                // Track buffer utilization
+                                _totalBytesReceived += messageLength;
+                                _bufferUtilizationCount++;
+                                _averageBufferUtilization = (_averageBufferUtilization * (_bufferUtilizationCount - 1) + (double)messageLength / _bufferSize) / _bufferUtilizationCount;
+
+                                // Update bandwidth
+                                if (_lastConnectionStart != DateTime.MinValue)
+                                {
+                                    double connectedSeconds = (DateTime.UtcNow - _lastConnectionStart).TotalSeconds;
+                                    _bandwidthBps = connectedSeconds > 0 ? _totalBytesReceived / connectedSeconds : 0;
+                                }
+
+                                // Update throughput with sliding window
+                                _throughputWindow.Enqueue((now, 1));
+                                while (_throughputWindow.Count > 0 && (now - _throughputWindow.Peek().timestamp).TotalSeconds > 60)
+                                {
+                                    _throughputWindow.Dequeue();
+                                }
+                                _messageThroughput = _throughputWindow.Count / 60.0; // messages per second over last 60 seconds
+
+                                _lastMessageTime = now;
+
+                                // Post metrics snapshot periodically
+                                if ((now - _lastMetricsPost) >= _metricsPostInterval)
+                                {
+                                    PostMetricsSnapshot();
+                                    _lastMetricsPost = now;
+                                }
+                            }
+                            _logger.LogDebug("Received complete WebSocket message: Length={Length}", fullMessage.Length);
                             // Note: In the refactored design, message processing should be handled by MessageProcessor
                             // This method should be called from the main client which has access to MessageProcessor
                             messageBuilder.Clear();
@@ -501,6 +592,11 @@ namespace KalshiBotAPI.Websockets
             catch (Exception ex)
             {
                 _logger.LogError(ex, "WebSocket receiver encountered error: {Message}", ex.Message);
+                if (_enableMetrics)
+                {
+                    _messageErrors++;
+                    _errorRate = (_messagesReceived + _messageErrors) > 0 ? (double)_messageErrors / (_messagesReceived + _messageErrors) : 0;
+                }
                 _isConnected = false;
             }
             finally
@@ -538,6 +634,10 @@ namespace KalshiBotAPI.Websockets
                     if (_webSocket != null && _webSocket.State == WebSocketState.Open)
                     {
                         oldSocket = _webSocket;
+                        if (_enableMetrics)
+                        {
+                            _totalConnectedTimeMs += (long)(DateTime.UtcNow - _lastConnectionStart).TotalMilliseconds;
+                        }
                         _webSocket = null;
                         _isConnected = false;
                     }
@@ -548,6 +648,9 @@ namespace KalshiBotAPI.Websockets
                     oldSocket.Dispose();
                     _logger.LogInformation("Closed and disposed WebSocket during shutdown");
                 }
+
+                // Post final metrics snapshot on shutdown
+                PostMetricsSnapshot();
             }
             catch (Exception ex)
             {
@@ -697,6 +800,46 @@ namespace KalshiBotAPI.Websockets
         public double AverageBufferUtilization => _averageBufferUtilization;
 
         /// <summary>
+        /// Gets the round-trip time (RTT) in milliseconds (proxied by average connection latency).
+        /// </summary>
+        /// <remarks>
+        /// Since WebSocket is asynchronous and receive-only, this uses connection latency as a proxy for RTT.
+        /// </remarks>
+        public double RoundTripTime => AverageConnectionLatency;
+
+        /// <summary>
+        /// Gets the current bandwidth utilization in bytes per second.
+        /// </summary>
+        /// <remarks>
+        /// Calculated as total bytes received divided by total connected time.
+        /// </remarks>
+        public double BandwidthBps => _bandwidthBps;
+
+        /// <summary>
+        /// Gets the error rate (0.0 to 1.0) for message processing.
+        /// </summary>
+        /// <remarks>
+        /// Ratio of messages with errors to total messages processed.
+        /// </remarks>
+        public double ErrorRate => _errorRate;
+
+        /// <summary>
+        /// Gets the total connected time in milliseconds.
+        /// </summary>
+        /// <remarks>
+        /// Cumulative time the WebSocket has been connected across all sessions.
+        /// </remarks>
+        public long TotalConnectedTimeMs => _totalConnectedTimeMs;
+
+        /// <summary>
+        /// Gets the current queue depth (number of messages waiting to be processed).
+        /// </summary>
+        /// <remarks>
+        /// Currently returns 0 as messages are processed immediately without queuing.
+        /// </remarks>
+        public int QueueDepth => _queueDepth;
+
+        /// <summary>
         /// Generates authentication headers required for WebSocket connection to Kalshi's platform.
         /// </summary>
         /// <param name="method">The HTTP method (typically "GET" for WebSocket connections).</param>
@@ -722,10 +865,10 @@ namespace KalshiBotAPI.Websockets
             if (_signatureCache.TryGetValue(cacheKey, out var cached) && cached.expiry > DateTime.UtcNow)
             {
                 _logger.LogDebug("Using cached auth headers for {Method} {Path}", method, path);
-                _signatureCacheHits++;
+                if (_enableMetrics) _signatureCacheHits++;
                 return (cached.timestamp, cached.signature);
             }
-            _signatureCacheMisses++;
+            if (_enableMetrics) _signatureCacheMisses++;
 
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
             var message = $"{timestamp}{method}{path.Split('?')[0]}";
@@ -750,15 +893,65 @@ namespace KalshiBotAPI.Websockets
         /// </remarks>
         private void TrackConnectionFailure(string reason)
         {
-            _connectionFailures++;
-            if (_connectionFailureReasons.ContainsKey(reason))
+            if (_enableMetrics)
             {
-                _connectionFailureReasons[reason]++;
+                _connectionFailures++;
+                if (_connectionFailureReasons.ContainsKey(reason))
+                {
+                    _connectionFailureReasons[reason]++;
+                }
+                else
+                {
+                    _connectionFailureReasons[reason] = 1;
+                }
             }
-            else
+        }
+
+        /// <summary>
+        /// Posts WebSocket performance metrics to the central performance monitor.
+        /// </summary>
+        /// <param name="operation">The operation name for the metric (e.g., "WebSocketConnect", "WebSocketReceive").</param>
+        /// <param name="milliseconds">The execution time in milliseconds.</param>
+        /// <remarks>
+        /// This method sends performance data to the central performance monitor if available.
+        /// It records execution times for various WebSocket operations to enable performance analysis.
+        /// </remarks>
+        private void PostPerformanceMetric(string operation, long milliseconds)
+        {
+            if (_performanceMonitor != null && _enableMetrics)
             {
-                _connectionFailureReasons[reason] = 1;
+                _performanceMonitor.RecordExecutionTime($"WebSocketConnectionManager.{operation}", milliseconds);
             }
+        }
+
+        /// <summary>
+        /// Posts current WebSocket metrics snapshot to the performance monitor.
+        /// </summary>
+        /// <remarks>
+        /// This method captures and posts a comprehensive snapshot of current WebSocket performance
+        /// metrics including connection stats, throughput, and error rates to the central monitor.
+        /// </remarks>
+        private void PostMetricsSnapshot()
+        {
+            if (_performanceMonitor == null || !_enableMetrics) return;
+
+            // Post connection success rate as execution time (using a fixed operation name)
+            var successRateMs = (long)(ConnectionSuccessRate * 1000); // Convert to milliseconds for consistency
+            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.ConnectionSuccessRate", successRateMs);
+
+            // Post throughput as execution time
+            var throughputMs = (long)(MessageThroughput * 1000); // Convert messages/sec to "milliseconds" equivalent
+            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.MessageThroughput", throughputMs);
+
+            // Post error rate
+            var errorRateMs = (long)(ErrorRate * 1000);
+            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.ErrorRate", errorRateMs);
+
+            // Post bandwidth
+            var bandwidthMs = (long)(BandwidthBps * 1000); // Convert bytes/sec to "milliseconds" equivalent
+            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.Bandwidth", bandwidthMs);
+
+            _logger.LogDebug("Posted WebSocketConnectionManager metrics snapshot to performance monitor");
         }
     }
 }

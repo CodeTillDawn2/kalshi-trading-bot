@@ -17,5 +17,16 @@ namespace BacklashBot.Management.Interfaces
         bool IsShuttingDown { get; set; }
         DateTime? LastPerformanceSampleDate { get; set; }
         string BrainInstance { get; }
+
+        /// <summary>
+        /// Gets whether WebSocketConnectionManager performance metrics are being recorded.
+        /// </summary>
+        bool WebSocketConnectionManagerMetricsRecording { get; }
+
+        /// <summary>
+        /// Updates the WebSocket metrics recording status.
+        /// </summary>
+        /// <param name="isRecording">True if WebSocket metrics are being recorded, false otherwise.</param>
+        void UpdateWebSocketMetricsRecordingStatus(bool isRecording);
     }
 }

@@ -55,6 +55,12 @@ public class KalshiConfig
     public int WebSocketSemaphoreTimeoutMs { get; set; } = 60000;
 
     /// <summary>
+    /// Gets or sets whether WebSocket performance metrics collection is enabled.
+    /// When disabled, metric tracking is skipped to reduce overhead. Defaults to true.
+    /// </summary>
+    public bool? WebSocketEnableMetrics { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets the configuration for candlestick lookback periods in days.
     /// Controls how far back in time to fetch candlestick data for different intervals.
     /// </summary>
