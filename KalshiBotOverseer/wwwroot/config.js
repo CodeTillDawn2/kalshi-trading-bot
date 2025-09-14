@@ -39,6 +39,23 @@ const CONFIG = {
     // SignalR real-time communication settings
     SIGNALR_HUB: '/chartHub',
 
+    // Enhanced SignalR configuration for connection management
+    SIGNALR: {
+        // Connection parameters
+        LOG_LEVEL: signalR.LogLevel.Information,
+        AUTOMATIC_RECONNECT: true,
+        RECONNECT_INTERVALS: [0, 2000, 10000, 30000], // Custom reconnect intervals in ms
+        MAX_RECONNECT_ATTEMPTS: 10,
+
+        // Health monitoring
+        PING_INTERVAL: 30000, // Ping every 30 seconds for health monitoring
+        CONNECTION_QUALITY_THRESHOLD: 1000, // Consider connection poor if ping > 1s
+
+        // Message batching for high-frequency updates
+        MESSAGE_BATCH_SIZE: 10, // Batch up to 10 messages before sending
+        MESSAGE_BATCH_DELAY: 100 // Delay in ms before sending batch
+    },
+
     // Default application behavior settings
     DEFAULT_PAGE_SIZE: 50,              // Default items per page in grids
 

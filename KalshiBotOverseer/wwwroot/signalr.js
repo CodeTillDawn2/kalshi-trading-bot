@@ -21,19 +21,42 @@
  */
 
 /**
+ * SignalR Configuration
+ * Uses centralized configuration from CONFIG.SIGNALR
+ */
+
+/**
+ * Connection Health Monitoring
+ */
+let connectionHealth = {
+    isConnected: false,
+    lastPingTime: null,
+    lastPongTime: null,
+    pingCount: 0,
+    pongCount: 0,
+    reconnectAttempts: 0,
+    connectionQuality: 'unknown', // 'good', 'fair', 'poor', 'disconnected'
+    messageQueue: [],
+    batchTimer: null
+};
+
+/**
  * Initializes the SignalR connection to the backend hub
  * Sets up event handlers for real-time updates and manages connection lifecycle
- * Automatically reconnects on connection loss
+ * Automatically reconnects on connection loss with enhanced monitoring
  */
 async function initializeSignalR() {
-    const hubUrl = CONFIG.SIGNALR_HUB;
-    console.log('[BrainCards] building hub connection to', hubUrl);
+    console.log('[BrainCards] building hub connection to', CONFIG.SIGNALR_HUB);
 
-    connection = new signalR.HubConnectionBuilder()
-        .withUrl(hubUrl)
-        .withAutomaticReconnect()
-        .configureLogging(signalR.LogLevel.Information)
-        .build();
+    const builder = new signalR.HubConnectionBuilder()
+        .withUrl(CONFIG.SIGNALR_HUB)
+        .configureLogging(CONFIG.SIGNALR.LOG_LEVEL);
+
+    if (CONFIG.SIGNALR.AUTOMATIC_RECONNECT) {
+        builder.withAutomaticReconnect(CONFIG.SIGNALR.RECONNECT_INTERVALS);
+    }
+
+    connection = builder.build();
 
     // Expose for other functions already in the page
     window.connection = connection;
@@ -102,21 +125,40 @@ async function initializeSignalR() {
 
     /**
      * Handles connection reconnection attempts
-     * Logs reconnection events for monitoring connection stability
+     * Logs reconnection events and updates health monitoring
      */
-    connection.onreconnecting(err => console.warn('[BrainCards] reconnecting…', err));
+    connection.onreconnecting(err => {
+        connectionHealth.reconnectAttempts++;
+        connectionHealth.isConnected = false;
+        connectionHealth.connectionQuality = 'disconnected';
+        updateConnectionQualityIndicator();
+        console.warn('[BrainCards] reconnecting…', err, 'Attempt:', connectionHealth.reconnectAttempts);
+    });
 
     /**
      * Handles successful reconnection
-     * Logs new connection ID for debugging purposes
+     * Logs new connection ID and resets health metrics
      */
-    connection.onreconnected(id => console.log('[BrainCards] reconnected, connId=', id));
+    connection.onreconnected(id => {
+        connectionHealth.isConnected = true;
+        connectionHealth.reconnectAttempts = 0;
+        connectionHealth.connectionQuality = 'good';
+        updateConnectionQualityIndicator();
+        console.log('[BrainCards] reconnected, connId=', id);
+        startPingMonitoring();
+    });
 
     /**
      * Handles connection closure
-     * Logs closure events to monitor connection issues
+     * Logs closure events and updates health status
      */
-    connection.onclose(err => console.warn('[BrainCards] closed', err));
+    connection.onclose(err => {
+        connectionHealth.isConnected = false;
+        connectionHealth.connectionQuality = 'disconnected';
+        updateConnectionQualityIndicator();
+        console.warn('[BrainCards] closed', err);
+        stopPingMonitoring();
+    });
 
     // Start
     try {
@@ -125,6 +167,179 @@ async function initializeSignalR() {
     } catch (err) {
         console.error('[BrainCards] connection start failed:', err);
     }
+
+    // Start health monitoring if connection successful
+    if (connection.state === signalR.HubConnectionState.Connected) {
+        connectionHealth.isConnected = true;
+        connectionHealth.connectionQuality = 'good';
+        updateConnectionQualityIndicator();
+        startPingMonitoring();
+    }
+}
+
+/**
+ * Starts periodic ping monitoring for connection health
+ */
+function startPingMonitoring() {
+    if (connectionHealth.pingIntervalId) {
+        clearInterval(connectionHealth.pingIntervalId);
+    }
+
+    connectionHealth.pingIntervalId = setInterval(async () => {
+        if (connection && connection.state === signalR.HubConnectionState.Connected) {
+            try {
+                connectionHealth.lastPingTime = Date.now();
+                connectionHealth.pingCount++;
+
+                // Send ping and measure response time
+                await connection.invoke('Ping');
+
+                // Note: Actual pong handling would need server-side implementation
+                // For now, we'll simulate pong detection
+                setTimeout(() => {
+                    if (connectionHealth.lastPingTime) {
+                        const pingTime = Date.now() - connectionHealth.lastPingTime;
+                        updateConnectionQuality(pingTime);
+                        connectionHealth.lastPingTime = null;
+                    }
+                }, 100);
+
+            } catch (err) {
+                console.warn('[BrainCards] Ping failed:', err);
+                connectionHealth.connectionQuality = 'poor';
+                updateConnectionQualityIndicator();
+            }
+        }
+    }, CONFIG.SIGNALR.PING_INTERVAL);
+}
+
+/**
+ * Stops ping monitoring
+ */
+function stopPingMonitoring() {
+    if (connectionHealth.pingIntervalId) {
+        clearInterval(connectionHealth.pingIntervalId);
+        connectionHealth.pingIntervalId = null;
+    }
+}
+
+/**
+ * Updates connection quality based on ping time
+ * @param {number} pingTime - Time in milliseconds
+ */
+function updateConnectionQuality(pingTime) {
+    if (pingTime < 100) {
+        connectionHealth.connectionQuality = 'good';
+    } else if (pingTime < CONFIG.SIGNALR.CONNECTION_QUALITY_THRESHOLD) {
+        connectionHealth.connectionQuality = 'fair';
+    } else {
+        connectionHealth.connectionQuality = 'poor';
+    }
+    updateConnectionQualityIndicator();
+}
+
+/**
+ * Updates the UI connection quality indicator
+ */
+function updateConnectionQualityIndicator() {
+    const indicator = document.getElementById('connection-quality-indicator');
+    if (indicator) {
+        const quality = connectionHealth.connectionQuality;
+        let text, color, icon;
+
+        switch (quality) {
+            case 'good':
+                text = 'Connected';
+                color = '#28a745';
+                icon = 'fas fa-wifi';
+                break;
+            case 'fair':
+                text = 'Fair';
+                color = '#ffc107';
+                icon = 'fas fa-wifi';
+                break;
+            case 'poor':
+                text = 'Poor';
+                color = '#fd7e14';
+                icon = 'fas fa-exclamation-triangle';
+                break;
+            case 'disconnected':
+                text = 'Disconnected';
+                color = '#dc3545';
+                icon = 'fas fa-times-circle';
+                break;
+            default:
+                text = 'Unknown';
+                color = '#6c757d';
+                icon = 'fas fa-question-circle';
+        }
+
+        indicator.innerHTML = `<i class="${icon}"></i> ${text}`;
+        indicator.style.color = color;
+    }
+}
+
+// MESSAGE BATCHING SYSTEM
+
+/**
+ * Queues a message for batching
+ * @param {string} method - SignalR method name
+ * @param {...any} args - Method arguments
+ */
+function queueMessage(method, ...args) {
+    connectionHealth.messageQueue.push({ method, args, timestamp: Date.now() });
+
+    if (connectionHealth.messageQueue.length >= CONFIG.SIGNALR.MESSAGE_BATCH_SIZE) {
+        flushMessageBatch();
+    } else if (!connectionHealth.batchTimer) {
+        connectionHealth.batchTimer = setTimeout(flushMessageBatch, CONFIG.SIGNALR.MESSAGE_BATCH_DELAY);
+    }
+}
+
+/**
+ * Flushes the message batch by sending all queued messages
+ */
+function flushMessageBatch() {
+    if (connectionHealth.batchTimer) {
+        clearTimeout(connectionHealth.batchTimer);
+        connectionHealth.batchTimer = null;
+    }
+
+    if (connectionHealth.messageQueue.length === 0) return;
+
+    const batch = [...connectionHealth.messageQueue];
+    connectionHealth.messageQueue = [];
+
+    // Send messages in batch
+    batch.forEach(({ method, args }) => {
+        if (connection && connection.state === signalR.HubConnectionState.Connected) {
+            connection.invoke(method, ...args).catch(err => {
+                console.error(`[BrainCards] Batch message failed (${method}):`, err);
+            });
+        }
+    });
+
+    console.log(`[BrainCards] Flushed ${batch.length} messages in batch`);
+}
+
+/**
+ * Gets current connection health metrics
+ * @returns {Object} Connection health information
+ */
+function getConnectionHealth() {
+    return {
+        ...connectionHealth,
+        state: connection ? connection.state : 'disconnected',
+        connectionId: connection ? connection.connectionId : null
+    };
+}
+
+/**
+ * Manually trigger connection quality update
+ * Useful for debugging or forced refresh
+ */
+function refreshConnectionQuality() {
+    updateConnectionQualityIndicator();
 }
 
 // BRAIN STATUS MANAGEMENT
@@ -316,12 +531,8 @@ function updateBrainStatusUI(msg) {
 // Brain ticker management functions
 async function confirmTargetTickersReceived(brainInstanceName) {
     if (connection && connection.state === signalR.HubConnectionState.Connected) {
-        try {
-            await connection.invoke('ConfirmTargetTickersReceived', brainInstanceName);
-            console.log(`Confirmed receipt of target tickers for ${brainInstanceName}`);
-        } catch (error) {
-            console.error('Error confirming target tickers receipt:', error);
-        }
+        queueMessage('ConfirmTargetTickersReceived', brainInstanceName);
+        console.log(`Queued confirmation of target tickers for ${brainInstanceName}`);
     } else {
         console.warn('SignalR connection not available for target tickers confirmation');
     }
@@ -329,12 +540,8 @@ async function confirmTargetTickersReceived(brainInstanceName) {
 
 async function requestTargetTickers(brainInstanceName) {
     if (connection && connection.state === signalR.HubConnectionState.Connected) {
-        try {
-            await connection.invoke('GetTargetTickers', brainInstanceName);
-            console.log(`Requested target tickers for ${brainInstanceName}`);
-        } catch (error) {
-            console.error('Error requesting target tickers:', error);
-        }
+        queueMessage('GetTargetTickers', brainInstanceName);
+        console.log(`Queued request for target tickers for ${brainInstanceName}`);
     } else {
         console.warn('SignalR connection not available for target tickers request');
     }
@@ -342,12 +549,8 @@ async function requestTargetTickers(brainInstanceName) {
 
 async function updateCurrentTickers(brainInstanceName, tickers) {
     if (connection && connection.state === signalR.HubConnectionState.Connected) {
-        try {
-            await connection.invoke('UpdateCurrentTickers', brainInstanceName, tickers);
-            console.log(`Updated current tickers for ${brainInstanceName}:`, tickers);
-        } catch (error) {
-            console.error('Error updating current tickers:', error);
-        }
+        queueMessage('UpdateCurrentTickers', brainInstanceName, tickers);
+        console.log(`Queued update for current tickers for ${brainInstanceName}:`, tickers);
     } else {
         console.warn('SignalR connection not available for current tickers update');
     }
@@ -400,25 +603,21 @@ function handleCheckInResponse(response) {
 
 function requestDataRefresh() {
     if (connection && connection.state === signalR.HubConnectionState.Connected) {
-        connection.invoke('SendOverseerMessage', 'refresh_data', 'Request market data refresh')
-            .then(() => {
-                console.log('Refresh request sent to overseer');
-                // Show loading state
-                const refreshBtn = document.getElementById('refreshChartBtn');
-                const originalText = refreshBtn.innerHTML;
-                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
-                refreshBtn.disabled = true;
+        // Use message batching for high-frequency requests
+        queueMessage('SendOverseerMessage', 'refresh_data', 'Request market data refresh');
 
-                // Re-enable after 5 seconds
-                setTimeout(() => {
-                    refreshBtn.innerHTML = originalText;
-                    refreshBtn.disabled = false;
-                }, 5000);
-            })
-            .catch(err => {
-                console.error('Error sending refresh request:', err);
-                alert('Failed to send refresh request');
-            });
+        console.log('Refresh request queued for overseer');
+        // Show loading state
+        const refreshBtn = document.getElementById('refreshChartBtn');
+        const originalText = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+        refreshBtn.disabled = true;
+
+        // Re-enable after 5 seconds
+        setTimeout(() => {
+            refreshBtn.innerHTML = originalText;
+            refreshBtn.disabled = false;
+        }, 5000);
     } else {
         console.warn('SignalR connection not available');
         alert('Connection not available. Please refresh the page.');

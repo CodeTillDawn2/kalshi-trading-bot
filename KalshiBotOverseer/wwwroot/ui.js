@@ -19,7 +19,8 @@
  * - Position and order table generation
  * - Snapshot data display
  * - UI state management and updates
- * - Tab switching and navigation
+ * - Tab switching and navigation with active tab refresh
+ * - Active tab refresh system for efficient data updates
  * - Filtering and sorting UI updates
  */
 
@@ -409,6 +410,12 @@ function createBrainCard(item) {
 
 /**
  * NAVIGATION AND TAB MANAGEMENT
+ *
+ * Active Tab Refresh System:
+ * - Only refreshes data for the currently selected tab
+ * - Immediate refresh when clicking tabs for instant feedback
+ * - Automatic refresh every 30 seconds while tab is active
+ * - Efficient resource usage by focusing on visible content
  */
 
 // Active tab refresh timer
