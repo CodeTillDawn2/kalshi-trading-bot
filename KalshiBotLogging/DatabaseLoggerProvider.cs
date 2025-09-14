@@ -5,6 +5,9 @@ using BacklashBot.Management.Interfaces;
 
 namespace KalshiBotLogging
 {
+    /// <summary>
+    /// Provides logging to a database via a queue.
+    /// </summary>
     public class DatabaseLoggerProvider : ILoggerProvider
     {
         private readonly DatabaseLoggingQueue _loggingQueue;
@@ -15,6 +18,16 @@ namespace KalshiBotLogging
         private readonly string _defaultEnvironment;
         private readonly string _defaultInstance;
 
+        /// <summary>
+        /// Initializes a new instance of the DatabaseLoggerProvider class.
+        /// </summary>
+        /// <param name="loggingQueue">The queue for logging messages.</param>
+        /// <param name="minLevel">The minimum log level.</param>
+        /// <param name="loggingConfig">The logging configuration.</param>
+        /// <param name="executionConfig">The execution configuration.</param>
+        /// <param name="brainStatus">The brain status service.</param>
+        /// <param name="defaultEnvironment">The default environment name.</param>
+        /// <param name="defaultInstance">The default instance name.</param>
         public DatabaseLoggerProvider(
             DatabaseLoggingQueue loggingQueue,
             LogLevel minLevel = LogLevel.Warning,
@@ -34,11 +47,19 @@ namespace KalshiBotLogging
             _defaultInstance = defaultInstance;
         }
 
+        /// <summary>
+        /// Creates a new ILogger instance.
+        /// </summary>
+        /// <param name="categoryName">The category name for the logger.</param>
+        /// <returns>A new DatabaseLogger instance.</returns>
         public ILogger CreateLogger(string categoryName)
         {
             return new DatabaseLogger(categoryName, _loggingQueue, _minLevel, _loggingConfig, _executionConfig, _brainStatus, _defaultEnvironment, _defaultInstance);
         }
 
+        /// <summary>
+        /// Disposes the logger provider.
+        /// </summary>
         public void Dispose() { }
     }
 }

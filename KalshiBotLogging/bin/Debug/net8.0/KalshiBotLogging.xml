@@ -64,6 +64,35 @@
             </summary>
             <returns>The session identifier string, or "DEF" if unavailable.</returns>
         </member>
+        <member name="T:KalshiBotLogging.DatabaseLoggerProvider">
+            <summary>
+            Provides logging to a database via a queue.
+            </summary>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLoggerProvider.#ctor(KalshiBotLogging.DatabaseLoggingQueue,Microsoft.Extensions.Logging.LogLevel,BacklashDTOs.Configuration.LoggingConfig,BacklashDTOs.Configuration.ExecutionConfig,BacklashBot.Management.Interfaces.IBrainStatusService,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the DatabaseLoggerProvider class.
+            </summary>
+            <param name="loggingQueue">The queue for logging messages.</param>
+            <param name="minLevel">The minimum log level.</param>
+            <param name="loggingConfig">The logging configuration.</param>
+            <param name="executionConfig">The execution configuration.</param>
+            <param name="brainStatus">The brain status service.</param>
+            <param name="defaultEnvironment">The default environment name.</param>
+            <param name="defaultInstance">The default instance name.</param>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLoggerProvider.CreateLogger(System.String)">
+            <summary>
+            Creates a new ILogger instance.
+            </summary>
+            <param name="categoryName">The category name for the logger.</param>
+            <returns>A new DatabaseLogger instance.</returns>
+        </member>
+        <member name="M:KalshiBotLogging.DatabaseLoggerProvider.Dispose">
+            <summary>
+            Disposes the logger provider.
+            </summary>
+        </member>
         <member name="T:KalshiBotLogging.DatabaseLoggingQueue">
             <summary>
             Background service that asynchronously processes log entries from a concurrent queue
