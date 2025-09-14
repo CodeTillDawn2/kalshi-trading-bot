@@ -33,6 +33,7 @@ namespace TradingStrategies.Trading.Overseer
         private readonly MarketTypeService _marketTypeService;
         private readonly PatternDetectionService _patternDetectionService;
         private readonly PerformanceMonitor? _performanceMonitor;
+        private readonly bool _enablePerformanceMetrics;
 
         /// <summary>
         /// Initializes a new instance of the SimulationEngine with required services.
@@ -48,6 +49,7 @@ namespace TradingStrategies.Trading.Overseer
             _marketTypeService = new MarketTypeService();
             _patternDetectionService = new PatternDetectionService(configuration);
             _performanceMonitor = performanceMonitor;
+            _enablePerformanceMetrics = configuration.GetValue<bool>("SimulationEngine:EnablePerformanceMetrics", true);
         }
 
        /// <summary>
@@ -59,6 +61,21 @@ namespace TradingStrategies.Trading.Overseer
        /// Gets the approximate memory usage difference of the last simulation run.
        /// </summary>
        public long LastMemoryUsed { get; private set; }
+
+       /// <summary>
+       /// Gets the throughput of snapshots processed per second in the last simulation run.
+       /// </summary>
+       public double LastThroughputSnapshotsPerSecond { get; private set; }
+
+       /// <summary>
+       /// Gets the I/O read time in the last simulation run (placeholder for future I/O tracking).
+       /// </summary>
+       public TimeSpan LastIOReadTime { get; private set; }
+
+       /// <summary>
+       /// Gets the I/O write time in the last simulation run (placeholder for future I/O tracking).
+       /// </summary>
+       public TimeSpan LastIOWriteTime { get; private set; }
 
        /// <summary>
        /// Gets the pattern performance monitor for accessing performance metrics.
@@ -155,8 +172,30 @@ namespace TradingStrategies.Trading.Overseer
 
             stopwatch.Stop();
             long memoryAfter = GC.GetTotalMemory(false);
-            LastExecutionTime = stopwatch.Elapsed;
-            LastMemoryUsed = memoryAfter - memoryBefore;
+            if (_enablePerformanceMetrics)
+            {
+                LastExecutionTime = stopwatch.Elapsed;
+                LastMemoryUsed = memoryAfter - memoryBefore;
+                LastThroughputSnapshotsPerSecond = snapshots.Count / LastExecutionTime.TotalSeconds;
+                LastIOReadTime = TimeSpan.Zero; // Placeholder for future I/O tracking
+                LastIOWriteTime = TimeSpan.Zero; // Placeholder for future I/O tracking
+
+                // Record metrics to PerformanceMonitor if available and enabled
+                if (_performanceMonitor != null && _performanceMonitor.EnablePerformanceMetrics)
+                {
+                    var metrics = new Dictionary<string, object>
+                    {
+                        ["TotalExecutionTime"] = LastExecutionTime,
+                        ["MemoryUsed"] = LastMemoryUsed,
+                        ["ThroughputSnapshotsPerSecond"] = LastThroughputSnapshotsPerSecond,
+                        ["SnapshotsProcessed"] = snapshots.Count,
+                        ["IOReadTime"] = LastIOReadTime,
+                        ["IOWriteTime"] = LastIOWriteTime,
+                        ["EnablePerformanceMetrics"] = _enablePerformanceMetrics
+                    };
+                    _performanceMonitor.RecordSimulationMetrics("SimulationEngine", metrics);
+                }
+            }
             return activePaths;
         }
 
