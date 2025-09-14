@@ -24,25 +24,6 @@ This document outlines the performance metrics tracked across various classes in
 - `BrainPersistence` (KalshiBotOverseer.Models.BrainPersistence.DeserializeWithMetrics)
 
 
-## TradingStrategies.Trading.Overseer.StrategySimulation
-
-### Properties
-- `TotalExecutionTime`: TimeSpan - Aggregate execution time of all ProcessSnapshot calls
-- `AverageExecutionTimeMs`: double - Average execution time per snapshot in milliseconds
-- `PeakMemoryUsage`: long - Maximum memory usage recorded during simulation
-- `TotalTradesExecuted`: int - Total number of trades executed during simulation
-- `AverageDecisionTimeMs`: double - Average strategy decision time in milliseconds
-- `AverageApplyTimeMs`: double - Average action application time in milliseconds
-
-### Methods
-- `GetDetailedPerformanceMetrics()`: Dictionary<string, object> - Comprehensive metrics dictionary with execution details
-- `ResetPerformanceMetrics()`: void - Resets all performance metrics for new simulation runs
-
-## TradingStrategies.Trading.Overseer.SimulationEngine
-
-### Properties
-- `LastExecutionTime`: TimeSpan - Execution time of the last simulation run
-- `LastMemoryUsed`: long - Memory usage difference of the last simulation run
 
 ## TradingStrategies.Extensions.MarketSnapshotExtensions
 
@@ -479,48 +460,7 @@ This document outlines the performance metrics tracked across various classes in
 - `HashSet<string>` (_checkedMarketNames) - Collection of selected market names for UI state management
 - `List<string>` (GetCheckedMarkets() return) - Array-backed list of currently selected market tickers
 
-## BacklashBot.Services.WebSocketMonitorService
 
-### Properties
-- `_monitoringIntervalMinutes`: int - Configurable interval in minutes between exchange status checks (default: 1)
-- `_retryDelayMinutes`: int - Configurable delay in minutes before retrying after errors (default: 5)
-- `_exchangeStatusCheckCount`: int - Total number of exchange status checks performed since service start
-- `_exchangeStatusSuccessCount`: int - Number of successful exchange status checks
-- `_connectionAttemptCount`: int - Total number of WebSocket connection attempts
-- `_connectionSuccessCount`: int - Number of successful WebSocket connections
-- `_monitoringStopwatch`: System.Diagnostics.Stopwatch - Timer for measuring individual operation durations
-
-### Methods
-- `GetMetrics()`: (int ExchangeStatusChecks, int ExchangeStatusSuccesses, int ConnectionAttempts, int ConnectionSuccesses) - Returns current performance metrics as a tuple with exchange status check counts and connection attempt statistics
-- `MonitorAndManageWebSocketConnectionAsync(bool immediate)`: Task - Core monitoring method that checks exchange status and manages WebSocket connections with configurable intervals and comprehensive metrics collection
-- `TriggerConnectionCheckAsync()`: Task - Triggers an immediate WebSocket connection check outside the normal monitoring cycle
-
-### Notes
-- Exchange status check frequency and success rates are tracked and logged on errors and shutdown
-- Connection attempt success rates are monitored and reported for reliability analysis
-- Operation timing is measured for each exchange status check to identify performance bottlenecks
-- Configurable intervals allow tuning monitoring frequency based on operational requirements
-- Metrics are logged during error conditions and final metrics are reported on service shutdown
-
-## KalshiBotAPI.Websockets.WebSocketConnectionManager
-
-### Properties
-- `ConnectionAttempts`: int - Total connection attempts made
-- `ConnectionSuccesses`: int - Number of successful connections
-- `ConnectionSuccessRate`: double - Percentage of successful connections
-- `ReconnectionCount`: int - Number of reconnections performed
-- `AverageConnectionLatency`: double - Average connection time in milliseconds
-- `MessagesReceived`: int - Total messages received
-- `MessageThroughput`: double - Messages per second (sliding window)
-- `ConnectionFailures`: int - Total connection failures
-- `SignatureCacheHitRate`: double - Percentage of signature cache hits
-- `SignatureCacheHits`: int - Number of signature cache hits
-- `SignatureCacheMisses`: int - Number of signature cache misses
-- `TotalBytesReceived`: long - Total bytes received
-- `AverageBufferUtilization`: double - Average buffer usage percentage
-
-### Methods
-- `ConnectionFailureReasons`: IReadOnlyDictionary<string, int> - Failure reasons and counts
 
 
 

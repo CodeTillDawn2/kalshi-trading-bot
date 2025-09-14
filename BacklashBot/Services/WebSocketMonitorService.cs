@@ -2,6 +2,9 @@ using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs.KalshiAPI;
+using BacklashBot.Management.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BacklashBot.Services
 {
@@ -35,12 +38,42 @@ namespace BacklashBot.Services
         private readonly int _monitoringIntervalMinutes;
         private readonly int _retryDelayMinutes;
 
+        // Configuration and dependencies
+        private readonly bool _enableMetrics;
+        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
+
         // Performance metrics
         private int _exchangeStatusCheckCount = 0;
         private int _exchangeStatusSuccessCount = 0;
         private int _connectionAttemptCount = 0;
         private int _connectionSuccessCount = 0;
         private readonly System.Diagnostics.Stopwatch _monitoringStopwatch = new System.Diagnostics.Stopwatch();
+
+        // Enhanced metrics for granularity
+        private readonly List<long> _responseTimesMs = new List<long>();
+        private long _minResponseTimeMs = long.MaxValue;
+        private long _maxResponseTimeMs = 0;
+        private double _averageResponseTimeMs = 0;
+        private double _responseTimeStdDev = 0;
+
+        // Additional timing metrics
+        private readonly System.Diagnostics.Stopwatch _connectionStopwatch = new System.Diagnostics.Stopwatch();
+        private readonly System.Diagnostics.Stopwatch _cycleStopwatch = new System.Diagnostics.Stopwatch();
+        private long _totalRetryDelayMs = 0;
+
+        // WebSocket latency and throughput
+        private readonly List<long> _websocketLatenciesMs = new List<long>();
+        private int _messagesProcessedCount = 0;
+        private DateTime _lastThroughputReset = DateTime.UtcNow;
+        private int _queueDepth = 0;
+
+        // Reliability metrics
+        private DateTime _serviceStartTime = DateTime.UtcNow;
+        private TimeSpan _totalUptime = TimeSpan.Zero;
+        private DateTime _lastConnectionFailure = DateTime.MinValue;
+        private DateTime _lastConnectionRecovery = DateTime.MinValue;
+        private readonly List<TimeSpan> _timeBetweenFailures = new List<TimeSpan>();
+        private readonly List<TimeSpan> _timeToRecovery = new List<TimeSpan>();
 
         /// <summary>
         /// Initializes a new instance of the WebSocketMonitorService with required dependencies.
@@ -52,6 +85,7 @@ namespace BacklashBot.Services
         /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
         /// <param name="readyStatus">Status tracker for bot initialization completion.</param>
         /// <param name="statusTrackerService">Service for managing cancellation tokens and operation status.</param>
+        /// <param name="centralPerformanceMonitor">Central performance monitoring service for posting metrics.</param>
         public WebSocketMonitorService(
             IServiceScopeFactory scopeFactory,
             IServiceFactory serviceFactory,
@@ -59,7 +93,8 @@ namespace BacklashBot.Services
             IConfiguration configuration,
             IScopeManagerService scopeManagerService,
             IBotReadyStatus readyStatus,
-            IStatusTrackerService statusTrackerService)
+            IStatusTrackerService statusTrackerService,
+            ICentralPerformanceMonitor centralPerformanceMonitor)
         {
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
@@ -68,13 +103,15 @@ namespace BacklashBot.Services
             _readyStatus = readyStatus;
             _logger = logger;
             _configuration = configuration;
+            _centralPerformanceMonitor = centralPerformanceMonitor;
 
             // Load configurable intervals with defaults
             _monitoringIntervalMinutes = _configuration.GetValue<int>("WebSocketMonitor:MonitoringIntervalMinutes", 1);
             _retryDelayMinutes = _configuration.GetValue<int>("WebSocketMonitor:RetryDelayMinutes", 5);
+            _enableMetrics = _configuration.GetValue<bool>("WebSocketMonitor:EnableMetrics", true);
 
-            _logger.LogDebug("WebSocketMonitorService instance created with MonitoringInterval={MonitoringInterval}min, RetryDelay={RetryDelay}min",
-                _monitoringIntervalMinutes, _retryDelayMinutes);
+            _logger.LogDebug("WebSocketMonitorService instance created with MonitoringInterval={MonitoringInterval}min, RetryDelay={RetryDelay}min, EnableMetrics={EnableMetrics}",
+                _monitoringIntervalMinutes, _retryDelayMinutes, _enableMetrics);
         }
 
         /// <summary>
@@ -164,6 +201,19 @@ namespace BacklashBot.Services
                     checks > 0 ? (double)successes / checks : 0,
                     attempts,
                     attempts > 0 ? (double)connSuccesses / attempts : 0);
+
+                var extended = GetExtendedMetrics();
+                _logger.LogInformation("Extended final metrics: AvgResponseTime={Avg:F2}ms, StdDev={StdDev:F2}ms, Min={Min}ms, Max={Max}ms, TotalRetryDelay={Delay}ms, Uptime={Uptime:F2}%, MTBF={MTBF:F2}min, MTTR={MTTR:F2}min, MessagesProcessed={Msgs}, QueueDepth={Queue}",
+                    extended.AverageResponseTimeMs,
+                    extended.ResponseTimeStdDev,
+                    extended.MinResponseTimeMs,
+                    extended.MaxResponseTimeMs,
+                    extended.TotalRetryDelayMs,
+                    extended.UptimePercentage,
+                    extended.MTBFMinutes,
+                    extended.MTTRMinutes,
+                    extended.MessagesProcessedCount,
+                    extended.QueueDepth);
             }
             finally
             {
@@ -193,6 +243,179 @@ namespace BacklashBot.Services
         public (int ExchangeStatusChecks, int ExchangeStatusSuccesses, int ConnectionAttempts, int ConnectionSuccesses) GetMetrics()
         {
             return (_exchangeStatusCheckCount, _exchangeStatusSuccessCount, _connectionAttemptCount, _connectionSuccessCount);
+        }
+
+        /// <summary>
+        /// Gets extended performance metrics including timing, reliability, and throughput data.
+        /// Only returns meaningful data when metrics collection is enabled.
+        /// </summary>
+        /// <returns>A tuple containing extended metrics: average response time, standard deviation, min/max times, total retry delay, uptime percentage, MTBF, MTTR, messages processed, and queue depth.</returns>
+        public (double AverageResponseTimeMs, double ResponseTimeStdDev, long MinResponseTimeMs, long MaxResponseTimeMs, long TotalRetryDelayMs, double UptimePercentage, double MTBFMinutes, double MTTRMinutes, int MessagesProcessedCount, int QueueDepth) GetExtendedMetrics()
+        {
+            return (
+                _averageResponseTimeMs,
+                _responseTimeStdDev,
+                _minResponseTimeMs,
+                _maxResponseTimeMs,
+                _totalRetryDelayMs,
+                GetUptimePercentage(),
+                GetMTBF(),
+                GetMTTR(),
+                _messagesProcessedCount,
+                _queueDepth
+            );
+        }
+
+        /// <summary>
+        /// Updates response time statistics after adding a new measurement.
+        /// </summary>
+        /// <param name="responseTimeMs">The new response time in milliseconds.</param>
+        private void UpdateResponseTimeStats(long responseTimeMs)
+        {
+            if (_enableMetrics)
+            {
+                _responseTimesMs.Add(responseTimeMs);
+                _minResponseTimeMs = Math.Min(_minResponseTimeMs, responseTimeMs);
+                _maxResponseTimeMs = Math.Max(_maxResponseTimeMs, responseTimeMs);
+
+                // Calculate average
+                _averageResponseTimeMs = _responseTimesMs.Average();
+
+                // Calculate standard deviation
+                if (_responseTimesMs.Count > 1)
+                {
+                    double sumOfSquares = _responseTimesMs.Sum(rt => Math.Pow(rt - _averageResponseTimeMs, 2));
+                    _responseTimeStdDev = Math.Sqrt(sumOfSquares / (_responseTimesMs.Count - 1));
+                }
+
+                // Post to central performance monitor
+                _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.ExchangeStatusCheck", responseTimeMs);
+            }
+        }
+
+        /// <summary>
+        /// Records a connection failure for MTBF/MTTR calculations.
+        /// </summary>
+        private void RecordConnectionFailure()
+        {
+            if (_enableMetrics)
+            {
+                var now = DateTime.UtcNow;
+                if (_lastConnectionFailure != DateTime.MinValue && _lastConnectionRecovery != DateTime.MinValue)
+                {
+                    _timeBetweenFailures.Add(now - _lastConnectionRecovery);
+                }
+                _lastConnectionFailure = now;
+            }
+        }
+
+        /// <summary>
+        /// Records a connection recovery for MTBF/MTTR calculations.
+        /// </summary>
+        private void RecordConnectionRecovery()
+        {
+            if (_enableMetrics)
+            {
+                var now = DateTime.UtcNow;
+                if (_lastConnectionFailure != DateTime.MinValue)
+                {
+                    _timeToRecovery.Add(now - _lastConnectionFailure);
+                }
+                _lastConnectionRecovery = now;
+            }
+        }
+
+        /// <summary>
+        /// Updates uptime tracking.
+        /// </summary>
+        /// <param name="isConnected">Whether the WebSocket is currently connected.</param>
+        private void UpdateUptime(bool isConnected)
+        {
+            if (_enableMetrics)
+            {
+                var now = DateTime.UtcNow;
+                if (isConnected)
+                {
+                    _totalUptime += (now - _serviceStartTime);
+                }
+                _serviceStartTime = now;
+            }
+        }
+
+        /// <summary>
+        /// Records WebSocket message latency for performance tracking.
+        /// Only records when metrics collection is enabled.
+        /// </summary>
+        /// <param name="latencyMs">The message latency in milliseconds.</param>
+        public void RecordWebSocketLatency(long latencyMs)
+        {
+            if (_enableMetrics)
+            {
+                _websocketLatenciesMs.Add(latencyMs);
+                _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketLatency", latencyMs);
+            }
+        }
+
+        /// <summary>
+        /// Records a processed WebSocket message for throughput tracking.
+        /// Only records when metrics collection is enabled.
+        /// </summary>
+        public void RecordMessageProcessed()
+        {
+            if (_enableMetrics)
+            {
+                _messagesProcessedCount++;
+                // Reset throughput counter every minute
+                if ((DateTime.UtcNow - _lastThroughputReset).TotalMinutes >= 1)
+                {
+                    _messagesProcessedCount = 1;
+                    _lastThroughputReset = DateTime.UtcNow;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the current WebSocket message queue depth for monitoring.
+        /// Only records when metrics collection is enabled.
+        /// </summary>
+        /// <param name="depth">The current queue depth.</param>
+        public void SetQueueDepth(int depth)
+        {
+            if (_enableMetrics)
+            {
+                _queueDepth = depth;
+            }
+        }
+
+        /// <summary>
+        /// Calculates Mean Time Between Failures (MTBF) in minutes.
+        /// </summary>
+        /// <returns>MTBF in minutes.</returns>
+        private double GetMTBF()
+        {
+            if (_timeBetweenFailures.Count == 0) return 0;
+            return _timeBetweenFailures.Average(ts => ts.TotalMinutes);
+        }
+
+        /// <summary>
+        /// Calculates Mean Time To Recovery (MTTR) in minutes.
+        /// </summary>
+        /// <returns>MTTR in minutes.</returns>
+        private double GetMTTR()
+        {
+            if (_timeToRecovery.Count == 0) return 0;
+            return _timeToRecovery.Average(ts => ts.TotalMinutes);
+        }
+
+        /// <summary>
+        /// Calculates the WebSocket uptime percentage.
+        /// </summary>
+        /// <returns>Uptime percentage.</returns>
+        private double GetUptimePercentage()
+        {
+            var totalTime = DateTime.UtcNow - _serviceStartTime;
+            if (totalTime.TotalMilliseconds == 0) return 0;
+            return (_totalUptime.TotalMilliseconds / totalTime.TotalMilliseconds) * 100;
         }
 
         /// <summary>
@@ -267,23 +490,25 @@ namespace BacklashBot.Services
                         {
                             _logger.LogDebug("Checking exchange status, Current _isWebSocketConnected: {IsConnected}", _isWebSocketConnected);
 
-                            // Start timing for exchange status check
+                            // Start timing for exchange status check and cycle
                             _monitoringStopwatch.Restart();
-                            _exchangeStatusCheckCount++;
+                            _cycleStopwatch.Restart();
+                            if (_enableMetrics) _exchangeStatusCheckCount++;
 
                             using var scope = _scopeFactory.CreateScope();
                             var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
                             ExchangeStatus status = await apiService.GetExchangeStatusAsync();
 
                             // Record successful check
-                            _exchangeStatusSuccessCount++;
+                            if (_enableMetrics) _exchangeStatusSuccessCount++;
                             var checkDuration = _monitoringStopwatch.ElapsedMilliseconds;
                             _monitoringStopwatch.Stop();
+                            if (_enableMetrics) UpdateResponseTimeStats(checkDuration);
 
                             _serviceFactory.GetDataCache().ExchangeStatus = status.exchange_active;
                             _serviceFactory.GetDataCache().TradingStatus = status.trading_active;
                             _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _serviceFactory.GetDataCache().ExchangeStatus, _serviceFactory.GetDataCache().TradingStatus);
-                            _logger.LogDebug("Exchange status check completed in {Duration}ms", checkDuration);
+                            _logger.LogDebug("Exchange status check completed in {Duration}ms, Cycle time: {CycleTime}ms", checkDuration, _cycleStopwatch.ElapsedMilliseconds);
 
                             if (status.exchange_active && !_isWebSocketConnected)
                             {
@@ -291,11 +516,19 @@ namespace BacklashBot.Services
                                 if (_readyStatus.InitializationCompleted.Task.IsCompleted && _readyStatus.InitializationCompleted.Task.Result)
                                 {
                                     _logger.LogInformation("Exchange is active and initialization complete, connecting WebSocket");
-                                    _connectionAttemptCount++;
+                                    if (_enableMetrics) _connectionAttemptCount++;
+                                    _connectionStopwatch.Restart();
                                     await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync();
+                                    long connectionDuration = _connectionStopwatch.ElapsedMilliseconds;
                                     _isWebSocketConnected = true;
-                                    _connectionSuccessCount++;
-                                    _logger.LogDebug("WebSocket connected successfully");
+                                    if (_enableMetrics)
+                                    {
+                                        _connectionSuccessCount++;
+                                        RecordConnectionRecovery();
+                                        UpdateUptime(true);
+                                        _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketConnection", connectionDuration);
+                                    }
+                                    _logger.LogDebug("WebSocket connected successfully in {Duration}ms", connectionDuration);
                                 }
                                 else
                                 {
@@ -308,6 +541,11 @@ namespace BacklashBot.Services
                                 _serviceFactory.GetDataCache().LastWebSocketTimestamp = DateTime.UtcNow;
                                 await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync();
                                 _isWebSocketConnected = false;
+                                if (_enableMetrics)
+                                {
+                                    RecordConnectionFailure();
+                                    UpdateUptime(false);
+                                }
                                 _logger.LogWarning("WebSocket connection reset due to inactive exchange, will try again in {Interval} minutes", _monitoringIntervalMinutes);
                             }
 
@@ -324,6 +562,11 @@ namespace BacklashBot.Services
                             _isWebSocketConnected = false;
                             _serviceFactory.GetDataCache().ExchangeStatus = false;
                             _serviceFactory.GetDataCache().TradingStatus = false;
+                            if (_enableMetrics)
+                            {
+                                RecordConnectionFailure();
+                                UpdateUptime(false);
+                            }
 
                             // Log current metrics
                             _logger.LogInformation("Monitoring metrics: ExchangeStatusChecks={Checks}, SuccessRate={Rate:P2}, ConnectionAttempts={Attempts}, SuccessRate={ConnRate:P2}",
@@ -332,6 +575,20 @@ namespace BacklashBot.Services
                                 _connectionAttemptCount,
                                 _connectionAttemptCount > 0 ? (double)_connectionSuccessCount / _connectionAttemptCount : 0);
 
+                            var extended = GetExtendedMetrics();
+                            _logger.LogInformation("Extended metrics: AvgResponseTime={Avg:F2}ms, StdDev={StdDev:F2}ms, Min={Min}ms, Max={Max}ms, TotalRetryDelay={Delay}ms, Uptime={Uptime:F2}%, MTBF={MTBF:F2}min, MTTR={MTTR:F2}min, MessagesProcessed={Msgs}, QueueDepth={Queue}",
+                                extended.AverageResponseTimeMs,
+                                extended.ResponseTimeStdDev,
+                                extended.MinResponseTimeMs,
+                                extended.MaxResponseTimeMs,
+                                extended.TotalRetryDelayMs,
+                                extended.UptimePercentage,
+                                extended.MTBFMinutes,
+                                extended.MTTRMinutes,
+                                extended.MessagesProcessedCount,
+                                extended.QueueDepth);
+
+                            if (_enableMetrics) _totalRetryDelayMs += (long)TimeSpan.FromMinutes(_retryDelayMinutes).TotalMilliseconds;
                             await Task.Delay(TimeSpan.FromMinutes(_retryDelayMinutes), _statusTrackerService.GetCancellationToken()).ConfigureAwait(false);
                         }
                     }
@@ -342,23 +599,25 @@ namespace BacklashBot.Services
                     {
                         _logger.LogDebug("Performing immediate exchange status check");
 
-                        // Start timing for exchange status check
+                        // Start timing for exchange status check and cycle
                         _monitoringStopwatch.Restart();
-                        _exchangeStatusCheckCount++;
+                        _cycleStopwatch.Restart();
+                        if (_enableMetrics) _exchangeStatusCheckCount++;
 
                         using var scope = _scopeFactory.CreateScope();
                         var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
                         ExchangeStatus status = await apiService.GetExchangeStatusAsync();
 
                         // Record successful check
-                        _exchangeStatusSuccessCount++;
+                        if (_enableMetrics) _exchangeStatusSuccessCount++;
                         var checkDuration = _monitoringStopwatch.ElapsedMilliseconds;
                         _monitoringStopwatch.Stop();
+                        if (_enableMetrics) UpdateResponseTimeStats(checkDuration);
 
                         _serviceFactory.GetDataCache().ExchangeStatus = status.exchange_active;
                         _serviceFactory.GetDataCache().TradingStatus = status.trading_active;
                         _logger.LogDebug("Updated DataCache.ExchangeStatus to {Status} and TradingStatus to {tradingStatus}", _serviceFactory.GetDataCache().ExchangeStatus, _serviceFactory.GetDataCache().TradingStatus);
-                        _logger.LogDebug("Exchange status check completed in {Duration}ms", checkDuration);
+                        _logger.LogDebug("Exchange status check completed in {Duration}ms, Cycle time: {CycleTime}ms", checkDuration, _cycleStopwatch.ElapsedMilliseconds);
 
                         if (status.exchange_active && !_isWebSocketConnected)
                         {
@@ -366,11 +625,19 @@ namespace BacklashBot.Services
                             if (_readyStatus.InitializationCompleted.Task.IsCompleted && _readyStatus.InitializationCompleted.Task.Result)
                             {
                                 _logger.LogInformation("Exchange is active and initialization complete, connecting WebSocket");
-                                _connectionAttemptCount++;
+                                if (_enableMetrics) _connectionAttemptCount++;
+                                _connectionStopwatch.Restart();
                                 await _serviceFactory.GetKalshiWebSocketClient().ConnectAsync(0);
+                                long connectionDuration = _connectionStopwatch.ElapsedMilliseconds;
                                 _isWebSocketConnected = true;
-                                _connectionSuccessCount++;
-                                _logger.LogInformation("WebSocket connected successfully");
+                                if (_enableMetrics)
+                                {
+                                    _connectionSuccessCount++;
+                                    RecordConnectionRecovery();
+                                    UpdateUptime(true);
+                                    _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketConnection", connectionDuration);
+                                }
+                                _logger.LogInformation("WebSocket connected successfully in {Duration}ms", connectionDuration);
                             }
                             else
                             {
@@ -382,6 +649,11 @@ namespace BacklashBot.Services
                             _logger.LogWarning("Exchange is inactive, resetting WebSocket connection");
                             await _serviceFactory.GetKalshiWebSocketClient().ResetConnectionAsync();
                             _isWebSocketConnected = false;
+                            if (_enableMetrics)
+                            {
+                                RecordConnectionFailure();
+                                UpdateUptime(false);
+                            }
                             _logger.LogInformation("WebSocket connection reset due to inactive exchange");
                         }
                         else
@@ -400,6 +672,11 @@ namespace BacklashBot.Services
                         _isWebSocketConnected = false;
                         _serviceFactory.GetDataCache().ExchangeStatus = false;
                         _serviceFactory.GetDataCache().TradingStatus = false;
+                        if (_enableMetrics)
+                        {
+                            RecordConnectionFailure();
+                            UpdateUptime(false);
+                        }
 
                         // Log current metrics
                         _logger.LogInformation("Immediate check metrics: ExchangeStatusChecks={Checks}, SuccessRate={Rate:P2}, ConnectionAttempts={Attempts}, SuccessRate={ConnRate:P2}",
@@ -407,6 +684,19 @@ namespace BacklashBot.Services
                             _exchangeStatusCheckCount > 0 ? (double)_exchangeStatusSuccessCount / _exchangeStatusCheckCount : 0,
                             _connectionAttemptCount,
                             _connectionAttemptCount > 0 ? (double)_connectionSuccessCount / _connectionAttemptCount : 0);
+
+                        var extended = GetExtendedMetrics();
+                        _logger.LogInformation("Extended immediate metrics: AvgResponseTime={Avg:F2}ms, StdDev={StdDev:F2}ms, Min={Min}ms, Max={Max}ms, TotalRetryDelay={Delay}ms, Uptime={Uptime:F2}%, MTBF={MTBF:F2}min, MTTR={MTTR:F2}min, MessagesProcessed={Msgs}, QueueDepth={Queue}",
+                            extended.AverageResponseTimeMs,
+                            extended.ResponseTimeStdDev,
+                            extended.MinResponseTimeMs,
+                            extended.MaxResponseTimeMs,
+                            extended.TotalRetryDelayMs,
+                            extended.UptimePercentage,
+                            extended.MTBFMinutes,
+                            extended.MTTRMinutes,
+                            extended.MessagesProcessedCount,
+                            extended.QueueDepth);
                     }
                 }
             }

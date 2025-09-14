@@ -612,5 +612,16 @@
             <param name="dueTime">The amount of time to delay before the invoking the callback method specified when the Timer was constructed, in milliseconds. Specify Timeout.Infinite to prevent the timer from restarting. Specify zero (0) to restart the timer immediately.</param>
             <param name="period">The time interval between invocations of the callback method specified when the Timer was constructed, in milliseconds. Specify Timeout.Infinite to disable periodic signaling.</param>
         </member>
+        <member name="P:BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording">
+            <summary>
+            Gets whether WebSocketConnectionManager performance metrics are being recorded.
+            </summary>
+        </member>
+        <member name="M:BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(System.Boolean)">
+            <summary>
+            Updates the WebSocket metrics recording status.
+            </summary>
+            <param name="isRecording">True if WebSocket metrics are being recorded, false otherwise.</param>
+        </member>
     </members>
 </doc>
