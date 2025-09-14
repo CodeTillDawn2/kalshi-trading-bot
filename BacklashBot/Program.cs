@@ -13,7 +13,6 @@ using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Middleware;
-using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State;
 using BacklashBot.State.Interfaces;

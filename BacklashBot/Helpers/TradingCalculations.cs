@@ -80,7 +80,7 @@ namespace BacklashBot.Helpers
         /// </summary>
         /// <param name="prices">The list of price values. Must not be null, contain valid indices, and not contain NaN or Infinity.</param>
         /// <param name="period">The period for the EMA calculation. Must be at least 1.</param>
-        /// <param name="endIndex">The end index in the prices list to calculate EMA up to. Must be >= period-1 and < prices.Count.</param>
+        /// <param name="endIndex">The end index in the prices list to calculate EMA up to. Must be >= period-1 and &lt; prices.Count.</param>
         /// <returns>The calculated EMA value.</returns>
         /// <exception cref="ArgumentException">Thrown if inputs are invalid.</exception>
         public static double CalculateIterativeEMA(List<double> prices, int period, int endIndex)

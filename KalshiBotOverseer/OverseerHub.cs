@@ -122,7 +122,7 @@ namespace KalshiBotOverseer
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log error - would need logger instance
             }
@@ -151,7 +151,7 @@ namespace KalshiBotOverseer
                     _rateLimits.TryRemove(key, out _);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log error
             }

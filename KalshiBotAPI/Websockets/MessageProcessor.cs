@@ -37,7 +37,7 @@ namespace KalshiBotAPI.Websockets
         private bool _isDataPersistenceEnabled;
         private readonly ConcurrentDictionary<string, long> _messageTypeCounts;
         private readonly PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long> _orderBookUpdateQueue;
-        private readonly ReaderWriterLockSlim _orderBookQueueLock;
+        private readonly ReaderWriterLockSlim? _orderBookQueueLock;
         private readonly object _orderBookQueueSynchronizationLock = new object(); // Keep for backward compatibility
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, SubscriptionState>> _marketChannelSubscriptionStates;
         private readonly Dictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions;
@@ -190,6 +190,7 @@ namespace KalshiBotAPI.Websockets
         public async Task StartProcessingAsync()
         {
             _messageReceivingTask = Task.Run(() => ReceiveAsync(), _processingCancellationToken);
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -495,7 +496,7 @@ namespace KalshiBotAPI.Websockets
                     LogPerformanceMetrics();
                 }
             }
-            catch (JsonException ex)
+            catch (JsonException)
             {
                 _logger.LogWarning("The input does not contain any JSON tokens. Raw: {RawMessage}", message);
             }
@@ -1013,6 +1014,8 @@ namespace KalshiBotAPI.Websockets
             {
                 _logger.LogError(ex, "Error processing unsubscription confirmation message");
             }
+
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -1143,6 +1146,8 @@ namespace KalshiBotAPI.Websockets
             {
                 _logger.LogError(ex, "Error processing error message");
             }
+
+            await Task.CompletedTask;
         }
 
         /// <summary>

@@ -64,7 +64,7 @@ namespace KalshiBotTasks
             /// <summary>
             /// The market ticker symbol where the missing orderbook was detected.
             /// </summary>
-            public string MarketTicker { get; set; }
+            public string? MarketTicker { get; set; }
 
             /// <summary>
             /// The timestamp when the snapshot was taken.
@@ -86,7 +86,7 @@ namespace KalshiBotTasks
             /// <summary>
             /// The market ticker symbol where the price overlap was detected.
             /// </summary>
-            public string MarketTicker { get; set; }
+            public string? MarketTicker { get; set; }
 
             /// <summary>
             /// The timestamp when the snapshot was taken.
@@ -108,7 +108,7 @@ namespace KalshiBotTasks
             /// <summary>
             /// The market ticker symbol where the rate discrepancy was detected.
             /// </summary>
-            public string MarketTicker { get; set; }
+            public string? MarketTicker { get; set; }
 
             /// <summary>
             /// The timestamp when the snapshot was taken.
@@ -141,16 +141,19 @@ namespace KalshiBotTasks
         public void Setup()
         {
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
-            var config = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
                 .Build();
+            this.config = configuration;
 
-            var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>();
-            var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>();
-            var kalshiConfig = config.GetSection("Kalshi").Get<KalshiConfig>(); // Add this for KalshiConfig
+            this.config = configuration;
+
+            var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>()!;
+            var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>()!;
+            var kalshiConfig = config.GetSection("Kalshi").Get<KalshiConfig>()!; // Add this for KalshiConfig
             _snapshotOptions = Options.Create(snapshotConfig);
-            _executionConfig = Options.Create(config.GetSection("Execution").Get<ExecutionConfig>());
+            _executionConfig = Options.Create(config.GetSection("Execution").Get<ExecutionConfig>()!);
             var kalshiOptions = Options.Create(kalshiConfig); // Create options for KalshiConfig
 
             var snapshotLoggerMock = new Mock<ILogger<TradingSnapshotService>>();
@@ -218,7 +221,7 @@ namespace KalshiBotTasks
         [Test]
         public async Task ExecuteOvernightTasks()
         {
-            var scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
+            var scopeFactory = _serviceProvider!.GetRequiredService<IServiceScopeFactory>();
             await _overnightService.RunOvernightTasks(scopeFactory);
         }
 
@@ -274,7 +277,7 @@ namespace KalshiBotTasks
             int totalValidated = 0;
             int totalErrors = 0;
 
-            TestContext.WriteLine($"Starting snapshot upgrade process at {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+            TestContext.Out.WriteLine($"Starting snapshot upgrade process at {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
 
             while (true)
             {
@@ -283,11 +286,11 @@ namespace KalshiBotTasks
 
                 if (recordsReturned == 0)
                 {
-                    TestContext.WriteLine("No more unvalidated snapshots found. Upgrade process complete.");
+                    TestContext.Out.WriteLine("No more unvalidated snapshots found. Upgrade process complete.");
                     break;
                 }
 
-                TestContext.WriteLine($"Processing batch of {recordsReturned} snapshots...");
+                TestContext.Out.WriteLine($"Processing batch of {recordsReturned} snapshots...");
 
                 var marketGroups = allUnvalidatedSnapshots
                     .GroupBy(x => x.MarketTicker)
@@ -299,7 +302,7 @@ namespace KalshiBotTasks
                     string marketName = marketGroup.Key;
                     var snapshots = marketGroup.OrderBy(x => x.SnapshotDate).ToList();
 
-                    TestContext.WriteLine($"Processing market: {marketName} ({snapshots.Count} snapshots)");
+                    TestContext.Out.WriteLine($"Processing market: {marketName} ({snapshots.Count} snapshots)");
 
                     try
                     {
@@ -310,7 +313,7 @@ namespace KalshiBotTasks
                         var market = await dbContext.GetMarketByTicker(marketName);
                         if (market?.Event == null)
                         {
-                            TestContext.WriteLine($"Warning: Market {marketName} has no associated event. Skipping.");
+                            TestContext.Out.WriteLine($"Warning: Market {marketName} has no associated event. Skipping.");
                             totalErrors += snapshots.Count;
                             continue;
                         }
@@ -326,7 +329,7 @@ namespace KalshiBotTasks
                         var cacheSnapshotDict = await _snapshotService.LoadManySnapshots(snapshots, true);
                         if (cacheSnapshotDict == null)
                         {
-                            TestContext.WriteLine($"Error: Failed to load snapshots for market {marketName}");
+                            TestContext.Out.WriteLine($"Error: Failed to load snapshots for market {marketName}");
                             totalErrors += snapshots.Count;
                             continue;
                         }
@@ -347,7 +350,7 @@ namespace KalshiBotTasks
                             {
                                 if (cacheSnapshot == null)
                                 {
-                                    TestContext.WriteLine($"Warning: Null snapshot found for market {marketName}");
+                                    TestContext.Out.WriteLine($"Warning: Null snapshot found for market {marketName}");
                                     totalErrors++;
                                     continue;
                                 }
@@ -362,24 +365,24 @@ namespace KalshiBotTasks
 
                                         if (!validationResult.IsValid)
                                         {
-                                            TestContext.WriteLine($"Snapshot {cacheSnapshot.MarketTicker} at {cacheSnapshot.Timestamp:yyyy-MM-dd HH:mm:ss} failed validation:");
+                                            TestContext.Out.WriteLine($"Snapshot {cacheSnapshot.MarketTicker} at {cacheSnapshot.Timestamp:yyyy-MM-dd HH:mm:ss} failed validation:");
                                             if (validationResult.IsOrderbookMissing)
                                             {
-                                                TestContext.WriteLine("  - Missing orderbook data");
-                                                LogMissingOrderbook(cacheSnapshot.MarketTicker, cacheSnapshot.Timestamp);
+                                                TestContext.Out.WriteLine("  - Missing orderbook data");
+                                                LogMissingOrderbook(cacheSnapshot.MarketTicker!, cacheSnapshot.Timestamp);
                                             }
                                             if (validationResult.DoPricesOverlap)
                                             {
-                                                TestContext.WriteLine("  - Overlapping prices");
-                                                LogOverlappingPrice(cacheSnapshot.MarketTicker, cacheSnapshot.Timestamp, cacheSnapshot.BestYesBid);
+                                                TestContext.Out.WriteLine("  - Overlapping prices");
+                                                LogOverlappingPrice(cacheSnapshot.MarketTicker!, cacheSnapshot.Timestamp, cacheSnapshot.BestYesBid);
                                             }
                                             if (validationResult.IsRateDiscrepancy)
                                             {
                                                 double velocitySum = cacheSnapshot.VelocityPerMinute_Top_Yes_Bid + cacheSnapshot.VelocityPerMinute_Bottom_Yes_Bid;
                                                 double rateSum = cacheSnapshot.OrderVolumePerMinute_YesBid + cacheSnapshot.TradeVolumePerMinute_Yes;
                                                 double diff = Math.Abs(velocitySum - rateSum);
-                                                TestContext.WriteLine($"  - Rate discrepancy: Velocity={velocitySum:F2}, Rate={rateSum:F2}, Diff={diff:F2}");
-                                                LogRateDiscrepancy(cacheSnapshot.MarketTicker, cacheSnapshot.Timestamp, velocitySum, rateSum, diff);
+                                                TestContext.Out.WriteLine($"  - Rate discrepancy: Velocity={velocitySum:F2}, Rate={rateSum:F2}, Diff={diff:F2}");
+                                                LogRateDiscrepancy(cacheSnapshot.MarketTicker!, cacheSnapshot.Timestamp, velocitySum, rateSum, diff);
                                             }
                                             isValid = false;
                                         }
@@ -411,7 +414,7 @@ namespace KalshiBotTasks
                                 }
                                 catch (Exception ex)
                                 {
-                                    TestContext.WriteLine($"Error processing snapshot for {marketName} at {cacheSnapshot.Timestamp}: {ex.Message}");
+                                    TestContext.Out.WriteLine($"Error processing snapshot for {marketName} at {cacheSnapshot.Timestamp}: {ex.Message}");
                                     totalErrors++;
                                 }
                             }
@@ -421,22 +424,22 @@ namespace KalshiBotTasks
                         if (validatedSnapshots.Any())
                         {
                             await _dbContext.AddOrUpdateSnapshots(validatedSnapshots);
-                            TestContext.WriteLine($"Updated {validatedSnapshots.Count} snapshots for market {marketName}");
+                            TestContext.Out.WriteLine($"Updated {validatedSnapshots.Count} snapshots for market {marketName}");
                         }
 
                         totalProcessed += snapshots.Count;
                     }
                     catch (Exception ex)
                     {
-                        TestContext.WriteLine($"Error processing market {marketName}: {ex.Message}");
+                        TestContext.Out.WriteLine($"Error processing market {marketName}: {ex.Message}");
                         totalErrors += snapshots.Count;
                     }
                 }
 
-                TestContext.WriteLine($"Batch complete. Total processed: {totalProcessed}, Validated: {totalValidated}, Errors: {totalErrors}");
+                TestContext.Out.WriteLine($"Batch complete. Total processed: {totalProcessed}, Validated: {totalValidated}, Errors: {totalErrors}");
             }
 
-            TestContext.WriteLine($"Snapshot upgrade complete. Final stats - Processed: {totalProcessed}, Validated: {totalValidated}, Errors: {totalErrors}");
+            TestContext.Out.WriteLine($"Snapshot upgrade complete. Final stats - Processed: {totalProcessed}, Validated: {totalValidated}, Errors: {totalErrors}");
 
             // Export discrepancy reports if validation was performed
             if (performValidation)
@@ -829,7 +832,7 @@ namespace KalshiBotTasks
         {
             _sqlDataService.Dispose();
             _dbContext.Dispose();
-            _serviceProvider.Dispose();
+            _serviceProvider!.Dispose();
         }
     }
 }

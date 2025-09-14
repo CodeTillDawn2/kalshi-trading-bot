@@ -961,7 +961,7 @@ namespace BacklashBot.Services
                     ).Select(m => m.market_ticker);
 
 
-                _logger.LogDebug("Fetched {Count} market watches from database: {Markets}", markets.Count(), string.Join(", "));
+                _logger.LogDebug("Fetched {Count} market watches from database: {Markets}", markets.Count(), string.Join(", ", markets));
 
                 HashSet<string> allWatchedMarkets = markets.ToHashSet();
 

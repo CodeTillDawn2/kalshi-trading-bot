@@ -68,7 +68,7 @@ namespace KalshiBotOverseer.Services
         private readonly Stopwatch _serviceStopwatch = new();
         private long _totalOperations;
         private readonly object _metricsLock = new();
-        private readonly System.Timers.Timer _persistenceTimer;
+        private readonly System.Timers.Timer? _persistenceTimer;
         private bool _isInitialized;
 
         /// <summary>

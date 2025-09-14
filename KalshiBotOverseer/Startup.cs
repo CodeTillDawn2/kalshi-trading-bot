@@ -49,7 +49,7 @@ namespace KalshiBotOverseer
             });
 
             // Add database logging services
-            services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetService<IServiceProvider>(), true)); // isOverseer = true
+            services.AddSingleton<DatabaseLoggingQueue>(provider => new DatabaseLoggingQueue(provider.GetRequiredService<IServiceProvider>(), true)); // isOverseer = true
             services.AddSingleton<ILoggerProvider>(provider =>
                 new DatabaseLoggerProvider(
                     provider.GetRequiredService<DatabaseLoggingQueue>(),
@@ -95,7 +95,7 @@ namespace KalshiBotOverseer
             ));
             services.AddScoped<ISqlDataService, SqlDataService>();
             services.AddScoped<KalshiBotContext>(provider => new KalshiBotContext(Configuration));
-            services.AddScoped<IKalshiBotContext>(provider => provider.GetService<KalshiBotContext>());
+            services.AddScoped<IKalshiBotContext>(provider => provider.GetRequiredService<KalshiBotContext>());
             services.AddSingleton<IStatusTrackerService, OverseerStatusTracker>();
             services.AddSingleton<IBotReadyStatus, OverseerReadyStatus>();
             services.AddScoped<IDataCache, BacklashBot.State.DataCache>();

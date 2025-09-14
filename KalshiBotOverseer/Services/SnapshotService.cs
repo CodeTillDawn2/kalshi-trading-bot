@@ -38,7 +38,7 @@ namespace KalshiBotOverseer.Services
             // Get all snapshot groups with their related markets
             var snapshotGroups = await _context.GetSnapshotGroups();
 
-            var relatedMarkets = await _context.GetMarketsFiltered(includedMarkets: snapshotGroups.Select(x => x.MarketTicker).Distinct().ToHashSet());
+            var relatedMarkets = await _context.GetMarketsFiltered(includedMarkets: snapshotGroups.Where(x => x.MarketTicker != null).Select(x => x.MarketTicker!).Distinct().ToHashSet());
 
             return await GetSnapshotGroupsDataAsync(snapshotGroups, relatedMarkets);
         }
@@ -121,7 +121,7 @@ namespace KalshiBotOverseer.Services
                 throw new ArgumentNullException(nameof(relatedMarkets));
 
             // Create a lookup for markets for faster access
-            var marketLookup = relatedMarkets.ToDictionary(m => m.market_ticker, m => m);
+            var marketLookup = relatedMarkets.Where(m => m.market_ticker != null).ToDictionary(m => m.market_ticker!, m => m);
 
             // Group by MarketTicker and calculate aggregated data
             var stopwatch = Stopwatch.StartNew();
@@ -129,7 +129,7 @@ namespace KalshiBotOverseer.Services
                 .GroupBy(sg => sg.MarketTicker)
                 .Select(group =>
                 {
-                    marketLookup.TryGetValue(group.Key, out var market);
+                    marketLookup.TryGetValue(group.Key!, out var market);
                     var firstSnapshot = group.First(); // Use first snapshot for individual fields
 
                     // Calculate total recorded hours for this market

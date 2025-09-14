@@ -774,7 +774,7 @@ namespace BacklashBot.Services
                     foreach (var action in KalshiConstants.MarketChannels)
                         await _serviceFactory.GetKalshiWebSocketClient().UpdateSubscriptionAsync("delete_markets", new string[] { marketTicker }, action);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     _logger.LogWarning("Failed to unsubscribe from market {MarketTicker} for order book update, Seq: {Seq}", marketTicker, seq);
                 }

@@ -12,7 +12,7 @@ namespace BacklashDTOs
     /// MarketSnapshot is created from MarketData instances and serialized for persistence. It includes:
     /// - Market identification and metadata (ticker, category, status)
     /// - Current order book state with bid/ask prices and depths
-    /// - Position information and P&L calculations
+    /// - Position information and P&amp;L calculations
     /// - Technical indicators and trading metrics
     /// - Historical price data and support/resistance levels
     /// - Calculated velocities, spreads, and market statistics
@@ -297,8 +297,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Stores a list of dictionaries with order details (price, side, resting contracts, last modified date).
-        /// Sourced from <see cref="MarketData.OrderbookData"/> and converted via <see cref="ConvertOrderbookData"/>.
-        /// Updated via WebSocket events by <see cref="OrderBookService"/>. Null if no data is available.
+        /// Sourced from MarketData.OrderbookData and converted via ConvertOrderbookData.
+        /// Updated via WebSocket events by OrderBookService. Null if no data is available.
         /// </remarks>
         [JsonPropertyName("Orderbook")]
         [JsonConverter(typeof(OrderbookSlimConverter))]
@@ -317,7 +317,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Highest bid price recorded, in cents (e.g., 72 = $0.72).
-        /// Sourced from <see cref="MarketData.AllTimeHighYes_Bid"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.BidHigh"/>.
+        /// Sourced from MarketData.AllTimeHighYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidHigh.
         /// Default is (0, DateTime.MinValue) if no data. Skips initial candles with zero volume.
         /// </remarks>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -328,7 +328,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Lowest bid price recorded, in cents (e.g., 28 = $0.28).
-        /// Sourced from <see cref="MarketData.AllTimeLowYes_Bid"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.BidLow"/>.
+        /// Sourced from MarketData.AllTimeLowYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidLow.
         /// Default is (0, DateTime.MinValue) if no data. Skips initial candles with zero volume.
         /// </remarks>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -339,7 +339,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Highest bid price recorded, in cents (e.g., 72 = $0.72).
-        /// Sourced from <see cref="MarketData.AllTimeHighNo_Bid"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.BidHigh"/>.
+        /// Sourced from MarketData.AllTimeHighNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidHigh.
         /// Default is (0, DateTime.MinValue) if no data. Skips initial candles with zero volume.
         /// </remarks>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -350,7 +350,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Lowest bid price recorded, in cents (e.g., 28 = $0.28).
-        /// Sourced from <see cref="MarketData.AllTimeLowNo_Bid"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.BidLow"/>.
+        /// Sourced from MarketData.AllTimeLowNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidLow.
         /// Default is (0, DateTime.MinValue) if no data. Skips initial candles with zero volume.
         /// </remarks>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -361,7 +361,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Highest bid price in the last 3 months, in cents (e.g., 68 = $0.68).
-        /// Sourced from <see cref="MarketData.RecentHighYes_Bid"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.BidHigh"/>.
+        /// Sourced from MarketData.RecentHighYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidHigh.
         /// Default is (0, DateTime.MinValue) if no recent data.
         /// </remarks>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -372,7 +372,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Lowest bid price in the last 3 months, in cents (e.g., 32 = $0.32).
-        /// Sourced from <see cref="MarketData.RecentLowYes_Bid"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.BidLow"/>.
+        /// Sourced from MarketData.RecentLowYes_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidLow.
         /// Default is (0, DateTime.MinValue) if no recent data.
         /// </remarks>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -383,7 +383,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Highest bid price in the last 3 months, in cents (e.g., 68 = $0.68).
-        /// Sourced from <see cref="MarketData.RecentHighNo_Bid"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.BidHigh"/>.
+        /// Sourced from MarketData.RecentHighNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidHigh.
         /// Default is (0, DateTime.MinValue) if no recent data.
         /// </remarks>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -394,7 +394,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Lowest bid price in the last 3 months, in cents (e.g., 32 = $0.32).
-        /// Sourced from <see cref="MarketData.RecentLowNo_Bid"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.BidLow"/>.
+        /// Sourced from MarketData.RecentLowNo_Bid, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.BidLow.
         /// Default is (0, DateTime.MinValue) if no recent data.
         /// </remarks>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -407,7 +407,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Contains key price levels (in cents) with strength, touches, and volume data.
-        /// Sourced from <see cref="MarketData.AllSupportResistanceLevels"/>, calculated by <see cref="TradingCalculator.CalculateHistoricalSupportResistance"/> using minute candlesticks.
+        /// Sourced from MarketData.AllSupportResistanceLevels, calculated by TradingCalculator.CalculateHistoricalSupportResistance using minute candlesticks.
         /// Levels are filtered for statistical significance, excluding data from 07:00:00 to 11:59:00 UTC.
         /// </remarks>
         public List<SupportResistanceLevel>? AllSupportResistanceLevels { get; set; }
@@ -419,8 +419,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Positive for "Yes" (long), negative for "No" (short) positions.
-        /// Sourced from <see cref="MarketData.PositionSize"/>, calculated by <see cref="MarketData.RefreshPositionMetadata"/> from <see cref="MarketData.Positions"/>.
-        /// 0 if no position exists. Side is indicated by <see cref="PositionSide"/>.
+        /// Sourced from MarketData.PositionSize, calculated by MarketData.RefreshPositionMetadata from MarketData.Positions.
+        /// 0 if no position exists. Side is indicated by PositionSide.
         /// </remarks>
         public int PositionSize { get; set; }
 
@@ -429,7 +429,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Total cost of contracts held, in dollars (cents / 100).
-        /// Sourced from <see cref="MarketData.MarketExposure"/>, calculated by <see cref="MarketData.RefreshPositionMetadata"/> from <see cref="MarketPosition.MarketExposure"/>.
+        /// Sourced from MarketData.MarketExposure, calculated by MarketData.RefreshPositionMetadata from MarketPosition.MarketExposure.
         /// Absolute value, 0 if no position.
         /// </remarks>
         public double MarketExposure { get; set; }
@@ -439,7 +439,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Average price paid per contract (MarketExposure / |PositionSize|), in dollars.
-        /// Sourced from <see cref="MarketData.BuyinPrice"/>, calculated by <see cref="MarketData.RefreshPositionMetadata"/>.
+        /// Sourced from MarketData.BuyinPrice, calculated by MarketData.RefreshPositionMetadata.
         /// 0 if no position or PositionSize is 0.
         /// </remarks>
         public double BuyinPrice { get; set; }
@@ -449,7 +449,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Potential gain if held to resolution and outcome favors position, in dollars.
-        /// Sourced from <see cref="MarketData.PositionUpside"/>, calculated by <see cref="MarketData.RefreshPositionMetadata"/> as max payout ($1/contract * |PositionSize|) minus liquidation value.
+        /// Sourced from MarketData.PositionUpside, calculated by MarketData.RefreshPositionMetadata as max payout ($1/contract * |PositionSize|) minus liquidation value.
         /// Uses order book or current prices. 0 if no position or data unavailable.
         /// </remarks>
         public double PositionUpside { get; set; }
@@ -459,7 +459,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Potential loss if liquidated at current prices, as negative liquidation value in dollars.
-        /// Sourced from <see cref="MarketData.PositionDownside"/>, calculated by <see cref="MarketData.RefreshPositionMetadata"/> using order book or current prices.
+        /// Sourced from MarketData.PositionDownside, calculated by MarketData.RefreshPositionMetadata using order book or current prices.
         /// Typically negative, 0 if no position or data unavailable.
         /// </remarks>
         public double PositionDownside { get; set; }
@@ -469,7 +469,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Cumulative contracts traded (bought/sold) for the position.
-        /// Sourced from <see cref="MarketData.TotalPositionTraded"/>, retrieved by <see cref="MarketData.RefreshPositionMetadata"/> from <see cref="MarketPosition.TotalTraded"/>.
+        /// Sourced from MarketData.TotalPositionTraded, retrieved by MarketData.RefreshPositionMetadata from MarketPosition.TotalTraded.
         /// 0 if no position. Non-negative integer.
         /// </remarks>
         public long TotalTraded { get; set; }
@@ -479,7 +479,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Count of open orders (e.g., limit orders) waiting to be filled.
-        /// Sourced from <see cref="MarketData.RestingOrders"/>, retrieved by <see cref="MarketData.RefreshPositionMetadata"/> from <see cref="MarketPosition.RestingOrdersCount"/>.
+        /// Sourced from MarketData.RestingOrders, retrieved by MarketData.RefreshPositionMetadata from MarketPosition.RestingOrdersCount.
         /// 0 if no orders or position. Non-negative integer.
         /// </remarks>
         public List<(string action, string side, string type, int count, int price, DateTime? expiration)>? RestingOrders { get; set; }
@@ -489,7 +489,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Net profit/loss from closed trades, in dollars (cents / 100).
-        /// Sourced from <see cref="MarketData.RealizedPnl"/>, retrieved by <see cref="MarketData.RefreshPositionMetadata"/> from <see cref="MarketPosition.RealizedPnl"/>.
+        /// Sourced from MarketData.RealizedPnl, retrieved by MarketData.RefreshPositionMetadata from MarketPosition.RealizedPnl.
         /// Positive for profit, negative for loss, 0 if no closed trades.
         /// </remarks>
         public double RealizedPnl { get; set; }
@@ -499,7 +499,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Cumulative trading fees for all trades, in dollars (cents / 100).
-        /// Sourced from <see cref="MarketData.FeesPaid"/>, retrieved by <see cref="MarketData.RefreshPositionMetadata"/> from <see cref="MarketPosition.FeesPaid"/>.
+        /// Sourced from MarketData.FeesPaid, retrieved by MarketData.RefreshPositionMetadata from MarketPosition.FeesPaid.
         /// Non-negative, 0 if no trades.
         /// </remarks>
         public double FeesPaid { get; set; }
@@ -509,7 +509,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Percentage return: (liquidation price - BuyinPrice) / BuyinPrice * 100.
-        /// Sourced from <see cref="MarketData.PositionROI"/>, calculated by <see cref="MarketData.RefreshPositionMetadata"/> using order book or current prices.
+        /// Sourced from MarketData.PositionROI, calculated by MarketData.RefreshPositionMetadata using order book or current prices.
         /// 0 if no position, BuyinPrice is 0, or data unavailable. Positive for profit, negative for loss.
         /// </remarks>
         public double PositionROI { get; set; }
@@ -518,7 +518,7 @@ namespace BacklashDTOs
         /// Gets or sets the return on investment (ROI) for the position as a dollar amount.
         /// </summary>
         /// <remarks>
-        /// Sourced from <see cref="MarketData.PositionROIAmount"/>, calculated by <see cref="MarketData.RefreshPositionMetadata"/> using order book or current prices.
+        /// Sourced from MarketData.PositionROIAmount, calculated by MarketData.RefreshPositionMetadata using order book or current prices.
         /// </remarks>
         public double PositionROIAmt { get; set; }
 
@@ -530,7 +530,7 @@ namespace BacklashDTOs
         /// P is the liquidation price in dollars, and roundup rounds to the next cent. Fees are summed across price levels in the order book
         /// when available, or based on the current bid (for "yes" positions) or ask (for "no" positions) price if no orders exist.
         /// Only applied for takers, not makers.
-        /// Sourced from <see cref="MarketData.RefreshPositionMetadata"/>. Returns 0 if no position exists, position size is 0, or data is unavailable.
+        /// Sourced from MarketData.RefreshPositionMetadata. Returns 0 if no position exists, position size is 0, or data is unavailable.
         /// </remarks>
         public double ExpectedFees { get; private set; }
         #endregion
@@ -548,8 +548,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Rate of "Yes" side trades (taker side = "no") within the change window.
-        /// Sourced from <see cref="MarketData.TradeRatePerMinute_Yes"/>, computed by <see cref="OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics"/> using <see cref="OrderbookChangeTracker.GetTradeRatePerMinute_MakerYes"/>.
-        /// Number of trades divided by elapsed minutes (capped at <see cref="OrderbookChangeTracker.ChangeWindowDuration"/>). 0 if no trades.
+        /// Sourced from MarketData.TradeRatePerMinute_Yes, computed by OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics using OrderbookChangeTracker.GetTradeRatePerMinute_MakerYes.
+        /// Number of trades divided by elapsed minutes (capped at OrderbookChangeTracker.ChangeWindowDuration). 0 if no trades.
         /// </remarks>
         public double TradeRatePerMinute_Yes { get; set; }
 
@@ -558,8 +558,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Rate of "No" side trades (taker side = "yes") within the change window.
-        /// Sourced from <see cref="MarketData.TradeRatePerMinute_No"/>, computed by <see cref="OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics"/> using <see cref="OrderbookChangeTracker.GetTradeRatePerMinute_MakerNo"/>.
-        /// Number of trades divided by elapsed minutes (capped at <see cref="OrderbookChangeTracker.ChangeWindowDuration"/>). 0 if no trades.
+        /// Sourced from MarketData.TradeRatePerMinute_No, computed by OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics using OrderbookChangeTracker.GetTradeRatePerMinute_MakerNo.
+        /// Number of trades divided by elapsed minutes (capped at OrderbookChangeTracker.ChangeWindowDuration). 0 if no trades.
         /// </remarks>
         public double TradeRatePerMinute_No { get; set; }
 
@@ -568,7 +568,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Rate of "Yes" side trade volume within the change window.
-        /// Sourced from <see cref="MarketData.TradeVolumePerMinute_Yes"/>, computed by <see cref="OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics"/> using <see cref="OrderbookChangeTracker.GetTradeRatePerMinute_MakerYes"/>.
+        /// Sourced from MarketData.TradeVolumePerMinute_Yes, computed by OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics using OrderbookChangeTracker.GetTradeRatePerMinute_MakerYes.
         /// Sums dollar value (price/100 * |delta contracts|) of trade-related changes, divided by elapsed minutes. 0 if no trades.
         /// </remarks>
         public double TradeVolumePerMinute_Yes { get; set; }
@@ -578,7 +578,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Rate of "No" side trade volume within the change window.
-        /// Sourced from <see cref="MarketData.TradeVolumePerMinute_No"/>, computed by <see cref="OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics"/> using <see cref="OrderbookChangeTracker.GetTradeRatePerMinute_MakerNo"/>.
+        /// Sourced from MarketData.TradeVolumePerMinute_No, computed by OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics using OrderbookChangeTracker.GetTradeRatePerMinute_MakerNo.
         /// Sums dollar value (price/100 * |delta contracts|) of trade-related changes, divided by elapsed minutes. 0 if no trades.
         /// </remarks>
         public double TradeVolumePerMinute_No { get; set; }
@@ -588,8 +588,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Average dollar value per "Yes" side trade (taker side = "no").
-        /// Sourced from <see cref="MarketData.AverageTradeSize_Yes"/>, computed by <see cref="OrderbookChangeTracker.GetAverageTradeSize_MakerYes"/>.
-        /// Sums dollar value (price/100 * |delta contracts|) divided by trade count. 0 if no trades. Trade count in <see cref="TradeCount_Yes"/>.
+        /// Sourced from MarketData.AverageTradeSize_Yes, computed by OrderbookChangeTracker.GetAverageTradeSize_MakerYes.
+        /// Sums dollar value (price/100 * |delta contracts|) divided by trade count. 0 if no trades. Trade count in TradeCount_Yes.
         /// </remarks>
         public double AverageTradeSize_Yes { get; set; }
 
@@ -598,8 +598,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Average dollar value per "No" side trade (taker side = "yes").
-        /// Sourced from <see cref="MarketData.AverageTradeSize_No"/>, computed by <see cref="OrderbookChangeTracker.GetAverageTradeSize_MakerNo"/>.
-        /// Sums dollar value (price/100 * |delta contracts|) divided by trade count. 0 if no trades. Trade count in <see cref="TradeCount_No"/>.
+        /// Sourced from MarketData.AverageTradeSize_No, computed by OrderbookChangeTracker.GetAverageTradeSize_MakerNo.
+        /// Sums dollar value (price/100 * |delta contracts|) divided by trade count. 0 if no trades. Trade count in TradeCount_No.
         /// </remarks>
         public double AverageTradeSize_No { get; set; }
 
@@ -608,8 +608,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Count of trades with "Yes" as the maker side (taker side = "no").
-        /// Sourced from <see cref="MarketData.TradeCount_Yes"/>, computed by <see cref="OrderbookChangeTracker.GetTradeCount_MakerYes"/>.
-        /// Tracks trades in <see cref="OrderbookChangeTracker.TradeEvent"/>. 0 if no trades.
+        /// Sourced from MarketData.TradeCount_Yes, computed by OrderbookChangeTracker.GetTradeCount_MakerYes.
+        /// Tracks trades in OrderbookChangeTracker.TradeEvent. 0 if no trades.
         /// </remarks>
         public int TradeCount_Yes { get; set; }
 
@@ -618,8 +618,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Count of trades with "No" as the maker side (taker side = "yes").
-        /// Sourced from <see cref="MarketData.TradeCount_No"/>, computed by <see cref="OrderbookChangeTracker.GetTradeCount_MakerNo"/>.
-        /// Tracks trades in <see cref="OrderbookChangeTracker.TradeEvent"/>. 0 if no trades.
+        /// Sourced from MarketData.TradeCount_No, computed by OrderbookChangeTracker.GetTradeCount_MakerNo.
+        /// Tracks trades in OrderbookChangeTracker.TradeEvent. 0 if no trades.
         /// </remarks>
         public int TradeCount_No { get; set; }
 
@@ -628,8 +628,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Number of "Yes" side order book changes not linked to trades.
-        /// Sourced from <see cref="MarketData.NonTradeRelatedOrderCount_Yes"/>, computed by <see cref="OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics"/> using <see cref="OrderbookChangeTracker.GetYesNetOrderRatePerMinute"/>.
-        /// Tracks changes in <see cref="OrderbookChangeTracker.OrderbookChange"/> with <see cref="OrderbookChangeTracker.OrderbookChange.IsTradeRelated"/> set to false.
+        /// Sourced from MarketData.NonTradeRelatedOrderCount_Yes, computed by OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics using OrderbookChangeTracker.GetYesNetOrderRatePerMinute.
+        /// Tracks changes in OrderbookChangeTracker.OrderbookChange with OrderbookChangeTracker.OrderbookChange.IsTradeRelated set to false.
         /// </remarks>
         public int NonTradeRelatedOrderCount_Yes { get; set; }
 
@@ -638,8 +638,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Number of "No" side order book changes not linked to trades.
-        /// Sourced from <see cref="MarketData.NonTradeRelatedOrderCount_No"/>, computed by <see cref="OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics"/> using <see cref="OrderbookChangeTracker.GetNoNetOrderRatePerMinute"/>.
-        /// Tracks changes in <see cref="OrderbookChangeTracker.OrderbookChange"/> with <see cref="OrderbookChangeTracker.OrderbookChange.IsTradeRelated"/> set to false.
+        /// Sourced from MarketData.NonTradeRelatedOrderCount_No, computed by OrderbookChangeTracker.RefreshTradeChangeOverTimeMetrics using OrderbookChangeTracker.GetNoNetOrderRatePerMinute.
+        /// Tracks changes in OrderbookChangeTracker.OrderbookChange with OrderbookChangeTracker.OrderbookChange.IsTradeRelated set to false.
         /// </remarks>
         public int NonTradeRelatedOrderCount_No { get; set; }
         #endregion
@@ -650,7 +650,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Maximum volume traded in a single day, in contracts.
-        /// Sourced from <see cref="MarketData.HighestVolume_Day"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using day candlesticks' <see cref="CandlestickData.Volume"/>.
+        /// Sourced from MarketData.HighestVolume_Day, calculated by CandlestickService.PopulateMarketDataAsync using day candlesticks' CandlestickData.Volume.
         /// 0 if no day candlesticks or volume data.
         /// </remarks>
         public double HighestVolume_Day { get; set; }
@@ -660,7 +660,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Maximum volume traded in a single hour, in contracts.
-        /// Sourced from <see cref="MarketData.HighestVolume_Hour"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using hour candlesticks' <see cref="CandlestickData.Volume"/>.
+        /// Sourced from MarketData.HighestVolume_Hour, calculated by CandlestickService.PopulateMarketDataAsync using hour candlesticks' CandlestickData.Volume.
         /// 0 if no hour candlesticks or volume data.
         /// </remarks>
         public double HighestVolume_Hour { get; set; }
@@ -670,7 +670,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Maximum volume traded in a single minute, in contracts.
-        /// Sourced from <see cref="MarketData.HighestVolume_Minute"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.Volume"/>.
+        /// Sourced from MarketData.HighestVolume_Minute, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.Volume.
         /// 0 if no minute candlesticks or volume data.
         /// </remarks>
         public double HighestVolume_Minute { get; set; }
@@ -680,7 +680,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Sum of volumes from minute candlesticks in the last hour, in contracts.
-        /// Sourced from <see cref="MarketData.RecentVolume_LastHour"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.Volume"/>.
+        /// Sourced from MarketData.RecentVolume_LastHour, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.Volume.
         /// 0 if no recent data or volume.
         /// </remarks>
         public double RecentVolume_LastHour { get; set; }
@@ -690,7 +690,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Sum of volumes from minute candlesticks in the last three hours, in contracts.
-        /// Sourced from <see cref="MarketData.RecentVolume_LastThreeHours"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.Volume"/>.
+        /// Sourced from MarketData.RecentVolume_LastThreeHours, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.Volume.
         /// 0 if no recent data or volume.
         /// </remarks>
         public double RecentVolume_LastThreeHours { get; set; }
@@ -700,7 +700,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Sum of volumes from minute candlesticks in the last month, in contracts.
-        /// Sourced from <see cref="MarketData.RecentVolume_LastMonth"/>, calculated by <see cref="CandlestickService.PopulateMarketDataAsync"/> using minute candlesticks' <see cref="CandlestickData.Volume"/>.
+        /// Sourced from MarketData.RecentVolume_LastMonth, calculated by CandlestickService.PopulateMarketDataAsync using minute candlesticks' CandlestickData.Volume.
         /// 0 if no recent data or volume.
         /// </remarks>
         public double RecentVolume_LastMonth { get; set; }
@@ -712,9 +712,9 @@ namespace BacklashDTOs
         /// Gets or sets the velocity of order book changes for bottom "Yes" bid prices, in dollars per minute.
         /// </summary>
         /// <remarks>
-        /// Rate of change for "Yes" bid prices below 90% of <see cref="MarketData.BestYesBid"/>.
-        /// Sourced from <see cref="MarketData.VelocityPerMinute_Bottom_Yes_Bid"/>, computed by <see cref="OrderbookChangeTracker.GetBottomYesVelocityPerMinute"/>.
-        /// Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in <see cref="LevelCount_Bottom_Yes_Bid"/>.
+        /// Rate of change for "Yes" bid prices below 90% of MarketData.BestYesBid.
+        /// Sourced from MarketData.VelocityPerMinute_Bottom_Yes_Bid, computed by OrderbookChangeTracker.GetBottomYesVelocityPerMinute.
+        /// Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in LevelCount_Bottom_Yes_Bid.
         /// </remarks>
         public double VelocityPerMinute_Bottom_Yes_Bid { get; set; }
 
@@ -722,8 +722,8 @@ namespace BacklashDTOs
         /// Gets or sets the number of price levels for bottom "Yes" bid velocity.
         /// </summary>
         /// <remarks>
-        /// Count of "Yes" bid price levels below 90% of <see cref="MarketData.BestYesBid"/> used in <see cref="VelocityPerMinute_Bottom_Yes_Bid"/>.
-        /// Sourced from <see cref="MarketData.LevelCount_Bottom_Yes_Bid"/>, computed by <see cref="OrderbookChangeTracker.GetBottomYesVelocityPerMinute"/>.
+        /// Count of "Yes" bid price levels below 90% of MarketData.BestYesBid used in VelocityPerMinute_Bottom_Yes_Bid.
+        /// Sourced from MarketData.LevelCount_Bottom_Yes_Bid, computed by OrderbookChangeTracker.GetBottomYesVelocityPerMinute.
         /// 0 if no relevant orders.
         /// </remarks>
         public int LevelCount_Bottom_Yes_Bid { get; set; }
@@ -732,9 +732,9 @@ namespace BacklashDTOs
         /// Gets or sets the velocity of order book changes for bottom "No" bid prices, in dollars per minute.
         /// </summary>
         /// <remarks>
-        /// Rate of change for "No" bid prices below 90% of <see cref="MarketData.BestNoBid"/>.
-        /// Sourced from <see cref="MarketData.VelocityPerMinute_Bottom_No_Bid"/>, computed by <see cref="OrderbookChangeTracker.GetBottomNoVelocityPerMinute"/>.
-        /// Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in <see cref="LevelCount_Bottom_No_Bid"/>.
+        /// Rate of change for "No" bid prices below 90% of MarketData.BestNoBid.
+        /// Sourced from MarketData.VelocityPerMinute_Bottom_No_Bid, computed by OrderbookChangeTracker.GetBottomNoVelocityPerMinute.
+        /// Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in LevelCount_Bottom_No_Bid.
         /// </remarks>
         public double VelocityPerMinute_Bottom_No_Bid { get; set; }
 
@@ -742,8 +742,8 @@ namespace BacklashDTOs
         /// Gets or sets the number of price levels for bottom "No" bid velocity.
         /// </summary>
         /// <remarks>
-        /// Count of "No" bid price levels below 90% of <see cref="MarketData.BestNoBid"/> used in <see cref="VelocityPerMinute_Bottom_No_Bid"/>.
-        /// Sourced from <see cref="MarketData.LevelCount_Bottom_No_Bid"/>, computed by <see cref="OrderbookChangeTracker.GetBottomNoVelocityPerMinute"/>.
+        /// Count of "No" bid price levels below 90% of MarketData.BestNoBid used in VelocityPerMinute_Bottom_No_Bid.
+        /// Sourced from MarketData.LevelCount_Bottom_No_Bid, computed by OrderbookChangeTracker.GetBottomNoVelocityPerMinute.
         /// 0 if no relevant orders.
         /// </remarks>
         public int LevelCount_Bottom_No_Bid { get; set; }
@@ -752,9 +752,9 @@ namespace BacklashDTOs
         /// Gets or sets the velocity of order book changes for top "Yes" bid prices, in dollars per minute.
         /// </summary>
         /// <remarks>
-        /// Rate of change for "Yes" bid prices at or above 90% of <see cref="MarketData.BestYesBid"/>.
-        /// Sourced from <see cref="MarketData.VelocityPerMinute_Top_Yes_Bid"/>, computed by <see cref="OrderbookChangeTracker.GetTopYesVelocityPerMinute"/>.
-        /// Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in <see cref="LevelCount_Top_Yes_Bid"/>.
+        /// Rate of change for "Yes" bid prices at or above 90% of MarketData.BestYesBid.
+        /// Sourced from MarketData.VelocityPerMinute_Top_Yes_Bid, computed by OrderbookChangeTracker.GetTopYesVelocityPerMinute.
+        /// Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in LevelCount_Top_Yes_Bid.
         /// </remarks>
         public double VelocityPerMinute_Top_Yes_Bid { get; set; }
 
@@ -762,8 +762,8 @@ namespace BacklashDTOs
         /// Gets or sets the number of price levels for top "Yes" bid velocity.
         /// </summary>
         /// <remarks>
-        /// Count of "Yes" bid price levels at or above 90% of <see cref="MarketData.BestYesBid"/> used in <see cref="VelocityPerMinute_Top_Yes_Bid"/>.
-        /// Sourced from <see cref="MarketData.LevelCount_Top_Yes_Bid"/>, computed by <see cref="OrderbookChangeTracker.GetTopYesVelocityPerMinute"/>.
+        /// Count of "Yes" bid price levels at or above 90% of MarketData.BestYesBid used in VelocityPerMinute_Top_Yes_Bid.
+        /// Sourced from MarketData.LevelCount_Top_Yes_Bid, computed by OrderbookChangeTracker.GetTopYesVelocityPerMinute.
         /// 0 if no relevant orders.
         /// </remarks>
         public int LevelCount_Top_Yes_Bid { get; set; }
@@ -772,9 +772,9 @@ namespace BacklashDTOs
         /// Gets or sets the velocity of order book changes for top "No" bid prices, in dollars per minute.
         /// </summary>
         /// <remarks>
-        /// Rate of change for "No" bid prices at or above 90% of <see cref="MarketData.BestNoBid"/>.
-        /// Sourced from <see cref="MarketData.VelocityPerMinute_Top_No_Bid"/>, computed by <see cref="OrderbookChangeTracker.GetTopNoVelocityPerMinute"/>.
-        /// Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in <see cref="LevelCount_Top_No_Bid"/>.
+        /// Rate of change for "No" bid prices at or above 90% of MarketData.BestNoBid.
+        /// Sourced from MarketData.VelocityPerMinute_Top_No_Bid, computed by OrderbookChangeTracker.GetTopNoVelocityPerMinute.
+        /// Sums dollar value (price/100 * delta contracts) of changes, divided by elapsed minutes. 0 if no changes. Levels in LevelCount_Top_No_Bid.
         /// </remarks>
         public double VelocityPerMinute_Top_No_Bid { get; set; }
 
@@ -782,8 +782,8 @@ namespace BacklashDTOs
         /// Gets or sets the number of price levels for top "No" bid velocity.
         /// </summary>
         /// <remarks>
-        /// Count of "No" bid price levels at or above 90% of <see cref="MarketData.BestNoBid"/> used in <see cref="VelocityPerMinute_Top_No_Bid"/>.
-        /// Sourced from <see cref="MarketData.LevelCount_Top_No_Bid"/>, computed by <see cref="OrderbookChangeTracker.GetTopNoVelocityPerMinute"/>.
+        /// Count of "No" bid price levels at or above 90% of MarketData.BestNoBid used in VelocityPerMinute_Top_No_Bid.
+        /// Sourced from MarketData.LevelCount_Top_No_Bid, computed by OrderbookChangeTracker.GetTopNoVelocityPerMinute.
         /// 0 if no relevant orders.
         /// </remarks>
         public int LevelCount_Top_No_Bid { get; set; }
@@ -797,7 +797,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Total orderbook depth, in cents
-        /// Sourced from <see cref="MarketData.OrderbookData"/>.
+        /// Sourced from MarketData.OrderbookData.
         /// 0 if no "Yes" bid orders.
         /// </remarks>
         public long TotalOrderbookDepth_Yes { get; set; }
@@ -807,7 +807,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Total orderbook depth, in cents
-        /// Sourced from <see cref="MarketData.OrderbookData"/>.
+        /// Sourced from MarketData.OrderbookData.
         /// 0 if no "Yes" bid orders.
         /// </remarks>
         public long TotalOrderbookDepth_No { get; set; }
@@ -817,7 +817,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Highest price offered to buy "Yes" contracts, in cents.
-        /// Sourced from <see cref="MarketData.BestYesBid"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Sourced from MarketData.BestYesBid, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// 0 if no "Yes" bid orders.
         /// </remarks>
         public int BestYesBid { get; set; }
@@ -827,7 +827,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Highest price offered to buy "No" contracts, in cents.
-        /// Sourced from <see cref="MarketData.BestNoBid"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Sourced from MarketData.BestNoBid, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// 0 if no "No" bid orders.
         /// </remarks>
         public int BestNoBid { get; set; }
@@ -838,7 +838,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Highest price offered to buy "Yes" contracts, in cents. This is the dollars version of the price which is included to ease the transition later.
-        /// Sourced from <see cref="MarketData.BestYesBid"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Sourced from MarketData.BestYesBid, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// 0 if no "Yes" bid orders.
         /// </remarks>
         public double BestYesBidD { get; set; }
@@ -848,7 +848,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Highest price offered to buy "No" contracts, in cents.
-        /// Sourced from <see cref="MarketData.BestNoBid"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Sourced from MarketData.BestNoBid, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// 0 if no "No" bid orders.
         /// </remarks>
         public double BestNoBidD { get; set; }
@@ -858,7 +858,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Lowest price offered to sell "Yes" contracts (equals best "No" bid), in cents.
-        /// Sourced from <see cref="MarketData.BestYesAsk"/>, computed from <see cref="MarketData.OrderbookData"/>.
+        /// Sourced from MarketData.BestYesAsk, computed from MarketData.OrderbookData.
         /// 0 if no "No" bid orders.
         /// </remarks>
         public int BestYesAsk { get { return (100 - BestNoBid); } }
@@ -868,7 +868,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Lowest price offered to sell "No" contracts (equals best "Yes" bid), in cents.
-        /// Sourced from <see cref="MarketData.BestNoAsk"/>, computed from <see cref="MarketData.OrderbookData"/>.
+        /// Sourced from MarketData.BestNoAsk, computed from MarketData.OrderbookData.
         /// 0 if no "Yes" bid orders.
         /// </remarks>
         public int BestNoAsk { get { return (100 - BestYesBid); } }
@@ -877,8 +877,8 @@ namespace BacklashDTOs
         /// Gets or sets the spread between "Yes" ask and bid prices.
         /// </summary>
         /// <remarks>
-        /// Difference between <see cref="BestYesAsk"/> and <see cref="BestYesBid"/>, in cents.
-        /// Sourced from <see cref="MarketData.YesSpread"/>. 0 if no orders.
+        /// Difference between BestYesAsk and BestYesBid, in cents.
+        /// Sourced from MarketData.YesSpread. 0 if no orders.
         /// </remarks>
         public int YesSpread { get; set; }
 
@@ -886,8 +886,8 @@ namespace BacklashDTOs
         /// Gets or sets the spread between "No" ask and bid prices.
         /// </summary>
         /// <remarks>
-        /// Difference between <see cref="BestNoAsk"/> and <see cref="BestNoBid"/>, in cents.
-        /// Sourced from <see cref="MarketData.NoSpread"/>. 0 if no orders.
+        /// Difference between BestNoAsk and BestNoBid, in cents.
+        /// Sourced from MarketData.NoSpread. 0 if no orders.
         /// </remarks>
         public int NoSpread { get; set; }
 
@@ -895,8 +895,8 @@ namespace BacklashDTOs
         /// Gets or sets the number of resting contracts at the best "Yes" bid price.
         /// </summary>
         /// <remarks>
-        /// Total contracts at <see cref="BestYesBid"/>.
-        /// Sourced from <see cref="MarketData.DepthAtBestYesBid"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Total contracts at BestYesBid.
+        /// Sourced from MarketData.DepthAtBestYesBid, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// 0 if no "Yes" bid orders.
         /// </remarks>
         public int DepthAtBestYesBid { get; set; }
@@ -905,8 +905,8 @@ namespace BacklashDTOs
         /// Gets or sets the number of resting contracts at the best "No" bid price.
         /// </summary>
         /// <remarks>
-        /// Total contracts at <see cref="BestNoBid"/>.
-        /// Sourced from <see cref="MarketData.DepthAtBestNoBid"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Total contracts at BestNoBid.
+        /// Sourced from MarketData.DepthAtBestNoBid, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// 0 if no "No" bid orders.
         /// </remarks>
         public int DepthAtBestNoBid { get; set; }
@@ -916,8 +916,8 @@ namespace BacklashDTOs
         /// Gets or sets the cumulative resting contracts for "Yes" bid orders within tolerance.
         /// </summary>
         /// <remarks>
-        /// Total contracts for "Yes" bids within <see cref="TolerancePercentage"/> below <see cref="BestYesBid"/>.
-        /// Sourced from <see cref="MarketData.TopTenPercentLevelDepth_Yes"/>, computed by <see cref="MarketData.CalculateCumulativeDepth"/>.
+        /// Total contracts for "Yes" bids within TolerancePercentage below BestYesBid.
+        /// Sourced from MarketData.TopTenPercentLevelDepth_Yes, computed by MarketData.CalculateCumulativeDepth.
         /// 0 if no orders within range.
         /// </remarks>
         public int TopTenPercentLevelDepth_Yes { get; set; }
@@ -926,8 +926,8 @@ namespace BacklashDTOs
         /// Gets or sets the cumulative resting contracts for "No" bid orders within tolerance.
         /// </summary>
         /// <remarks>
-        /// Total contracts for "No" bids within <see cref="TolerancePercentage"/> below <see cref="BestNoBid"/>.
-        /// Sourced from <see cref="MarketData.TopTenPercentLevelDepth_No"/>, computed by <see cref="MarketData.CalculateCumulativeDepth"/>.
+        /// Total contracts for "No" bids within TolerancePercentage below BestNoBid.
+        /// Sourced from MarketData.TopTenPercentLevelDepth_No, computed by MarketData.CalculateCumulativeDepth.
         /// 0 if no orders within range.
         /// </remarks>
         public int TopTenPercentLevelDepth_No { get; set; }
@@ -937,7 +937,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Difference between highest and lowest "Yes" bid prices, in cents.
-        /// Sourced from <see cref="MarketData.BidRange_Yes"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Sourced from MarketData.BidRange_Yes, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// 0 if no "Yes" bid orders.
         /// </remarks>
         public int BidRange_Yes { get; set; }
@@ -947,7 +947,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Difference between highest and lowest "No" bid prices, in cents.
-        /// Sourced from <see cref="MarketData.BidRange_No"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Sourced from MarketData.BidRange_No, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// 0 if no "No" bid orders.
         /// </remarks>
         public int BidRange_No { get; set; }
@@ -957,7 +957,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Total contracts available for "Yes" bids.
-        /// Sourced from <see cref="MarketData.TotalBidContracts_Yes"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Sourced from MarketData.TotalBidContracts_Yes, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// 0 if no "Yes" bid orders.
         /// </remarks>
         public int TotalBidContracts_Yes { get; set; }
@@ -967,7 +967,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Total contracts available for "No" bids.
-        /// Sourced from <see cref="MarketData.TotalBidContracts_No"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Sourced from MarketData.TotalBidContracts_No, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// 0 if no "No" bid orders.
         /// </remarks>
         public int TotalBidContracts_No { get; set; }
@@ -976,8 +976,8 @@ namespace BacklashDTOs
         /// Gets or sets the imbalance between "Yes" and "No" bid contracts.
         /// </summary>
         /// <remarks>
-        /// Difference: <see cref="TotalBidContracts_Yes"/> - <see cref="TotalBidContracts_No"/>.
-        /// Sourced from <see cref="MarketData.BidImbalance"/>. Positive for "Yes" dominance, negative for "No".
+        /// Difference: TotalBidContracts_Yes - TotalBidContracts_No.
+        /// Sourced from MarketData.BidImbalance. Positive for "Yes" dominance, negative for "No".
         /// 0 if no bid orders.
         /// </remarks>
         public int BidCountImbalance { get; set; }
@@ -986,8 +986,8 @@ namespace BacklashDTOs
         /// Gets or sets the imbalance between "Yes" and "No" bid contracts * price.
         /// </summary>
         /// <remarks>
-        /// Difference: <see cref="TotalBidContracts_Yes"/> - <see cref="TotalBidContracts_No"/>.
-        /// Sourced from <see cref="MarketData.BidImbalance"/>. Positive for "Yes" dominance, negative for "No".
+        /// Difference: TotalBidContracts_Yes - TotalBidContracts_No.
+        /// Sourced from MarketData.BidImbalance. Positive for "Yes" dominance, negative for "No".
         /// 0 if no bid orders.
         /// </remarks>
         public double BidVolumeImbalance { get; set; }
@@ -997,7 +997,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Sum of contracts at four highest "Yes" bid prices.
-        /// Sourced from <see cref="MarketData.DepthAtTop4YesBids"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Sourced from MarketData.DepthAtTop4YesBids, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// Sums all levels if fewer than four. 0 if no "Yes" bid orders.
         /// </remarks>
         public int DepthAtTop4YesBids { get; set; }
@@ -1007,7 +1007,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Sum of contracts at four highest "No" bid prices.
-        /// Sourced from <see cref="MarketData.DepthAtTop4NoBids"/>, computed from <see cref="MarketData.OrderbookData"/> using <see cref="MarketData.GetBids"/>.
+        /// Sourced from MarketData.DepthAtTop4NoBids, computed from MarketData.OrderbookData using MarketData.GetBids.
         /// Sums all levels if fewer than four. 0 if no "No" bid orders.
         /// </remarks>
         public int DepthAtTop4NoBids { get; set; }
@@ -1024,8 +1024,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Momentum indicator (0-100) for "Yes" side, using minute candlesticks.
-        /// Sourced from <see cref="MarketData.RSI_Short"/>, computed by <see cref="TradingCalculator.CalculateRSI"/>.
-        /// Null if < 15 candlesticks or invalid. >70 overbought, <30 oversold.
+        /// Sourced from MarketData.RSI_Short, computed by TradingCalculator.CalculateRSI.
+        /// Null if less than 15 candlesticks or invalid. greater than 70 overbought, less than 30 oversold.
         /// </remarks>
         public double? RSI_Short { get; set; }
 
@@ -1034,8 +1034,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Momentum indicator (0-100) for "Yes" side, using hour candlesticks.
-        /// Sourced from <see cref="MarketData.RSI_Medium"/>, computed by <see cref="TradingCalculator.CalculateRSI"/>.
-        /// Null if < 15 candlesticks or invalid. >70 overbought, <30 oversold.
+        /// Sourced from MarketData.RSI_Medium, computed by TradingCalculator.CalculateRSI.
+        /// Null if less than 15 candlesticks or invalid. greater than 70 overbought, less than 30 oversold.
         /// </remarks>
         public double? RSI_Medium { get; set; }
 
@@ -1044,8 +1044,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Momentum indicator (0-100) for "Yes" side, using day candlesticks.
-        /// Sourced from <see cref="MarketData.RSI_Long"/>, computed by <see cref="TradingCalculator.CalculateRSI"/>.
-        /// Null if < 15 candlesticks or invalid. >70 overbought, <30 oversold.
+        /// Sourced from MarketData.RSI_Long, computed by TradingCalculator.CalculateRSI.
+        /// Null if less than 15 candlesticks or invalid. greater than 70 overbought, less than 30 oversold.
         /// </remarks>
         public double? RSI_Long { get; set; }
 
@@ -1054,8 +1054,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// MACD line, signal line, and histogram for trend and momentum.
-        /// Sourced from <see cref="MarketData.MACD_Medium"/>, computed by <see cref="TradingCalculator.CalculateMACD"/>.
-        /// Null if < 35 candlesticks or invalid. Uses <see cref="MACDConverter"/> for JSON.
+        /// Sourced from MarketData.MACD_Medium, computed by TradingCalculator.CalculateMACD.
+        /// Null if less than 35 candlesticks or invalid. Uses MACDConverter for JSON.
         /// </remarks>
         [JsonConverter(typeof(MACDConverter))]
         public (double? MACD, double? Signal, double? Histogram) MACD_Medium { get; set; }
@@ -1065,8 +1065,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// MACD line, signal line, and histogram for trend and momentum.
-        /// Sourced from <see cref="MarketData.MACD_Long"/>, computed by <see cref="TradingCalculator.CalculateMACD"/>.
-        /// Null if < 35 candlesticks or invalid. Uses <see cref="MACDConverter"/> for JSON.
+        /// Sourced from MarketData.MACD_Long, computed by TradingCalculator.CalculateMACD.
+        /// Null if less than 35 candlesticks or invalid. Uses MACDConverter for JSON.
         /// </remarks>
         [JsonConverter(typeof(MACDConverter))]
         public (double? MACD, double? Signal, double? Histogram) MACD_Long { get; set; }
@@ -1076,8 +1076,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Weighted moving average for "Yes" side, in cents.
-        /// Sourced from <see cref="MarketData.EMA_Medium"/>, computed by <see cref="TradingCalculator.CalculateEMA"/>.
-        /// Null if < 14 candlesticks or invalid.
+        /// Sourced from MarketData.EMA_Medium, computed by TradingCalculator.CalculateEMA.
+        /// Null if less than 14 candlesticks or invalid.
         /// </remarks>
         public double? EMA_Medium { get; set; }
 
@@ -1086,8 +1086,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Weighted moving average for "Yes" side, in cents.
-        /// Sourced from <see cref="MarketData.EMA_Long"/>, computed by <see cref="TradingCalculator.CalculateEMA"/>.
-        /// Null if < 14 candlesticks or invalid.
+        /// Sourced from MarketData.EMA_Long, computed by TradingCalculator.CalculateEMA.
+        /// Null if less than 14 candlesticks or invalid.
         /// </remarks>
         public double? EMA_Long { get; set; }
 
@@ -1096,8 +1096,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// SMA (Middle), Upper, and Lower bands for volatility.
-        /// Sourced from <see cref="MarketData.BollingerBands_Medium"/>, computed by <see cref="TradingCalculator.CalculateBollingerBands"/>.
-        /// Upper/Lower null if < 20 candlesticks or invalid, Middle may be valid. In cents. Uses <see cref="BollingerBandsConverter"/> for JSON.
+        /// Sourced from MarketData.BollingerBands_Medium, computed by TradingCalculator.CalculateBollingerBands.
+        /// Upper/Lower null if less than 20 candlesticks or invalid, Middle may be valid. In cents. Uses BollingerBandsConverter for JSON.
         /// </remarks>
         [JsonConverter(typeof(BollingerBandsConverter))]
         public (double? Lower, double? Middle, double? Upper) BollingerBands_Medium { get; set; }
@@ -1107,8 +1107,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// SMA (Middle), Upper, and Lower bands for volatility.
-        /// Sourced from <see cref="MarketData.BollingerBands_Long"/>, computed by <see cref="TradingCalculator.CalculateBollingerBands"/>.
-        /// Upper/Lower null if < 20 candlesticks or invalid, Middle may be valid. In cents. Uses <see cref="BollingerBandsConverter"/> for JSON.
+        /// Sourced from MarketData.BollingerBands_Long, computed by TradingCalculator.CalculateBollingerBands.
+        /// Upper/Lower null if less than 20 candlesticks or invalid, Middle may be valid. In cents. Uses BollingerBandsConverter for JSON.
         /// </remarks>
         [JsonConverter(typeof(BollingerBandsConverter))]
         public (double? Lower, double? Middle, double? Upper) BollingerBands_Long { get; set; }
@@ -1118,8 +1118,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Average price range for volatility, in cents.
-        /// Sourced from <see cref="MarketData.ATR_Medium"/>, computed by <see cref="TradingCalculator.CalculateATR"/>.
-        /// Null if < 15 candlesticks or invalid.
+        /// Sourced from MarketData.ATR_Medium, computed by TradingCalculator.CalculateATR.
+        /// Null if less than 15 candlesticks or invalid.
         /// </remarks>
         public double? ATR_Medium { get; set; }
 
@@ -1128,8 +1128,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Average price range for volatility, in cents.
-        /// Sourced from <see cref="MarketData.ATR_Long"/>, computed by <see cref="TradingCalculator.CalculateATR"/>.
-        /// Null if < 15 candlesticks or invalid.
+        /// Sourced from MarketData.ATR_Long, computed by TradingCalculator.CalculateATR.
+        /// Null if less than 15 candlesticks or invalid.
         /// </remarks>
         public double? ATR_Long { get; set; }
 
@@ -1138,7 +1138,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Volume-weighted average price, in cents.
-        /// Sourced from <see cref="MarketData.VWAP_Short"/>, computed by <see cref="TradingCalculator.CalculateVWAP"/>.
+        /// Sourced from MarketData.VWAP_Short, computed by TradingCalculator.CalculateVWAP.
         /// Null if insufficient data, zero volume, or invalid.
         /// </remarks>
         public double? VWAP_Short { get; set; }
@@ -1148,7 +1148,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Volume-weighted average price, in cents.
-        /// Sourced from <see cref="MarketData.VWAP_Medium"/>, computed by <see cref="TradingCalculator.CalculateVWAP"/>.
+        /// Sourced from MarketData.VWAP_Medium, computed by TradingCalculator.CalculateVWAP.
         /// Null if insufficient data, zero volume, or invalid.
         /// </remarks>
         public double? VWAP_Medium { get; set; }
@@ -1158,8 +1158,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Momentum indicator (%K, %D, 0-100) for price range.
-        /// Sourced from <see cref="MarketData.StochasticOscillator_Short"/>, computed by <see cref="TradingCalculator.CalculateStochastic"/>.
-        /// %D null if < 14 candlesticks or invalid; %K computed if possible. Uses <see cref="StochasticOscillatorConverter"/> for JSON.
+        /// Sourced from MarketData.StochasticOscillator_Short, computed by TradingCalculator.CalculateStochastic.
+        /// %D null if less than 14 candlesticks or invalid; %K computed if possible. Uses StochasticOscillatorConverter for JSON.
         /// </remarks>
         [JsonConverter(typeof(StochasticOscillatorConverter))]
         public (double? K, double? D) StochasticOscillator_Short { get; set; }
@@ -1169,8 +1169,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Momentum indicator (%K, %D, 0-100) for price range.
-        /// Sourced from <see cref="MarketData.StochasticOscillator_Medium"/>, computed by <see cref="TradingCalculator.CalculateStochastic"/>.
-        /// %D null if < 14 candlesticks or invalid; %K computed if possible. Uses <see cref="StochasticOscillatorConverter"/> for JSON.
+        /// Sourced from MarketData.StochasticOscillator_Medium, computed by TradingCalculator.CalculateStochastic.
+        /// %D null if less than 14 candlesticks or invalid; %K computed if possible. Uses StochasticOscillatorConverter for JSON.
         /// </remarks>
         [JsonConverter(typeof(StochasticOscillatorConverter))]
         public (double? K, double? D) StochasticOscillator_Medium { get; set; }
@@ -1180,8 +1180,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Momentum indicator (%K, %D, 0-100) for price range.
-        /// Sourced from <see cref="MarketData.StochasticOscillator_Long"/>, computed by <see cref="TradingCalculator.CalculateStochastic"/>.
-        /// %D null if < 14 candlesticks or invalid; %K computed if possible. Uses <see cref="StochasticOscillatorConverter"/> for JSON.
+        /// Sourced from MarketData.StochasticOscillator_Long, computed by TradingCalculator.CalculateStochastic.
+        /// %D null if less than 14 candlesticks or invalid; %K computed if possible. Uses StochasticOscillatorConverter for JSON.
         /// </remarks>
         [JsonConverter(typeof(StochasticOscillatorConverter))]
         public (double? K, double? D) StochasticOscillator_Long { get; set; }
@@ -1191,8 +1191,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Cumulative volume based on price direction.
-        /// Sourced from <see cref="MarketData.OBV_Medium"/>, computed by <see cref="TradingCalculator.CalculateOBV"/>.
-        /// 0 if < 2 candlesticks. Positive/negative for buying/selling pressure.
+        /// Sourced from MarketData.OBV_Medium, computed by TradingCalculator.CalculateOBV.
+        /// 0 if less than 2 candlesticks. Positive/negative for buying/selling pressure.
         /// </remarks>
         public long OBV_Medium { get; set; }
 
@@ -1201,8 +1201,8 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Cumulative volume based on price direction.
-        /// Sourced from <see cref="MarketData.OBV_Long"/>, computed by <see cref="TradingCalculator.CalculateOBV"/>.
-        /// 0 if < 2 candlesticks. Positive/negative for buying/selling pressure.
+        /// Sourced from MarketData.OBV_Long, computed by TradingCalculator.CalculateOBV.
+        /// 0 if less than 2 candlesticks. Positive/negative for buying/selling pressure.
         /// </remarks>
         public long OBV_Long { get; set; }
         #endregion
@@ -1213,7 +1213,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Indicates if order book change metrics are stable based on market activity duration.
-        /// Sourced from <see cref="MarketData.ChangeMetricsMature"/>, determined by <see cref="OrderbookChangeTracker.IsMature"/>.
+        /// Sourced from MarketData.ChangeMetricsMature, determined by OrderbookChangeTracker.IsMature.
         /// </remarks>
         public bool ChangeMetricsMature { get; set; }
 
@@ -1222,7 +1222,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Time since market opened, in days.
-        /// Sourced from <see cref="MarketData.MarketAge"/>. Used to assess market maturity.
+        /// Sourced from MarketData.MarketAge. Used to assess market maturity.
         /// </remarks>
         public TimeSpan? MarketAge { get; set; }
 
@@ -1231,7 +1231,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Time until market resolution, in days.
-        /// Sourced from <see cref="MarketData.TimeLeft"/>. Negative if market is closed.
+        /// Sourced from MarketData.TimeLeft. Negative if market is closed.
         /// </remarks>
         public TimeSpan? TimeLeft { get; set; }
 
@@ -1240,7 +1240,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Indicates if the market may resolve before its scheduled close.
-        /// Sourced from <see cref="MarketData.CanCloseEarly"/>. Affects trading strategy.
+        /// Sourced from MarketData.CanCloseEarly. Affects trading strategy.
         /// </remarks>
         public bool CanCloseEarly { get; set; }
 
@@ -1249,7 +1249,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Indicates the most recent update from the exchange.
-        /// Sourced from <see cref="MarketData.LastWebSocketMessageReceived"/>. MinValue if no messages.
+        /// Sourced from MarketData.LastWebSocketMessageReceived. MinValue if no messages.
         /// </remarks>
         public DateTime LastWebSocketMessageReceived { get; set; }
 
@@ -1284,7 +1284,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Time since position was opened.
-        /// Sourced from <see cref="MarketData.HoldTime"/>. 0 if no position.
+        /// Sourced from MarketData.HoldTime. 0 if no position.
         /// </remarks>
         public TimeSpan? HoldTime { get; set; }
 
@@ -1293,7 +1293,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Rate of non-trade-related "Yes" bid order changes.
-        /// Sourced from <see cref="MarketData.OrderVolumePerMinute_YesBid"/>, computed by <see cref="OrderbookChangeTracker.GetYesNetOrderRatePerMinute"/>.
+        /// Sourced from MarketData.OrderVolumePerMinute_YesBid, computed by OrderbookChangeTracker.GetYesNetOrderRatePerMinute.
         /// Sums dollar value (price/100 * delta contracts) divided by elapsed minutes.
         /// </remarks>
         public double OrderVolumePerMinute_YesBid { get; set; }
@@ -1303,7 +1303,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Rate of non-trade-related "No" bid order changes.
-        /// Sourced from <see cref="MarketData.OrderVolumePerMinute_NoBid"/>, computed by <see cref="OrderbookChangeTracker.GetNoNetOrderRatePerMinute"/>.
+        /// Sourced from MarketData.OrderVolumePerMinute_NoBid, computed by OrderbookChangeTracker.GetNoNetOrderRatePerMinute.
         /// Sums dollar value (price/100 * delta contracts) divided by elapsed minutes.
         /// </remarks>
         public double OrderVolumePerMinute_NoBid { get; set; }
@@ -1313,7 +1313,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Weighted average price of "Yes" bid orders, in cents.
-        /// Sourced from <see cref="MarketData.YesBidCenterOfMass"/>, computed from <see cref="MarketData.OrderbookData"/>.
+        /// Sourced from MarketData.YesBidCenterOfMass, computed from MarketData.OrderbookData.
         /// 0 if no orders.
         /// </remarks>
         public double YesBidCenterOfMass { get; set; }
@@ -1323,7 +1323,7 @@ namespace BacklashDTOs
         /// </summary>
         /// <remarks>
         /// Weighted average price of "No" bid orders, in cents.
-        /// Sourced from <see cref="MarketData.NoBidCenterOfMass"/>, computed from <see cref="MarketData.OrderbookData"/>.
+        /// Sourced from MarketData.NoBidCenterOfMass, computed from MarketData.OrderbookData.
         /// 0 if no orders.
         /// </remarks>
         public double NoBidCenterOfMass { get; set; }
@@ -1332,8 +1332,8 @@ namespace BacklashDTOs
         /// Gets or sets the tolerance percentage for cumulative depth calculations.
         /// </summary>
         /// <remarks>
-        /// Percentage (e.g., 5%) used to define price range for <see cref="TopTenPercentLevelDepth_Yes"/> and <see cref="TopTenPercentLevelDepth_No"/>.
-        /// Sourced from <see cref="MarketData.TolerancePercentage"/>. Typically 5%.
+        /// Percentage (e.g., 5%) used to define price range for TopTenPercentLevelDepth_Yes and TopTenPercentLevelDepth_No.
+        /// Sourced from MarketData.TolerancePercentage. Typically 5%.
         /// </remarks>
         public double TolerancePercentage { get; set; }
         #endregion

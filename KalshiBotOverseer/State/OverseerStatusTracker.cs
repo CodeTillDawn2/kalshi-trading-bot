@@ -29,7 +29,7 @@ namespace KalshiBotOverseer.State
         /// <summary>
         /// The global CancellationTokenSource used to coordinate cancellation across all overseer components.
         /// </summary>
-        private CancellationTokenSource _globalCancellationTokenSource;
+        private CancellationTokenSource _globalCancellationTokenSource = new();
 
         /// <summary>
         /// Lock object to ensure thread-safe access to the CancellationTokenSource.

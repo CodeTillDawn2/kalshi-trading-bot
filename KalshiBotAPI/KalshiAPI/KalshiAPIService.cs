@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.Json;
 
 namespace KalshiBotAPI.KalshiAPI
@@ -211,7 +212,9 @@ namespace KalshiBotAPI.KalshiAPI
                         {
                             var marketsToUpdate = new ConcurrentBag<MarketDTO>();
 
+#pragma warning disable CS1998
                             await Parallel.ForEachAsync(responseData?.Markets ?? new List<KalshiMarket>(), new ParallelOptions { CancellationToken = _statusTrackerService.GetCancellationToken() }, async (apiMarket, cancellationToken) =>
+#pragma warning restore CS1998
                             {
                                 var calcStopwatch = Stopwatch.StartNew();
                                 try
@@ -275,6 +278,7 @@ namespace KalshiBotAPI.KalshiAPI
                             using var scope = _scopeFactory.CreateScope();
                             var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
                             await context.AddOrUpdateMarkets(marketsToUpdate.ToList());
+                            await Task.CompletedTask;
                         }
                         catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key"))
                         {
@@ -442,7 +446,7 @@ namespace KalshiBotAPI.KalshiAPI
 
                 var jsonContent = JsonSerializer.Serialize(orderRequest, new JsonSerializerOptions
                 {
-                    IgnoreNullValues = true,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
                 });
                 request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
@@ -571,6 +575,11 @@ namespace KalshiBotAPI.KalshiAPI
 
                 if (seriesResponse == null) throw new Exception(url + $" returned null response. JSON: {jsonString}");
 
+                if (seriesResponse.Series == null)
+                {
+                    throw new Exception("Series response is null");
+                }
+
                 var newTags = (seriesResponse.Series.Tags ?? new List<string>())
                     .Select(tag => new SeriesTagDTO
                     {
@@ -579,7 +588,8 @@ namespace KalshiBotAPI.KalshiAPI
                     })
                     .ToList();
 
-                var newSources = (seriesResponse.Series.SettlementSources)
+                var settlementSources = seriesResponse.Series.SettlementSources ?? new List<SeriesSettlementSourceDTO>();
+                var newSources = settlementSources
                   .Select(ss => new SeriesSettlementSourceDTO
                   {
                       series_ticker = seriesResponse.Series.Ticker,
@@ -662,6 +672,11 @@ namespace KalshiBotAPI.KalshiAPI
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
+                if (eventResponse == null || eventResponse.Event == null)
+                {
+                    throw new Exception("Event response is null");
+                }
+
                 var eventDTO = new EventDTO
                 {
                     event_ticker = eventResponse.Event.EventTicker,
@@ -670,14 +685,14 @@ namespace KalshiBotAPI.KalshiAPI
                     sub_title = eventResponse.Event.SubTitle,
                     collateral_return_type = eventResponse.Event.CollateralReturnType,
                     mutually_exclusive = eventResponse.Event.MutuallyExclusive,
-                    category = eventResponse.Event.Category,
+                    category = eventResponse.Event.Category ?? "",
                     CreatedDate = DateTime.Now,
                     LastModifiedDate = DateTime.Now
                 };
 
                 await context.AddOrUpdateEvent(eventDTO);
 
-                string extractedCategory = eventResponse.Event.Category;
+                string extractedCategory = eventResponse.Event.Category ?? "";
 
                 if (withNestedMarkets && eventResponse.Event.Markets != null && eventResponse.Event.Markets.Any())
                 {
@@ -815,6 +830,12 @@ namespace KalshiBotAPI.KalshiAPI
                             jsonString,
                             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                         );
+
+                        if (responseData == null)
+                        {
+                            _logger.LogWarning("Failed to deserialize positions response");
+                            continue;
+                        }
 
                         var marketPositions = responseData.MarketPositions ?? new List<MarketPositionApi>();
                         if (marketPositions.Count > 0)
@@ -1049,6 +1070,8 @@ namespace KalshiBotAPI.KalshiAPI
                             apiCandlestick.EndPeriodTs = UnixHelper.ConvertToUnixTimestamp(now);
                         }
 
+                        if (apiCandlestick == null) return;
+
                         var candlestick = new CandlestickDTO
                         {
                             market_ticker = marketTicker,
@@ -1056,20 +1079,20 @@ namespace KalshiBotAPI.KalshiAPI
                             end_period_ts = apiCandlestick.EndPeriodTs,
                             open_interest = apiCandlestick.OpenInterest,
                             volume = apiCandlestick.Volume,
-                            price_close = apiCandlestick.Price.Close,
-                            price_high = apiCandlestick.Price.High,
-                            price_low = apiCandlestick.Price.Low,
-                            price_mean = apiCandlestick.Price.Mean,
-                            price_open = apiCandlestick.Price.Open,
-                            price_previous = apiCandlestick.Price.Previous,
-                            yes_ask_close = apiCandlestick.YesAsk.Close ?? 0,
-                            yes_ask_high = apiCandlestick.YesAsk.High ?? 0,
-                            yes_ask_low = apiCandlestick.YesAsk.Low ?? 0,
-                            yes_ask_open = apiCandlestick.YesAsk.Open ?? 0,
-                            yes_bid_close = apiCandlestick.YesBid.Close ?? 0,
-                            yes_bid_high = apiCandlestick.YesBid.High ?? 0,
-                            yes_bid_low = apiCandlestick.YesBid.Low ?? 0,
-                            yes_bid_open = apiCandlestick.YesBid.Open ?? 0
+                            price_close = apiCandlestick.Price?.Close ?? 0,
+                            price_high = apiCandlestick.Price?.High ?? 0,
+                            price_low = apiCandlestick.Price?.Low ?? 0,
+                            price_mean = apiCandlestick.Price?.Mean ?? 0,
+                            price_open = apiCandlestick.Price?.Open ?? 0,
+                            price_previous = apiCandlestick.Price?.Previous ?? 0,
+                            yes_ask_close = apiCandlestick.YesAsk?.Close ?? 0,
+                            yes_ask_high = apiCandlestick.YesAsk?.High ?? 0,
+                            yes_ask_low = apiCandlestick.YesAsk?.Low ?? 0,
+                            yes_ask_open = apiCandlestick.YesAsk?.Open ?? 0,
+                            yes_bid_close = apiCandlestick.YesBid?.Close ?? 0,
+                            yes_bid_high = apiCandlestick.YesBid?.High ?? 0,
+                            yes_bid_low = apiCandlestick.YesBid?.Low ?? 0,
+                            yes_bid_open = apiCandlestick.YesBid?.Open ?? 0
                         };
 
                         await context.AddOrUpdateCandlestick(candlestick);
@@ -1156,6 +1179,12 @@ namespace KalshiBotAPI.KalshiAPI
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                 );
 
+                if (balanceData == null)
+                {
+                    _logger.LogWarning("Failed to deserialize balance response");
+                    return 0;
+                }
+
                 _logger.LogInformation("Balance: {Balance}", balanceData.Balance);
                 return balanceData.Balance;
             }
@@ -1181,7 +1210,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// This includes information about whether the exchange is open for trading, in maintenance, or closed.
         /// </summary>
         /// <returns>The exchange status information, or an empty status object if the operation fails.</returns>
-        public async Task<ExchangeStatus?> GetExchangeStatusAsync()
+        public async Task<ExchangeStatus> GetExchangeStatusAsync()
         {
             var stopwatch = Stopwatch.StartNew();
             string url = "exchange/status";
@@ -1204,7 +1233,7 @@ namespace KalshiBotAPI.KalshiAPI
                     jsonString,
                     options
                 );
-                return statusData;
+                return statusData ?? new ExchangeStatus();
             }
             catch (OperationCanceledException)
             {
@@ -1285,6 +1314,12 @@ namespace KalshiBotAPI.KalshiAPI
                             jsonString,
                             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                         );
+
+                        if (responseData == null)
+                        {
+                            _logger.LogWarning("Failed to deserialize orders response");
+                            break;
+                        }
 
                         var orders = responseData.Orders ?? new List<OrderApi>();
                         if (orders.Count > 0)
@@ -1517,8 +1552,8 @@ namespace KalshiBotAPI.KalshiAPI
                         dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
                         {
                             DayOfWeek = "Monday",
-                            StartTime = TimeSpan.Parse(session.OpenTime),
-                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            StartTime = TimeSpan.Parse(session.OpenTime ?? "00:00:00"),
+                            EndTime = TimeSpan.Parse(session.CloseTime ?? "00:00:00"),
                             CreatedDate = DateTime.Now,
                             LastModifiedDate = DateTime.Now
                         });
@@ -1530,8 +1565,8 @@ namespace KalshiBotAPI.KalshiAPI
                         dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
                         {
                             DayOfWeek = "Tuesday",
-                            StartTime = TimeSpan.Parse(session.OpenTime),
-                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            StartTime = TimeSpan.Parse(session.OpenTime ?? "00:00:00"),
+                            EndTime = TimeSpan.Parse(session.CloseTime ?? "00:00:00"),
                             CreatedDate = DateTime.Now,
                             LastModifiedDate = DateTime.Now
                         });
@@ -1543,8 +1578,8 @@ namespace KalshiBotAPI.KalshiAPI
                         dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
                         {
                             DayOfWeek = "Wednesday",
-                            StartTime = TimeSpan.Parse(session.OpenTime),
-                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            StartTime = TimeSpan.Parse(session.OpenTime ?? "00:00:00"),
+                            EndTime = TimeSpan.Parse(session.CloseTime ?? "00:00:00"),
                             CreatedDate = DateTime.Now,
                             LastModifiedDate = DateTime.Now
                         });
@@ -1556,8 +1591,8 @@ namespace KalshiBotAPI.KalshiAPI
                         dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
                         {
                             DayOfWeek = "Thursday",
-                            StartTime = TimeSpan.Parse(session.OpenTime),
-                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            StartTime = TimeSpan.Parse(session.OpenTime ?? "00:00:00"),
+                            EndTime = TimeSpan.Parse(session.CloseTime ?? "00:00:00"),
                             CreatedDate = DateTime.Now,
                             LastModifiedDate = DateTime.Now
                         });
@@ -1569,8 +1604,8 @@ namespace KalshiBotAPI.KalshiAPI
                         dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
                         {
                             DayOfWeek = "Friday",
-                            StartTime = TimeSpan.Parse(session.OpenTime),
-                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            StartTime = TimeSpan.Parse(session.OpenTime ?? "00:00:00"),
+                            EndTime = TimeSpan.Parse(session.CloseTime ?? "00:00:00"),
                             CreatedDate = DateTime.Now,
                             LastModifiedDate = DateTime.Now
                         });
@@ -1582,8 +1617,8 @@ namespace KalshiBotAPI.KalshiAPI
                         dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
                         {
                             DayOfWeek = "Saturday",
-                            StartTime = TimeSpan.Parse(session.OpenTime),
-                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            StartTime = TimeSpan.Parse(session.OpenTime ?? "00:00:00"),
+                            EndTime = TimeSpan.Parse(session.CloseTime ?? "00:00:00"),
                             CreatedDate = DateTime.Now,
                             LastModifiedDate = DateTime.Now
                         });
@@ -1595,8 +1630,8 @@ namespace KalshiBotAPI.KalshiAPI
                         dtoStandardHours.Sessions.Add(new StandardHoursSessionDTO
                         {
                             DayOfWeek = "Sunday",
-                            StartTime = TimeSpan.Parse(session.OpenTime),
-                            EndTime = TimeSpan.Parse(session.CloseTime),
+                            StartTime = TimeSpan.Parse(session.OpenTime ?? "00:00:00"),
+                            EndTime = TimeSpan.Parse(session.CloseTime ?? "00:00:00"),
                             CreatedDate = DateTime.Now,
                             LastModifiedDate = DateTime.Now
                         });
@@ -1851,7 +1886,7 @@ namespace KalshiBotAPI.KalshiAPI
 
                 var jsonContent = JsonSerializer.Serialize(request, new JsonSerializerOptions
                 {
-                    IgnoreNullValues = true,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
                 });
                 httpRequest.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
@@ -1909,7 +1944,7 @@ namespace KalshiBotAPI.KalshiAPI
 
                 var jsonContent = JsonSerializer.Serialize(request, new JsonSerializerOptions
                 {
-                    IgnoreNullValues = true,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
                 });
                 httpRequest.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");

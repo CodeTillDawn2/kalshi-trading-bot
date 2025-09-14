@@ -12,8 +12,6 @@ using BacklashDTOs.Configuration;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.Management.Interfaces;
-using BacklashBot.Services.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using System;
@@ -265,7 +263,7 @@ namespace KalshiBotOverseer
                 var batch = MarketsWhichAreLikelyClosed
                     .Skip(i)
                     .Take(batchSize)
-                    .Select(m => m.market_ticker)
+                    .Select(m => m.market_ticker!)
                     .ToArray();
                 (int processed, int error) = await apiService.FetchMarketsAsync(tickers: batch);
                 await Task.Delay(5000, cancellationToken);
@@ -327,6 +325,7 @@ namespace KalshiBotOverseer
             // and are no longer needed for analysis or backtesting
 
             _logger.LogInformation("OVERNIGHT-DeleteProcessedSnapshots completed (placeholder implementation).");
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -372,9 +371,9 @@ namespace KalshiBotOverseer
                 {
                     try
                     {
-                        double score = (await interestScoreHelper.CalculateMarketInterestScoreAsync(context, market.market_ticker)).score;
+                        double score = (await interestScoreHelper.CalculateMarketInterestScoreAsync(context, market.market_ticker!)).score;
 
-                        MarketWatchDTO? marketWatch = await context.GetMarketWatch(market.market_ticker);
+                        MarketWatchDTO? marketWatch = await context.GetMarketWatch(market.market_ticker!);
 
                         if (marketWatch == null)
                         {

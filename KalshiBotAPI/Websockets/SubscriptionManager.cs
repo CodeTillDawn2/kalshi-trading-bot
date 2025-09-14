@@ -128,6 +128,7 @@ namespace KalshiBotAPI.Websockets
             _pendingConfirmationMonitorTask = Task.Run(() => CheckPendingConfirmationsAsync(), _processingCancellationToken);
             _orderBookQueueProcessorTask = Task.Run(() => ProcessOrderBookQueuePeriodicallyAsync(), _processingCancellationToken);
             _healthMonitorTask = Task.Run(() => MonitorSubscriptionHealthAsync(), _processingCancellationToken);
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -585,7 +586,7 @@ namespace KalshiBotAPI.Websockets
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to update subscription for {Channel}, action={Action}, markets={Markets}",
-                    channel, string.Join(", ", marketTickers));
+                    channel, action, string.Join(", ", marketTickers));
                 throw;
             }
             finally
@@ -1192,6 +1193,8 @@ namespace KalshiBotAPI.Websockets
             {
                 _logger.LogWarning("Received confirmation for unknown channel {Channel}", channel);
             }
+
+            await Task.CompletedTask;
         }
 
         /// <summary>
