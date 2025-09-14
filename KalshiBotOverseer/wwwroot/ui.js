@@ -508,7 +508,7 @@ function setupActiveTabRefresh(tabName) {
     }
 
     // Set up the refresh timer using the configured interval
-    const refreshInterval = CONFIG.REFRESH_INTERVALS.GLOBAL; // Use the global interval (30 seconds)
+    const refreshInterval = getRefreshInterval(tabName.toUpperCase()) || CONFIG.REFRESH_INTERVALS.GLOBAL;
     if (refreshInterval > 0) {
         activeTabRefreshTimer = setInterval(refreshFunction, refreshInterval);
         logWithTimestamp('info', `Set up active tab refresh for ${tabName}: ${refreshInterval}ms`);

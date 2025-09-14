@@ -59,7 +59,7 @@ const CONFIG = {
     // Default application behavior settings
     DEFAULT_PAGE_SIZE: 50,              // Default items per page in grids
 
-    // UI Refresh Intervals (in milliseconds)
+    // UI Refresh Intervals (in milliseconds) - Now configurable via backend and user preferences
     REFRESH_INTERVALS: {
         GLOBAL: 30000,                  // 30 seconds - Global data refresh interval
         MARKETS: 30000,                 // 30 seconds - Markets tab refresh interval
@@ -69,6 +69,14 @@ const CONFIG = {
         SNAPSHOTS: 30000,               // 30 seconds - Snapshots tab refresh interval
         CHART: 30000,                   // 30 seconds - Chart modal refresh interval
         ACCOUNT: 30000                  // 30 seconds - Account data refresh interval
+    },
+
+    // Backend integration settings for new features
+    DASHBOARD: {
+        ERROR_REPORTING_ENABLED: true,
+        PERFORMANCE_METRICS_ENABLED: true,
+        MIN_REFRESH_INTERVAL: 5000,     // 5 seconds minimum
+        MAX_REFRESH_INTERVAL: 300000    // 5 minutes maximum
     },
 
     // Legacy compatibility - maintain existing intervals
