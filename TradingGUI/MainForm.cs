@@ -10,10 +10,21 @@ using TradingStrategies.Strategies.Strategies.Strats;
 using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Trading.Helpers;
 
-// Config class for remembering user selections
+/// <summary>
+/// Configuration class for persisting user selections in the Trading GUI.
+/// Stores the last selected strategy and weight set to maintain user preferences
+/// across application sessions.
+/// </summary>
 public class TradingGUIConfig
 {
+    /// <summary>
+    /// Gets or sets the name of the last selected trading strategy.
+    /// </summary>
     public string? LastSelectedStrategy { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the last selected weight set for the strategy.
+    /// </summary>
     public string? LastSelectedWeightSet { get; set; }
 }
 
@@ -55,6 +66,9 @@ namespace SimulatorWinForms
         private (double xMin, double xMax, double yMin, double yMax) _savedChartLimits;
 
         private SnapshotViewer? _snapshotViewer;
+
+        // Progress indicator for long-running operations
+        private ProgressBar? _progressBar;
 
         // Original dimensions for scaling reference
         private const int OriginalWidth = 1100;
@@ -150,6 +164,11 @@ namespace SimulatorWinForms
             await InitializeStrategyControls();
         }
 
+        /// <summary>
+        /// Resets the PnL (Profit and Loss) values for the specified markets in the UI grid.
+        /// Clears both the internal tracking dictionary and the visual display.
+        /// </summary>
+        /// <param name="markets">Collection of market names to reset PnL for.</param>
         private void ResetPnLForMarkets(IEnumerable<string> markets)
         {
             if (dgvMarkets.InvokeRequired)
@@ -235,7 +254,7 @@ namespace SimulatorWinForms
                             var canonical = Path.Combine(_cacheDir, $"{b}.json");
                             if (File.Exists(canonical))
                             {
-                                var json = File.ReadAllText(canonical);
+                                var json = await File.ReadAllTextAsync(canonical);
                                 var cd = JsonSerializer.Deserialize<CachedMarketData>(json);
                                 if (cd != null)
                                 {
@@ -250,7 +269,7 @@ namespace SimulatorWinForms
                                 double sum = 0;
                                 foreach (var p in parts)
                                 {
-                                    var pj = File.ReadAllText(p);
+                                    var pj = await File.ReadAllTextAsync(p);
                                     var d = JsonSerializer.Deserialize<CachedMarketData>(pj);
                                     if (d != null)
                                     {
@@ -283,6 +302,10 @@ namespace SimulatorWinForms
             }
         }
 
+        /// <summary>
+        /// Restores the checkbox states in the market grid based on the internal tracking set.
+        /// Ensures that the UI reflects the current selection state after operations like sorting.
+        /// </summary>
         private void RestoreCheckboxes()
         {
             foreach (DataGridViewRow row in dgvMarkets.Rows)
@@ -293,6 +316,12 @@ namespace SimulatorWinForms
             }
         }
 
+        /// <summary>
+        /// Handles changes to market selection checkboxes in the grid.
+        /// Updates the internal tracking set when users check or uncheck market rows.
+        /// </summary>
+        /// <param name="sender">The DataGridView that triggered the event.</param>
+        /// <param name="e">Event arguments containing row and column information.</param>
         private void HandleMarketCheckStateChanged(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == dgvMarkets.Columns["CheckedCol"].Index)
@@ -532,6 +561,14 @@ namespace SimulatorWinForms
             ResetPnLForMarkets(sel);
 
             EnsureSimulatorSetup();
+
+            // Show and initialize progress bar
+            if (_progressBar != null)
+            {
+                _progressBar.Visible = true;
+                _progressBar.Value = 0;
+            }
+
             try
             {
                 string? selectedStrategy = _strategyTypeComboBox?.SelectedItem?.ToString();
@@ -555,6 +592,10 @@ namespace SimulatorWinForms
 
                 AppendLog($"Found {allWeightSets.Count} weight sets to run: {string.Join(", ", allWeightSets)}");
 
+                // Set up progress tracking
+                int totalSteps = allWeightSets.Count;
+                int currentStep = 0;
+
                 // Run each weight set for all selected markets
                 foreach (var weightSet in allWeightSets)
                 {
@@ -567,6 +608,13 @@ namespace SimulatorWinForms
                         marketsToRun: sel);
 
                     AppendLog($"Completed {weightSet} for all markets");
+
+                    // Update progress
+                    currentStep++;
+                    if (_progressBar != null)
+                    {
+                        _progressBar.Value = (int)((double)currentStep / totalSteps * 100);
+                    }
                 }
 
                 AppendLog($"Completed running all {allWeightSets.Count} weight sets for {selectedStrategy}");
@@ -575,6 +623,12 @@ namespace SimulatorWinForms
             {
                 _simulator.TearDown();
                 _simSetup = false;
+
+                // Hide progress bar
+                if (_progressBar != null)
+                {
+                    _progressBar.Visible = false;
+                }
             }
         }
 
@@ -591,18 +645,43 @@ namespace SimulatorWinForms
             ResetPnLForMarkets(sel);
 
             EnsureSimulatorSetup();
+
+            // Show and initialize progress bar
+            if (_progressBar != null)
+            {
+                _progressBar.Visible = true;
+                _progressBar.Value = 0;
+            }
+
             try
             {
+                AppendLog("Starting specific set simulation...");
+
                 await _simulator.RunSelectedSetForGuiAsync(
                     setKey: "TryAgain",
                     weightName: "TryAgain_S091",
                     writeToFile: true,
                     marketsToRun: sel);
+
+                AppendLog("Specific set simulation completed.");
+
+                // Update progress to complete
+                if (_progressBar != null)
+                {
+                    _progressBar.Value = 100;
+                }
             }
             finally
             {
                 _simulator.TearDown();
                 _simSetup = false;
+
+                // Hide progress bar after a short delay
+                if (_progressBar != null)
+                {
+                    await Task.Delay(500); // Brief delay to show completion
+                    _progressBar.Visible = false;
+                }
             }
         }
 
@@ -613,12 +692,12 @@ namespace SimulatorWinForms
         /// in OADate form is passed to the dashboard for potential use (not used
         /// currently but reserved for future enhancements).
         /// </summary>
-        private void HandleChartMouseDown(object? sender, MouseEventArgs e)
+        private async void HandleChartMouseDown(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
                 double xVal = formsPlot1.Plot.GetCoordinateX(e.X);
-                ShowDashboardAt(xVal);
+                await ShowDashboardAt(xVal);
                 return;
             }
 
@@ -650,7 +729,7 @@ namespace SimulatorWinForms
         /// the main form content with the dashboard for detailed analysis.
         /// </summary>
         /// <param name="xOADate">The x-coordinate in OADate format where the user clicked on the chart.</param>
-        private void ShowDashboardAt(double xOADate)
+        private async Task ShowDashboardAt(double xOADate)
         {
             _savedChartLimits = (formsPlot1.Plot.GetAxisLimits().XMin, formsPlot1.Plot.GetAxisLimits().XMax, formsPlot1.Plot.GetAxisLimits().YMin, formsPlot1.Plot.GetAxisLimits().YMax);
 
@@ -704,7 +783,7 @@ namespace SimulatorWinForms
 
                 if (matchingFiles.Any())
                 {
-                    var json = File.ReadAllText(matchingFiles.First());
+                    var json = await File.ReadAllTextAsync(matchingFiles.First());
                     var cd = JsonSerializer.Deserialize<CachedMarketData>(json);
                     if (cd != null)
                     {
@@ -734,7 +813,7 @@ namespace SimulatorWinForms
                     var canonical = Path.Combine(_cacheDir, $"{marketName}.json");
                     if (File.Exists(canonical))
                     {
-                        var json = File.ReadAllText(canonical);
+                        var json = await File.ReadAllTextAsync(canonical);
                         var cd = JsonSerializer.Deserialize<CachedMarketData>(json);
                         if (cd != null)
                         {
@@ -881,6 +960,17 @@ namespace SimulatorWinForms
 
         private async Task InitializeStrategyControls()
         {
+            // Create progress bar for long-running operations
+            _progressBar = new ProgressBar
+            {
+                Size = new Size(200, 20),
+                Visible = false,
+                Margin = new Padding(3),
+                Minimum = 0,
+                Maximum = 100,
+                Value = 0
+            };
+
             // Create strategy type ComboBox
             _strategyTypeComboBox = new ComboBox
             {
@@ -916,6 +1006,7 @@ namespace SimulatorWinForms
 
             // Add controls to buttonPanel
             // buttonPanel is declared in the designer file and should be accessible
+            buttonPanel.Controls.Add(_progressBar);
             buttonPanel.Controls.Add(_strategyTypeComboBox);
             buttonPanel.Controls.Add(_weightSetComboBox);
             buttonPanel.Controls.Add(_refreshWeightSetsButton);
@@ -1123,16 +1214,41 @@ namespace SimulatorWinForms
             // Reset UI PnL for selected markets before the run
             ResetPnLForMarkets(sel);
             EnsureSimulatorSetup();
+
+            // Show and initialize progress bar
+            if (_progressBar != null)
+            {
+                _progressBar.Visible = true;
+                _progressBar.Value = 0;
+            }
+
             try
             {
+                AppendLog("Starting ML training and simulation...");
+
                 await _simulator.RunMLTrainingAndSimulationForGuiAsync(
                     writeToFile: true,
                     marketsToRun: sel);
+
+                AppendLog("ML training and simulation completed.");
+
+                // Update progress to complete
+                if (_progressBar != null)
+                {
+                    _progressBar.Value = 100;
+                }
             }
             finally
             {
                 _simulator.TearDown();
                 _simSetup = false;
+
+                // Hide progress bar after a short delay
+                if (_progressBar != null)
+                {
+                    await Task.Delay(500); // Brief delay to show completion
+                    _progressBar.Visible = false;
+                }
             }
         }
     }

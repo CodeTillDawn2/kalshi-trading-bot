@@ -456,6 +456,44 @@ This document outlines the performance metrics tracked across various classes in
 - **Resource Protection**: Parallel processing limits prevent system resource exhaustion during high-volume data operations
 - **Cleanup Automation**: Scheduled cleanup operations remove old data based on retention policies and configurable intervals
 
+## TradingGUI.MainForm
+
+### Properties
+- `_progressBar`: ProgressBar - UI progress indicator control for displaying simulation operation completion percentage
+- `_progressBar.Value`: int - Current progress value (0-100) representing completion percentage of long-running operations
+- `_progressBar.Visible`: bool - Controls visibility of progress indicator during operations
+
+### Methods
+- `LoadCache()`: Task - Asynchronous market data loading operation with improved UI responsiveness through non-blocking file I/O
+- `ShowDashboardAt()`: Task - Asynchronous dashboard display operation with non-blocking file reading for cached market data
+- `HandleRunSimulation()`: void - Simulation execution with progress tracking and UI feedback
+- `HandleRunSpecificSet()`: void - Specific strategy set execution with progress indication
+- `HandleRunMLTraining()`: void - ML training execution with progress monitoring
+
+### Performance Metrics Features
+- **Async File Operations**: File.ReadAllTextAsync() replaces synchronous File.ReadAllText() to prevent UI thread blocking during large data loads
+- **Progress Tracking**: Real-time progress updates during multi-weight-set simulations using currentStep/totalSteps ratio calculation
+- **UI Responsiveness**: Non-blocking operations ensure main form remains responsive during data-intensive operations
+- **Memory Efficiency**: Progress bar control minimizes memory overhead while providing user feedback
+- **Operation Completion Feedback**: Automatic progress bar hiding after operation completion with brief delay for visual confirmation
+
+### Distinct Return Types (Deconstructed)
+
+#### Primitive Types
+- `int` (ProgressBar.Value, currentStep counter, totalSteps counter) - Used for progress calculation and UI updates
+- `bool` (ProgressBar.Visible, operation completion flags) - Controls UI state during operations
+
+#### Non-Primitive Types
+- `ProgressBar` (System.Windows.Forms.ProgressBar) - Windows Forms control for visual progress indication containing:
+  - `Value`: int - Current progress value (0-100)
+  - `Visible`: bool - UI visibility state
+  - `Minimum`: int - Minimum progress value (fixed at 0)
+  - `Maximum`: int - Maximum progress value (fixed at 100)
+- `Task` (System.Threading.Tasks.Task) - Asynchronous operation result for non-blocking UI operations
+- `Dictionary<string, double>` (_bestPnL) - Market PnL tracking with string keys (market tickers) and double values (PnL amounts)
+- `HashSet<string>` (_checkedMarketNames) - Collection of selected market names for UI state management
+- `List<string>` (GetCheckedMarkets() return) - Array-backed list of currently selected market tickers
+
 ## BacklashBot.Services.WebSocketMonitorService
 
 ### Properties
