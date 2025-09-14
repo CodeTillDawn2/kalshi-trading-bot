@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
@@ -10,6 +11,7 @@ using TradingStrategies.Trading.Helpers;
 using TradingStrategies.Trading.Overseer;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Trading.Overseer.ReportGenerator;
+using System.Diagnostics;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -41,9 +43,19 @@ namespace TradingStrategies.Trading.Overseer
         {
             _marketTypeService = new MarketTypeService();
             _patternDetectionService = new PatternDetectionService();
-        }
+       }
 
-        /// <summary>
+       /// <summary>
+       /// Gets the execution time of the last simulation run.
+       /// </summary>
+       public TimeSpan LastExecutionTime { get; private set; }
+
+       /// <summary>
+       /// Gets the approximate memory usage difference of the last simulation run.
+       /// </summary>
+       public long LastMemoryUsed { get; private set; }
+
+       /// <summary>
         /// Executes a complete trading simulation against a sequence of market snapshots.
         /// </summary>
         /// <param name="scenario">The trading scenario containing strategies organized by market conditions.</param>
@@ -57,6 +69,7 @@ namespace TradingStrategies.Trading.Overseer
         /// 3. Manages order book state, position tracking, and cash flow
         /// 4. Generates detailed event logs for analysis
         /// 5. Handles strategy branching in multi-strategy mode
+        /// 6. Collects performance metrics (execution time and memory usage)
         ///
         /// The simulation supports realistic trading mechanics including:
         /// - Order book depth changes and fill simulation
@@ -66,7 +79,12 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         public List<SimulationPath> RunSimulation(Scenario scenario, List<MarketSnapshot> snapshots, bool isSingleStrategy)
         {
-            if (snapshots == null || snapshots.Count == 0) return new List<SimulationPath>();
+            if (scenario == null) throw new ArgumentNullException(nameof(scenario));
+            if (snapshots == null) throw new ArgumentNullException(nameof(snapshots));
+            if (scenario.StrategiesByMarketConditions == null) throw new ArgumentException("Scenario StrategiesByMarketConditions cannot be null");
+            var stopwatch = Stopwatch.StartNew();
+            long memoryBefore = GC.GetTotalMemory(false);
+            if (snapshots.Count == 0) return new List<SimulationPath>();
 
             var initialStrategiesByMarketConditions = scenario.StrategiesByMarketConditions.ToDictionary(
                 kvp => kvp.Key,
@@ -125,6 +143,10 @@ namespace TradingStrategies.Trading.Overseer
                 prevSnapshot = snapshot;
             }
 
+            stopwatch.Stop();
+            long memoryAfter = GC.GetTotalMemory(false);
+            LastExecutionTime = stopwatch.Elapsed;
+            LastMemoryUsed = memoryAfter - memoryBefore;
             return activePaths;
         }
 
