@@ -49,7 +49,7 @@ namespace BacklashBot.Hubs
             }
         }
 
-        public override async Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception? exception)
         {
             lock (_connectedClients)
             {

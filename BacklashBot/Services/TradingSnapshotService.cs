@@ -338,6 +338,7 @@ namespace BacklashBot.Services
                 stopwatch.Stop();
                 _logger.LogInformation("Snapshot load operation completed in {ElapsedMilliseconds}ms for {TotalSnapshots} snapshots across {MarketCount} markets",
                     stopwatch.ElapsedMilliseconds, snapshots.Count, result.Count);
+                await Task.CompletedTask;
                 return result;
             }
             catch (Exception ex)

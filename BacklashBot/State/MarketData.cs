@@ -7,7 +7,7 @@
 /// - Current order book state with bid/ask prices and depths
 /// - Historical candlestick data across multiple timeframes (minute, hour, day)
 /// - Real-time ticker updates and price movements
-/// - Position information and P&L calculations
+/// - Position information and P&amp;L calculations
 /// - Technical indicators (RSI, MACD, Bollinger Bands, etc.)
 /// - Order book change velocities and trade metrics
 /// - Support/resistance levels and market metadata

@@ -697,6 +697,7 @@ namespace BacklashBot.Services
                 _authToken = Guid.NewGuid().ToString();
                 _authTokenExpiry = DateTime.UtcNow.AddHours(1); // Token valid for 1 hour
                 _logger.LogInformation("OVERSEER- Auth token refreshed, expires at {Expiry}", _authTokenExpiry);
+                await Task.CompletedTask;
             }
             catch (Exception ex)
             {

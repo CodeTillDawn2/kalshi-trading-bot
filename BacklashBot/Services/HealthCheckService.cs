@@ -62,6 +62,7 @@ namespace BacklashBot.Services
                 // Attempt to execute a simple query to verify database connectivity
                 // For now, assume database is healthy if no exception
                 // TODO: Implement proper database health check
+                await Task.CompletedTask;
                 return true;
             }
             catch (Exception ex)

@@ -539,7 +539,7 @@ namespace BacklashBot.Services
 
                 // Final metadata refresh
                 _logger.LogDebug("Refreshing metadata for {MarketTicker}", marketTicker);
-                marketData.RefreshAllMetadata();
+                await marketData.RefreshAllMetadata();
                 _logger.LogInformation("Completed market data population for {MarketTicker}", marketTicker);
 
                 stopwatch.Stop();

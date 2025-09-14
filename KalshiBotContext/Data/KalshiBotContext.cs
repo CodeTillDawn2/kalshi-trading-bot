@@ -413,7 +413,8 @@ namespace KalshiBotData.Data
         /// </remarks>
         public async Task<HashSet<string>> GetMarketsWithSnapshots()
         {
-            return await Snapshots.AsNoTracking().Select(x => x.MarketTicker).Distinct().ToHashSetAsync();
+            var list = await Snapshots.AsNoTracking().Select(x => x.MarketTicker).Distinct().ToListAsync();
+            return list.ToHashSet();
         }
 
         /// <summary>
@@ -426,14 +427,15 @@ namespace KalshiBotData.Data
         /// </remarks>
         public async Task<HashSet<string>> GetInactiveMarketsWithNoSnapshots()
         {
-            return await Markets.AsNoTracking()
+            var list = await Markets.AsNoTracking()
                 .GroupJoin(Snapshots,
                     m => m.market_ticker,
                     s => s.MarketTicker,
                     (m, s) => new { Market = m, Snapshots = s })
                 .Where(ms => ms.Market.status != KalshiConstants.Status_Active && !ms.Snapshots.Any())
                 .Select(ms => ms.Market.market_ticker)
-                .ToHashSetAsync();
+                .ToListAsync();
+            return list.ToHashSet();
         }
 
         public async Task<HashSet<string>> GetInactiveMarketTickersWithoutSnapshots()
@@ -451,14 +453,15 @@ namespace KalshiBotData.Data
         /// </remarks>
         public async Task<HashSet<string>> GetProcessedMarkets()
         {
-            return await Markets.AsNoTracking()
+            var list = await Markets.AsNoTracking()
                 .GroupJoin(SnapshotGroups,
                     m => m.market_ticker,
                     s => s.MarketTicker,
                     (m, s) => new { Market = m, SnapshotGroups = s })
                 .Where(ms => ms.Market.status != KalshiConstants.Status_Active && ms.SnapshotGroups.Any())
                 .Select(ms => ms.Market.market_ticker)
-                .ToHashSetAsync();
+                .ToListAsync();
+            return list.ToHashSet();
         }
 
         public async Task AddOrUpdateMarket(MarketDTO dto)
@@ -877,7 +880,8 @@ namespace KalshiBotData.Data
                 query = query.Where(x => x.InterestScore == null || x.InterestScore <= maxInterestScore);
             if (maxInterestScoreDate != null)
                 query = query.Where(x => x.InterestScoreDate != null && x.InterestScoreDate <= maxInterestScoreDate);
-            return await query.Select(x => x.ToMarketWatchDTO()).ToHashSetAsync();
+            var list = await query.Select(x => x.ToMarketWatchDTO()).ToListAsync();
+            return list.ToHashSet();
         }
 
         public async Task RemoveClosedWatches()
@@ -1345,7 +1349,8 @@ namespace KalshiBotData.Data
 
         public async Task<HashSet<string>> GetSnapshotGroupNames()
         {
-            return await SnapshotGroups.AsNoTracking().Select(x => x.MarketTicker).Distinct().ToHashSetAsync();
+            var list = await SnapshotGroups.AsNoTracking().Select(x => x.MarketTicker).Distinct().ToListAsync();
+            return list.ToHashSet();
         }
 
 
