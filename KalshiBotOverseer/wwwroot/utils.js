@@ -83,34 +83,135 @@ function getStatusColor(status) {
 
 /**
  * Sends log messages to the backend for persistent storage
+ *
+ * PERFORMANCE & RELIABILITY CONSIDERATIONS:
+ * - Early returns prevent unnecessary network calls
+ * - Message truncation prevents payload size issues
+ * - Async operation doesn't block UI thread
+ * - Graceful error handling prevents logging failures from breaking app
+ *
  * @param {string} message - Log message to send
  * @param {string} level - Log level (defaults to 'info')
  */
 async function logToBackend(message, level = 'info') {
+    // PERFORMANCE: Early return if backend logging disabled
+    // Saves network round-trip and server processing
+    if (!CONFIG.LOGGING.ENABLED_TYPES.BACKEND) {
+        return;
+    }
+
+    // PERFORMANCE: Early return if this log level disabled
+    // Prevents processing of unwanted log levels
+    if (!CONFIG.LOGGING.ENABLED_TYPES[level.toUpperCase()]) {
+        return;
+    }
+
+    // RELIABILITY: Truncate message to prevent oversized payloads
+    // Large messages can cause network timeouts or server errors
+    let processedMessage = message;
+    if (CONFIG.LOGGING.MAX_MESSAGE_LENGTH > 0 && message.length > CONFIG.LOGGING.MAX_MESSAGE_LENGTH) {
+        processedMessage = message.substring(0, CONFIG.LOGGING.MAX_MESSAGE_LENGTH) + '...';
+    }
+
     try {
+        // RELIABILITY: Fire-and-forget async operation
+        // Don't await to prevent blocking UI on slow networks
         await fetch(CONFIG.API_BASE + CONFIG.ENDPOINTS.LOG, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, level })
+            body: JSON.stringify({ message: processedMessage, level })
         });
     } catch (error) {
+        // RELIABILITY: Silent failure handling
+        // Logging failures shouldn't break the application
+        // Consider console.error only in development
         console.error('Failed to log to backend:', error);
     }
 }
 
 /**
  * Console logging utility with consistent formatting and timestamp
- * Provides structured logging with timestamps for debugging and monitoring
+ *
+ * FLEXIBILITY & PERFORMANCE FEATURES:
+ * - Multiple output formats (simple, detailed, JSON) for different use cases
+ * - Hierarchical verbosity control (debug < info < warn < error)
+ * - Configurable message truncation to prevent console bloat
+ * - Optional timestamps and source identification
+ * - Graceful fallback for unsupported console methods
+ *
+ * USE CASES:
+ * - Development: Use 'debug' verbosity with 'detailed' format
+ * - Production: Use 'error' verbosity with 'simple' format
+ * - Log aggregation: Use 'json' format with timestamps
+ *
  * @param {string} level - Console method to use (log, warn, error, info, debug, etc.)
  * @param {string} msg - Log message to display
  * @param {*} obj - Optional object/data to log alongside the message
  */
 function logWithTimestamp(level, msg, obj) {
+    // PERFORMANCE: Early return if log level disabled
+    // Prevents unnecessary string processing and console operations
+    if (!CONFIG.LOGGING.ENABLED_TYPES[level.toUpperCase()]) {
+        return;
+    }
+
+    // PERFORMANCE: Hierarchical verbosity filtering
+    // Lower verbosity levels include higher priority messages
+    // Example: 'info' level includes 'warn' and 'error' but not 'debug'
+    const levelPriority = { 'debug': 0, 'info': 1, 'warn': 2, 'error': 3 };
+    const currentPriority = levelPriority[CONFIG.LOGGING.VERBOSITY] ?? 1;
+    const messagePriority = levelPriority[level] ?? 1;
+
+    if (messagePriority < currentPriority) {
+        return;
+    }
+
+    // RELIABILITY: Message truncation prevents console performance issues
+    // Large objects or messages can slow down or crash browser console
+    let processedMessage = msg;
+    if (CONFIG.LOGGING.MAX_MESSAGE_LENGTH > 0 && msg.length > CONFIG.LOGGING.MAX_MESSAGE_LENGTH) {
+        processedMessage = msg.substring(0, CONFIG.LOGGING.MAX_MESSAGE_LENGTH) + '...';
+    }
+
+    // FLEXIBILITY: Multiple output formats for different scenarios
+    let formattedMessage;
+    if (CONFIG.LOGGING.FORMAT === 'json') {
+        // JSON format: Perfect for log aggregation systems and structured analysis
+        const logEntry = {
+            timestamp: CONFIG.LOGGING.INCLUDE_TIMESTAMP ? new Date().toISOString() : undefined,
+            level: level,
+            message: processedMessage,
+            source: CONFIG.LOGGING.INCLUDE_SOURCE ? 'DASHBOARD' : undefined,
+            data: obj
+        };
+        // Clean up undefined properties for cleaner JSON
+        Object.keys(logEntry).forEach(key => logEntry[key] === undefined && delete logEntry[key]);
+        formattedMessage = JSON.stringify(logEntry);
+    } else if (CONFIG.LOGGING.FORMAT === 'detailed') {
+        // Detailed format: Human-readable with full context
+        let parts = [];
+        if (CONFIG.LOGGING.INCLUDE_TIMESTAMP) parts.push(`[${new Date().toISOString()}]`);
+        if (CONFIG.LOGGING.INCLUDE_SOURCE) parts.push('[DASHBOARD]');
+        parts.push(`[${level.toUpperCase()}]`);
+        parts.push(processedMessage);
+        formattedMessage = parts.join(' ');
+    } else { // simple format (default)
+        // Simple format: Clean, minimal output for production
+        let prefix = '[DASHBOARD]';
+        if (CONFIG.LOGGING.INCLUDE_TIMESTAMP) {
+            prefix += `[${new Date().toISOString()}]`;
+        }
+        formattedMessage = `${prefix} ${processedMessage}`;
+    }
+
     try {
-        console[level](`[DASHBOARD][${new Date().toISOString()}] ${msg}`, obj ?? '');
+        // RELIABILITY: Use appropriate console method with fallback
+        // Some environments may not support all console methods
+        console[level](formattedMessage, obj ?? '');
     } catch (_) {
-        // Fallback if console method doesn't exist
-        console.log(`[DASHBOARD][${new Date().toISOString()}] ${msg}`, obj ?? '');
+        // Fallback to console.log if the specific method doesn't exist
+        // Ensures logging always works regardless of environment
+        console.log(formattedMessage, obj ?? '');
     }
 }
 

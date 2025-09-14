@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using static BacklashInterfaces.Enums.StrategyEnums;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Provides a centralized mechanism for logging and exporting research data on trading entries during simulation and backtesting operations.
@@ -28,28 +29,75 @@ namespace TradingStrategies.ML
         }
 
         /// <summary>
+        /// Validates the provided EntryResearch instance to ensure all parameters are within valid ranges.
+        /// Throws ArgumentException if any validation fails.
+        /// </summary>
+        /// <param name="e">The EntryResearch instance to validate.</param>
+        private static void ValidateEntry(EntryResearch e)
+        {
+            if (string.IsNullOrWhiteSpace(e.MarketTicker))
+                throw new ArgumentException("MarketTicker cannot be null or empty.", nameof(e.MarketTicker));
+
+            if (e.EntryTime == default)
+                throw new ArgumentException("EntryTime must be a valid DateTime.", nameof(e.EntryTime));
+
+            if (e.HorizonEnd == default)
+                throw new ArgumentException("HorizonEnd must be a valid DateTime.", nameof(e.HorizonEnd));
+
+            if (e.TauTicks <= 0)
+                throw new ArgumentException("TauTicks must be greater than 0.", nameof(e.TauTicks));
+
+            if (e.PLongAtEntry < 0 || e.PLongAtEntry > 1)
+                throw new ArgumentException("PLongAtEntry must be between 0 and 1.", nameof(e.PLongAtEntry));
+
+            if (e.PShortAtEntry < 0 || e.PShortAtEntry > 1)
+                throw new ArgumentException("PShortAtEntry must be between 0 and 1.", nameof(e.PShortAtEntry));
+
+            if (e.Score < 0 || e.Score > 1)
+                throw new ArgumentException("Score must be between 0 and 1.", nameof(e.Score));
+
+            if (string.IsNullOrWhiteSpace(e.ParameterSet))
+                throw new ArgumentException("ParameterSet cannot be null or empty.", nameof(e.ParameterSet));
+        }
+
+        /// <summary>
         /// Records a research entry to the collection for later analysis.
-        /// This method adds the provided entry research data to the concurrent collection,
+        /// This method validates the entry and adds the provided entry research data to the concurrent collection,
         /// allowing strategies to record detailed metrics about trading signals and their outcomes.
         /// </summary>
         /// <param name="e">The entry research data to record, containing all relevant metrics and context.</param>
-        public static void RecordEntry(EntryResearch e) => Entries.Add(e);
+        public static void RecordEntry(EntryResearch e)
+        {
+            ValidateEntry(e);
+            Entries.Add(e);
+        }
 
         /// <summary>
         /// Exports all logged research entries to a CSV file for external analysis.
         /// The CSV file includes a header row with column names and data rows ordered by score in descending order.
+        /// For large datasets, parallel processing is used to build the CSV lines for improved performance.
         /// This facilitates analysis in spreadsheet applications or statistical tools for strategy optimization.
         /// </summary>
         /// <param name="path">The file system path where the CSV file should be written.</param>
         public static void DumpCsv(string path)
         {
+            var sortedEntries = Entries.OrderByDescending(x => x.Score).ToList();
+            var lines = new string[sortedEntries.Count];
+
+            // Use parallel processing to build CSV lines for better performance on large datasets
+            Parallel.For(0, sortedEntries.Count, i =>
+            {
+                var e = sortedEntries[i];
+                lines[i] = $"{e.MarketTicker},{e.EntryTime:O},{e.Side},{e.ThresholdUsed:F3}," +
+                           $"{e.HitTau},{e.TauTicks},{e.DdTicks},{e.MfeTicks},{e.MaeTicks},{e.PeakSizeTicks}," +
+                           $"{(int)e.TimeToPeak.TotalSeconds},{e.PLongAtEntry:F4},{e.PShortAtEntry:F4},{e.Score:F4},{e.ParameterSet}";
+            });
+
             using var sw = new StreamWriter(path);
             sw.WriteLine("market,ts_entry,side,thr,hit_tau,tau,dd,mfe,mae,peak_size,time_to_peak_sec,p_long,p_short,score,parameter_set");
-            foreach (var e in Entries.OrderByDescending(x => x.Score))
+            foreach (var line in lines)
             {
-                sw.WriteLine($"{e.MarketTicker},{e.EntryTime:O},{e.Side},{e.ThresholdUsed:F3}," +
-                              $"{e.HitTau},{e.TauTicks},{e.DdTicks},{e.MfeTicks},{e.MaeTicks},{e.PeakSizeTicks}," +
-                              $"{(int)e.TimeToPeak.TotalSeconds},{e.PLongAtEntry:F4},{e.PShortAtEntry:F4},{e.Score:F4},{e.ParameterSet}");
+                sw.WriteLine(line);
             }
         }
 

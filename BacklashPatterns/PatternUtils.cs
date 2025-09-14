@@ -13,6 +13,10 @@ namespace BacklashPatterns
     /// </summary>
     public static class PatternUtils
     {
+        private static int _totalCalculations = 0;
+        private static long _totalCalculationTimeMs = 0;
+        private static int _cacheHits = 0;
+        private static int _cacheMisses = 0;
         /// <summary>
         /// Computes comprehensive metrics for a specific candle at the given index, utilizing caching for performance.
         /// This method aggregates basic candle properties (body size, wicks, range) with advanced trend analysis
@@ -99,7 +103,15 @@ namespace BacklashPatterns
                     CalculationTimeMs = stopwatch.ElapsedMilliseconds
                 };
                 metricsCache[index] = metrics;
+                Interlocked.Increment(ref _cacheMisses);
             }
+            else
+            {
+                Interlocked.Increment(ref _cacheHits);
+            }
+
+            Interlocked.Increment(ref _totalCalculations);
+            Interlocked.Add(ref _totalCalculationTimeMs, (long)stopwatch.ElapsedMilliseconds);
 
             return metrics;
         }
@@ -191,7 +203,15 @@ namespace BacklashPatterns
                     CalculationTimeMs = stopwatch.ElapsedMilliseconds
                 };
                 metricsCache[index] = metrics;
+                Interlocked.Increment(ref _cacheMisses);
             }
+            else
+            {
+                Interlocked.Increment(ref _cacheHits);
+            }
+
+            Interlocked.Increment(ref _totalCalculations);
+            Interlocked.Add(ref _totalCalculationTimeMs, (long)stopwatch.ElapsedMilliseconds);
 
             return metrics;
         }
@@ -230,6 +250,30 @@ namespace BacklashPatterns
         {
             // Parse the exact ISO 8601 format and enforce UTC
             return DateTime.ParseExact(timestamp, "yyyy-MM-dd'T'HH:mm:ss'Z'", null, System.Globalization.DateTimeStyles.RoundtripKind);
+        }
+
+        /// <summary>
+        /// Gets current performance metrics for the PatternUtils class.
+        /// Returns cache hit/miss statistics and calculation timing information.
+        /// </summary>
+        /// <returns>A tuple containing total calculations, cache hits, cache misses, and average calculation time in milliseconds.</returns>
+        public static (int TotalCalculations, int CacheHits, int CacheMisses, double AverageCalculationTimeMs) GetPerformanceMetrics()
+        {
+            var total = _totalCalculations;
+            var hits = _cacheHits;
+            var misses = _cacheMisses;
+            var avgTime = total > 0 ? (double)_totalCalculationTimeMs / total : 0.0;
+            return (total, hits, misses, avgTime);
+        }
+
+        /// <summary>
+        /// Gets the cache hit rate as a percentage.
+        /// </summary>
+        /// <returns>The cache hit rate (0.0 to 100.0).</returns>
+        public static double GetCacheHitRate()
+        {
+            var (total, hits, _, _) = GetPerformanceMetrics();
+            return total > 0 ? (double)hits / total * 100.0 : 0.0;
         }
 
 

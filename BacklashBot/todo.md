@@ -1,196 +1,567 @@
-# StrategySimulation Feedback
-**Class Analysis Summary:**
-- **Purpose**: StrategySimulation is the core simulation engine that executes trading strategies against historical market snapshots in the Kalshi trading bot system. It manages the complete simulation lifecycle including order book state, position tracking, cash flow, and realistic trading mechanics. The class processes market data sequentially, applies strategy decisions, handles order matching with FIFO accuracy, and tracks performance metrics for backtesting and analysis.
-- **Key Improvements Made**:
-  - Verified comprehensive XML documentation is already present for the entire class, all public/private methods, and key private members, explaining the simulation workflow, parameters, return values, and role in the trading system from a developer's implementation perspective
-  - Verified no unclear method or property names exist (all names are descriptive and follow clear naming conventions)
-  - Verified no placeholders or incomplete implementation comments exist
-  - Confirmed all methods are actively used in the simulation pipeline
-  - No notes about removed functionality present
-  - No logging present in the class (appropriate for a simulation engine)
-- **Strengths**: Well-architected simulation engine with robust order book management, accurate FIFO order matching, comprehensive action type support (market orders, limit orders, exits, cancellations), proper fee calculation, realistic position and cash tracking, actively used in production for backtesting, follows established patterns, excellent integration with Strategy, SimulatedOrderbook, and MarketSnapshot classes, thread-safe operations through proper state management, efficient delta-based order book updates, comprehensive XML documentation enhancing maintainability.
-- **Areas for Improvement**:
-  - Consider implementing input validation for strategy and snapshot parameters to prevent null reference exceptions
-  - Consider adding performance metrics collection for simulation execution timing and memory usage
-  - Consider implementing simulation result caching to avoid redundant computations for the same market/strategy combinations
-  - Add configuration options for fee rates and initial cash amounts instead of hardcoded values
-  - Consider implementing parallel processing for multiple strategy simulations if performance becomes critical
-  - Add unit tests to validate simulation accuracy against known test cases
-- **Overall Assessment**: Excellent, production-ready simulation engine that effectively serves as the core execution platform for trading strategy evaluation in the Kalshi bot system. The comprehensive XML documentation enhances code clarity, maintainability, and developer understanding without breaking existing functionality. The class is well-architected with proper separation of concerns, robust simulation mechanics, and accurate market modeling. No critical issues found - the implementation is sophisticated and serves as a reliable foundation for trading strategy backtesting. The engine successfully handles complex scenarios including multi-strategy branching, realistic order execution, and comprehensive performance tracking, making it a critical component of the trading system's evaluation pipeline.
+# Performance Metrics Documentation
 
-# SimulationPath Feedback
-**Class Analysis Summary:**
-- **Purpose**: SimulationPath is a core data container class that encapsulates the complete state of a single trading simulation path in the Kalshi trading bot system. It serves as the fundamental data structure for tracking the evolution of a trading strategy simulation over time, maintaining essential state including position, cash balance, risk metrics, order book state, and strategy configurations. The class acts as the primary state holder during simulation execution, enabling accurate performance evaluation, risk assessment, and comprehensive reporting across the trading system.
-- **Key Improvements Made**:
-  - Verified comprehensive XML documentation is already present for the entire class, all properties, constructor, and AverageCost property, explaining the purpose, data types, usage context, and role in trading operations from a developer's implementation perspective
-  - Verified no unclear method or property names exist (all names are descriptive and follow clear naming conventions like StrategiesByMarketConditions, Position, Cash, CurrentRisk, TotalPaid, TotalReceived, Events, SimulatedBook, SimulatedRestingOrders, AverageCost)
-  - Verified no placeholders or incomplete implementation comments exist
-  - Confirmed all properties and methods are actively used in the simulation pipeline (referenced in SimulationEngine, EquityCalculator, TradingOverseer, and other components)
-  - No notes about removed functionality present
-  - No logging present in the class (appropriate for a data container)
-- **Strengths**: Well-architected data container with clear separation of concerns, comprehensive state tracking for simulation mechanics, thread-safe through immutable StrategiesByMarketConditions and proper usage patterns, actively used in production across simulation engine, equity calculator, and reporting components, follows established patterns, excellent integration with Strategy enums, SimulatedOrderbook, and ReportGenerator.EventLog, proper encapsulation of trading state with meaningful property names, clean API with simple property access, comprehensive coverage of simulation state including position, cash, risk, and order book data.
-- **Areas for Improvement**:
-  - Consider implementing data validation for property values to prevent invalid simulation states (e.g., ensuring position is reasonable and cash is non-negative)
-  - Consider adding immutability by making more properties read-only after initialization or converting to a record for safer state management
-  - Consider implementing deep cloning methods for safe copying of complex nested objects like Events list and SimulatedRestingOrders
-  - Add input validation for constructor parameters to prevent null reference exceptions
-  - Consider implementing state validation methods to ensure simulation path consistency before use
-- **Overall Assessment**: Excellent, production-ready data container that effectively serves as the core state holder for trading simulation paths in the Kalshi bot system. The comprehensive XML documentation enhances code clarity, maintainability, and developer understanding without breaking existing functionality. The class is well-architected with proper separation of concerns, comprehensive state coverage, and robust integration with the broader trading system. No critical issues found - the implementation is simple, effective, and serves as a reliable foundation for simulation state management throughout the system.
+This document outlines the performance metrics tracked across various classes in the Kalshi Trading Bot project.
 
 
+## Distinct Return Types (Broken Down by Constituents)
 
-# JavaScript Frontend Files Feedback
+### Primitive Types
+- `bool` (multiple classes)
+- `double` (multiple classes)
+- `int` (multiple classes)
+- `long` (multiple classes)
 
-## app.js Feedback
-**Class Analysis Summary:**
-- **Purpose**: Main application initialization and coordination module for the Kalshi Trading Bot Dashboard. Serves as the entry point for the application, managing global error handling, SignalR initialization, and data refresh scheduling.
-- **Key Improvements Made**:
-  - Renamed `refreshBrainsDisplay` to `refreshBrainsDisplayForCompatibility` for better clarity about its legacy purpose
-  - Renamed `refreshBrainLocksDisplay` to `refreshBrainLocksDisplayForCompatibility` for consistency
-  - Added comprehensive JSDoc documentation for the entire file and all functions
-  - Verified no placeholders or incomplete implementations exist
-  - Confirmed no unused methods in the file
-  - No notes about removed functionality present
-  - Logging is appropriate with global error handlers using console.error
-- **Strengths**: Well-structured entry point with clear separation of concerns, robust global error handling, proper SignalR initialization sequence, actively used in production for application startup, follows established patterns, excellent integration with data management and UI modules, proper lifecycle management with auto-refresh scheduling.
-- **Areas for Improvement**:
-  - Consider implementing more sophisticated error reporting instead of just console.error
-  - Add configuration options for auto-refresh intervals instead of hardcoded 30 seconds
-  - Consider implementing application health checks during initialization
-  - Add performance metrics collection for initialization timing
-  - Consider implementing graceful degradation if SignalR fails to connect
-- **Overall Assessment**: Excellent, production-ready application entry point that effectively manages the complete application lifecycle. The improvements enhance code clarity, maintainability, and operational visibility without breaking existing functionality. The module is well-architected with proper separation of concerns, robust error handling, and comprehensive initialization logic. No critical issues found - the implementation is sophisticated and serves as a reliable foundation for the trading dashboard.
+### Non-Primitive Types
+- `ClientRateLimit` (KalshiBotOverseer.OverseerHub.ClientRateLimit) - Internal class for tracking rate limiting information per client, containing HandshakeCount (int), CheckInCount (int), and WindowStart (DateTime)
+- `PatternDetectionMetrics` (BacklashPatterns.PatternSearch.PatternDetectionMetrics)
+- `ClientMetrics` (KalshiBotOverseer.OverseerHub.ClientSpecificMetrics)
+- `MetricHistory` (KalshiBotOverseer.Models.BrainPersistence.CpuUsageHistory)
+- `OverseerHubConfig` (KalshiBotOverseer.OverseerHubConfig) - Configuration class containing settings for connection health monitoring, authentication token validity, and rate limiting parameters
+- `PerformanceMetrics` (TradingSimulator.MarketProcessor.GetPerformanceMetrics, TradingSimulator.Simulator.SimulatorReporting.GetPerformanceMetrics)
+- `PatternDetectionMetricsSummary` (BacklashPatterns.PatternSearch.GetSummary)
+- `ResourceMetrics` (KalshiBotOverseer.OvernightActivitiesHelper.ResourceConsumptionTrend)
+- `TimeSpan` (multiple properties: TradingStrategies.Trading.Overseer.PatternDetectionService.DetectPatterns, TradingStrategies.Trading.Overseer.StrategySimulation.TotalExecutionTime, etc.)
+- `BrainPersistence` (KalshiBotOverseer.Models.BrainPersistence.DeserializeWithMetrics)
 
-## charts.js Feedback
-**Class Analysis Summary:**
-- **Purpose**: Chart rendering and data visualization module for the Kalshi Trading Bot Dashboard. Handles interactive price charts, technical indicators, and real-time market data visualization using Chart.js library.
-- **Key Improvements Made**:
-  - Renamed unclear variable names (timeUnit → currentTimeUnit, timeFormat → currentTimeFormat, dataPoints → currentDataPoints)
-  - Renamed unclear function names (renderSecondaryChart → renderTechnicalIndicatorChart, updateChartMetrics → populateChartMetricsDisplay)
-  - Added comprehensive JSDoc documentation for the entire file and all functions
-  - Verified no placeholders or incomplete implementations exist
-  - Confirmed no unused methods in the file
-  - No notes about removed functionality present
-  - Logging is appropriate with console.warn for missing elements and console.log for successful operations
-- **Strengths**: Well-structured visualization module with robust Chart.js integration, comprehensive technical indicator support, proper error handling with graceful fallbacks, actively used in production for market analysis, follows established patterns, excellent integration with SignalR for real-time updates, proper modal management with auto-refresh capabilities, effective data preprocessing and formatting.
-- **Areas for Improvement**:
-  - Consider implementing chart caching to reduce rendering overhead for frequently viewed markets
-  - Add configuration options for chart appearance and technical indicator parameters instead of hardcoded values
-  - Consider implementing chart export functionality for analysis
-  - Add performance metrics collection for chart rendering timing
-  - Consider implementing progressive loading for large datasets
-  - The sample data generation could be made more realistic for testing purposes
-- **Overall Assessment**: Excellent, production-ready chart visualization module that effectively handles complex market data visualization. The improvements enhance code clarity, maintainability, and operational visibility without breaking existing functionality. The module is well-architected with proper separation of concerns, robust error handling, and comprehensive charting capabilities. No critical issues found - the implementation is sophisticated and serves as a reliable foundation for market analysis and visualization.
 
-## context-menus.js Feedback
-**Class Analysis Summary:**
-- **Purpose**: Context menu management module for the Kalshi Trading Bot Dashboard. Handles right-click context menus for different data types (markets, brains, positions, orders, snapshots) providing quick access to actions without cluttering the main interface.
-- **Key Improvements Made**:
-  - Renamed unclear variable names (currentBrainInstance → selectedBrainInstance, currentMode → selectedBrainMode, currentMarketTicker → selectedMarketTicker, currentMarketBrainLock → selectedMarketBrainLock, currentSnapshotTicker → selectedSnapshotTicker)
-  - Added comprehensive JSDoc documentation for the entire file and all functions
-  - Verified no placeholders or incomplete implementations exist
-  - Confirmed no unused methods in the file
-  - No notes about removed functionality present
-  - Logging is appropriate with console.log for user actions
-- **Strengths**: Well-structured context menu system with clear separation of concerns, robust event handling with proper propagation control, comprehensive menu options for different data types, actively used in production for user interactions, follows established patterns, excellent integration with backend logging system, proper menu positioning and state management, effective click-outside handling for menu dismissal.
-- **Areas for Improvement**:
-  - Consider implementing keyboard navigation for accessibility
-  - Add configuration options for menu positioning and behavior
-  - Consider implementing menu item enable/disable states based on data state
-  - Add performance metrics collection for menu interaction timing
-  - Consider implementing menu persistence for user preferences
-- **Overall Assessment**: Excellent, production-ready context menu system that effectively provides intuitive user interactions. The improvements enhance code clarity, maintainability, and operational visibility without breaking existing functionality. The module is well-architected with proper separation of concerns, robust event handling, and comprehensive menu management. No critical issues found - the implementation is sophisticated and serves as a reliable foundation for user interface interactions.
+## TradingStrategies.Trading.Overseer.PatternDetectionService
 
-## data.js Feedback
-**Class Analysis Summary:**
-- **Purpose**: Data management module for the Kalshi Trading Bot Dashboard. Handles all data loading, fetching, and management operations from various API endpoints, providing centralized data access and UI updates.
-- **Key Improvements Made**:
-  - Added comprehensive JSDoc documentation for the entire file and all functions
-  - Verified no placeholders or incomplete implementations exist
-  - Confirmed no unused methods in the file
-  - No notes about removed functionality present
-  - Logging is appropriate with console.error for errors and console.log for successful operations
-- **Strengths**: Well-structured data management module with robust error handling, comprehensive API endpoint coverage, proper parallel data loading with Promise.all, actively used in production for data synchronization, follows established patterns, excellent integration with UI rendering modules, proper data transformation and preprocessing, effective error recovery with graceful fallbacks.
-- **Areas for Improvement**:
-  - Consider implementing data caching to reduce API calls for frequently accessed data
-  - Add configuration options for API endpoints and error retry logic instead of hardcoded values
-  - Consider implementing data validation before processing
-  - Add performance metrics collection for API call timing and success rates
-  - Consider implementing progressive data loading for large datasets
-- **Overall Assessment**: Excellent, production-ready data management module that effectively handles all data operations for the trading dashboard. The improvements enhance code clarity, maintainability, and operational visibility without breaking existing functionality. The module is well-architected with proper separation of concerns, robust error handling, and comprehensive data management capabilities. No critical issues found - the implementation is sophisticated and serves as a reliable foundation for data operations.
+### Methods
+- `DetectPatterns()`: TimeSpan - Execution time for pattern detection operations
+- `DetectPatternsAsync()`: TimeSpan - Execution time for async pattern detection operations
 
-## config.js Feedback
-**Class Analysis Summary:**
-- **Purpose**: Configuration and constants module for the Kalshi Trading Bot Dashboard. Centralizes all application-wide configuration, API endpoints, UI settings, and global state variables for easy maintenance and consistency.
-- **Key Improvements Made**:
-  - Added comprehensive JSDoc documentation for the entire file and all configuration sections
-  - Verified no placeholders or incomplete implementations exist
-  - Confirmed no unused methods in the file (only configuration objects)
-  - No notes about removed functionality present
-  - No logging present in the file (no cleanup needed)
-- **Strengths**: Well-organized configuration system with clear categorization, comprehensive coverage of all application settings, proper separation of concerns with logical grouping, actively used throughout the application for consistent behavior, follows established patterns, excellent maintainability with centralized configuration, proper state management for navigation and sorting, effective status color and icon mappings.
-- **Areas for Improvement**:
-  - Consider implementing configuration validation on application startup
-  - Add configuration options for dynamic settings that might change based on environment
-  - Consider implementing configuration hot-reloading for runtime changes
-  - Add configuration documentation for business logic behind the values
-- **Overall Assessment**: Excellent, production-ready configuration system that effectively centralizes all application settings. The improvements enhance code clarity, maintainability, and documentation without breaking existing functionality. The module is well-architected with proper separation of concerns, comprehensive coverage, and logical organization. No critical issues found - the implementation is sophisticated and serves as a reliable foundation for application configuration.
+## TradingStrategies.Trading.Overseer.StrategySimulation
 
-## signalr.js Feedback
-**Class Analysis Summary:**
-- **Purpose**: SignalR communication module for the Kalshi Trading Bot Dashboard. Manages real-time WebSocket connections, handles incoming market data updates, and coordinates UI updates with server-sent events.
-- **Key Improvements Made**:
-  - Renamed `mwLog` function calls to `logWithTimestamp` for better clarity and consistency
-  - Added comprehensive JSDoc documentation for the entire file and all functions
-  - Verified no placeholders or incomplete implementations exist
-  - Confirmed no unused methods in the file
-  - No notes about removed functionality present
-  - Logging is appropriate with structured logging for debugging
-- **Strengths**: Well-structured real-time communication module with robust SignalR integration, comprehensive event handling for different data types, proper connection management with error recovery, actively used in production for live data updates, follows established patterns, excellent integration with UI rendering modules, proper state management for brain and market data, effective data filtering and processing.
-- **Areas for Improvement**:
-  - Consider implementing connection health monitoring with automatic reconnection
-  - Add configuration options for SignalR connection parameters instead of hardcoded values
-  - Consider implementing message batching for high-frequency updates
-  - Add performance metrics collection for message processing timing
-  - Consider implementing connection quality indicators for user feedback
-- **Overall Assessment**: Excellent, production-ready SignalR communication module that effectively manages real-time data flow. The improvements enhance code clarity, maintainability, and operational visibility without breaking existing functionality. The module is well-architected with proper separation of concerns, robust error handling, and comprehensive real-time communication capabilities. No critical issues found - the implementation is sophisticated and serves as a reliable foundation for live data updates.
+### Properties
+- `TotalExecutionTime`: TimeSpan - Aggregate execution time of all ProcessSnapshot calls
+- `AverageExecutionTimeMs`: double - Average execution time per snapshot in milliseconds
+- `PeakMemoryUsage`: long - Maximum memory usage recorded during simulation
+- `TotalTradesExecuted`: int - Total number of trades executed during simulation
+- `AverageDecisionTimeMs`: double - Average strategy decision time in milliseconds
+- `AverageApplyTimeMs`: double - Average action application time in milliseconds
 
-## ui.js Feedback
-**Class Analysis Summary:**
-- **Purpose**: User interface rendering module for the Kalshi Trading Bot Dashboard. Handles all UI updates, market data display, brain status visualization, and user interaction coordination.
-- **Key Improvements Made**:
-  - Renamed `mwLog` function calls to `logWithTimestamp` for better clarity and consistency
-  - Added comprehensive JSDoc documentation for the entire file and all functions
-  - Verified no placeholders or incomplete implementations exist
-  - Confirmed no unused methods in the file
-  - No notes about removed functionality present
-  - Logging is appropriate with structured logging for debugging
-- **Strengths**: Well-structured UI rendering module with comprehensive display logic, robust error handling with graceful fallbacks, proper integration with data management modules, actively used in production for user interface updates, follows established patterns, excellent state management for UI components, effective data formatting and display logic, proper event handling for user interactions.
-- **Areas for Improvement**:
-  - Consider implementing UI caching to reduce rendering overhead for frequently updated elements
-  - Add configuration options for UI refresh intervals and display preferences
-  - Consider implementing progressive loading for large data sets
-  - Add performance metrics collection for UI rendering timing
-  - Consider implementing user preference persistence for UI settings
-- **Overall Assessment**: Excellent, production-ready UI rendering module that effectively manages all user interface updates. The improvements enhance code clarity, maintainability, and operational visibility without breaking existing functionality. The module is well-architected with proper separation of concerns, robust error handling, and comprehensive UI management capabilities. No critical issues found - the implementation is sophisticated and serves as a reliable foundation for user interface operations.
+### Methods
+- `GetDetailedPerformanceMetrics()`: Dictionary<string, object> - Comprehensive metrics dictionary with execution details
+- `ResetPerformanceMetrics()`: void - Resets all performance metrics for new simulation runs
 
-## utils.js Feedback
-**Class Analysis Summary:**
-- **Purpose**: Utility functions module for the Kalshi Trading Bot Dashboard. Provides common helper functions for logging, data formatting, and general utilities used throughout the application.
-- **Key Improvements Made**:
-  - Renamed `mwLog` function to `logWithTimestamp` for better clarity and consistency
-  - Added comprehensive JSDoc documentation for the entire file and all functions
-  - Verified no placeholders or incomplete implementations exist
-  - Confirmed no unused methods in the file
-  - No notes about removed functionality present
-  - Logging is appropriate with structured logging including timestamps
-- **Strengths**: Well-structured utility module with focused helper functions, proper logging infrastructure with timestamps, actively used throughout the application for consistent logging, follows established patterns, excellent maintainability with centralized utilities, proper error handling in utility functions.
-- **Areas for Improvement**:
-  - Consider implementing additional utility functions for common data operations
-  - Add configuration options for logging verbosity and format
-  - Consider implementing performance utilities for timing operations
-  - Add input validation for utility function parameters
-- **Overall Assessment**: Excellent, production-ready utility module that effectively provides essential helper functions. The improvements enhance code clarity, maintainability, and operational visibility without breaking existing functionality. The module is well-architected with proper separation of concerns and serves as a reliable foundation for common operations throughout the application.
+## TradingStrategies.Trading.Overseer.SimulationEngine
+
+### Properties
+- `LastExecutionTime`: TimeSpan - Execution time of the last simulation run
+- `LastMemoryUsed`: long - Memory usage difference of the last simulation run
+
+## TradingStrategies.Extensions.MarketSnapshotExtensions
+
+### Methods
+- `UpdateOrderbookMetricsFromSimulated()`: TimeSpan - Execution time for order book metrics update
+
+## TradingStrategies.Extensions.PseudoCandlestickExtensions
+
+### Methods
+- `ToCandleMids()`: TimeSpan - Execution time for candlestick conversion (logged when >100ms)
+
+## TradingStrategies.Trading.Overseer.EquityCalculator
+
+### Methods
+- `GetCalculationTimes()`: long[] - Returns array of all recorded calculation times
+- `GetCalculationStatistics()`: (int Count, double AverageMs, long MinMs, long MaxMs) - Returns tuple with calculation statistics
+- `ClearCalculationTimes()`: void - Clears all recorded performance metrics
+
+## TradingStrategies.Trading.Helpers.StrategySelectionHelper
+
+### Properties
+- `EnablePerformanceMetrics`: bool - Configurable flag for performance metrics collection
+
+### Methods
+- `GetPerformanceMetrics()`: object - Retrieves all collected performance metrics
+- `ClearPerformanceMetrics()`: void - Clears all collected performance metrics
+
+## TradingStrategies.Trading.Overseer.MarketTypeService
+
+### Methods
+- `GetCacheStatistics()`: (long Hits, long Misses) - Returns tuple of cache statistics
+- `GetAverageClassificationTime()`: TimeSpan - Returns average classification time
+- `GetClassificationCount()`: int - Returns total classifications performed
+
+## KalshiBotOverseer.Services.SnapshotService
+
+### Methods
+- `GetAggregationTimes()`: long[] - Returns array of all recorded aggregation times
+- `GetAggregationStatistics()`: (int Count, double AverageMs, long MinMs, long MaxMs) - Returns tuple with aggregation statistics
+- `GetTotalAggregationTime()`: long - Returns total time in milliseconds
+- `GetAggregationCount()`: int - Returns count of operations
+- `ClearAggregationMetrics()`: void - Clears all recorded performance metrics
+
+## TradingSimulator.CachedMarketData
+
+### Methods
+- `SerializeWithMetrics()`: string - Returns serialized string with out TimeSpan serializationTime parameter
+- `DeserializeWithMetrics()`: CachedMarketData - Returns deserialized instance with out TimeSpan deserializationTime parameter
+
+## KalshiBotAPI.Websockets.MessageProcessor
+
+### Properties
+- `TotalMessagesProcessed`: long - Total number of messages processed since last metrics reset
+- `TotalProcessingTimeMs`: long - Total processing time in milliseconds since last metrics reset
+- `LastMetricsLogTime`: DateTime - Timestamp of the last performance metrics log
+- `MessagesPerSecond`: double - Current messages per second rate based on recent processing
+- `AverageProcessingTimeMs`: double - Average processing time per message in milliseconds
+- `OrderBookMessageQueueCount`: int - Current count of order book update messages in processing queue
+- `DuplicateMessageCount`: int - Count of duplicate messages detected and skipped
+- `LastSequenceNumber`: long - Latest sequence number processed from WebSocket messages
+- `MessageProcessingLatency`: TimeSpan - Average time between message receipt and processing completion. Helps identify processing bottlenecks and ensures real-time performance requirements are met for high-frequency trading.
+- `MessageDropRate`: double - Percentage of messages dropped due to queue overflow or processing errors. Critical for monitoring system reliability and detecting when message throughput exceeds processing capacity.
+- `WebSocketReconnectionCount`: int - Number of WebSocket reconnections performed. Indicates connection stability issues that could impact real-time data flow and trading decisions.
+- `PeakQueueDepth`: int - Maximum order book queue depth recorded during operation. Helps dimension queue sizes and identify periods of high message volume that may require infrastructure scaling.
+
+### Methods
+- `GetMessageTypeCounts()`: IReadOnlyDictionary<string, long> - Returns count of messages by type processed since startup
+- `ResetEventCounts()`: void - Resets all message type counters to zero
+
+## KalshiBotContext.Data.SqlDataService
+
+### Properties
+- `TotalProcessed`: long - Total number of operations processed successfully
+- `TotalFailed`: long - Total number of operations that failed
+- `OrderBookQueueDepth`: int - Current depth of the order book queue
+- `TradeQueueDepth`: int - Current depth of the trade queue
+- `FillQueueDepth`: int - Current depth of the fill queue
+- `EventLifecycleQueueDepth`: int - Current depth of the event lifecycle queue
+- `MarketLifecycleQueueDepth`: int - Current depth of the market lifecycle queue
+- `SuccessRate`: double - Success rate as a percentage (0-100)
+- `TotalQueuedOperations`: int - Total number of queued operations across all queues
+- `AverageOperationLatency`: TimeSpan - Average time to complete database operations. Essential for identifying database performance bottlenecks that could slow down the entire trading system.
+- `DatabaseConnectionPoolUtilization`: double - Percentage of available database connections in use. Prevents connection pool exhaustion which could halt all database operations during peak trading periods.
+- `BatchProcessingEfficiency`: double - Average operations processed per batch. Optimizes batch sizes for maximum throughput while minimizing latency.
+- `DeadlockDetectionCount`: int - Number of database deadlocks detected and resolved. Critical for monitoring database concurrency issues that could impact system stability.
+
+## KalshiBotOverseer.Services.BrainPersistenceService
+
+### Properties
+- `TotalOperations`: long - Total number of operations performed by this service
+- `ServiceUptime`: TimeSpan - Service uptime as a TimeSpan
+- `BrainCount`: int - Current number of brain instances being managed
+- `TotalHistoryEntries`: long - Total number of metric history entries across all brain instances
+- `MemoryGrowthRate`: double - Rate of memory usage increase over time. Detects memory leaks in long-running brain instances that could lead to system instability.
+- `OperationThroughput`: double - Operations per second processed by the service. Measures service capacity and helps identify when additional instances are needed for load distribution.
+- `CacheHitRate`: double - Percentage of brain lookups served from cache vs database. Optimizes performance by ensuring frequently accessed brain data remains in memory.
+- `PersistenceFailureRate`: double - Percentage of persistence operations that fail. Critical for ensuring brain state is reliably saved to prevent data loss during system restarts.
+
+### Methods
+- `GetHealthStatus()`: (long TotalMemoryBytes, int BrainCount, long TotalHistoryEntries, TimeSpan ServiceUptime) - Returns comprehensive health metrics
+
+## KalshiBotOverseer.Controllers.MarketWatchController
+
+### Properties
+- `AverageEndpointLatency`: TimeSpan - Average response time across all endpoints. Monitors overall API performance and user experience for the monitoring dashboard.
+- `CacheHitRate`: double - Percentage of requests served from cache. Measures effectiveness of caching strategy and identifies opportunities for performance optimization.
+- `ConcurrentRequestCount`: int - Number of concurrent requests being processed. Helps dimension the system for peak usage periods and prevents resource exhaustion.
+- `ErrorRateByEndpoint`: Dictionary<string, double> - Error rates for each API endpoint. Identifies problematic endpoints that may need optimization or bug fixes.
+
+### Notes
+- Endpoint execution times logged for GetMarketWatchData, GetBrainLocksData, GetPositionsData, GetOrdersData, GetAccountData, LogEvent, GetSnapshotsData, GetBrainsData
+
+## KalshiBotOverseer.Models.BrainPersistence
+
+### Methods
+- `SerializeWithMetrics()`: (string Json, long Milliseconds) - Serializes instance with timing metrics
+- `DeserializeWithMetrics()`: (BrainPersistence Instance, long Milliseconds) - Deserializes with timing metrics
+
+### Properties
+- `CpuUsageHistory`: List<MetricHistory> - Historical CPU usage metrics
+- `EventQueueHistory`: List<MetricHistory> - Historical event queue depth metrics
+- `TickerQueueHistory`: List<MetricHistory> - Historical ticker queue depth metrics
+- `NotificationQueueHistory`: List<MetricHistory> - Historical notification queue depth metrics
+- `OrderbookQueueHistory`: List<MetricHistory> - Historical order book queue depth metrics
+- `MarketCountHistory`: List<MetricHistory> - Historical market count metrics
+- `ErrorHistory`: List<MetricHistory> - Historical error count metrics
+- `RefreshCycleSecondsHistory`: List<MetricHistory> - Historical refresh cycle duration metrics
+- `RefreshCycleIntervalHistory`: List<MetricHistory> - Historical refresh cycle interval metrics
+- `RefreshMarketCountHistory`: List<MetricHistory> - Historical refresh market count metrics
+- `RefreshUsagePercentageHistory`: List<MetricHistory> - Historical refresh CPU usage percentage metrics
+- `PerformanceSampleDateHistory`: List<MetricHistory> - Historical performance sample dates
+- `LastRefreshTimeAcceptable`: bool - Whether last refresh cycle completed within acceptable time limits
+- `HistoryRetentionEfficiency`: double - Percentage of configured history entries actually retained. Ensures metrics history is properly maintained for trend analysis and troubleshooting.
+- `SerializationCompressionRatio`: double - Ratio of compressed to uncompressed serialization size. Optimizes storage efficiency for large brain state objects during persistence.
+- `MetricUpdateFrequency`: TimeSpan - Average time between metric updates. Ensures metrics are collected at appropriate intervals for real-time monitoring without excessive overhead.
+- `StateValidationTime`: TimeSpan - Time required to validate brain state integrity. Critical for ensuring data consistency during state transitions and preventing corrupted brain configurations.
+
+## KalshiBotAPI.Websockets.KalshiWebSocketClient
+
+### Properties
+- `EventCounts`: ConcurrentDictionary<string, long> - Current event counts for different message types processed by the subscription manager
+- `ConnectSemaphoreCount`: int - Current count of the connection semaphore, indicating connection operation status
+- `SubscriptionUpdateSemaphoreCount`: int - Current count of the subscription update semaphore
+- `ChannelSubscriptionSemaphoreCount`: int - Current count of the channel subscription semaphore
+- `QueuedSubscriptionUpdatesCount`: int - Count of queued subscription update requests waiting to be processed
+- `OrderBookMessageQueueCount`: int - Count of order book messages currently in the processing queue
+- `PendingConfirmsCount`: int - Count of pending subscription confirmations
+- `LastSequenceNumber`: long - Last sequence number processed from WebSocket messages
+
+### Methods
+- `GetEventCountsByMarket(string marketTicker)`: (int orderbookEvents, int tradeEvents, int tickerEvents) - Gets event counts by market
+- `ResetEventCounts()`: void - Resets event counts
+
+## KalshiBotAPI.Websockets.SubscriptionManager
+
+### Properties
+- `EventCounts`: ConcurrentDictionary<string, long> - Dictionary containing counts of different message types processed by the subscription manager
+- `SubscriptionUpdateSemaphoreCount`: int - Current count of the subscription update synchronization semaphore
+- `ChannelSubscriptionSemaphoreCount`: int - Current count of the channel subscription synchronization semaphore
+- `QueuedSubscriptionUpdatesCount`: int - Number of queued subscription update requests waiting to be processed
+
+### Methods
+- `GetPerformanceMetrics()`: ConcurrentDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)> - Gets performance metrics for subscription operations
+- `ResetEventCounts()`: void - Resets all message type event counts to zero
+- `GetEventCountsByMarket(string marketTicker)`: (int orderbookEvents, int tradeEvents, int tickerEvents) - Gets the event counts for different message types for a specific market
+
+## BacklashBot.Services.OverseerClientService
+
+### Properties
+- `ConnectionAttemptCount`: int - Total number of connection attempts made to overseer servers
+- `ConnectionSuccessCount`: int - Number of successful connections to overseer servers
+- `TotalDiscoveryTime`: TimeSpan - Total time spent on overseer discovery operations
+- `DiscoveryOperationCount`: int - Number of overseer discovery operations performed
+- `CircuitBreakerFailureCount`: int - Current count of circuit breaker failures
+
+### Methods
+- `GetMetrics()`: Dictionary<string, object> - Gets the current performance metrics for the overseer client service
+
+## BacklashPatterns.PatternSearch
+
+### Classes
+- `PatternDetectionMetrics`: class - Service for collecting performance metrics during pattern detection
+- `PatternDetectionMetricsSummary`: class - Summary of pattern detection performance metrics
+
+### Methods
+- `GetSummary()`: PatternDetectionMetricsSummary - Gets the performance metrics summary
+
+## KalshiBotAPI.KalshiAPI.KalshiAPIService
+
+### Methods
+- `GetMethodExecutionDurations()`: ConcurrentDictionary<string, ConcurrentBag<long>> - Gets the method execution durations for performance monitoring
+- `GetCalculationExecutionDurations()`: ConcurrentDictionary<string, ConcurrentBag<long>> - Gets the calculation execution durations for performance monitoring
+- `GetMethodPerformanceMetrics()`: Dictionary<string, (int Count, double AverageMs, long MinMs, long MaxMs)> - Gets aggregated performance metrics for method executions
+- `GetCalculationPerformanceMetrics()`: Dictionary<string, (int Count, double AverageMs, long MinMs, long MaxMs)> - Gets aggregated performance metrics for calculation executions
+
+## BacklashBot.Management.BrainStatusService
+
+### Methods
+- `GetPerformanceMetrics()`: (double InitializationTimeMs, int InitializationAttempts) - Gets initialization timing and attempt count for performance monitoring
+
+## BacklashBot.Management.MarketAnalysisHelper
+
+### Methods
+- `GetPerformanceMetrics()`: (int TotalMarketsProcessed, long TotalProcessingTimeMs, double AverageTimePerMarketMs, int ErrorCount) - Gets processing statistics and error counts
+
+## BacklashBot.Services.InterestScoreService
+
+### Methods
+- `GetPerformanceMetrics()`: (int CacheHits, int CacheMisses, double AverageOperationTimeMs, int TotalOperations) - Gets cache statistics and operation timing
+- `GetCacheHitRate()`: double - Gets the cache hit rate as a percentage
+
+## BacklashBot.Services.OrderBookService
+
+### Methods
+- `GetQueueCounts()`: (int EventQueueCount, int TickerQueueCount, int NotificationQueueCount) - Gets current queue depths for monitoring
+- `GetEventQueueProcessingMetrics()`: (double AverageProcessingTimeMs, int TotalOperations) - Gets event queue processing statistics
+- `GetTickerQueueProcessingMetrics()`: (double AverageProcessingTimeMs, int TotalOperations) - Gets ticker queue processing statistics
+- `GetNotificationQueueProcessingMetrics()`: (double AverageProcessingTimeMs, int TotalOperations) - Gets notification queue processing statistics
+- `GetMarketLockWaitMetrics(string marketTicker)`: (double AverageWaitTimeMs, int TotalOperations) - Gets market-specific lock wait times
+
+## BacklashPatterns.PatternUtils
+
+### Methods
+- `GetPerformanceMetrics()`: (int TotalCalculations, int CacheHits, int CacheMisses, double AverageCalculationTimeMs) - Gets calculation and cache statistics
+- `GetCacheHitRate()`: double - Gets the cache hit rate as a percentage
+
+## BacklashBot.Services.KaslhiBotScopeManagerService
+
+### Notes
+- No performance metrics currently tracked
+
+## BacklashBot.Services.MarketRefreshService
+
+### Properties
+- `LastWorkDuration`: TimeSpan - Duration of the last market refresh operation
+- `LastWorkMarketCount`: int - Number of markets processed in the last refresh operation
+- `TotalRefreshOperations`: long - Total number of refresh operations performed
+- `AverageRefreshTimePerMarket`: TimeSpan - Average time spent per market refresh in the last operation
+- `LastRefreshCount`: int - Total number of markets refreshed in the last operation
+
+## BacklashBot.Services.MarketDataInitializer
+
+### Properties
+- `LastInitializationDuration`: TimeSpan - Duration of the last market data initialization operation
+- `LastInitializationMarketCount`: int - Number of markets processed during the last initialization
+
+## BacklashBot.Services.BroadcastService
+
+### Properties
+- `SuccessfulBroadcasts`: long - Total number of successful broadcast operations
+- `FailedBroadcasts`: long - Total number of failed broadcast operations
+- `TotalBroadcastTimeMs`: double - Cumulative total time spent on broadcast operations in milliseconds
+- `AverageBroadcastTimeMs`: double - Average broadcast time per operation in milliseconds
+- `BroadcastSuccessRate`: double - Broadcast success rate as a percentage (0-100)
+
+## TradingStrategies.TradingOverseer
+
+### Notes
+- No explicit public performance metrics properties currently tracked
+
+## TradingSimulator.Simulator.SimulatorReporting
+
+### Methods
+- `GetPerformanceMetrics()`: PerformanceMetrics - Returns comprehensive metrics object with timing and counts
+
+### Properties
+- `TotalAnalysisTime`: TimeSpan - Total time spent analyzing velocity discrepancies
+- `RollingObservationsTime`: TimeSpan - Time spent computing rolling observations
+- `ExpectedFlowsTime`: TimeSpan - Time spent computing expected flows
+- `SpikeSuppressionTime`: TimeSpan - Time spent on spike suppression logic
+- `SnapshotsProcessed`: int - Number of market snapshots processed
+- `DiscrepanciesDetected`: int - Number of velocity discrepancies detected
+
+## TradingSimulator.MarketProcessor
+
+### Methods
+- `GetPerformanceMetrics()`: PerformanceMetrics - Returns comprehensive metrics object
+- `ResetPerformanceMetrics()`: void - Resets all performance counters
+- `GetMetricsSummary()`: string - Formatted summary of all metrics
+
+### Properties
+- `AverageProcessingTimePerMarket`: TimeSpan - Average time to process a single market
+- `AverageBatchProcessingTime`: TimeSpan - Average time to process a batch of markets
+- `MarketsPerSecond`: double - Processing rate in markets per second
+- `SnapshotsPerSecond`: double - Processing rate in snapshots per second
+- `CurrentQueueDepth`: int - Current number of markets in processing queue
+- `MaxQueueDepth`: int - Maximum queue depth recorded
+- `TotalMarketsProcessed`: int - Total number of markets processed
+- `TotalSnapshotsProcessed`: int - Total number of snapshots processed
+- `TotalProcessingTime`: TimeSpan - Total time spent processing
+- `Uptime`: TimeSpan - Time since metrics were started
+- `PeakMemoryUsage`: long - Peak memory usage recorded
+- `AverageMemoryUsage`: double - Average memory usage
+- `CurrentMemoryUsage`: long - Current memory usage
+
+## KalshiBotOverseer.OverseerHub
+
+### Methods
+- `GetHubMetrics()`: dynamic - Returns comprehensive hub metrics object
+- `GetPerformanceMetrics()`: Dictionary<string, object> - Returns real-time performance metrics including message processing rates, connection counts, and request statistics. Dictionary keys include: TotalMessagesProcessed (long), TotalHandshakeRequests (long), TotalCheckInRequests (long), MessagesPerMinute (double), HandshakeRequestsPerMinute (double), CheckInRequestsPerMinute (double), CurrentConnectionCount (int), LastMetricsReset (DateTime)
+- `ResetPerformanceMetrics()`: void - Resets all performance metrics counters to zero and updates the last reset timestamp
+
+### Properties
+- `Uptime`: TimeSpan - Time since hub started
+- `TotalConnections`: long - Total number of client connections
+- `ActiveConnections`: long - Currently active connections
+- `TotalMessagesProcessed`: long - Total messages processed
+- `MessagesPerSecond`: double - Current message processing rate
+- `ConnectionHealthCount`: int - Number of healthy connections
+- `MessageBatchQueueSize`: int - Size of message batch queue
+- `HandshakeRateLimitCount`: int - Number of rate-limited handshakes
+- `CheckInRateLimitCount`: int - Number of rate-limited check-ins
+
+## KalshiBotOverseer.OverseerHubConfig
+
+### Properties
+- `ConnectionHealthTimeoutSeconds`: int - Timeout in seconds for connection health monitoring (default: 300)
+- `HealthCheckIntervalSeconds`: int - Interval in seconds between health checks (default: 60)
+- `AuthTokenValidityHours`: int - Validity duration for authentication tokens in hours (default: 24)
+- `MaxHandshakeRequestsPerMinute`: int - Maximum number of handshake requests allowed per minute per IP (default: 10)
+- `MaxCheckInRequestsPerMinute`: int - Maximum number of check-in requests allowed per minute per client (default: 60)
+
+## KalshiBotOverseer.OvernightActivitiesHelper
+
+### Methods
+- `GetPerformanceMetrics()`: tuple - Returns comprehensive performance metrics (newly added)
+
+### Properties
+- `TotalTasks`: int - Total number of overnight tasks executed
+- `SuccessfulTasks`: int - Number of tasks that completed successfully
+- `SuccessRate`: double - Percentage of tasks that succeeded
+- `TotalDuration`: TimeSpan - Total time for all overnight operations
+- `TaskTimings`: Dictionary<string, TimeSpan> - Individual task execution times
+- `MarketRefreshFailureCount`: int - Number of market refresh failures
+- `LastMarketRefreshFailure`: DateTime? - Timestamp of last market refresh failure
+
+## KalshiBotContext.Data.KalshiBotContext
+
+### Methods
+- `GetPerformanceMetrics()`: IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> - Returns comprehensive performance metrics for all tracked database operations
+- `ResetPerformanceMetrics()`: void - Resets all performance metrics counters to zero
+- `TrackPerformanceMetric(string operationName, bool success, TimeSpan duration)`: void - Tracks performance metrics for individual database operations (private method)
+
+### Properties
+- `_performanceMetrics`: Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime)> - Internal dictionary storing performance metrics for each operation
+- `_maxRetryCount`: int - Configurable maximum number of retry attempts for database operations
+- `_retryDelay`: TimeSpan - Configurable delay between retry attempts
+- `_batchSize`: int - Configurable batch size for bulk database operations
+
+## BacklashBot.Services.TradingSnapshotService
+
+### Methods
+- `SaveSnapshotAsync()`: TimeSpan - Execution time for snapshot save operations, logged with count of snapshots saved
+- `LoadManySnapshots()`: TimeSpan - Execution time for snapshot load operations, logged with total snapshots and market count
+
+### Properties
+- `MaxParallelism`: int - Configurable limit for parallel processing during snapshot loading (default: Environment.ProcessorCount)
+- `StorageDirectory`: string - Configurable directory path for storing snapshot files
+
+## BacklashBot.Services.OrderbookChangeTracker
+
+### Methods
+- `FindMatchingOrderbookChange()`: TimeSpan - Execution time for trade-orderbook matching operations
+- `ProcessOrderbookSnapshot()`: TimeSpan - Execution time for orderbook snapshot processing
+- `GetPerformanceMetrics()`: Dictionary<string, object> - Returns comprehensive performance metrics including matching success rates, processing times, and queue depths
+
+### Properties
+- `MaxOrderbookChangeQueueSize`: int - Configurable maximum size for orderbook change queue (default: 10000)
+- `MaxTradeEventQueueSize`: int - Configurable maximum size for trade event queue (default: 5000)
+- `OrderbookChangeCleanupThresholdMinutes`: int - Age threshold for cleaning up old orderbook changes (default: 60)
+- `TradeEventCleanupThresholdMinutes`: int - Age threshold for cleaning up old trade events (default: 60)
+
+### Performance Metrics
+- `TotalMatchingOperations`: long - Total number of trade-orderbook matching operations performed
+- `SuccessfulMatches`: long - Number of successful trade-orderbook matches
+- `MatchSuccessRate`: double - Percentage of successful matches (0-100)
+- `AverageProcessingTimeMs`: double - Average time per matching operation in milliseconds
+- `TotalQueueProcessingTimeMs`: long - Total time spent processing queue operations
+- `MaxQueueDepth`: int - Maximum observed queue depth
+- `CurrentQueueDepth`: int - Current orderbook change queue depth
+- `CurrentTradeQueueDepth`: int - Current trade event queue depth
+- `OperationsPerSecond`: double - Rate of matching operations per second
+
+## BacklashBot.Services.CandlestickService
+
+### Methods
+- `UpdateCandlesticksAsync()`: TimeSpan - Execution time for updating candlesticks for a specific market, logged with market ticker and operation details
+- `PopulateMarketDataAsync()`: TimeSpan - Execution time for populating market data including parallel processing of minute/hour/day intervals, logged with market ticker
+- `LoadAndProcessCandlesticksAsync()`: TimeSpan - Execution time for loading and processing candlestick data from Parquet files and SQL database, logged with market ticker, interval, and count of loaded candlesticks
+- `PerformDataCleanupAsync()`: TimeSpan - Execution time for performing data cleanup operations on old candlestick data, logged with total items cleaned
+
+### Properties
+- `EnableCandlestickPerformanceMetrics`: bool - Configurable flag to enable/disable performance metrics collection for candlestick operations (default: true)
+- `CandlestickPerformanceMetricsLogLevel`: string - Configurable log level for performance metrics ("Debug", "Information", "Warning", "Error") (default: "Information")
+- `MaxParallelCandlestickTasks`: int - Maximum number of parallel tasks for candlestick processing to prevent resource exhaustion (default: 4)
+- `MaxDegreeOfParallelismDataLoading`: int - Maximum degree of parallelism for data loading operations (default: 2)
+- `CandlestickDataRetentionDays`: int - Number of days to retain candlestick data before cleanup (default: 365)
+- `CandlestickCleanupIntervalHours`: int - Interval in hours between cleanup operations (default: 24)
+- `MaxCandlesticksPerMarket`: int - Maximum number of candlesticks to keep per market per interval (default: 10000)
+
+### Performance Metrics Features
+- **Parallel Processing Control**: Uses SemaphoreSlim to limit concurrent interval processing based on `MaxParallelCandlestickTasks` configuration
+- **Data Retention Management**: Automatically applies retention policies based on `CandlestickDataRetentionDays` and limits data size with `MaxCandlesticksPerMarket`
+- **Configurable Logging**: Performance metrics are logged at the configured log level when `EnableCandlestickPerformanceMetrics` is true
+- **Resource Protection**: Parallel processing limits prevent system resource exhaustion during high-volume data operations
+- **Cleanup Automation**: Scheduled cleanup operations remove old data based on retention policies and configurable intervals
+
+## TradingGUI.MainForm
+
+### Properties
+- `_progressBar`: ProgressBar - UI progress indicator control for displaying simulation operation completion percentage
+- `_progressBar.Value`: int - Current progress value (0-100) representing completion percentage of long-running operations
+- `_progressBar.Visible`: bool - Controls visibility of progress indicator during operations
+
+### Methods
+- `LoadCache()`: Task - Asynchronous market data loading operation with improved UI responsiveness through non-blocking file I/O
+- `ShowDashboardAt()`: Task - Asynchronous dashboard display operation with non-blocking file reading for cached market data
+- `HandleRunSimulation()`: void - Simulation execution with progress tracking and UI feedback
+- `HandleRunSpecificSet()`: void - Specific strategy set execution with progress indication
+- `HandleRunMLTraining()`: void - ML training execution with progress monitoring
+
+### Performance Metrics Features
+- **Async File Operations**: File.ReadAllTextAsync() replaces synchronous File.ReadAllText() to prevent UI thread blocking during large data loads
+- **Progress Tracking**: Real-time progress updates during multi-weight-set simulations using currentStep/totalSteps ratio calculation
+- **UI Responsiveness**: Non-blocking operations ensure main form remains responsive during data-intensive operations
+- **Memory Efficiency**: Progress bar control minimizes memory overhead while providing user feedback
+- **Operation Completion Feedback**: Automatic progress bar hiding after operation completion with brief delay for visual confirmation
+
+### Distinct Return Types (Deconstructed)
+
+#### Primitive Types
+- `int` (ProgressBar.Value, currentStep counter, totalSteps counter) - Used for progress calculation and UI updates
+- `bool` (ProgressBar.Visible, operation completion flags) - Controls UI state during operations
+
+#### Non-Primitive Types
+- `ProgressBar` (System.Windows.Forms.ProgressBar) - Windows Forms control for visual progress indication containing:
+  - `Value`: int - Current progress value (0-100)
+  - `Visible`: bool - UI visibility state
+  - `Minimum`: int - Minimum progress value (fixed at 0)
+  - `Maximum`: int - Maximum progress value (fixed at 100)
+- `Task` (System.Threading.Tasks.Task) - Asynchronous operation result for non-blocking UI operations
+- `Dictionary<string, double>` (_bestPnL) - Market PnL tracking with string keys (market tickers) and double values (PnL amounts)
+- `HashSet<string>` (_checkedMarketNames) - Collection of selected market names for UI state management
+- `List<string>` (GetCheckedMarkets() return) - Array-backed list of currently selected market tickers
+
+## BacklashBot.Services.WebSocketMonitorService
+
+### Properties
+- `_monitoringIntervalMinutes`: int - Configurable interval in minutes between exchange status checks (default: 1)
+- `_retryDelayMinutes`: int - Configurable delay in minutes before retrying after errors (default: 5)
+- `_exchangeStatusCheckCount`: int - Total number of exchange status checks performed since service start
+- `_exchangeStatusSuccessCount`: int - Number of successful exchange status checks
+- `_connectionAttemptCount`: int - Total number of WebSocket connection attempts
+- `_connectionSuccessCount`: int - Number of successful WebSocket connections
+- `_monitoringStopwatch`: System.Diagnostics.Stopwatch - Timer for measuring individual operation durations
+
+### Methods
+- `GetMetrics()`: (int ExchangeStatusChecks, int ExchangeStatusSuccesses, int ConnectionAttempts, int ConnectionSuccesses) - Returns current performance metrics as a tuple with exchange status check counts and connection attempt statistics
+- `MonitorAndManageWebSocketConnectionAsync(bool immediate)`: Task - Core monitoring method that checks exchange status and manages WebSocket connections with configurable intervals and comprehensive metrics collection
+- `TriggerConnectionCheckAsync()`: Task - Triggers an immediate WebSocket connection check outside the normal monitoring cycle
+
+### Notes
+- Exchange status check frequency and success rates are tracked and logged on errors and shutdown
+- Connection attempt success rates are monitored and reported for reliability analysis
+- Operation timing is measured for each exchange status check to identify performance bottlenecks
+- Configurable intervals allow tuning monitoring frequency based on operational requirements
+- Metrics are logged during error conditions and final metrics are reported on service shutdown
+
+## KalshiBotAPI.Websockets.WebSocketConnectionManager
+
+### Properties
+- `ConnectionAttempts`: int - Total connection attempts made
+- `ConnectionSuccesses`: int - Number of successful connections
+- `ConnectionSuccessRate`: double - Percentage of successful connections
+- `ReconnectionCount`: int - Number of reconnections performed
+- `AverageConnectionLatency`: double - Average connection time in milliseconds
+- `MessagesReceived`: int - Total messages received
+- `MessageThroughput`: double - Messages per second (sliding window)
+- `ConnectionFailures`: int - Total connection failures
+- `SignatureCacheHitRate`: double - Percentage of signature cache hits
+- `SignatureCacheHits`: int - Number of signature cache hits
+- `SignatureCacheMisses`: int - Number of signature cache misses
+- `TotalBytesReceived`: long - Total bytes received
+- `AverageBufferUtilization`: double - Average buffer usage percentage
+
+### Methods
+- `ConnectionFailureReasons`: IReadOnlyDictionary<string, int> - Failure reasons and counts
+
+
+
+# Important warnings to fix
+XML Comment Issues in BacklashDTOs/MarketSnapshot.cs:
+
+Multiple CS1570 warnings for badly formed XML comments (e.g., undefined entity '&L', expected identifiers, mismatched tags)
+These appear to be malformed documentation comments that need fixing for proper IntelliSense and documentation generation
+Nullability Warnings (Extensive):
+
+CS8600/CS8625: Converting null literals to non-nullable types (primarily in KalshiBotTests)
+CS8602/CS8604: Dereference of possibly null references (in TradingGUI and tests)
+CS8620/CS8622: Nullability mismatches in method parameters and delegates
+CS8629: Nullable value types that may be null
+These indicate potential runtime null reference exceptions and should be addressed for code safety
+Async Method Issues:
+
+CS1998: Several async methods lack 'await' operators and run synchronously (in KalshiAPIServiceTests, TradingGUI)
+CS4014: Unawaited async calls that continue execution before completion
+Other Notable Warnings:
+
+CS8618: Non-nullable fields not initialized in constructors (consider 'required' modifier)
+CS0649: Fields never assigned (in test classes)
+CS0168: Unused variables
+CS1571: Duplicate XML param tags
+
 
 # Backlog
 - [ ] Fix build warnings

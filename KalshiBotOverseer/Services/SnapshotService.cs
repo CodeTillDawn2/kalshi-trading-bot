@@ -14,6 +14,11 @@ namespace KalshiBotOverseer.Services
     {
         private readonly IKalshiBotContext _context;
 
+        // Performance metrics storage
+        private readonly List<long> _aggregationTimes = new List<long>();
+        private long _totalAggregationTime;
+        private int _aggregationCount;
+
         /// <summary>
         /// Initializes a new instance of the SnapshotService class.
         /// </summary>
@@ -89,6 +94,13 @@ namespace KalshiBotOverseer.Services
                 })
                 .OrderBy(s => s.MarketTicker)
                 .ToList();
+
+            stopwatch.Stop();
+            // Store performance metrics
+            var elapsedMs = stopwatch.ElapsedMilliseconds;
+            _aggregationTimes.Add(elapsedMs);
+            _totalAggregationTime += elapsedMs;
+            _aggregationCount++;
 
             return await Task.FromResult(groupedSnapshots.Cast<object>().ToList());
         }
@@ -167,10 +179,79 @@ namespace KalshiBotOverseer.Services
                 .ToList();
 
             stopwatch.Stop();
-            // Performance metric: Aggregation took {stopwatch.ElapsedMilliseconds} ms
-            // Consider logging this if performance becomes a bottleneck
+            // Store performance metrics
+            var elapsedMs = stopwatch.ElapsedMilliseconds;
+            _aggregationTimes.Add(elapsedMs);
+            _totalAggregationTime += elapsedMs;
+            _aggregationCount++;
 
             return await Task.FromResult(groupedSnapshots.Cast<object>().ToList());
+        }
+
+        /// <summary>
+        /// Gets all recorded aggregation times in milliseconds.
+        /// </summary>
+        /// <returns>An array of aggregation times in milliseconds.</returns>
+        /// <remarks>
+        /// This method provides access to the performance metrics collected during snapshot aggregation operations.
+        /// Each value represents the time taken for a single aggregation operation.
+        /// </remarks>
+        public long[] GetAggregationTimes()
+        {
+            return _aggregationTimes.ToArray();
+        }
+
+        /// <summary>
+        /// Gets performance statistics for snapshot aggregation operations.
+        /// </summary>
+        /// <returns>A tuple containing count, average time, min time, and max time in milliseconds.</returns>
+        /// <remarks>
+        /// Returns comprehensive statistics about the performance of snapshot aggregation operations.
+        /// If no aggregations have been performed, returns (0, 0, 0, 0).
+        /// </remarks>
+        public (int Count, double AverageMs, long MinMs, long MaxMs) GetAggregationStatistics()
+        {
+            if (_aggregationTimes.Count == 0)
+                return (0, 0, 0, 0);
+
+            return (
+                _aggregationTimes.Count,
+                _aggregationTimes.Average(),
+                _aggregationTimes.Min(),
+                _aggregationTimes.Max()
+            );
+        }
+
+        /// <summary>
+        /// Gets the total time spent on all aggregation operations.
+        /// </summary>
+        /// <returns>The total aggregation time in milliseconds.</returns>
+        public long GetTotalAggregationTime()
+        {
+            return _totalAggregationTime;
+        }
+
+        /// <summary>
+        /// Gets the number of aggregation operations performed.
+        /// </summary>
+        /// <returns>The count of aggregation operations.</returns>
+        public int GetAggregationCount()
+        {
+            return _aggregationCount;
+        }
+
+        /// <summary>
+        /// Clears all recorded aggregation times and resets counters.
+        /// </summary>
+        /// <remarks>
+        /// This method resets the performance metrics collection, useful for starting
+        /// fresh measurements or clearing accumulated data.
+        /// </remarks>
+        public void ClearAggregationMetrics()
+        {
+            _aggregationTimes.Clear();
+            _totalAggregationTime = 0;
+            _aggregationCount = 0;
         }
     }
 }

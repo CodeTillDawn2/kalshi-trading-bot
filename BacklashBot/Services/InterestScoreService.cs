@@ -459,5 +459,38 @@ CalculateMarketInterestScoreAsync(
             }
         }
 
+        /// <summary>
+        /// Gets current performance metrics for the interest score service.
+        /// Returns cache hit/miss statistics and operation timing information.
+        /// </summary>
+        /// <returns>A tuple containing cache hits, cache misses, average operation time in milliseconds, and total operations count.</returns>
+        public (int CacheHits, int CacheMisses, double AverageOperationTimeMs, int TotalOperations) GetPerformanceMetrics()
+        {
+            var hits = _cacheHits;
+            var misses = _cacheMisses;
+            double avgTime = 0;
+            int count = 0;
+            lock (_scoringOperationTimes)
+            {
+                if (_scoringOperationTimes.Count > 0)
+                {
+                    avgTime = _scoringOperationTimes.Average(t => t.TotalMilliseconds);
+                    count = _scoringOperationTimes.Count;
+                }
+            }
+            return (hits, misses, avgTime, count);
+        }
+
+        /// <summary>
+        /// Gets the cache hit rate as a percentage.
+        /// </summary>
+        /// <returns>The cache hit rate (0.0 to 100.0).</returns>
+        public double GetCacheHitRate()
+        {
+            var (hits, misses, _, _) = GetPerformanceMetrics();
+            var total = hits + misses;
+            return total > 0 ? (double)hits / total * 100.0 : 0.0;
+        }
+
     }
 }

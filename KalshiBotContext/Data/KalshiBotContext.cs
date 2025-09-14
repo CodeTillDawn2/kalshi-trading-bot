@@ -69,6 +69,12 @@ namespace KalshiBotData.Data
         private readonly IConfiguration _config;
         private readonly ILogger<KalshiBotContext>? _logger;
 
+        // Configuration options
+        private readonly int _maxRetryCount;
+        private readonly TimeSpan _retryDelay;
+        private readonly int _batchSize;
+        private readonly Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime)> _performanceMetrics;
+
         /// <summary>
         /// Initializes a new instance of the KalshiBotContext with configuration and optional logging.
         /// </summary>
@@ -80,6 +86,12 @@ namespace KalshiBotData.Data
             _config = config;
             _logger = logger;
             _connectionString = _config.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
+
+            // Initialize configuration options with defaults
+            _maxRetryCount = _config.GetValue<int>("Database:MaxRetryCount", 3);
+            _retryDelay = TimeSpan.FromSeconds(_config.GetValue<double>("Database:RetryDelaySeconds", 1.0));
+            _batchSize = _config.GetValue<int>("Database:BatchSize", 100);
+            _performanceMetrics = new Dictionary<string, (int, int, TimeSpan)>();
         }
 
         #region Series
@@ -88,15 +100,30 @@ namespace KalshiBotData.Data
         /// </summary>
         /// <param name="seriesTicker">The unique ticker identifier for the series.</param>
         /// <returns>The series data transfer object, or null if not found.</returns>
+        /// <exception cref="ArgumentException">Thrown when seriesTicker is null or empty.</exception>
         public async Task<SeriesDTO?> GetSeriesByTicker(string seriesTicker)
         {
-            SeriesDTO? seriesDTO = null;
-            Series? series = await Series.AsNoTracking().FirstOrDefaultAsync(x => x.series_ticker == seriesTicker);
-            if (series != null)
+            if (string.IsNullOrWhiteSpace(seriesTicker))
+                throw new ArgumentException("Series ticker cannot be null or empty.", nameof(seriesTicker));
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            try
             {
-                seriesDTO = series.ToSeriesDTO();
+                SeriesDTO? seriesDTO = null;
+                Series? series = await Series.AsNoTracking().FirstOrDefaultAsync(x => x.series_ticker == seriesTicker);
+                if (series != null)
+                {
+                    seriesDTO = series.ToSeriesDTO();
+                }
+                TrackPerformanceMetric("GetSeriesByTicker", true, stopwatch.Elapsed);
+                return seriesDTO;
             }
-            return seriesDTO;
+            catch (Exception ex)
+            {
+                TrackPerformanceMetric("GetSeriesByTicker", false, stopwatch.Elapsed);
+                _logger?.LogError(ex, "Error retrieving series by ticker {SeriesTicker}", seriesTicker);
+                throw;
+            }
         }
 
 
@@ -105,6 +132,8 @@ namespace KalshiBotData.Data
         /// Performs idempotent operations with case-insensitive deduplication.
         /// </summary>
         /// <param name="dto">The series data transfer object containing series information and related data.</param>
+        /// <exception cref="ArgumentNullException">Thrown when dto is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when dto.series_ticker is null or empty.</exception>
         /// <exception cref="Exception">Thrown when the operation fails, with details about the failure.</exception>
         /// <remarks>
         /// This method handles:
@@ -116,6 +145,12 @@ namespace KalshiBotData.Data
         /// </remarks>
         public async Task AddOrUpdateSeries(SeriesDTO dto)
         {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+            if (string.IsNullOrWhiteSpace(dto.series_ticker))
+                throw new ArgumentException("Series ticker cannot be null or empty.", nameof(dto.series_ticker));
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             using var tx = await this.Database.BeginTransactionAsync();
             try
             {
@@ -199,10 +234,13 @@ namespace KalshiBotData.Data
 
                 await SaveChangesWithRetryAsync();
                 await tx.CommitAsync();
+                TrackPerformanceMetric("AddOrUpdateSeries", true, stopwatch.Elapsed);
             }
             catch (Exception ex)
             {
                 await tx.RollbackAsync();
+                TrackPerformanceMetric("AddOrUpdateSeries", false, stopwatch.Elapsed);
+                _logger?.LogError(ex, "Error adding or updating series {SeriesTicker}", dto.series_ticker);
                 throw new Exception($"Failed to add or update series for ticker {dto.series_ticker}: {ex.Message}", ex);
             }
         }
@@ -215,16 +253,37 @@ namespace KalshiBotData.Data
         /// </summary>
         /// <param name="eventTicker">The unique ticker identifier for the event.</param>
         /// <returns>The event data transfer object with series information, or null if not found.</returns>
+        /// <exception cref="ArgumentException">Thrown when eventTicker is null or empty.</exception>
         public async Task<EventDTO?> GetEventByTicker(string eventTicker)
         {
-            var rawEvent = await Events.AsNoTracking().FirstOrDefaultAsync(x => x.event_ticker == eventTicker);
-            if (rawEvent == null) return null;
-            var rawSeries = await Series.AsNoTracking().FirstOrDefaultAsync(x => x.series_ticker == rawEvent.series_ticker);
-            if (rawSeries != null)
+            if (string.IsNullOrWhiteSpace(eventTicker))
+                throw new ArgumentException("Event ticker cannot be null or empty.", nameof(eventTicker));
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            try
             {
-                rawEvent.Series = rawSeries;
+                var rawEvent = await Events.AsNoTracking().FirstOrDefaultAsync(x => x.event_ticker == eventTicker);
+                if (rawEvent == null)
+                {
+                    TrackPerformanceMetric("GetEventByTicker", true, stopwatch.Elapsed);
+                    return null;
+                }
+
+                var rawSeries = await Series.AsNoTracking().FirstOrDefaultAsync(x => x.series_ticker == rawEvent.series_ticker);
+                if (rawSeries != null)
+                {
+                    rawEvent.Series = rawSeries;
+                }
+
+                TrackPerformanceMetric("GetEventByTicker", true, stopwatch.Elapsed);
+                return rawEvent.ToEventDTO();
             }
-            return rawEvent.ToEventDTO();
+            catch (Exception ex)
+            {
+                TrackPerformanceMetric("GetEventByTicker", false, stopwatch.Elapsed);
+                _logger?.LogError(ex, "Error retrieving event by ticker {EventTicker}", eventTicker);
+                throw;
+            }
         }
 
 
@@ -300,27 +359,47 @@ namespace KalshiBotData.Data
         /// </summary>
         /// <param name="marketTicker">The unique ticker identifier for the market.</param>
         /// <returns>The market data transfer object with event and series information, or null if not found.</returns>
+        /// <exception cref="ArgumentException">Thrown when marketTicker is null or empty.</exception>
         public async Task<MarketDTO?> GetMarketByTicker(string marketTicker)
         {
-            Market? market = await Markets.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.market_ticker == marketTicker);
+            if (string.IsNullOrWhiteSpace(marketTicker))
+                throw new ArgumentException("Market ticker cannot be null or empty.", nameof(marketTicker));
 
-            if (market == null) return null;
-
-            Event? thisEvent = await Events.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.event_ticker == market.event_ticker);
-
-            if (thisEvent != null)
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            try
             {
-                market.Event = thisEvent;
-                Series? series = await Series.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.series_ticker == thisEvent.series_ticker);
-                if (series != null)
+                Market? market = await Markets.AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.market_ticker == marketTicker);
+
+                if (market == null)
                 {
-                    market.Event.Series = series;
+                    TrackPerformanceMetric("GetMarketByTicker", true, stopwatch.Elapsed);
+                    return null;
                 }
+
+                Event? thisEvent = await Events.AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.event_ticker == market.event_ticker);
+
+                if (thisEvent != null)
+                {
+                    market.Event = thisEvent;
+                    Series? series = await Series.AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.series_ticker == thisEvent.series_ticker);
+                    if (series != null)
+                    {
+                        market.Event.Series = series;
+                    }
+                }
+
+                TrackPerformanceMetric("GetMarketByTicker", true, stopwatch.Elapsed);
+                return market.ToMarketDTO();
             }
-            return market.ToMarketDTO();
+            catch (Exception ex)
+            {
+                TrackPerformanceMetric("GetMarketByTicker", false, stopwatch.Elapsed);
+                _logger?.LogError(ex, "Error retrieving market by ticker {MarketTicker}", marketTicker);
+                throw;
+            }
         }
 
 
@@ -423,8 +502,22 @@ namespace KalshiBotData.Data
         }
         public async Task AddOrUpdateMarkets(List<MarketDTO> dtos)
         {
+            if (dtos == null)
+                throw new ArgumentNullException(nameof(dtos));
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            int successCount = 0;
+            int failureCount = 0;
+
             foreach (MarketDTO dto in dtos)
             {
+                if (dto == null || string.IsNullOrWhiteSpace(dto.market_ticker))
+                {
+                    _logger?.LogWarning("Invalid market DTO encountered, skipping");
+                    failureCount++;
+                    continue;
+                }
+
                 Market? market = await Markets.FirstOrDefaultAsync(x => x.market_ticker == dto.market_ticker);
                 if (market == null)
                 {
@@ -439,7 +532,8 @@ namespace KalshiBotData.Data
                 try
                 {
                     await SaveChangesAsync();
-                    Thread.Sleep(50);
+                    successCount++;
+                    await Task.Delay(_retryDelay); // Replace Thread.Sleep with Task.Delay
                 }
                 catch (DbUpdateException ex)
                 {
@@ -447,10 +541,12 @@ namespace KalshiBotData.Data
                     {
                         // Duplicate key violation - this is expected when multiple bots are running
                         _logger?.LogWarning(ex, "Duplicate market key {MarketTicker} encountered during save, continuing", dto.market_ticker);
+                        failureCount++;
                     }
                     else
                     {
                         // Re-throw for other DbUpdateExceptions
+                        failureCount++;
                         throw;
                     }
                 }
@@ -460,14 +556,20 @@ namespace KalshiBotData.Data
                     try
                     {
                         await SaveChangesAsync();
-                        Thread.Sleep(50);
+                        successCount++;
+                        await Task.Delay(_retryDelay);
                     }
                     catch (Exception retryEx)
                     {
                         _logger?.LogError(retryEx, "Failed to save market {MarketTicker} after retry", dto.market_ticker);
+                        failureCount++;
                     }
                 }
             }
+
+            TrackPerformanceMetric("AddOrUpdateMarkets", successCount > failureCount, stopwatch.Elapsed);
+            _logger?.LogInformation("AddOrUpdateMarkets completed: {SuccessCount} successes, {FailureCount} failures",
+                successCount, failureCount);
         }
 
         /// <summary>
@@ -780,15 +882,30 @@ namespace KalshiBotData.Data
 
         public async Task RemoveClosedWatches()
         {
-            var marketWatches = await MarketWatches.Include(x => x.Market)
-                .Where(x => x.Market != null && x.Market.status != KalshiConstants.Status_Active)
-                .ToListAsync();
-
-            for (int i = 0; i < marketWatches.Count; i += 1)
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            try
             {
-                var batch = marketWatches.Skip(i).Take(1).ToList();
-                MarketWatches.RemoveRange(batch);
-                await SaveChangesAsync();
+                var marketWatches = await MarketWatches.Include(x => x.Market)
+                    .Where(x => x.Market != null && x.Market.status != KalshiConstants.Status_Active)
+                    .ToListAsync();
+
+                int totalRemoved = 0;
+                for (int i = 0; i < marketWatches.Count; i += _batchSize)
+                {
+                    var batch = marketWatches.Skip(i).Take(_batchSize).ToList();
+                    MarketWatches.RemoveRange(batch);
+                    await SaveChangesAsync();
+                    totalRemoved += batch.Count;
+                }
+
+                TrackPerformanceMetric("RemoveClosedWatches", true, stopwatch.Elapsed);
+                _logger?.LogInformation("Removed {Count} closed market watches", totalRemoved);
+            }
+            catch (Exception ex)
+            {
+                TrackPerformanceMetric("RemoveClosedWatches", false, stopwatch.Elapsed);
+                _logger?.LogError(ex, "Error removing closed watches");
+                throw;
             }
         }
 
@@ -856,14 +973,32 @@ namespace KalshiBotData.Data
 
         public async Task RemoveMarketWatches(List<MarketWatchDTO> dtoRange)
         {
-            for (int i = 0; i < dtoRange.Count; i += 1)
+            if (dtoRange == null)
+                throw new ArgumentNullException(nameof(dtoRange));
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            try
             {
-                var batch = dtoRange.Skip(i).Take(1).ToList();
-                var marketWatch = await MarketWatches
-                    .Where(x => batch.Select(y => y.market_ticker).Contains(x.market_ticker))
-                    .ToListAsync();
-                MarketWatches.RemoveRange(marketWatch);
-                await SaveChangesAsync();
+                int totalRemoved = 0;
+                for (int i = 0; i < dtoRange.Count; i += _batchSize)
+                {
+                    var batch = dtoRange.Skip(i).Take(_batchSize).ToList();
+                    var marketWatch = await MarketWatches
+                        .Where(x => batch.Select(y => y.market_ticker).Contains(x.market_ticker))
+                        .ToListAsync();
+                    MarketWatches.RemoveRange(marketWatch);
+                    await SaveChangesAsync();
+                    totalRemoved += marketWatch.Count;
+                }
+
+                TrackPerformanceMetric("RemoveMarketWatches", true, stopwatch.Elapsed);
+                _logger?.LogInformation("Removed {Count} market watches", totalRemoved);
+            }
+            catch (Exception ex)
+            {
+                TrackPerformanceMetric("RemoveMarketWatches", false, stopwatch.Elapsed);
+                _logger?.LogError(ex, "Error removing market watches");
+                throw;
             }
         }
 
@@ -1585,16 +1720,47 @@ namespace KalshiBotData.Data
             return await OverseerInfos.FirstOrDefaultAsync(oi => oi.HostName == hostName && oi.IsActive);
         }
         /// <summary>
+        /// Tracks performance metrics for database operations.
+        /// </summary>
+        /// <param name="operationName">Name of the operation being tracked.</param>
+        /// <param name="success">Whether the operation was successful.</param>
+        /// <param name="duration">Time taken for the operation.</param>
+        private void TrackPerformanceMetric(string operationName, bool success, TimeSpan duration)
+        {
+            lock (_performanceMetrics)
+            {
+                if (!_performanceMetrics.ContainsKey(operationName))
+                {
+                    _performanceMetrics[operationName] = (0, 0, TimeSpan.Zero);
+                }
+
+                var current = _performanceMetrics[operationName];
+                if (success)
+                {
+                    _performanceMetrics[operationName] = (current.SuccessCount + 1, current.FailureCount, current.TotalTime + duration);
+                }
+                else
+                {
+                    _performanceMetrics[operationName] = (current.SuccessCount, current.FailureCount + 1, current.TotalTime + duration);
+                }
+            }
+
+            _logger?.LogInformation("Operation {OperationName} completed in {Duration}ms, Success: {Success}",
+                operationName, duration.TotalMilliseconds, success);
+        }
+
+        /// <summary>
         /// Saves changes to the database with retry logic for transient SQL errors.
         /// </summary>
         /// <remarks>
         /// Implements Polly retry policy to handle transient SQL Server errors such as:
         /// deadlocks (1205), lock timeouts (1222), connection issues, and throttling errors.
-        /// Retries up to 3 times with exponential backoff (1s, 2s, 3s delays).
+        /// Retries up to configured count with exponential backoff.
         /// </remarks>
         private async Task SaveChangesWithRetryAsync()
         {
-            var retryPolicy = Policy.Handle<SqlException>(ex => IsTransient(ex)).WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(i));
+            var retryPolicy = Policy.Handle<SqlException>(ex => IsTransient(ex))
+                .WaitAndRetryAsync(_maxRetryCount, i => TimeSpan.FromSeconds(i) * _retryDelay.TotalSeconds);
             await retryPolicy.ExecuteAsync(async () => await SaveChangesAsync());
         }
 
@@ -1613,6 +1779,38 @@ namespace KalshiBotData.Data
             return transientErrors.Contains(ex.Number);
         }
         #endregion
+
+        /// <summary>
+        /// Retrieves current performance metrics for database operations.
+        /// </summary>
+        /// <returns>Dictionary containing operation names and their performance statistics.</returns>
+        public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetPerformanceMetrics()
+        {
+            lock (_performanceMetrics)
+            {
+                return _performanceMetrics.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp =>
+                    {
+                        var totalOperations = kvp.Value.SuccessCount + kvp.Value.FailureCount;
+                        var averageTime = totalOperations > 0
+                            ? kvp.Value.TotalTime.TotalMilliseconds / totalOperations
+                            : 0.0;
+                        return (kvp.Value.SuccessCount, kvp.Value.FailureCount, kvp.Value.TotalTime, averageTime);
+                    });
+            }
+        }
+
+        /// <summary>
+        /// Resets all performance metrics.
+        /// </summary>
+        public void ResetPerformanceMetrics()
+        {
+            lock (_performanceMetrics)
+            {
+                _performanceMetrics.Clear();
+            }
+        }
 
         /// <summary>
         /// Configures the database context to use SQL Server with the configured connection string.

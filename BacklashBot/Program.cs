@@ -280,7 +280,7 @@ app.Lifetime.ApplicationStopping.Register(() =>
 app.UseRouting();
 app.UseAuthorization();
 
-app.MapHub<ChartHub>("/chartHub");
+app.MapHub<BacklashBotHub>("/chartHub");
 app.MapGet("/shutdown-services", async (ICentralBrain brain, ILogger<Program> logger) =>
 {
     try

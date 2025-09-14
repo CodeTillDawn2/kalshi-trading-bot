@@ -1,3 +1,4 @@
+using System;
 using BacklashDTOs;
 using TradingStrategies.Strategies;
 using static BacklashInterfaces.Enums.StrategyEnums;
@@ -61,7 +62,15 @@ namespace TradingStrategies.Trading.Overseer
         /// This value is updated by the simulation engine as trades are executed. It directly
         /// affects equity calculations and risk assessments throughout the simulation.
         /// </remarks>
-        public int Position { get; set; }
+        private int _position;
+        public int Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the current cash balance available for trading.
@@ -70,9 +79,19 @@ namespace TradingStrategies.Trading.Overseer
         /// <remarks>
         /// Cash is reduced when buying positions and increased when selling. Trading fees
         /// are also deducted from this balance. This value is critical for determining
-        /// buying power and overall portfolio value.
+        /// buying power and overall portfolio value. This property cannot be set to a negative value.
         /// </remarks>
-        public double Cash { get; set; }
+        private double _cash;
+        public double Cash
+        {
+            get => _cash;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Cash cannot be negative.", nameof(Cash));
+                _cash = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the current risk level of the position.
@@ -81,9 +100,19 @@ namespace TradingStrategies.Trading.Overseer
         /// <remarks>
         /// This property tracks the risk associated with the current position. It may be
         /// calculated based on position size, volatility, or other risk factors. Used by
-        /// risk management components to enforce position limits.
+        /// risk management components to enforce position limits. This property cannot be set to a negative value.
         /// </remarks>
-        public double CurrentRisk { get; set; } = 0.0;
+        private double _currentRisk = 0.0;
+        public double CurrentRisk
+        {
+            get => _currentRisk;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("CurrentRisk cannot be negative.", nameof(CurrentRisk));
+                _currentRisk = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the cumulative amount paid for establishing long positions.
@@ -94,7 +123,15 @@ namespace TradingStrategies.Trading.Overseer
         /// <see cref="TotalReceived"/>, it enables calculation of net trading costs and
         /// average entry prices for performance analysis.
         /// </remarks>
-        public double TotalPaid { get; set; } = 0.0;
+        private double _totalPaid = 0.0;
+        public double TotalPaid
+        {
+            get => _totalPaid;
+            set
+            {
+                _totalPaid = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the cumulative amount received from establishing short positions.
@@ -105,7 +142,15 @@ namespace TradingStrategies.Trading.Overseer
         /// this represents the entry price received when selling. Used alongside
         /// <see cref="TotalPaid"/> for comprehensive cost tracking.
         /// </remarks>
-        public double TotalReceived { get; set; } = 0.0;
+        private double _totalReceived = 0.0;
+        public double TotalReceived
+        {
+            get => _totalReceived;
+            set
+            {
+                _totalReceived = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the list of events that occurred during the simulation.
@@ -163,13 +208,22 @@ namespace TradingStrategies.Trading.Overseer
         /// <remarks>
         /// Creates a new simulation path with the specified strategy configuration and starting conditions.
         /// The strategy mapping is stored as read-only to ensure consistency throughout the simulation.
+        /// Input validation is performed to ensure strategiesByMarketConditions is not null and cash is non-negative.
         /// Other properties are initialized to default values and will be updated as the simulation progresses.
         /// </remarks>
         public SimulationPath(Dictionary<MarketType, HashSet<Strategy>> strategiesByMarketConditions, int position, double cash)
         {
+            if (strategiesByMarketConditions == null)
+                throw new ArgumentNullException(nameof(strategiesByMarketConditions));
+            if (cash < 0)
+                throw new ArgumentException("Cash cannot be negative.", nameof(cash));
             StrategiesByMarketConditions = strategiesByMarketConditions;
-            Position = position;
-            Cash = cash;
+            _position = position;
+            _cash = cash;
+            _currentRisk = 0.0;
+            _totalPaid = 0.0;
+            _totalReceived = 0.0;
+            Events = new List<SimulationEventLog>();
         }
 
         /// <summary>
@@ -215,6 +269,30 @@ namespace TradingStrategies.Trading.Overseer
                 }
                 return 0.0;
             }
+        }
+
+        /// <summary>
+        /// Creates a deep clone of the current SimulationPath instance.
+        /// </summary>
+        /// <returns>A new SimulationPath instance with deep-copied collections.</returns>
+        public SimulationPath Clone()
+        {
+            var clonedStrategies = StrategiesByMarketConditions.ToDictionary(
+                kvp => kvp.Key,
+                kvp => new HashSet<Strategy>(kvp.Value)
+            );
+            var clonedEvents = new List<SimulationEventLog>(Events);
+            var clonedRestingOrders = new List<(string, string, string, int, int, DateTime?)>(SimulatedRestingOrders);
+            var clonedBook = SimulatedBook; // Shallow copy
+            return new SimulationPath(clonedStrategies, _position, _cash)
+            {
+                CurrentRisk = _currentRisk,
+                TotalPaid = _totalPaid,
+                TotalReceived = _totalReceived,
+                Events = clonedEvents,
+                SimulatedBook = clonedBook,
+                SimulatedRestingOrders = clonedRestingOrders
+            };
         }
     }
 }

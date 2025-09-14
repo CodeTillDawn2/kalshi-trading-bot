@@ -129,5 +129,51 @@ namespace TradingStrategies.Trading.Overseer
         {
             return await Task.Run(() => GetEquity(path, lastSnapshot));
         }
+
+        /// <summary>
+        /// Gets all recorded calculation times in milliseconds.
+        /// </summary>
+        /// <returns>An array of calculation times in milliseconds.</returns>
+        /// <remarks>
+        /// This method provides access to the performance metrics collected during equity calculations.
+        /// Each value represents the time taken for a single GetEquity or GetEquityAsync call.
+        /// </remarks>
+        public long[] GetCalculationTimes()
+        {
+            return _calculationTimes.ToArray();
+        }
+
+        /// <summary>
+        /// Gets performance statistics for equity calculations.
+        /// </summary>
+        /// <returns>A tuple containing count, average time, min time, and max time in milliseconds.</returns>
+        /// <remarks>
+        /// Returns comprehensive statistics about the performance of equity calculations.
+        /// If no calculations have been performed, returns (0, 0, 0, 0).
+        /// </remarks>
+        public (int Count, double AverageMs, long MinMs, long MaxMs) GetCalculationStatistics()
+        {
+            if (_calculationTimes.Count == 0)
+                return (0, 0, 0, 0);
+
+            return (
+                _calculationTimes.Count,
+                _calculationTimes.Average(),
+                _calculationTimes.Min(),
+                _calculationTimes.Max()
+            );
+        }
+
+        /// <summary>
+        /// Clears all recorded calculation times.
+        /// </summary>
+        /// <remarks>
+        /// This method resets the performance metrics collection, useful for starting
+        /// fresh measurements or clearing accumulated data.
+        /// </remarks>
+        public void ClearCalculationTimes()
+        {
+            _calculationTimes.Clear();
+        }
     }
 }

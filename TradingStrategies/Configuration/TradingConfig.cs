@@ -163,6 +163,46 @@ public class TradingConfig
     /// </summary>
     public int VolumePrecisionDigits { get; set; } = 2;
 
+    [Range(100, 100000)]
+    /// <summary>
+    /// Maximum number of orderbook changes to keep in the processing queue.
+    /// This prevents memory exhaustion during high-volume market activity.
+    /// When the queue exceeds this size, older events are automatically cleaned up.
+    /// Typical values: 1000-10000 depending on market volatility and processing capacity.
+    /// Used by OrderbookChangeTracker to manage memory usage and prevent queue overflow.
+    /// </summary>
+    public int MaxOrderbookChangeQueueSize { get; set; } = 10000;
+
+    [Range(100, 100000)]
+    /// <summary>
+    /// Maximum number of trade events to keep in the processing queue.
+    /// This prevents memory exhaustion during high-volume trading activity.
+    /// When the queue exceeds this size, older events are automatically cleaned up.
+    /// Typical values: 1000-10000 depending on market activity and processing capacity.
+    /// Used by OrderbookChangeTracker to manage memory usage and prevent queue overflow.
+    /// </summary>
+    public int MaxTradeEventQueueSize { get; set; } = 5000;
+
+    [Range(1, 1440)]
+    /// <summary>
+    /// Age threshold in minutes for cleaning up old orderbook changes.
+    /// Events older than this threshold are automatically removed during cleanup operations.
+    /// This helps maintain queue sizes and prevents processing of stale data.
+    /// Typical values: 30-120 minutes depending on analysis requirements and memory constraints.
+    /// Used by OrderbookChangeTracker for periodic cleanup of old events.
+    /// </summary>
+    public int OrderbookChangeCleanupThresholdMinutes { get; set; } = 60;
+
+    [Range(1, 1440)]
+    /// <summary>
+    /// Age threshold in minutes for cleaning up old trade events.
+    /// Events older than this threshold are automatically removed during cleanup operations.
+    /// This helps maintain queue sizes and prevents processing of stale data.
+    /// Typical values: 30-120 minutes depending on analysis requirements and memory constraints.
+    /// Used by OrderbookChangeTracker for periodic cleanup of old events.
+    /// </summary>
+    public int TradeEventCleanupThresholdMinutes { get; set; } = 60;
+
     /// <summary>
     /// Validates the configuration parameters to ensure they are within acceptable ranges and prevent invalid combinations.
     /// This method should be called during application startup to catch misconfigurations early.

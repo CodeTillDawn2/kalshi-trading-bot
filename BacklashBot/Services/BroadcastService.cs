@@ -21,7 +21,7 @@ namespace BacklashBot.Services
     /// </summary>
     public class BroadcastService : IBroadcastService
     {
-        private readonly IHubContext<ChartHub> _hubContext;
+        private readonly IHubContext<BacklashBotHub> _hubContext;
         private readonly IServiceFactory _serviceFactory;
         private readonly ILogger<IBroadcastService> _logger;
         private Task? _statusBroadcastTask;
@@ -76,7 +76,7 @@ namespace BacklashBot.Services
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="executionConfig">Configuration options for execution parameters</param>
         public BroadcastService(
-            IHubContext<ChartHub> hubContext,
+            IHubContext<BacklashBotHub> hubContext,
             IServiceFactory serviceFactory,
             IStatusTrackerService statusTracker,
             IServiceScopeFactory scopeFactory,
@@ -117,7 +117,7 @@ namespace BacklashBot.Services
                     {
                         try
                         {
-                            if (ChartHub.HasConnectedClients())
+                            if (BacklashBotHub.HasConnectedClients())
                             {
                                 await BroadcastCheckInAsync();
                             }
@@ -162,7 +162,7 @@ namespace BacklashBot.Services
             bool broadcastSuccessful = false;
             var cancellationToken = _statusTracker.GetCancellationToken();
             cancellationToken.ThrowIfCancellationRequested();
-            if (!ChartHub.HasConnectedClients())
+            if (!BacklashBotHub.HasConnectedClients())
             {
                 _logger.LogDebug("No clients connected, skipping status broadcast.");
                 return;
@@ -299,7 +299,7 @@ namespace BacklashBot.Services
                 {
                     await Task.WhenAll(tasksToWait).ConfigureAwait(false);
                 }
-                ChartHub.ClearConnectedClients();
+                BacklashBotHub.ClearConnectedClients();
             }
             catch (OperationCanceledException)
             {
@@ -327,6 +327,79 @@ namespace BacklashBot.Services
                 return value;
             }
             return defaultValue;
+        }
+
+        /// <summary>
+        /// Gets the total number of successful broadcast operations.
+        /// </summary>
+        public long SuccessfulBroadcasts
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _successfulBroadcasts;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the total number of failed broadcast operations.
+        /// </summary>
+        public long FailedBroadcasts
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _failedBroadcasts;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the cumulative total time spent on broadcast operations in milliseconds.
+        /// </summary>
+        public double TotalBroadcastTimeMs
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _totalBroadcastTime;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the average broadcast time per operation in milliseconds.
+        /// </summary>
+        public double AverageBroadcastTimeMs
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _successfulBroadcasts + _failedBroadcasts > 0
+                        ? _totalBroadcastTime / (_successfulBroadcasts + _failedBroadcasts)
+                        : 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the broadcast success rate as a percentage (0-100).
+        /// </summary>
+        public double BroadcastSuccessRate
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    var total = _successfulBroadcasts + _failedBroadcasts;
+                    return total > 0 ? (_successfulBroadcasts * 100.0) / total : 0;
+                }
+            }
         }
 
         /// <summary>

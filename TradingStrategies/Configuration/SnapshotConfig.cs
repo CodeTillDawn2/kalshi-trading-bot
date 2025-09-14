@@ -47,5 +47,19 @@ namespace TradingStrategies.Configuration
         /// </summary>
         [Range(1, int.MaxValue, ErrorMessage = "PriceChangeThreshold must be at least 1.")]
         public int PriceChangeThreshold { get; set; } = 3;
+
+        /// <summary>
+        /// Directory path for storing snapshot files. If not specified, defaults to a hardcoded path.
+        /// Should be a valid absolute or relative path accessible for file operations.
+        /// </summary>
+        public string? StorageDirectory { get; set; }
+
+        /// <summary>
+        /// Maximum degree of parallelism for snapshot loading operations.
+        /// Limits the number of concurrent threads to prevent resource exhaustion during high-volume operations.
+        /// Set to -1 for unlimited parallelism, or a positive integer to limit concurrent processing.
+        /// </summary>
+        [Range(-1, int.MaxValue, ErrorMessage = "MaxParallelism must be -1 (unlimited) or a positive integer.")]
+        public int MaxParallelism { get; set; } = Environment.ProcessorCount;
     }
 }

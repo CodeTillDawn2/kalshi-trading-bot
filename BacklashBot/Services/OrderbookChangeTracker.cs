@@ -118,6 +118,14 @@ namespace BacklashBot.Services
 
         private readonly object _orderbookMatchingLock = new object();
 
+        // Performance metrics
+        private long _totalMatchingOperations = 0;
+        private long _successfulMatches = 0;
+        private long _totalProcessingTimeMs = 0;
+        private long _totalQueueProcessingTimeMs = 0;
+        private int _maxQueueDepth = 0;
+        private DateTime _lastMetricsReset = DateTime.UtcNow;
+
         /// <summary>
         /// Initializes a new instance of the OrderbookChangeTracker for the specified market.
         /// Sets up timers for periodic metric recalculation and log output, initializes event queues,
@@ -263,6 +271,50 @@ namespace BacklashBot.Services
             _logger.LogDebug("OrderbookChangeTracker stopped for {MarketTicker}: Timers stopped", _marketTicker);
         }
 
+        /// <summary>
+        /// Gets the current performance metrics for the orderbook change tracker.
+        /// </summary>
+        /// <returns>A dictionary containing performance metrics including matching success rates, processing times, and queue depths.</returns>
+        public Dictionary<string, object> GetPerformanceMetrics()
+        {
+            var uptime = DateTime.UtcNow - _lastMetricsReset;
+            var matchSuccessRate = _totalMatchingOperations > 0 ? (double)_successfulMatches / _totalMatchingOperations : 0.0;
+            var avgProcessingTimeMs = _totalMatchingOperations > 0 ? (double)_totalProcessingTimeMs / _totalMatchingOperations : 0.0;
+            var avgQueueProcessingTimeMs = _totalMatchingOperations > 0 ? (double)_totalQueueProcessingTimeMs / _totalMatchingOperations : 0.0;
+
+            return new Dictionary<string, object>
+            {
+                ["MarketTicker"] = _marketTicker,
+                ["TotalMatchingOperations"] = _totalMatchingOperations,
+                ["SuccessfulMatches"] = _successfulMatches,
+                ["MatchSuccessRate"] = Math.Round(matchSuccessRate * 100, 2),
+                ["TotalProcessingTimeMs"] = _totalProcessingTimeMs,
+                ["AverageProcessingTimeMs"] = Math.Round(avgProcessingTimeMs, 2),
+                ["TotalQueueProcessingTimeMs"] = _totalQueueProcessingTimeMs,
+                ["AverageQueueProcessingTimeMs"] = Math.Round(avgQueueProcessingTimeMs, 2),
+                ["MaxQueueDepth"] = _maxQueueDepth,
+                ["CurrentQueueDepth"] = _orderbookChanges.Count,
+                ["CurrentTradeQueueDepth"] = _tradeEvents.Count,
+                ["UptimeSeconds"] = uptime.TotalSeconds,
+                ["OperationsPerSecond"] = uptime.TotalSeconds > 0 ? Math.Round(_totalMatchingOperations / uptime.TotalSeconds, 2) : 0.0,
+                ["LastMetricsReset"] = _lastMetricsReset
+            };
+        }
+
+        /// <summary>
+        /// Resets all performance metrics counters to zero.
+        /// </summary>
+        public void ResetPerformanceMetrics()
+        {
+            _totalMatchingOperations = 0;
+            _successfulMatches = 0;
+            _totalProcessingTimeMs = 0;
+            _totalQueueProcessingTimeMs = 0;
+            _maxQueueDepth = 0;
+            _lastMetricsReset = DateTime.UtcNow;
+            _logger.LogInformation("Performance metrics reset for {MarketTicker}", _marketTicker);
+        }
+
         #region Event Logging and Matching
         /// <summary>
         /// Processes a complete orderbook snapshot by comparing it with the previous state.
@@ -280,6 +332,7 @@ namespace BacklashBot.Services
         /// </remarks>
         public void ProcessOrderbookSnapshot(List<OrderbookData> originalOrderbook, List<OrderbookData> newOrderbook)
         {
+            var queueProcessingStopwatch = Stopwatch.StartNew();
             if (_cancellationToken.IsCancellationRequested)
             {
                 _logger.LogDebug("Orderbook snapshot logging cancelled for {MarketTicker}", _marketTicker);
@@ -331,7 +384,18 @@ namespace BacklashBot.Services
 
             IsFirstSnapshotProcessed = true;
 
-            _logger.LogDebug("Completed orderbook snapshot processing for {MarketTicker}", _marketTicker);
+            queueProcessingStopwatch.Stop();
+            _totalQueueProcessingTimeMs += queueProcessingStopwatch.ElapsedMilliseconds;
+
+            // Track max queue depth
+            int currentQueueDepth = _orderbookChanges.Count;
+            if (currentQueueDepth > _maxQueueDepth)
+            {
+                _maxQueueDepth = currentQueueDepth;
+            }
+
+            _logger.LogDebug("Completed orderbook snapshot processing for {MarketTicker} in {ProcessingTime}ms, QueueDepth={QueueDepth}",
+                _marketTicker, queueProcessingStopwatch.ElapsedMilliseconds, currentQueueDepth);
         }
 
         /// <summary>
@@ -353,6 +417,31 @@ namespace BacklashBot.Services
             if (_cancellationToken.IsCancellationRequested)
             {
                 _logger.LogDebug("Orderbook change logging cancelled for {MarketTicker}", _marketTicker);
+                return;
+            }
+
+            // Input validation for data integrity
+            if (string.IsNullOrWhiteSpace(side))
+            {
+                _logger.LogWarning("Invalid orderbook change for {MarketTicker}: side is null or empty", _marketTicker);
+                return;
+            }
+
+            if (side != "yes" && side != "no")
+            {
+                _logger.LogWarning("Invalid orderbook change for {MarketTicker}: side '{Side}' is not 'yes' or 'no'", _marketTicker, side);
+                return;
+            }
+
+            if (price < 0 || price > 100)
+            {
+                _logger.LogWarning("Invalid orderbook change for {MarketTicker}: price {Price} is outside valid range (0-100)", _marketTicker, price);
+                return;
+            }
+
+            if (deltaContracts == 0)
+            {
+                _logger.LogWarning("Invalid orderbook change for {MarketTicker}: deltaContracts is 0 (no change)", _marketTicker);
                 return;
             }
 
@@ -414,6 +503,43 @@ namespace BacklashBot.Services
                 return;
             }
 
+            // Input validation for trade data integrity
+            if (string.IsNullOrWhiteSpace(takerSide))
+            {
+                _logger.LogWarning("Invalid trade for {MarketTicker}: takerSide is null or empty", _marketTicker);
+                return;
+            }
+
+            if (takerSide != "yes" && takerSide != "no")
+            {
+                _logger.LogWarning("Invalid trade for {MarketTicker}: takerSide '{TakerSide}' is not 'yes' or 'no'", _marketTicker, takerSide);
+                return;
+            }
+
+            if (yesPrice < 0 || yesPrice > 100)
+            {
+                _logger.LogWarning("Invalid trade for {MarketTicker}: yesPrice {YesPrice} is outside valid range (0-100)", _marketTicker, yesPrice);
+                return;
+            }
+
+            if (noPrice < 0 || noPrice > 100)
+            {
+                _logger.LogWarning("Invalid trade for {MarketTicker}: noPrice {NoPrice} is outside valid range (0-100)", _marketTicker, noPrice);
+                return;
+            }
+
+            if (count <= 0)
+            {
+                _logger.LogWarning("Invalid trade for {MarketTicker}: count {Count} must be positive", _marketTicker, count);
+                return;
+            }
+
+            if (timestamp == default || timestamp > DateTime.UtcNow.AddMinutes(1) || timestamp < DateTime.UtcNow.AddHours(-24))
+            {
+                _logger.LogWarning("Invalid trade for {MarketTicker}: timestamp {Timestamp} is invalid or outside reasonable range", _marketTicker, timestamp);
+                return;
+            }
+
             var trade = new TradeEvent
             {
                 TakerSide = takerSide,
@@ -458,11 +584,15 @@ namespace BacklashBot.Services
 
         private bool FindMatchingOrderbookChange(TradeEvent trade)
         {
+            var stopwatch = Stopwatch.StartNew();
             lock (_orderbookMatchingLock)
             {
+                _totalMatchingOperations++;
                 if (_cancellationToken.IsCancellationRequested || trade.HasMatchingOrderbookChange)
                 {
                     _logger.LogDebug("Trade already matched or cancelled: TradeID={TradeID}", trade.Id);
+                    stopwatch.Stop();
+                    _totalProcessingTimeMs += stopwatch.ElapsedMilliseconds;
                     return trade.HasMatchingOrderbookChange;
                 }
 
@@ -495,9 +625,12 @@ namespace BacklashBot.Services
                     bestMatch.IsTradeRelated = true;
                     bestMatch.MatchedTradeId = trade.Id;
                     trade.HasMatchingOrderbookChange = true;
+                    _successfulMatches++;
                     _logger.LogDebug(
                         "TRADEMON-Matched orderbook change to trade in {MarketTicker}: ChangeID={ChangeID}, Side={Side}, Price={Price}, Delta={Delta}, TradeID={TradeID}, TradeTimestamp={TradeTimestamp}, TimeDiff={TimeDiff:F2}s",
                         _marketTicker, bestMatch.Id, bestMatch.Side, bestMatch.Price, bestMatch.DeltaContracts, trade.Id, trade.Timestamp, minTimeDiff);
+                    stopwatch.Stop();
+                    _totalProcessingTimeMs += stopwatch.ElapsedMilliseconds;
                     return true;
                 }
 
@@ -522,15 +655,20 @@ namespace BacklashBot.Services
                     bestCanceledMatch.IsTradeRelated = true;
                     bestCanceledMatch.MatchedTradeId = trade.Id;
                     trade.HasMatchingOrderbookChange = true;
+                    _successfulMatches++;
                     _logger.LogDebug(
                         "TRADEMON-Reclassified canceled orderbook change for trade in {MarketTicker}: ChangeID={ChangeID}, Side={Side}, Price={Price}, Delta={Delta}, TradeID={TradeID}, TradeTimestamp={TradeTimestamp}",
                         _marketTicker, bestCanceledMatch.Id, bestCanceledMatch.Side, bestCanceledMatch.Price, bestCanceledMatch.DeltaContracts, trade.Id, trade.Timestamp);
+                    stopwatch.Stop();
+                    _totalProcessingTimeMs += stopwatch.ElapsedMilliseconds;
                     return true;
                 }
 
                 _logger.LogDebug(
                     "No matching orderbook change found for trade in {MarketTicker}: TradeID={TradeID}, TakerSide={TakerSide}, Price={Price}, Count={Count}, Timestamp={Timestamp}",
                     _marketTicker, trade.Id, trade.TakerSide, tradePriceToMatch, trade.Count, trade.Timestamp);
+                stopwatch.Stop();
+                _totalProcessingTimeMs += stopwatch.ElapsedMilliseconds;
                 return false;
             }
         }
@@ -950,8 +1088,20 @@ namespace BacklashBot.Services
                 return;
             }
 
-            var cutoff = DateTime.UtcNow - _config.Value.ChangeWindowDuration;
+            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_config.Value.OrderbookChangeCleanupThresholdMinutes);
             int removedCount = 0;
+            int queueSizeBefore = _orderbookChanges.Count;
+
+            // First, enforce queue size limits by removing oldest events if queue is too large
+            while (_orderbookChanges.Count > _config.Value.MaxOrderbookChangeQueueSize && _orderbookChanges.TryDequeue(out var oldChange))
+            {
+                removedCount++;
+                _logger.LogDebug(
+                    "Orderbook change removed due to queue size limit for {MarketTicker}: ChangeID={ChangeID}, Side={Side}, Price={Price}, DeltaContracts={DeltaContracts}, Timestamp={Timestamp}",
+                    _marketTicker, oldChange.Id, oldChange.Side, oldChange.Price, oldChange.DeltaContracts, oldChange.Timestamp);
+            }
+
+            // Then, remove events older than the cleanup threshold
             while (_orderbookChanges.TryPeek(out var change) && change.Timestamp < cutoff)
             {
                 if (_cancellationToken.IsCancellationRequested)
@@ -968,10 +1118,12 @@ namespace BacklashBot.Services
                         _marketTicker, change.Id, change.Side, change.Price, change.DeltaContracts, change.Timestamp, DateTime.UtcNow, change.IsCanceled, change.IsTradeRelated);
                 }
             }
+
             if (removedCount > 0)
             {
                 MetricsNeedRecalculation = true;
-                _logger.LogDebug("Cleaned up {Count} old order book events for {MarketTicker}", removedCount, _marketTicker);
+                _logger.LogDebug("Cleaned up {Count} old order book events for {MarketTicker} (queue size: {Before} -> {After})",
+                    removedCount, _marketTicker, queueSizeBefore, _orderbookChanges.Count);
             }
         }
 
@@ -1050,11 +1202,22 @@ namespace BacklashBot.Services
                 return;
             }
 
-            var cutoff = DateTime.UtcNow - _config.Value.ChangeWindowDuration;
+            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_config.Value.TradeEventCleanupThresholdMinutes);
             var gracePeriodEnd = LastMarketOpenTime.Add(_config.Value.ChangeWindowDuration);
             int removedCount = 0;
             int warningCount = 0;
+            int queueSizeBefore = _tradeEvents.Count;
 
+            // First, enforce queue size limits by removing oldest trades if queue is too large
+            while (_tradeEvents.Count > _config.Value.MaxTradeEventQueueSize && _tradeEvents.TryDequeue(out var oldTrade))
+            {
+                removedCount++;
+                _logger.LogDebug(
+                    "Trade event removed due to queue size limit for {MarketTicker}: TradeID={TradeID}, TakerSide={TakerSide}, Count={Count}, Timestamp={Timestamp}",
+                    _marketTicker, oldTrade.Id, oldTrade.TakerSide, oldTrade.Count, oldTrade.Timestamp);
+            }
+
+            // Then, remove trades older than the cleanup threshold
             while (_tradeEvents.TryPeek(out var trade) && trade.Timestamp < cutoff)
             {
                 if (_cancellationToken.IsCancellationRequested)
@@ -1098,10 +1261,10 @@ namespace BacklashBot.Services
                 }
             }
 
-            if (removedCount > 0 && warningCount > 0)
+            if (removedCount > 0)
             {
-                _logger.LogDebug("TRADEMON-Cleaned up {Count} old trade events for {MarketTicker}, {WarningCount} trades without matching orderbook changes",
-                    removedCount, _marketTicker, warningCount);
+                _logger.LogDebug("TRADEMON-Cleaned up {Count} old trade events for {MarketTicker} (queue size: {Before} -> {After}), {WarningCount} trades without matching orderbook changes",
+                    removedCount, _marketTicker, queueSizeBefore, _tradeEvents.Count, warningCount);
             }
         }
 

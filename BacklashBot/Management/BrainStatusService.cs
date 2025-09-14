@@ -22,6 +22,8 @@ namespace BacklashBot.Management
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ExecutionConfig _executionConfig;
         private readonly ILogger<BrainStatusService> _logger;
+        private TimeSpan _initializationTime = TimeSpan.Zero;
+        private int _initializationAttempts = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrainStatusService"/> class.
@@ -105,6 +107,8 @@ namespace BacklashBot.Management
         /// <exception cref="Exception">Thrown when the brain instance is not found in the database.</exception>
         private async Task PopulateFieldsAsync()
         {
+            var startTime = DateTime.UtcNow;
+            Interlocked.Increment(ref _initializationAttempts);
             try
             {
                 using var scope = _scopeFactory.CreateScope();
@@ -118,10 +122,12 @@ namespace BacklashBot.Management
                 _brainLock = brainInstance.BrainLock ?? Guid.NewGuid();
                 _sessionIdentifier = GenerateRandomString(_executionConfig.SessionIdLength);
                 _initialized = true;
+                _initializationTime = DateTime.UtcNow - startTime;
                 _logger.LogInformation("Brain status service initialized successfully for brain instance {BrainInstance}.", _executionConfig.BrainInstance);
             }
             catch (Exception ex)
             {
+                _initializationTime = DateTime.UtcNow - startTime;
                 _logger.LogError(ex, "Failed to initialize brain status service for brain instance {BrainInstance}.", _executionConfig.BrainInstance);
                 throw; // Rethrow to surface in task; handle as needed in consumers.
             }
@@ -153,6 +159,16 @@ namespace BacklashBot.Management
                 result[i] = chars[data[i] % chars.Length];
             }
             return new string(result);
+        }
+
+        /// <summary>
+        /// Gets current performance metrics for the brain status service.
+        /// Returns initialization timing and attempt information.
+        /// </summary>
+        /// <returns>A tuple containing initialization time in milliseconds and number of initialization attempts.</returns>
+        public (double InitializationTimeMs, int InitializationAttempts) GetPerformanceMetrics()
+        {
+            return (_initializationTime.TotalMilliseconds, _initializationAttempts);
         }
 
         /// <summary>

@@ -330,6 +330,18 @@ namespace KalshiBotOverseer
         }
 
         /// <summary>
+        /// Gets current performance metrics for the overnight activities.
+        /// </summary>
+        /// <returns>A tuple containing performance metrics and task timings.</returns>
+        public (int TotalTasks, int SuccessfulTasks, double SuccessRate, TimeSpan TotalDuration, Dictionary<string, TimeSpan> TaskTimings, int MarketRefreshFailureCount, DateTime? LastMarketRefreshFailure) GetPerformanceMetrics()
+        {
+            return (_totalTasks, _successfulTasks,
+                    _totalTasks > 0 ? (double)_successfulTasks / _totalTasks : 0.0,
+                    _overnightStopwatch.Elapsed, new Dictionary<string, TimeSpan>(_taskTimings),
+                    _marketRefreshFailureCount, _lastMarketRefreshFailure);
+        }
+
+        /// <summary>
         /// Calculates interest scores for active markets that haven't been scored recently.
         /// This operation updates market watch data with fresh interest scores for decision making.
         /// </summary>

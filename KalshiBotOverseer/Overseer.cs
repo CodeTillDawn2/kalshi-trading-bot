@@ -72,7 +72,7 @@ namespace KalshiBotOverseer
         private readonly IKalshiWebSocketClient _webSocketClient;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<Overseer> _logger;
-        private readonly IHubContext<ChartHub> _hubContext;
+        private readonly IHubContext<OverseerHub> _hubContext;
         private readonly OverseerConfig _config;
         private Timer? _apiFetchTimer;
         private CancellationTokenSource? _apiFetchCancellationTokenSource;
@@ -103,7 +103,7 @@ namespace KalshiBotOverseer
         /// <param name="logger">Logger for recording system events and diagnostics.</param>
         /// <param name="hubContext">SignalR hub context for real-time client communication.</param>
         /// <param name="config">Configuration options for the overseer system.</param>
-        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, IHubContext<ChartHub> hubContext, IOptions<OverseerConfig> config)
+        public Overseer(IKalshiWebSocketClient webSocketClient, IServiceScopeFactory scopeFactory, ILogger<Overseer> logger, IHubContext<OverseerHub> hubContext, IOptions<OverseerConfig> config)
         {
             _webSocketClient = webSocketClient;
             _scopeFactory = scopeFactory;

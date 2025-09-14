@@ -169,5 +169,49 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         /// <value>Default is 10 minutes.</value>
         public int MaxConnectionAgeMinutes { get; set; } = 10;
+
+        // Candlestick Service Configuration
+        /// <summary>
+        /// Gets or sets the data retention period in days for candlestick data.
+        /// Data older than this will be subject to cleanup.
+        /// </summary>
+        /// <value>Default is 365 days (1 year).</value>
+        public int CandlestickDataRetentionDays { get; set; } = 365;
+
+        /// <summary>
+        /// Gets or sets the cleanup interval in hours for removing old candlestick data.
+        /// </summary>
+        /// <value>Default is 24 hours.</value>
+        public int CandlestickCleanupIntervalHours { get; set; } = 24;
+
+        /// <summary>
+        /// Gets or sets the maximum number of candlesticks to keep per market per interval.
+        /// </summary>
+        /// <value>Default is 10000 candlesticks.</value>
+        public int MaxCandlesticksPerMarket { get; set; } = 10000;
+
+        /// <summary>
+        /// Gets or sets the maximum number of parallel tasks for candlestick processing.
+        /// </summary>
+        /// <value>Default is 4 parallel tasks.</value>
+        public int MaxParallelCandlestickTasks { get; set; } = 4;
+
+        /// <summary>
+        /// Gets or sets the maximum degree of parallelism for data loading operations.
+        /// </summary>
+        /// <value>Default is 2.</value>
+        public int MaxDegreeOfParallelismDataLoading { get; set; } = 2;
+
+        /// <summary>
+        /// Gets or sets whether to enable performance metrics collection for candlestick operations.
+        /// </summary>
+        /// <value>Default is true.</value>
+        public bool EnableCandlestickPerformanceMetrics { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the log level for performance metrics.
+        /// </summary>
+        /// <value>Default is "Information".</value>
+        public string CandlestickPerformanceMetricsLogLevel { get; set; } = "Information";
     }
 }
