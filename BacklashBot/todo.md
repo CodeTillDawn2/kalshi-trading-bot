@@ -408,6 +408,30 @@ This document outlines the performance metrics tracked across various classes in
 - `MaxParallelism`: int - Configurable limit for parallel processing during snapshot loading (default: Environment.ProcessorCount)
 - `StorageDirectory`: string - Configurable directory path for storing snapshot files
 
+## BacklashBot.Services.OrderbookChangeTracker
+
+### Methods
+- `FindMatchingOrderbookChange()`: TimeSpan - Execution time for trade-orderbook matching operations
+- `ProcessOrderbookSnapshot()`: TimeSpan - Execution time for orderbook snapshot processing
+- `GetPerformanceMetrics()`: Dictionary<string, object> - Returns comprehensive performance metrics including matching success rates, processing times, and queue depths
+
+### Properties
+- `MaxOrderbookChangeQueueSize`: int - Configurable maximum size for orderbook change queue (default: 10000)
+- `MaxTradeEventQueueSize`: int - Configurable maximum size for trade event queue (default: 5000)
+- `OrderbookChangeCleanupThresholdMinutes`: int - Age threshold for cleaning up old orderbook changes (default: 60)
+- `TradeEventCleanupThresholdMinutes`: int - Age threshold for cleaning up old trade events (default: 60)
+
+### Performance Metrics
+- `TotalMatchingOperations`: long - Total number of trade-orderbook matching operations performed
+- `SuccessfulMatches`: long - Number of successful trade-orderbook matches
+- `MatchSuccessRate`: double - Percentage of successful matches (0-100)
+- `AverageProcessingTimeMs`: double - Average time per matching operation in milliseconds
+- `TotalQueueProcessingTimeMs`: long - Total time spent processing queue operations
+- `MaxQueueDepth`: int - Maximum observed queue depth
+- `CurrentQueueDepth`: int - Current orderbook change queue depth
+- `CurrentTradeQueueDepth`: int - Current trade event queue depth
+- `OperationsPerSecond`: double - Rate of matching operations per second
+
 ## BacklashBot.Services.WebSocketMonitorService
 
 ### Properties
