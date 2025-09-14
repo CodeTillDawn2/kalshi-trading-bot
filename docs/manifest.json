@@ -68,17 +68,17 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Hubs.ChartHub.yml",
+      "source_relative_path": "api/BacklashBot.Hubs.BacklashBotHub.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BacklashBot.Hubs.ChartHub.html"
+          "relative_path": "api/BacklashBot.Hubs.BacklashBotHub.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "BacklashBot.Hubs.ChartHub",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Hubs.ChartHub.yml\" sourcestartlinenumber=\"1\">SignalR hub for managing real-time communication between the BacklashBot trading system and connected clients.\nHandles client connections, handshakes, check-ins, and message routing to the Overseer system.\nProvides methods for broadcasting trading data, confirming target tickers, and processing overseer responses.</p>\n"
+      "Title": "BacklashBot.Hubs.BacklashBotHub",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Hubs.BacklashBotHub.yml\" sourcestartlinenumber=\"1\">SignalR hub for managing real-time communication between the BacklashBot trading system and connected clients.\nHandles client connections, handshakes, check-ins, and message routing to the Overseer system.\nProvides methods for broadcasting trading data, confirming target tickers, and processing overseer responses.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4478,34 +4478,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.ChartHub.ClientInfo.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.ChartHub.ClientInfo.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.ChartHub.ClientInfo",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.ChartHub.ClientInfo.yml\" sourcestartlinenumber=\"1\">Represents information about a connected client, including identification,\nconnection details, and last activity timestamp.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.ChartHub.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.ChartHub.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.ChartHub",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.ChartHub.yml\" sourcestartlinenumber=\"1\">SignalR hub that manages real-time communication between the Kalshi trading bot overseer\nand connected clients. This hub handles client connections, authentication via handshakes,\nperiodic status check-ins from brain instances, and broadcasting of trading data and updates.\nIt serves as the central communication point for the overseer system, enabling real-time\nmonitoring and control of trading bot operations.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/KalshiBotOverseer.CheckInData.yml",
       "output": {
         ".html": {
@@ -4674,6 +4646,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotOverseer.OverseerHub.ClientInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotOverseer.OverseerHub.ClientInfo.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotOverseer.OverseerHub.ClientInfo",
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.OverseerHub.ClientInfo.yml\" sourcestartlinenumber=\"1\">Represents information about a connected client, including identification,\nconnection details, and last activity timestamp.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/KalshiBotOverseer.OverseerHub.yml",
       "output": {
         ".html": {
@@ -4684,7 +4670,21 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotOverseer.OverseerHub",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.OverseerHub.yml\" sourcestartlinenumber=\"1\">SignalR hub for managing real-time communication with brain instances in the\nKalshi trading bot overseer system. Handles authentication, status updates,\nand data broadcasting between the overseer and distributed brain components.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.OverseerHub.yml\" sourcestartlinenumber=\"1\">SignalR hub that manages real-time communication between the Kalshi trading bot overseer\nand connected clients. This hub handles client connections, authentication via handshakes,\nperiodic status check-ins from brain instances, and broadcasting of trading data and updates.\nIt serves as the central communication point for the overseer system, enabling real-time\nmonitoring and control of trading bot operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotOverseer.OverseerHubConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotOverseer.OverseerHubConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotOverseer.OverseerHubConfig",
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.OverseerHubConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the OverseerHub SignalR hub.</p>\n"
     },
     {
       "type": "ManagedReference",

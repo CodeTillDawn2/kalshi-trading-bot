@@ -132,24 +132,106 @@ resting order management, and risk controls.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationEngine__ctor.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationEngine.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationEngine__ctor_Microsoft_Extensions_Configuration_IConfiguration_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationEngine.%23ctor(Microsoft.Extensions.Configuration.IConfiguration)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationEngine.cs/#L40">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationEngine.cs/#L44">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_SimulationEngine__ctor_" data-uid="TradingStrategies.Trading.Overseer.SimulationEngine.#ctor*"></a>
-  <h4 id="TradingStrategies_Trading_Overseer_SimulationEngine__ctor" data-uid="TradingStrategies.Trading.Overseer.SimulationEngine.#ctor">SimulationEngine()</h4>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationEngine__ctor_Microsoft_Extensions_Configuration_IConfiguration_" data-uid="TradingStrategies.Trading.Overseer.SimulationEngine.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">SimulationEngine(IConfiguration)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the SimulationEngine with required services.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SimulationEngine()</code></pre>
+    <pre><code class="lang-csharp hljs">public SimulationEngine(IConfiguration configuration)</code></pre>
   </div>
-  <h5 id="TradingStrategies_Trading_Overseer_SimulationEngine__ctor_remarks">Remarks</h5>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.configuration.iconfiguration">IConfiguration</a></td>
+        <td><span class="parametername">configuration</span></td>
+        <td><p>The configuration instance for reading settings from appsettings.json.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_SimulationEngine__ctor_Microsoft_Extensions_Configuration_IConfiguration__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Creates instances of MarketTypeService and PatternDetectionService for
 market classification and pattern recognition during simulation.</p>
 </div>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationEngine_LastExecutionTime.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationEngine.LastExecutionTime%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationEngine.cs/#L53">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationEngine_LastExecutionTime_" data-uid="TradingStrategies.Trading.Overseer.SimulationEngine.LastExecutionTime*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationEngine_LastExecutionTime" data-uid="TradingStrategies.Trading.Overseer.SimulationEngine.LastExecutionTime">LastExecutionTime</h4>
+  <div class="markdown level1 summary"><p>Gets the execution time of the last simulation run.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan LastExecutionTime { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationEngine_LastMemoryUsed.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationEngine.LastMemoryUsed%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationEngine.cs/#L58">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_SimulationEngine_LastMemoryUsed_" data-uid="TradingStrategies.Trading.Overseer.SimulationEngine.LastMemoryUsed*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_SimulationEngine_LastMemoryUsed" data-uid="TradingStrategies.Trading.Overseer.SimulationEngine.LastMemoryUsed">LastMemoryUsed</h4>
+  <div class="markdown level1 summary"><p>Gets the approximate memory usage difference of the last simulation run.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long LastMemoryUsed { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
 </h3>
   <span class="small pull-right mobile-hide">
@@ -157,7 +239,7 @@ market classification and pattern recognition during simulation.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationEngine_RunSimulation_TradingStrategies_Strategies_Scenario_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationEngine.RunSimulation(TradingStrategies.Strategies.Scenario%2CSystem.Collections.Generic.List%7BBacklashDTOs.MarketSnapshot%7D%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationEngine.cs/#L67">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationEngine.cs/#L82">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_SimulationEngine_RunSimulation_" data-uid="TradingStrategies.Trading.Overseer.SimulationEngine.RunSimulation*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_SimulationEngine_RunSimulation_TradingStrategies_Strategies_Scenario_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_" data-uid="TradingStrategies.Trading.Overseer.SimulationEngine.RunSimulation(TradingStrategies.Strategies.Scenario,System.Collections.Generic.List{BacklashDTOs.MarketSnapshot},System.Boolean)">RunSimulation(Scenario, List&lt;MarketSnapshot&gt;, bool)</h4>
@@ -222,6 +304,7 @@ market classification and pattern recognition during simulation.</p>
 <li>Manages order book state, position tracking, and cash flow</li>
 <li>Generates detailed event logs for analysis</li>
 <li>Handles strategy branching in multi-strategy mode</li>
+<li>Collects performance metrics (execution time and memory usage)</li>
 </ol>
 <p>The simulation supports realistic trading mechanics including:</p>
 <ul>
@@ -243,7 +326,7 @@ market classification and pattern recognition during simulation.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_SimulationEngine.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.SimulationEngine%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationEngine.cs/#L28" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/SimulationEngine.cs/#L31" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

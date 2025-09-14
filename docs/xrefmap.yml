@@ -355,170 +355,170 @@ references:
   commentId: N:BacklashBot.Hubs
   fullName: BacklashBot.Hubs
   nameWithType: BacklashBot.Hubs
-- uid: BacklashBot.Hubs.ChartHub
-  name: ChartHub
-  href: api/BacklashBot.Hubs.ChartHub.html
-  commentId: T:BacklashBot.Hubs.ChartHub
-  fullName: BacklashBot.Hubs.ChartHub
-  nameWithType: ChartHub
-- uid: BacklashBot.Hubs.ChartHub.#ctor(BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Hubs.ChartHub})
-  name: ChartHub(IServiceFactory, ILogger<ChartHub>)
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub__ctor_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Hubs_ChartHub__
-  commentId: M:BacklashBot.Hubs.ChartHub.#ctor(BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Hubs.ChartHub})
-  name.vb: New(IServiceFactory, ILogger(Of ChartHub))
-  fullName: BacklashBot.Hubs.ChartHub.ChartHub(BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger<BacklashBot.Hubs.ChartHub>)
-  fullName.vb: BacklashBot.Hubs.ChartHub.New(BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger(Of BacklashBot.Hubs.ChartHub))
-  nameWithType: ChartHub.ChartHub(IServiceFactory, ILogger<ChartHub>)
-  nameWithType.vb: ChartHub.New(IServiceFactory, ILogger(Of ChartHub))
-- uid: BacklashBot.Hubs.ChartHub.#ctor*
-  name: ChartHub
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub__ctor_
-  commentId: Overload:BacklashBot.Hubs.ChartHub.#ctor
+- uid: BacklashBot.Hubs.BacklashBotHub
+  name: BacklashBotHub
+  href: api/BacklashBot.Hubs.BacklashBotHub.html
+  commentId: T:BacklashBot.Hubs.BacklashBotHub
+  fullName: BacklashBot.Hubs.BacklashBotHub
+  nameWithType: BacklashBotHub
+- uid: BacklashBot.Hubs.BacklashBotHub.#ctor(BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Hubs.BacklashBotHub})
+  name: BacklashBotHub(IServiceFactory, ILogger<BacklashBotHub>)
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub__ctor_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Hubs_BacklashBotHub__
+  commentId: M:BacklashBot.Hubs.BacklashBotHub.#ctor(BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Hubs.BacklashBotHub})
+  name.vb: New(IServiceFactory, ILogger(Of BacklashBotHub))
+  fullName: BacklashBot.Hubs.BacklashBotHub.BacklashBotHub(BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger<BacklashBot.Hubs.BacklashBotHub>)
+  fullName.vb: BacklashBot.Hubs.BacklashBotHub.New(BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger(Of BacklashBot.Hubs.BacklashBotHub))
+  nameWithType: BacklashBotHub.BacklashBotHub(IServiceFactory, ILogger<BacklashBotHub>)
+  nameWithType.vb: BacklashBotHub.New(IServiceFactory, ILogger(Of BacklashBotHub))
+- uid: BacklashBot.Hubs.BacklashBotHub.#ctor*
+  name: BacklashBotHub
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub__ctor_
+  commentId: Overload:BacklashBot.Hubs.BacklashBotHub.#ctor
   isSpec: "True"
   name.vb: New
-  fullName: BacklashBot.Hubs.ChartHub.ChartHub
-  fullName.vb: BacklashBot.Hubs.ChartHub.New
-  nameWithType: ChartHub.ChartHub
-  nameWithType.vb: ChartHub.New
-- uid: BacklashBot.Hubs.ChartHub.CheckIn(BacklashBot.Hubs.CheckInData)
+  fullName: BacklashBot.Hubs.BacklashBotHub.BacklashBotHub
+  fullName.vb: BacklashBot.Hubs.BacklashBotHub.New
+  nameWithType: BacklashBotHub.BacklashBotHub
+  nameWithType.vb: BacklashBotHub.New
+- uid: BacklashBot.Hubs.BacklashBotHub.CheckIn(BacklashBot.Hubs.CheckInData)
   name: CheckIn(CheckInData)
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_CheckIn_BacklashBot_Hubs_CheckInData_
-  commentId: M:BacklashBot.Hubs.ChartHub.CheckIn(BacklashBot.Hubs.CheckInData)
-  fullName: BacklashBot.Hubs.ChartHub.CheckIn(BacklashBot.Hubs.CheckInData)
-  nameWithType: ChartHub.CheckIn(CheckInData)
-- uid: BacklashBot.Hubs.ChartHub.CheckIn*
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_CheckIn_BacklashBot_Hubs_CheckInData_
+  commentId: M:BacklashBot.Hubs.BacklashBotHub.CheckIn(BacklashBot.Hubs.CheckInData)
+  fullName: BacklashBot.Hubs.BacklashBotHub.CheckIn(BacklashBot.Hubs.CheckInData)
+  nameWithType: BacklashBotHub.CheckIn(CheckInData)
+- uid: BacklashBot.Hubs.BacklashBotHub.CheckIn*
   name: CheckIn
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_CheckIn_
-  commentId: Overload:BacklashBot.Hubs.ChartHub.CheckIn
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_CheckIn_
+  commentId: Overload:BacklashBot.Hubs.BacklashBotHub.CheckIn
   isSpec: "True"
-  fullName: BacklashBot.Hubs.ChartHub.CheckIn
-  nameWithType: ChartHub.CheckIn
-- uid: BacklashBot.Hubs.ChartHub.ClearConnectedClients
+  fullName: BacklashBot.Hubs.BacklashBotHub.CheckIn
+  nameWithType: BacklashBotHub.CheckIn
+- uid: BacklashBot.Hubs.BacklashBotHub.ClearConnectedClients
   name: ClearConnectedClients()
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_ClearConnectedClients
-  commentId: M:BacklashBot.Hubs.ChartHub.ClearConnectedClients
-  fullName: BacklashBot.Hubs.ChartHub.ClearConnectedClients()
-  nameWithType: ChartHub.ClearConnectedClients()
-- uid: BacklashBot.Hubs.ChartHub.ClearConnectedClients*
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_ClearConnectedClients
+  commentId: M:BacklashBot.Hubs.BacklashBotHub.ClearConnectedClients
+  fullName: BacklashBot.Hubs.BacklashBotHub.ClearConnectedClients()
+  nameWithType: BacklashBotHub.ClearConnectedClients()
+- uid: BacklashBot.Hubs.BacklashBotHub.ClearConnectedClients*
   name: ClearConnectedClients
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_ClearConnectedClients_
-  commentId: Overload:BacklashBot.Hubs.ChartHub.ClearConnectedClients
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_ClearConnectedClients_
+  commentId: Overload:BacklashBot.Hubs.BacklashBotHub.ClearConnectedClients
   isSpec: "True"
-  fullName: BacklashBot.Hubs.ChartHub.ClearConnectedClients
-  nameWithType: ChartHub.ClearConnectedClients
-- uid: BacklashBot.Hubs.ChartHub.ConfirmTargetTickersReceived(System.String)
+  fullName: BacklashBot.Hubs.BacklashBotHub.ClearConnectedClients
+  nameWithType: BacklashBotHub.ClearConnectedClients
+- uid: BacklashBot.Hubs.BacklashBotHub.ConfirmTargetTickersReceived(System.String)
   name: ConfirmTargetTickersReceived(string)
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_ConfirmTargetTickersReceived_System_String_
-  commentId: M:BacklashBot.Hubs.ChartHub.ConfirmTargetTickersReceived(System.String)
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_ConfirmTargetTickersReceived_System_String_
+  commentId: M:BacklashBot.Hubs.BacklashBotHub.ConfirmTargetTickersReceived(System.String)
   name.vb: ConfirmTargetTickersReceived(String)
-  fullName: BacklashBot.Hubs.ChartHub.ConfirmTargetTickersReceived(string)
-  fullName.vb: BacklashBot.Hubs.ChartHub.ConfirmTargetTickersReceived(String)
-  nameWithType: ChartHub.ConfirmTargetTickersReceived(string)
-  nameWithType.vb: ChartHub.ConfirmTargetTickersReceived(String)
-- uid: BacklashBot.Hubs.ChartHub.ConfirmTargetTickersReceived*
+  fullName: BacklashBot.Hubs.BacklashBotHub.ConfirmTargetTickersReceived(string)
+  fullName.vb: BacklashBot.Hubs.BacklashBotHub.ConfirmTargetTickersReceived(String)
+  nameWithType: BacklashBotHub.ConfirmTargetTickersReceived(string)
+  nameWithType.vb: BacklashBotHub.ConfirmTargetTickersReceived(String)
+- uid: BacklashBot.Hubs.BacklashBotHub.ConfirmTargetTickersReceived*
   name: ConfirmTargetTickersReceived
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_ConfirmTargetTickersReceived_
-  commentId: Overload:BacklashBot.Hubs.ChartHub.ConfirmTargetTickersReceived
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_ConfirmTargetTickersReceived_
+  commentId: Overload:BacklashBot.Hubs.BacklashBotHub.ConfirmTargetTickersReceived
   isSpec: "True"
-  fullName: BacklashBot.Hubs.ChartHub.ConfirmTargetTickersReceived
-  nameWithType: ChartHub.ConfirmTargetTickersReceived
-- uid: BacklashBot.Hubs.ChartHub.HandleCheckInResponse(BacklashBot.Hubs.CheckInResponse)
+  fullName: BacklashBot.Hubs.BacklashBotHub.ConfirmTargetTickersReceived
+  nameWithType: BacklashBotHub.ConfirmTargetTickersReceived
+- uid: BacklashBot.Hubs.BacklashBotHub.HandleCheckInResponse(BacklashBot.Hubs.CheckInResponse)
   name: HandleCheckInResponse(CheckInResponse)
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_HandleCheckInResponse_BacklashBot_Hubs_CheckInResponse_
-  commentId: M:BacklashBot.Hubs.ChartHub.HandleCheckInResponse(BacklashBot.Hubs.CheckInResponse)
-  fullName: BacklashBot.Hubs.ChartHub.HandleCheckInResponse(BacklashBot.Hubs.CheckInResponse)
-  nameWithType: ChartHub.HandleCheckInResponse(CheckInResponse)
-- uid: BacklashBot.Hubs.ChartHub.HandleCheckInResponse*
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_HandleCheckInResponse_BacklashBot_Hubs_CheckInResponse_
+  commentId: M:BacklashBot.Hubs.BacklashBotHub.HandleCheckInResponse(BacklashBot.Hubs.CheckInResponse)
+  fullName: BacklashBot.Hubs.BacklashBotHub.HandleCheckInResponse(BacklashBot.Hubs.CheckInResponse)
+  nameWithType: BacklashBotHub.HandleCheckInResponse(CheckInResponse)
+- uid: BacklashBot.Hubs.BacklashBotHub.HandleCheckInResponse*
   name: HandleCheckInResponse
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_HandleCheckInResponse_
-  commentId: Overload:BacklashBot.Hubs.ChartHub.HandleCheckInResponse
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_HandleCheckInResponse_
+  commentId: Overload:BacklashBot.Hubs.BacklashBotHub.HandleCheckInResponse
   isSpec: "True"
-  fullName: BacklashBot.Hubs.ChartHub.HandleCheckInResponse
-  nameWithType: ChartHub.HandleCheckInResponse
-- uid: BacklashBot.Hubs.ChartHub.HandleTargetTickersConfirmationResponse(BacklashBot.Hubs.TargetTickersConfirmationResponse)
+  fullName: BacklashBot.Hubs.BacklashBotHub.HandleCheckInResponse
+  nameWithType: BacklashBotHub.HandleCheckInResponse
+- uid: BacklashBot.Hubs.BacklashBotHub.HandleTargetTickersConfirmationResponse(BacklashBot.Hubs.TargetTickersConfirmationResponse)
   name: HandleTargetTickersConfirmationResponse(TargetTickersConfirmationResponse)
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_HandleTargetTickersConfirmationResponse_BacklashBot_Hubs_TargetTickersConfirmationResponse_
-  commentId: M:BacklashBot.Hubs.ChartHub.HandleTargetTickersConfirmationResponse(BacklashBot.Hubs.TargetTickersConfirmationResponse)
-  fullName: BacklashBot.Hubs.ChartHub.HandleTargetTickersConfirmationResponse(BacklashBot.Hubs.TargetTickersConfirmationResponse)
-  nameWithType: ChartHub.HandleTargetTickersConfirmationResponse(TargetTickersConfirmationResponse)
-- uid: BacklashBot.Hubs.ChartHub.HandleTargetTickersConfirmationResponse*
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_HandleTargetTickersConfirmationResponse_BacklashBot_Hubs_TargetTickersConfirmationResponse_
+  commentId: M:BacklashBot.Hubs.BacklashBotHub.HandleTargetTickersConfirmationResponse(BacklashBot.Hubs.TargetTickersConfirmationResponse)
+  fullName: BacklashBot.Hubs.BacklashBotHub.HandleTargetTickersConfirmationResponse(BacklashBot.Hubs.TargetTickersConfirmationResponse)
+  nameWithType: BacklashBotHub.HandleTargetTickersConfirmationResponse(TargetTickersConfirmationResponse)
+- uid: BacklashBot.Hubs.BacklashBotHub.HandleTargetTickersConfirmationResponse*
   name: HandleTargetTickersConfirmationResponse
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_HandleTargetTickersConfirmationResponse_
-  commentId: Overload:BacklashBot.Hubs.ChartHub.HandleTargetTickersConfirmationResponse
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_HandleTargetTickersConfirmationResponse_
+  commentId: Overload:BacklashBot.Hubs.BacklashBotHub.HandleTargetTickersConfirmationResponse
   isSpec: "True"
-  fullName: BacklashBot.Hubs.ChartHub.HandleTargetTickersConfirmationResponse
-  nameWithType: ChartHub.HandleTargetTickersConfirmationResponse
-- uid: BacklashBot.Hubs.ChartHub.Handshake(System.String,System.String,System.String)
+  fullName: BacklashBot.Hubs.BacklashBotHub.HandleTargetTickersConfirmationResponse
+  nameWithType: BacklashBotHub.HandleTargetTickersConfirmationResponse
+- uid: BacklashBot.Hubs.BacklashBotHub.Handshake(System.String,System.String,System.String)
   name: Handshake(string, string, string)
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_Handshake_System_String_System_String_System_String_
-  commentId: M:BacklashBot.Hubs.ChartHub.Handshake(System.String,System.String,System.String)
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_Handshake_System_String_System_String_System_String_
+  commentId: M:BacklashBot.Hubs.BacklashBotHub.Handshake(System.String,System.String,System.String)
   name.vb: Handshake(String, String, String)
-  fullName: BacklashBot.Hubs.ChartHub.Handshake(string, string, string)
-  fullName.vb: BacklashBot.Hubs.ChartHub.Handshake(String, String, String)
-  nameWithType: ChartHub.Handshake(string, string, string)
-  nameWithType.vb: ChartHub.Handshake(String, String, String)
-- uid: BacklashBot.Hubs.ChartHub.Handshake*
+  fullName: BacklashBot.Hubs.BacklashBotHub.Handshake(string, string, string)
+  fullName.vb: BacklashBot.Hubs.BacklashBotHub.Handshake(String, String, String)
+  nameWithType: BacklashBotHub.Handshake(string, string, string)
+  nameWithType.vb: BacklashBotHub.Handshake(String, String, String)
+- uid: BacklashBot.Hubs.BacklashBotHub.Handshake*
   name: Handshake
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_Handshake_
-  commentId: Overload:BacklashBot.Hubs.ChartHub.Handshake
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_Handshake_
+  commentId: Overload:BacklashBot.Hubs.BacklashBotHub.Handshake
   isSpec: "True"
-  fullName: BacklashBot.Hubs.ChartHub.Handshake
-  nameWithType: ChartHub.Handshake
-- uid: BacklashBot.Hubs.ChartHub.HasConnectedClients
+  fullName: BacklashBot.Hubs.BacklashBotHub.Handshake
+  nameWithType: BacklashBotHub.Handshake
+- uid: BacklashBot.Hubs.BacklashBotHub.HasConnectedClients
   name: HasConnectedClients()
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_HasConnectedClients
-  commentId: M:BacklashBot.Hubs.ChartHub.HasConnectedClients
-  fullName: BacklashBot.Hubs.ChartHub.HasConnectedClients()
-  nameWithType: ChartHub.HasConnectedClients()
-- uid: BacklashBot.Hubs.ChartHub.HasConnectedClients*
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_HasConnectedClients
+  commentId: M:BacklashBot.Hubs.BacklashBotHub.HasConnectedClients
+  fullName: BacklashBot.Hubs.BacklashBotHub.HasConnectedClients()
+  nameWithType: BacklashBotHub.HasConnectedClients()
+- uid: BacklashBot.Hubs.BacklashBotHub.HasConnectedClients*
   name: HasConnectedClients
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_HasConnectedClients_
-  commentId: Overload:BacklashBot.Hubs.ChartHub.HasConnectedClients
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_HasConnectedClients_
+  commentId: Overload:BacklashBot.Hubs.BacklashBotHub.HasConnectedClients
   isSpec: "True"
-  fullName: BacklashBot.Hubs.ChartHub.HasConnectedClients
-  nameWithType: ChartHub.HasConnectedClients
-- uid: BacklashBot.Hubs.ChartHub.OnConnectedAsync
+  fullName: BacklashBot.Hubs.BacklashBotHub.HasConnectedClients
+  nameWithType: BacklashBotHub.HasConnectedClients
+- uid: BacklashBot.Hubs.BacklashBotHub.OnConnectedAsync
   name: OnConnectedAsync()
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_OnConnectedAsync
-  commentId: M:BacklashBot.Hubs.ChartHub.OnConnectedAsync
-  fullName: BacklashBot.Hubs.ChartHub.OnConnectedAsync()
-  nameWithType: ChartHub.OnConnectedAsync()
-- uid: BacklashBot.Hubs.ChartHub.OnConnectedAsync*
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_OnConnectedAsync
+  commentId: M:BacklashBot.Hubs.BacklashBotHub.OnConnectedAsync
+  fullName: BacklashBot.Hubs.BacklashBotHub.OnConnectedAsync()
+  nameWithType: BacklashBotHub.OnConnectedAsync()
+- uid: BacklashBot.Hubs.BacklashBotHub.OnConnectedAsync*
   name: OnConnectedAsync
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_OnConnectedAsync_
-  commentId: Overload:BacklashBot.Hubs.ChartHub.OnConnectedAsync
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_OnConnectedAsync_
+  commentId: Overload:BacklashBot.Hubs.BacklashBotHub.OnConnectedAsync
   isSpec: "True"
-  fullName: BacklashBot.Hubs.ChartHub.OnConnectedAsync
-  nameWithType: ChartHub.OnConnectedAsync
-- uid: BacklashBot.Hubs.ChartHub.OnDisconnectedAsync(System.Exception)
+  fullName: BacklashBot.Hubs.BacklashBotHub.OnConnectedAsync
+  nameWithType: BacklashBotHub.OnConnectedAsync
+- uid: BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync(System.Exception)
   name: OnDisconnectedAsync(Exception)
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_OnDisconnectedAsync_System_Exception_
-  commentId: M:BacklashBot.Hubs.ChartHub.OnDisconnectedAsync(System.Exception)
-  fullName: BacklashBot.Hubs.ChartHub.OnDisconnectedAsync(System.Exception)
-  nameWithType: ChartHub.OnDisconnectedAsync(Exception)
-- uid: BacklashBot.Hubs.ChartHub.OnDisconnectedAsync*
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_OnDisconnectedAsync_System_Exception_
+  commentId: M:BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync(System.Exception)
+  fullName: BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync(System.Exception)
+  nameWithType: BacklashBotHub.OnDisconnectedAsync(Exception)
+- uid: BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync*
   name: OnDisconnectedAsync
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_OnDisconnectedAsync_
-  commentId: Overload:BacklashBot.Hubs.ChartHub.OnDisconnectedAsync
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_OnDisconnectedAsync_
+  commentId: Overload:BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync
   isSpec: "True"
-  fullName: BacklashBot.Hubs.ChartHub.OnDisconnectedAsync
-  nameWithType: ChartHub.OnDisconnectedAsync
-- uid: BacklashBot.Hubs.ChartHub.SendOverseerMessage(System.String,System.String)
+  fullName: BacklashBot.Hubs.BacklashBotHub.OnDisconnectedAsync
+  nameWithType: BacklashBotHub.OnDisconnectedAsync
+- uid: BacklashBot.Hubs.BacklashBotHub.SendOverseerMessage(System.String,System.String)
   name: SendOverseerMessage(string, string)
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_SendOverseerMessage_System_String_System_String_
-  commentId: M:BacklashBot.Hubs.ChartHub.SendOverseerMessage(System.String,System.String)
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_SendOverseerMessage_System_String_System_String_
+  commentId: M:BacklashBot.Hubs.BacklashBotHub.SendOverseerMessage(System.String,System.String)
   name.vb: SendOverseerMessage(String, String)
-  fullName: BacklashBot.Hubs.ChartHub.SendOverseerMessage(string, string)
-  fullName.vb: BacklashBot.Hubs.ChartHub.SendOverseerMessage(String, String)
-  nameWithType: ChartHub.SendOverseerMessage(string, string)
-  nameWithType.vb: ChartHub.SendOverseerMessage(String, String)
-- uid: BacklashBot.Hubs.ChartHub.SendOverseerMessage*
+  fullName: BacklashBot.Hubs.BacklashBotHub.SendOverseerMessage(string, string)
+  fullName.vb: BacklashBot.Hubs.BacklashBotHub.SendOverseerMessage(String, String)
+  nameWithType: BacklashBotHub.SendOverseerMessage(string, string)
+  nameWithType.vb: BacklashBotHub.SendOverseerMessage(String, String)
+- uid: BacklashBot.Hubs.BacklashBotHub.SendOverseerMessage*
   name: SendOverseerMessage
-  href: api/BacklashBot.Hubs.ChartHub.html#BacklashBot_Hubs_ChartHub_SendOverseerMessage_
-  commentId: Overload:BacklashBot.Hubs.ChartHub.SendOverseerMessage
+  href: api/BacklashBot.Hubs.BacklashBotHub.html#BacklashBot_Hubs_BacklashBotHub_SendOverseerMessage_
+  commentId: Overload:BacklashBot.Hubs.BacklashBotHub.SendOverseerMessage
   isSpec: "True"
-  fullName: BacklashBot.Hubs.ChartHub.SendOverseerMessage
-  nameWithType: ChartHub.SendOverseerMessage
+  fullName: BacklashBot.Hubs.BacklashBotHub.SendOverseerMessage
+  nameWithType: BacklashBotHub.SendOverseerMessage
 - uid: BacklashBot.Hubs.CheckInData
   name: CheckInData
   href: api/BacklashBot.Hubs.CheckInData.html
@@ -1498,6 +1498,19 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Management.BrainStatusService.EnsureInitializedAsync
   nameWithType: BrainStatusService.EnsureInitializedAsync
+- uid: BacklashBot.Management.BrainStatusService.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/BacklashBot.Management.BrainStatusService.html#BacklashBot_Management_BrainStatusService_GetPerformanceMetrics
+  commentId: M:BacklashBot.Management.BrainStatusService.GetPerformanceMetrics
+  fullName: BacklashBot.Management.BrainStatusService.GetPerformanceMetrics()
+  nameWithType: BrainStatusService.GetPerformanceMetrics()
+- uid: BacklashBot.Management.BrainStatusService.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/BacklashBot.Management.BrainStatusService.html#BacklashBot_Management_BrainStatusService_GetPerformanceMetrics_
+  commentId: Overload:BacklashBot.Management.BrainStatusService.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: BacklashBot.Management.BrainStatusService.GetPerformanceMetrics
+  nameWithType: BrainStatusService.GetPerformanceMetrics
 - uid: BacklashBot.Management.BrainStatusService.SessionIdentifier
   name: SessionIdentifier
   href: api/BacklashBot.Management.BrainStatusService.html#BacklashBot_Management_BrainStatusService_SessionIdentifier
@@ -2801,6 +2814,19 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Management.MarketAnalysisHelper.GenerateSnapshotGroups
   nameWithType: MarketAnalysisHelper.GenerateSnapshotGroups
+- uid: BacklashBot.Management.MarketAnalysisHelper.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/BacklashBot.Management.MarketAnalysisHelper.html#BacklashBot_Management_MarketAnalysisHelper_GetPerformanceMetrics
+  commentId: M:BacklashBot.Management.MarketAnalysisHelper.GetPerformanceMetrics
+  fullName: BacklashBot.Management.MarketAnalysisHelper.GetPerformanceMetrics()
+  nameWithType: MarketAnalysisHelper.GetPerformanceMetrics()
+- uid: BacklashBot.Management.MarketAnalysisHelper.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/BacklashBot.Management.MarketAnalysisHelper.html#BacklashBot_Management_MarketAnalysisHelper_GetPerformanceMetrics_
+  commentId: Overload:BacklashBot.Management.MarketAnalysisHelper.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: BacklashBot.Management.MarketAnalysisHelper.GetPerformanceMetrics
+  nameWithType: MarketAnalysisHelper.GetPerformanceMetrics
 - uid: BacklashBot.Management.MarketManagerService
   name: MarketManagerService
   href: api/BacklashBot.Management.MarketManagerService.html
@@ -3112,15 +3138,15 @@ references:
   commentId: T:BacklashBot.Services.BroadcastService
   fullName: BacklashBot.Services.BroadcastService
   nameWithType: BroadcastService
-- uid: BacklashBot.Services.BroadcastService.#ctor(Microsoft.AspNetCore.SignalR.IHubContext{BacklashBot.Hubs.ChartHub},BacklashBot.Services.Interfaces.IServiceFactory,BacklashBot.State.Interfaces.IStatusTrackerService,Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IBroadcastService},BacklashBot.Services.Interfaces.IScopeManagerService,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig})
-  name: BroadcastService(IHubContext<ChartHub>, IServiceFactory, IStatusTrackerService, IServiceScopeFactory, ILogger<IBroadcastService>, IScopeManagerService, IOptions<ExecutionConfig>)
-  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService__ctor_Microsoft_AspNetCore_SignalR_IHubContext_BacklashBot_Hubs_ChartHub__BacklashBot_Services_Interfaces_IServiceFactory_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IBroadcastService__BacklashBot_Services_Interfaces_IScopeManagerService_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__
-  commentId: M:BacklashBot.Services.BroadcastService.#ctor(Microsoft.AspNetCore.SignalR.IHubContext{BacklashBot.Hubs.ChartHub},BacklashBot.Services.Interfaces.IServiceFactory,BacklashBot.State.Interfaces.IStatusTrackerService,Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IBroadcastService},BacklashBot.Services.Interfaces.IScopeManagerService,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig})
-  name.vb: New(IHubContext(Of ChartHub), IServiceFactory, IStatusTrackerService, IServiceScopeFactory, ILogger(Of IBroadcastService), IScopeManagerService, IOptions(Of ExecutionConfig))
-  fullName: BacklashBot.Services.BroadcastService.BroadcastService(Microsoft.AspNetCore.SignalR.IHubContext<BacklashBot.Hubs.ChartHub>, BacklashBot.Services.Interfaces.IServiceFactory, BacklashBot.State.Interfaces.IStatusTrackerService, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Logging.ILogger<BacklashBot.Services.Interfaces.IBroadcastService>, BacklashBot.Services.Interfaces.IScopeManagerService, Microsoft.Extensions.Options.IOptions<BacklashDTOs.Configuration.ExecutionConfig>)
-  fullName.vb: BacklashBot.Services.BroadcastService.New(Microsoft.AspNetCore.SignalR.IHubContext(Of BacklashBot.Hubs.ChartHub), BacklashBot.Services.Interfaces.IServiceFactory, BacklashBot.State.Interfaces.IStatusTrackerService, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Logging.ILogger(Of BacklashBot.Services.Interfaces.IBroadcastService), BacklashBot.Services.Interfaces.IScopeManagerService, Microsoft.Extensions.Options.IOptions(Of BacklashDTOs.Configuration.ExecutionConfig))
-  nameWithType: BroadcastService.BroadcastService(IHubContext<ChartHub>, IServiceFactory, IStatusTrackerService, IServiceScopeFactory, ILogger<IBroadcastService>, IScopeManagerService, IOptions<ExecutionConfig>)
-  nameWithType.vb: BroadcastService.New(IHubContext(Of ChartHub), IServiceFactory, IStatusTrackerService, IServiceScopeFactory, ILogger(Of IBroadcastService), IScopeManagerService, IOptions(Of ExecutionConfig))
+- uid: BacklashBot.Services.BroadcastService.#ctor(Microsoft.AspNetCore.SignalR.IHubContext{BacklashBot.Hubs.BacklashBotHub},BacklashBot.Services.Interfaces.IServiceFactory,BacklashBot.State.Interfaces.IStatusTrackerService,Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IBroadcastService},BacklashBot.Services.Interfaces.IScopeManagerService,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig})
+  name: BroadcastService(IHubContext<BacklashBotHub>, IServiceFactory, IStatusTrackerService, IServiceScopeFactory, ILogger<IBroadcastService>, IScopeManagerService, IOptions<ExecutionConfig>)
+  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService__ctor_Microsoft_AspNetCore_SignalR_IHubContext_BacklashBot_Hubs_BacklashBotHub__BacklashBot_Services_Interfaces_IServiceFactory_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IBroadcastService__BacklashBot_Services_Interfaces_IScopeManagerService_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__
+  commentId: M:BacklashBot.Services.BroadcastService.#ctor(Microsoft.AspNetCore.SignalR.IHubContext{BacklashBot.Hubs.BacklashBotHub},BacklashBot.Services.Interfaces.IServiceFactory,BacklashBot.State.Interfaces.IStatusTrackerService,Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IBroadcastService},BacklashBot.Services.Interfaces.IScopeManagerService,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig})
+  name.vb: New(IHubContext(Of BacklashBotHub), IServiceFactory, IStatusTrackerService, IServiceScopeFactory, ILogger(Of IBroadcastService), IScopeManagerService, IOptions(Of ExecutionConfig))
+  fullName: BacklashBot.Services.BroadcastService.BroadcastService(Microsoft.AspNetCore.SignalR.IHubContext<BacklashBot.Hubs.BacklashBotHub>, BacklashBot.Services.Interfaces.IServiceFactory, BacklashBot.State.Interfaces.IStatusTrackerService, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Logging.ILogger<BacklashBot.Services.Interfaces.IBroadcastService>, BacklashBot.Services.Interfaces.IScopeManagerService, Microsoft.Extensions.Options.IOptions<BacklashDTOs.Configuration.ExecutionConfig>)
+  fullName.vb: BacklashBot.Services.BroadcastService.New(Microsoft.AspNetCore.SignalR.IHubContext(Of BacklashBot.Hubs.BacklashBotHub), BacklashBot.Services.Interfaces.IServiceFactory, BacklashBot.State.Interfaces.IStatusTrackerService, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Logging.ILogger(Of BacklashBot.Services.Interfaces.IBroadcastService), BacklashBot.Services.Interfaces.IScopeManagerService, Microsoft.Extensions.Options.IOptions(Of BacklashDTOs.Configuration.ExecutionConfig))
+  nameWithType: BroadcastService.BroadcastService(IHubContext<BacklashBotHub>, IServiceFactory, IStatusTrackerService, IServiceScopeFactory, ILogger<IBroadcastService>, IScopeManagerService, IOptions<ExecutionConfig>)
+  nameWithType.vb: BroadcastService.New(IHubContext(Of BacklashBotHub), IServiceFactory, IStatusTrackerService, IServiceScopeFactory, ILogger(Of IBroadcastService), IScopeManagerService, IOptions(Of ExecutionConfig))
 - uid: BacklashBot.Services.BroadcastService.#ctor*
   name: BroadcastService
   href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService__ctor_
@@ -3131,6 +3157,32 @@ references:
   fullName.vb: BacklashBot.Services.BroadcastService.New
   nameWithType: BroadcastService.BroadcastService
   nameWithType.vb: BroadcastService.New
+- uid: BacklashBot.Services.BroadcastService.AverageBroadcastTimeMs
+  name: AverageBroadcastTimeMs
+  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_AverageBroadcastTimeMs
+  commentId: P:BacklashBot.Services.BroadcastService.AverageBroadcastTimeMs
+  fullName: BacklashBot.Services.BroadcastService.AverageBroadcastTimeMs
+  nameWithType: BroadcastService.AverageBroadcastTimeMs
+- uid: BacklashBot.Services.BroadcastService.AverageBroadcastTimeMs*
+  name: AverageBroadcastTimeMs
+  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_AverageBroadcastTimeMs_
+  commentId: Overload:BacklashBot.Services.BroadcastService.AverageBroadcastTimeMs
+  isSpec: "True"
+  fullName: BacklashBot.Services.BroadcastService.AverageBroadcastTimeMs
+  nameWithType: BroadcastService.AverageBroadcastTimeMs
+- uid: BacklashBot.Services.BroadcastService.BroadcastSuccessRate
+  name: BroadcastSuccessRate
+  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_BroadcastSuccessRate
+  commentId: P:BacklashBot.Services.BroadcastService.BroadcastSuccessRate
+  fullName: BacklashBot.Services.BroadcastService.BroadcastSuccessRate
+  nameWithType: BroadcastService.BroadcastSuccessRate
+- uid: BacklashBot.Services.BroadcastService.BroadcastSuccessRate*
+  name: BroadcastSuccessRate
+  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_BroadcastSuccessRate_
+  commentId: Overload:BacklashBot.Services.BroadcastService.BroadcastSuccessRate
+  isSpec: "True"
+  fullName: BacklashBot.Services.BroadcastService.BroadcastSuccessRate
+  nameWithType: BroadcastService.BroadcastSuccessRate
 - uid: BacklashBot.Services.BroadcastService.Dispose
   name: Dispose()
   href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_Dispose
@@ -3144,6 +3196,19 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Services.BroadcastService.Dispose
   nameWithType: BroadcastService.Dispose
+- uid: BacklashBot.Services.BroadcastService.FailedBroadcasts
+  name: FailedBroadcasts
+  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_FailedBroadcasts
+  commentId: P:BacklashBot.Services.BroadcastService.FailedBroadcasts
+  fullName: BacklashBot.Services.BroadcastService.FailedBroadcasts
+  nameWithType: BroadcastService.FailedBroadcasts
+- uid: BacklashBot.Services.BroadcastService.FailedBroadcasts*
+  name: FailedBroadcasts
+  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_FailedBroadcasts_
+  commentId: Overload:BacklashBot.Services.BroadcastService.FailedBroadcasts
+  isSpec: "True"
+  fullName: BacklashBot.Services.BroadcastService.FailedBroadcasts
+  nameWithType: BroadcastService.FailedBroadcasts
 - uid: BacklashBot.Services.BroadcastService.StartServicesAsync
   name: StartServicesAsync()
   href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_StartServicesAsync
@@ -3170,6 +3235,32 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Services.BroadcastService.StopServicesAsync
   nameWithType: BroadcastService.StopServicesAsync
+- uid: BacklashBot.Services.BroadcastService.SuccessfulBroadcasts
+  name: SuccessfulBroadcasts
+  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_SuccessfulBroadcasts
+  commentId: P:BacklashBot.Services.BroadcastService.SuccessfulBroadcasts
+  fullName: BacklashBot.Services.BroadcastService.SuccessfulBroadcasts
+  nameWithType: BroadcastService.SuccessfulBroadcasts
+- uid: BacklashBot.Services.BroadcastService.SuccessfulBroadcasts*
+  name: SuccessfulBroadcasts
+  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_SuccessfulBroadcasts_
+  commentId: Overload:BacklashBot.Services.BroadcastService.SuccessfulBroadcasts
+  isSpec: "True"
+  fullName: BacklashBot.Services.BroadcastService.SuccessfulBroadcasts
+  nameWithType: BroadcastService.SuccessfulBroadcasts
+- uid: BacklashBot.Services.BroadcastService.TotalBroadcastTimeMs
+  name: TotalBroadcastTimeMs
+  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_TotalBroadcastTimeMs
+  commentId: P:BacklashBot.Services.BroadcastService.TotalBroadcastTimeMs
+  fullName: BacklashBot.Services.BroadcastService.TotalBroadcastTimeMs
+  nameWithType: BroadcastService.TotalBroadcastTimeMs
+- uid: BacklashBot.Services.BroadcastService.TotalBroadcastTimeMs*
+  name: TotalBroadcastTimeMs
+  href: api/BacklashBot.Services.BroadcastService.html#BacklashBot_Services_BroadcastService_TotalBroadcastTimeMs_
+  commentId: Overload:BacklashBot.Services.BroadcastService.TotalBroadcastTimeMs
+  isSpec: "True"
+  fullName: BacklashBot.Services.BroadcastService.TotalBroadcastTimeMs
+  nameWithType: BroadcastService.TotalBroadcastTimeMs
 - uid: BacklashBot.Services.CandlestickService
   name: CandlestickService
   href: api/BacklashBot.Services.CandlestickService.html
@@ -3195,6 +3286,19 @@ references:
   fullName.vb: BacklashBot.Services.CandlestickService.New
   nameWithType: CandlestickService.CandlestickService
   nameWithType.vb: CandlestickService.New
+- uid: BacklashBot.Services.CandlestickService.PerformDataCleanupAsync
+  name: PerformDataCleanupAsync()
+  href: api/BacklashBot.Services.CandlestickService.html#BacklashBot_Services_CandlestickService_PerformDataCleanupAsync
+  commentId: M:BacklashBot.Services.CandlestickService.PerformDataCleanupAsync
+  fullName: BacklashBot.Services.CandlestickService.PerformDataCleanupAsync()
+  nameWithType: CandlestickService.PerformDataCleanupAsync()
+- uid: BacklashBot.Services.CandlestickService.PerformDataCleanupAsync*
+  name: PerformDataCleanupAsync
+  href: api/BacklashBot.Services.CandlestickService.html#BacklashBot_Services_CandlestickService_PerformDataCleanupAsync_
+  commentId: Overload:BacklashBot.Services.CandlestickService.PerformDataCleanupAsync
+  isSpec: "True"
+  fullName: BacklashBot.Services.CandlestickService.PerformDataCleanupAsync
+  nameWithType: CandlestickService.PerformDataCleanupAsync
 - uid: BacklashBot.Services.CandlestickService.PopulateMarketDataAsync(System.String)
   name: PopulateMarketDataAsync(string)
   href: api/BacklashBot.Services.CandlestickService.html#BacklashBot_Services_CandlestickService_PopulateMarketDataAsync_System_String_
@@ -3322,6 +3426,19 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Services.InterestScoreService.CalculateMarketInterestScoreAsync
   nameWithType: InterestScoreService.CalculateMarketInterestScoreAsync
+- uid: BacklashBot.Services.InterestScoreService.GetCacheHitRate
+  name: GetCacheHitRate()
+  href: api/BacklashBot.Services.InterestScoreService.html#BacklashBot_Services_InterestScoreService_GetCacheHitRate
+  commentId: M:BacklashBot.Services.InterestScoreService.GetCacheHitRate
+  fullName: BacklashBot.Services.InterestScoreService.GetCacheHitRate()
+  nameWithType: InterestScoreService.GetCacheHitRate()
+- uid: BacklashBot.Services.InterestScoreService.GetCacheHitRate*
+  name: GetCacheHitRate
+  href: api/BacklashBot.Services.InterestScoreService.html#BacklashBot_Services_InterestScoreService_GetCacheHitRate_
+  commentId: Overload:BacklashBot.Services.InterestScoreService.GetCacheHitRate
+  isSpec: "True"
+  fullName: BacklashBot.Services.InterestScoreService.GetCacheHitRate
+  nameWithType: InterestScoreService.GetCacheHitRate
 - uid: BacklashBot.Services.InterestScoreService.GetMarketInterestScores(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,System.Collections.Generic.IEnumerable{System.String},System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)
   name: GetMarketInterestScores(IServiceScopeFactory, IEnumerable<string>, double, double, double, double, double, double)
   href: api/BacklashBot.Services.InterestScoreService.html#BacklashBot_Services_InterestScoreService_GetMarketInterestScores_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_System_Collections_Generic_IEnumerable_System_String__System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_
@@ -3338,6 +3455,19 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Services.InterestScoreService.GetMarketInterestScores
   nameWithType: InterestScoreService.GetMarketInterestScores
+- uid: BacklashBot.Services.InterestScoreService.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/BacklashBot.Services.InterestScoreService.html#BacklashBot_Services_InterestScoreService_GetPerformanceMetrics
+  commentId: M:BacklashBot.Services.InterestScoreService.GetPerformanceMetrics
+  fullName: BacklashBot.Services.InterestScoreService.GetPerformanceMetrics()
+  nameWithType: InterestScoreService.GetPerformanceMetrics()
+- uid: BacklashBot.Services.InterestScoreService.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/BacklashBot.Services.InterestScoreService.html#BacklashBot_Services_InterestScoreService_GetPerformanceMetrics_
+  commentId: Overload:BacklashBot.Services.InterestScoreService.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: BacklashBot.Services.InterestScoreService.GetPerformanceMetrics
+  nameWithType: InterestScoreService.GetPerformanceMetrics
 - uid: BacklashBot.Services.Interfaces
   name: BacklashBot.Services.Interfaces
   href: api/BacklashBot.Services.Interfaces.html
@@ -5979,6 +6109,48 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Services.OrderBookService.GetCurrentOrderBook
   nameWithType: OrderBookService.GetCurrentOrderBook
+- uid: BacklashBot.Services.OrderBookService.GetEventQueueProcessingMetrics
+  name: GetEventQueueProcessingMetrics()
+  href: api/BacklashBot.Services.OrderBookService.html#BacklashBot_Services_OrderBookService_GetEventQueueProcessingMetrics
+  commentId: M:BacklashBot.Services.OrderBookService.GetEventQueueProcessingMetrics
+  fullName: BacklashBot.Services.OrderBookService.GetEventQueueProcessingMetrics()
+  nameWithType: OrderBookService.GetEventQueueProcessingMetrics()
+- uid: BacklashBot.Services.OrderBookService.GetEventQueueProcessingMetrics*
+  name: GetEventQueueProcessingMetrics
+  href: api/BacklashBot.Services.OrderBookService.html#BacklashBot_Services_OrderBookService_GetEventQueueProcessingMetrics_
+  commentId: Overload:BacklashBot.Services.OrderBookService.GetEventQueueProcessingMetrics
+  isSpec: "True"
+  fullName: BacklashBot.Services.OrderBookService.GetEventQueueProcessingMetrics
+  nameWithType: OrderBookService.GetEventQueueProcessingMetrics
+- uid: BacklashBot.Services.OrderBookService.GetMarketLockWaitMetrics(System.String)
+  name: GetMarketLockWaitMetrics(string)
+  href: api/BacklashBot.Services.OrderBookService.html#BacklashBot_Services_OrderBookService_GetMarketLockWaitMetrics_System_String_
+  commentId: M:BacklashBot.Services.OrderBookService.GetMarketLockWaitMetrics(System.String)
+  name.vb: GetMarketLockWaitMetrics(String)
+  fullName: BacklashBot.Services.OrderBookService.GetMarketLockWaitMetrics(string)
+  fullName.vb: BacklashBot.Services.OrderBookService.GetMarketLockWaitMetrics(String)
+  nameWithType: OrderBookService.GetMarketLockWaitMetrics(string)
+  nameWithType.vb: OrderBookService.GetMarketLockWaitMetrics(String)
+- uid: BacklashBot.Services.OrderBookService.GetMarketLockWaitMetrics*
+  name: GetMarketLockWaitMetrics
+  href: api/BacklashBot.Services.OrderBookService.html#BacklashBot_Services_OrderBookService_GetMarketLockWaitMetrics_
+  commentId: Overload:BacklashBot.Services.OrderBookService.GetMarketLockWaitMetrics
+  isSpec: "True"
+  fullName: BacklashBot.Services.OrderBookService.GetMarketLockWaitMetrics
+  nameWithType: OrderBookService.GetMarketLockWaitMetrics
+- uid: BacklashBot.Services.OrderBookService.GetNotificationQueueProcessingMetrics
+  name: GetNotificationQueueProcessingMetrics()
+  href: api/BacklashBot.Services.OrderBookService.html#BacklashBot_Services_OrderBookService_GetNotificationQueueProcessingMetrics
+  commentId: M:BacklashBot.Services.OrderBookService.GetNotificationQueueProcessingMetrics
+  fullName: BacklashBot.Services.OrderBookService.GetNotificationQueueProcessingMetrics()
+  nameWithType: OrderBookService.GetNotificationQueueProcessingMetrics()
+- uid: BacklashBot.Services.OrderBookService.GetNotificationQueueProcessingMetrics*
+  name: GetNotificationQueueProcessingMetrics
+  href: api/BacklashBot.Services.OrderBookService.html#BacklashBot_Services_OrderBookService_GetNotificationQueueProcessingMetrics_
+  commentId: Overload:BacklashBot.Services.OrderBookService.GetNotificationQueueProcessingMetrics
+  isSpec: "True"
+  fullName: BacklashBot.Services.OrderBookService.GetNotificationQueueProcessingMetrics
+  nameWithType: OrderBookService.GetNotificationQueueProcessingMetrics
 - uid: BacklashBot.Services.OrderBookService.GetQueueCounts
   name: GetQueueCounts()
   href: api/BacklashBot.Services.OrderBookService.html#BacklashBot_Services_OrderBookService_GetQueueCounts
@@ -5992,6 +6164,19 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Services.OrderBookService.GetQueueCounts
   nameWithType: OrderBookService.GetQueueCounts
+- uid: BacklashBot.Services.OrderBookService.GetTickerQueueProcessingMetrics
+  name: GetTickerQueueProcessingMetrics()
+  href: api/BacklashBot.Services.OrderBookService.html#BacklashBot_Services_OrderBookService_GetTickerQueueProcessingMetrics
+  commentId: M:BacklashBot.Services.OrderBookService.GetTickerQueueProcessingMetrics
+  fullName: BacklashBot.Services.OrderBookService.GetTickerQueueProcessingMetrics()
+  nameWithType: OrderBookService.GetTickerQueueProcessingMetrics()
+- uid: BacklashBot.Services.OrderBookService.GetTickerQueueProcessingMetrics*
+  name: GetTickerQueueProcessingMetrics
+  href: api/BacklashBot.Services.OrderBookService.html#BacklashBot_Services_OrderBookService_GetTickerQueueProcessingMetrics_
+  commentId: Overload:BacklashBot.Services.OrderBookService.GetTickerQueueProcessingMetrics
+  isSpec: "True"
+  fullName: BacklashBot.Services.OrderBookService.GetTickerQueueProcessingMetrics
+  nameWithType: OrderBookService.GetTickerQueueProcessingMetrics
 - uid: BacklashBot.Services.OrderBookService.IsEventQueueUnderLimit(System.Int32)
   name: IsEventQueueUnderLimit(int)
   href: api/BacklashBot.Services.OrderBookService.html#BacklashBot_Services_OrderBookService_IsEventQueueUnderLimit_System_Int32_
@@ -6248,6 +6433,19 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Services.OrderbookChangeTracker.GetNoNetOrderVolumePerMinute
   nameWithType: OrderbookChangeTracker.GetNoNetOrderVolumePerMinute
+- uid: BacklashBot.Services.OrderbookChangeTracker.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/BacklashBot.Services.OrderbookChangeTracker.html#BacklashBot_Services_OrderbookChangeTracker_GetPerformanceMetrics
+  commentId: M:BacklashBot.Services.OrderbookChangeTracker.GetPerformanceMetrics
+  fullName: BacklashBot.Services.OrderbookChangeTracker.GetPerformanceMetrics()
+  nameWithType: OrderbookChangeTracker.GetPerformanceMetrics()
+- uid: BacklashBot.Services.OrderbookChangeTracker.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/BacklashBot.Services.OrderbookChangeTracker.html#BacklashBot_Services_OrderbookChangeTracker_GetPerformanceMetrics_
+  commentId: Overload:BacklashBot.Services.OrderbookChangeTracker.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: BacklashBot.Services.OrderbookChangeTracker.GetPerformanceMetrics
+  nameWithType: OrderbookChangeTracker.GetPerformanceMetrics
 - uid: BacklashBot.Services.OrderbookChangeTracker.GetTopLevels(System.Collections.Generic.List{BacklashDTOs.OrderbookData},System.Int32)
   name: GetTopLevels(List<OrderbookData>, int)
   href: api/BacklashBot.Services.OrderbookChangeTracker.html#BacklashBot_Services_OrderbookChangeTracker_GetTopLevels_System_Collections_Generic_List_BacklashDTOs_OrderbookData__System_Int32_
@@ -6483,6 +6681,19 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Services.OrderbookChangeTracker.RecordTrade
   nameWithType: OrderbookChangeTracker.RecordTrade
+- uid: BacklashBot.Services.OrderbookChangeTracker.ResetPerformanceMetrics
+  name: ResetPerformanceMetrics()
+  href: api/BacklashBot.Services.OrderbookChangeTracker.html#BacklashBot_Services_OrderbookChangeTracker_ResetPerformanceMetrics
+  commentId: M:BacklashBot.Services.OrderbookChangeTracker.ResetPerformanceMetrics
+  fullName: BacklashBot.Services.OrderbookChangeTracker.ResetPerformanceMetrics()
+  nameWithType: OrderbookChangeTracker.ResetPerformanceMetrics()
+- uid: BacklashBot.Services.OrderbookChangeTracker.ResetPerformanceMetrics*
+  name: ResetPerformanceMetrics
+  href: api/BacklashBot.Services.OrderbookChangeTracker.html#BacklashBot_Services_OrderbookChangeTracker_ResetPerformanceMetrics_
+  commentId: Overload:BacklashBot.Services.OrderbookChangeTracker.ResetPerformanceMetrics
+  isSpec: "True"
+  fullName: BacklashBot.Services.OrderbookChangeTracker.ResetPerformanceMetrics
+  nameWithType: OrderbookChangeTracker.ResetPerformanceMetrics
 - uid: BacklashBot.Services.OrderbookChangeTracker.Shutdown
   name: Shutdown()
   href: api/BacklashBot.Services.OrderbookChangeTracker.html#BacklashBot_Services_OrderbookChangeTracker_Shutdown
@@ -6563,6 +6774,58 @@ references:
   fullName.vb: BacklashBot.Services.OverseerClientService.New
   nameWithType: OverseerClientService.OverseerClientService
   nameWithType.vb: OverseerClientService.New
+- uid: BacklashBot.Services.OverseerClientService.CircuitBreakerFailureCount
+  name: CircuitBreakerFailureCount
+  href: api/BacklashBot.Services.OverseerClientService.html#BacklashBot_Services_OverseerClientService_CircuitBreakerFailureCount
+  commentId: P:BacklashBot.Services.OverseerClientService.CircuitBreakerFailureCount
+  fullName: BacklashBot.Services.OverseerClientService.CircuitBreakerFailureCount
+  nameWithType: OverseerClientService.CircuitBreakerFailureCount
+- uid: BacklashBot.Services.OverseerClientService.CircuitBreakerFailureCount*
+  name: CircuitBreakerFailureCount
+  href: api/BacklashBot.Services.OverseerClientService.html#BacklashBot_Services_OverseerClientService_CircuitBreakerFailureCount_
+  commentId: Overload:BacklashBot.Services.OverseerClientService.CircuitBreakerFailureCount
+  isSpec: "True"
+  fullName: BacklashBot.Services.OverseerClientService.CircuitBreakerFailureCount
+  nameWithType: OverseerClientService.CircuitBreakerFailureCount
+- uid: BacklashBot.Services.OverseerClientService.ConnectionAttemptCount
+  name: ConnectionAttemptCount
+  href: api/BacklashBot.Services.OverseerClientService.html#BacklashBot_Services_OverseerClientService_ConnectionAttemptCount
+  commentId: P:BacklashBot.Services.OverseerClientService.ConnectionAttemptCount
+  fullName: BacklashBot.Services.OverseerClientService.ConnectionAttemptCount
+  nameWithType: OverseerClientService.ConnectionAttemptCount
+- uid: BacklashBot.Services.OverseerClientService.ConnectionAttemptCount*
+  name: ConnectionAttemptCount
+  href: api/BacklashBot.Services.OverseerClientService.html#BacklashBot_Services_OverseerClientService_ConnectionAttemptCount_
+  commentId: Overload:BacklashBot.Services.OverseerClientService.ConnectionAttemptCount
+  isSpec: "True"
+  fullName: BacklashBot.Services.OverseerClientService.ConnectionAttemptCount
+  nameWithType: OverseerClientService.ConnectionAttemptCount
+- uid: BacklashBot.Services.OverseerClientService.ConnectionSuccessCount
+  name: ConnectionSuccessCount
+  href: api/BacklashBot.Services.OverseerClientService.html#BacklashBot_Services_OverseerClientService_ConnectionSuccessCount
+  commentId: P:BacklashBot.Services.OverseerClientService.ConnectionSuccessCount
+  fullName: BacklashBot.Services.OverseerClientService.ConnectionSuccessCount
+  nameWithType: OverseerClientService.ConnectionSuccessCount
+- uid: BacklashBot.Services.OverseerClientService.ConnectionSuccessCount*
+  name: ConnectionSuccessCount
+  href: api/BacklashBot.Services.OverseerClientService.html#BacklashBot_Services_OverseerClientService_ConnectionSuccessCount_
+  commentId: Overload:BacklashBot.Services.OverseerClientService.ConnectionSuccessCount
+  isSpec: "True"
+  fullName: BacklashBot.Services.OverseerClientService.ConnectionSuccessCount
+  nameWithType: OverseerClientService.ConnectionSuccessCount
+- uid: BacklashBot.Services.OverseerClientService.DiscoveryOperationCount
+  name: DiscoveryOperationCount
+  href: api/BacklashBot.Services.OverseerClientService.html#BacklashBot_Services_OverseerClientService_DiscoveryOperationCount
+  commentId: P:BacklashBot.Services.OverseerClientService.DiscoveryOperationCount
+  fullName: BacklashBot.Services.OverseerClientService.DiscoveryOperationCount
+  nameWithType: OverseerClientService.DiscoveryOperationCount
+- uid: BacklashBot.Services.OverseerClientService.DiscoveryOperationCount*
+  name: DiscoveryOperationCount
+  href: api/BacklashBot.Services.OverseerClientService.html#BacklashBot_Services_OverseerClientService_DiscoveryOperationCount_
+  commentId: Overload:BacklashBot.Services.OverseerClientService.DiscoveryOperationCount
+  isSpec: "True"
+  fullName: BacklashBot.Services.OverseerClientService.DiscoveryOperationCount
+  nameWithType: OverseerClientService.DiscoveryOperationCount
 - uid: BacklashBot.Services.OverseerClientService.GetMetrics
   name: GetMetrics()
   href: api/BacklashBot.Services.OverseerClientService.html#BacklashBot_Services_OverseerClientService_GetMetrics
@@ -6602,6 +6865,19 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Services.OverseerClientService.StopAsync
   nameWithType: OverseerClientService.StopAsync
+- uid: BacklashBot.Services.OverseerClientService.TotalDiscoveryTime
+  name: TotalDiscoveryTime
+  href: api/BacklashBot.Services.OverseerClientService.html#BacklashBot_Services_OverseerClientService_TotalDiscoveryTime
+  commentId: P:BacklashBot.Services.OverseerClientService.TotalDiscoveryTime
+  fullName: BacklashBot.Services.OverseerClientService.TotalDiscoveryTime
+  nameWithType: OverseerClientService.TotalDiscoveryTime
+- uid: BacklashBot.Services.OverseerClientService.TotalDiscoveryTime*
+  name: TotalDiscoveryTime
+  href: api/BacklashBot.Services.OverseerClientService.html#BacklashBot_Services_OverseerClientService_TotalDiscoveryTime_
+  commentId: Overload:BacklashBot.Services.OverseerClientService.TotalDiscoveryTime
+  isSpec: "True"
+  fullName: BacklashBot.Services.OverseerClientService.TotalDiscoveryTime
+  nameWithType: OverseerClientService.TotalDiscoveryTime
 - uid: BacklashBot.Services.ServiceFactory
   name: ServiceFactory
   href: api/BacklashBot.Services.ServiceFactory.html
@@ -7363,15 +7639,15 @@ references:
   commentId: T:BacklashBot.Services.WebSocketMonitorService
   fullName: BacklashBot.Services.WebSocketMonitorService
   nameWithType: WebSocketMonitorService
-- uid: BacklashBot.Services.WebSocketMonitorService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IWebSocketMonitorService},BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IBotReadyStatus,BacklashBot.State.Interfaces.IStatusTrackerService)
-  name: WebSocketMonitorService(IServiceScopeFactory, IServiceFactory, ILogger<IWebSocketMonitorService>, IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
-  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IWebSocketMonitorService__BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IBotReadyStatus_BacklashBot_State_Interfaces_IStatusTrackerService_
-  commentId: M:BacklashBot.Services.WebSocketMonitorService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IWebSocketMonitorService},BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IBotReadyStatus,BacklashBot.State.Interfaces.IStatusTrackerService)
-  name.vb: New(IServiceScopeFactory, IServiceFactory, ILogger(Of IWebSocketMonitorService), IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
-  fullName: BacklashBot.Services.WebSocketMonitorService.WebSocketMonitorService(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger<BacklashBot.Services.Interfaces.IWebSocketMonitorService>, BacklashBot.Services.Interfaces.IScopeManagerService, BacklashBot.State.Interfaces.IBotReadyStatus, BacklashBot.State.Interfaces.IStatusTrackerService)
-  fullName.vb: BacklashBot.Services.WebSocketMonitorService.New(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger(Of BacklashBot.Services.Interfaces.IWebSocketMonitorService), BacklashBot.Services.Interfaces.IScopeManagerService, BacklashBot.State.Interfaces.IBotReadyStatus, BacklashBot.State.Interfaces.IStatusTrackerService)
-  nameWithType: WebSocketMonitorService.WebSocketMonitorService(IServiceScopeFactory, IServiceFactory, ILogger<IWebSocketMonitorService>, IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
-  nameWithType.vb: WebSocketMonitorService.New(IServiceScopeFactory, IServiceFactory, ILogger(Of IWebSocketMonitorService), IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
+- uid: BacklashBot.Services.WebSocketMonitorService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IWebSocketMonitorService},Microsoft.Extensions.Configuration.IConfiguration,BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IBotReadyStatus,BacklashBot.State.Interfaces.IStatusTrackerService)
+  name: WebSocketMonitorService(IServiceScopeFactory, IServiceFactory, ILogger<IWebSocketMonitorService>, IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IWebSocketMonitorService__Microsoft_Extensions_Configuration_IConfiguration_BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IBotReadyStatus_BacklashBot_State_Interfaces_IStatusTrackerService_
+  commentId: M:BacklashBot.Services.WebSocketMonitorService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IWebSocketMonitorService},Microsoft.Extensions.Configuration.IConfiguration,BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IBotReadyStatus,BacklashBot.State.Interfaces.IStatusTrackerService)
+  name.vb: New(IServiceScopeFactory, IServiceFactory, ILogger(Of IWebSocketMonitorService), IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
+  fullName: BacklashBot.Services.WebSocketMonitorService.WebSocketMonitorService(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger<BacklashBot.Services.Interfaces.IWebSocketMonitorService>, Microsoft.Extensions.Configuration.IConfiguration, BacklashBot.Services.Interfaces.IScopeManagerService, BacklashBot.State.Interfaces.IBotReadyStatus, BacklashBot.State.Interfaces.IStatusTrackerService)
+  fullName.vb: BacklashBot.Services.WebSocketMonitorService.New(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger(Of BacklashBot.Services.Interfaces.IWebSocketMonitorService), Microsoft.Extensions.Configuration.IConfiguration, BacklashBot.Services.Interfaces.IScopeManagerService, BacklashBot.State.Interfaces.IBotReadyStatus, BacklashBot.State.Interfaces.IStatusTrackerService)
+  nameWithType: WebSocketMonitorService.WebSocketMonitorService(IServiceScopeFactory, IServiceFactory, ILogger<IWebSocketMonitorService>, IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
+  nameWithType.vb: WebSocketMonitorService.New(IServiceScopeFactory, IServiceFactory, ILogger(Of IWebSocketMonitorService), IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
 - uid: BacklashBot.Services.WebSocketMonitorService.#ctor*
   name: WebSocketMonitorService
   href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService__ctor_
@@ -7382,6 +7658,19 @@ references:
   fullName.vb: BacklashBot.Services.WebSocketMonitorService.New
   nameWithType: WebSocketMonitorService.WebSocketMonitorService
   nameWithType.vb: WebSocketMonitorService.New
+- uid: BacklashBot.Services.WebSocketMonitorService.GetMetrics
+  name: GetMetrics()
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_GetMetrics
+  commentId: M:BacklashBot.Services.WebSocketMonitorService.GetMetrics
+  fullName: BacklashBot.Services.WebSocketMonitorService.GetMetrics()
+  nameWithType: WebSocketMonitorService.GetMetrics()
+- uid: BacklashBot.Services.WebSocketMonitorService.GetMetrics*
+  name: GetMetrics
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_GetMetrics_
+  commentId: Overload:BacklashBot.Services.WebSocketMonitorService.GetMetrics
+  isSpec: "True"
+  fullName: BacklashBot.Services.WebSocketMonitorService.GetMetrics
+  nameWithType: WebSocketMonitorService.GetMetrics
 - uid: BacklashBot.Services.WebSocketMonitorService.IsConnected
   name: IsConnected()
   href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_IsConnected
@@ -12670,6 +12959,45 @@ references:
   isSpec: "True"
   fullName: BacklashDTOs.Configuration.ExecutionConfig.BrainInstance
   nameWithType: ExecutionConfig.BrainInstance
+- uid: BacklashDTOs.Configuration.ExecutionConfig.CandlestickCleanupIntervalHours
+  name: CandlestickCleanupIntervalHours
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_CandlestickCleanupIntervalHours
+  commentId: P:BacklashDTOs.Configuration.ExecutionConfig.CandlestickCleanupIntervalHours
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.CandlestickCleanupIntervalHours
+  nameWithType: ExecutionConfig.CandlestickCleanupIntervalHours
+- uid: BacklashDTOs.Configuration.ExecutionConfig.CandlestickCleanupIntervalHours*
+  name: CandlestickCleanupIntervalHours
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_CandlestickCleanupIntervalHours_
+  commentId: Overload:BacklashDTOs.Configuration.ExecutionConfig.CandlestickCleanupIntervalHours
+  isSpec: "True"
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.CandlestickCleanupIntervalHours
+  nameWithType: ExecutionConfig.CandlestickCleanupIntervalHours
+- uid: BacklashDTOs.Configuration.ExecutionConfig.CandlestickDataRetentionDays
+  name: CandlestickDataRetentionDays
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_CandlestickDataRetentionDays
+  commentId: P:BacklashDTOs.Configuration.ExecutionConfig.CandlestickDataRetentionDays
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.CandlestickDataRetentionDays
+  nameWithType: ExecutionConfig.CandlestickDataRetentionDays
+- uid: BacklashDTOs.Configuration.ExecutionConfig.CandlestickDataRetentionDays*
+  name: CandlestickDataRetentionDays
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_CandlestickDataRetentionDays_
+  commentId: Overload:BacklashDTOs.Configuration.ExecutionConfig.CandlestickDataRetentionDays
+  isSpec: "True"
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.CandlestickDataRetentionDays
+  nameWithType: ExecutionConfig.CandlestickDataRetentionDays
+- uid: BacklashDTOs.Configuration.ExecutionConfig.CandlestickPerformanceMetricsLogLevel
+  name: CandlestickPerformanceMetricsLogLevel
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_CandlestickPerformanceMetricsLogLevel
+  commentId: P:BacklashDTOs.Configuration.ExecutionConfig.CandlestickPerformanceMetricsLogLevel
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.CandlestickPerformanceMetricsLogLevel
+  nameWithType: ExecutionConfig.CandlestickPerformanceMetricsLogLevel
+- uid: BacklashDTOs.Configuration.ExecutionConfig.CandlestickPerformanceMetricsLogLevel*
+  name: CandlestickPerformanceMetricsLogLevel
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_CandlestickPerformanceMetricsLogLevel_
+  commentId: Overload:BacklashDTOs.Configuration.ExecutionConfig.CandlestickPerformanceMetricsLogLevel
+  isSpec: "True"
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.CandlestickPerformanceMetricsLogLevel
+  nameWithType: ExecutionConfig.CandlestickPerformanceMetricsLogLevel
 - uid: BacklashDTOs.Configuration.ExecutionConfig.CheckInRateLimitPerMinute
   name: CheckInRateLimitPerMinute
   href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_CheckInRateLimitPerMinute
@@ -12709,6 +13037,19 @@ references:
   isSpec: "True"
   fullName: BacklashDTOs.Configuration.ExecutionConfig.ConnectionHealthTimeoutSeconds
   nameWithType: ExecutionConfig.ConnectionHealthTimeoutSeconds
+- uid: BacklashDTOs.Configuration.ExecutionConfig.EnableCandlestickPerformanceMetrics
+  name: EnableCandlestickPerformanceMetrics
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_EnableCandlestickPerformanceMetrics
+  commentId: P:BacklashDTOs.Configuration.ExecutionConfig.EnableCandlestickPerformanceMetrics
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.EnableCandlestickPerformanceMetrics
+  nameWithType: ExecutionConfig.EnableCandlestickPerformanceMetrics
+- uid: BacklashDTOs.Configuration.ExecutionConfig.EnableCandlestickPerformanceMetrics*
+  name: EnableCandlestickPerformanceMetrics
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_EnableCandlestickPerformanceMetrics_
+  commentId: Overload:BacklashDTOs.Configuration.ExecutionConfig.EnableCandlestickPerformanceMetrics
+  isSpec: "True"
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.EnableCandlestickPerformanceMetrics
+  nameWithType: ExecutionConfig.EnableCandlestickPerformanceMetrics
 - uid: BacklashDTOs.Configuration.ExecutionConfig.EventQueueLimit
   name: EventQueueLimit
   href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_EventQueueLimit
@@ -12813,6 +13154,19 @@ references:
   isSpec: "True"
   fullName: BacklashDTOs.Configuration.ExecutionConfig.MarketUpdateTimeout
   nameWithType: ExecutionConfig.MarketUpdateTimeout
+- uid: BacklashDTOs.Configuration.ExecutionConfig.MaxCandlesticksPerMarket
+  name: MaxCandlesticksPerMarket
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_MaxCandlesticksPerMarket
+  commentId: P:BacklashDTOs.Configuration.ExecutionConfig.MaxCandlesticksPerMarket
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.MaxCandlesticksPerMarket
+  nameWithType: ExecutionConfig.MaxCandlesticksPerMarket
+- uid: BacklashDTOs.Configuration.ExecutionConfig.MaxCandlesticksPerMarket*
+  name: MaxCandlesticksPerMarket
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_MaxCandlesticksPerMarket_
+  commentId: Overload:BacklashDTOs.Configuration.ExecutionConfig.MaxCandlesticksPerMarket
+  isSpec: "True"
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.MaxCandlesticksPerMarket
+  nameWithType: ExecutionConfig.MaxCandlesticksPerMarket
 - uid: BacklashDTOs.Configuration.ExecutionConfig.MaxConnectionAgeMinutes
   name: MaxConnectionAgeMinutes
   href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_MaxConnectionAgeMinutes
@@ -12826,6 +13180,19 @@ references:
   isSpec: "True"
   fullName: BacklashDTOs.Configuration.ExecutionConfig.MaxConnectionAgeMinutes
   nameWithType: ExecutionConfig.MaxConnectionAgeMinutes
+- uid: BacklashDTOs.Configuration.ExecutionConfig.MaxDegreeOfParallelismDataLoading
+  name: MaxDegreeOfParallelismDataLoading
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_MaxDegreeOfParallelismDataLoading
+  commentId: P:BacklashDTOs.Configuration.ExecutionConfig.MaxDegreeOfParallelismDataLoading
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.MaxDegreeOfParallelismDataLoading
+  nameWithType: ExecutionConfig.MaxDegreeOfParallelismDataLoading
+- uid: BacklashDTOs.Configuration.ExecutionConfig.MaxDegreeOfParallelismDataLoading*
+  name: MaxDegreeOfParallelismDataLoading
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_MaxDegreeOfParallelismDataLoading_
+  commentId: Overload:BacklashDTOs.Configuration.ExecutionConfig.MaxDegreeOfParallelismDataLoading
+  isSpec: "True"
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.MaxDegreeOfParallelismDataLoading
+  nameWithType: ExecutionConfig.MaxDegreeOfParallelismDataLoading
 - uid: BacklashDTOs.Configuration.ExecutionConfig.MaxMarketsPerSubscriptionAction
   name: MaxMarketsPerSubscriptionAction
   href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_MaxMarketsPerSubscriptionAction
@@ -12839,6 +13206,19 @@ references:
   isSpec: "True"
   fullName: BacklashDTOs.Configuration.ExecutionConfig.MaxMarketsPerSubscriptionAction
   nameWithType: ExecutionConfig.MaxMarketsPerSubscriptionAction
+- uid: BacklashDTOs.Configuration.ExecutionConfig.MaxParallelCandlestickTasks
+  name: MaxParallelCandlestickTasks
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_MaxParallelCandlestickTasks
+  commentId: P:BacklashDTOs.Configuration.ExecutionConfig.MaxParallelCandlestickTasks
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.MaxParallelCandlestickTasks
+  nameWithType: ExecutionConfig.MaxParallelCandlestickTasks
+- uid: BacklashDTOs.Configuration.ExecutionConfig.MaxParallelCandlestickTasks*
+  name: MaxParallelCandlestickTasks
+  href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_MaxParallelCandlestickTasks_
+  commentId: Overload:BacklashDTOs.Configuration.ExecutionConfig.MaxParallelCandlestickTasks
+  isSpec: "True"
+  fullName: BacklashDTOs.Configuration.ExecutionConfig.MaxParallelCandlestickTasks
+  nameWithType: ExecutionConfig.MaxParallelCandlestickTasks
 - uid: BacklashDTOs.Configuration.ExecutionConfig.MessageBatchIntervalMs
   name: MessageBatchIntervalMs
   href: api/BacklashDTOs.Configuration.ExecutionConfig.html#BacklashDTOs_Configuration_ExecutionConfig_MessageBatchIntervalMs
@@ -28562,6 +28942,32 @@ references:
   isSpec: "True"
   fullName: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetBalanceAsync
   nameWithType: KalshiAPIService.GetBalanceAsync
+- uid: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationExecutionDurations
+  name: GetCalculationExecutionDurations()
+  href: api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html#KalshiBotAPI_KalshiAPI_KalshiAPIService_GetCalculationExecutionDurations
+  commentId: M:KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationExecutionDurations
+  fullName: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationExecutionDurations()
+  nameWithType: KalshiAPIService.GetCalculationExecutionDurations()
+- uid: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationExecutionDurations*
+  name: GetCalculationExecutionDurations
+  href: api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html#KalshiBotAPI_KalshiAPI_KalshiAPIService_GetCalculationExecutionDurations_
+  commentId: Overload:KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationExecutionDurations
+  isSpec: "True"
+  fullName: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationExecutionDurations
+  nameWithType: KalshiAPIService.GetCalculationExecutionDurations
+- uid: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationPerformanceMetrics
+  name: GetCalculationPerformanceMetrics()
+  href: api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html#KalshiBotAPI_KalshiAPI_KalshiAPIService_GetCalculationPerformanceMetrics
+  commentId: M:KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationPerformanceMetrics
+  fullName: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationPerformanceMetrics()
+  nameWithType: KalshiAPIService.GetCalculationPerformanceMetrics()
+- uid: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationPerformanceMetrics*
+  name: GetCalculationPerformanceMetrics
+  href: api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html#KalshiBotAPI_KalshiAPI_KalshiAPIService_GetCalculationPerformanceMetrics_
+  commentId: Overload:KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationPerformanceMetrics
+  nameWithType: KalshiAPIService.GetCalculationPerformanceMetrics
 - uid: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetEventMetadataAsync(System.String)
   name: GetEventMetadataAsync(string)
   href: api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html#KalshiBotAPI_KalshiAPI_KalshiAPIService_GetEventMetadataAsync_System_String_
@@ -28636,6 +29042,32 @@ references:
   isSpec: "True"
   fullName: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetIncentiveProgramsAsync
   nameWithType: KalshiAPIService.GetIncentiveProgramsAsync
+- uid: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodExecutionDurations
+  name: GetMethodExecutionDurations()
+  href: api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html#KalshiBotAPI_KalshiAPI_KalshiAPIService_GetMethodExecutionDurations
+  commentId: M:KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodExecutionDurations
+  fullName: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodExecutionDurations()
+  nameWithType: KalshiAPIService.GetMethodExecutionDurations()
+- uid: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodExecutionDurations*
+  name: GetMethodExecutionDurations
+  href: api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html#KalshiBotAPI_KalshiAPI_KalshiAPIService_GetMethodExecutionDurations_
+  commentId: Overload:KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodExecutionDurations
+  isSpec: "True"
+  fullName: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodExecutionDurations
+  nameWithType: KalshiAPIService.GetMethodExecutionDurations
+- uid: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodPerformanceMetrics
+  name: GetMethodPerformanceMetrics()
+  href: api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html#KalshiBotAPI_KalshiAPI_KalshiAPIService_GetMethodPerformanceMetrics
+  commentId: M:KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodPerformanceMetrics
+  fullName: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodPerformanceMetrics()
+  nameWithType: KalshiAPIService.GetMethodPerformanceMetrics()
+- uid: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodPerformanceMetrics*
+  name: GetMethodPerformanceMetrics
+  href: api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html#KalshiBotAPI_KalshiAPI_KalshiAPIService_GetMethodPerformanceMetrics_
+  commentId: Overload:KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodPerformanceMetrics
+  nameWithType: KalshiAPIService.GetMethodPerformanceMetrics
 - uid: KalshiBotAPI.KalshiAPI.KalshiAPIService.GetOrderDetailsAsync(System.String)
   name: GetOrderDetailsAsync(string)
   href: api/KalshiBotAPI.KalshiAPI.KalshiAPIService.html#KalshiBotAPI_KalshiAPI_KalshiAPIService_GetOrderDetailsAsync_System_String_
@@ -30625,6 +31057,19 @@ references:
   fullName.vb: KalshiBotAPI.Websockets.MessageProcessor.New
   nameWithType: MessageProcessor.MessageProcessor
   nameWithType.vb: MessageProcessor.New
+- uid: KalshiBotAPI.Websockets.MessageProcessor.AverageProcessingTimeMs
+  name: AverageProcessingTimeMs
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_AverageProcessingTimeMs
+  commentId: P:KalshiBotAPI.Websockets.MessageProcessor.AverageProcessingTimeMs
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.AverageProcessingTimeMs
+  nameWithType: MessageProcessor.AverageProcessingTimeMs
+- uid: KalshiBotAPI.Websockets.MessageProcessor.AverageProcessingTimeMs*
+  name: AverageProcessingTimeMs
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_AverageProcessingTimeMs_
+  commentId: Overload:KalshiBotAPI.Websockets.MessageProcessor.AverageProcessingTimeMs
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.AverageProcessingTimeMs
+  nameWithType: MessageProcessor.AverageProcessingTimeMs
 - uid: KalshiBotAPI.Websockets.MessageProcessor.ClearOrderBookQueue(System.String)
   name: ClearOrderBookQueue(string)
   href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_ClearOrderBookQueue_System_String_
@@ -30682,6 +31127,32 @@ references:
   isSpec: "True"
   fullName: KalshiBotAPI.Websockets.MessageProcessor.GetEventCountsByMarket
   nameWithType: MessageProcessor.GetEventCountsByMarket
+- uid: KalshiBotAPI.Websockets.MessageProcessor.GetMessageTypeCounts
+  name: GetMessageTypeCounts()
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_GetMessageTypeCounts
+  commentId: M:KalshiBotAPI.Websockets.MessageProcessor.GetMessageTypeCounts
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.GetMessageTypeCounts()
+  nameWithType: MessageProcessor.GetMessageTypeCounts()
+- uid: KalshiBotAPI.Websockets.MessageProcessor.GetMessageTypeCounts*
+  name: GetMessageTypeCounts
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_GetMessageTypeCounts_
+  commentId: Overload:KalshiBotAPI.Websockets.MessageProcessor.GetMessageTypeCounts
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.GetMessageTypeCounts
+  nameWithType: MessageProcessor.GetMessageTypeCounts
+- uid: KalshiBotAPI.Websockets.MessageProcessor.LastMetricsLogTime
+  name: LastMetricsLogTime
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_LastMetricsLogTime
+  commentId: P:KalshiBotAPI.Websockets.MessageProcessor.LastMetricsLogTime
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.LastMetricsLogTime
+  nameWithType: MessageProcessor.LastMetricsLogTime
+- uid: KalshiBotAPI.Websockets.MessageProcessor.LastMetricsLogTime*
+  name: LastMetricsLogTime
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_LastMetricsLogTime_
+  commentId: Overload:KalshiBotAPI.Websockets.MessageProcessor.LastMetricsLogTime
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.LastMetricsLogTime
+  nameWithType: MessageProcessor.LastMetricsLogTime
 - uid: KalshiBotAPI.Websockets.MessageProcessor.LastSequenceNumber
   name: LastSequenceNumber
   href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_LastSequenceNumber
@@ -30707,6 +31178,19 @@ references:
   commentId: E:KalshiBotAPI.Websockets.MessageProcessor.MessageReceived
   fullName: KalshiBotAPI.Websockets.MessageProcessor.MessageReceived
   nameWithType: MessageProcessor.MessageReceived
+- uid: KalshiBotAPI.Websockets.MessageProcessor.MessagesPerSecond
+  name: MessagesPerSecond
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_MessagesPerSecond
+  commentId: P:KalshiBotAPI.Websockets.MessageProcessor.MessagesPerSecond
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.MessagesPerSecond
+  nameWithType: MessageProcessor.MessagesPerSecond
+- uid: KalshiBotAPI.Websockets.MessageProcessor.MessagesPerSecond*
+  name: MessagesPerSecond
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_MessagesPerSecond_
+  commentId: Overload:KalshiBotAPI.Websockets.MessageProcessor.MessagesPerSecond
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.MessagesPerSecond
+  nameWithType: MessageProcessor.MessagesPerSecond
 - uid: KalshiBotAPI.Websockets.MessageProcessor.OrderBookMessageQueueCount
   name: OrderBookMessageQueueCount
   href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_OrderBookMessageQueueCount
@@ -30816,6 +31300,32 @@ references:
   commentId: E:KalshiBotAPI.Websockets.MessageProcessor.TickerReceived
   fullName: KalshiBotAPI.Websockets.MessageProcessor.TickerReceived
   nameWithType: MessageProcessor.TickerReceived
+- uid: KalshiBotAPI.Websockets.MessageProcessor.TotalMessagesProcessed
+  name: TotalMessagesProcessed
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_TotalMessagesProcessed
+  commentId: P:KalshiBotAPI.Websockets.MessageProcessor.TotalMessagesProcessed
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.TotalMessagesProcessed
+  nameWithType: MessageProcessor.TotalMessagesProcessed
+- uid: KalshiBotAPI.Websockets.MessageProcessor.TotalMessagesProcessed*
+  name: TotalMessagesProcessed
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_TotalMessagesProcessed_
+  commentId: Overload:KalshiBotAPI.Websockets.MessageProcessor.TotalMessagesProcessed
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.TotalMessagesProcessed
+  nameWithType: MessageProcessor.TotalMessagesProcessed
+- uid: KalshiBotAPI.Websockets.MessageProcessor.TotalProcessingTimeMs
+  name: TotalProcessingTimeMs
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_TotalProcessingTimeMs
+  commentId: P:KalshiBotAPI.Websockets.MessageProcessor.TotalProcessingTimeMs
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.TotalProcessingTimeMs
+  nameWithType: MessageProcessor.TotalProcessingTimeMs
+- uid: KalshiBotAPI.Websockets.MessageProcessor.TotalProcessingTimeMs*
+  name: TotalProcessingTimeMs
+  href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_TotalProcessingTimeMs_
+  commentId: Overload:KalshiBotAPI.Websockets.MessageProcessor.TotalProcessingTimeMs
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.MessageProcessor.TotalProcessingTimeMs
+  nameWithType: MessageProcessor.TotalProcessingTimeMs
 - uid: KalshiBotAPI.Websockets.MessageProcessor.TradeReceived
   name: TradeReceived
   href: api/KalshiBotAPI.Websockets.MessageProcessor.html#KalshiBotAPI_Websockets_MessageProcessor_TradeReceived
@@ -33878,6 +34388,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Data.KalshiBotContext.GetOverseerInfoByHostName
   nameWithType: KalshiBotContext.GetOverseerInfoByHostName
+- uid: KalshiBotData.Data.KalshiBotContext.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotData.Data.KalshiBotContext.html#KalshiBotData_Data_KalshiBotContext_GetPerformanceMetrics
+  commentId: M:KalshiBotData.Data.KalshiBotContext.GetPerformanceMetrics
+  fullName: KalshiBotData.Data.KalshiBotContext.GetPerformanceMetrics()
+  nameWithType: KalshiBotContext.GetPerformanceMetrics()
+- uid: KalshiBotData.Data.KalshiBotContext.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotData.Data.KalshiBotContext.html#KalshiBotData_Data_KalshiBotContext_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Data.KalshiBotContext.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Data.KalshiBotContext.GetPerformanceMetrics
+  nameWithType: KalshiBotContext.GetPerformanceMetrics
 - uid: KalshiBotData.Data.KalshiBotContext.GetProcessedMarkets
   name: GetProcessedMarkets()
   href: api/KalshiBotData.Data.KalshiBotContext.html#KalshiBotData_Data_KalshiBotContext_GetProcessedMarkets
@@ -34283,6 +34806,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Data.KalshiBotContext.RemoveOrphanedBrainLocks
   nameWithType: KalshiBotContext.RemoveOrphanedBrainLocks
+- uid: KalshiBotData.Data.KalshiBotContext.ResetPerformanceMetrics
+  name: ResetPerformanceMetrics()
+  href: api/KalshiBotData.Data.KalshiBotContext.html#KalshiBotData_Data_KalshiBotContext_ResetPerformanceMetrics
+  commentId: M:KalshiBotData.Data.KalshiBotContext.ResetPerformanceMetrics
+  fullName: KalshiBotData.Data.KalshiBotContext.ResetPerformanceMetrics()
+  nameWithType: KalshiBotContext.ResetPerformanceMetrics()
+- uid: KalshiBotData.Data.KalshiBotContext.ResetPerformanceMetrics*
+  name: ResetPerformanceMetrics
+  href: api/KalshiBotData.Data.KalshiBotContext.html#KalshiBotData_Data_KalshiBotContext_ResetPerformanceMetrics_
+  commentId: Overload:KalshiBotData.Data.KalshiBotContext.ResetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotData.Data.KalshiBotContext.ResetPerformanceMetrics
+  nameWithType: KalshiBotContext.ResetPerformanceMetrics
 - uid: KalshiBotData.Data.KalshiBotContext.RetrieveCandlesticksAsync(System.Threading.CancellationToken,System.Int32,System.String,System.DateTime)
   name: RetrieveCandlesticksAsync(CancellationToken, int, string, DateTime)
   href: api/KalshiBotData.Data.KalshiBotContext.html#KalshiBotData_Data_KalshiBotContext_RetrieveCandlesticksAsync_System_Threading_CancellationToken_System_Int32_System_String_System_DateTime_
@@ -34401,6 +34937,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Data.SqlDataService.Dispose
   nameWithType: SqlDataService.Dispose
+- uid: KalshiBotData.Data.SqlDataService.EventLifecycleQueueDepth
+  name: EventLifecycleQueueDepth
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_EventLifecycleQueueDepth
+  commentId: P:KalshiBotData.Data.SqlDataService.EventLifecycleQueueDepth
+  fullName: KalshiBotData.Data.SqlDataService.EventLifecycleQueueDepth
+  nameWithType: SqlDataService.EventLifecycleQueueDepth
+- uid: KalshiBotData.Data.SqlDataService.EventLifecycleQueueDepth*
+  name: EventLifecycleQueueDepth
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_EventLifecycleQueueDepth_
+  commentId: Overload:KalshiBotData.Data.SqlDataService.EventLifecycleQueueDepth
+  isSpec: "True"
+  fullName: KalshiBotData.Data.SqlDataService.EventLifecycleQueueDepth
+  nameWithType: SqlDataService.EventLifecycleQueueDepth
 - uid: KalshiBotData.Data.SqlDataService.ExecuteSnapshotImportJobAsync(System.Threading.CancellationToken)
   name: ExecuteSnapshotImportJobAsync(CancellationToken)
   href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_ExecuteSnapshotImportJobAsync_System_Threading_CancellationToken_
@@ -34414,6 +34963,45 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Data.SqlDataService.ExecuteSnapshotImportJobAsync
   nameWithType: SqlDataService.ExecuteSnapshotImportJobAsync
+- uid: KalshiBotData.Data.SqlDataService.FillQueueDepth
+  name: FillQueueDepth
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_FillQueueDepth
+  commentId: P:KalshiBotData.Data.SqlDataService.FillQueueDepth
+  fullName: KalshiBotData.Data.SqlDataService.FillQueueDepth
+  nameWithType: SqlDataService.FillQueueDepth
+- uid: KalshiBotData.Data.SqlDataService.FillQueueDepth*
+  name: FillQueueDepth
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_FillQueueDepth_
+  commentId: Overload:KalshiBotData.Data.SqlDataService.FillQueueDepth
+  isSpec: "True"
+  fullName: KalshiBotData.Data.SqlDataService.FillQueueDepth
+  nameWithType: SqlDataService.FillQueueDepth
+- uid: KalshiBotData.Data.SqlDataService.MarketLifecycleQueueDepth
+  name: MarketLifecycleQueueDepth
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_MarketLifecycleQueueDepth
+  commentId: P:KalshiBotData.Data.SqlDataService.MarketLifecycleQueueDepth
+  fullName: KalshiBotData.Data.SqlDataService.MarketLifecycleQueueDepth
+  nameWithType: SqlDataService.MarketLifecycleQueueDepth
+- uid: KalshiBotData.Data.SqlDataService.MarketLifecycleQueueDepth*
+  name: MarketLifecycleQueueDepth
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_MarketLifecycleQueueDepth_
+  commentId: Overload:KalshiBotData.Data.SqlDataService.MarketLifecycleQueueDepth
+  isSpec: "True"
+  fullName: KalshiBotData.Data.SqlDataService.MarketLifecycleQueueDepth
+  nameWithType: SqlDataService.MarketLifecycleQueueDepth
+- uid: KalshiBotData.Data.SqlDataService.OrderBookQueueDepth
+  name: OrderBookQueueDepth
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_OrderBookQueueDepth
+  commentId: P:KalshiBotData.Data.SqlDataService.OrderBookQueueDepth
+  fullName: KalshiBotData.Data.SqlDataService.OrderBookQueueDepth
+  nameWithType: SqlDataService.OrderBookQueueDepth
+- uid: KalshiBotData.Data.SqlDataService.OrderBookQueueDepth*
+  name: OrderBookQueueDepth
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_OrderBookQueueDepth_
+  commentId: Overload:KalshiBotData.Data.SqlDataService.OrderBookQueueDepth
+  isSpec: "True"
+  fullName: KalshiBotData.Data.SqlDataService.OrderBookQueueDepth
+  nameWithType: SqlDataService.OrderBookQueueDepth
 - uid: KalshiBotData.Data.SqlDataService.StoreEventLifecycleAsync(System.Text.Json.JsonElement)
   name: StoreEventLifecycleAsync(JsonElement)
   href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_StoreEventLifecycleAsync_System_Text_Json_JsonElement_
@@ -34495,6 +35083,71 @@ references:
   isSpec: "True"
   fullName: KalshiBotData.Data.SqlDataService.StoreTradeAsync
   nameWithType: SqlDataService.StoreTradeAsync
+- uid: KalshiBotData.Data.SqlDataService.SuccessRate
+  name: SuccessRate
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_SuccessRate
+  commentId: P:KalshiBotData.Data.SqlDataService.SuccessRate
+  fullName: KalshiBotData.Data.SqlDataService.SuccessRate
+  nameWithType: SqlDataService.SuccessRate
+- uid: KalshiBotData.Data.SqlDataService.SuccessRate*
+  name: SuccessRate
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_SuccessRate_
+  commentId: Overload:KalshiBotData.Data.SqlDataService.SuccessRate
+  isSpec: "True"
+  fullName: KalshiBotData.Data.SqlDataService.SuccessRate
+  nameWithType: SqlDataService.SuccessRate
+- uid: KalshiBotData.Data.SqlDataService.TotalFailed
+  name: TotalFailed
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_TotalFailed
+  commentId: P:KalshiBotData.Data.SqlDataService.TotalFailed
+  fullName: KalshiBotData.Data.SqlDataService.TotalFailed
+  nameWithType: SqlDataService.TotalFailed
+- uid: KalshiBotData.Data.SqlDataService.TotalFailed*
+  name: TotalFailed
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_TotalFailed_
+  commentId: Overload:KalshiBotData.Data.SqlDataService.TotalFailed
+  isSpec: "True"
+  fullName: KalshiBotData.Data.SqlDataService.TotalFailed
+  nameWithType: SqlDataService.TotalFailed
+- uid: KalshiBotData.Data.SqlDataService.TotalProcessed
+  name: TotalProcessed
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_TotalProcessed
+  commentId: P:KalshiBotData.Data.SqlDataService.TotalProcessed
+  fullName: KalshiBotData.Data.SqlDataService.TotalProcessed
+  nameWithType: SqlDataService.TotalProcessed
+- uid: KalshiBotData.Data.SqlDataService.TotalProcessed*
+  name: TotalProcessed
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_TotalProcessed_
+  commentId: Overload:KalshiBotData.Data.SqlDataService.TotalProcessed
+  isSpec: "True"
+  fullName: KalshiBotData.Data.SqlDataService.TotalProcessed
+  nameWithType: SqlDataService.TotalProcessed
+- uid: KalshiBotData.Data.SqlDataService.TotalQueuedOperations
+  name: TotalQueuedOperations
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_TotalQueuedOperations
+  commentId: P:KalshiBotData.Data.SqlDataService.TotalQueuedOperations
+  fullName: KalshiBotData.Data.SqlDataService.TotalQueuedOperations
+  nameWithType: SqlDataService.TotalQueuedOperations
+- uid: KalshiBotData.Data.SqlDataService.TotalQueuedOperations*
+  name: TotalQueuedOperations
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_TotalQueuedOperations_
+  commentId: Overload:KalshiBotData.Data.SqlDataService.TotalQueuedOperations
+  isSpec: "True"
+  fullName: KalshiBotData.Data.SqlDataService.TotalQueuedOperations
+  nameWithType: SqlDataService.TotalQueuedOperations
+- uid: KalshiBotData.Data.SqlDataService.TradeQueueDepth
+  name: TradeQueueDepth
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_TradeQueueDepth
+  commentId: P:KalshiBotData.Data.SqlDataService.TradeQueueDepth
+  fullName: KalshiBotData.Data.SqlDataService.TradeQueueDepth
+  nameWithType: SqlDataService.TradeQueueDepth
+- uid: KalshiBotData.Data.SqlDataService.TradeQueueDepth*
+  name: TradeQueueDepth
+  href: api/KalshiBotData.Data.SqlDataService.html#KalshiBotData_Data_SqlDataService_TradeQueueDepth_
+  commentId: Overload:KalshiBotData.Data.SqlDataService.TradeQueueDepth
+  isSpec: "True"
+  fullName: KalshiBotData.Data.SqlDataService.TradeQueueDepth
+  nameWithType: SqlDataService.TradeQueueDepth
 - uid: KalshiBotData.Extensions
   name: KalshiBotData.Extensions
   href: api/KalshiBotData.Extensions.html
@@ -41608,215 +42261,6 @@ references:
   commentId: N:KalshiBotOverseer
   fullName: KalshiBotOverseer
   nameWithType: KalshiBotOverseer
-- uid: KalshiBotOverseer.ChartHub
-  name: ChartHub
-  href: api/KalshiBotOverseer.ChartHub.html
-  commentId: T:KalshiBotOverseer.ChartHub
-  fullName: KalshiBotOverseer.ChartHub
-  nameWithType: ChartHub
-- uid: KalshiBotOverseer.ChartHub.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.ChartHub},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,KalshiBotOverseer.Services.BrainPersistenceService)
-  name: ChartHub(ILogger<ChartHub>, IServiceScopeFactory, BrainPersistenceService)
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_ChartHub__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_KalshiBotOverseer_Services_BrainPersistenceService_
-  commentId: M:KalshiBotOverseer.ChartHub.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.ChartHub},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,KalshiBotOverseer.Services.BrainPersistenceService)
-  name.vb: New(ILogger(Of ChartHub), IServiceScopeFactory, BrainPersistenceService)
-  fullName: KalshiBotOverseer.ChartHub.ChartHub(Microsoft.Extensions.Logging.ILogger<KalshiBotOverseer.ChartHub>, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, KalshiBotOverseer.Services.BrainPersistenceService)
-  fullName.vb: KalshiBotOverseer.ChartHub.New(Microsoft.Extensions.Logging.ILogger(Of KalshiBotOverseer.ChartHub), Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, KalshiBotOverseer.Services.BrainPersistenceService)
-  nameWithType: ChartHub.ChartHub(ILogger<ChartHub>, IServiceScopeFactory, BrainPersistenceService)
-  nameWithType.vb: ChartHub.New(ILogger(Of ChartHub), IServiceScopeFactory, BrainPersistenceService)
-- uid: KalshiBotOverseer.ChartHub.#ctor*
-  name: ChartHub
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub__ctor_
-  commentId: Overload:KalshiBotOverseer.ChartHub.#ctor
-  isSpec: "True"
-  name.vb: New
-  fullName: KalshiBotOverseer.ChartHub.ChartHub
-  fullName.vb: KalshiBotOverseer.ChartHub.New
-  nameWithType: ChartHub.ChartHub
-  nameWithType.vb: ChartHub.New
-- uid: KalshiBotOverseer.ChartHub.ClearConnectedClients
-  name: ClearConnectedClients()
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_ClearConnectedClients
-  commentId: M:KalshiBotOverseer.ChartHub.ClearConnectedClients
-  fullName: KalshiBotOverseer.ChartHub.ClearConnectedClients()
-  nameWithType: ChartHub.ClearConnectedClients()
-- uid: KalshiBotOverseer.ChartHub.ClearConnectedClients*
-  name: ClearConnectedClients
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_ClearConnectedClients_
-  commentId: Overload:KalshiBotOverseer.ChartHub.ClearConnectedClients
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.ClearConnectedClients
-  nameWithType: ChartHub.ClearConnectedClients
-- uid: KalshiBotOverseer.ChartHub.ClientInfo
-  name: ChartHub.ClientInfo
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html
-  commentId: T:KalshiBotOverseer.ChartHub.ClientInfo
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo
-  nameWithType: ChartHub.ClientInfo
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.ClientId
-  name: ClientId
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_ClientId
-  commentId: P:KalshiBotOverseer.ChartHub.ClientInfo.ClientId
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.ClientId
-  nameWithType: ChartHub.ClientInfo.ClientId
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.ClientId*
-  name: ClientId
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_ClientId_
-  commentId: Overload:KalshiBotOverseer.ChartHub.ClientInfo.ClientId
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.ClientId
-  nameWithType: ChartHub.ClientInfo.ClientId
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.ClientName
-  name: ClientName
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_ClientName
-  commentId: P:KalshiBotOverseer.ChartHub.ClientInfo.ClientName
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.ClientName
-  nameWithType: ChartHub.ClientInfo.ClientName
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.ClientName*
-  name: ClientName
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_ClientName_
-  commentId: Overload:KalshiBotOverseer.ChartHub.ClientInfo.ClientName
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.ClientName
-  nameWithType: ChartHub.ClientInfo.ClientName
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.ClientType
-  name: ClientType
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_ClientType
-  commentId: P:KalshiBotOverseer.ChartHub.ClientInfo.ClientType
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.ClientType
-  nameWithType: ChartHub.ClientInfo.ClientType
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.ClientType*
-  name: ClientType
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_ClientType_
-  commentId: Overload:KalshiBotOverseer.ChartHub.ClientInfo.ClientType
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.ClientType
-  nameWithType: ChartHub.ClientInfo.ClientType
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.ConnectionId
-  name: ConnectionId
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_ConnectionId
-  commentId: P:KalshiBotOverseer.ChartHub.ClientInfo.ConnectionId
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.ConnectionId
-  nameWithType: ChartHub.ClientInfo.ConnectionId
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.ConnectionId*
-  name: ConnectionId
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_ConnectionId_
-  commentId: Overload:KalshiBotOverseer.ChartHub.ClientInfo.ConnectionId
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.ConnectionId
-  nameWithType: ChartHub.ClientInfo.ConnectionId
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.IPAddress
-  name: IPAddress
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_IPAddress
-  commentId: P:KalshiBotOverseer.ChartHub.ClientInfo.IPAddress
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.IPAddress
-  nameWithType: ChartHub.ClientInfo.IPAddress
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.IPAddress*
-  name: IPAddress
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_IPAddress_
-  commentId: Overload:KalshiBotOverseer.ChartHub.ClientInfo.IPAddress
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.IPAddress
-  nameWithType: ChartHub.ClientInfo.IPAddress
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.LastSeen
-  name: LastSeen
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_LastSeen
-  commentId: P:KalshiBotOverseer.ChartHub.ClientInfo.LastSeen
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.LastSeen
-  nameWithType: ChartHub.ClientInfo.LastSeen
-- uid: KalshiBotOverseer.ChartHub.ClientInfo.LastSeen*
-  name: LastSeen
-  href: api/KalshiBotOverseer.ChartHub.ClientInfo.html#KalshiBotOverseer_ChartHub_ClientInfo_LastSeen_
-  commentId: Overload:KalshiBotOverseer.ChartHub.ClientInfo.LastSeen
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.ClientInfo.LastSeen
-  nameWithType: ChartHub.ClientInfo.LastSeen
-- uid: KalshiBotOverseer.ChartHub.HandleOverseerMessage(System.String,System.String)
-  name: HandleOverseerMessage(string, string)
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_HandleOverseerMessage_System_String_System_String_
-  commentId: M:KalshiBotOverseer.ChartHub.HandleOverseerMessage(System.String,System.String)
-  name.vb: HandleOverseerMessage(String, String)
-  fullName: KalshiBotOverseer.ChartHub.HandleOverseerMessage(string, string)
-  fullName.vb: KalshiBotOverseer.ChartHub.HandleOverseerMessage(String, String)
-  nameWithType: ChartHub.HandleOverseerMessage(string, string)
-  nameWithType.vb: ChartHub.HandleOverseerMessage(String, String)
-- uid: KalshiBotOverseer.ChartHub.HandleOverseerMessage*
-  name: HandleOverseerMessage
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_HandleOverseerMessage_
-  commentId: Overload:KalshiBotOverseer.ChartHub.HandleOverseerMessage
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.HandleOverseerMessage
-  nameWithType: ChartHub.HandleOverseerMessage
-- uid: KalshiBotOverseer.ChartHub.Handshake(System.String,System.String,System.String)
-  name: Handshake(string, string, string)
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_Handshake_System_String_System_String_System_String_
-  commentId: M:KalshiBotOverseer.ChartHub.Handshake(System.String,System.String,System.String)
-  name.vb: Handshake(String, String, String)
-  fullName: KalshiBotOverseer.ChartHub.Handshake(string, string, string)
-  fullName.vb: KalshiBotOverseer.ChartHub.Handshake(String, String, String)
-  nameWithType: ChartHub.Handshake(string, string, string)
-  nameWithType.vb: ChartHub.Handshake(String, String, String)
-- uid: KalshiBotOverseer.ChartHub.Handshake*
-  name: Handshake
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_Handshake_
-  commentId: Overload:KalshiBotOverseer.ChartHub.Handshake
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.Handshake
-  nameWithType: ChartHub.Handshake
-- uid: KalshiBotOverseer.ChartHub.HasConnectedClients
-  name: HasConnectedClients()
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_HasConnectedClients
-  commentId: M:KalshiBotOverseer.ChartHub.HasConnectedClients
-  fullName: KalshiBotOverseer.ChartHub.HasConnectedClients()
-  nameWithType: ChartHub.HasConnectedClients()
-- uid: KalshiBotOverseer.ChartHub.HasConnectedClients*
-  name: HasConnectedClients
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_HasConnectedClients_
-  commentId: Overload:KalshiBotOverseer.ChartHub.HasConnectedClients
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.HasConnectedClients
-  nameWithType: ChartHub.HasConnectedClients
-- uid: KalshiBotOverseer.ChartHub.OnConnectedAsync
-  name: OnConnectedAsync()
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_OnConnectedAsync
-  commentId: M:KalshiBotOverseer.ChartHub.OnConnectedAsync
-  fullName: KalshiBotOverseer.ChartHub.OnConnectedAsync()
-  nameWithType: ChartHub.OnConnectedAsync()
-- uid: KalshiBotOverseer.ChartHub.OnConnectedAsync*
-  name: OnConnectedAsync
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_OnConnectedAsync_
-  commentId: Overload:KalshiBotOverseer.ChartHub.OnConnectedAsync
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.OnConnectedAsync
-  nameWithType: ChartHub.OnConnectedAsync
-- uid: KalshiBotOverseer.ChartHub.OnDisconnectedAsync(System.Exception)
-  name: OnDisconnectedAsync(Exception?)
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_OnDisconnectedAsync_System_Exception_
-  commentId: M:KalshiBotOverseer.ChartHub.OnDisconnectedAsync(System.Exception)
-  name.vb: OnDisconnectedAsync(Exception)
-  fullName: KalshiBotOverseer.ChartHub.OnDisconnectedAsync(System.Exception?)
-  fullName.vb: KalshiBotOverseer.ChartHub.OnDisconnectedAsync(System.Exception)
-  nameWithType: ChartHub.OnDisconnectedAsync(Exception?)
-  nameWithType.vb: ChartHub.OnDisconnectedAsync(Exception)
-- uid: KalshiBotOverseer.ChartHub.OnDisconnectedAsync*
-  name: OnDisconnectedAsync
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_OnDisconnectedAsync_
-  commentId: Overload:KalshiBotOverseer.ChartHub.OnDisconnectedAsync
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.OnDisconnectedAsync
-  nameWithType: ChartHub.OnDisconnectedAsync
-- uid: KalshiBotOverseer.ChartHub.ProcessCheckIn(KalshiBotOverseer.CheckInData)
-  name: ProcessCheckIn(CheckInData)
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_ProcessCheckIn_KalshiBotOverseer_CheckInData_
-  commentId: M:KalshiBotOverseer.ChartHub.ProcessCheckIn(KalshiBotOverseer.CheckInData)
-  fullName: KalshiBotOverseer.ChartHub.ProcessCheckIn(KalshiBotOverseer.CheckInData)
-  nameWithType: ChartHub.ProcessCheckIn(CheckInData)
-- uid: KalshiBotOverseer.ChartHub.ProcessCheckIn*
-  name: ProcessCheckIn
-  href: api/KalshiBotOverseer.ChartHub.html#KalshiBotOverseer_ChartHub_ProcessCheckIn_
-  commentId: Overload:KalshiBotOverseer.ChartHub.ProcessCheckIn
-  isSpec: "True"
-  fullName: KalshiBotOverseer.ChartHub.ProcessCheckIn
-  nameWithType: ChartHub.ProcessCheckIn
 - uid: KalshiBotOverseer.CheckInData
   name: CheckInData
   href: api/KalshiBotOverseer.CheckInData.html
@@ -43422,6 +43866,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotOverseer.OvernightActivitiesHelper.DeleteUnrecordedMarkets
   nameWithType: OvernightActivitiesHelper.DeleteUnrecordedMarkets
+- uid: KalshiBotOverseer.OvernightActivitiesHelper.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotOverseer.OvernightActivitiesHelper.html#KalshiBotOverseer_OvernightActivitiesHelper_GetPerformanceMetrics
+  commentId: M:KalshiBotOverseer.OvernightActivitiesHelper.GetPerformanceMetrics
+  fullName: KalshiBotOverseer.OvernightActivitiesHelper.GetPerformanceMetrics()
+  nameWithType: OvernightActivitiesHelper.GetPerformanceMetrics()
+- uid: KalshiBotOverseer.OvernightActivitiesHelper.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotOverseer.OvernightActivitiesHelper.html#KalshiBotOverseer_OvernightActivitiesHelper_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotOverseer.OvernightActivitiesHelper.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OvernightActivitiesHelper.GetPerformanceMetrics
+  nameWithType: OvernightActivitiesHelper.GetPerformanceMetrics
 - uid: KalshiBotOverseer.OvernightActivitiesHelper.RunOvernightTasks(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,System.Threading.CancellationToken)
   name: RunOvernightTasks(IServiceScopeFactory, CancellationToken)
   href: api/KalshiBotOverseer.OvernightActivitiesHelper.html#KalshiBotOverseer_OvernightActivitiesHelper_RunOvernightTasks_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_System_Threading_CancellationToken_
@@ -43441,15 +43898,15 @@ references:
   commentId: T:KalshiBotOverseer.Overseer
   fullName: KalshiBotOverseer.Overseer
   nameWithType: Overseer
-- uid: KalshiBotOverseer.Overseer.#ctor(KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient,Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.Overseer},Microsoft.AspNetCore.SignalR.IHubContext{KalshiBotOverseer.ChartHub},Microsoft.Extensions.Options.IOptions{KalshiBotOverseer.OverseerConfig})
-  name: Overseer(IKalshiWebSocketClient, IServiceScopeFactory, ILogger<Overseer>, IHubContext<ChartHub>, IOptions<OverseerConfig>)
-  href: api/KalshiBotOverseer.Overseer.html#KalshiBotOverseer_Overseer__ctor_KalshiBotAPI_WebSockets_Interfaces_IKalshiWebSocketClient_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_Overseer__Microsoft_AspNetCore_SignalR_IHubContext_KalshiBotOverseer_ChartHub__Microsoft_Extensions_Options_IOptions_KalshiBotOverseer_OverseerConfig__
-  commentId: M:KalshiBotOverseer.Overseer.#ctor(KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient,Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.Overseer},Microsoft.AspNetCore.SignalR.IHubContext{KalshiBotOverseer.ChartHub},Microsoft.Extensions.Options.IOptions{KalshiBotOverseer.OverseerConfig})
-  name.vb: New(IKalshiWebSocketClient, IServiceScopeFactory, ILogger(Of Overseer), IHubContext(Of ChartHub), IOptions(Of OverseerConfig))
-  fullName: KalshiBotOverseer.Overseer.Overseer(KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Logging.ILogger<KalshiBotOverseer.Overseer>, Microsoft.AspNetCore.SignalR.IHubContext<KalshiBotOverseer.ChartHub>, Microsoft.Extensions.Options.IOptions<KalshiBotOverseer.OverseerConfig>)
-  fullName.vb: KalshiBotOverseer.Overseer.New(KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Logging.ILogger(Of KalshiBotOverseer.Overseer), Microsoft.AspNetCore.SignalR.IHubContext(Of KalshiBotOverseer.ChartHub), Microsoft.Extensions.Options.IOptions(Of KalshiBotOverseer.OverseerConfig))
-  nameWithType: Overseer.Overseer(IKalshiWebSocketClient, IServiceScopeFactory, ILogger<Overseer>, IHubContext<ChartHub>, IOptions<OverseerConfig>)
-  nameWithType.vb: Overseer.New(IKalshiWebSocketClient, IServiceScopeFactory, ILogger(Of Overseer), IHubContext(Of ChartHub), IOptions(Of OverseerConfig))
+- uid: KalshiBotOverseer.Overseer.#ctor(KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient,Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.Overseer},Microsoft.AspNetCore.SignalR.IHubContext{KalshiBotOverseer.OverseerHub},Microsoft.Extensions.Options.IOptions{KalshiBotOverseer.OverseerConfig})
+  name: Overseer(IKalshiWebSocketClient, IServiceScopeFactory, ILogger<Overseer>, IHubContext<OverseerHub>, IOptions<OverseerConfig>)
+  href: api/KalshiBotOverseer.Overseer.html#KalshiBotOverseer_Overseer__ctor_KalshiBotAPI_WebSockets_Interfaces_IKalshiWebSocketClient_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_Overseer__Microsoft_AspNetCore_SignalR_IHubContext_KalshiBotOverseer_OverseerHub__Microsoft_Extensions_Options_IOptions_KalshiBotOverseer_OverseerConfig__
+  commentId: M:KalshiBotOverseer.Overseer.#ctor(KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient,Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.Overseer},Microsoft.AspNetCore.SignalR.IHubContext{KalshiBotOverseer.OverseerHub},Microsoft.Extensions.Options.IOptions{KalshiBotOverseer.OverseerConfig})
+  name.vb: New(IKalshiWebSocketClient, IServiceScopeFactory, ILogger(Of Overseer), IHubContext(Of OverseerHub), IOptions(Of OverseerConfig))
+  fullName: KalshiBotOverseer.Overseer.Overseer(KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Logging.ILogger<KalshiBotOverseer.Overseer>, Microsoft.AspNetCore.SignalR.IHubContext<KalshiBotOverseer.OverseerHub>, Microsoft.Extensions.Options.IOptions<KalshiBotOverseer.OverseerConfig>)
+  fullName.vb: KalshiBotOverseer.Overseer.New(KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Logging.ILogger(Of KalshiBotOverseer.Overseer), Microsoft.AspNetCore.SignalR.IHubContext(Of KalshiBotOverseer.OverseerHub), Microsoft.Extensions.Options.IOptions(Of KalshiBotOverseer.OverseerConfig))
+  nameWithType: Overseer.Overseer(IKalshiWebSocketClient, IServiceScopeFactory, ILogger<Overseer>, IHubContext<OverseerHub>, IOptions<OverseerConfig>)
+  nameWithType.vb: Overseer.New(IKalshiWebSocketClient, IServiceScopeFactory, ILogger(Of Overseer), IHubContext(Of OverseerHub), IOptions(Of OverseerConfig))
 - uid: KalshiBotOverseer.Overseer.#ctor*
   name: Overseer
   href: api/KalshiBotOverseer.Overseer.html#KalshiBotOverseer_Overseer__ctor_
@@ -43615,15 +44072,15 @@ references:
   commentId: T:KalshiBotOverseer.OverseerHub
   fullName: KalshiBotOverseer.OverseerHub
   nameWithType: OverseerHub
-- uid: KalshiBotOverseer.OverseerHub.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.OverseerHub},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig})
-  name: OverseerHub(ILogger<OverseerHub>, IServiceScopeFactory, IOptions<ExecutionConfig>)
-  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_OverseerHub__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__
-  commentId: M:KalshiBotOverseer.OverseerHub.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.OverseerHub},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig})
-  name.vb: New(ILogger(Of OverseerHub), IServiceScopeFactory, IOptions(Of ExecutionConfig))
-  fullName: KalshiBotOverseer.OverseerHub.OverseerHub(Microsoft.Extensions.Logging.ILogger<KalshiBotOverseer.OverseerHub>, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Options.IOptions<BacklashDTOs.Configuration.ExecutionConfig>)
-  fullName.vb: KalshiBotOverseer.OverseerHub.New(Microsoft.Extensions.Logging.ILogger(Of KalshiBotOverseer.OverseerHub), Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Options.IOptions(Of BacklashDTOs.Configuration.ExecutionConfig))
-  nameWithType: OverseerHub.OverseerHub(ILogger<OverseerHub>, IServiceScopeFactory, IOptions<ExecutionConfig>)
-  nameWithType.vb: OverseerHub.New(ILogger(Of OverseerHub), IServiceScopeFactory, IOptions(Of ExecutionConfig))
+- uid: KalshiBotOverseer.OverseerHub.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.OverseerHub},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,KalshiBotOverseer.Services.BrainPersistenceService,Microsoft.Extensions.Options.IOptions{KalshiBotOverseer.OverseerHubConfig})
+  name: OverseerHub(ILogger<OverseerHub>, IServiceScopeFactory, BrainPersistenceService, IOptions<OverseerHubConfig>)
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub__ctor_Microsoft_Extensions_Logging_ILogger_KalshiBotOverseer_OverseerHub__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_KalshiBotOverseer_Services_BrainPersistenceService_Microsoft_Extensions_Options_IOptions_KalshiBotOverseer_OverseerHubConfig__
+  commentId: M:KalshiBotOverseer.OverseerHub.#ctor(Microsoft.Extensions.Logging.ILogger{KalshiBotOverseer.OverseerHub},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,KalshiBotOverseer.Services.BrainPersistenceService,Microsoft.Extensions.Options.IOptions{KalshiBotOverseer.OverseerHubConfig})
+  name.vb: New(ILogger(Of OverseerHub), IServiceScopeFactory, BrainPersistenceService, IOptions(Of OverseerHubConfig))
+  fullName: KalshiBotOverseer.OverseerHub.OverseerHub(Microsoft.Extensions.Logging.ILogger<KalshiBotOverseer.OverseerHub>, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, KalshiBotOverseer.Services.BrainPersistenceService, Microsoft.Extensions.Options.IOptions<KalshiBotOverseer.OverseerHubConfig>)
+  fullName.vb: KalshiBotOverseer.OverseerHub.New(Microsoft.Extensions.Logging.ILogger(Of KalshiBotOverseer.OverseerHub), Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, KalshiBotOverseer.Services.BrainPersistenceService, Microsoft.Extensions.Options.IOptions(Of KalshiBotOverseer.OverseerHubConfig))
+  nameWithType: OverseerHub.OverseerHub(ILogger<OverseerHub>, IServiceScopeFactory, BrainPersistenceService, IOptions<OverseerHubConfig>)
+  nameWithType.vb: OverseerHub.New(ILogger(Of OverseerHub), IServiceScopeFactory, BrainPersistenceService, IOptions(Of OverseerHubConfig))
 - uid: KalshiBotOverseer.OverseerHub.#ctor*
   name: OverseerHub
   href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub__ctor_
@@ -43634,48 +44091,132 @@ references:
   fullName.vb: KalshiBotOverseer.OverseerHub.New
   nameWithType: OverseerHub.OverseerHub
   nameWithType.vb: OverseerHub.New
-- uid: KalshiBotOverseer.OverseerHub.BroadcastMessage(System.String,System.Object,System.String)
-  name: BroadcastMessage(string, object, string?)
-  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_BroadcastMessage_System_String_System_Object_System_String_
-  commentId: M:KalshiBotOverseer.OverseerHub.BroadcastMessage(System.String,System.Object,System.String)
-  name.vb: BroadcastMessage(String, Object, String)
-  fullName: KalshiBotOverseer.OverseerHub.BroadcastMessage(string, object, string?)
-  fullName.vb: KalshiBotOverseer.OverseerHub.BroadcastMessage(String, Object, String)
-  nameWithType: OverseerHub.BroadcastMessage(string, object, string?)
-  nameWithType.vb: OverseerHub.BroadcastMessage(String, Object, String)
-- uid: KalshiBotOverseer.OverseerHub.BroadcastMessage*
-  name: BroadcastMessage
-  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_BroadcastMessage_
-  commentId: Overload:KalshiBotOverseer.OverseerHub.BroadcastMessage
+- uid: KalshiBotOverseer.OverseerHub.ClearConnectedClients
+  name: ClearConnectedClients()
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_ClearConnectedClients
+  commentId: M:KalshiBotOverseer.OverseerHub.ClearConnectedClients
+  fullName: KalshiBotOverseer.OverseerHub.ClearConnectedClients()
+  nameWithType: OverseerHub.ClearConnectedClients()
+- uid: KalshiBotOverseer.OverseerHub.ClearConnectedClients*
+  name: ClearConnectedClients
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_ClearConnectedClients_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.ClearConnectedClients
   isSpec: "True"
-  fullName: KalshiBotOverseer.OverseerHub.BroadcastMessage
-  nameWithType: OverseerHub.BroadcastMessage
-- uid: KalshiBotOverseer.OverseerHub.CheckIn(KalshiBotOverseer.CheckInData)
-  name: CheckIn(CheckInData)
-  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_CheckIn_KalshiBotOverseer_CheckInData_
-  commentId: M:KalshiBotOverseer.OverseerHub.CheckIn(KalshiBotOverseer.CheckInData)
-  fullName: KalshiBotOverseer.OverseerHub.CheckIn(KalshiBotOverseer.CheckInData)
-  nameWithType: OverseerHub.CheckIn(CheckInData)
-- uid: KalshiBotOverseer.OverseerHub.CheckIn*
-  name: CheckIn
-  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_CheckIn_
-  commentId: Overload:KalshiBotOverseer.OverseerHub.CheckIn
+  fullName: KalshiBotOverseer.OverseerHub.ClearConnectedClients
+  nameWithType: OverseerHub.ClearConnectedClients
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo
+  name: OverseerHub.ClientInfo
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html
+  commentId: T:KalshiBotOverseer.OverseerHub.ClientInfo
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo
+  nameWithType: OverseerHub.ClientInfo
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.ClientId
+  name: ClientId
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_ClientId
+  commentId: P:KalshiBotOverseer.OverseerHub.ClientInfo.ClientId
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.ClientId
+  nameWithType: OverseerHub.ClientInfo.ClientId
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.ClientId*
+  name: ClientId
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_ClientId_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.ClientInfo.ClientId
   isSpec: "True"
-  fullName: KalshiBotOverseer.OverseerHub.CheckIn
-  nameWithType: OverseerHub.CheckIn
-- uid: KalshiBotOverseer.OverseerHub.GetHubMetrics
-  name: GetHubMetrics()
-  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_GetHubMetrics
-  commentId: M:KalshiBotOverseer.OverseerHub.GetHubMetrics
-  fullName: KalshiBotOverseer.OverseerHub.GetHubMetrics()
-  nameWithType: OverseerHub.GetHubMetrics()
-- uid: KalshiBotOverseer.OverseerHub.GetHubMetrics*
-  name: GetHubMetrics
-  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_GetHubMetrics_
-  commentId: Overload:KalshiBotOverseer.OverseerHub.GetHubMetrics
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.ClientId
+  nameWithType: OverseerHub.ClientInfo.ClientId
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.ClientName
+  name: ClientName
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_ClientName
+  commentId: P:KalshiBotOverseer.OverseerHub.ClientInfo.ClientName
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.ClientName
+  nameWithType: OverseerHub.ClientInfo.ClientName
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.ClientName*
+  name: ClientName
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_ClientName_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.ClientInfo.ClientName
   isSpec: "True"
-  fullName: KalshiBotOverseer.OverseerHub.GetHubMetrics
-  nameWithType: OverseerHub.GetHubMetrics
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.ClientName
+  nameWithType: OverseerHub.ClientInfo.ClientName
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.ClientType
+  name: ClientType
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_ClientType
+  commentId: P:KalshiBotOverseer.OverseerHub.ClientInfo.ClientType
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.ClientType
+  nameWithType: OverseerHub.ClientInfo.ClientType
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.ClientType*
+  name: ClientType
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_ClientType_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.ClientInfo.ClientType
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.ClientType
+  nameWithType: OverseerHub.ClientInfo.ClientType
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.ConnectionId
+  name: ConnectionId
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_ConnectionId
+  commentId: P:KalshiBotOverseer.OverseerHub.ClientInfo.ConnectionId
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.ConnectionId
+  nameWithType: OverseerHub.ClientInfo.ConnectionId
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.ConnectionId*
+  name: ConnectionId
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_ConnectionId_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.ClientInfo.ConnectionId
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.ConnectionId
+  nameWithType: OverseerHub.ClientInfo.ConnectionId
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.IPAddress
+  name: IPAddress
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_IPAddress
+  commentId: P:KalshiBotOverseer.OverseerHub.ClientInfo.IPAddress
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.IPAddress
+  nameWithType: OverseerHub.ClientInfo.IPAddress
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.IPAddress*
+  name: IPAddress
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_IPAddress_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.ClientInfo.IPAddress
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.IPAddress
+  nameWithType: OverseerHub.ClientInfo.IPAddress
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.LastSeen
+  name: LastSeen
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_LastSeen
+  commentId: P:KalshiBotOverseer.OverseerHub.ClientInfo.LastSeen
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.LastSeen
+  nameWithType: OverseerHub.ClientInfo.LastSeen
+- uid: KalshiBotOverseer.OverseerHub.ClientInfo.LastSeen*
+  name: LastSeen
+  href: api/KalshiBotOverseer.OverseerHub.ClientInfo.html#KalshiBotOverseer_OverseerHub_ClientInfo_LastSeen_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.ClientInfo.LastSeen
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHub.ClientInfo.LastSeen
+  nameWithType: OverseerHub.ClientInfo.LastSeen
+- uid: KalshiBotOverseer.OverseerHub.GetPerformanceMetrics
+  name: GetPerformanceMetrics()
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_GetPerformanceMetrics
+  commentId: M:KalshiBotOverseer.OverseerHub.GetPerformanceMetrics
+  fullName: KalshiBotOverseer.OverseerHub.GetPerformanceMetrics()
+  nameWithType: OverseerHub.GetPerformanceMetrics()
+- uid: KalshiBotOverseer.OverseerHub.GetPerformanceMetrics*
+  name: GetPerformanceMetrics
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_GetPerformanceMetrics_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.GetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHub.GetPerformanceMetrics
+  nameWithType: OverseerHub.GetPerformanceMetrics
+- uid: KalshiBotOverseer.OverseerHub.HandleOverseerMessage(System.String,System.String)
+  name: HandleOverseerMessage(string, string)
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_HandleOverseerMessage_System_String_System_String_
+  commentId: M:KalshiBotOverseer.OverseerHub.HandleOverseerMessage(System.String,System.String)
+  name.vb: HandleOverseerMessage(String, String)
+  fullName: KalshiBotOverseer.OverseerHub.HandleOverseerMessage(string, string)
+  fullName.vb: KalshiBotOverseer.OverseerHub.HandleOverseerMessage(String, String)
+  nameWithType: OverseerHub.HandleOverseerMessage(string, string)
+  nameWithType.vb: OverseerHub.HandleOverseerMessage(String, String)
+- uid: KalshiBotOverseer.OverseerHub.HandleOverseerMessage*
+  name: HandleOverseerMessage
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_HandleOverseerMessage_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.HandleOverseerMessage
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHub.HandleOverseerMessage
+  nameWithType: OverseerHub.HandleOverseerMessage
 - uid: KalshiBotOverseer.OverseerHub.Handshake(System.String,System.String,System.String)
   name: Handshake(string, string, string)
   href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_Handshake_System_String_System_String_System_String_
@@ -43692,6 +44233,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotOverseer.OverseerHub.Handshake
   nameWithType: OverseerHub.Handshake
+- uid: KalshiBotOverseer.OverseerHub.HasConnectedClients
+  name: HasConnectedClients()
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_HasConnectedClients
+  commentId: M:KalshiBotOverseer.OverseerHub.HasConnectedClients
+  fullName: KalshiBotOverseer.OverseerHub.HasConnectedClients()
+  nameWithType: OverseerHub.HasConnectedClients()
+- uid: KalshiBotOverseer.OverseerHub.HasConnectedClients*
+  name: HasConnectedClients
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_HasConnectedClients_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.HasConnectedClients
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHub.HasConnectedClients
+  nameWithType: OverseerHub.HasConnectedClients
 - uid: KalshiBotOverseer.OverseerHub.OnConnectedAsync
   name: OnConnectedAsync()
   href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_OnConnectedAsync
@@ -43721,6 +44275,103 @@ references:
   isSpec: "True"
   fullName: KalshiBotOverseer.OverseerHub.OnDisconnectedAsync
   nameWithType: OverseerHub.OnDisconnectedAsync
+- uid: KalshiBotOverseer.OverseerHub.ProcessCheckIn(KalshiBotOverseer.CheckInData)
+  name: ProcessCheckIn(CheckInData)
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_ProcessCheckIn_KalshiBotOverseer_CheckInData_
+  commentId: M:KalshiBotOverseer.OverseerHub.ProcessCheckIn(KalshiBotOverseer.CheckInData)
+  fullName: KalshiBotOverseer.OverseerHub.ProcessCheckIn(KalshiBotOverseer.CheckInData)
+  nameWithType: OverseerHub.ProcessCheckIn(CheckInData)
+- uid: KalshiBotOverseer.OverseerHub.ProcessCheckIn*
+  name: ProcessCheckIn
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_ProcessCheckIn_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.ProcessCheckIn
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHub.ProcessCheckIn
+  nameWithType: OverseerHub.ProcessCheckIn
+- uid: KalshiBotOverseer.OverseerHub.ResetPerformanceMetrics
+  name: ResetPerformanceMetrics()
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_ResetPerformanceMetrics
+  commentId: M:KalshiBotOverseer.OverseerHub.ResetPerformanceMetrics
+  fullName: KalshiBotOverseer.OverseerHub.ResetPerformanceMetrics()
+  nameWithType: OverseerHub.ResetPerformanceMetrics()
+- uid: KalshiBotOverseer.OverseerHub.ResetPerformanceMetrics*
+  name: ResetPerformanceMetrics
+  href: api/KalshiBotOverseer.OverseerHub.html#KalshiBotOverseer_OverseerHub_ResetPerformanceMetrics_
+  commentId: Overload:KalshiBotOverseer.OverseerHub.ResetPerformanceMetrics
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHub.ResetPerformanceMetrics
+  nameWithType: OverseerHub.ResetPerformanceMetrics
+- uid: KalshiBotOverseer.OverseerHubConfig
+  name: OverseerHubConfig
+  href: api/KalshiBotOverseer.OverseerHubConfig.html
+  commentId: T:KalshiBotOverseer.OverseerHubConfig
+  fullName: KalshiBotOverseer.OverseerHubConfig
+  nameWithType: OverseerHubConfig
+- uid: KalshiBotOverseer.OverseerHubConfig.AuthTokenValidityHours
+  name: AuthTokenValidityHours
+  href: api/KalshiBotOverseer.OverseerHubConfig.html#KalshiBotOverseer_OverseerHubConfig_AuthTokenValidityHours
+  commentId: P:KalshiBotOverseer.OverseerHubConfig.AuthTokenValidityHours
+  fullName: KalshiBotOverseer.OverseerHubConfig.AuthTokenValidityHours
+  nameWithType: OverseerHubConfig.AuthTokenValidityHours
+- uid: KalshiBotOverseer.OverseerHubConfig.AuthTokenValidityHours*
+  name: AuthTokenValidityHours
+  href: api/KalshiBotOverseer.OverseerHubConfig.html#KalshiBotOverseer_OverseerHubConfig_AuthTokenValidityHours_
+  commentId: Overload:KalshiBotOverseer.OverseerHubConfig.AuthTokenValidityHours
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHubConfig.AuthTokenValidityHours
+  nameWithType: OverseerHubConfig.AuthTokenValidityHours
+- uid: KalshiBotOverseer.OverseerHubConfig.ConnectionHealthTimeoutSeconds
+  name: ConnectionHealthTimeoutSeconds
+  href: api/KalshiBotOverseer.OverseerHubConfig.html#KalshiBotOverseer_OverseerHubConfig_ConnectionHealthTimeoutSeconds
+  commentId: P:KalshiBotOverseer.OverseerHubConfig.ConnectionHealthTimeoutSeconds
+  fullName: KalshiBotOverseer.OverseerHubConfig.ConnectionHealthTimeoutSeconds
+  nameWithType: OverseerHubConfig.ConnectionHealthTimeoutSeconds
+- uid: KalshiBotOverseer.OverseerHubConfig.ConnectionHealthTimeoutSeconds*
+  name: ConnectionHealthTimeoutSeconds
+  href: api/KalshiBotOverseer.OverseerHubConfig.html#KalshiBotOverseer_OverseerHubConfig_ConnectionHealthTimeoutSeconds_
+  commentId: Overload:KalshiBotOverseer.OverseerHubConfig.ConnectionHealthTimeoutSeconds
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHubConfig.ConnectionHealthTimeoutSeconds
+  nameWithType: OverseerHubConfig.ConnectionHealthTimeoutSeconds
+- uid: KalshiBotOverseer.OverseerHubConfig.HealthCheckIntervalSeconds
+  name: HealthCheckIntervalSeconds
+  href: api/KalshiBotOverseer.OverseerHubConfig.html#KalshiBotOverseer_OverseerHubConfig_HealthCheckIntervalSeconds
+  commentId: P:KalshiBotOverseer.OverseerHubConfig.HealthCheckIntervalSeconds
+  fullName: KalshiBotOverseer.OverseerHubConfig.HealthCheckIntervalSeconds
+  nameWithType: OverseerHubConfig.HealthCheckIntervalSeconds
+- uid: KalshiBotOverseer.OverseerHubConfig.HealthCheckIntervalSeconds*
+  name: HealthCheckIntervalSeconds
+  href: api/KalshiBotOverseer.OverseerHubConfig.html#KalshiBotOverseer_OverseerHubConfig_HealthCheckIntervalSeconds_
+  commentId: Overload:KalshiBotOverseer.OverseerHubConfig.HealthCheckIntervalSeconds
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHubConfig.HealthCheckIntervalSeconds
+  nameWithType: OverseerHubConfig.HealthCheckIntervalSeconds
+- uid: KalshiBotOverseer.OverseerHubConfig.MaxCheckInRequestsPerMinute
+  name: MaxCheckInRequestsPerMinute
+  href: api/KalshiBotOverseer.OverseerHubConfig.html#KalshiBotOverseer_OverseerHubConfig_MaxCheckInRequestsPerMinute
+  commentId: P:KalshiBotOverseer.OverseerHubConfig.MaxCheckInRequestsPerMinute
+  fullName: KalshiBotOverseer.OverseerHubConfig.MaxCheckInRequestsPerMinute
+  nameWithType: OverseerHubConfig.MaxCheckInRequestsPerMinute
+- uid: KalshiBotOverseer.OverseerHubConfig.MaxCheckInRequestsPerMinute*
+  name: MaxCheckInRequestsPerMinute
+  href: api/KalshiBotOverseer.OverseerHubConfig.html#KalshiBotOverseer_OverseerHubConfig_MaxCheckInRequestsPerMinute_
+  commentId: Overload:KalshiBotOverseer.OverseerHubConfig.MaxCheckInRequestsPerMinute
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHubConfig.MaxCheckInRequestsPerMinute
+  nameWithType: OverseerHubConfig.MaxCheckInRequestsPerMinute
+- uid: KalshiBotOverseer.OverseerHubConfig.MaxHandshakeRequestsPerMinute
+  name: MaxHandshakeRequestsPerMinute
+  href: api/KalshiBotOverseer.OverseerHubConfig.html#KalshiBotOverseer_OverseerHubConfig_MaxHandshakeRequestsPerMinute
+  commentId: P:KalshiBotOverseer.OverseerHubConfig.MaxHandshakeRequestsPerMinute
+  fullName: KalshiBotOverseer.OverseerHubConfig.MaxHandshakeRequestsPerMinute
+  nameWithType: OverseerHubConfig.MaxHandshakeRequestsPerMinute
+- uid: KalshiBotOverseer.OverseerHubConfig.MaxHandshakeRequestsPerMinute*
+  name: MaxHandshakeRequestsPerMinute
+  href: api/KalshiBotOverseer.OverseerHubConfig.html#KalshiBotOverseer_OverseerHubConfig_MaxHandshakeRequestsPerMinute_
+  commentId: Overload:KalshiBotOverseer.OverseerHubConfig.MaxHandshakeRequestsPerMinute
+  isSpec: "True"
+  fullName: KalshiBotOverseer.OverseerHubConfig.MaxHandshakeRequestsPerMinute
+  nameWithType: OverseerHubConfig.MaxHandshakeRequestsPerMinute
 - uid: KalshiBotOverseer.Services
   name: KalshiBotOverseer.Services
   href: api/KalshiBotOverseer.Services.html
@@ -43752,6 +44403,19 @@ references:
   fullName.vb: KalshiBotOverseer.Services.BrainPersistenceService.New
   nameWithType: BrainPersistenceService.BrainPersistenceService
   nameWithType.vb: BrainPersistenceService.New
+- uid: KalshiBotOverseer.Services.BrainPersistenceService.BrainCount
+  name: BrainCount
+  href: api/KalshiBotOverseer.Services.BrainPersistenceService.html#KalshiBotOverseer_Services_BrainPersistenceService_BrainCount
+  commentId: P:KalshiBotOverseer.Services.BrainPersistenceService.BrainCount
+  fullName: KalshiBotOverseer.Services.BrainPersistenceService.BrainCount
+  nameWithType: BrainPersistenceService.BrainCount
+- uid: KalshiBotOverseer.Services.BrainPersistenceService.BrainCount*
+  name: BrainCount
+  href: api/KalshiBotOverseer.Services.BrainPersistenceService.html#KalshiBotOverseer_Services_BrainPersistenceService_BrainCount_
+  commentId: Overload:KalshiBotOverseer.Services.BrainPersistenceService.BrainCount
+  isSpec: "True"
+  fullName: KalshiBotOverseer.Services.BrainPersistenceService.BrainCount
+  nameWithType: BrainPersistenceService.BrainCount
 - uid: KalshiBotOverseer.Services.BrainPersistenceService.Dispose
   name: Dispose()
   href: api/KalshiBotOverseer.Services.BrainPersistenceService.html#KalshiBotOverseer_Services_BrainPersistenceService_Dispose
@@ -43862,6 +44526,45 @@ references:
   isSpec: "True"
   fullName: KalshiBotOverseer.Services.BrainPersistenceService.SaveBrainAsync
   nameWithType: BrainPersistenceService.SaveBrainAsync
+- uid: KalshiBotOverseer.Services.BrainPersistenceService.ServiceUptime
+  name: ServiceUptime
+  href: api/KalshiBotOverseer.Services.BrainPersistenceService.html#KalshiBotOverseer_Services_BrainPersistenceService_ServiceUptime
+  commentId: P:KalshiBotOverseer.Services.BrainPersistenceService.ServiceUptime
+  fullName: KalshiBotOverseer.Services.BrainPersistenceService.ServiceUptime
+  nameWithType: BrainPersistenceService.ServiceUptime
+- uid: KalshiBotOverseer.Services.BrainPersistenceService.ServiceUptime*
+  name: ServiceUptime
+  href: api/KalshiBotOverseer.Services.BrainPersistenceService.html#KalshiBotOverseer_Services_BrainPersistenceService_ServiceUptime_
+  commentId: Overload:KalshiBotOverseer.Services.BrainPersistenceService.ServiceUptime
+  isSpec: "True"
+  fullName: KalshiBotOverseer.Services.BrainPersistenceService.ServiceUptime
+  nameWithType: BrainPersistenceService.ServiceUptime
+- uid: KalshiBotOverseer.Services.BrainPersistenceService.TotalHistoryEntries
+  name: TotalHistoryEntries
+  href: api/KalshiBotOverseer.Services.BrainPersistenceService.html#KalshiBotOverseer_Services_BrainPersistenceService_TotalHistoryEntries
+  commentId: P:KalshiBotOverseer.Services.BrainPersistenceService.TotalHistoryEntries
+  fullName: KalshiBotOverseer.Services.BrainPersistenceService.TotalHistoryEntries
+  nameWithType: BrainPersistenceService.TotalHistoryEntries
+- uid: KalshiBotOverseer.Services.BrainPersistenceService.TotalHistoryEntries*
+  name: TotalHistoryEntries
+  href: api/KalshiBotOverseer.Services.BrainPersistenceService.html#KalshiBotOverseer_Services_BrainPersistenceService_TotalHistoryEntries_
+  commentId: Overload:KalshiBotOverseer.Services.BrainPersistenceService.TotalHistoryEntries
+  isSpec: "True"
+  fullName: KalshiBotOverseer.Services.BrainPersistenceService.TotalHistoryEntries
+  nameWithType: BrainPersistenceService.TotalHistoryEntries
+- uid: KalshiBotOverseer.Services.BrainPersistenceService.TotalOperations
+  name: TotalOperations
+  href: api/KalshiBotOverseer.Services.BrainPersistenceService.html#KalshiBotOverseer_Services_BrainPersistenceService_TotalOperations
+  commentId: P:KalshiBotOverseer.Services.BrainPersistenceService.TotalOperations
+  fullName: KalshiBotOverseer.Services.BrainPersistenceService.TotalOperations
+  nameWithType: BrainPersistenceService.TotalOperations
+- uid: KalshiBotOverseer.Services.BrainPersistenceService.TotalOperations*
+  name: TotalOperations
+  href: api/KalshiBotOverseer.Services.BrainPersistenceService.html#KalshiBotOverseer_Services_BrainPersistenceService_TotalOperations_
+  commentId: Overload:KalshiBotOverseer.Services.BrainPersistenceService.TotalOperations
+  isSpec: "True"
+  fullName: KalshiBotOverseer.Services.BrainPersistenceService.TotalOperations
+  nameWithType: BrainPersistenceService.TotalOperations
 - uid: KalshiBotOverseer.Services.BrainPersistenceService.UpdateCurrentMarketTickersAsync(System.String,System.Collections.Generic.IEnumerable{System.String})
   name: UpdateCurrentMarketTickersAsync(string, IEnumerable<string>)
   href: api/KalshiBotOverseer.Services.BrainPersistenceService.html#KalshiBotOverseer_Services_BrainPersistenceService_UpdateCurrentMarketTickersAsync_System_String_System_Collections_Generic_IEnumerable_System_String__
@@ -44006,6 +44709,58 @@ references:
   fullName.vb: KalshiBotOverseer.Services.SnapshotService.New
   nameWithType: SnapshotService.SnapshotService
   nameWithType.vb: SnapshotService.New
+- uid: KalshiBotOverseer.Services.SnapshotService.ClearAggregationMetrics
+  name: ClearAggregationMetrics()
+  href: api/KalshiBotOverseer.Services.SnapshotService.html#KalshiBotOverseer_Services_SnapshotService_ClearAggregationMetrics
+  commentId: M:KalshiBotOverseer.Services.SnapshotService.ClearAggregationMetrics
+  fullName: KalshiBotOverseer.Services.SnapshotService.ClearAggregationMetrics()
+  nameWithType: SnapshotService.ClearAggregationMetrics()
+- uid: KalshiBotOverseer.Services.SnapshotService.ClearAggregationMetrics*
+  name: ClearAggregationMetrics
+  href: api/KalshiBotOverseer.Services.SnapshotService.html#KalshiBotOverseer_Services_SnapshotService_ClearAggregationMetrics_
+  commentId: Overload:KalshiBotOverseer.Services.SnapshotService.ClearAggregationMetrics
+  isSpec: "True"
+  fullName: KalshiBotOverseer.Services.SnapshotService.ClearAggregationMetrics
+  nameWithType: SnapshotService.ClearAggregationMetrics
+- uid: KalshiBotOverseer.Services.SnapshotService.GetAggregationCount
+  name: GetAggregationCount()
+  href: api/KalshiBotOverseer.Services.SnapshotService.html#KalshiBotOverseer_Services_SnapshotService_GetAggregationCount
+  commentId: M:KalshiBotOverseer.Services.SnapshotService.GetAggregationCount
+  fullName: KalshiBotOverseer.Services.SnapshotService.GetAggregationCount()
+  nameWithType: SnapshotService.GetAggregationCount()
+- uid: KalshiBotOverseer.Services.SnapshotService.GetAggregationCount*
+  name: GetAggregationCount
+  href: api/KalshiBotOverseer.Services.SnapshotService.html#KalshiBotOverseer_Services_SnapshotService_GetAggregationCount_
+  commentId: Overload:KalshiBotOverseer.Services.SnapshotService.GetAggregationCount
+  isSpec: "True"
+  fullName: KalshiBotOverseer.Services.SnapshotService.GetAggregationCount
+  nameWithType: SnapshotService.GetAggregationCount
+- uid: KalshiBotOverseer.Services.SnapshotService.GetAggregationStatistics
+  name: GetAggregationStatistics()
+  href: api/KalshiBotOverseer.Services.SnapshotService.html#KalshiBotOverseer_Services_SnapshotService_GetAggregationStatistics
+  commentId: M:KalshiBotOverseer.Services.SnapshotService.GetAggregationStatistics
+  fullName: KalshiBotOverseer.Services.SnapshotService.GetAggregationStatistics()
+  nameWithType: SnapshotService.GetAggregationStatistics()
+- uid: KalshiBotOverseer.Services.SnapshotService.GetAggregationStatistics*
+  name: GetAggregationStatistics
+  href: api/KalshiBotOverseer.Services.SnapshotService.html#KalshiBotOverseer_Services_SnapshotService_GetAggregationStatistics_
+  commentId: Overload:KalshiBotOverseer.Services.SnapshotService.GetAggregationStatistics
+  isSpec: "True"
+  fullName: KalshiBotOverseer.Services.SnapshotService.GetAggregationStatistics
+  nameWithType: SnapshotService.GetAggregationStatistics
+- uid: KalshiBotOverseer.Services.SnapshotService.GetAggregationTimes
+  name: GetAggregationTimes()
+  href: api/KalshiBotOverseer.Services.SnapshotService.html#KalshiBotOverseer_Services_SnapshotService_GetAggregationTimes
+  commentId: M:KalshiBotOverseer.Services.SnapshotService.GetAggregationTimes
+  fullName: KalshiBotOverseer.Services.SnapshotService.GetAggregationTimes()
+  nameWithType: SnapshotService.GetAggregationTimes()
+- uid: KalshiBotOverseer.Services.SnapshotService.GetAggregationTimes*
+  name: GetAggregationTimes
+  href: api/KalshiBotOverseer.Services.SnapshotService.html#KalshiBotOverseer_Services_SnapshotService_GetAggregationTimes_
+  commentId: Overload:KalshiBotOverseer.Services.SnapshotService.GetAggregationTimes
+  isSpec: "True"
+  fullName: KalshiBotOverseer.Services.SnapshotService.GetAggregationTimes
+  nameWithType: SnapshotService.GetAggregationTimes
 - uid: KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync
   name: GetSnapshotGroupsDataAsync()
   href: api/KalshiBotOverseer.Services.SnapshotService.html#KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync
@@ -44037,6 +44792,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync
   nameWithType: SnapshotService.GetSnapshotGroupsDataAsync
+- uid: KalshiBotOverseer.Services.SnapshotService.GetTotalAggregationTime
+  name: GetTotalAggregationTime()
+  href: api/KalshiBotOverseer.Services.SnapshotService.html#KalshiBotOverseer_Services_SnapshotService_GetTotalAggregationTime
+  commentId: M:KalshiBotOverseer.Services.SnapshotService.GetTotalAggregationTime
+  fullName: KalshiBotOverseer.Services.SnapshotService.GetTotalAggregationTime()
+  nameWithType: SnapshotService.GetTotalAggregationTime()
+- uid: KalshiBotOverseer.Services.SnapshotService.GetTotalAggregationTime*
+  name: GetTotalAggregationTime
+  href: api/KalshiBotOverseer.Services.SnapshotService.html#KalshiBotOverseer_Services_SnapshotService_GetTotalAggregationTime_
+  commentId: Overload:KalshiBotOverseer.Services.SnapshotService.GetTotalAggregationTime
+  isSpec: "True"
+  fullName: KalshiBotOverseer.Services.SnapshotService.GetTotalAggregationTime
+  nameWithType: SnapshotService.GetTotalAggregationTime
 - uid: KalshiBotOverseer.Startup
   name: Startup
   href: api/KalshiBotOverseer.Startup.html
@@ -47803,6 +48571,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Configuration.SnapshotConfig.MaxActiveGapHours
   nameWithType: SnapshotConfig.MaxActiveGapHours
+- uid: TradingStrategies.Configuration.SnapshotConfig.MaxParallelism
+  name: MaxParallelism
+  href: api/TradingStrategies.Configuration.SnapshotConfig.html#TradingStrategies_Configuration_SnapshotConfig_MaxParallelism
+  commentId: P:TradingStrategies.Configuration.SnapshotConfig.MaxParallelism
+  fullName: TradingStrategies.Configuration.SnapshotConfig.MaxParallelism
+  nameWithType: SnapshotConfig.MaxParallelism
+- uid: TradingStrategies.Configuration.SnapshotConfig.MaxParallelism*
+  name: MaxParallelism
+  href: api/TradingStrategies.Configuration.SnapshotConfig.html#TradingStrategies_Configuration_SnapshotConfig_MaxParallelism_
+  commentId: Overload:TradingStrategies.Configuration.SnapshotConfig.MaxParallelism
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SnapshotConfig.MaxParallelism
+  nameWithType: SnapshotConfig.MaxParallelism
 - uid: TradingStrategies.Configuration.SnapshotConfig.PriceChangeThreshold
   name: PriceChangeThreshold
   href: api/TradingStrategies.Configuration.SnapshotConfig.html#TradingStrategies_Configuration_SnapshotConfig_PriceChangeThreshold
@@ -47855,6 +48636,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Configuration.SnapshotConfig.SnapshotToleranceSeconds
   nameWithType: SnapshotConfig.SnapshotToleranceSeconds
+- uid: TradingStrategies.Configuration.SnapshotConfig.StorageDirectory
+  name: StorageDirectory
+  href: api/TradingStrategies.Configuration.SnapshotConfig.html#TradingStrategies_Configuration_SnapshotConfig_StorageDirectory
+  commentId: P:TradingStrategies.Configuration.SnapshotConfig.StorageDirectory
+  fullName: TradingStrategies.Configuration.SnapshotConfig.StorageDirectory
+  nameWithType: SnapshotConfig.StorageDirectory
+- uid: TradingStrategies.Configuration.SnapshotConfig.StorageDirectory*
+  name: StorageDirectory
+  href: api/TradingStrategies.Configuration.SnapshotConfig.html#TradingStrategies_Configuration_SnapshotConfig_StorageDirectory_
+  commentId: Overload:TradingStrategies.Configuration.SnapshotConfig.StorageDirectory
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.SnapshotConfig.StorageDirectory
+  nameWithType: SnapshotConfig.StorageDirectory
 - uid: TradingStrategies.Configuration.TradingConfig
   name: TradingConfig
   href: api/TradingStrategies.Configuration.TradingConfig.html
@@ -47926,6 +48720,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Configuration.TradingConfig.MaxDrawdownPercent
   nameWithType: TradingConfig.MaxDrawdownPercent
+- uid: TradingStrategies.Configuration.TradingConfig.MaxOrderbookChangeQueueSize
+  name: MaxOrderbookChangeQueueSize
+  href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_MaxOrderbookChangeQueueSize
+  commentId: P:TradingStrategies.Configuration.TradingConfig.MaxOrderbookChangeQueueSize
+  fullName: TradingStrategies.Configuration.TradingConfig.MaxOrderbookChangeQueueSize
+  nameWithType: TradingConfig.MaxOrderbookChangeQueueSize
+- uid: TradingStrategies.Configuration.TradingConfig.MaxOrderbookChangeQueueSize*
+  name: MaxOrderbookChangeQueueSize
+  href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_MaxOrderbookChangeQueueSize_
+  commentId: Overload:TradingStrategies.Configuration.TradingConfig.MaxOrderbookChangeQueueSize
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.TradingConfig.MaxOrderbookChangeQueueSize
+  nameWithType: TradingConfig.MaxOrderbookChangeQueueSize
 - uid: TradingStrategies.Configuration.TradingConfig.MaxPositionSizePercent
   name: MaxPositionSizePercent
   href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_MaxPositionSizePercent
@@ -47952,6 +48759,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Configuration.TradingConfig.MaxTotalExposurePercent
   nameWithType: TradingConfig.MaxTotalExposurePercent
+- uid: TradingStrategies.Configuration.TradingConfig.MaxTradeEventQueueSize
+  name: MaxTradeEventQueueSize
+  href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_MaxTradeEventQueueSize
+  commentId: P:TradingStrategies.Configuration.TradingConfig.MaxTradeEventQueueSize
+  fullName: TradingStrategies.Configuration.TradingConfig.MaxTradeEventQueueSize
+  nameWithType: TradingConfig.MaxTradeEventQueueSize
+- uid: TradingStrategies.Configuration.TradingConfig.MaxTradeEventQueueSize*
+  name: MaxTradeEventQueueSize
+  href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_MaxTradeEventQueueSize_
+  commentId: Overload:TradingStrategies.Configuration.TradingConfig.MaxTradeEventQueueSize
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.TradingConfig.MaxTradeEventQueueSize
+  nameWithType: TradingConfig.MaxTradeEventQueueSize
 - uid: TradingStrategies.Configuration.TradingConfig.OrderbookCancelWindow
   name: OrderbookCancelWindow
   href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_OrderbookCancelWindow
@@ -47978,6 +48798,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Configuration.TradingConfig.OrderbookCancelWindowSeconds
   nameWithType: TradingConfig.OrderbookCancelWindowSeconds
+- uid: TradingStrategies.Configuration.TradingConfig.OrderbookChangeCleanupThresholdMinutes
+  name: OrderbookChangeCleanupThresholdMinutes
+  href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_OrderbookChangeCleanupThresholdMinutes
+  commentId: P:TradingStrategies.Configuration.TradingConfig.OrderbookChangeCleanupThresholdMinutes
+  fullName: TradingStrategies.Configuration.TradingConfig.OrderbookChangeCleanupThresholdMinutes
+  nameWithType: TradingConfig.OrderbookChangeCleanupThresholdMinutes
+- uid: TradingStrategies.Configuration.TradingConfig.OrderbookChangeCleanupThresholdMinutes*
+  name: OrderbookChangeCleanupThresholdMinutes
+  href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_OrderbookChangeCleanupThresholdMinutes_
+  commentId: Overload:TradingStrategies.Configuration.TradingConfig.OrderbookChangeCleanupThresholdMinutes
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.TradingConfig.OrderbookChangeCleanupThresholdMinutes
+  nameWithType: TradingConfig.OrderbookChangeCleanupThresholdMinutes
 - uid: TradingStrategies.Configuration.TradingConfig.RefreshIntervalMinutes
   name: RefreshIntervalMinutes
   href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_RefreshIntervalMinutes
@@ -48043,6 +48876,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Configuration.TradingConfig.TimeBudgetRatio
   nameWithType: TradingConfig.TimeBudgetRatio
+- uid: TradingStrategies.Configuration.TradingConfig.TradeEventCleanupThresholdMinutes
+  name: TradeEventCleanupThresholdMinutes
+  href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_TradeEventCleanupThresholdMinutes
+  commentId: P:TradingStrategies.Configuration.TradingConfig.TradeEventCleanupThresholdMinutes
+  fullName: TradingStrategies.Configuration.TradingConfig.TradeEventCleanupThresholdMinutes
+  nameWithType: TradingConfig.TradeEventCleanupThresholdMinutes
+- uid: TradingStrategies.Configuration.TradingConfig.TradeEventCleanupThresholdMinutes*
+  name: TradeEventCleanupThresholdMinutes
+  href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_TradeEventCleanupThresholdMinutes_
+  commentId: Overload:TradingStrategies.Configuration.TradingConfig.TradeEventCleanupThresholdMinutes
+  isSpec: "True"
+  fullName: TradingStrategies.Configuration.TradingConfig.TradeEventCleanupThresholdMinutes
+  nameWithType: TradingConfig.TradeEventCleanupThresholdMinutes
 - uid: TradingStrategies.Configuration.TradingConfig.TradeMatchingWindow
   name: TradeMatchingWindow
   href: api/TradingStrategies.Configuration.TradingConfig.html#TradingStrategies_Configuration_TradingConfig_TradeMatchingWindow
@@ -51482,6 +52328,45 @@ references:
   commentId: T:TradingStrategies.Trading.Overseer.EquityCalculator
   fullName: TradingStrategies.Trading.Overseer.EquityCalculator
   nameWithType: EquityCalculator
+- uid: TradingStrategies.Trading.Overseer.EquityCalculator.ClearCalculationTimes
+  name: ClearCalculationTimes()
+  href: api/TradingStrategies.Trading.Overseer.EquityCalculator.html#TradingStrategies_Trading_Overseer_EquityCalculator_ClearCalculationTimes
+  commentId: M:TradingStrategies.Trading.Overseer.EquityCalculator.ClearCalculationTimes
+  fullName: TradingStrategies.Trading.Overseer.EquityCalculator.ClearCalculationTimes()
+  nameWithType: EquityCalculator.ClearCalculationTimes()
+- uid: TradingStrategies.Trading.Overseer.EquityCalculator.ClearCalculationTimes*
+  name: ClearCalculationTimes
+  href: api/TradingStrategies.Trading.Overseer.EquityCalculator.html#TradingStrategies_Trading_Overseer_EquityCalculator_ClearCalculationTimes_
+  commentId: Overload:TradingStrategies.Trading.Overseer.EquityCalculator.ClearCalculationTimes
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.EquityCalculator.ClearCalculationTimes
+  nameWithType: EquityCalculator.ClearCalculationTimes
+- uid: TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationStatistics
+  name: GetCalculationStatistics()
+  href: api/TradingStrategies.Trading.Overseer.EquityCalculator.html#TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationStatistics
+  commentId: M:TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationStatistics
+  fullName: TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationStatistics()
+  nameWithType: EquityCalculator.GetCalculationStatistics()
+- uid: TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationStatistics*
+  name: GetCalculationStatistics
+  href: api/TradingStrategies.Trading.Overseer.EquityCalculator.html#TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationStatistics_
+  commentId: Overload:TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationStatistics
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationStatistics
+  nameWithType: EquityCalculator.GetCalculationStatistics
+- uid: TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationTimes
+  name: GetCalculationTimes()
+  href: api/TradingStrategies.Trading.Overseer.EquityCalculator.html#TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationTimes
+  commentId: M:TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationTimes
+  fullName: TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationTimes()
+  nameWithType: EquityCalculator.GetCalculationTimes()
+- uid: TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationTimes*
+  name: GetCalculationTimes
+  href: api/TradingStrategies.Trading.Overseer.EquityCalculator.html#TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationTimes_
+  commentId: Overload:TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationTimes
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationTimes
+  nameWithType: EquityCalculator.GetCalculationTimes
 - uid: TradingStrategies.Trading.Overseer.EquityCalculator.GetEquity(TradingStrategies.Trading.Overseer.SimulationPath,BacklashDTOs.MarketSnapshot)
   name: GetEquity(SimulationPath, MarketSnapshot)
   href: api/TradingStrategies.Trading.Overseer.EquityCalculator.html#TradingStrategies_Trading_Overseer_EquityCalculator_GetEquity_TradingStrategies_Trading_Overseer_SimulationPath_BacklashDTOs_MarketSnapshot_
@@ -51620,6 +52505,32 @@ references:
   commentId: T:TradingStrategies.Trading.Overseer.PatternDetectionConfig
   fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig
   nameWithType: PatternDetectionConfig
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnableParallelProcessing
+  name: EnableParallelProcessing
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_EnableParallelProcessing
+  commentId: P:TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnableParallelProcessing
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnableParallelProcessing
+  nameWithType: PatternDetectionConfig.EnableParallelProcessing
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnableParallelProcessing*
+  name: EnableParallelProcessing
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_EnableParallelProcessing_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnableParallelProcessing
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.EnableParallelProcessing
+  nameWithType: PatternDetectionConfig.EnableParallelProcessing
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.InitialPatternCapacity
+  name: InitialPatternCapacity
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_InitialPatternCapacity
+  commentId: P:TradingStrategies.Trading.Overseer.PatternDetectionConfig.InitialPatternCapacity
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.InitialPatternCapacity
+  nameWithType: PatternDetectionConfig.InitialPatternCapacity
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.InitialPatternCapacity*
+  name: InitialPatternCapacity
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_InitialPatternCapacity_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PatternDetectionConfig.InitialPatternCapacity
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.InitialPatternCapacity
+  nameWithType: PatternDetectionConfig.InitialPatternCapacity
 - uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.LookbackWindow
   name: LookbackWindow
   href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_LookbackWindow
@@ -51633,6 +52544,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.LookbackWindow
   nameWithType: PatternDetectionConfig.LookbackWindow
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.MaxDegreeOfParallelism
+  name: MaxDegreeOfParallelism
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_MaxDegreeOfParallelism
+  commentId: P:TradingStrategies.Trading.Overseer.PatternDetectionConfig.MaxDegreeOfParallelism
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.MaxDegreeOfParallelism
+  nameWithType: PatternDetectionConfig.MaxDegreeOfParallelism
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.MaxDegreeOfParallelism*
+  name: MaxDegreeOfParallelism
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_MaxDegreeOfParallelism_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PatternDetectionConfig.MaxDegreeOfParallelism
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.MaxDegreeOfParallelism
+  nameWithType: PatternDetectionConfig.MaxDegreeOfParallelism
 - uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.PatternTypes
   name: PatternTypes
   href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_PatternTypes
@@ -51646,12 +52570,47 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.PatternTypes
   nameWithType: PatternDetectionConfig.PatternTypes
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.SignificancePriceThreshold
+  name: SignificancePriceThreshold
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_SignificancePriceThreshold
+  commentId: P:TradingStrategies.Trading.Overseer.PatternDetectionConfig.SignificancePriceThreshold
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.SignificancePriceThreshold
+  nameWithType: PatternDetectionConfig.SignificancePriceThreshold
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.SignificancePriceThreshold*
+  name: SignificancePriceThreshold
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_SignificancePriceThreshold_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PatternDetectionConfig.SignificancePriceThreshold
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.SignificancePriceThreshold
+  nameWithType: PatternDetectionConfig.SignificancePriceThreshold
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.VolumeIncreaseMultiplier
+  name: VolumeIncreaseMultiplier
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_VolumeIncreaseMultiplier
+  commentId: P:TradingStrategies.Trading.Overseer.PatternDetectionConfig.VolumeIncreaseMultiplier
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.VolumeIncreaseMultiplier
+  nameWithType: PatternDetectionConfig.VolumeIncreaseMultiplier
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionConfig.VolumeIncreaseMultiplier*
+  name: VolumeIncreaseMultiplier
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionConfig.html#TradingStrategies_Trading_Overseer_PatternDetectionConfig_VolumeIncreaseMultiplier_
+  commentId: Overload:TradingStrategies.Trading.Overseer.PatternDetectionConfig.VolumeIncreaseMultiplier
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionConfig.VolumeIncreaseMultiplier
+  nameWithType: PatternDetectionConfig.VolumeIncreaseMultiplier
 - uid: TradingStrategies.Trading.Overseer.PatternDetectionService
   name: PatternDetectionService
   href: api/TradingStrategies.Trading.Overseer.PatternDetectionService.html
   commentId: T:TradingStrategies.Trading.Overseer.PatternDetectionService
   fullName: TradingStrategies.Trading.Overseer.PatternDetectionService
   nameWithType: PatternDetectionService
+- uid: TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor(Microsoft.Extensions.Configuration.IConfiguration)
+  name: PatternDetectionService(IConfiguration)
+  href: api/TradingStrategies.Trading.Overseer.PatternDetectionService.html#TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_Microsoft_Extensions_Configuration_IConfiguration_
+  commentId: M:TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor(Microsoft.Extensions.Configuration.IConfiguration)
+  name.vb: New(IConfiguration)
+  fullName: TradingStrategies.Trading.Overseer.PatternDetectionService.PatternDetectionService(Microsoft.Extensions.Configuration.IConfiguration)
+  fullName.vb: TradingStrategies.Trading.Overseer.PatternDetectionService.New(Microsoft.Extensions.Configuration.IConfiguration)
+  nameWithType: PatternDetectionService.PatternDetectionService(IConfiguration)
+  nameWithType.vb: PatternDetectionService.New(IConfiguration)
 - uid: TradingStrategies.Trading.Overseer.PatternDetectionService.#ctor(TradingStrategies.Trading.Overseer.PatternDetectionConfig)
   name: PatternDetectionService(PatternDetectionConfig)
   href: api/TradingStrategies.Trading.Overseer.PatternDetectionService.html#TradingStrategies_Trading_Overseer_PatternDetectionService__ctor_TradingStrategies_Trading_Overseer_PatternDetectionConfig_
@@ -52704,15 +53663,15 @@ references:
   commentId: T:TradingStrategies.Trading.Overseer.SimulationEngine
   fullName: TradingStrategies.Trading.Overseer.SimulationEngine
   nameWithType: SimulationEngine
-- uid: TradingStrategies.Trading.Overseer.SimulationEngine.#ctor
-  name: SimulationEngine()
-  href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine__ctor
-  commentId: M:TradingStrategies.Trading.Overseer.SimulationEngine.#ctor
-  name.vb: New()
-  fullName: TradingStrategies.Trading.Overseer.SimulationEngine.SimulationEngine()
-  fullName.vb: TradingStrategies.Trading.Overseer.SimulationEngine.New()
-  nameWithType: SimulationEngine.SimulationEngine()
-  nameWithType.vb: SimulationEngine.New()
+- uid: TradingStrategies.Trading.Overseer.SimulationEngine.#ctor(Microsoft.Extensions.Configuration.IConfiguration)
+  name: SimulationEngine(IConfiguration)
+  href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine__ctor_Microsoft_Extensions_Configuration_IConfiguration_
+  commentId: M:TradingStrategies.Trading.Overseer.SimulationEngine.#ctor(Microsoft.Extensions.Configuration.IConfiguration)
+  name.vb: New(IConfiguration)
+  fullName: TradingStrategies.Trading.Overseer.SimulationEngine.SimulationEngine(Microsoft.Extensions.Configuration.IConfiguration)
+  fullName.vb: TradingStrategies.Trading.Overseer.SimulationEngine.New(Microsoft.Extensions.Configuration.IConfiguration)
+  nameWithType: SimulationEngine.SimulationEngine(IConfiguration)
+  nameWithType.vb: SimulationEngine.New(IConfiguration)
 - uid: TradingStrategies.Trading.Overseer.SimulationEngine.#ctor*
   name: SimulationEngine
   href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine__ctor_
@@ -52723,6 +53682,32 @@ references:
   fullName.vb: TradingStrategies.Trading.Overseer.SimulationEngine.New
   nameWithType: SimulationEngine.SimulationEngine
   nameWithType.vb: SimulationEngine.New
+- uid: TradingStrategies.Trading.Overseer.SimulationEngine.LastExecutionTime
+  name: LastExecutionTime
+  href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine_LastExecutionTime
+  commentId: P:TradingStrategies.Trading.Overseer.SimulationEngine.LastExecutionTime
+  fullName: TradingStrategies.Trading.Overseer.SimulationEngine.LastExecutionTime
+  nameWithType: SimulationEngine.LastExecutionTime
+- uid: TradingStrategies.Trading.Overseer.SimulationEngine.LastExecutionTime*
+  name: LastExecutionTime
+  href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine_LastExecutionTime_
+  commentId: Overload:TradingStrategies.Trading.Overseer.SimulationEngine.LastExecutionTime
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.SimulationEngine.LastExecutionTime
+  nameWithType: SimulationEngine.LastExecutionTime
+- uid: TradingStrategies.Trading.Overseer.SimulationEngine.LastMemoryUsed
+  name: LastMemoryUsed
+  href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine_LastMemoryUsed
+  commentId: P:TradingStrategies.Trading.Overseer.SimulationEngine.LastMemoryUsed
+  fullName: TradingStrategies.Trading.Overseer.SimulationEngine.LastMemoryUsed
+  nameWithType: SimulationEngine.LastMemoryUsed
+- uid: TradingStrategies.Trading.Overseer.SimulationEngine.LastMemoryUsed*
+  name: LastMemoryUsed
+  href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine_LastMemoryUsed_
+  commentId: Overload:TradingStrategies.Trading.Overseer.SimulationEngine.LastMemoryUsed
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.SimulationEngine.LastMemoryUsed
+  nameWithType: SimulationEngine.LastMemoryUsed
 - uid: TradingStrategies.Trading.Overseer.SimulationEngine.RunSimulation(TradingStrategies.Strategies.Scenario,System.Collections.Generic.List{BacklashDTOs.MarketSnapshot},System.Boolean)
   name: RunSimulation(Scenario, List<MarketSnapshot>, bool)
   href: api/TradingStrategies.Trading.Overseer.SimulationEngine.html#TradingStrategies_Trading_Overseer_SimulationEngine_RunSimulation_TradingStrategies_Strategies_Scenario_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_
@@ -52790,6 +53775,19 @@ references:
   isSpec: "True"
   fullName: TradingStrategies.Trading.Overseer.SimulationPath.Cash
   nameWithType: SimulationPath.Cash
+- uid: TradingStrategies.Trading.Overseer.SimulationPath.Clone
+  name: Clone()
+  href: api/TradingStrategies.Trading.Overseer.SimulationPath.html#TradingStrategies_Trading_Overseer_SimulationPath_Clone
+  commentId: M:TradingStrategies.Trading.Overseer.SimulationPath.Clone
+  fullName: TradingStrategies.Trading.Overseer.SimulationPath.Clone()
+  nameWithType: SimulationPath.Clone()
+- uid: TradingStrategies.Trading.Overseer.SimulationPath.Clone*
+  name: Clone
+  href: api/TradingStrategies.Trading.Overseer.SimulationPath.html#TradingStrategies_Trading_Overseer_SimulationPath_Clone_
+  commentId: Overload:TradingStrategies.Trading.Overseer.SimulationPath.Clone
+  isSpec: "True"
+  fullName: TradingStrategies.Trading.Overseer.SimulationPath.Clone
+  nameWithType: SimulationPath.Clone
 - uid: TradingStrategies.Trading.Overseer.SimulationPath.CurrentRisk
   name: CurrentRisk
   href: api/TradingStrategies.Trading.Overseer.SimulationPath.html#TradingStrategies_Trading_Overseer_SimulationPath_CurrentRisk
@@ -53168,15 +54166,15 @@ references:
   commentId: T:TradingStrategies.TradingOverseer
   fullName: TradingStrategies.TradingOverseer
   nameWithType: TradingOverseer
-- uid: TradingStrategies.TradingOverseer.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.ITradingSnapshotService,Microsoft.Extensions.Logging.ILogger{TradingStrategies.TradingOverseer})
-  name: TradingOverseer(IServiceScopeFactory, ITradingSnapshotService, ILogger<TradingOverseer>)
-  href: api/TradingStrategies.TradingOverseer.html#TradingStrategies_TradingOverseer__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Logging_ILogger_TradingStrategies_TradingOverseer__
-  commentId: M:TradingStrategies.TradingOverseer.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.ITradingSnapshotService,Microsoft.Extensions.Logging.ILogger{TradingStrategies.TradingOverseer})
-  name.vb: New(IServiceScopeFactory, ITradingSnapshotService, ILogger(Of TradingOverseer))
-  fullName: TradingStrategies.TradingOverseer.TradingOverseer(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.ITradingSnapshotService, Microsoft.Extensions.Logging.ILogger<TradingStrategies.TradingOverseer>)
-  fullName.vb: TradingStrategies.TradingOverseer.New(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.ITradingSnapshotService, Microsoft.Extensions.Logging.ILogger(Of TradingStrategies.TradingOverseer))
-  nameWithType: TradingOverseer.TradingOverseer(IServiceScopeFactory, ITradingSnapshotService, ILogger<TradingOverseer>)
-  nameWithType.vb: TradingOverseer.New(IServiceScopeFactory, ITradingSnapshotService, ILogger(Of TradingOverseer))
+- uid: TradingStrategies.TradingOverseer.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.ITradingSnapshotService,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{TradingStrategies.TradingOverseer})
+  name: TradingOverseer(IServiceScopeFactory, ITradingSnapshotService, IConfiguration, ILogger<TradingOverseer>)
+  href: api/TradingStrategies.TradingOverseer.html#TradingStrategies_TradingOverseer__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_TradingStrategies_TradingOverseer__
+  commentId: M:TradingStrategies.TradingOverseer.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.ITradingSnapshotService,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{TradingStrategies.TradingOverseer})
+  name.vb: New(IServiceScopeFactory, ITradingSnapshotService, IConfiguration, ILogger(Of TradingOverseer))
+  fullName: TradingStrategies.TradingOverseer.TradingOverseer(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.ITradingSnapshotService, Microsoft.Extensions.Configuration.IConfiguration, Microsoft.Extensions.Logging.ILogger<TradingStrategies.TradingOverseer>)
+  fullName.vb: TradingStrategies.TradingOverseer.New(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.ITradingSnapshotService, Microsoft.Extensions.Configuration.IConfiguration, Microsoft.Extensions.Logging.ILogger(Of TradingStrategies.TradingOverseer))
+  nameWithType: TradingOverseer.TradingOverseer(IServiceScopeFactory, ITradingSnapshotService, IConfiguration, ILogger<TradingOverseer>)
+  nameWithType.vb: TradingOverseer.New(IServiceScopeFactory, ITradingSnapshotService, IConfiguration, ILogger(Of TradingOverseer))
 - uid: TradingStrategies.TradingOverseer.#ctor*
   name: TradingOverseer
   href: api/TradingStrategies.TradingOverseer.html#TradingStrategies_TradingOverseer__ctor_

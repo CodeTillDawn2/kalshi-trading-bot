@@ -143,6 +143,98 @@ in highly concurrent scenarios. The async methods help improve performance in hi
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_EquityCalculator_ClearCalculationTimes.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.EquityCalculator.ClearCalculationTimes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/EquityCalculator.cs/#L174">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_EquityCalculator_ClearCalculationTimes_" data-uid="TradingStrategies.Trading.Overseer.EquityCalculator.ClearCalculationTimes*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_EquityCalculator_ClearCalculationTimes" data-uid="TradingStrategies.Trading.Overseer.EquityCalculator.ClearCalculationTimes">ClearCalculationTimes()</h4>
+  <div class="markdown level1 summary"><p>Clears all recorded calculation times.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearCalculationTimes()</code></pre>
+  </div>
+  <h5 id="TradingStrategies_Trading_Overseer_EquityCalculator_ClearCalculationTimes_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method resets the performance metrics collection, useful for starting
+fresh measurements or clearing accumulated data.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationStatistics.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationStatistics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/EquityCalculator.cs/#L154">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationStatistics_" data-uid="TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationStatistics*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationStatistics" data-uid="TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationStatistics">GetCalculationStatistics()</h4>
+  <div class="markdown level1 summary"><p>Gets performance statistics for equity calculations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (int Count, double AverageMs, long MinMs, long MaxMs) GetCalculationStatistics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.count">Count</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.averagems">AverageMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.minms">MinMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.maxms">MaxMs</a>)</td>
+        <td><p>A tuple containing count, average time, min time, and max time in milliseconds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationStatistics_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Returns comprehensive statistics about the performance of equity calculations.
+If no calculations have been performed, returns (0, 0, 0, 0).</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationTimes.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationTimes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/EquityCalculator.cs/#L141">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationTimes_" data-uid="TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationTimes*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationTimes" data-uid="TradingStrategies.Trading.Overseer.EquityCalculator.GetCalculationTimes">GetCalculationTimes()</h4>
+  <div class="markdown level1 summary"><p>Gets all recorded calculation times in milliseconds.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long[] GetCalculationTimes()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>[]</td>
+        <td><p>An array of calculation times in milliseconds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_EquityCalculator_GetCalculationTimes_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method provides access to the performance metrics collected during equity calculations.
+Each value represents the time taken for a single GetEquity or GetEquityAsync call.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_EquityCalculator_GetEquity_TradingStrategies_Trading_Overseer_SimulationPath_BacklashDTOs_MarketSnapshot_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.EquityCalculator.GetEquity(TradingStrategies.Trading.Overseer.SimulationPath%2CBacklashDTOs.MarketSnapshot)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">

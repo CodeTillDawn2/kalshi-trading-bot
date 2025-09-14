@@ -300,6 +300,123 @@ Returns an empty list if the market is not found in the cache.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_GetEventQueueProcessingMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.GetEventQueueProcessingMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L446">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderBookService_GetEventQueueProcessingMetrics_" data-uid="BacklashBot.Services.OrderBookService.GetEventQueueProcessingMetrics*"></a>
+  <h4 id="BacklashBot_Services_OrderBookService_GetEventQueueProcessingMetrics" data-uid="BacklashBot.Services.OrderBookService.GetEventQueueProcessingMetrics">GetEventQueueProcessingMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets performance metrics for event queue processing operations.
+Returns the average processing time and total operations count for the last MaxWaitTimeSamples operations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double AverageProcessingTimeMs, int TotalOperations) GetEventQueueProcessingMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationtimems">InitializationTimeMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationattempts">InitializationAttempts</a>)</td>
+        <td><p>A tuple containing average processing time in milliseconds and total operations count.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_GetMarketLockWaitMetrics_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.GetMarketLockWaitMetrics(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L483">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderBookService_GetMarketLockWaitMetrics_" data-uid="BacklashBot.Services.OrderBookService.GetMarketLockWaitMetrics*"></a>
+  <h4 id="BacklashBot_Services_OrderBookService_GetMarketLockWaitMetrics_System_String_" data-uid="BacklashBot.Services.OrderBookService.GetMarketLockWaitMetrics(System.String)">GetMarketLockWaitMetrics(string)</h4>
+  <div class="markdown level1 summary"><p>Gets performance metrics for market lock wait times.
+Returns the average wait time and total operations count for the last MaxWaitTimeSamples operations per market.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double AverageWaitTimeMs, int TotalOperations) GetMarketLockWaitMetrics(string marketTicker)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">marketTicker</span></td>
+        <td><p>The market ticker to get metrics for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationtimems">InitializationTimeMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationattempts">InitializationAttempts</a>)</td>
+        <td><p>A tuple containing average wait time in milliseconds and total operations count.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_GetNotificationQueueProcessingMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.GetNotificationQueueProcessingMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L470">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderBookService_GetNotificationQueueProcessingMetrics_" data-uid="BacklashBot.Services.OrderBookService.GetNotificationQueueProcessingMetrics*"></a>
+  <h4 id="BacklashBot_Services_OrderBookService_GetNotificationQueueProcessingMetrics" data-uid="BacklashBot.Services.OrderBookService.GetNotificationQueueProcessingMetrics">GetNotificationQueueProcessingMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets performance metrics for notification queue processing operations.
+Returns the average processing time and total operations count for the last MaxWaitTimeSamples operations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double AverageProcessingTimeMs, int TotalOperations) GetNotificationQueueProcessingMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationtimems">InitializationTimeMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationattempts">InitializationAttempts</a>)</td>
+        <td><p>A tuple containing average processing time in milliseconds and total operations count.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_GetQueueCounts.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.GetQueueCounts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
@@ -327,6 +444,39 @@ Used for monitoring and diagnostics.</p>
       <tr>
         <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.orderbookevents">orderbookEvents</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.tradeevents">tradeEvents</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int32,system.int32-.tickerevents">tickerEvents</a>)</td>
         <td><p>A tuple containing the count of items in the event, ticker, and notification queues.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_OrderBookService_GetTickerQueueProcessingMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Services.OrderBookService.GetTickerQueueProcessingMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/OrderBookService.cs/#L458">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_OrderBookService_GetTickerQueueProcessingMetrics_" data-uid="BacklashBot.Services.OrderBookService.GetTickerQueueProcessingMetrics*"></a>
+  <h4 id="BacklashBot_Services_OrderBookService_GetTickerQueueProcessingMetrics" data-uid="BacklashBot.Services.OrderBookService.GetTickerQueueProcessingMetrics">GetTickerQueueProcessingMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets performance metrics for ticker queue processing operations.
+Returns the average processing time and total operations count for the last MaxWaitTimeSamples operations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (double AverageProcessingTimeMs, int TotalOperations) GetTickerQueueProcessingMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationtimems">InitializationTimeMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.int32-.initializationattempts">InitializationAttempts</a>)</td>
+        <td><p>A tuple containing average processing time in milliseconds and total operations count.</p>
 </td>
       </tr>
     </tbody>

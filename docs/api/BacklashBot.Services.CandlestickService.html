@@ -133,7 +133,7 @@ Provides market data population and candlestick synchronization functionality.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_CandlestickService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_ICandlestickService__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_LoggingConfig__BacklashBot_Services_Interfaces_IServiceFactory_BacklashBot_Services_Interfaces_IScopeManagerService_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.CandlestickService.%23ctor(Microsoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.ICandlestickService%7D%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.State.Interfaces.IStatusTrackerService%2CMicrosoft.Extensions.Options.IOptions%7BBacklashDTOs.Configuration.ExecutionConfig%7D%2CMicrosoft.Extensions.Options.IOptions%7BBacklashDTOs.Configuration.LoggingConfig%7D%2CBacklashBot.Services.Interfaces.IServiceFactory%2CBacklashBot.Services.Interfaces.IScopeManagerService)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/CandlestickService.cs/#L44">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/CandlestickService.cs/#L45">View Source</a>
   </span>
   <a id="BacklashBot_Services_CandlestickService__ctor_" data-uid="BacklashBot.Services.CandlestickService.#ctor*"></a>
   <h4 id="BacklashBot_Services_CandlestickService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_ICandlestickService__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_LoggingConfig__BacklashBot_Services_Interfaces_IServiceFactory_BacklashBot_Services_Interfaces_IScopeManagerService_" data-uid="BacklashBot.Services.CandlestickService.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.ICandlestickService},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.State.Interfaces.IStatusTrackerService,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig},Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.LoggingConfig},BacklashBot.Services.Interfaces.IServiceFactory,BacklashBot.Services.Interfaces.IScopeManagerService)">CandlestickService(ILogger&lt;ICandlestickService&gt;, IServiceScopeFactory, IStatusTrackerService, IOptions&lt;ExecutionConfig&gt;, IOptions&lt;LoggingConfig&gt;, IServiceFactory, IScopeManagerService)</h4>
@@ -202,10 +202,42 @@ Provides market data population and candlestick synchronization functionality.</
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_CandlestickService_PerformDataCleanupAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Services.CandlestickService.PerformDataCleanupAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/CandlestickService.cs/#L67">View Source</a>
+  </span>
+  <a id="BacklashBot_Services_CandlestickService_PerformDataCleanupAsync_" data-uid="BacklashBot.Services.CandlestickService.PerformDataCleanupAsync*"></a>
+  <h4 id="BacklashBot_Services_CandlestickService_PerformDataCleanupAsync" data-uid="BacklashBot.Services.CandlestickService.PerformDataCleanupAsync">PerformDataCleanupAsync()</h4>
+  <div class="markdown level1 summary"><p>Performs cleanup of old candlestick data based on retention policies.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task PerformDataCleanupAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous cleanup operation</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_CandlestickService_PopulateMarketDataAsync_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.CandlestickService.PopulateMarketDataAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/CandlestickService.cs/#L177">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/CandlestickService.cs/#L315">View Source</a>
   </span>
   <a id="BacklashBot_Services_CandlestickService_PopulateMarketDataAsync_" data-uid="BacklashBot.Services.CandlestickService.PopulateMarketDataAsync*"></a>
   <h4 id="BacklashBot_Services_CandlestickService_PopulateMarketDataAsync_System_String_" data-uid="BacklashBot.Services.CandlestickService.PopulateMarketDataAsync(System.String)">PopulateMarketDataAsync(string)</h4>
@@ -257,7 +289,7 @@ and performs data validation and deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_CandlestickService_RetrieveHistoricalCandlesticksAsync_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.CandlestickService.RetrieveHistoricalCandlesticksAsync(System.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/CandlestickService.cs/#L161">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/CandlestickService.cs/#L299">View Source</a>
   </span>
   <a id="BacklashBot_Services_CandlestickService_RetrieveHistoricalCandlesticksAsync_" data-uid="BacklashBot.Services.CandlestickService.RetrieveHistoricalCandlesticksAsync*"></a>
   <h4 id="BacklashBot_Services_CandlestickService_RetrieveHistoricalCandlesticksAsync_System_String_System_String_" data-uid="BacklashBot.Services.CandlestickService.RetrieveHistoricalCandlesticksAsync(System.String,System.String)">RetrieveHistoricalCandlesticksAsync(string, string)</h4>
@@ -313,7 +345,7 @@ and performs data validation and deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_CandlestickService_UpdateCandlesticksAsync_System_String_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.CandlestickService.UpdateCandlesticksAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/CandlestickService.cs/#L68">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/CandlestickService.cs/#L200">View Source</a>
   </span>
   <a id="BacklashBot_Services_CandlestickService_UpdateCandlesticksAsync_" data-uid="BacklashBot.Services.CandlestickService.UpdateCandlesticksAsync*"></a>
   <h4 id="BacklashBot_Services_CandlestickService_UpdateCandlesticksAsync_System_String_" data-uid="BacklashBot.Services.CandlestickService.UpdateCandlesticksAsync(System.String)">UpdateCandlesticksAsync(string)</h4>
@@ -375,7 +407,7 @@ Synchronizes minute, hour, and day interval candlesticks and updates market meta
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_CandlestickService.md&amp;value=---%0Auid%3A%20BacklashBot.Services.CandlestickService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/CandlestickService.cs/#L24" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/CandlestickService.cs/#L25" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

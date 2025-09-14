@@ -125,7 +125,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_ML_ResearchBus_Entries.md&amp;value=---%0Auid%3A%20TradingStrategies.ML.ResearchBus.Entries%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/ML/ResearchBus.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/ML/ResearchBus.cs/#L19">View Source</a>
   </span>
   <h4 id="TradingStrategies_ML_ResearchBus_Entries" data-uid="TradingStrategies.ML.ResearchBus.Entries">Entries</h4>
   <div class="markdown level1 summary"><p>Thread-safe collection of research entries logged during simulation runs.
@@ -158,7 +158,7 @@ Entries are stored in a concurrent bag to support parallel logging from multiple
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_ML_ResearchBus_Clear.md&amp;value=---%0Auid%3A%20TradingStrategies.ML.ResearchBus.Clear%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/ML/ResearchBus.cs/#L25">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/ML/ResearchBus.cs/#L26">View Source</a>
   </span>
   <a id="TradingStrategies_ML_ResearchBus_Clear_" data-uid="TradingStrategies.ML.ResearchBus.Clear*"></a>
   <h4 id="TradingStrategies_ML_ResearchBus_Clear" data-uid="TradingStrategies.ML.ResearchBus.Clear">Clear()</h4>
@@ -176,12 +176,13 @@ and prevent contamination from previous runs.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_ML_ResearchBus_DumpCsv_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.ML.ResearchBus.DumpCsv(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/ML/ResearchBus.cs/#L44">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/ML/ResearchBus.cs/#L82">View Source</a>
   </span>
   <a id="TradingStrategies_ML_ResearchBus_DumpCsv_" data-uid="TradingStrategies.ML.ResearchBus.DumpCsv*"></a>
   <h4 id="TradingStrategies_ML_ResearchBus_DumpCsv_System_String_" data-uid="TradingStrategies.ML.ResearchBus.DumpCsv(System.String)">DumpCsv(string)</h4>
   <div class="markdown level1 summary"><p>Exports all logged research entries to a CSV file for external analysis.
 The CSV file includes a header row with column names and data rows ordered by score in descending order.
+For large datasets, parallel processing is used to build the CSV lines for improved performance.
 This facilitates analysis in spreadsheet applications or statistical tools for strategy optimization.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -212,12 +213,12 @@ This facilitates analysis in spreadsheet applications or statistical tools for s
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_ML_ResearchBus_RecordEntry_TradingStrategies_ML_ResearchBus_EntryResearch_.md&amp;value=---%0Auid%3A%20TradingStrategies.ML.ResearchBus.RecordEntry(TradingStrategies.ML.ResearchBus.EntryResearch)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/ML/ResearchBus.cs/#L36">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/ML/ResearchBus.cs/#L69">View Source</a>
   </span>
   <a id="TradingStrategies_ML_ResearchBus_RecordEntry_" data-uid="TradingStrategies.ML.ResearchBus.RecordEntry*"></a>
   <h4 id="TradingStrategies_ML_ResearchBus_RecordEntry_TradingStrategies_ML_ResearchBus_EntryResearch_" data-uid="TradingStrategies.ML.ResearchBus.RecordEntry(TradingStrategies.ML.ResearchBus.EntryResearch)">RecordEntry(EntryResearch)</h4>
   <div class="markdown level1 summary"><p>Records a research entry to the collection for later analysis.
-This method adds the provided entry research data to the concurrent collection,
+This method validates the entry and adds the provided entry research data to the concurrent collection,
 allowing strategies to record detailed metrics about trading signals and their outcomes.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -255,7 +256,7 @@ allowing strategies to record detailed metrics about trading signals and their o
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_ML_ResearchBus.md&amp;value=---%0Auid%3A%20TradingStrategies.ML.ResearchBus%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/ML/ResearchBus.cs/#L12" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/ML/ResearchBus.cs/#L13" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

@@ -989,6 +989,72 @@ Returns the balance in cents as a long integer.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetCalculationExecutionDurations.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationExecutionDurations%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L2285">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetCalculationExecutionDurations_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationExecutionDurations*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetCalculationExecutionDurations" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationExecutionDurations">GetCalculationExecutionDurations()</h4>
+  <div class="markdown level1 summary"><p>Gets the calculation execution durations for performance monitoring.
+Returns a dictionary mapping calculation names to their execution time measurements.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ConcurrentDictionary&lt;string, ConcurrentBag&lt;long&gt;&gt; GetCalculationExecutionDurations()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.concurrent.concurrentdictionary-2">ConcurrentDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.concurrent.concurrentbag-1">ConcurrentBag</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>&gt;&gt;</td>
+        <td><p>A concurrent dictionary containing calculation execution durations.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetCalculationPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L2318">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetCalculationPerformanceMetrics_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationPerformanceMetrics*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetCalculationPerformanceMetrics" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetCalculationPerformanceMetrics">GetCalculationPerformanceMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets aggregated performance metrics for calculation executions.
+Returns statistics like average, min, max execution times for each calculation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;string, (int Count, double AverageMs, long MinMs, long MaxMs)&gt; GetCalculationPerformanceMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, (<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.count">Count</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.averagems">AverageMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.minms">MinMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.maxms">MaxMs</a>)&gt;</td>
+        <td><p>A dictionary containing aggregated calculation performance metrics.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetEventMetadataAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetEventMetadataAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
@@ -1214,6 +1280,72 @@ Provides details about trading incentives, rewards, and promotional programs off
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="BacklashDTOs.KalshiAPI.IncentiveProgramsResponse.html">IncentiveProgramsResponse</a>&gt;</td>
         <td><p>The incentive programs response containing program data, or null if the operation fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetMethodExecutionDurations.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodExecutionDurations%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L2275">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetMethodExecutionDurations_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodExecutionDurations*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetMethodExecutionDurations" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodExecutionDurations">GetMethodExecutionDurations()</h4>
+  <div class="markdown level1 summary"><p>Gets the method execution durations for performance monitoring.
+Returns a dictionary mapping method names to their execution time measurements.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ConcurrentDictionary&lt;string, ConcurrentBag&lt;long&gt;&gt; GetMethodExecutionDurations()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.concurrent.concurrentdictionary-2">ConcurrentDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.concurrent.concurrentbag-1">ConcurrentBag</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>&gt;&gt;</td>
+        <td><p>A concurrent dictionary containing method execution durations.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_KalshiAPI_KalshiAPIService_GetMethodPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/KalshiAPI/KalshiAPIService.cs/#L2295">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetMethodPerformanceMetrics_" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodPerformanceMetrics*"></a>
+  <h4 id="KalshiBotAPI_KalshiAPI_KalshiAPIService_GetMethodPerformanceMetrics" data-uid="KalshiBotAPI.KalshiAPI.KalshiAPIService.GetMethodPerformanceMetrics">GetMethodPerformanceMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets aggregated performance metrics for method executions.
+Returns statistics like average, min, max execution times for each method.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;string, (int Count, double AverageMs, long MinMs, long MaxMs)&gt; GetMethodPerformanceMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, (<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.count">Count</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.averagems">AverageMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.minms">MinMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.maxms">MaxMs</a>)&gt;</td>
+        <td><p>A dictionary containing aggregated method performance metrics.</p>
 </td>
       </tr>
     </tbody>

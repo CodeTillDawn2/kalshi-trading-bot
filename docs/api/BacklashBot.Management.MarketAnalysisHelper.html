@@ -131,7 +131,7 @@ from raw market snapshots by filtering markets and processing them into valid ti
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_MarketAnalysisHelper__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_TradingStrategies_Classification_Interfaces_ISnapshotPeriodHelper_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_MarketAnalysisHelper__.md&amp;value=---%0Auid%3A%20BacklashBot.Management.MarketAnalysisHelper.%23ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory%2CTradingStrategies.Classification.Interfaces.ISnapshotPeriodHelper%2CBacklashBot.Services.Interfaces.ITradingSnapshotService%2CMicrosoft.Extensions.Options.IOptions%7BBacklashDTOs.Configuration.ExecutionConfig%7D%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Management.MarketAnalysisHelper%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketAnalysisHelper.cs/#L34">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketAnalysisHelper.cs/#L37">View Source</a>
   </span>
   <a id="BacklashBot_Management_MarketAnalysisHelper__ctor_" data-uid="BacklashBot.Management.MarketAnalysisHelper.#ctor*"></a>
   <h4 id="BacklashBot_Management_MarketAnalysisHelper__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_TradingStrategies_Classification_Interfaces_ISnapshotPeriodHelper_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__Microsoft_Extensions_Logging_ILogger_BacklashBot_Management_MarketAnalysisHelper__" data-uid="BacklashBot.Management.MarketAnalysisHelper.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,TradingStrategies.Classification.Interfaces.ISnapshotPeriodHelper,BacklashBot.Services.Interfaces.ITradingSnapshotService,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig},Microsoft.Extensions.Logging.ILogger{BacklashBot.Management.MarketAnalysisHelper})">MarketAnalysisHelper(IServiceScopeFactory, ISnapshotPeriodHelper, ITradingSnapshotService, IOptions&lt;ExecutionConfig&gt;, ILogger&lt;MarketAnalysisHelper&gt;)</h4>
@@ -191,7 +191,7 @@ from raw market snapshots by filtering markets and processing them into valid ti
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_MarketAnalysisHelper_GenerateSnapshotGroups.md&amp;value=---%0Auid%3A%20BacklashBot.Management.MarketAnalysisHelper.GenerateSnapshotGroups%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketAnalysisHelper.cs/#L61">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketAnalysisHelper.cs/#L64">View Source</a>
   </span>
   <a id="BacklashBot_Management_MarketAnalysisHelper_GenerateSnapshotGroups_" data-uid="BacklashBot.Management.MarketAnalysisHelper.GenerateSnapshotGroups*"></a>
   <h4 id="BacklashBot_Management_MarketAnalysisHelper_GenerateSnapshotGroups" data-uid="BacklashBot.Management.MarketAnalysisHelper.GenerateSnapshotGroups">GenerateSnapshotGroups()</h4>
@@ -216,6 +216,39 @@ and processes them into valid time periods for storage.</p>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
         <td><p>A task representing the snapshot group generation operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_MarketAnalysisHelper_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Management.MarketAnalysisHelper.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Management/MarketAnalysisHelper.cs/#L173">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_MarketAnalysisHelper_GetPerformanceMetrics_" data-uid="BacklashBot.Management.MarketAnalysisHelper.GetPerformanceMetrics*"></a>
+  <h4 id="BacklashBot_Management_MarketAnalysisHelper_GetPerformanceMetrics" data-uid="BacklashBot.Management.MarketAnalysisHelper.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets current performance metrics for the market analysis helper.
+Returns processing statistics and error counts.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (int TotalMarketsProcessed, long TotalProcessingTimeMs, double AverageTimePerMarketMs, int ErrorCount) GetPerformanceMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int64,system.double,system.int32-.totalmarketsprocessed">TotalMarketsProcessed</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int64,system.double,system.int32-.totalprocessingtimems">TotalProcessingTimeMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int64,system.double,system.int32-.averagetimepermarketms">AverageTimePerMarketMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.int64,system.double,system.int32-.errorcount">ErrorCount</a>)</td>
+        <td><p>A tuple containing total markets processed, total processing time in milliseconds, average time per market, and error count.</p>
 </td>
       </tr>
     </tbody>

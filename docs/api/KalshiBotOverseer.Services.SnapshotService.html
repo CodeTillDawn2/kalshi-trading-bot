@@ -128,7 +128,7 @@ market hours, and recorded hours percentages, and returns structured data for an
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService__ctor_KalshiBotData_Data_Interfaces_IKalshiBotContext_.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.%23ctor(KalshiBotData.Data.Interfaces.IKalshiBotContext)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L21">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L26">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Services_SnapshotService__ctor_" data-uid="KalshiBotOverseer.Services.SnapshotService.#ctor*"></a>
   <h4 id="KalshiBotOverseer_Services_SnapshotService__ctor_KalshiBotData_Data_Interfaces_IKalshiBotContext_" data-uid="KalshiBotOverseer.Services.SnapshotService.#ctor(KalshiBotData.Data.Interfaces.IKalshiBotContext)">SnapshotService(IKalshiBotContext)</h4>
@@ -161,10 +161,134 @@ market hours, and recorded hours percentages, and returns structured data for an
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_ClearAggregationMetrics.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.ClearAggregationMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L250">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_SnapshotService_ClearAggregationMetrics_" data-uid="KalshiBotOverseer.Services.SnapshotService.ClearAggregationMetrics*"></a>
+  <h4 id="KalshiBotOverseer_Services_SnapshotService_ClearAggregationMetrics" data-uid="KalshiBotOverseer.Services.SnapshotService.ClearAggregationMetrics">ClearAggregationMetrics()</h4>
+  <div class="markdown level1 summary"><p>Clears all recorded aggregation times and resets counters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearAggregationMetrics()</code></pre>
+  </div>
+  <h5 id="KalshiBotOverseer_Services_SnapshotService_ClearAggregationMetrics_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method resets the performance metrics collection, useful for starting
+fresh measurements or clearing accumulated data.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetAggregationCount.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetAggregationCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L238">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_SnapshotService_GetAggregationCount_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetAggregationCount*"></a>
+  <h4 id="KalshiBotOverseer_Services_SnapshotService_GetAggregationCount" data-uid="KalshiBotOverseer.Services.SnapshotService.GetAggregationCount">GetAggregationCount()</h4>
+  <div class="markdown level1 summary"><p>Gets the number of aggregation operations performed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int GetAggregationCount()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><p>The count of aggregation operations.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetAggregationStatistics.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetAggregationStatistics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L212">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_SnapshotService_GetAggregationStatistics_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetAggregationStatistics*"></a>
+  <h4 id="KalshiBotOverseer_Services_SnapshotService_GetAggregationStatistics" data-uid="KalshiBotOverseer.Services.SnapshotService.GetAggregationStatistics">GetAggregationStatistics()</h4>
+  <div class="markdown level1 summary"><p>Gets performance statistics for snapshot aggregation operations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (int Count, double AverageMs, long MinMs, long MaxMs) GetAggregationStatistics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.count">Count</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.averagems">AverageMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.minms">MinMs</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.int32,system.double,system.int64,system.int64-.maxms">MaxMs</a>)</td>
+        <td><p>A tuple containing count, average time, min time, and max time in milliseconds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="KalshiBotOverseer_Services_SnapshotService_GetAggregationStatistics_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Returns comprehensive statistics about the performance of snapshot aggregation operations.
+If no aggregations have been performed, returns (0, 0, 0, 0).</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetAggregationTimes.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetAggregationTimes%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L199">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_SnapshotService_GetAggregationTimes_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetAggregationTimes*"></a>
+  <h4 id="KalshiBotOverseer_Services_SnapshotService_GetAggregationTimes" data-uid="KalshiBotOverseer.Services.SnapshotService.GetAggregationTimes">GetAggregationTimes()</h4>
+  <div class="markdown level1 summary"><p>Gets all recorded aggregation times in milliseconds.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long[] GetAggregationTimes()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>[]</td>
+        <td><p>An array of aggregation times in milliseconds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="KalshiBotOverseer_Services_SnapshotService_GetAggregationTimes_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method provides access to the performance metrics collected during snapshot aggregation operations.
+Each value represents the time taken for a single aggregation operation.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L31">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L36">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync*"></a>
   <h4 id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync">GetSnapshotGroupsDataAsync()</h4>
@@ -197,7 +321,7 @@ into aggregated market data without related market information.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync(System.Collections.Generic.List%7BBacklashDTOs.Data.SnapshotGroupDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L47">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L52">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync*"></a>
   <h4 id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync(System.Collections.Generic.List{BacklashDTOs.Data.SnapshotGroupDTO})">GetSnapshotGroupsDataAsync(List&lt;SnapshotGroupDTO&gt;)</h4>
@@ -248,7 +372,7 @@ Groups snapshots by market ticker and calculates total recorded hours and other 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__System_Collections_Generic_List_BacklashDTOs_Data_MarketDTO__.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync(System.Collections.Generic.List%7BBacklashDTOs.Data.SnapshotGroupDTO%7D%2CSystem.Collections.Generic.List%7BBacklashDTOs.Data.MarketDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L104">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L116">View Source</a>
   </span>
   <a id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync*"></a>
   <h4 id="KalshiBotOverseer_Services_SnapshotService_GetSnapshotGroupsDataAsync_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__System_Collections_Generic_List_BacklashDTOs_Data_MarketDTO__" data-uid="KalshiBotOverseer.Services.SnapshotService.GetSnapshotGroupsDataAsync(System.Collections.Generic.List{BacklashDTOs.Data.SnapshotGroupDTO},System.Collections.Generic.List{BacklashDTOs.Data.MarketDTO})">GetSnapshotGroupsDataAsync(List&lt;SnapshotGroupDTO&gt;, List&lt;MarketDTO&gt;)</h4>
@@ -297,6 +421,38 @@ using the provided market data for accurate calculations.</p>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;&gt;</td>
         <td><p>A task representing the asynchronous operation, containing a list of anonymous objects with aggregated snapshot data per market.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotOverseer_Services_SnapshotService_GetTotalAggregationTime.md&amp;value=---%0Auid%3A%20KalshiBotOverseer.Services.SnapshotService.GetTotalAggregationTime%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotOverseer/Services/SnapshotService.cs/#L229">View Source</a>
+  </span>
+  <a id="KalshiBotOverseer_Services_SnapshotService_GetTotalAggregationTime_" data-uid="KalshiBotOverseer.Services.SnapshotService.GetTotalAggregationTime*"></a>
+  <h4 id="KalshiBotOverseer_Services_SnapshotService_GetTotalAggregationTime" data-uid="KalshiBotOverseer.Services.SnapshotService.GetTotalAggregationTime">GetTotalAggregationTime()</h4>
+  <div class="markdown level1 summary"><p>Gets the total time spent on all aggregation operations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long GetTotalAggregationTime()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td><p>The total aggregation time in milliseconds.</p>
 </td>
       </tr>
     </tbody>

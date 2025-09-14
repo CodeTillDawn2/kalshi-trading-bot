@@ -122,20 +122,20 @@
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_TradingOverseer__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Logging_ILogger_TradingStrategies_TradingOverseer__.md&amp;value=---%0Auid%3A%20TradingStrategies.TradingOverseer.%23ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.Services.Interfaces.ITradingSnapshotService%2CMicrosoft.Extensions.Logging.ILogger%7BTradingStrategies.TradingOverseer%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_TradingOverseer__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_TradingStrategies_TradingOverseer__.md&amp;value=---%0Auid%3A%20TradingStrategies.TradingOverseer.%23ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory%2CBacklashBot.Services.Interfaces.ITradingSnapshotService%2CMicrosoft.Extensions.Configuration.IConfiguration%2CMicrosoft.Extensions.Logging.ILogger%7BTradingStrategies.TradingOverseer%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/TradingOverseer.cs/#L40">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/TradingOverseer.cs/#L42">View Source</a>
   </span>
   <a id="TradingStrategies_TradingOverseer__ctor_" data-uid="TradingStrategies.TradingOverseer.#ctor*"></a>
-  <h4 id="TradingStrategies_TradingOverseer__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Logging_ILogger_TradingStrategies_TradingOverseer__" data-uid="TradingStrategies.TradingOverseer.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.ITradingSnapshotService,Microsoft.Extensions.Logging.ILogger{TradingStrategies.TradingOverseer})">TradingOverseer(IServiceScopeFactory, ITradingSnapshotService, ILogger&lt;TradingOverseer&gt;)</h4>
+  <h4 id="TradingStrategies_TradingOverseer__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_ITradingSnapshotService_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_TradingStrategies_TradingOverseer__" data-uid="TradingStrategies.TradingOverseer.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.ITradingSnapshotService,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{TradingStrategies.TradingOverseer})">TradingOverseer(IServiceScopeFactory, ITradingSnapshotService, IConfiguration, ILogger&lt;TradingOverseer&gt;)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the TradingOverseer class.
 Sets up dependencies for simulation, equity calculation, and snapshot services.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, ILogger&lt;TradingOverseer&gt; logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, IConfiguration configuration, ILogger&lt;TradingOverseer&gt; logger)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -160,6 +160,12 @@ Sets up dependencies for simulation, equity calculation, and snapshot services.<
 </td>
       </tr>
       <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.configuration.iconfiguration">IConfiguration</a></td>
+        <td><span class="parametername">configuration</span></td>
+        <td><p>The configuration instance for reading settings from appsettings.json.</p>
+</td>
+      </tr>
+      <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="TradingStrategies.TradingOverseer.html">TradingOverseer</a>&gt;</td>
         <td><span class="parametername">logger</span></td>
         <td><p>Logger for recording warnings and errors.</p>
@@ -174,7 +180,7 @@ Sets up dependencies for simulation, equity calculation, and snapshot services.<
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_TradingOverseer_TestScenario_TradingStrategies_Strategies_Scenario_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_System_Double_BacklashDTOs_Data_SnapshotGroupDTO_.md&amp;value=---%0Auid%3A%20TradingStrategies.TradingOverseer.TestScenario(TradingStrategies.Strategies.Scenario%2CSystem.Collections.Generic.List%7BBacklashDTOs.MarketSnapshot%7D%2CSystem.Boolean%2CSystem.Double%2CBacklashDTOs.Data.SnapshotGroupDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/TradingOverseer.cs/#L65">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/TradingOverseer.cs/#L67">View Source</a>
   </span>
   <a id="TradingStrategies_TradingOverseer_TestScenario_" data-uid="TradingStrategies.TradingOverseer.TestScenario*"></a>
   <h4 id="TradingStrategies_TradingOverseer_TestScenario_TradingStrategies_Strategies_Scenario_System_Collections_Generic_List_BacklashDTOs_MarketSnapshot__System_Boolean_System_Double_BacklashDTOs_Data_SnapshotGroupDTO_" data-uid="TradingStrategies.TradingOverseer.TestScenario(TradingStrategies.Strategies.Scenario,System.Collections.Generic.List{BacklashDTOs.MarketSnapshot},System.Boolean,System.Double,BacklashDTOs.Data.SnapshotGroupDTO)">TestScenario(Scenario, List&lt;MarketSnapshot&gt;, bool, double, SnapshotGroupDTO?)</h4>
@@ -259,7 +265,7 @@ and asynchronous execution for high-throughput scenarios.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_TradingOverseer.md&amp;value=---%0Auid%3A%20TradingStrategies.TradingOverseer%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/TradingOverseer.cs/#L24" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/TradingOverseer.cs/#L25" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>
