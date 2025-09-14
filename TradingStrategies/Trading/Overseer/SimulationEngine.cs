@@ -32,19 +32,22 @@ namespace TradingStrategies.Trading.Overseer
     {
         private readonly MarketTypeService _marketTypeService;
         private readonly PatternDetectionService _patternDetectionService;
+        private readonly PatternPerformanceMonitor? _performanceMonitor;
 
         /// <summary>
         /// Initializes a new instance of the SimulationEngine with required services.
         /// </summary>
         /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
+        /// <param name="performanceMonitor">Optional performance monitor for recording execution times.</param>
         /// <remarks>
         /// Creates instances of MarketTypeService and PatternDetectionService for
         /// market classification and pattern recognition during simulation.
         /// </remarks>
-        public SimulationEngine(IConfiguration configuration)
+        public SimulationEngine(IConfiguration configuration, PatternPerformanceMonitor? performanceMonitor = null)
         {
             _marketTypeService = new MarketTypeService();
             _patternDetectionService = new PatternDetectionService(configuration);
+            _performanceMonitor = performanceMonitor;
         }
 
        /// <summary>
@@ -56,6 +59,11 @@ namespace TradingStrategies.Trading.Overseer
        /// Gets the approximate memory usage difference of the last simulation run.
        /// </summary>
        public long LastMemoryUsed { get; private set; }
+
+       /// <summary>
+       /// Gets the pattern performance monitor for accessing performance metrics.
+       /// </summary>
+       public PatternPerformanceMonitor? PerformanceMonitor => _performanceMonitor;
 
        /// <summary>
         /// Executes a complete trading simulation against a sequence of market snapshots.
@@ -943,10 +951,25 @@ namespace TradingStrategies.Trading.Overseer
         /// Delegates pattern detection to the specialized PatternDetectionService.
         /// Patterns are used in strategy decision making and logged in event records
         /// for analysis of pattern-based trading signals.
+        /// Records comprehensive performance metrics to performance monitor if available.
         /// </remarks>
         private List<BacklashPatterns.PatternDefinitions.PatternDefinition> DetectPatterns(MarketSnapshot snapshot)
         {
-            return _patternDetectionService.DetectPatterns(snapshot);
+            var result = _patternDetectionService.DetectPatterns(snapshot);
+
+            // Record comprehensive performance metrics if monitor is available and metrics were collected
+            if (_performanceMonitor != null && result.ExecutionTimeMs.HasValue)
+            {
+                _performanceMonitor.RecordPatternDetectionMetrics(
+                    methodName: "PatternDetectionService.DetectPatterns",
+                    totalDetectionTimeMs: result.ExecutionTimeMs.Value,
+                    totalCandlesProcessed: result.TotalCandlesProcessed ?? 0,
+                    totalPatternsFound: result.TotalPatternsFound ?? 0,
+                    patternCheckTimes: result.PatternCheckTimes
+                );
+            }
+
+            return result.Patterns;
         }
     }
 }

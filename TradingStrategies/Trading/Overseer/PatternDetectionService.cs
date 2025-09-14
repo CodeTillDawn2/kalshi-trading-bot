@@ -5,6 +5,17 @@ using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Represents the comprehensive result of pattern detection including patterns and performance metrics.
+/// </summary>
+public record PatternDetectionResult(
+    List<BacklashPatterns.PatternDefinitions.PatternDefinition> Patterns,
+    long? ExecutionTimeMs,
+    int? TotalCandlesProcessed = null,
+    int? TotalPatternsFound = null,
+    Dictionary<string, long>? PatternCheckTimes = null
+);
+
 namespace TradingStrategies.Trading.Overseer
 {
     /// <summary>
@@ -46,6 +57,14 @@ namespace TradingStrategies.Trading.Overseer
         /// Maximum degree of parallelism for pattern checks.
         /// </summary>
         public int MaxDegreeOfParallelism { get; set; }
+
+        /// <summary>
+        /// Whether to enable detailed pattern detection performance metrics collection and logging.
+        /// When disabled, no performance metrics or logging occurs. When enabled, comprehensive
+        /// metrics including execution time, candles processed, patterns found, and per-pattern
+        /// timing are collected and logged.
+        /// </summary>
+        public bool EnablePatternDetectionMetrics { get; set; }
     }
 
     /// <summary>
@@ -118,7 +137,7 @@ namespace TradingStrategies.Trading.Overseer
         /// that can inform trading strategy decisions.
         /// </summary>
         /// <param name="snapshot">The market snapshot containing recent candlestick data and market information.</param>
-        /// <returns>A list of detected pattern definitions representing significant technical formations.</returns>
+        /// <returns>A comprehensive result containing detected patterns and detailed performance metrics.</returns>
         /// <remarks>
         /// The detection process involves:
         /// - Converting PseudoCandlesticks to CandleMids format for pattern analysis
@@ -141,12 +160,12 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         /// <exception cref="ArgumentNullException">Thrown when snapshot is null (handled internally).</exception>
         /// <exception cref="Exception">Any pattern detection errors are caught and logged internally.</exception>
-        public List<BacklashPatterns.PatternDefinitions.PatternDefinition> DetectPatterns(MarketSnapshot snapshot)
+        public PatternDetectionResult DetectPatterns(MarketSnapshot snapshot)
         {
             // Validate input data availability
             if (snapshot.RecentCandlesticks == null || snapshot.RecentCandlesticks.Count == 0)
             {
-                return new List<BacklashPatterns.PatternDefinitions.PatternDefinition>();
+                return new PatternDetectionResult(new List<BacklashPatterns.PatternDefinitions.PatternDefinition>(), null);
             }
 
             var stopwatch = Stopwatch.StartNew();
@@ -166,8 +185,8 @@ namespace TradingStrategies.Trading.Overseer
                     MaxDegreeOfParallelism = _config.MaxDegreeOfParallelism
                 };
 
-                // Create metrics collector for detailed performance tracking
-                var metrics = new BacklashPatterns.PatternDetectionMetrics();
+                // Create metrics collector for detailed performance tracking (conditionally)
+                var metrics = _config.EnablePatternDetectionMetrics ? new BacklashPatterns.PatternDetectionMetrics() : null;
 
                 // Execute pattern detection asynchronously with custom config and metrics
                 var patterns = PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics).GetAwaiter().GetResult();
@@ -175,38 +194,69 @@ namespace TradingStrategies.Trading.Overseer
                 // Filter patterns based on configured pattern types if specified
                 var filteredPatterns = FilterPatternsByTypes(patterns, _config.PatternTypes);
 
-                // Get metrics summary for logging
-                var metricsSummary = metrics.GetSummary();
-
                 // Return the most recent set of detected patterns if any were found
                 if (filteredPatterns.Keys.Count > 0)
                 {
                     stopwatch.Stop();
-                    Console.WriteLine($"Pattern detection completed in {stopwatch.ElapsedMilliseconds} ms for {snapshot.MarketTicker}");
-                    Console.WriteLine($"Detailed metrics: Total time {metricsSummary.TotalDetectionTimeMs} ms, Candles processed: {metricsSummary.TotalCandlesProcessed}, Patterns found: {metricsSummary.TotalPatternsFound}");
 
-                    // Log pattern check times if any
-                    if (metricsSummary.PatternCheckTimes.Any())
+                    // Create result with comprehensive metrics
+                    PatternDetectionResult result;
+                    if (_config.EnablePatternDetectionMetrics && metrics != null)
                     {
-                        Console.WriteLine("Pattern check times (ms):");
-                        foreach (var kvp in metricsSummary.PatternCheckTimes.OrderByDescending(x => x.Value))
+                        var metricsSummary = metrics.GetSummary();
+                        Console.WriteLine($"Pattern detection completed in {stopwatch.ElapsedMilliseconds} ms for {snapshot.MarketTicker}");
+                        Console.WriteLine($"Detailed metrics: Total time {metricsSummary.TotalDetectionTimeMs} ms, Candles processed: {metricsSummary.TotalCandlesProcessed}, Patterns found: {metricsSummary.TotalPatternsFound}");
+
+                        // Log pattern check times if any
+                        if (metricsSummary.PatternCheckTimes.Any())
                         {
-                            Console.WriteLine($"  {kvp.Key}: {TimeSpan.FromTicks(kvp.Value).TotalMilliseconds:F2} ms");
+                            Console.WriteLine("Pattern check times (ms):");
+                            foreach (var kvp in metricsSummary.PatternCheckTimes.OrderByDescending(x => x.Value))
+                            {
+                                Console.WriteLine($"  {kvp.Key}: {TimeSpan.FromTicks(kvp.Value).TotalMilliseconds:F2} ms");
+                            }
                         }
+
+                        result = new PatternDetectionResult(
+                            Patterns: filteredPatterns[filteredPatterns.Keys.Last()],
+                            ExecutionTimeMs: stopwatch.ElapsedMilliseconds,
+                            TotalCandlesProcessed: metricsSummary.TotalCandlesProcessed,
+                            TotalPatternsFound: metricsSummary.TotalPatternsFound,
+                            PatternCheckTimes: metricsSummary.PatternCheckTimes.ToDictionary(
+                                kvp => kvp.Key,
+                                kvp => (long)TimeSpan.FromTicks(kvp.Value).TotalMilliseconds
+                            )
+                        );
+                    }
+                    else
+                    {
+                        result = new PatternDetectionResult(
+                            Patterns: filteredPatterns[filteredPatterns.Keys.Last()],
+                            ExecutionTimeMs: null,
+                            TotalCandlesProcessed: null,
+                            TotalPatternsFound: null,
+                            PatternCheckTimes: null
+                        );
                     }
 
-                    return filteredPatterns[filteredPatterns.Keys.Last()];
+                    return result;
                 }
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                // Log pattern detection errors while maintaining system stability
-                Console.WriteLine($"Error detecting patterns: {ex.Message} (took {stopwatch.ElapsedMilliseconds} ms)");
+                // Log pattern detection errors while maintaining system stability (only if metrics enabled)
+                if (_config.EnablePatternDetectionMetrics)
+                {
+                    Console.WriteLine($"Error detecting patterns: {ex.Message} (took {stopwatch.ElapsedMilliseconds} ms)");
+                }
             }
 
             // Return empty list as fallback for any processing failures
-            return new List<BacklashPatterns.PatternDefinitions.PatternDefinition>();
+            return new PatternDetectionResult(
+                new List<BacklashPatterns.PatternDefinitions.PatternDefinition>(),
+                _config.EnablePatternDetectionMetrics ? stopwatch.ElapsedMilliseconds : null
+            );
         }
 
         /// <summary>
@@ -244,17 +294,17 @@ namespace TradingStrategies.Trading.Overseer
             return filtered;
         }
 
-        /// <returns>A task representing the asynchronous operation, with a list of detected pattern definitions.</returns>
+        /// <returns>A task representing the asynchronous operation with comprehensive pattern detection results.</returns>
         /// <remarks>
         /// This async version is suitable for high-throughput scenarios to avoid blocking the calling thread.
         /// Uses the enhanced configuration and metrics for optimal performance.
         /// </remarks>
-        public async Task<List<BacklashPatterns.PatternDefinitions.PatternDefinition>> DetectPatternsAsync(MarketSnapshot snapshot)
+        public async Task<PatternDetectionResult> DetectPatternsAsync(MarketSnapshot snapshot)
         {
             // Validate input data availability
             if (snapshot.RecentCandlesticks == null || snapshot.RecentCandlesticks.Count == 0)
             {
-                return new List<BacklashPatterns.PatternDefinitions.PatternDefinition>();
+                return new PatternDetectionResult(new List<BacklashPatterns.PatternDefinitions.PatternDefinition>(), null);
             }
 
             try
@@ -272,8 +322,8 @@ namespace TradingStrategies.Trading.Overseer
                     MaxDegreeOfParallelism = _config.MaxDegreeOfParallelism
                 };
 
-                // Create metrics collector for detailed performance tracking
-                var metrics = new BacklashPatterns.PatternDetectionMetrics();
+                // Create metrics collector for detailed performance tracking (conditionally)
+                var metrics = _config.EnablePatternDetectionMetrics ? new BacklashPatterns.PatternDetectionMetrics() : null;
 
                 // Execute pattern detection asynchronously with custom config and metrics
                 var patterns = await PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics);
@@ -281,26 +331,52 @@ namespace TradingStrategies.Trading.Overseer
                 // Filter patterns based on configured pattern types if specified
                 var filteredPatterns = FilterPatternsByTypes(patterns, _config.PatternTypes);
 
-                // Get metrics summary for logging
-                var metricsSummary = metrics.GetSummary();
-
-                Console.WriteLine($"Async pattern detection completed in {metricsSummary.TotalDetectionTimeMs} ms for {snapshot.MarketTicker}");
-                Console.WriteLine($"Detailed metrics: Candles processed: {metricsSummary.TotalCandlesProcessed}, Patterns found: {metricsSummary.TotalPatternsFound}");
-
-                // Return the most recent set of detected patterns if any were found
+                // Create result with comprehensive metrics
                 if (filteredPatterns.Keys.Count > 0)
                 {
-                    return filteredPatterns[filteredPatterns.Keys.Last()];
+                    PatternDetectionResult result;
+                    if (_config.EnablePatternDetectionMetrics && metrics != null)
+                    {
+                        var metricsSummary = metrics.GetSummary();
+                        Console.WriteLine($"Async pattern detection completed in {metricsSummary.TotalDetectionTimeMs} ms for {snapshot.MarketTicker}");
+                        Console.WriteLine($"Detailed metrics: Candles processed: {metricsSummary.TotalCandlesProcessed}, Patterns found: {metricsSummary.TotalPatternsFound}");
+
+                        result = new PatternDetectionResult(
+                            Patterns: filteredPatterns[filteredPatterns.Keys.Last()],
+                            ExecutionTimeMs: metricsSummary.TotalDetectionTimeMs,
+                            TotalCandlesProcessed: metricsSummary.TotalCandlesProcessed,
+                            TotalPatternsFound: metricsSummary.TotalPatternsFound,
+                            PatternCheckTimes: metricsSummary.PatternCheckTimes.ToDictionary(
+                                kvp => kvp.Key,
+                                kvp => (long)TimeSpan.FromTicks(kvp.Value).TotalMilliseconds
+                            )
+                        );
+                    }
+                    else
+                    {
+                        result = new PatternDetectionResult(
+                            Patterns: filteredPatterns[filteredPatterns.Keys.Last()],
+                            ExecutionTimeMs: null,
+                            TotalCandlesProcessed: null,
+                            TotalPatternsFound: null,
+                            PatternCheckTimes: null
+                        );
+                    }
+
+                    return result;
                 }
             }
             catch (Exception ex)
             {
-                // Log pattern detection errors while maintaining system stability
-                Console.WriteLine($"Error detecting patterns asynchronously: {ex.Message}");
+                // Log pattern detection errors while maintaining system stability (only if metrics enabled)
+                if (_config.EnablePatternDetectionMetrics)
+                {
+                    Console.WriteLine($"Error detecting patterns asynchronously: {ex.Message}");
+                }
             }
 
             // Return empty list as fallback for any processing failures
-            return new List<BacklashPatterns.PatternDefinitions.PatternDefinition>();
+            return new PatternDetectionResult(new List<BacklashPatterns.PatternDefinitions.PatternDefinition>(), null);
         }
     }
 }

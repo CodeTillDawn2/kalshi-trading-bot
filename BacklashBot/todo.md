@@ -580,7 +580,7 @@ CS1571: Duplicate XML param tags
 - [ ] userdatatimestamp endpoint (https://docs.kalshi.com/api-reference/get-user-data-timestamp). Make system that monitors this and, beyond a defined threshold, cancels all resting orders and shuts down until it improves. 
 
 
-# v0.2.6
+# v0.3.0
 - [ ] Automate data cleanup
 - [ ] Make database logging of debug work
 - [ ] Was forced to upgrade to market lifecycle v2, need to update code to capture new fields if necessary
