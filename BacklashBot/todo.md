@@ -539,6 +539,30 @@ This document outlines the performance metrics tracked across various classes in
 
 
 
+# Important warnings to fix
+XML Comment Issues in BacklashDTOs/MarketSnapshot.cs:
+
+Multiple CS1570 warnings for badly formed XML comments (e.g., undefined entity '&L', expected identifiers, mismatched tags)
+These appear to be malformed documentation comments that need fixing for proper IntelliSense and documentation generation
+Nullability Warnings (Extensive):
+
+CS8600/CS8625: Converting null literals to non-nullable types (primarily in KalshiBotTests)
+CS8602/CS8604: Dereference of possibly null references (in TradingGUI and tests)
+CS8620/CS8622: Nullability mismatches in method parameters and delegates
+CS8629: Nullable value types that may be null
+These indicate potential runtime null reference exceptions and should be addressed for code safety
+Async Method Issues:
+
+CS1998: Several async methods lack 'await' operators and run synchronously (in KalshiAPIServiceTests, TradingGUI)
+CS4014: Unawaited async calls that continue execution before completion
+Other Notable Warnings:
+
+CS8618: Non-nullable fields not initialized in constructors (consider 'required' modifier)
+CS0649: Fields never assigned (in test classes)
+CS0168: Unused variables
+CS1571: Duplicate XML param tags
+
+
 # Backlog
 - [ ] Fix build warnings
 - [ ] Change to "fractional cents"
