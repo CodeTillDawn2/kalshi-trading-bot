@@ -25,10 +25,10 @@ namespace SimulatorWinForms
     /// </remarks>
     public partial class SnapshotViewer : UserControl
     {
-        private MarketSnapshot currentSnapshot;
-        private List<MarketSnapshot> historySnapshots;
+        private MarketSnapshot? currentSnapshot;
+        private List<MarketSnapshot>? historySnapshots;
         private int currentIndex;
-        private List<string> memos;
+        private List<string>? memos;
         private string memoText = "";
         /// <summary>
         /// Flag to prevent recursive conflicts between chart update operations.
@@ -44,9 +44,9 @@ namespace SimulatorWinForms
         private List<PricePoint> _historicalPatternDataPoints = new List<PricePoint>();
         private readonly KalshiBotContext _context;
 
-        public Action BackAction { get; set; }
+        public Action? BackAction { get; set; }
 
-        public string CacheDir { get; set; }  // New property to receive cache dir from MainForm
+        public string? CacheDir { get; set; }  // New property to receive cache dir from MainForm
 
         /// <summary>
         /// Original control width in pixels used as baseline for responsive scaling calculations.
@@ -111,7 +111,7 @@ namespace SimulatorWinForms
 
             // Initialize database context and load configuration
             var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>
+                .AddInMemoryCollection(new Dictionary<string, string?>
                 {
                     ["ConnectionStrings:DefaultConnection"] = "Server=localhost;Database=KalshiBot;Trusted_Connection=True;"
                 })
@@ -360,7 +360,7 @@ namespace SimulatorWinForms
         /// </summary>
         private (double xMin, double xMax, double yMin, double yMax) _secondaryChartPanStartLimits;
 
-        private void PriceChart_MouseDown(object sender, MouseEventArgs e)
+        private void PriceChart_MouseDown(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -375,7 +375,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void PriceChart_MouseMove(object sender, MouseEventArgs e)
+        private void PriceChart_MouseMove(object? sender, MouseEventArgs e)
         {
             if (_isMainChartPanning && e.Button == MouseButtons.Right)
             {
@@ -403,7 +403,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void PriceChart_MouseUp(object sender, MouseEventArgs e)
+        private void PriceChart_MouseUp(object? sender, MouseEventArgs e)
         {
             if (_isMainChartPanning)
             {
@@ -413,7 +413,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void SecondaryChart_MouseDown(object sender, MouseEventArgs e)
+        private void SecondaryChart_MouseDown(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -426,7 +426,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void SecondaryChart_MouseMove(object sender, MouseEventArgs e)
+        private void SecondaryChart_MouseMove(object? sender, MouseEventArgs e)
         {
             if (_isSecondaryChartPanning && e.Button == MouseButtons.Right)
             {
@@ -455,7 +455,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void SecondaryChart_MouseUp(object sender, MouseEventArgs e)
+        private void SecondaryChart_MouseUp(object? sender, MouseEventArgs e)
         {
             if (_isSecondaryChartPanning)
             {
@@ -466,17 +466,17 @@ namespace SimulatorWinForms
         }
 
         // Cursor line and click-to-jump functionality
-        private void PriceChart_MouseMove_Cursor(object sender, MouseEventArgs e)
+        private void PriceChart_MouseMove_Cursor(object? sender, MouseEventArgs e)
         {
             UpdateCursorLine(priceChart, e);
         }
 
-        private void PriceChart_MouseLeave(object sender, EventArgs e)
+        private void PriceChart_MouseLeave(object? sender, EventArgs e)
         {
             RemoveCursorLine(priceChart);
         }
 
-        private void PriceChart_MouseDown_Cursor(object sender, MouseEventArgs e)
+        private void PriceChart_MouseDown_Cursor(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -484,17 +484,17 @@ namespace SimulatorWinForms
             }
         }
 
-        private void SecondaryChart_MouseMove_Cursor(object sender, MouseEventArgs e)
+        private void SecondaryChart_MouseMove_Cursor(object? sender, MouseEventArgs e)
         {
             UpdateCursorLine(secondaryChart, e);
         }
 
-        private void SecondaryChart_MouseLeave(object sender, EventArgs e)
+        private void SecondaryChart_MouseLeave(object? sender, EventArgs e)
         {
             RemoveCursorLine(secondaryChart);
         }
 
-        private void SecondaryChart_MouseDown_Cursor(object sender, MouseEventArgs e)
+        private void SecondaryChart_MouseDown_Cursor(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -543,6 +543,7 @@ namespace SimulatorWinForms
         /// </remarks>
         private async void JumpToClickedPosition(ScottPlot.FormsPlot chart, MouseEventArgs e)
         {
+            await Task.Yield();
             if (historySnapshots == null || historySnapshots.Count == 0) return;
 
             // Get clicked position in data coordinates
@@ -596,7 +597,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void PriceChart_MouseWheel(object sender, MouseEventArgs e)
+        private void PriceChart_MouseWheel(object? sender, MouseEventArgs e)
         {
             if (currentSnapshot == null || !_fullChartDataRange.HasValue) return;
 
@@ -650,7 +651,7 @@ namespace SimulatorWinForms
             priceChart.Refresh();
         }
 
-        private void SecondaryChart_MouseWheel(object sender, MouseEventArgs e)
+        private void SecondaryChart_MouseWheel(object? sender, MouseEventArgs e)
         {
             if (currentSnapshot == null || !_fullChartDataRange.HasValue) return;
 
@@ -704,7 +705,7 @@ namespace SimulatorWinForms
             secondaryChart.Refresh();
         }
 
-        private void NavigationTimer_Tick(object sender, EventArgs e)
+        private void NavigationTimer_Tick(object? sender, EventArgs e)
         {
             // Stop the timer and reset navigation flag
             _chartUpdateTimer.Stop();
@@ -821,7 +822,7 @@ namespace SimulatorWinForms
             }
         }
 
-        private void HandleMouseDown(object sender, MouseEventArgs e)
+        private void HandleMouseDown(object? sender, MouseEventArgs e)
         {
             // Only handle right-click for back action if it's not on a chart control
             if (e.Button == MouseButtons.Right && !(sender is ScottPlot.FormsPlot || sender is System.Windows.Forms.PictureBox))
@@ -895,6 +896,7 @@ namespace SimulatorWinForms
 
         private async void Navigate(int delta)
         {
+            await Task.Yield();
             // Use the fast navigation approach for better performance
             PerformFastNavigation(delta);
         }
@@ -932,7 +934,7 @@ namespace SimulatorWinForms
             // Update the data immediately
             currentIndex = newIndex;
             currentSnapshot = historySnapshots[currentIndex];
-            memoText = memos[newIndex];
+            memoText = memos![newIndex];
 
             // Update position and average cost for current snapshot
             _hypotheticalPositionSize = currentSnapshot.PositionSize;
@@ -1070,13 +1072,13 @@ namespace SimulatorWinForms
             string marketTitle = currentSnapshot.MarketTicker ?? "--";
             try
             {
-                var market = await _context.GetMarketByTicker(currentSnapshot.MarketTicker);
+                var market = await _context.GetMarketByTicker(currentSnapshot!.MarketTicker!);
                 if (market != null && !string.IsNullOrEmpty(market.title))
                 {
                     marketTitle = market.title;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // If database query fails, fall back to ticker
             }
@@ -1223,7 +1225,7 @@ namespace SimulatorWinForms
             toolTip1.SetToolTip(patternsLabel, patternsTooltip);
 
             // Update support/resistance levels count
-            supportValue.Text = currentSnapshot.AllSupportResistanceLevels != null && currentSnapshot.AllSupportResistanceLevels.Count != 1
+            supportValue.Text = currentSnapshot!.AllSupportResistanceLevels != null && currentSnapshot!.AllSupportResistanceLevels.Count != 1
                 ? currentSnapshot.AllSupportResistanceLevels.Count.ToString()
                 : (currentSnapshot.AllSupportResistanceLevels != null && currentSnapshot.AllSupportResistanceLevels.Count == 1
                     ? $"{currentSnapshot.AllSupportResistanceLevels.First().Price}"
@@ -1248,8 +1250,8 @@ namespace SimulatorWinForms
                 {
                     // Check for ScottPlot vertical line types
                     if (plottable.GetType().Name.Contains("VerticalLine") ||
-                        plottable.GetType().FullName.Contains("VerticalLine") ||
-                        plottable.ToString().Contains("Vertical"))
+                        plottable!.GetType().FullName.Contains("VerticalLine") ||
+                        plottable!.ToString().Contains("Vertical"))
                     {
                         priceChart.Plot.Remove(plottable);
                     }
@@ -1269,8 +1271,8 @@ namespace SimulatorWinForms
                     if (plottable != null)
                     {
                         if (plottable.GetType().Name.Contains("VerticalLine") ||
-                            plottable.GetType().FullName.Contains("VerticalLine") ||
-                            plottable.ToString().Contains("Vertical"))
+                            plottable!.GetType().FullName.Contains("VerticalLine") ||
+                            plottable!.ToString().Contains("Vertical"))
                         {
                             secondaryChart.Plot.Remove(plottable);
                         }
@@ -1298,6 +1300,7 @@ namespace SimulatorWinForms
         /// </remarks>
         public async void NavigateToSnapshot(int delta)
         {
+            await Task.Yield();
             // Use fast navigation for better performance
             PerformFastNavigation(delta);
         }
@@ -1456,6 +1459,7 @@ namespace SimulatorWinForms
         /// </remarks>
         private async Task PopulateUIFromSnapshotAsync()
         {
+            await Task.Yield();
             // Clear and repopulate order book with bids and asks
             orderbookGrid.Rows.Clear();
             if (currentSnapshot != null)
@@ -1658,7 +1662,7 @@ namespace SimulatorWinForms
         /// - Only applies scaling when changes are significant (>10% difference)
         /// - Refreshes both primary and secondary charts after scaling
         /// </remarks>
-        private void SnapshotViewer_ResizeEnd(object sender, EventArgs e)
+        private void SnapshotViewer_ResizeEnd(object? sender, EventArgs e)
         {
             // Calculate isotropic scale factor with DPI awareness (more conservative)
             float widthScale = (float)this.Width / OriginalWidth;
@@ -1801,7 +1805,7 @@ namespace SimulatorWinForms
                 else
                 {
                     // User hasn't zoomed - set a reasonable default around current snapshot
-                    DateTime snapshotTime = currentSnapshot.Timestamp;
+                    DateTime snapshotTime = currentSnapshot!.Timestamp;
                     if (snapshotTime == DateTime.MinValue || snapshotTime.Year < 2000)
                     {
                         snapshotTime = DateTime.Now;
@@ -1874,7 +1878,7 @@ namespace SimulatorWinForms
         {
             if (historySnapshots == null || historySnapshots.Count == 0 || currentSnapshot == null) return;
 
-            string market = currentSnapshot.MarketTicker;  // Use ticker from snapshot
+            string market = currentSnapshot!.MarketTicker!;  // Use ticker from snapshot
             DateTime snapshotTime = currentSnapshot.Timestamp;
 
             // Ensure we have a valid timestamp
@@ -1890,7 +1894,7 @@ namespace SimulatorWinForms
                 try
                 {
                     // Render the same chart as MainForm, but without collecting tooltips
-                    Charting.MarketChartRenderer.Render(chart, CacheDir, market, null, collectTooltips: false);
+                    _ = Charting.MarketChartRenderer.Render(chart, CacheDir, market, null, collectTooltips: false);
                 }
                 catch (Exception)
                 {
@@ -1935,7 +1939,7 @@ namespace SimulatorWinForms
             var exitPrices = new List<double>();
             var timePoints = new List<double>();
 
-            foreach (var snapshot in historySnapshots)
+            foreach (var snapshot in historySnapshots!)
             {
                 timePoints.Add(snapshot.Timestamp.ToOADate());
 
@@ -1987,7 +1991,7 @@ namespace SimulatorWinForms
                 var emaPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     if (snapshot.EMA_Medium.HasValue)
                     {
@@ -2012,14 +2016,14 @@ namespace SimulatorWinForms
                 var lowerPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     if (snapshot.BollingerBands_Medium.Upper.HasValue)
                     {
                         timePoints.Add(snapshot.Timestamp.ToOADate());
-                        upperPoints.Add(snapshot.BollingerBands_Medium.Upper.Value);
-                        middlePoints.Add(snapshot.BollingerBands_Medium.Middle.Value);
-                        lowerPoints.Add(snapshot.BollingerBands_Medium.Lower.Value);
+                        upperPoints.Add(snapshot.BollingerBands_Medium.Upper!.Value);
+                        middlePoints.Add(snapshot.BollingerBands_Medium.Middle!.Value);
+                        lowerPoints.Add(snapshot.BollingerBands_Medium.Lower!.Value);
                     }
                 }
 
@@ -2041,7 +2045,7 @@ namespace SimulatorWinForms
                 var vwapPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     if (snapshot.VWAP_Medium.HasValue)
                     {
@@ -2064,7 +2068,7 @@ namespace SimulatorWinForms
                 var psarPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     if (snapshot.PSAR.HasValue)
                     {
@@ -2082,7 +2086,7 @@ namespace SimulatorWinForms
             }
 
             // Support/Resistance Levels
-            if (supportLabel.Checked && currentSnapshot.AllSupportResistanceLevels != null)
+            if (supportLabel.Checked && currentSnapshot!.AllSupportResistanceLevels != null)
             {
                 double centerX = currentSnapshot.Timestamp.ToOADate();
                 int count = 0;
@@ -2106,7 +2110,7 @@ namespace SimulatorWinForms
                 var patternValuePoints = new List<double>();
                 var patternTooltips = new List<string>();
 
-                foreach (var patternPoint in _historicalPatternDataPoints)
+                foreach (var patternPoint in _historicalPatternDataPoints!)
                 {
                     patternTimePoints.Add(patternPoint.Date.ToOADate());
                     patternValuePoints.Add(patternPoint.Price);
@@ -2168,7 +2172,7 @@ namespace SimulatorWinForms
             var legendItems = new List<string>();
 
             // Ensure we have a valid timestamp
-            DateTime snapshotTime = currentSnapshot.Timestamp;
+            DateTime snapshotTime = currentSnapshot!.Timestamp;
             if (snapshotTime == DateTime.MinValue || snapshotTime.Year < 2000)
             {
                 snapshotTime = DateTime.Now;
@@ -2185,7 +2189,7 @@ namespace SimulatorWinForms
                 var signalPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     if (snapshot.MACD_Medium.MACD.HasValue)
                     {
@@ -2211,7 +2215,7 @@ namespace SimulatorWinForms
                 var atrPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     if (snapshot.ATR_Medium.HasValue)
                     {
@@ -2234,7 +2238,7 @@ namespace SimulatorWinForms
                 var rsiPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     if (snapshot.RSI_Medium.HasValue)
                     {
@@ -2258,7 +2262,7 @@ namespace SimulatorWinForms
                 var slopeNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     slopeYesPoints.Add(snapshot.YesBidSlopePerMinute_Short);
@@ -2283,7 +2287,7 @@ namespace SimulatorWinForms
                 var minusDIPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     if (snapshot.ADX.HasValue)
                     {
@@ -2313,13 +2317,13 @@ namespace SimulatorWinForms
                 var dPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     if (snapshot.StochasticOscillator_Medium.K.HasValue)
                     {
                         timePoints.Add(snapshot.Timestamp.ToOADate());
                         kPoints.Add(snapshot.StochasticOscillator_Medium.K.Value);
-                        dPoints.Add(snapshot.StochasticOscillator_Medium.D.Value);
+                        dPoints.Add(snapshot.StochasticOscillator_Medium.D!.Value);
                     }
                 }
 
@@ -2339,7 +2343,7 @@ namespace SimulatorWinForms
                 var obvPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     obvPoints.Add(snapshot.OBV_Medium / 1000000.0); // Scale for visibility
@@ -2360,7 +2364,7 @@ namespace SimulatorWinForms
                 var topVelNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     topVelYesPoints.Add(snapshot.VelocityPerMinute_Top_Yes_Bid);
@@ -2384,7 +2388,7 @@ namespace SimulatorWinForms
                 var bottomVelNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     bottomVelYesPoints.Add(snapshot.VelocityPerMinute_Bottom_Yes_Bid);
@@ -2408,7 +2412,7 @@ namespace SimulatorWinForms
                 var netOrderNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     netOrderYesPoints.Add(snapshot.TradeRatePerMinute_Yes);
@@ -2432,7 +2436,7 @@ namespace SimulatorWinForms
                 var tradeVolNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     tradeVolYesPoints.Add(snapshot.TradeVolumePerMinute_Yes);
@@ -2456,7 +2460,7 @@ namespace SimulatorWinForms
                 var avgSizeNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     avgSizeYesPoints.Add(snapshot.AverageTradeSize_Yes);
@@ -2479,7 +2483,7 @@ namespace SimulatorWinForms
                 var imbalPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     double imbalance = 1;
@@ -2509,7 +2513,7 @@ namespace SimulatorWinForms
                 var depthNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     depthYesPoints.Add(snapshot.DepthAtTop4YesBids);
@@ -2533,7 +2537,7 @@ namespace SimulatorWinForms
                 var centerMassNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     centerMassYesPoints.Add(snapshot.YesBidCenterOfMass);
@@ -2556,7 +2560,7 @@ namespace SimulatorWinForms
                 var contractsPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     contractsPoints.Add(snapshot.TotalBidContracts_Yes);
@@ -2577,7 +2581,7 @@ namespace SimulatorWinForms
                 var depthNoPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     depthYesPoints.Add(snapshot.TotalOrderbookDepth_Yes);
@@ -2600,7 +2604,7 @@ namespace SimulatorWinForms
                 var positionSizePoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     positionSizePoints.Add(snapshot.PositionSize);
@@ -2623,7 +2627,7 @@ namespace SimulatorWinForms
                 // Use cached position data if available, otherwise fall back to snapshot data
                 if (_historicalPositionDataPoints != null && _historicalPositionDataPoints.Count > 0)
                 {
-                    foreach (var point in _historicalPositionDataPoints)
+                    foreach (var point in _historicalPositionDataPoints!)
                     {
                         timePoints.Add(point.Date.ToOADate());
                         simulatedPosPoints.Add(point.Price);
@@ -2631,7 +2635,7 @@ namespace SimulatorWinForms
                 }
                 else
                 {
-                    foreach (var snapshot in historySnapshots)
+                    foreach (var snapshot in historySnapshots!)
                     {
                         timePoints.Add(snapshot.Timestamp.ToOADate());
                         simulatedPosPoints.Add(snapshot.PositionSize); // Using position size as proxy
@@ -2653,7 +2657,7 @@ namespace SimulatorWinForms
                 var positionRoiPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     positionRoiPoints.Add(snapshot.PositionROI);
@@ -2673,7 +2677,7 @@ namespace SimulatorWinForms
                 var restingOrdersPoints = new List<double>();
                 var timePoints = new List<double>();
 
-                foreach (var snapshot in historySnapshots)
+                foreach (var snapshot in historySnapshots!)
                 {
                     timePoints.Add(snapshot.Timestamp.ToOADate());
                     restingOrdersPoints.Add(snapshot.RestingOrders?.Count ?? 0);
