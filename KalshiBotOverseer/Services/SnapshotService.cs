@@ -2,6 +2,7 @@ using KalshiBotData.Data.Interfaces;
 using BacklashDTOs.Data;
 using System;
 using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace KalshiBotOverseer.Services
 {
@@ -10,7 +11,7 @@ namespace KalshiBotOverseer.Services
     /// This service aggregates snapshot groups by market ticker, calculates recorded hours,
     /// market hours, and recorded hours percentages, and returns structured data for analysis.
     /// </summary>
-    public class SnapshotService
+    public class SnapshotAggregationService
     {
         private readonly IKalshiBotContext _context;
 
@@ -20,12 +21,20 @@ namespace KalshiBotOverseer.Services
         private int _aggregationCount;
 
         /// <summary>
-        /// Initializes a new instance of the SnapshotService class.
+        /// Gets or sets whether performance metrics collection is enabled for snapshot aggregation operations.
+        /// When disabled, timing operations are skipped to improve performance.
+        /// </summary>
+        public bool EnableAggregationMetrics { get; set; } = true;
+
+        /// <summary>
+        /// Initializes a new instance of the SnapshotAggregationService class.
         /// </summary>
         /// <param name="context">The database context interface for accessing snapshot and market data.</param>
-        public SnapshotService(IKalshiBotContext context)
+        /// <param name="configuration">The configuration interface for reading application settings.</param>
+        public SnapshotAggregationService(IKalshiBotContext context, IConfiguration configuration)
         {
             _context = context;
+            EnableAggregationMetrics = configuration.GetValue<bool>("Performance:SnapshotAggregation:EnableMetrics", true);
         }
 
         /// <summary>
@@ -55,7 +64,7 @@ namespace KalshiBotOverseer.Services
                 throw new ArgumentNullException(nameof(snapshotGroups));
 
             // Group by MarketTicker and calculate aggregated data
-            var stopwatch = Stopwatch.StartNew();
+            var stopwatch = EnableAggregationMetrics ? Stopwatch.StartNew() : null;
             var groupedSnapshots = snapshotGroups
                 .GroupBy(sg => sg.MarketTicker)
                 .Select(group =>
@@ -95,12 +104,18 @@ namespace KalshiBotOverseer.Services
                 .OrderBy(s => s.MarketTicker)
                 .ToList();
 
-            stopwatch.Stop();
-            // Store performance metrics
-            var elapsedMs = stopwatch.ElapsedMilliseconds;
-            _aggregationTimes.Add(elapsedMs);
-            _totalAggregationTime += elapsedMs;
-            _aggregationCount++;
+            if (stopwatch != null)
+            {
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    // Store performance metrics
+                    var elapsedMs = stopwatch.ElapsedMilliseconds;
+                    _aggregationTimes.Add(elapsedMs);
+                    _totalAggregationTime += elapsedMs;
+                    _aggregationCount++;
+                }
+            }
 
             return await Task.FromResult(groupedSnapshots.Cast<object>().ToList());
         }
@@ -124,7 +139,7 @@ namespace KalshiBotOverseer.Services
             var marketLookup = relatedMarkets.Where(m => m.market_ticker != null).ToDictionary(m => m.market_ticker!, m => m);
 
             // Group by MarketTicker and calculate aggregated data
-            var stopwatch = Stopwatch.StartNew();
+            var stopwatch = EnableAggregationMetrics ? Stopwatch.StartNew() : null;
             var groupedSnapshots = snapshotGroups
                 .GroupBy(sg => sg.MarketTicker)
                 .Select(group =>
@@ -195,10 +210,11 @@ namespace KalshiBotOverseer.Services
         /// <remarks>
         /// This method provides access to the performance metrics collected during snapshot aggregation operations.
         /// Each value represents the time taken for a single aggregation operation.
+        /// If metrics are disabled, returns an empty array.
         /// </remarks>
         public long[] GetAggregationTimes()
         {
-            return _aggregationTimes.ToArray();
+            return EnableAggregationMetrics ? _aggregationTimes.ToArray() : Array.Empty<long>();
         }
 
         /// <summary>
@@ -207,11 +223,11 @@ namespace KalshiBotOverseer.Services
         /// <returns>A tuple containing count, average time, min time, and max time in milliseconds.</returns>
         /// <remarks>
         /// Returns comprehensive statistics about the performance of snapshot aggregation operations.
-        /// If no aggregations have been performed, returns (0, 0, 0, 0).
+        /// If no aggregations have been performed or metrics are disabled, returns (0, 0, 0, 0).
         /// </remarks>
         public (int Count, double AverageMs, long MinMs, long MaxMs) GetAggregationStatistics()
         {
-            if (_aggregationTimes.Count == 0)
+            if (!EnableAggregationMetrics || _aggregationTimes.Count == 0)
                 return (0, 0, 0, 0);
 
             return (
@@ -226,18 +242,24 @@ namespace KalshiBotOverseer.Services
         /// Gets the total time spent on all aggregation operations.
         /// </summary>
         /// <returns>The total aggregation time in milliseconds.</returns>
+        /// <remarks>
+        /// If metrics are disabled, returns 0.
+        /// </remarks>
         public long GetTotalAggregationTime()
         {
-            return _totalAggregationTime;
+            return EnableAggregationMetrics ? _totalAggregationTime : 0;
         }
 
         /// <summary>
         /// Gets the number of aggregation operations performed.
         /// </summary>
         /// <returns>The count of aggregation operations.</returns>
+        /// <remarks>
+        /// If metrics are disabled, returns 0.
+        /// </remarks>
         public int GetAggregationCount()
         {
-            return _aggregationCount;
+            return EnableAggregationMetrics ? _aggregationCount : 0;
         }
 
         /// <summary>
@@ -249,9 +271,12 @@ namespace KalshiBotOverseer.Services
         /// </remarks>
         public void ClearAggregationMetrics()
         {
-            _aggregationTimes.Clear();
-            _totalAggregationTime = 0;
-            _aggregationCount = 0;
+            if (EnableAggregationMetrics)
+            {
+                _aggregationTimes.Clear();
+                _totalAggregationTime = 0;
+                _aggregationCount = 0;
+            }
         }
     }
 }

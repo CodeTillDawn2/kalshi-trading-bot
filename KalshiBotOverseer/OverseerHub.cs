@@ -64,12 +64,7 @@ namespace KalshiBotOverseer
         private static readonly HashSet<string> _connectedClients = new HashSet<string>();
         private static readonly ConcurrentDictionary<string, ClientInfo> _clientInfo = new();
 
-        // Performance metrics
-        private static long _totalMessagesProcessed = 0;
-        private static long _totalHandshakeRequests = 0;
-        private static long _totalCheckInRequests = 0;
-        private static DateTime _lastMetricsReset = DateTime.UtcNow;
-        private static readonly object _metricsLock = new object();
+        // Performance metrics are now handled by PerformanceMetricsService
 
         // Rate limiting
         private static readonly ConcurrentDictionary<string, ClientRateLimit> _rateLimits = new();
@@ -82,6 +77,7 @@ namespace KalshiBotOverseer
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly BrainPersistenceService _brainService;
         private readonly OverseerHubConfig _config;
+        private readonly PerformanceMetricsService _performanceMetrics;
 
         static OverseerHub()
         {
@@ -161,12 +157,14 @@ namespace KalshiBotOverseer
             ILogger<OverseerHub> logger,
             IServiceScopeFactory scopeFactory,
             BrainPersistenceService brainService,
-            IOptions<OverseerHubConfig> config)
+            IOptions<OverseerHubConfig> config,
+            PerformanceMetricsService performanceMetrics)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
             _brainService = brainService;
             _config = config.Value;
+            _performanceMetrics = performanceMetrics;
         }
 
         /// <summary>
@@ -241,40 +239,32 @@ namespace KalshiBotOverseer
         /// Gets the current performance metrics for the hub.
         /// </summary>
         /// <returns>A dictionary containing performance metrics.</returns>
-        public static Dictionary<string, object> GetPerformanceMetrics()
+        public Dictionary<string, object> GetPerformanceMetrics()
         {
-            lock (_metricsLock)
-            {
-                var now = DateTime.UtcNow;
-                var timeSinceReset = now - _lastMetricsReset;
-                var minutesSinceReset = timeSinceReset.TotalMinutes;
+            var signalRMetrics = _performanceMetrics.GetSignalRMetrics();
+            var now = DateTime.UtcNow;
+            var timeSinceReset = now - signalRMetrics.LastReset;
+            var minutesSinceReset = timeSinceReset.TotalMinutes;
 
-                return new Dictionary<string, object>
-                {
-                    ["TotalMessagesProcessed"] = _totalMessagesProcessed,
-                    ["TotalHandshakeRequests"] = _totalHandshakeRequests,
-                    ["TotalCheckInRequests"] = _totalCheckInRequests,
-                    ["MessagesPerMinute"] = minutesSinceReset > 0 ? _totalMessagesProcessed / minutesSinceReset : 0,
-                    ["HandshakeRequestsPerMinute"] = minutesSinceReset > 0 ? _totalHandshakeRequests / minutesSinceReset : 0,
-                    ["CheckInRequestsPerMinute"] = minutesSinceReset > 0 ? _totalCheckInRequests / minutesSinceReset : 0,
-                    ["CurrentConnectionCount"] = _connectedClients.Count,
-                    ["LastMetricsReset"] = _lastMetricsReset
-                };
-            }
+            return new Dictionary<string, object>
+            {
+                ["TotalMessagesProcessed"] = signalRMetrics.MessagesProcessed,
+                ["TotalHandshakeRequests"] = signalRMetrics.HandshakeRequests,
+                ["TotalCheckInRequests"] = signalRMetrics.CheckInRequests,
+                ["MessagesPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.MessagesProcessed / minutesSinceReset : 0,
+                ["HandshakeRequestsPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.HandshakeRequests / minutesSinceReset : 0,
+                ["CheckInRequestsPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.CheckInRequests / minutesSinceReset : 0,
+                ["CurrentConnectionCount"] = _connectedClients.Count,
+                ["LastMetricsReset"] = signalRMetrics.LastReset
+            };
         }
 
         /// <summary>
         /// Resets the performance metrics counters.
         /// </summary>
-        public static void ResetPerformanceMetrics()
+        public void ResetPerformanceMetrics()
         {
-            lock (_metricsLock)
-            {
-                _totalMessagesProcessed = 0;
-                _totalHandshakeRequests = 0;
-                _totalCheckInRequests = 0;
-                _lastMetricsReset = DateTime.UtcNow;
-            }
+            _performanceMetrics.ResetSignalRMetrics();
         }
 
         /// <summary>
@@ -332,8 +322,8 @@ namespace KalshiBotOverseer
                 return;
             }
 
-            Interlocked.Increment(ref _totalHandshakeRequests);
-            Interlocked.Increment(ref _totalMessagesProcessed);
+            _performanceMetrics.RecordSignalRHandshake();
+            _performanceMetrics.RecordSignalRMessage();
 
             _logger.LogInformation("Handshake request from client: {ClientId}, Name: {ClientName}, Type: {ClientType}",
                 clientId, clientName, clientType);
@@ -417,8 +407,8 @@ namespace KalshiBotOverseer
                 return;
             }
 
-            Interlocked.Increment(ref _totalCheckInRequests);
-            Interlocked.Increment(ref _totalMessagesProcessed);
+            _performanceMetrics.RecordSignalRCheckIn();
+            _performanceMetrics.RecordSignalRMessage();
 
             _logger.LogInformation("CheckIn received from connection: {ConnectionId}", Context.ConnectionId);
 
