@@ -2310,10 +2310,10 @@ namespace TradingStrategies.Trading.Helpers
         /// with the specified parameter configuration. The returned dictionary provides strategies
         /// tailored for different market conditions (LowLiquidity, Bouncing, Trending, etc.).
         /// </remarks>
-        public Dictionary<MarketType, List<Strategy>> CreateStrategyInstance(string setKey, string weightName)
+        public async Task<Dictionary<MarketType, List<Strategy>>> CreateStrategyInstance(string setKey, string weightName)
         {
             var factory = StrategyConfiguration.GetStrategyFactory(setKey);
-            return factory(weightName);
+            return await factory(weightName);
         }
         /// <summary>
         /// Creates strategy instances for all available parameter sets of a strategy type for training purposes.
