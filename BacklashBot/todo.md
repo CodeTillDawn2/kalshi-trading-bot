@@ -48,6 +48,126 @@ TradingSimulator.CachedMarketData:
 - SerializeWithMetrics(): Public method returning string with out TimeSpan serializationTime parameter
 - DeserializeWithMetrics(): Public static method returning CachedMarketData with out TimeSpan deserializationTime parameter
 
+KalshiBotAPI.Websockets.MessageProcessor:
+- TotalMessagesProcessed - long - Total number of messages processed since last metrics reset
+- TotalProcessingTimeMs - long - Total processing time in milliseconds since last metrics reset
+- LastMetricsLogTime - DateTime - Timestamp of the last performance metrics log
+- MessagesPerSecond - double - Current messages per second rate based on recent processing
+- AverageProcessingTimeMs - double - Average processing time per message in milliseconds
+- GetMessageTypeCounts() - IReadOnlyDictionary<string, long> - Count of messages by type processed since startup
+- OrderBookMessageQueueCount - int - Current count of order book update messages in processing queue
+- DuplicateMessageCount - int - Count of duplicate messages detected and skipped
+- LastSequenceNumber - long - Latest sequence number processed from WebSocket messages
+- ResetEventCounts() - void - Resets all message type counters to zero
+
+KalshiBotContext.Data.SqlDataService:
+- TotalProcessed - long - Total number of operations processed successfully
+- TotalFailed - long - Total number of operations that failed
+- OrderBookQueueDepth - int - Current depth of the order book queue
+- TradeQueueDepth - int - Current depth of the trade queue
+- FillQueueDepth - int - Current depth of the fill queue
+- EventLifecycleQueueDepth - int - Current depth of the event lifecycle queue
+- MarketLifecycleQueueDepth - int - Current depth of the market lifecycle queue
+- SuccessRate - double - Success rate as a percentage (0-100)
+- TotalQueuedOperations - int - Total number of queued operations across all queues
+
+KalshiBotOverseer.Services.BrainPersistenceService:
+- TotalOperations - long - Total number of operations performed by this service
+- ServiceUptime - TimeSpan - Service uptime as a TimeSpan
+- BrainCount - int - Current number of brain instances being managed
+- TotalHistoryEntries - long - Total number of metric history entries across all brain instances
+- GetHealthStatus() - (long TotalMemoryBytes, int BrainCount, long TotalHistoryEntries, TimeSpan ServiceUptime) - Comprehensive health metrics
+
+KalshiBotOverseer.Controllers.MarketWatchController:
+- Endpoint execution times logged for GetMarketWatchData, GetBrainLocksData, GetPositionsData, GetOrdersData, GetAccountData, LogEvent, GetSnapshotsData, GetBrainsData
+
+KalshiBotOverseer.Models.BrainPersistence:
+- SerializeWithMetrics() - (string Json, long Milliseconds) - Serializes instance with timing metrics
+- DeserializeWithMetrics() - (BrainPersistence Instance, long Milliseconds) - Deserializes with timing metrics
+- CpuUsageHistory - List<MetricHistory> - Historical CPU usage metrics
+- EventQueueHistory - List<MetricHistory> - Historical event queue depth metrics
+- TickerQueueHistory - List<MetricHistory> - Historical ticker queue depth metrics
+- NotificationQueueHistory - List<MetricHistory> - Historical notification queue depth metrics
+- OrderbookQueueHistory - List<MetricHistory> - Historical order book queue depth metrics
+- MarketCountHistory - List<MetricHistory> - Historical market count metrics
+- ErrorHistory - List<MetricHistory> - Historical error count metrics
+- RefreshCycleSecondsHistory - List<MetricHistory> - Historical refresh cycle duration metrics
+- RefreshCycleIntervalHistory - List<MetricHistory> - Historical refresh cycle interval metrics
+- RefreshMarketCountHistory - List<MetricHistory> - Historical refresh market count metrics
+- RefreshUsagePercentageHistory - List<MetricHistory> - Historical refresh CPU usage percentage metrics
+- PerformanceSampleDateHistory - List<MetricHistory> - Historical performance sample dates
+- LastRefreshTimeAcceptable - bool - Whether last refresh cycle completed within acceptable time limits
+
+## TradingSimulator.Simulator.SimulatorReporting
+- `GetPerformanceMetrics()` - PerformanceMetrics - Returns comprehensive metrics object with timing and counts
+- `TotalAnalysisTime` - TimeSpan - Total time spent analyzing velocity discrepancies
+- `RollingObservationsTime` - TimeSpan - Time spent computing rolling observations
+- `ExpectedFlowsTime` - TimeSpan - Time spent computing expected flows
+- `SpikeSuppressionTime` - TimeSpan - Time spent on spike suppression logic
+- `SnapshotsProcessed` - int - Number of market snapshots processed
+- `DiscrepanciesDetected` - int - Number of velocity discrepancies detected
+
+
+## TradingSimulator.MarketProcessor
+- `GetPerformanceMetrics()` - PerformanceMetrics - Returns comprehensive metrics object
+- `ResetPerformanceMetrics()` - void - Resets all performance counters
+- `AverageProcessingTimePerMarket` - TimeSpan - Average time to process a single market
+- `AverageBatchProcessingTime` - TimeSpan - Average time to process a batch of markets
+- `MarketsPerSecond` - double - Processing rate in markets per second
+- `SnapshotsPerSecond` - double - Processing rate in snapshots per second
+- `CurrentQueueDepth` - int - Current number of markets in processing queue
+- `MaxQueueDepth` - int - Maximum queue depth recorded
+- `TotalMarketsProcessed` - int - Total number of markets processed
+- `TotalSnapshotsProcessed` - int - Total number of snapshots processed
+- `TotalProcessingTime` - TimeSpan - Total time spent processing
+- `Uptime` - TimeSpan - Time since metrics were started
+- `PeakMemoryUsage` - long - Peak memory usage recorded
+- `AverageMemoryUsage` - double - Average memory usage
+- `CurrentMemoryUsage` - long - Current memory usage
+- `GetMetricsSummary()` - string - Formatted summary of all metrics
+
+
+
+## KalshiBotOverseer.OverseerHub
+- `GetHubMetrics()` - dynamic - Returns comprehensive hub metrics object
+- `Uptime` - TimeSpan - Time since hub started
+- `TotalConnections` - long - Total number of client connections
+- `ActiveConnections` - long - Currently active connections
+- `TotalMessagesProcessed` - long - Total messages processed
+- `MessagesPerSecond` - double - Current message processing rate
+- `ConnectionHealthCount` - int - Number of healthy connections
+- `MessageBatchQueueSize` - int - Size of message batch queue
+- `HandshakeRateLimitCount` - int - Number of rate-limited handshakes
+- `CheckInRateLimitCount` - int - Number of rate-limited check-ins
+
+
+## KalshiBotOverseer.OvernightActivitiesHelper
+- `GetPerformanceMetrics()` - tuple - Returns comprehensive performance metrics (newly added)
+- `TotalTasks` - int - Total number of overnight tasks executed
+- `SuccessfulTasks` - int - Number of tasks that completed successfully
+- `SuccessRate` - double - Percentage of tasks that succeeded
+- `TotalDuration` - TimeSpan - Total time for all overnight operations
+- `TaskTimings` - Dictionary<string, TimeSpan> - Individual task execution times
+- `MarketRefreshFailureCount` - int - Number of market refresh failures
+- `LastMarketRefreshFailure` - DateTime? - Timestamp of last market refresh failure
+
+
+## KalshiBotAPI.Websockets.WebSocketConnectionManager
+- `ConnectionAttempts` - int - Total connection attempts made
+- `ConnectionSuccesses` - int - Number of successful connections
+- `ConnectionSuccessRate` - double - Percentage of successful connections
+- `ReconnectionCount` - int - Number of reconnections performed
+- `AverageConnectionLatency` - double - Average connection time in milliseconds
+- `MessagesReceived` - int - Total messages received
+- `MessageThroughput` - double - Messages per second (sliding window)
+- `ConnectionFailures` - int - Total connection failures
+- `ConnectionFailureReasons` - IReadOnlyDictionary<string, int> - Failure reasons and counts
+- `SignatureCacheHitRate` - double - Percentage of signature cache hits
+- `SignatureCacheHits` - int - Number of signature cache hits
+- `SignatureCacheMisses` - int - Number of signature cache misses
+- `TotalBytesReceived` - long - Total bytes received
+- `AverageBufferUtilization` - double - Average buffer usage percentage
+
 
 
 
@@ -58,21 +178,6 @@ TradingSimulator.CachedMarketData:
 
 Remove from this list:
 
-EquityCalculator
-StrategySelectionHelper
-MarketTypeService
-SnapshotService.cs
-CachedMarketData
-SimulatorReporting
-MarketProcessor
-OverseerHub.cs
-OvernightActivitiesHelper.cs
-WebSocketConnectionManager.cs
-MessageProcessor.cs
-SqlDataService.cs
-BrainPersistenceService.cs
-MarketWatchController.cs
-BrainPersistence.cs
 KalshiWebSocketClient.cs
 SubscriptionManager.cs
 OverseerClientService

@@ -671,6 +671,60 @@ namespace KalshiBotData.Data
         }
 
         /// <summary>
+        /// Gets the total number of operations processed successfully.
+        /// </summary>
+        public long TotalProcessed => _totalProcessed;
+
+        /// <summary>
+        /// Gets the total number of operations that failed.
+        /// </summary>
+        public long TotalFailed => _totalFailed;
+
+        /// <summary>
+        /// Gets the current depth of the order book queue.
+        /// </summary>
+        public int OrderBookQueueDepth => _orderBookQueue.Count;
+
+        /// <summary>
+        /// Gets the current depth of the trade queue.
+        /// </summary>
+        public int TradeQueueDepth => _tradeQueue.Count;
+
+        /// <summary>
+        /// Gets the current depth of the fill queue.
+        /// </summary>
+        public int FillQueueDepth => _fillQueue.Count;
+
+        /// <summary>
+        /// Gets the current depth of the event lifecycle queue.
+        /// </summary>
+        public int EventLifecycleQueueDepth => _eventLifecycleQueue.Count;
+
+        /// <summary>
+        /// Gets the current depth of the market lifecycle queue.
+        /// </summary>
+        public int MarketLifecycleQueueDepth => _marketLifecycleQueue.Count;
+
+        /// <summary>
+        /// Gets the success rate as a percentage (0-100).
+        /// </summary>
+        public double SuccessRate
+        {
+            get
+            {
+                var total = _totalProcessed + _totalFailed;
+                return total > 0 ? (_totalProcessed * 100.0) / total : 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the total number of queued operations across all queues.
+        /// </summary>
+        public int TotalQueuedOperations =>
+            _orderBookQueue.Count + _tradeQueue.Count + _fillQueue.Count +
+            _eventLifecycleQueue.Count + _marketLifecycleQueue.Count;
+
+        /// <summary>
         /// Disposes of the service resources, canceling background worker tasks and cleaning up cancellation tokens.
         /// Waits for worker tasks to complete gracefully within a timeout period.
         /// </summary>

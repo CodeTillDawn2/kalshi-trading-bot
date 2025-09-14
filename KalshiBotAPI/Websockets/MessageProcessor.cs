@@ -261,6 +261,63 @@ namespace KalshiBotAPI.Websockets
         public int DuplicateMessageCount => _duplicateMessageCount;
 
         /// <summary>
+        /// Gets the total number of messages processed since last metrics reset.
+        /// </summary>
+        public long TotalMessagesProcessed => _totalMessagesProcessed;
+
+        /// <summary>
+        /// Gets the total processing time in milliseconds since last metrics reset.
+        /// </summary>
+        public long TotalProcessingTimeMs => _totalProcessingTimeMs;
+
+        /// <summary>
+        /// Gets the timestamp of the last performance metrics log.
+        /// </summary>
+        public DateTime LastMetricsLogTime => _lastMetricsLogTime;
+
+        /// <summary>
+        /// Gets the current messages per second rate based on recent processing.
+        /// </summary>
+        public double MessagesPerSecond
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    var timeSinceLastLog = DateTime.UtcNow - _lastMetricsLogTime;
+                    if (timeSinceLastLog.TotalMilliseconds > 0)
+                    {
+                        return _totalMessagesProcessed / timeSinceLastLog.TotalSeconds;
+                    }
+                    return 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the average processing time per message in milliseconds.
+        /// </summary>
+        public double AverageProcessingTimeMs
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _totalMessagesProcessed > 0 ? (double)_totalProcessingTimeMs / _totalMessagesProcessed : 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the count of messages by type processed since startup.
+        /// </summary>
+        /// <returns>Dictionary containing message type counts.</returns>
+        public IReadOnlyDictionary<string, long> GetMessageTypeCounts()
+        {
+            return _messageTypeCounts.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        }
+
+        /// <summary>
         /// Continuously receives WebSocket messages and processes them until cancellation is requested.
         /// Handles message fragmentation, connection monitoring, and error recovery.
         /// </summary>

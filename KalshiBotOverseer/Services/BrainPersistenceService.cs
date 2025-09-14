@@ -471,6 +471,48 @@ namespace KalshiBotOverseer.Services
         }
 
         /// <summary>
+        /// Gets the total number of operations performed by this service.
+        /// </summary>
+        public long TotalOperations => _totalOperations;
+
+        /// <summary>
+        /// Gets the service uptime as a TimeSpan.
+        /// </summary>
+        public TimeSpan ServiceUptime => _serviceStopwatch.Elapsed;
+
+        /// <summary>
+        /// Gets the current number of brain instances being managed.
+        /// </summary>
+        public int BrainCount => _brains.Count;
+
+        /// <summary>
+        /// Gets the total number of metric history entries across all brain instances.
+        /// </summary>
+        public long TotalHistoryEntries
+        {
+            get
+            {
+                long total = 0;
+                foreach (var brain in _brains.Values)
+                {
+                    total += brain.CpuUsageHistory.Count +
+                             brain.EventQueueHistory.Count +
+                             brain.TickerQueueHistory.Count +
+                             brain.NotificationQueueHistory.Count +
+                             brain.OrderbookQueueHistory.Count +
+                             brain.MarketCountHistory.Count +
+                             brain.ErrorHistory.Count +
+                             brain.RefreshCycleSecondsHistory.Count +
+                             brain.RefreshCycleIntervalHistory.Count +
+                             brain.RefreshMarketCountHistory.Count +
+                             brain.RefreshUsagePercentageHistory.Count +
+                             brain.PerformanceSampleDateHistory.Count;
+                }
+                return total;
+            }
+        }
+
+        /// <summary>
         /// Disposes of the service and cleans up resources.
         /// </summary>
         public void Dispose()
