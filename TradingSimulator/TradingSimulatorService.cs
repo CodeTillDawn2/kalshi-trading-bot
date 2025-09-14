@@ -137,7 +137,7 @@ namespace TradingSimulator
 
             _snapshotPeriodHelper = new SnapshotPeriodHelper(_snapshotOptions.Value);
             _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, _snapshotOptions, _tradingOptions, _scopeFactory);
-            _overseer = new TradingOverseer(_scopeFactory, _snapshotService, overseerLoggerMock.Object);
+            _overseer = new TradingOverseer(_scopeFactory, _snapshotService, config, overseerLoggerMock.Object);
             _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 

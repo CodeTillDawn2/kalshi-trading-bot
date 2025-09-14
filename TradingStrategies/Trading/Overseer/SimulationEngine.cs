@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
@@ -35,15 +36,16 @@ namespace TradingStrategies.Trading.Overseer
         /// <summary>
         /// Initializes a new instance of the SimulationEngine with required services.
         /// </summary>
+        /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
         /// <remarks>
         /// Creates instances of MarketTypeService and PatternDetectionService for
         /// market classification and pattern recognition during simulation.
         /// </remarks>
-        public SimulationEngine()
+        public SimulationEngine(IConfiguration configuration)
         {
             _marketTypeService = new MarketTypeService();
-            _patternDetectionService = new PatternDetectionService();
-       }
+            _patternDetectionService = new PatternDetectionService(configuration);
+        }
 
        /// <summary>
        /// Gets the execution time of the last simulation run.

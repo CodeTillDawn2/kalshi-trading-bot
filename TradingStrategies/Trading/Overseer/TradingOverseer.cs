@@ -8,6 +8,7 @@
 /// and async method implementations for better performance in high-throughput scenarios.
 /// </summary>
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
@@ -36,13 +37,14 @@ namespace TradingStrategies
         /// </summary>
         /// <param name="scopeFactory">Factory for creating service scopes to resolve dependencies.</param>
         /// <param name="snapshotService">Service for managing trading snapshot data.</param>
+        /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
         /// <param name="logger">Logger for recording warnings and errors.</param>
-        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, ILogger<TradingOverseer> logger)
+        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, IConfiguration configuration, ILogger<TradingOverseer> logger)
         {
             _scopeFactory = scopeFactory;
             _snapshotService = snapshotService;
             _logger = logger;
-            _simulationEngine = new SimulationEngine();
+            _simulationEngine = new SimulationEngine(configuration);
             _equityCalculator = new EquityCalculator();
         }
 

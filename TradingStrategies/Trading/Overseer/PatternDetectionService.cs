@@ -1,6 +1,7 @@
 using BacklashDTOs;
 using BacklashPatterns;
 using TradingStrategies.Extensions;
+using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -14,12 +15,37 @@ namespace TradingStrategies.Trading.Overseer
         /// <summary>
         /// The lookback window in periods for trend context and pattern validation.
         /// </summary>
-        public int LookbackWindow { get; set; } = 10;
+        public int LookbackWindow { get; set; }
 
         /// <summary>
         /// The types of patterns to detect. If empty, all patterns are detected.
         /// </summary>
         public List<string> PatternTypes { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Minimum price change threshold for significance check.
+        /// </summary>
+        public double SignificancePriceThreshold { get; set; }
+
+        /// <summary>
+        /// Minimum volume increase multiplier for context check.
+        /// </summary>
+        public double VolumeIncreaseMultiplier { get; set; }
+
+        /// <summary>
+        /// Initial capacity for patterns array per candle.
+        /// </summary>
+        public int InitialPatternCapacity { get; set; }
+
+        /// <summary>
+        /// Whether to enable parallel processing for pattern detection.
+        /// </summary>
+        public bool EnableParallelProcessing { get; set; }
+
+        /// <summary>
+        /// Maximum degree of parallelism for pattern checks.
+        /// </summary>
+        public int MaxDegreeOfParallelism { get; set; }
     }
 
     /// <summary>
@@ -60,10 +86,28 @@ namespace TradingStrategies.Trading.Overseer
         private readonly PatternDetectionConfig _config;
 
         /// <summary>
+        /// Initializes a new instance of the PatternDetectionService with configuration from appsettings.json.
+        /// </summary>
+        /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
+        public PatternDetectionService(IConfiguration configuration)
+        {
+            _config = new PatternDetectionConfig();
+
+            // Bind PatternDetectionServiceConfig section (service-specific settings)
+            var serviceConfig = configuration.GetSection("PatternDetectionServiceConfig");
+            serviceConfig.Bind(_config);
+
+            // Bind PatternDetectionConfig section (PatternSearch-specific settings)
+            var patternConfig = configuration.GetSection("PatternDetectionConfig");
+            patternConfig.Bind(_config);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the PatternDetectionService with the specified configuration.
+        /// This constructor is for backward compatibility and testing purposes.
         /// </summary>
         /// <param name="config">The configuration for pattern detection parameters.</param>
-        public PatternDetectionService(PatternDetectionConfig config = null)
+        public PatternDetectionService(PatternDetectionConfig config)
         {
             _config = config ?? new PatternDetectionConfig();
         }
@@ -112,15 +156,46 @@ namespace TradingStrategies.Trading.Overseer
                 // Convert PseudoCandlesticks to CandleMids format for pattern analysis
                 var mids = snapshot.RecentCandlesticks.ToCandleMids(snapshot.MarketTicker ?? string.Empty);
 
-                // Execute pattern detection with configured lookback window for trend context
-                var patterns = PatternSearch.DetectPatterns(mids, _config.LookbackWindow);
+                // Create PatternSearch config from service config
+                var patternConfig = new BacklashPatterns.PatternDetectionConfig
+                {
+                    SignificancePriceThreshold = _config.SignificancePriceThreshold,
+                    VolumeIncreaseMultiplier = _config.VolumeIncreaseMultiplier,
+                    InitialPatternCapacity = _config.InitialPatternCapacity,
+                    EnableParallelProcessing = _config.EnableParallelProcessing,
+                    MaxDegreeOfParallelism = _config.MaxDegreeOfParallelism
+                };
+
+                // Create metrics collector for detailed performance tracking
+                var metrics = new BacklashPatterns.PatternDetectionMetrics();
+
+                // Execute pattern detection asynchronously with custom config and metrics
+                var patterns = PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics).GetAwaiter().GetResult();
+
+                // Filter patterns based on configured pattern types if specified
+                var filteredPatterns = FilterPatternsByTypes(patterns, _config.PatternTypes);
+
+                // Get metrics summary for logging
+                var metricsSummary = metrics.GetSummary();
 
                 // Return the most recent set of detected patterns if any were found
-                if (patterns.Keys.Count > 0)
+                if (filteredPatterns.Keys.Count > 0)
                 {
                     stopwatch.Stop();
                     Console.WriteLine($"Pattern detection completed in {stopwatch.ElapsedMilliseconds} ms for {snapshot.MarketTicker}");
-                    return patterns[patterns.Keys.Last()];
+                    Console.WriteLine($"Detailed metrics: Total time {metricsSummary.TotalDetectionTimeMs} ms, Candles processed: {metricsSummary.TotalCandlesProcessed}, Patterns found: {metricsSummary.TotalPatternsFound}");
+
+                    // Log pattern check times if any
+                    if (metricsSummary.PatternCheckTimes.Any())
+                    {
+                        Console.WriteLine("Pattern check times (ms):");
+                        foreach (var kvp in metricsSummary.PatternCheckTimes.OrderByDescending(x => x.Value))
+                        {
+                            Console.WriteLine($"  {kvp.Key}: {TimeSpan.FromTicks(kvp.Value).TotalMilliseconds:F2} ms");
+                        }
+                    }
+
+                    return filteredPatterns[filteredPatterns.Keys.Last()];
                 }
             }
             catch (Exception ex)
@@ -140,14 +215,92 @@ namespace TradingStrategies.Trading.Overseer
         /// that can inform trading strategy decisions.
         /// </summary>
         /// <param name="snapshot">The market snapshot containing recent candlestick data and market information.</param>
+        /// <summary>
+        /// Filters patterns based on the configured pattern types.
+        /// </summary>
+        /// <param name="patterns">The raw detected patterns dictionary.</param>
+        /// <param name="allowedTypes">The list of allowed pattern types. If empty, all patterns are allowed.</param>
+        /// <returns>Filtered patterns dictionary.</returns>
+        private Dictionary<int, List<BacklashPatterns.PatternDefinitions.PatternDefinition>> FilterPatternsByTypes(
+            Dictionary<int, List<BacklashPatterns.PatternDefinitions.PatternDefinition>> patterns,
+            List<string> allowedTypes)
+        {
+            if (allowedTypes == null || allowedTypes.Count == 0)
+            {
+                return patterns;
+            }
+
+            var filtered = new Dictionary<int, List<BacklashPatterns.PatternDefinitions.PatternDefinition>>();
+
+            foreach (var kvp in patterns)
+            {
+                var filteredList = kvp.Value.Where(p => allowedTypes.Contains(p.Name)).ToList();
+                if (filteredList.Any())
+                {
+                    filtered[kvp.Key] = filteredList;
+                }
+            }
+
+            return filtered;
+        }
+
         /// <returns>A task representing the asynchronous operation, with a list of detected pattern definitions.</returns>
         /// <remarks>
         /// This async version is suitable for high-throughput scenarios to avoid blocking the calling thread.
-        /// The detection process is the same as the synchronous version but executed asynchronously.
+        /// Uses the enhanced configuration and metrics for optimal performance.
         /// </remarks>
         public async Task<List<BacklashPatterns.PatternDefinitions.PatternDefinition>> DetectPatternsAsync(MarketSnapshot snapshot)
         {
-            return await Task.Run(() => DetectPatterns(snapshot));
+            // Validate input data availability
+            if (snapshot.RecentCandlesticks == null || snapshot.RecentCandlesticks.Count == 0)
+            {
+                return new List<BacklashPatterns.PatternDefinitions.PatternDefinition>();
+            }
+
+            try
+            {
+                // Convert PseudoCandlesticks to CandleMids format for pattern analysis
+                var mids = snapshot.RecentCandlesticks.ToCandleMids(snapshot.MarketTicker ?? string.Empty);
+
+                // Create PatternSearch config from service config
+                var patternConfig = new BacklashPatterns.PatternDetectionConfig
+                {
+                    SignificancePriceThreshold = _config.SignificancePriceThreshold,
+                    VolumeIncreaseMultiplier = _config.VolumeIncreaseMultiplier,
+                    InitialPatternCapacity = _config.InitialPatternCapacity,
+                    EnableParallelProcessing = _config.EnableParallelProcessing,
+                    MaxDegreeOfParallelism = _config.MaxDegreeOfParallelism
+                };
+
+                // Create metrics collector for detailed performance tracking
+                var metrics = new BacklashPatterns.PatternDetectionMetrics();
+
+                // Execute pattern detection asynchronously with custom config and metrics
+                var patterns = await PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics);
+
+                // Filter patterns based on configured pattern types if specified
+                var filteredPatterns = FilterPatternsByTypes(patterns, _config.PatternTypes);
+
+                // Get metrics summary for logging
+                var metricsSummary = metrics.GetSummary();
+
+                Console.WriteLine($"Async pattern detection completed in {metricsSummary.TotalDetectionTimeMs} ms for {snapshot.MarketTicker}");
+                Console.WriteLine($"Detailed metrics: Candles processed: {metricsSummary.TotalCandlesProcessed}, Patterns found: {metricsSummary.TotalPatternsFound}");
+
+                // Return the most recent set of detected patterns if any were found
+                if (filteredPatterns.Keys.Count > 0)
+                {
+                    return filteredPatterns[filteredPatterns.Keys.Last()];
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log pattern detection errors while maintaining system stability
+                Console.WriteLine($"Error detecting patterns asynchronously: {ex.Message}");
+            }
+
+            // Return empty list as fallback for any processing failures
+            return new List<BacklashPatterns.PatternDefinitions.PatternDefinition>();
         }
     }
 }
