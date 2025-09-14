@@ -21,10 +21,10 @@ namespace KalshiBotOverseer.Services
         private int _aggregationCount;
 
         /// <summary>
-        /// Gets or sets whether performance metrics collection is enabled for snapshot aggregation operations.
+        /// Gets or sets whether performance metrics collection is enabled for SnapshotAggregationService operations.
         /// When disabled, timing operations are skipped to improve performance.
         /// </summary>
-        public bool EnableAggregationMetrics { get; set; } = true;
+        public bool EnableSnapshotAggregationMetrics { get; set; } = true;
 
         /// <summary>
         /// Initializes a new instance of the SnapshotAggregationService class.
@@ -34,7 +34,7 @@ namespace KalshiBotOverseer.Services
         public SnapshotAggregationService(IKalshiBotContext context, IConfiguration configuration)
         {
             _context = context;
-            EnableAggregationMetrics = configuration.GetValue<bool>("Performance:SnapshotAggregation:EnableMetrics", true);
+            EnableSnapshotAggregationMetrics = configuration.GetValue<bool>("Performance:SnapshotAggregation:EnableMetrics", true);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace KalshiBotOverseer.Services
                 throw new ArgumentNullException(nameof(snapshotGroups));
 
             // Group by MarketTicker and calculate aggregated data
-            var stopwatch = EnableAggregationMetrics ? Stopwatch.StartNew() : null;
+            var stopwatch = EnableSnapshotAggregationMetrics ? Stopwatch.StartNew() : null;
             var groupedSnapshots = snapshotGroups
                 .GroupBy(sg => sg.MarketTicker)
                 .Select(group =>
@@ -139,7 +139,7 @@ namespace KalshiBotOverseer.Services
             var marketLookup = relatedMarkets.Where(m => m.market_ticker != null).ToDictionary(m => m.market_ticker!, m => m);
 
             // Group by MarketTicker and calculate aggregated data
-            var stopwatch = EnableAggregationMetrics ? Stopwatch.StartNew() : null;
+            var stopwatch = EnableSnapshotAggregationMetrics ? Stopwatch.StartNew() : null;
             var groupedSnapshots = snapshotGroups
                 .GroupBy(sg => sg.MarketTicker)
                 .Select(group =>
@@ -214,7 +214,7 @@ namespace KalshiBotOverseer.Services
         /// </remarks>
         public long[] GetAggregationTimes()
         {
-            return EnableAggregationMetrics ? _aggregationTimes.ToArray() : Array.Empty<long>();
+            return EnableSnapshotAggregationMetrics ? _aggregationTimes.ToArray() : Array.Empty<long>();
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace KalshiBotOverseer.Services
         /// </remarks>
         public (int Count, double AverageMs, long MinMs, long MaxMs) GetAggregationStatistics()
         {
-            if (!EnableAggregationMetrics || _aggregationTimes.Count == 0)
+            if (!EnableSnapshotAggregationMetrics || _aggregationTimes.Count == 0)
                 return (0, 0, 0, 0);
 
             return (
@@ -247,7 +247,7 @@ namespace KalshiBotOverseer.Services
         /// </remarks>
         public long GetTotalAggregationTime()
         {
-            return EnableAggregationMetrics ? _totalAggregationTime : 0;
+            return EnableSnapshotAggregationMetrics ? _totalAggregationTime : 0;
         }
 
         /// <summary>
@@ -259,7 +259,7 @@ namespace KalshiBotOverseer.Services
         /// </remarks>
         public int GetAggregationCount()
         {
-            return EnableAggregationMetrics ? _aggregationCount : 0;
+            return EnableSnapshotAggregationMetrics ? _aggregationCount : 0;
         }
 
         /// <summary>
@@ -271,7 +271,7 @@ namespace KalshiBotOverseer.Services
         /// </remarks>
         public void ClearAggregationMetrics()
         {
-            if (EnableAggregationMetrics)
+            if (EnableSnapshotAggregationMetrics)
             {
                 _aggregationTimes.Clear();
                 _totalAggregationTime = 0;
