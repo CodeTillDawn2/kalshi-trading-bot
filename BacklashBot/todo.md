@@ -2,6 +2,63 @@
 
 This document outlines the performance metrics tracked across various classes in the Kalshi Trading Bot project.
 
+
+## Primitive Types
+- `bool`
+- `double`
+- `int`
+- `long`
+- `string`
+- `void`
+
+## Complex Types
+- `CachedMarketData`
+- `class`
+- `DateTime`
+- `DateTime?`
+- `Dictionary<string, ClientMetrics>`
+- `Dictionary<string, double>`
+- `Dictionary<string, int>`
+- `Dictionary<string, object>`
+- `Dictionary<string, TimeSpan>`
+- `Dictionary<MarketType, int>`
+- `dynamic`
+- `IReadOnlyDictionary<string, int>`
+- `IReadOnlyDictionary<string, long>`
+- `List<double>`
+- `List<MetricHistory>`
+- `long[]`
+- `object`
+- `PerformanceMetrics`
+- `PatternDetectionMetricsSummary`
+- `TimeSpan`
+- `tuple`
+
+## Tuple Types
+- `(int CacheHits, int CacheMisses, double AverageOperationTimeMs, int TotalOperations)`
+- `(int Count, double AverageMs, long MinMs, long MaxMs)`
+- `(int EventQueueCount, int TickerQueueCount, int NotificationQueueCount)`
+- `(int orderbookEvents, int tradeEvents, int tickerEvents)`
+- `(int TotalCalculations, int CacheHits, int CacheMisses, double AverageCalculationTimeMs)`
+- `(int TotalMarketsProcessed, long TotalProcessingTimeMs, double AverageTimePerMarketMs, int ErrorCount)`
+- `(long AverageBytes, long PeakBytes)`
+- `(long Hits, long Misses)`
+- `(long TotalAllocated, long AveragePerStrategy)`
+- `(long TotalMemoryBytes, int BrainCount, long TotalHistoryEntries, TimeSpan ServiceUptime)`
+- `(ResourceMetrics)`
+- `(string Json, long Milliseconds)`
+- `(TimeSpan AverageQueryTime, int QueryCount)`
+- `(double AverageProcessingTimeMs, int TotalOperations)`
+- `(double AverageWaitTimeMs, int TotalOperations)`
+- `(double InitializationTimeMs, int InitializationAttempts)`
+- `(BrainPersistence Instance, long Milliseconds)`
+
+## Concurrent Types
+- `ConcurrentDictionary<string, ConcurrentBag<long>>`
+- `ConcurrentDictionary<string, long>`
+- `ConcurrentDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)>`
+
+
 ## TradingStrategies.Trading.Overseer.PatternDetectionService
 
 ### Methods
