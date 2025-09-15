@@ -65,8 +65,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## BacklashBot.Services.KaslhiBotScopeManagerService
 
-## BacklashBot.Services.MarketRefreshService
-
 ## TradingGUI.MainForm
 
 
