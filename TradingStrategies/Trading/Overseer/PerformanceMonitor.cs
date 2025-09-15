@@ -6,11 +6,21 @@ namespace TradingStrategies.Trading.Overseer
     /// Generic performance monitor for tracking various metrics
     /// in the trading simulator. This class collects comprehensive performance data
     /// including execution times, memory usage, trade counts, and detailed metrics.
+    /// It supports both general operation metrics and specialized simulation performance metrics
+    /// from StrategySimulation, with typed access via SimulationPerformanceMetrics.
+    /// All metrics collection can be enabled/disabled via the EnablePerformanceMetrics property.
     /// </summary>
     public class PerformanceMonitor : IPerformanceMonitor
     {
         private readonly ConcurrentDictionary<string, List<PerformanceRecord>> _performanceRecords;
         private readonly ConcurrentDictionary<string, Dictionary<string, object>> _simulationMetrics;
+
+        /// <summary>
+        /// Gets or sets whether performance metrics collection is enabled.
+        /// When disabled, metric recording methods will return early without storing data.
+        /// Default is true. Can be configured from appsettings.json Simulation:Simulation_EnablePerformanceMetrics.
+        /// </summary>
+        public bool EnablePerformanceMetrics { get; set; } = true;
 
         /// <summary>
         /// Initializes a new instance of the PerformanceMonitor.
@@ -32,6 +42,7 @@ namespace TradingStrategies.Trading.Overseer
         /// <remarks>
         /// All performance metrics are stored in a thread-safe concurrent dictionary with timestamps.
         /// This data can be used for detailed performance analysis and optimization.
+        /// Metrics collection is gated by EnablePerformanceMetrics flag.
         /// </remarks>
         public void RecordPerformanceMetrics(
             string methodName,
@@ -40,6 +51,8 @@ namespace TradingStrategies.Trading.Overseer
             int totalItemsFound,
             Dictionary<string, long>? itemCheckTimes = null)
         {
+            if (!EnablePerformanceMetrics) return;
+
             var record = new PerformanceRecord(
                 Timestamp: DateTime.UtcNow,
                 TotalExecutionTimeMs: totalExecutionTimeMs,
@@ -59,8 +72,12 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         /// <param name="simulationName">The name of the simulation.</param>
         /// <param name="metrics">The detailed metrics dictionary from StrategySimulation.GetDetailedPerformanceMetrics().</param>
+        /// <remarks>
+        /// Metrics collection is gated by EnablePerformanceMetrics flag.
+        /// </remarks>
         public void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics)
         {
+            if (!EnablePerformanceMetrics) return;
             _simulationMetrics[simulationName] = metrics;
         }
 
@@ -72,9 +89,11 @@ namespace TradingStrategies.Trading.Overseer
         /// <remarks>
         /// This method is provided for backward compatibility with the IPerformanceMonitor interface.
         /// For comprehensive metrics, use RecordPerformanceMetrics.
+        /// Metrics collection is gated by EnablePerformanceMetrics flag.
         /// </remarks>
         public void RecordExecutionTime(string methodName, long milliseconds)
         {
+            if (!EnablePerformanceMetrics) return;
             RecordPerformanceMetrics(methodName, milliseconds, 0, 0, null);
         }
 
@@ -96,6 +115,53 @@ namespace TradingStrategies.Trading.Overseer
         public Dictionary<string, object> GetSimulationMetrics(string simulationName)
         {
             return _simulationMetrics.TryGetValue(simulationName, out var metrics) ? metrics : new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Gets typed simulation performance metrics for a specific simulation.
+        /// </summary>
+        /// <param name="simulationName">The name of the simulation.</param>
+        /// <returns>The typed performance metrics record.</returns>
+        public SimulationPerformanceMetrics GetTypedSimulationMetrics(string simulationName)
+        {
+            var metrics = GetSimulationMetrics(simulationName);
+            return ConvertToSimulationPerformanceMetrics(metrics);
+        }
+
+        /// <summary>
+        /// Converts a raw metrics dictionary to typed SimulationPerformanceMetrics.
+        /// </summary>
+        /// <param name="metrics">The raw metrics dictionary from StrategySimulation.</param>
+        /// <returns>The typed performance metrics.</returns>
+        private SimulationPerformanceMetrics ConvertToSimulationPerformanceMetrics(Dictionary<string, object> metrics)
+        {
+            if (metrics.Count == 0)
+            {
+                return new SimulationPerformanceMetrics(
+                    TimeSpan.Zero, 0.0, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0.0, 0, 0.0, 0.0, 0, 0.0, 0.0, 0
+                );
+            }
+
+            return new SimulationPerformanceMetrics(
+                TotalExecutionTime: (TimeSpan)metrics.GetValueOrDefault("TotalExecutionTime", TimeSpan.Zero),
+                AverageExecutionTimeMs: (double)metrics.GetValueOrDefault("AverageExecutionTimeMs", 0.0),
+                PeakMemoryUsage: (long)metrics.GetValueOrDefault("PeakMemoryUsage", 0L),
+                TotalSnapshotsProcessed: (int)metrics.GetValueOrDefault("TotalSnapshotsProcessed", 0),
+                PerformanceThresholdMs: (double)metrics.GetValueOrDefault("PerformanceThresholdMs", 0.0),
+                MemoryThresholdMB: (double)metrics.GetValueOrDefault("MemoryThresholdMB", 0.0),
+                SlowOperationsCount: (int)metrics.GetValueOrDefault("SlowOperationsCount", 0),
+                HighMemoryOperationsCount: (int)metrics.GetValueOrDefault("HighMemoryOperationsCount", 0),
+                RestingOrdersCount: (int)metrics.GetValueOrDefault("RestingOrdersCount", 0),
+                CurrentPosition: (int)metrics.GetValueOrDefault("CurrentPosition", 0),
+                CurrentCash: (double)metrics.GetValueOrDefault("CurrentCash", 0.0),
+                TotalTradesExecuted: (int)metrics.GetValueOrDefault("TotalTradesExecuted", 0),
+                AverageDecisionTimeMs: (double)metrics.GetValueOrDefault("AverageDecisionTimeMs", 0.0),
+                AverageApplyTimeMs: (double)metrics.GetValueOrDefault("AverageApplyTimeMs", 0.0),
+                SlowDecisionsCount: (int)metrics.GetValueOrDefault("SlowDecisionsCount", 0),
+                DecisionThresholdMs: (double)metrics.GetValueOrDefault("DecisionThresholdMs", 0.0),
+                BandWidthRatioThreshold: (double)metrics.GetValueOrDefault("BandWidthRatioThreshold", 0.0),
+                TradeRateLimitPerSnapshot: (int)metrics.GetValueOrDefault("TradeRateLimitPerSnapshot", 0)
+            );
         }
 
         /// <summary>
@@ -232,4 +298,29 @@ namespace TradingStrategies.Trading.Overseer
     {
         public PerformanceStats() : this(0, 0.0, 0, 0, 0.0, 0, 0.0, 0, new Dictionary<string, (int, double, long, long)>()) { }
     }
+
+    /// <summary>
+    /// Typed performance metrics for trading strategy simulations.
+    /// Exposes all metrics from StrategySimulation.GetDetailedPerformanceMetrics() in a strongly-typed format.
+    /// </summary>
+    public record SimulationPerformanceMetrics(
+        TimeSpan TotalExecutionTime,
+        double AverageExecutionTimeMs,
+        long PeakMemoryUsage,
+        int TotalSnapshotsProcessed,
+        double PerformanceThresholdMs,
+        double MemoryThresholdMB,
+        int SlowOperationsCount,
+        int HighMemoryOperationsCount,
+        int RestingOrdersCount,
+        int CurrentPosition,
+        double CurrentCash,
+        int TotalTradesExecuted,
+        double AverageDecisionTimeMs,
+        double AverageApplyTimeMs,
+        int SlowDecisionsCount,
+        double DecisionThresholdMs,
+        double BandWidthRatioThreshold,
+        int TradeRateLimitPerSnapshot
+    );
 }

@@ -203,15 +203,15 @@ namespace BacklashDTOs.Configuration
         public int MaxDegreeOfParallelismDataLoading { get; set; } = 2;
 
         /// <summary>
-        /// Gets or sets whether to enable performance metrics collection for candlestick operations.
+        /// Gets or sets whether to enable performance metrics collection for CandlestickService operations.
         /// </summary>
         /// <value>Default is true.</value>
-        public bool EnableCandlestickPerformanceMetrics { get; set; } = true;
+        public bool EnableCandlestickServicePerformanceMetrics { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the log level for performance metrics.
+        /// Gets or sets whether to enable database performance metrics collection in CentralPerformanceMonitor.
         /// </summary>
-        /// <value>Default is "Information".</value>
-        public string CandlestickPerformanceMetricsLogLevel { get; set; } = "Information";
+        /// <value>Default is true.</value>
+        public bool CentralPerformanceMonitor_EnableDatabaseMetrics { get; set; } = true;
     }
 }

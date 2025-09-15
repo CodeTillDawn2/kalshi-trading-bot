@@ -204,6 +204,15 @@ public class TradingConfig
     public int TradeEventCleanupThresholdMinutes { get; set; } = 60;
 
     /// <summary>
+    /// Enables or disables performance metrics collection in OrderbookChangeTracker.
+    /// When enabled, measures event processing latency (orderbook snapshots, changes, trades)
+    /// and timer accuracy (drift and execution times for periodic operations).
+    /// Disable for performance optimization in high-throughput scenarios.
+    /// Default: true
+    /// </summary>
+    public bool OrderbookChangeTracker_EnablePerformanceMetrics { get; set; } = true;
+
+    /// <summary>
     /// Validates the configuration parameters to ensure they are within acceptable ranges and prevent invalid combinations.
     /// This method should be called during application startup to catch misconfigurations early.
     /// Throws ArgumentException if any parameter is invalid.

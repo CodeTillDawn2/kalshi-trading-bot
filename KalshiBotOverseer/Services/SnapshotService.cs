@@ -3,6 +3,7 @@ using BacklashDTOs.Data;
 using System;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace KalshiBotOverseer.Services
 {
@@ -14,11 +15,8 @@ namespace KalshiBotOverseer.Services
     public class SnapshotAggregationService
     {
         private readonly IKalshiBotContext _context;
-
-        // Performance metrics storage
-        private readonly List<long> _aggregationTimes = new List<long>();
-        private long _totalAggregationTime;
-        private int _aggregationCount;
+        private readonly PerformanceMetricsService _performanceMetrics;
+        private readonly ILogger<SnapshotAggregationService> _logger;
 
         /// <summary>
         /// Gets or sets whether performance metrics collection is enabled for SnapshotAggregationService operations.
@@ -31,9 +29,17 @@ namespace KalshiBotOverseer.Services
         /// </summary>
         /// <param name="context">The database context interface for accessing snapshot and market data.</param>
         /// <param name="configuration">The configuration interface for reading application settings.</param>
-        public SnapshotAggregationService(IKalshiBotContext context, IConfiguration configuration)
+        /// <param name="performanceMetrics">The performance metrics service for recording metrics.</param>
+        /// <param name="logger">The logger instance for recording operations.</param>
+        public SnapshotAggregationService(
+            IKalshiBotContext context,
+            IConfiguration configuration,
+            PerformanceMetricsService performanceMetrics,
+            ILogger<SnapshotAggregationService> logger)
         {
             _context = context;
+            _performanceMetrics = performanceMetrics;
+            _logger = logger;
             EnableSnapshotAggregationMetrics = configuration.GetValue<bool>("Performance:SnapshotAggregation:EnableMetrics", true);
         }
 
@@ -106,15 +112,10 @@ namespace KalshiBotOverseer.Services
 
             if (stopwatch != null)
             {
-                if (stopwatch != null)
-                {
-                    stopwatch.Stop();
-                    // Store performance metrics
-                    var elapsedMs = stopwatch.ElapsedMilliseconds;
-                    _aggregationTimes.Add(elapsedMs);
-                    _totalAggregationTime += elapsedMs;
-                    _aggregationCount++;
-                }
+                stopwatch.Stop();
+                // Store performance metrics in centralized service
+                var duration = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
+                _performanceMetrics.RecordSnapshotAggregation(duration);
             }
 
             return await Task.FromResult(groupedSnapshots.Cast<object>().ToList());
@@ -193,12 +194,13 @@ namespace KalshiBotOverseer.Services
                 .OrderBy(s => s.MarketTicker)
                 .ToList();
 
-            stopwatch.Stop();
-            // Store performance metrics
-            var elapsedMs = stopwatch.ElapsedMilliseconds;
-            _aggregationTimes.Add(elapsedMs);
-            _totalAggregationTime += elapsedMs;
-            _aggregationCount++;
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                // Store performance metrics in centralized service
+                var duration = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
+                _performanceMetrics.RecordSnapshotAggregation(duration);
+            }
 
             return await Task.FromResult(groupedSnapshots.Cast<object>().ToList());
         }
@@ -214,7 +216,7 @@ namespace KalshiBotOverseer.Services
         /// </remarks>
         public long[] GetAggregationTimes()
         {
-            return EnableSnapshotAggregationMetrics ? _aggregationTimes.ToArray() : Array.Empty<long>();
+            return EnableSnapshotAggregationMetrics ? _performanceMetrics.GetSnapshotAggregationTimes() : Array.Empty<long>();
         }
 
         /// <summary>
@@ -227,15 +229,11 @@ namespace KalshiBotOverseer.Services
         /// </remarks>
         public (int Count, double AverageMs, long MinMs, long MaxMs) GetAggregationStatistics()
         {
-            if (!EnableSnapshotAggregationMetrics || _aggregationTimes.Count == 0)
+            if (!EnableSnapshotAggregationMetrics)
                 return (0, 0, 0, 0);
 
-            return (
-                _aggregationTimes.Count,
-                _aggregationTimes.Average(),
-                _aggregationTimes.Min(),
-                _aggregationTimes.Max()
-            );
+            var metrics = _performanceMetrics.GetSnapshotAggregationMetrics();
+            return (metrics.Count, metrics.AverageMs, metrics.MinMs, metrics.MaxMs);
         }
 
         /// <summary>
@@ -247,7 +245,11 @@ namespace KalshiBotOverseer.Services
         /// </remarks>
         public long GetTotalAggregationTime()
         {
-            return EnableSnapshotAggregationMetrics ? _totalAggregationTime : 0;
+            if (!EnableSnapshotAggregationMetrics)
+                return 0;
+
+            var metrics = _performanceMetrics.GetSnapshotAggregationMetrics();
+            return metrics.TotalMs;
         }
 
         /// <summary>
@@ -259,7 +261,11 @@ namespace KalshiBotOverseer.Services
         /// </remarks>
         public int GetAggregationCount()
         {
-            return EnableSnapshotAggregationMetrics ? _aggregationCount : 0;
+            if (!EnableSnapshotAggregationMetrics)
+                return 0;
+
+            var metrics = _performanceMetrics.GetSnapshotAggregationMetrics();
+            return metrics.Count;
         }
 
         /// <summary>
@@ -273,9 +279,7 @@ namespace KalshiBotOverseer.Services
         {
             if (EnableSnapshotAggregationMetrics)
             {
-                _aggregationTimes.Clear();
-                _totalAggregationTime = 0;
-                _aggregationCount = 0;
+                _performanceMetrics.ClearSnapshotAggregationMetrics();
             }
         }
     }

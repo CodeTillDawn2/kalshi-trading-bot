@@ -156,6 +156,15 @@ namespace SimulatorWinForms
             ApplyInitialTypography();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the MainForm class with dependency injection support.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+        public MainForm(IServiceProvider serviceProvider) : this()
+        {
+            // DI setup can be added here if needed in the future
+        }
+
         protected override async void OnLoad(EventArgs e)
         {
             base.OnLoad(e);

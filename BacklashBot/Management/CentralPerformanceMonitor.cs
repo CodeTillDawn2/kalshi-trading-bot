@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashDTOs.Data;
 using BacklashBot.State.Interfaces;
 using System.Collections.Concurrent;
@@ -40,7 +41,7 @@ namespace BacklashBot.Management
     /// - Market refresh cycle performance
     /// - System startup and shutdown states
     /// </remarks>
-    public class CentralPerformanceMonitor : ICentralPerformanceMonitor
+    public class CentralPerformanceMonitor : ICentralPerformanceMonitor, IKalshiBotContextPerformanceMetrics
     {
         private readonly ILogger<ICentralPerformanceMonitor> _logger;
         private readonly IServiceFactory _serviceFactory;
@@ -51,6 +52,7 @@ namespace BacklashBot.Management
         private IOrderBookService _orderbookService => _serviceFactory.GetOrderBookService();
         public string? BrainInstance { get; private set; }
         public TimeSpan RefreshInterval { get; private set; }
+        public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? DatabaseMetrics => _databaseMetrics;
 
         private bool _timerRunning = false;
         private readonly ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>> _queueCountSamples;
@@ -63,6 +65,7 @@ namespace BacklashBot.Management
         public DateTime? LastPerformanceSampleDate { get; set; }
         private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
+        private IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? _databaseMetrics;
 
         public bool IsStartingUp { get; set; } = false;
         public bool IsShuttingDown { get; set; } = false;
@@ -122,6 +125,7 @@ namespace BacklashBot.Management
             BrainInstance = _executionConfig.BrainInstance;
             _logger.LogInformation("PERFMON: Initialized with BrainInstance='{BrainInstance}' from config", BrainInstance);
             _queueCountSamples = new ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>>();
+            _databaseMetrics = null;
         }
 
         /// <summary>
@@ -373,6 +377,38 @@ namespace BacklashBot.Management
             _queueCountSamples["EventQueue"] = eventSamples;
 
             return percentage;
+        }
+
+        /// <summary>
+        /// Records database performance metrics from the KalshiBotContext.
+        /// </summary>
+        /// <param name="metrics">Dictionary containing database operation metrics.</param>
+        /// <remarks>
+        /// This method is called by the KalshiBotContext to post database performance metrics
+        /// to the central performance monitor for tracking and analysis.
+        /// </remarks>
+        public void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics)
+        {
+            _databaseMetrics = metrics;
+            _logger.LogDebug("Database metrics recorded: {Count} operations", metrics?.Count ?? 0);
+        }
+
+        /// <summary>
+        /// Gets the current database performance metrics.
+        /// </summary>
+        /// <returns>Dictionary containing operation names and their performance statistics.</returns>
+        public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetPerformanceMetrics()
+        {
+            return _databaseMetrics ?? new Dictionary<string, (int, int, TimeSpan, double)>();
+        }
+
+        /// <summary>
+        /// Resets all performance metrics.
+        /// </summary>
+        public void ResetPerformanceMetrics()
+        {
+            _databaseMetrics = null;
+            _logger.LogInformation("Database performance metrics reset");
         }
 
         /// <summary>

@@ -100,6 +100,7 @@ namespace TradingStrategies.Trading.Overseer
         private readonly List<TimeSpan> _decisionTimes = new List<TimeSpan>();
         private readonly List<TimeSpan> _applyTimes = new List<TimeSpan>();
         private readonly SimulationConfig _config;
+        private readonly IPerformanceMonitor? _performanceMonitor;
         private int _totalTradesExecuted = 0;
         private int _tradeCountThisSnapshot = 0;
 
@@ -110,13 +111,15 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="strategy">The trading strategy to simulate. Cannot be null.</param>
         /// <param name="config">The simulation configuration containing thresholds and settings.</param>
         /// <param name="initialCash">The initial cash balance for the simulation (default is 100.0).</param>
+        /// <param name="performanceMonitor">Optional performance monitor to automatically record metrics.</param>
         /// <exception cref="ArgumentNullException">Thrown when strategy or config is null.</exception>
-        public StrategySimulation(Strategy strategy, IOptions<SimulationConfig> config, double initialCash = 100.0)
+        public StrategySimulation(Strategy strategy, IOptions<SimulationConfig> config, double initialCash = 100.0, IPerformanceMonitor? performanceMonitor = null)
         {
             if (strategy == null) throw new ArgumentNullException(nameof(strategy));
             if (config == null) throw new ArgumentNullException(nameof(config));
             Strategy = strategy;
             _config = config.Value;
+            _performanceMonitor = performanceMonitor;
             Position = 0;
             Cash = initialCash;
             InitialCash = initialCash;
@@ -798,6 +801,7 @@ namespace TradingStrategies.Trading.Overseer
         /// Includes execution timing, memory usage, trade counts, and decision performance metrics.
         /// New metrics include decision timing, action application timing, and trade rate monitoring
         /// when corresponding configuration options are enabled.
+        /// Automatically records metrics to the performance monitor if provided.
         /// </summary>
         /// <returns>A dictionary containing various performance metrics including:
         /// - TotalExecutionTime: Total time spent processing snapshots
@@ -831,6 +835,9 @@ namespace TradingStrategies.Trading.Overseer
                 ["BandWidthRatioThreshold"] = _config.BandWidthRatioThreshold,
                 ["TradeRateLimitPerSnapshot"] = _config.TradeRateLimitPerSnapshot
             };
+
+            // Automatically record to performance monitor if provided
+            _performanceMonitor?.RecordSimulationMetrics(Strategy.Name, metrics);
 
             return metrics;
         }

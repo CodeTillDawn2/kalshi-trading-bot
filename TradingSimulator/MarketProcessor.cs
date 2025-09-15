@@ -53,9 +53,9 @@ namespace TradingSimulator
         public DiscrepancyDetectionConfig DiscrepancyDetection { get; set; } = new();
 
         /// <summary>
-        /// Whether to enable memory usage tracking in performance metrics.
+        /// Whether to enable performance metrics tracking (includes memory tracking).
         /// </summary>
-        public bool EnableMemoryTracking { get; set; } = true;
+        public bool EnablePerformanceMetrics { get; set; } = true;
     }
 
     /// <summary>
@@ -112,6 +112,11 @@ namespace TradingSimulator
         private readonly SimulatorReporting _simulatorReporting;
 
         /// <summary>
+        /// Performance monitor for centralized metrics collection.
+        /// </summary>
+        private readonly IPerformanceMonitor _performanceMonitor;
+
+        /// <summary>
         /// Performance metrics for tracking processing rates and queue depths.
         /// </summary>
         private readonly PerformanceMetrics _performanceMetrics;
@@ -129,19 +134,22 @@ namespace TradingSimulator
         /// <param name="processedMarkets">Set of already processed market tickers.</param>
         /// <param name="config">Configuration settings for the market processor.</param>
         /// <param name="simulatorReporting">Reporting service for discrepancy detection.</param>
+        /// <param name="performanceMonitor">Performance monitor for centralized metrics collection.</param>
         public MarketProcessor(
             TradingOverseer overseer,
             IServiceScopeFactory scopeFactory,
             HashSet<string> processedMarkets,
             MarketProcessorConfig config,
-            SimulatorReporting simulatorReporting)
+            SimulatorReporting simulatorReporting,
+            IPerformanceMonitor performanceMonitor)
         {
             _overseer = overseer;
             _scopeFactory = scopeFactory;
             _processedMarkets = processedMarkets;
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _simulatorReporting = simulatorReporting;
-            _performanceMetrics = new PerformanceMetrics(_config.EnableMemoryTracking);
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
+            _performanceMetrics = new PerformanceMetrics(_config.EnablePerformanceMetrics);
         }
 
         /// <summary>
@@ -255,6 +263,7 @@ namespace TradingSimulator
 
             // Record performance metrics
             var startTime = DateTime.UtcNow;
+            TimeSpan processingTime = TimeSpan.Zero;
             _performanceMetrics.StartMarketProcessing(marketTicker, marketSnapshots.Count);
 
             try
@@ -285,7 +294,9 @@ namespace TradingSimulator
                 else
                 {
                     OnTestProgress?.Invoke($"{progressPrefix}Processing timeout exceeded ({_config.ProcessingTimeoutSeconds}s) for {marketTicker}. Skipping.");
-                    _performanceMetrics.CompleteMarketProcessing(marketTicker, DateTime.UtcNow - startTime);
+                    processingTime = DateTime.UtcNow - startTime;
+                    _performanceMetrics.CompleteMarketProcessing(marketTicker, processingTime);
+                    _performanceMonitor.RecordExecutionTime("ProcessMarketTimeout", (long)processingTime.TotalMilliseconds);
                     return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
                 }
 
@@ -295,7 +306,9 @@ namespace TradingSimulator
                     var eventLogs = bestPath.events;
 
                     var result = await ProcessEventLogsAsync(marketSnapshots, eventLogs, marketTicker, writeToFile, progressPrefix, group);
-                    _performanceMetrics.CompleteMarketProcessing(marketTicker, DateTime.UtcNow - startTime);
+                    processingTime = DateTime.UtcNow - startTime;
+                    _performanceMetrics.CompleteMarketProcessing(marketTicker, processingTime);
+                    _performanceMonitor.RecordExecutionTime("ProcessMarket", (long)processingTime.TotalMilliseconds);
                     return result;
                 }
             }
@@ -304,7 +317,9 @@ namespace TradingSimulator
                 OnTestProgress?.Invoke($"{progressPrefix}Error processing {marketTicker}: {ex.Message}");
             }
 
-            _performanceMetrics.CompleteMarketProcessing(marketTicker, DateTime.UtcNow - startTime);
+            processingTime = DateTime.UtcNow - startTime;
+            _performanceMetrics.CompleteMarketProcessing(marketTicker, processingTime);
+            _performanceMonitor.RecordExecutionTime("ProcessMarketError", (long)processingTime.TotalMilliseconds);
             return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
         }
 
@@ -452,6 +467,7 @@ namespace TradingSimulator
                 await Task.WhenAll(batchTasks);
                 var batchProcessingTime = DateTime.UtcNow - batchStartTime;
                 _performanceMetrics.RecordBatchProcessing(batch.Count, batchProcessingTime);
+                _performanceMonitor.RecordExecutionTime("ProcessBatch", (long)batchProcessingTime.TotalMilliseconds);
                 OnTestProgress?.Invoke($"{progressPrefix}Completed batch {i / _config.BatchSize + 1} in {batchProcessingTime.TotalSeconds:F2}s");
             }
 
@@ -898,6 +914,7 @@ namespace TradingSimulator
     public class PerformanceMetrics
     {
         private readonly object _metricsLock = new object();
+        private readonly bool _enablePerformanceMetrics;
         private readonly bool _enableMemoryTracking;
         private DateTime _startTime = DateTime.UtcNow;
         private int _totalMarketsProcessed = 0;
@@ -913,10 +930,11 @@ namespace TradingSimulator
         /// <summary>
         /// Initializes a new instance of the PerformanceMetrics class.
         /// </summary>
-        /// <param name="enableMemoryTracking">Whether to enable memory usage tracking.</param>
-        public PerformanceMetrics(bool enableMemoryTracking = false)
+        /// <param name="enablePerformanceMetrics">Whether to enable performance metrics tracking (includes memory tracking).</param>
+        public PerformanceMetrics(bool enablePerformanceMetrics = true)
         {
-            _enableMemoryTracking = enableMemoryTracking;
+            _enablePerformanceMetrics = enablePerformanceMetrics;
+            _enableMemoryTracking = enablePerformanceMetrics;
         }
 
         /// <summary>
@@ -926,6 +944,8 @@ namespace TradingSimulator
         /// <param name="snapshotCount">Number of snapshots in this market.</param>
         public void StartMarketProcessing(string marketTicker, int snapshotCount)
         {
+            if (!_enablePerformanceMetrics) return;
+
             lock (_metricsLock)
             {
                 _totalSnapshotsProcessed += snapshotCount;
@@ -950,6 +970,8 @@ namespace TradingSimulator
         /// <param name="processingTime">Time taken to process this market.</param>
         public void CompleteMarketProcessing(string marketTicker, TimeSpan processingTime)
         {
+            if (!_enablePerformanceMetrics) return;
+
             lock (_metricsLock)
             {
                 _totalMarketsProcessed++;
@@ -965,6 +987,8 @@ namespace TradingSimulator
         /// <param name="processingTime">Time taken to process the batch.</param>
         public void RecordBatchProcessing(int batchSize, TimeSpan processingTime)
         {
+            if (!_enablePerformanceMetrics) return;
+
             lock (_metricsLock)
             {
                 _batchProcessingCount++;
@@ -1046,6 +1070,8 @@ namespace TradingSimulator
         /// </summary>
         public void Reset()
         {
+            if (!_enablePerformanceMetrics) return;
+
             lock (_metricsLock)
             {
                 _startTime = DateTime.UtcNow;
@@ -1064,6 +1090,9 @@ namespace TradingSimulator
         /// </summary>
         public string GetMetricsSummary()
         {
+            if (!_enablePerformanceMetrics)
+                return "Performance metrics tracking is disabled.";
+
             lock (_metricsLock)
             {
                 var summary = $"Performance Metrics:\n" +

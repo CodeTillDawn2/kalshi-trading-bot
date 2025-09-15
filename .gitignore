@@ -124,6 +124,7 @@ docfx_project/api/
 jwt-secret.txt
 !docs/**
 !docs/**
+/KalshiBotLogging/bin
 !docs/**
 /BacklashCommon/bin
 /BacklashCommon/obj

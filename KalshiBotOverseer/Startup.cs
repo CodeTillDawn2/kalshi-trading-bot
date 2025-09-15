@@ -146,8 +146,14 @@ namespace KalshiBotOverseer
             // Add memory cache for data caching
             services.AddMemoryCache();
 
-            // Register SnapshotService
-            services.AddScoped<SnapshotAggregationService>();
+            // Register SnapshotService with dependencies
+            services.AddScoped<SnapshotAggregationService>(sp =>
+                new SnapshotAggregationService(
+                    sp.GetRequiredService<IKalshiBotContext>(),
+                    sp.GetRequiredService<IConfiguration>(),
+                    sp.GetRequiredService<PerformanceMetricsService>(),
+                    sp.GetRequiredService<ILogger<SnapshotAggregationService>>()
+                ));
 
             // Register PerformanceMetricsService
             services.AddSingleton<PerformanceMetricsService>();

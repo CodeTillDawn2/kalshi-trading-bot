@@ -32,6 +32,7 @@ using TradingStrategies.ML;
 using TradingStrategies.Strategies;
 using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Trading.Helpers;
+using TradingStrategies.Trading.Overseer;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using TradingSimulator.Simulator;
 
@@ -80,6 +81,7 @@ namespace TradingSimulator
         private SimulatorReporting _simulatorReporting;
 
         private SqlDataService _sqlDataService;
+        private PerformanceMonitor _performanceMonitor;
 
         /// <summary>
         /// Formats a file name using the configured pattern and provided parameters.
@@ -149,6 +151,9 @@ namespace TradingSimulator
             _cacheDirectory = _simulatorOptions.Value.CacheDirectory;
             Directory.CreateDirectory(_cacheDirectory); // ensure output dir exists
 
+            // Initialize performance monitor
+            _performanceMonitor = new PerformanceMonitor();
+
             // Initialize helper classes
             _dataLoader = new DataLoader(_snapshotService, _simulatorOptions);
             var marketProcessorConfig = new MarketProcessorConfig
@@ -156,7 +161,7 @@ namespace TradingSimulator
                 CacheDirectory = _cacheDirectory,
                 ProcessingTimeoutSeconds = _simulatorOptions.Value.ProcessingTimeoutSeconds
             };
-            _marketProcessor = new MarketProcessor(_overseer, _scopeFactory, _processedMarkets, marketProcessorConfig, _simulatorReporting);
+            _marketProcessor = new MarketProcessor(_overseer, _scopeFactory, _processedMarkets, marketProcessorConfig, _simulatorReporting, _performanceMonitor);
             _marketProcessor.OnTestProgress += msg => OnTestProgress?.Invoke(msg);
             _strategyResolver = new StrategyResolver();
 

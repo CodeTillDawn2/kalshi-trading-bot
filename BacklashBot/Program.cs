@@ -123,7 +123,8 @@ builder.Services.AddTransient(provider =>
         dataCache,
         provider.GetRequiredService<IOptions<TradingConfig>>(),
         provider.GetRequiredService<IScopeManagerService>(),
-        provider.GetRequiredService<IStatusTrackerService>()
+        provider.GetRequiredService<IStatusTrackerService>(),
+        provider.GetRequiredService<ICentralPerformanceMonitor>()
     );
 });
 
@@ -148,7 +149,8 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
                 dataCache,
                 sp.GetRequiredService<IOptions<TradingConfig>>(),
                 sp.GetRequiredService<IScopeManagerService>(),
-                sp.GetRequiredService<IStatusTrackerService>()
+                sp.GetRequiredService<IStatusTrackerService>(),
+                sp.GetRequiredService<ICentralPerformanceMonitor>()
             ),
             sp.GetRequiredService<IOptions<CalculationConfig>>()
         );

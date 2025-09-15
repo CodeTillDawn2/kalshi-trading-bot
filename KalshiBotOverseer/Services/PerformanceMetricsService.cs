@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using KalshiBotData.Data.Interfaces;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace KalshiBotOverseer.Services
 {
@@ -10,7 +12,7 @@ namespace KalshiBotOverseer.Services
     /// This service aggregates metrics from various components including WebSocket operations, API calls,
     /// SignalR communications, overnight tasks, and snapshot processing.
     /// </summary>
-    public class PerformanceMetricsService
+    public class PerformanceMetricsService : IKalshiBotContextPerformanceMetrics
     {
         private readonly ILogger<PerformanceMetricsService> _logger;
 
@@ -27,6 +29,9 @@ namespace KalshiBotOverseer.Services
         private long _totalMessagesProcessed;
         private long _totalHandshakeRequests;
         private long _totalCheckInRequests;
+        private List<long> _handshakeLatencies = new();
+        private List<long> _checkInLatencies = new();
+        private List<long> _messageLatencies = new();
         private DateTime _lastMetricsReset;
 
         // Overnight task metrics
@@ -35,16 +40,46 @@ namespace KalshiBotOverseer.Services
         private TimeSpan _totalOvernightDuration;
         private Dictionary<string, TimeSpan> _overnightTaskTimings = new();
 
+        // Snapshot aggregation metrics
+        private long _totalSnapshotAggregationTime;
+        private int _snapshotAggregationCount;
+        private List<long> _snapshotAggregationTimes = new();
 
         // System health metrics
         private int _marketRefreshFailureCount;
         private DateTime? _lastMarketRefreshFailure;
+
+        // Database metrics
+        private Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> _databaseMetrics = new();
+
+        /// <summary>
+        /// Gets the current database performance metrics.
+        /// </summary>
+        public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> DatabaseMetrics => _databaseMetrics;
+
+        /// <summary>
+        /// Gets the current database performance metrics.
+        /// </summary>
+        /// <returns>Dictionary containing operation names and their performance statistics.</returns>
+        public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetPerformanceMetrics()
+        {
+            return _databaseMetrics;
+        }
+
+        /// <summary>
+        /// Resets all performance metrics.
+        /// </summary>
+        public void ResetPerformanceMetrics()
+        {
+            _databaseMetrics.Clear();
+        }
 
         // Locks for thread safety
         private readonly object _webSocketLock = new();
         private readonly object _apiLock = new();
         private readonly object _signalRLock = new();
         private readonly object _overnightLock = new();
+        private readonly object _snapshotLock = new();
         private readonly object _healthLock = new();
 
         /// <summary>
@@ -130,13 +165,53 @@ namespace KalshiBotOverseer.Services
         }
 
         /// <summary>
-        /// Gets the current SignalR metrics.
+        /// Records the latency of a SignalR handshake operation.
         /// </summary>
-        public (long MessagesProcessed, long HandshakeRequests, long CheckInRequests, DateTime LastReset) GetSignalRMetrics()
+        /// <param name="latency">The latency duration.</param>
+        public void RecordSignalRHandshakeLatency(TimeSpan latency)
         {
             lock (_signalRLock)
             {
-                return (_totalMessagesProcessed, _totalHandshakeRequests, _totalCheckInRequests, _lastMetricsReset);
+                _handshakeLatencies.Add((long)latency.TotalMilliseconds);
+            }
+        }
+
+        /// <summary>
+        /// Records the latency of a SignalR check-in operation.
+        /// </summary>
+        /// <param name="latency">The latency duration.</param>
+        public void RecordSignalRCheckInLatency(TimeSpan latency)
+        {
+            lock (_signalRLock)
+            {
+                _checkInLatencies.Add((long)latency.TotalMilliseconds);
+            }
+        }
+
+        /// <summary>
+        /// Records the latency of a general SignalR message processing operation.
+        /// </summary>
+        /// <param name="latency">The latency duration.</param>
+        public void RecordSignalRMessageLatency(TimeSpan latency)
+        {
+            lock (_signalRLock)
+            {
+                _messageLatencies.Add((long)latency.TotalMilliseconds);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current SignalR metrics.
+        /// </summary>
+        public (long MessagesProcessed, long HandshakeRequests, long CheckInRequests, DateTime LastReset,
+                double AvgHandshakeLatencyMs, double AvgCheckInLatencyMs, double AvgMessageLatencyMs) GetSignalRMetrics()
+        {
+            lock (_signalRLock)
+            {
+                return (_totalMessagesProcessed, _totalHandshakeRequests, _totalCheckInRequests, _lastMetricsReset,
+                        _handshakeLatencies.Count > 0 ? _handshakeLatencies.Average() : 0,
+                        _checkInLatencies.Count > 0 ? _checkInLatencies.Average() : 0,
+                        _messageLatencies.Count > 0 ? _messageLatencies.Average() : 0);
             }
         }
 
@@ -150,6 +225,9 @@ namespace KalshiBotOverseer.Services
                 _totalMessagesProcessed = 0;
                 _totalHandshakeRequests = 0;
                 _totalCheckInRequests = 0;
+                _handshakeLatencies.Clear();
+                _checkInLatencies.Clear();
+                _messageLatencies.Clear();
                 _lastMetricsReset = DateTime.UtcNow;
             }
         }
@@ -191,6 +269,69 @@ namespace KalshiBotOverseer.Services
 
         #endregion
 
+        #region Snapshot Aggregation Metrics
+
+        /// <summary>
+        /// Records a snapshot aggregation operation with its duration.
+        /// </summary>
+        /// <param name="duration">The duration of the snapshot aggregation operation.</param>
+        public void RecordSnapshotAggregation(TimeSpan duration)
+        {
+            lock (_snapshotLock)
+            {
+                _totalSnapshotAggregationTime += (long)duration.TotalMilliseconds;
+                _snapshotAggregationCount++;
+                _snapshotAggregationTimes.Add((long)duration.TotalMilliseconds);
+                _logger.LogDebug("Snapshot aggregation recorded: Duration={Duration}ms, TotalCount={Count}, TotalTime={TotalTime}ms",
+                    duration.TotalMilliseconds, _snapshotAggregationCount, _totalSnapshotAggregationTime);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current snapshot aggregation metrics.
+        /// </summary>
+        public (int Count, double AverageMs, long MinMs, long MaxMs, long TotalMs) GetSnapshotAggregationMetrics()
+        {
+            lock (_snapshotLock)
+            {
+                if (_snapshotAggregationTimes.Count == 0)
+                    return (0, 0, 0, 0, 0);
+
+                return (
+                    _snapshotAggregationCount,
+                    _snapshotAggregationTimes.Average(),
+                    _snapshotAggregationTimes.Min(),
+                    _snapshotAggregationTimes.Max(),
+                    _totalSnapshotAggregationTime
+                );
+            }
+        }
+
+        /// <summary>
+        /// Gets all recorded snapshot aggregation times.
+        /// </summary>
+        public long[] GetSnapshotAggregationTimes()
+        {
+            lock (_snapshotLock)
+            {
+                return _snapshotAggregationTimes.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Clears the snapshot aggregation metrics.
+        /// </summary>
+        public void ClearSnapshotAggregationMetrics()
+        {
+            lock (_snapshotLock)
+            {
+                _snapshotAggregationTimes.Clear();
+                _totalSnapshotAggregationTime = 0;
+                _snapshotAggregationCount = 0;
+            }
+        }
+
+        #endregion
 
         #region System Health Metrics
 
@@ -226,6 +367,109 @@ namespace KalshiBotOverseer.Services
             lock (_healthLock)
             {
                 return (_marketRefreshFailureCount, _lastMarketRefreshFailure);
+            }
+        }
+
+        #endregion
+
+        #region Database Metrics
+
+        /// <summary>
+        /// Records database performance metrics.
+        /// </summary>
+        /// <param name="metrics">Dictionary containing database operation metrics.</param>
+        public void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics)
+        {
+            lock (_snapshotLock) // reusing snapshot lock for database metrics
+            {
+                _databaseMetrics = new Dictionary<string, (int, int, TimeSpan, double)>(metrics);
+                _logger.LogDebug("Database metrics recorded: {Count} operations", metrics.Count);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current database performance metrics.
+        /// </summary>
+        public Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetDatabaseMetrics()
+        {
+            lock (_snapshotLock)
+            {
+                return new Dictionary<string, (int, int, TimeSpan, double)>(_databaseMetrics);
+            }
+        }
+
+        #endregion
+
+        #region Metrics Status
+
+        /// <summary>
+        /// Gets a comprehensive status of all metrics being captured.
+        /// </summary>
+        public Dictionary<string, object> GetMetricsStatus()
+        {
+            var status = new Dictionary<string, object>();
+
+            // WebSocket metrics
+            lock (_webSocketLock)
+            {
+                status["WebSocketEventCount"] = _webSocketEventCount;
+                status["LastWebSocketEventTime"] = _lastWebSocketEventTime;
+            }
+
+            // API metrics
+            lock (_apiLock)
+            {
+                status["TotalApiFetchTime"] = _totalApiFetchTime;
+                status["ApiFetchCount"] = _apiFetchCount;
+                status["LastApiFetchTime"] = _lastApiFetchTime;
+            }
+
+            // SignalR metrics
+            lock (_signalRLock)
+            {
+                status["TotalMessagesProcessed"] = _totalMessagesProcessed;
+                status["TotalHandshakeRequests"] = _totalHandshakeRequests;
+                status["TotalCheckInRequests"] = _totalCheckInRequests;
+            }
+
+            // Overnight task metrics
+            lock (_overnightLock)
+            {
+                status["TotalOvernightTasks"] = _totalOvernightTasks;
+                status["SuccessfulOvernightTasks"] = _successfulOvernightTasks;
+            }
+
+            // Snapshot aggregation metrics
+            lock (_snapshotLock)
+            {
+                status["SnapshotAggregationCount"] = _snapshotAggregationCount;
+                status["TotalSnapshotAggregationTime"] = _totalSnapshotAggregationTime;
+                status["SnapshotAggregationTimesCount"] = _snapshotAggregationTimes.Count;
+            }
+
+            // System health metrics
+            lock (_healthLock)
+            {
+                status["MarketRefreshFailureCount"] = _marketRefreshFailureCount;
+                status["LastMarketRefreshFailure"] = _lastMarketRefreshFailure;
+            }
+
+            status["LastMetricsReset"] = _lastMetricsReset;
+            status["ServiceUptime"] = DateTime.UtcNow - _lastMetricsReset;
+
+            return status;
+        }
+
+        /// <summary>
+        /// Logs the current metrics status for debugging purposes.
+        /// </summary>
+        public void LogMetricsStatus()
+        {
+            var status = GetMetricsStatus();
+            _logger.LogInformation("Performance Metrics Status:");
+            foreach (var kvp in status)
+            {
+                _logger.LogInformation("  {Key}: {Value}", kvp.Key, kvp.Value);
             }
         }
 

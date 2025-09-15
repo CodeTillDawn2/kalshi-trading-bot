@@ -1,6 +1,7 @@
 using KalshiBotData.Data.Interfaces;
 using KalshiBotData.Extensions;
 using KalshiBotData.Models;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.Data.SqlClient;
 using Polly;
 using Polly.Retry;
@@ -31,7 +32,7 @@ namespace KalshiBotData.Data
     /// - Logging and audit trails
     /// - Weight set and strategy management
     /// </remarks>
-    public class KalshiBotContext : DbContext, IKalshiBotContext
+    public class KalshiBotContext : DbContext, IKalshiBotContext, IKalshiBotContextPerformanceMetrics
     {
         private DbSet<Event> Events { get; set; }
         private DbSet<Series> Series { get; set; }

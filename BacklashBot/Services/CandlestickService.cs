@@ -171,16 +171,7 @@ namespace BacklashBot.Services
         /// <param name="additionalData">Optional additional data to log</param>
         private void LogPerformanceMetric(string operationName, long elapsedMilliseconds, string? additionalData = null)
         {
-            if (!_executionConfig.EnableCandlestickPerformanceMetrics) return;
-
-            var logLevel = _executionConfig.CandlestickPerformanceMetricsLogLevel.ToLower() switch
-            {
-                "debug" => LogLevel.Debug,
-                "information" => LogLevel.Information,
-                "warning" => LogLevel.Warning,
-                "error" => LogLevel.Error,
-                _ => LogLevel.Information
-            };
+            if (!_executionConfig.EnableCandlestickServicePerformanceMetrics) return;
 
             var message = $"Performance: {operationName} completed in {elapsedMilliseconds}ms";
             if (!string.IsNullOrEmpty(additionalData))
@@ -188,7 +179,14 @@ namespace BacklashBot.Services
                 message += $" - {additionalData}";
             }
 
-            _logger.Log(logLevel, message);
+            _logger.LogInformation(message);
+
+            // Record execution time in CentralPerformanceMonitor
+            var performanceMonitor = _serviceFactory.GetPerformanceMonitor();
+            if (performanceMonitor != null)
+            {
+                performanceMonitor.RecordExecutionTime(operationName, elapsedMilliseconds);
+            }
         }
 
         /// <summary>

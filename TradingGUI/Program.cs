@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Management;
+using Microsoft.Extensions.DependencyInjection;
+using TradingStrategies.Trading.Overseer;
 
 namespace SimulatorWinForms
 {
@@ -10,10 +12,15 @@ namespace SimulatorWinForms
         {
             if (IsUnderTestHost()) return;
 
+            // Set up DI container
+            var services = new ServiceCollection();
+            services.AddSingleton<IPerformanceMonitor, PerformanceMonitor>();
+            var serviceProvider = services.BuildServiceProvider();
+
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            Application.Run(new MainForm(serviceProvider));
         }
 
         private static bool IsUnderTestHost()
