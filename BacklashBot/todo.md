@@ -51,14 +51,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## BacklashPatterns.PatternSearch
 
-## KalshiBotAPI.KalshiAPI.KalshiAPIService
-
-## BacklashBot.Management.BrainStatusService
-
-## BacklashBot.Management.MarketAnalysisHelper
-
-## BacklashBot.Services.InterestScoreService
-
 
 ## TradingGUI.MainForm
 

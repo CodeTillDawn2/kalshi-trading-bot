@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Management;
 using Microsoft.Extensions.DependencyInjection;
 using TradingStrategies.Trading.Overseer;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace SimulatorWinForms
 {
@@ -14,7 +15,7 @@ namespace SimulatorWinForms
 
             // Set up DI container
             var services = new ServiceCollection();
-            services.AddSingleton<IPerformanceMonitor, PerformanceMonitor>();
+            services.AddSingleton<BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor, PerformanceMonitor>();
             var serviceProvider = services.BuildServiceProvider();
 
             Application.SetHighDpiMode(HighDpiMode.SystemAware);

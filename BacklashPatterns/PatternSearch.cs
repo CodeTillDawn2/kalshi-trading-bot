@@ -1,9 +1,11 @@
 using BacklashDTOs;
 using BacklashPatterns.PatternDefinitions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using static BacklashPatterns.PatternUtils;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace BacklashPatterns
 {
@@ -129,6 +131,37 @@ namespace BacklashPatterns
         private static ILogger? _logger;
 
         /// <summary>
+        /// Configuration key for enabling/disabling performance metrics collection for PatternSearch class.
+        /// When disabled, all performance monitoring operations are skipped for better performance.
+        /// This affects timing measurements, pattern detection counts, and central performance monitor integration.
+        /// Default is true. Can be configured from appsettings.json with key "PatternSearch:EnablePerformanceMetrics".
+        /// </summary>
+        private static bool _enablePerformanceMetrics = true;
+
+        /// <summary>
+        /// Gets or sets whether performance metrics collection is enabled for the PatternSearch class.
+        /// When disabled, all performance monitoring operations are skipped to improve performance.
+        /// This includes timing measurements, pattern detection counts, and central performance monitor integration.
+        /// </summary>
+        /// <remarks>
+        /// Setting this to false will disable:
+        /// - Stopwatch timing for pattern detection
+        /// - Pattern check time recording
+        /// - Pattern found count tracking
+        /// - Central performance monitor integration
+        /// - Candle processing count increments
+        /// </remarks>
+        public static bool EnablePerformanceMetrics
+        {
+            get => _enablePerformanceMetrics;
+            set
+            {
+                _enablePerformanceMetrics = value;
+                _logger?.LogInformation("PatternSearch performance metrics collection set to: {Enabled}", value);
+            }
+        }
+
+        /// <summary>
         /// Sets the logger instance for this static class.
         /// </summary>
         /// <param name="logger">The logger to use for logging operations.</param>
@@ -136,6 +169,65 @@ namespace BacklashPatterns
         {
             _logger = logger;
             CandleMetrics.SetLogger(logger);
+        }
+
+        /// <summary>
+        /// Configures performance metrics settings for the PatternSearch class from configuration.
+        /// </summary>
+        /// <param name="configuration">The configuration instance to read settings from.</param>
+        /// <remarks>
+        /// Reads the "PatternSearch:EnablePerformanceMetrics" setting from appsettings.json.
+        /// If not found, defaults to true.
+        /// This method should be called during application startup to configure performance monitoring.
+        /// </remarks>
+        /// <example>
+        /// Usage in Program.cs or Startup.cs:
+        /// <code>
+        /// PatternSearch.ConfigurePerformanceMetrics(configuration);
+        /// </code>
+        /// </example>
+        public static void ConfigurePerformanceMetrics(IConfiguration configuration)
+        {
+            if (configuration == null)
+            {
+                _logger?.LogWarning("Configuration is null, using default performance metrics setting (enabled)");
+                return;
+            }
+
+            var section = configuration.GetSection("PatternSearch");
+            bool originalValue = _enablePerformanceMetrics;
+            _enablePerformanceMetrics = section.GetValue("EnablePerformanceMetrics", true);
+
+            if (originalValue != _enablePerformanceMetrics)
+            {
+                _logger?.LogInformation("PatternSearch performance metrics configured from appsettings.json: {Enabled} (was {Original})",
+                    _enablePerformanceMetrics, originalValue);
+            }
+            else
+            {
+                _logger?.LogDebug("PatternSearch performance metrics setting: {Enabled}", _enablePerformanceMetrics);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current performance metrics configuration status for the PatternSearch class.
+        /// </summary>
+        /// <returns>A tuple containing the enabled status and configuration key used.</returns>
+        public static (bool IsEnabled, string ConfigurationKey) GetPerformanceMetricsStatus()
+        {
+            return (_enablePerformanceMetrics, "PatternSearch:EnablePerformanceMetrics");
+        }
+
+        /// <summary>
+        /// Checks if performance metrics collection is currently enabled for the PatternSearch class.
+        /// </summary>
+        /// <returns>True if performance metrics are enabled, false otherwise.</returns>
+        /// <remarks>
+        /// This is a convenience method for checking the current state without accessing the property directly.
+        /// </remarks>
+        public static bool IsPerformanceMetricsEnabled()
+        {
+            return _enablePerformanceMetrics;
         }
 
         /// <summary>
@@ -150,11 +242,11 @@ namespace BacklashPatterns
         /// <param name="prices">Array of candle data containing price and volume information.</param>
         /// <param name="trendLookback">Number of candles to look back for trend analysis and pattern context.</param>
         /// <returns>Dictionary mapping candle indices to lists of detected pattern definitions.</returns>
-        public static Dictionary<int, List<PatternDefinition>> DetectPatterns(CandleMids[] prices, int trendLookback)
+        public static Dictionary<int, List<PatternDefinition>> DetectPatterns(CandleMids[] prices, int trendLookback, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null)
         {
             var config = new PatternDetectionConfig();
             var metrics = new PatternDetectionMetrics();
-            return DetectPatternsAsync(prices, trendLookback, config, metrics).GetAwaiter().GetResult();
+            return DetectPatternsAsync(prices, trendLookback, config, metrics, performanceMonitor).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -166,6 +258,7 @@ namespace BacklashPatterns
         /// <param name="trendLookback">Number of candles to look back for trend analysis and pattern context.</param>
         /// <param name="config">Configuration for pattern detection thresholds and settings.</param>
         /// <param name="metrics">Metrics collector for performance tracking.</param>
+        /// <param name="performanceMonitor">Optional performance monitor to record metrics centrally.</param>
         /// <returns>Task containing dictionary mapping candle indices to lists of detected pattern definitions.</returns>
         /// <remarks>
         /// The method performs significance checks to skip insignificant candles and applies
@@ -173,14 +266,18 @@ namespace BacklashPatterns
         /// Detected patterns are then filtered to remove redundancies and less significant formations.
         /// </remarks>
         public static async Task<Dictionary<int, List<PatternDefinition>>> DetectPatternsAsync(CandleMids[] prices,
-                int trendLookback, PatternDetectionConfig config, PatternDetectionMetrics metrics)
+                int trendLookback, PatternDetectionConfig config, PatternDetectionMetrics metrics,
+                IPerformanceMonitor? performanceMonitor = null)
         {
             if (prices == null || prices.Length < 2)
                 return new Dictionary<int, List<PatternDefinition>>();
 
             return await Task.Run(async () =>
             {
-                metrics.StartDetection();
+                if (_enablePerformanceMetrics)
+                {
+                    metrics.StartDetection();
+                }
 
                 Dictionary<int, CandleMetrics> metricsCache = new Dictionary<int, CandleMetrics>();
 
@@ -573,10 +670,30 @@ namespace BacklashPatterns
                         detailedPatterns[i] = filteredPatterns;
                 }
 
-                metrics.IncrementCandlesProcessed();
+                if (_enablePerformanceMetrics)
+                {
+                    metrics.IncrementCandlesProcessed();
+                }
             }
 
-            metrics.StopDetection();
+            if (_enablePerformanceMetrics)
+            {
+                metrics.StopDetection();
+
+                // Record performance metrics to central monitor if provided
+                if (performanceMonitor != null)
+                {
+                    var summary = metrics.GetSummary();
+                    performanceMonitor.RecordPerformanceMetrics(
+                        "PatternSearch.DetectPatternsAsync",
+                        summary.TotalDetectionTimeMs,
+                        summary.TotalCandlesProcessed,
+                        summary.TotalPatternsFound,
+                        summary.PatternCheckTimes
+                    );
+                }
+            }
+
             return detailedPatterns;
         });
         }
@@ -599,6 +716,11 @@ namespace BacklashPatterns
         /// </summary>
         private static async Task<PatternDefinition?> CheckPatternWithMetricsAsync(Func<Task<PatternDefinition?>> patternCheck, string patternName, PatternDetectionMetrics metrics)
         {
+            if (!_enablePerformanceMetrics)
+            {
+                return await patternCheck();
+            }
+
             var stopwatch = Stopwatch.StartNew();
             var result = await patternCheck();
             stopwatch.Stop();

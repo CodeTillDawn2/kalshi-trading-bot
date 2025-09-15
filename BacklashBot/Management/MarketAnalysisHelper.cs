@@ -22,7 +22,7 @@ namespace BacklashBot.Management
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ITradingSnapshotService _snapshotService;
         private readonly ILogger<MarketAnalysisHelper> _logger;
-        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
+        private readonly ICentralPerformanceMonitor? _centralPerformanceMonitor;
         private readonly bool _metricsEnabled;
         private int _totalMarketsProcessed = 0;
         private long _totalProcessingTimeMs = 0;
@@ -35,15 +35,14 @@ namespace BacklashBot.Management
         /// <param name="snapshotPeriodHelper">Helper for processing snapshot periods into valid groups.</param>
         /// <param name="snapshotService">Service for managing trading snapshots.</param>
         /// <param name="executionConfig">Configuration options for execution settings.</param>
-        /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics.</param>
+        /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics. Can be null for environments without central monitoring.</param>
         /// <param name="logger">Logger for recording analysis operations and errors.</param>
-        public MarketAnalysisHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper, ITradingSnapshotService snapshotService, IOptions<ExecutionConfig> executionConfig, ICentralPerformanceMonitor centralPerformanceMonitor, ILogger<MarketAnalysisHelper> logger)
+        public MarketAnalysisHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper, ITradingSnapshotService snapshotService, IOptions<ExecutionConfig> executionConfig, ICentralPerformanceMonitor? centralPerformanceMonitor, ILogger<MarketAnalysisHelper> logger)
         {
             ArgumentNullException.ThrowIfNull(scopeFactory);
             ArgumentNullException.ThrowIfNull(snapshotPeriodHelper);
             ArgumentNullException.ThrowIfNull(snapshotService);
             ArgumentNullException.ThrowIfNull(executionConfig);
-            ArgumentNullException.ThrowIfNull(centralPerformanceMonitor);
             ArgumentNullException.ThrowIfNull(logger);
 
             _snapshotService = snapshotService;
@@ -200,8 +199,8 @@ namespace BacklashBot.Management
                 _logger.LogInformation("Completed snapshot group generation process. Total markets processed: {TotalMarkets}, Total processing time: {TotalTime} ms, Average time per market: {AverageTime} ms, Overall duration: {OverallDuration} ms.",
                     totalMarketsProcessed, totalProcessingTime, averageTimePerMarket, totalStopwatch.ElapsedMilliseconds);
 
-                // Post metrics to central performance monitor
-                _centralPerformanceMonitor.RecordMarketAnalysisHelperMetrics(totalMarketsProcessed, totalProcessingTime, averageTimePerMarket, _errorCount);
+                // Post metrics to central performance monitor if available
+                _centralPerformanceMonitor?.RecordMarketAnalysisHelperMetrics(totalMarketsProcessed, totalProcessingTime, averageTimePerMarket, _errorCount);
             }
             else
             {
