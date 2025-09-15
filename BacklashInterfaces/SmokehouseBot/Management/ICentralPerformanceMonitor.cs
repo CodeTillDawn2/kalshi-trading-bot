@@ -49,5 +49,14 @@ namespace BacklashBot.Management.Interfaces
             int successfulMarkets,
             int failedMarkets,
             TimeSpan totalWaitTime);
+
+        /// <summary>
+        /// Records MarketAnalysisHelper performance metrics.
+        /// </summary>
+        /// <param name="totalMarkets">Total number of markets processed.</param>
+        /// <param name="totalTimeMs">Total processing time in milliseconds.</param>
+        /// <param name="averageTimeMs">Average time per market in milliseconds.</param>
+        /// <param name="errorCount">Number of errors encountered.</param>
+        void RecordMarketAnalysisHelperMetrics(int totalMarkets, long totalTimeMs, double averageTimeMs, int errorCount);
     }
 }

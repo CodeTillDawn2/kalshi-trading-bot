@@ -699,6 +699,44 @@ namespace BacklashBot.Management
         }
 
         /// <summary>
+        /// Records MarketAnalysisHelper performance metrics.
+        /// </summary>
+        /// <param name="totalMarkets">Total number of markets processed.</param>
+        /// <param name="totalTimeMs">Total processing time in milliseconds.</param>
+        /// <param name="averageTimeMs">Average time per market in milliseconds.</param>
+        /// <param name="errorCount">Number of errors encountered.</param>
+        /// <remarks>
+        /// This method receives performance data from MarketAnalysisHelper
+        /// and integrates it with the central performance monitoring system.
+        /// </remarks>
+        public void RecordMarketAnalysisHelperMetrics(int totalMarkets, long totalTimeMs, double averageTimeMs, int errorCount)
+        {
+            // Record execution time
+            RecordExecutionTime("MarketAnalysisHelper.GenerateSnapshotGroups", totalTimeMs);
+
+            // Log performance summary
+            _logger.LogInformation(
+                "MARKET ANALYSIS HELPER PERFORMANCE: TotalMarkets={TotalMarkets}, TotalTime={TotalTime}ms, AvgTime={AvgTime:F2}ms, Errors={Errors}",
+                totalMarkets, totalTimeMs, averageTimeMs, errorCount);
+
+            // Check for performance alerts
+            if (errorCount > 0)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: MarketAnalysisHelper encountered {ErrorCount} errors", errorCount);
+            }
+
+            if (averageTimeMs > 5000) // 5 seconds per market
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Average market processing time {AvgTime:F2}ms exceeds 5 seconds", averageTimeMs);
+            }
+
+            if (totalTimeMs > 300000) // 5 minutes total
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Total processing time {TotalTime}ms exceeds 5 minutes", totalTimeMs);
+            }
+        }
+
+        /// <summary>
         /// Gets a formatted performance summary string.
         /// </summary>
         /// <returns>Formatted performance summary.</returns>
