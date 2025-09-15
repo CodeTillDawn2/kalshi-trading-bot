@@ -75,10 +75,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## TradingSimulator.Simulator.SimulatorReporting
 
-## TradingSimulator.MarketProcessor
-
-## KalshiBotOverseer.OverseerHub
-
 ## KalshiBotOverseer.OvernightActivitiesHelper
 
 ## TradingGUI.MainForm
