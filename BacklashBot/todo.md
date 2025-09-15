@@ -33,14 +33,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## TradingSimulator.CachedMarketData
 
-## KalshiBotAPI.Websockets.MessageProcessor
-
-## KalshiBotContext.Data.SqlDataService
-
-## KalshiBotOverseer.Services.BrainPersistenceService
-
-## KalshiBotOverseer.Controllers.MarketWatchController
-
 
 ## TradingGUI.MainForm
 

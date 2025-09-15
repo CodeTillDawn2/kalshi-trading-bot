@@ -9,10 +9,12 @@ using System.Data;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 using Polly;
 using Polly.Retry;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using BacklashInterfaces.PerformanceMetrics;
 namespace KalshiBotData.Data
 {
     /// <summary>
@@ -41,6 +43,11 @@ namespace KalshiBotData.Data
         /// Logger instance for recording operational events, errors, and performance metrics.
         /// </summary>
         private readonly ILogger<ISqlDataService> _logger;
+
+        /// <summary>
+        /// Collection of performance metrics receivers that will receive metrics automatically.
+        /// </summary>
+        private readonly IEnumerable<ISqlDataServicePerformanceMetrics> _performanceMetricsReceivers;
 
         /// <summary>
         /// Thread-safe queue for order book data operations awaiting database persistence.
@@ -113,15 +120,39 @@ namespace KalshiBotData.Data
         private long _totalFailed;
 
         /// <summary>
+        /// Start time for throughput calculations.
+        /// </summary>
+        private readonly DateTime _startTime;
+
+        /// <summary>
+        /// Total latency accumulated for processed operations (in milliseconds).
+        /// </summary>
+        private long _totalLatencyMs;
+
+        /// <summary>
+        /// Number of operations measured for latency.
+        /// </summary>
+        private long _latencySampleCount;
+
+        /// <summary>
+        /// Flag to enable or disable performance metrics collection.
+        /// </summary>
+        private readonly bool _enablePerformanceMetrics;
+
+        /// <summary>
         /// Initializes a new instance of the SqlDataService with configuration and logging dependencies.
         /// Sets up concurrent queues for different data types and starts background worker tasks for processing.
         /// </summary>
         /// <param name="configuration">Application configuration containing database connection string.</param>
         /// <param name="logger">Logger for recording service operations and errors.</param>
-        public SqlDataService(IConfiguration configuration, ILogger<ISqlDataService> logger)
+        /// <param name="performanceMetricsReceivers">Collection of services that will receive performance metrics automatically.</param>
+        public SqlDataService(IConfiguration configuration, ILogger<ISqlDataService> logger,
+                             IEnumerable<ISqlDataServicePerformanceMetrics>? performanceMetricsReceivers = null)
         {
             _logger = logger;
             _connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
+            _startTime = DateTime.UtcNow;
+            _performanceMetricsReceivers = performanceMetricsReceivers ?? Array.Empty<ISqlDataServicePerformanceMetrics>();
 
             // Load configuration options with defaults
             var sqlDataConfig = configuration.GetSection("SqlDataService");
@@ -130,6 +161,7 @@ namespace KalshiBotData.Data
             _maxQueueSize = sqlDataConfig.GetValue<int>("MaxQueueSize", 10000);
             _workersPerQueue = sqlDataConfig.GetValue<int>("WorkersPerQueue", 1);
             _batchSize = sqlDataConfig.GetValue<int>("BatchSize", 1);
+            _enablePerformanceMetrics = sqlDataConfig.GetValue<bool>("EnablePerformanceMetrics", false);
 
             _orderBookQueue = new ConcurrentQueue<DatabaseOperation>();
             _tradeQueue = new ConcurrentQueue<DatabaseOperation>();
@@ -310,6 +342,7 @@ namespace KalshiBotData.Data
                             {
                                 StoredProcedure = "dbo.sp_InsertFeed_OrderBook",
                                 Identifier = marketTicker,
+                                EnqueueTime = DateTime.UtcNow,
                                 SetParameters = cmd => SetOrderBookParameters(cmd, msg, sid, kalshiSeq, marketTicker, offerType, price, null, side, priceLevel[1].GetInt32())
                             });
                         }
@@ -338,6 +371,7 @@ namespace KalshiBotData.Data
                 {
                     StoredProcedure = "dbo.sp_InsertFeed_OrderBook",
                     Identifier = marketTicker,
+                    EnqueueTime = DateTime.UtcNow,
                     SetParameters = cmd => SetOrderBookParameters(cmd, msg, sid, kalshiSeq, marketTicker, offerType, price, delta, side, 0)
                 });
             }
@@ -391,6 +425,7 @@ namespace KalshiBotData.Data
             {
                 StoredProcedure = "dbo.sp_InsertFeed_Ticker",
                 Identifier = marketTicker,
+                EnqueueTime = DateTime.UtcNow,
                 SetParameters = cmd =>
                 {
                     cmd.Parameters.AddWithValue("@market_id", msg.TryGetProperty("market_id", out var mid)
@@ -452,6 +487,7 @@ namespace KalshiBotData.Data
             {
                 StoredProcedure = "dbo.sp_InsertFeed_Trade",
                 Identifier = marketTicker,
+                EnqueueTime = DateTime.UtcNow,
                 SetParameters = cmd =>
                 {
                     cmd.Parameters.AddWithValue("@market_ticker", marketTicker);
@@ -508,6 +544,7 @@ namespace KalshiBotData.Data
             {
                 StoredProcedure = "dbo.sp_InsertFeed_Fill",
                 Identifier = marketTicker,
+                EnqueueTime = DateTime.UtcNow,
                 SetParameters = cmd =>
                 {
                     cmd.Parameters.AddWithValue("@trade_id", msg.TryGetProperty("trade_id", out var tradeId)
@@ -570,6 +607,7 @@ namespace KalshiBotData.Data
             {
                 StoredProcedure = "dbo.sp_InsertFeed_Lifecycle_Event",
                 Identifier = eventTicker,
+                EnqueueTime = DateTime.UtcNow,
                 SetParameters = cmd =>
                 {
                     cmd.Parameters.AddWithValue("@event_ticker", eventTicker);
@@ -623,6 +661,7 @@ namespace KalshiBotData.Data
             {
                 StoredProcedure = "dbo.sp_InsertFeed_LifeCycle_Market",
                 Identifier = marketTicker,
+                EnqueueTime = DateTime.UtcNow,
                 SetParameters = cmd =>
                 {
                     cmd.Parameters.AddWithValue("@market_ticker", marketTicker);
@@ -725,6 +764,110 @@ namespace KalshiBotData.Data
             _eventLifecycleQueue.Count + _marketLifecycleQueue.Count;
 
         /// <summary>
+        /// Gets the operations per second (throughput) since service start.
+        /// Returns 0 if performance metrics are disabled.
+        /// </summary>
+        public double OperationsPerSecond
+        {
+            get
+            {
+                if (!_enablePerformanceMetrics) return 0;
+                var elapsed = DateTime.UtcNow - _startTime;
+                return elapsed.TotalSeconds > 0 ? _totalProcessed / elapsed.TotalSeconds : 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the average latency in milliseconds for processed operations.
+        /// Returns 0 if performance metrics are disabled.
+        /// </summary>
+        public double AverageLatencyMs
+        {
+            get
+            {
+                if (!_enablePerformanceMetrics) return 0;
+                return _latencySampleCount > 0 ? (double)_totalLatencyMs / _latencySampleCount : 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the current CPU usage percentage.
+        /// Returns 0 if performance metrics are disabled.
+        /// </summary>
+        public double CpuUsage
+        {
+            get
+            {
+                if (!_enablePerformanceMetrics) return 0;
+                try
+                {
+                    var process = Process.GetCurrentProcess();
+                    return (process.TotalProcessorTime.TotalMilliseconds / (DateTime.UtcNow - _startTime).TotalMilliseconds) * 100;
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the current memory usage in MB.
+        /// Returns 0 if performance metrics are disabled.
+        /// </summary>
+        public double MemoryUsageMB
+        {
+            get
+            {
+                if (!_enablePerformanceMetrics) return 0;
+                try
+                {
+                    var process = Process.GetCurrentProcess();
+                    return process.WorkingSet64 / (1024.0 * 1024.0);
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Broadcasts current performance metrics to all registered receivers.
+        /// Only sends metrics if performance monitoring is enabled.
+        /// </summary>
+        private void BroadcastPerformanceMetrics()
+        {
+            if (!_enablePerformanceMetrics || !_performanceMetricsReceivers.Any())
+                return;
+
+            try
+            {
+                foreach (var receiver in _performanceMetricsReceivers)
+                {
+                    try
+                    {
+                        receiver.ReceiveThroughputMetrics(OperationsPerSecond, _totalProcessed, _totalFailed);
+                        receiver.ReceiveLatencyMetrics(AverageLatencyMs, _latencySampleCount);
+                        receiver.ReceiveResourceMetrics(CpuUsage, MemoryUsageMB);
+                        receiver.ReceiveQueueMetrics(OrderBookQueueDepth, TradeQueueDepth, FillQueueDepth,
+                                                   EventLifecycleQueueDepth, MarketLifecycleQueueDepth, TotalQueuedOperations);
+                        receiver.ReceiveSuccessRateMetrics(SuccessRate);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to send performance metrics to receiver {ReceiverType}",
+                            receiver.GetType().Name);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error broadcasting performance metrics");
+            }
+        }
+
+        /// <summary>
         /// Disposes of the service resources, canceling background worker tasks and cleaning up cancellation tokens.
         /// Waits for worker tasks to complete gracefully within a timeout period.
         /// </summary>
@@ -803,6 +946,14 @@ namespace KalshiBotData.Data
                                 operation.SetParameters(cmd);
                                 await cmd.ExecuteNonQueryAsync(cancellationToken);
                                 Interlocked.Increment(ref _totalProcessed);
+
+                                // Measure latency if enabled
+                                if (_enablePerformanceMetrics)
+                                {
+                                    var latency = (DateTime.UtcNow - operation.EnqueueTime).TotalMilliseconds;
+                                    Interlocked.Add(ref _totalLatencyMs, (long)latency);
+                                    Interlocked.Increment(ref _latencySampleCount);
+                                }
                             }
                             catch (SqlException ex) when (ex.Message.Contains("Cannot insert duplicate key", StringComparison.OrdinalIgnoreCase))
                             {
@@ -830,6 +981,9 @@ namespace KalshiBotData.Data
                         _logger.LogInformation("Metrics - {OperationName}: Processed: {Processed}, Failed: {Failed}, Queue Depth: {Depth}",
                             operationName, Interlocked.Read(ref _totalProcessed), Interlocked.Read(ref _totalFailed), queue.Count);
                         lastMetricsLog = DateTime.UtcNow;
+
+                        // Broadcast performance metrics to registered receivers
+                        BroadcastPerformanceMetrics();
                     }
                 }
                 else
@@ -869,7 +1023,7 @@ namespace KalshiBotData.Data
         }
         /// <summary>
         /// Represents a database operation to be executed asynchronously by the background worker tasks.
-        /// Encapsulates the stored procedure name, parameter configuration, and an identifier for logging.
+        /// Encapsulates the stored procedure name, parameter configuration, identifier, and enqueue time for latency tracking.
         /// </summary>
         private struct DatabaseOperation
         {
@@ -887,6 +1041,11 @@ namespace KalshiBotData.Data
             /// Identifier for the operation (typically market ticker) used for logging and error tracking.
             /// </summary>
             public string Identifier { get; init; }
+
+            /// <summary>
+            /// The time when the operation was enqueued, used for latency calculations.
+            /// </summary>
+            public DateTime EnqueueTime { get; init; }
         }
     }
     

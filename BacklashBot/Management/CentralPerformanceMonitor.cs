@@ -41,7 +41,7 @@ namespace BacklashBot.Management
     /// - Market refresh cycle performance
     /// - System startup and shutdown states
     /// </remarks>
-    public class CentralPerformanceMonitor : ICentralPerformanceMonitor, IKalshiBotContextPerformanceMetrics, INightActivitiesPerformanceMetrics, IWebSocketPerformanceMetrics
+    public class CentralPerformanceMonitor : ICentralPerformanceMonitor, IKalshiBotContextPerformanceMetrics, INightActivitiesPerformanceMetrics, IWebSocketPerformanceMetrics, ISqlDataServicePerformanceMetrics
     {
         private readonly ILogger<ICentralPerformanceMonitor> _logger;
         private readonly IServiceFactory _serviceFactory;
@@ -842,6 +842,99 @@ namespace BacklashBot.Management
             _webSocketOperationTimes.Clear();
             _webSocketSemaphoreWaitCount.Clear();
             _logger.LogInformation("WebSocket performance metrics reset");
+        }
+
+        #endregion
+
+        #region ISqlDataServicePerformanceMetrics Implementation
+
+        /// <summary>
+        /// Receives throughput metrics from SqlDataService.
+        /// </summary>
+        /// <param name="operationsPerSecond">Current operations per second rate.</param>
+        /// <param name="totalProcessed">Total operations processed successfully.</param>
+        /// <param name="totalFailed">Total operations that failed.</param>
+        public void ReceiveThroughputMetrics(double operationsPerSecond, long totalProcessed, long totalFailed)
+        {
+            _logger.LogDebug("SqlDataService Throughput: {OpsPerSec:F2} ops/sec, Processed: {Processed}, Failed: {Failed}",
+                operationsPerSecond, totalProcessed, totalFailed);
+
+            // Store the metrics for monitoring
+            // Could be extended to store in a time-series database or expose via API
+        }
+
+        /// <summary>
+        /// Receives latency metrics from SqlDataService.
+        /// </summary>
+        /// <param name="averageLatencyMs">Average latency in milliseconds for processed operations.</param>
+        /// <param name="sampleCount">Number of latency samples collected.</param>
+        public void ReceiveLatencyMetrics(double averageLatencyMs, long sampleCount)
+        {
+            _logger.LogDebug("SqlDataService Latency: {AvgLatency:F2}ms over {SampleCount} samples", averageLatencyMs, sampleCount);
+
+            // Check for performance alerts
+            if (averageLatencyMs > 1000) // 1 second
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: SqlDataService average latency {AvgLatency:F2}ms exceeds 1 second", averageLatencyMs);
+            }
+        }
+
+        /// <summary>
+        /// Receives resource utilization metrics from SqlDataService.
+        /// </summary>
+        /// <param name="cpuUsagePercent">Current CPU usage percentage.</param>
+        /// <param name="memoryUsageMB">Current memory usage in MB.</param>
+        public void ReceiveResourceMetrics(double cpuUsagePercent, double memoryUsageMB)
+        {
+            _logger.LogDebug("SqlDataService Resources: CPU {CpuUsage:F2}%, Memory {MemoryUsage:F2}MB", cpuUsagePercent, memoryUsageMB);
+
+            // Check for resource alerts
+            if (cpuUsagePercent > 80)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: SqlDataService CPU usage {CpuUsage:F2}% exceeds 80%", cpuUsagePercent);
+            }
+
+            if (memoryUsageMB > 1000) // 1GB
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: SqlDataService memory usage {MemoryUsage:F2}MB exceeds 1GB", memoryUsageMB);
+            }
+        }
+
+        /// <summary>
+        /// Receives queue depth metrics from SqlDataService.
+        /// </summary>
+        /// <param name="orderBookQueueDepth">Current depth of order book queue.</param>
+        /// <param name="tradeQueueDepth">Current depth of trade queue.</param>
+        /// <param name="fillQueueDepth">Current depth of fill queue.</param>
+        /// <param name="eventLifecycleQueueDepth">Current depth of event lifecycle queue.</param>
+        /// <param name="marketLifecycleQueueDepth">Current depth of market lifecycle queue.</param>
+        /// <param name="totalQueuedOperations">Total operations across all queues.</param>
+        public void ReceiveQueueMetrics(int orderBookQueueDepth, int tradeQueueDepth, int fillQueueDepth,
+                                       int eventLifecycleQueueDepth, int marketLifecycleQueueDepth, int totalQueuedOperations)
+        {
+            _logger.LogDebug("SqlDataService Queues: OrderBook={OrderBook}, Trade={Trade}, Fill={Fill}, Event={Event}, Market={Market}, Total={Total}",
+                orderBookQueueDepth, tradeQueueDepth, fillQueueDepth, eventLifecycleQueueDepth, marketLifecycleQueueDepth, totalQueuedOperations);
+
+            // Check for queue alerts
+            if (totalQueuedOperations > 5000)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: SqlDataService total queued operations {Total} exceeds 5000", totalQueuedOperations);
+            }
+        }
+
+        /// <summary>
+        /// Receives success rate metrics from SqlDataService.
+        /// </summary>
+        /// <param name="successRatePercent">Success rate as a percentage (0-100).</param>
+        public void ReceiveSuccessRateMetrics(double successRatePercent)
+        {
+            _logger.LogDebug("SqlDataService Success Rate: {SuccessRate:F2}%", successRatePercent);
+
+            // Check for success rate alerts
+            if (successRatePercent < 95.0)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: SqlDataService success rate {SuccessRate:F2}% is below 95%", successRatePercent);
+            }
         }
 
         #endregion
