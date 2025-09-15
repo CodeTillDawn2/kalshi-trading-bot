@@ -165,7 +165,12 @@ namespace KalshiBotOverseer
                 (IWebSocketPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
 
             // Register BrainPersistenceService
-            services.AddSingleton<BrainPersistenceService>();
+            services.AddSingleton<BrainPersistenceService>(sp => new BrainPersistenceService(
+                sp.GetRequiredService<IOptions<BrainPersistenceServiceConfig>>(),
+                null, // context optional for singleton
+                sp.GetRequiredService<ILogger<BrainPersistenceService>>(),
+                sp.GetRequiredService<PerformanceMetricsService>()
+            ));
 
             // Add MVC for controllers
             services.AddControllers()

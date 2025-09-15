@@ -53,6 +53,13 @@ namespace KalshiBotOverseer.Services
         // Database metrics
         private Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> _databaseMetrics = new();
 
+        // BrainPersistence metrics
+        private Dictionary<string, (long AverageMs, long P50Ms, long P95Ms, long P99Ms)> _brainPersistenceOperationStats = new();
+        private IReadOnlyDictionary<string, int> _brainPersistenceTrimmingCounts = new Dictionary<string, int>();
+        private (long TotalWaitTimeMs, int ContentionCount) _brainPersistenceLockMetrics;
+        private Dictionary<string, long> _brainPersistenceMemoryUsage = new();
+        private (int AvailableWorkerThreads, int AvailableCompletionPortThreads, int MaxWorkerThreads, int MaxCompletionPortThreads) _brainPersistenceThreadPoolInfo;
+
         // WebSocket metrics
         private readonly ConcurrentDictionary<string, long> _webSocketProcessingTimeTicks = new();
         private readonly ConcurrentDictionary<string, int> _webSocketProcessingCount = new();
@@ -408,6 +415,87 @@ namespace KalshiBotOverseer.Services
 
         #endregion
 
+        #region BrainPersistence Metrics
+
+        /// <summary>
+        /// Records BrainPersistence service performance metrics.
+        /// </summary>
+        public void RecordBrainPersistenceMetrics(
+            IReadOnlyDictionary<string, (long AverageMs, long P50Ms, long P95Ms, long P99Ms)> operationStats,
+            IReadOnlyDictionary<string, int> trimmingCounts,
+            (long TotalWaitTimeMs, int ContentionCount) lockMetrics,
+            Dictionary<string, long> memoryUsage,
+            (int AvailableWorkerThreads, int AvailableCompletionPortThreads, int MaxWorkerThreads, int MaxCompletionPortThreads) threadPoolInfo)
+        {
+            lock (_snapshotLock)
+            {
+                _brainPersistenceOperationStats = new Dictionary<string, (long, long, long, long)>(operationStats);
+                _brainPersistenceTrimmingCounts = new Dictionary<string, int>(trimmingCounts);
+                _brainPersistenceLockMetrics = lockMetrics;
+                _brainPersistenceMemoryUsage = new Dictionary<string, long>(memoryUsage);
+                _brainPersistenceThreadPoolInfo = threadPoolInfo;
+                _logger.LogDebug("BrainPersistence metrics recorded: {OperationCount} operations, {TrimmingCount} trimmings",
+                    operationStats.Count, trimmingCounts.Count);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current BrainPersistence operation statistics.
+        /// </summary>
+        public IReadOnlyDictionary<string, (long AverageMs, long P50Ms, long P95Ms, long P99Ms)> GetBrainPersistenceOperationStats()
+        {
+            lock (_snapshotLock)
+            {
+                return new Dictionary<string, (long, long, long, long)>(_brainPersistenceOperationStats);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current BrainPersistence trimming counts.
+        /// </summary>
+        public IReadOnlyDictionary<string, int> GetBrainPersistenceTrimmingCounts()
+        {
+            lock (_snapshotLock)
+            {
+                return new Dictionary<string, int>(_brainPersistenceTrimmingCounts);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current BrainPersistence lock metrics.
+        /// </summary>
+        public (long TotalWaitTimeMs, int ContentionCount) GetBrainPersistenceLockMetrics()
+        {
+            lock (_snapshotLock)
+            {
+                return _brainPersistenceLockMetrics;
+            }
+        }
+
+        /// <summary>
+        /// Gets the current BrainPersistence memory usage.
+        /// </summary>
+        public IReadOnlyDictionary<string, long> GetBrainPersistenceMemoryUsage()
+        {
+            lock (_snapshotLock)
+            {
+                return new Dictionary<string, long>(_brainPersistenceMemoryUsage);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current BrainPersistence thread pool information.
+        /// </summary>
+        public (int AvailableWorkerThreads, int AvailableCompletionPortThreads, int MaxWorkerThreads, int MaxCompletionPortThreads) GetBrainPersistenceThreadPoolInfo()
+        {
+            lock (_snapshotLock)
+            {
+                return _brainPersistenceThreadPoolInfo;
+            }
+        }
+
+        #endregion
+
         #region Metrics Status
 
         /// <summary>
@@ -460,6 +548,20 @@ namespace KalshiBotOverseer.Services
             {
                 status["MarketRefreshFailureCount"] = _marketRefreshFailureCount;
                 status["LastMarketRefreshFailure"] = _lastMarketRefreshFailure;
+            }
+
+            // BrainPersistence metrics
+            lock (_snapshotLock)
+            {
+                status["BrainPersistenceOperationStatsCount"] = _brainPersistenceOperationStats.Count;
+                status["BrainPersistenceTrimmingCountsCount"] = _brainPersistenceTrimmingCounts.Count;
+                status["BrainPersistenceLockTotalWaitTimeMs"] = _brainPersistenceLockMetrics.TotalWaitTimeMs;
+                status["BrainPersistenceLockContentionCount"] = _brainPersistenceLockMetrics.ContentionCount;
+                status["BrainPersistenceMemoryUsageCount"] = _brainPersistenceMemoryUsage.Count;
+                status["BrainPersistenceThreadPoolAvailableWorkers"] = _brainPersistenceThreadPoolInfo.AvailableWorkerThreads;
+                status["BrainPersistenceThreadPoolAvailableCompletions"] = _brainPersistenceThreadPoolInfo.AvailableCompletionPortThreads;
+                status["BrainPersistenceThreadPoolMaxWorkers"] = _brainPersistenceThreadPoolInfo.MaxWorkerThreads;
+                status["BrainPersistenceThreadPoolMaxCompletions"] = _brainPersistenceThreadPoolInfo.MaxCompletionPortThreads;
             }
 
             status["LastMetricsReset"] = _lastMetricsReset;
