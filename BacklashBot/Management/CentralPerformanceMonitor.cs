@@ -464,6 +464,56 @@ namespace BacklashBot.Management
         }
 
         /// <summary>
+        /// Records MarketDataInitializer performance metrics.
+        /// </summary>
+        /// <param name="totalDuration">Total initialization duration.</param>
+        /// <param name="marketCount">Number of markets processed.</param>
+        /// <param name="averageMarketTime">Average time per market.</param>
+        /// <param name="memoryDelta">Memory usage change in bytes.</param>
+        /// <param name="cpuTime">CPU time used.</param>
+        /// <param name="successfulMarkets">Number of successfully initialized markets.</param>
+        /// <param name="failedMarkets">Number of failed market initializations.</param>
+        /// <param name="totalWaitTime">Total time spent waiting.</param>
+        /// <remarks>
+        /// This method receives performance data from MarketDataInitializer
+        /// and integrates it with the central performance monitoring system.
+        /// </remarks>
+        public void RecordMarketDataInitializerMetrics(
+            TimeSpan totalDuration,
+            int marketCount,
+            TimeSpan averageMarketTime,
+            long memoryDelta,
+            TimeSpan cpuTime,
+            int successfulMarkets,
+            int failedMarkets,
+            TimeSpan totalWaitTime)
+        {
+            // Record execution time
+            RecordExecutionTime("MarketDataInitializer", (long)totalDuration.TotalMilliseconds);
+
+            // Log performance summary
+            _logger.LogInformation(
+                "MARKET DATA INITIALIZER PERFORMANCE: Duration={Duration}, Markets={Count}, AvgTime={AvgTime}, MemoryDelta={Memory} bytes, CpuTime={Cpu}, Success={Success}, Fail={Fail}, WaitTime={Wait}",
+                totalDuration, marketCount, averageMarketTime, memoryDelta, cpuTime, successfulMarkets, failedMarkets, totalWaitTime);
+
+            // Check for performance alerts
+            if (totalDuration.TotalSeconds > 300) // 5 minutes
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Market data initialization took {Duration} (>5 minutes)", totalDuration);
+            }
+
+            if (failedMarkets > marketCount * 0.1) // More than 10% failures
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: {FailCount} market initialization failures (>10% of {TotalCount})", failedMarkets, marketCount);
+            }
+
+            if (memoryDelta > 100 * 1024 * 1024) // 100MB
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Memory usage increased by {Memory}MB (>100MB)", memoryDelta / (1024 * 1024));
+            }
+        }
+
+        /// <summary>
         /// Records overnight activities performance metrics from the common OvernightActivitiesHelper.
         /// </summary>
         /// <param name="metrics">The performance metrics from overnight activities.</param>

@@ -28,5 +28,26 @@ namespace BacklashBot.Management.Interfaces
         /// </summary>
         /// <param name="isRecording">True if WebSocket metrics are being recorded, false otherwise.</param>
         void UpdateWebSocketMetricsRecordingStatus(bool isRecording);
+
+        /// <summary>
+        /// Records MarketDataInitializer performance metrics.
+        /// </summary>
+        /// <param name="totalDuration">Total initialization duration.</param>
+        /// <param name="marketCount">Number of markets processed.</param>
+        /// <param name="averageMarketTime">Average time per market.</param>
+        /// <param name="memoryDelta">Memory usage change in bytes.</param>
+        /// <param name="cpuTime">CPU time used.</param>
+        /// <param name="successfulMarkets">Number of successfully initialized markets.</param>
+        /// <param name="failedMarkets">Number of failed market initializations.</param>
+        /// <param name="totalWaitTime">Total time spent waiting.</param>
+        void RecordMarketDataInitializerMetrics(
+            TimeSpan totalDuration,
+            int marketCount,
+            TimeSpan averageMarketTime,
+            long memoryDelta,
+            TimeSpan cpuTime,
+            int successfulMarkets,
+            int failedMarkets,
+            TimeSpan totalWaitTime);
     }
 }
