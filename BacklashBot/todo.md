@@ -71,10 +71,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## BacklashBot.Services.BroadcastService
 
-## TradingStrategies.TradingOverseer
-
-## KalshiBotOverseer.OvernightActivitiesHelper
-
 ## TradingGUI.MainForm
 
 
