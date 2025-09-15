@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using BacklashDTOs.Configuration;
 using BacklashBot.KalshiAPI.Interfaces;
-using BacklashBot.Management;
+using BacklashCommon.Services;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;

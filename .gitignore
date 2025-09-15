@@ -125,3 +125,6 @@ jwt-secret.txt
 !docs/**
 !docs/**
 !docs/**
+/BacklashCommon/bin
+/BacklashCommon/obj
+/KalshiBotLogging/bin

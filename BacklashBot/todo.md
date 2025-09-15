@@ -79,8 +79,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## KalshiBotOverseer.OverseerHub
 
-## KalshiBotOverseer.OverseerHubConfig
-
 ## KalshiBotOverseer.OvernightActivitiesHelper
 
 ## TradingGUI.MainForm

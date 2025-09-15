@@ -1,6 +1,7 @@
-// OvernightActivitiesHelper.cs
 using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using BacklashDTOs.Configuration;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management.Interfaces;
@@ -8,7 +9,7 @@ using BacklashBot.Services.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 
-namespace BacklashBot.Management
+namespace BacklashCommon.Services
 {
     public class OvernightActivitiesHelper : IOvernightActivitiesHelper
     {
@@ -100,11 +101,11 @@ namespace BacklashBot.Management
             List<MarketDTO> MarketsWhichAreLikelyClosed = await context.GetMarkets(
                 includedStatuses: null,
                 excludedStatuses: new HashSet<string> { KalshiConstants.Status_Finalized,
-                                                        KalshiConstants.Status_Inactive,
-                                                        KalshiConstants.Status_Initialized,
-                                                        KalshiConstants.Status_Bad,
-                                                        KalshiConstants.Status_Closed,
-                                                        KalshiConstants.Status_Settled },
+                                                         KalshiConstants.Status_Inactive,
+                                                         KalshiConstants.Status_Initialized,
+                                                         KalshiConstants.Status_Bad,
+                                                         KalshiConstants.Status_Closed,
+                                                         KalshiConstants.Status_Settled },
                 maxAPILastFetchTime: cutoff
             );
 
