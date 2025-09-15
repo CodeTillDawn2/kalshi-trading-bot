@@ -27,15 +27,29 @@ using System.Text.Json;
 
 namespace KalshiBotOverseer
 {
+    /// <summary>
+    /// Configures services and the request pipeline for the KalshiBotOverseer application.
+    /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// Initializes a new instance of the Startup class.
+        /// </summary>
+        /// <param name="configuration">The application configuration.</param>
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
+        /// <summary>
+        /// Gets the application configuration.
+        /// </summary>
         public IConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Configures the services for dependency injection.
+        /// </summary>
+        /// <param name="services">The service collection to configure.</param>
         public void ConfigureServices(IServiceCollection services)
         {
             // Add configuration as singleton
@@ -189,6 +203,11 @@ namespace KalshiBotOverseer
             }).AddJsonProtocol(o => { o.PayloadSerializerOptions.PropertyNamingPolicy = null; });
         }
 
+        /// <summary>
+        /// Configures the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app">The application builder.</param>
+        /// <param name="env">The web hosting environment.</param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

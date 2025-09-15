@@ -5,6 +5,9 @@ namespace BacklashDTOs.KalshiAPI
     /// </summary>
     public class BalanceResponse
     {
+        /// <summary>
+        /// Gets or sets the account balance.
+        /// </summary>
         public long Balance { get; set; }
     }
 }

@@ -162,6 +162,14 @@ namespace KalshiBotOverseer
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the OverseerHub class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="scopeFactory">The service scope factory.</param>
+        /// <param name="brainService">The brain persistence service.</param>
+        /// <param name="config">The hub configuration options.</param>
+        /// <param name="performanceMetrics">The performance metrics service.</param>
         public OverseerHub(
             ILogger<OverseerHub> logger,
             IServiceScopeFactory scopeFactory,
@@ -420,6 +428,11 @@ namespace KalshiBotOverseer
             }
         }
 
+        /// <summary>
+        /// Processes a check-in request from a connected brain instance.
+        /// </summary>
+        /// <param name="checkInData">The check-in data containing brain status information.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ProcessCheckIn(CheckInData checkInData)
         {
             var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;

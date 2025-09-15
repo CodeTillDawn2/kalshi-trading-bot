@@ -6,8 +6,14 @@ namespace BacklashDTOs.KalshiAPI
     /// </summary>
     public class PriceLevel
     {
+        /// <summary>
+        /// Gets or sets the price.
+        /// </summary>
         public int Price { get; set; }
 
+        /// <summary>
+        /// Gets or sets the number of resting contracts.
+        /// </summary>
         public int RestingContracts { get; set; }
     }
 }

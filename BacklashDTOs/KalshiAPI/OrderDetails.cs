@@ -3,80 +3,158 @@ using System.Text.Json.Serialization;
 
 namespace BacklashDTOs.KalshiAPI
 {
+    /// <summary>
+    /// Represents the details of an order from the Kalshi API.
+    /// </summary>
     public class OrderDetails
     {
+        /// <summary>
+        /// Gets or sets the order ID.
+        /// </summary>
         [JsonPropertyName("order_id")]
         public string OrderId { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the user ID.
+        /// </summary>
         [JsonPropertyName("user_id")]
         public string UserId { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the ticker.
+        /// </summary>
         [JsonPropertyName("ticker")]
         public string Ticker { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the status.
+        /// </summary>
         [JsonPropertyName("status")]
         public string Status { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the yes price.
+        /// </summary>
         [JsonPropertyName("yes_price")]
         public int YesPrice { get; set; }
 
+        /// <summary>
+        /// Gets or sets the no price.
+        /// </summary>
         [JsonPropertyName("no_price")]
         public int NoPrice { get; set; }
 
+        /// <summary>
+        /// Gets or sets the created time.
+        /// </summary>
         [JsonPropertyName("created_time")]
         public string CreatedTime { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the expiration time.
+        /// </summary>
         [JsonPropertyName("expiration_time")]
         public string? ExpirationTime { get; set; }
 
+        /// <summary>
+        /// Gets or sets the last update time.
+        /// </summary>
         [JsonPropertyName("last_update_time")]
         public string? LastUpdateTime { get; set; }
 
+        /// <summary>
+        /// Gets or sets the self trade prevention type.
+        /// </summary>
         [JsonPropertyName("self_trade_prevention_type")]
         public string SelfTradePreventionType { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the action (buy or sell).
+        /// </summary>
         [JsonPropertyName("action")]
         public string Action { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the side (yes or no).
+        /// </summary>
         [JsonPropertyName("side")]
         public string Side { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the type (market or limit).
+        /// </summary>
         [JsonPropertyName("type")]
         public string Type { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the client order ID.
+        /// </summary>
         [JsonPropertyName("client_order_id")]
         public string ClientOrderId { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the order group ID.
+        /// </summary>
         [JsonPropertyName("order_group_id")]
         public string OrderGroupId { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the fill count.
+        /// </summary>
         [JsonPropertyName("fill_count")]
         public int FillCount { get; set; }
 
+        /// <summary>
+        /// Gets or sets the initial count.
+        /// </summary>
         [JsonPropertyName("initial_count")]
         public int InitialCount { get; set; }
 
+        /// <summary>
+        /// Gets or sets the remaining count.
+        /// </summary>
         [JsonPropertyName("remaining_count")]
         public int RemainingCount { get; set; }
 
+        /// <summary>
+        /// Gets or sets the queue position.
+        /// </summary>
         [JsonPropertyName("queue_position")]
         public int QueuePosition { get; set; }
 
+        /// <summary>
+        /// Gets or sets the maker fees.
+        /// </summary>
         [JsonPropertyName("maker_fees")]
         public int MakerFees { get; set; }
 
+        /// <summary>
+        /// Gets or sets the taker fees.
+        /// </summary>
         [JsonPropertyName("taker_fees")]
         public int TakerFees { get; set; }
 
+        /// <summary>
+        /// Gets or sets the maker fill cost.
+        /// </summary>
         [JsonPropertyName("maker_fill_cost")]
         public int MakerFillCost { get; set; }
 
+        /// <summary>
+        /// Gets or sets the taker fill cost.
+        /// </summary>
         [JsonPropertyName("taker_fill_cost")]
         public int TakerFillCost { get; set; }
 
+        /// <summary>
+        /// Gets or sets the yes price in dollars.
+        /// </summary>
         [JsonPropertyName("yes_price_dollars")]
         public string YesPriceDollars { get; set; } = "";
 
+        /// <summary>
+        /// Gets or sets the no price in dollars.
+        /// </summary>
         [JsonPropertyName("no_price_dollars")]
         public string NoPriceDollars { get; set; } = "";
     }

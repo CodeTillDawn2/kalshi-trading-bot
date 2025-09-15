@@ -38,9 +38,21 @@ namespace BacklashDTOs
             set => _marketTicker = value;
         }
 
+        /// <summary>
+        /// Gets or sets the price.
+        /// </summary>
         public int Price { get; set; }
+        /// <summary>
+        /// Gets or sets the side.
+        /// </summary>
         public string Side { get; set; }
+        /// <summary>
+        /// Gets or sets the resting contracts.
+        /// </summary>
         public int RestingContracts { get; set; }
+        /// <summary>
+        /// Gets or sets the last modified date.
+        /// </summary>
         public DateTime? LastModifiedDate { get; set; }
 
 

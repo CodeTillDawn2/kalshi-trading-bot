@@ -7,22 +7,49 @@ namespace BacklashDTOs.KalshiAPI
     /// </summary>
     public class OrderbookMessage
     {
+        /// <summary>
+        /// Gets or sets the session ID.
+        /// </summary>
         public int Sid { get; set; }
 
+        /// <summary>
+        /// Gets or sets the sequence number.
+        /// </summary>
         public long Seq { get; set; }
 
+        /// <summary>
+        /// Gets or sets the offer type ("SNP" or "DEL").
+        /// </summary>
         public string? OfferType { get; set; } // "SNP" or "DEL"
 
+        /// <summary>
+        /// Gets or sets the market ticker.
+        /// </summary>
         public string? MarketTicker { get; set; }
 
+        /// <summary>
+        /// Gets or sets the list of yes orders for snapshot.
+        /// </summary>
         public List<PriceLevel>? YesOrders { get; set; } // For snapshot
 
+        /// <summary>
+        /// Gets or sets the list of no orders for snapshot.
+        /// </summary>
         public List<PriceLevel>? NoOrders { get; set; }  // For snapshot
 
+        /// <summary>
+        /// Gets or sets the price for delta.
+        /// </summary>
         public int? Price { get; set; }                 // For delta
 
+        /// <summary>
+        /// Gets or sets the delta for delta.
+        /// </summary>
         public int? Delta { get; set; }                 // For delta
 
+        /// <summary>
+        /// Gets or sets the side for delta.
+        /// </summary>
         public string? Side { get; set; }                // For delta
 
         /// <summary>

@@ -1,6 +1,9 @@
 
 namespace BacklashDTOs.KalshiAPI
 {
+    /// <summary>
+    /// Represents the response containing a list of orders from the Kalshi API.
+    /// </summary>
     public class OrdersResponse
     {
         /// <summary>

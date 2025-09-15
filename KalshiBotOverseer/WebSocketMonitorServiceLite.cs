@@ -7,6 +7,9 @@ using BacklashDTOs.KalshiAPI;
 
 namespace KalshiBotOverseer
 {
+    /// <summary>
+    /// Lightweight service for monitoring WebSocket connections and exchange status.
+    /// </summary>
     public class WebSocketMonitorServiceLite : IWebSocketMonitorService
     {
         private readonly ILogger<WebSocketMonitorServiceLite> _logger;
@@ -20,8 +23,17 @@ namespace KalshiBotOverseer
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
+        /// <summary>
+        /// Gets the cancellation token for the service.
+        /// </summary>
         public CancellationToken CancellationToken { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the WebSocketMonitorServiceLite class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="webSocketClient">The WebSocket client.</param>
+        /// <param name="scopeFactory">The service scope factory.</param>
         public WebSocketMonitorServiceLite(
             ILogger<WebSocketMonitorServiceLite> logger,
             IKalshiWebSocketClient webSocketClient,
@@ -34,6 +46,10 @@ namespace KalshiBotOverseer
             _logger.LogDebug("WebSocketMonitorServiceLite instance created");
         }
 
+        /// <summary>
+        /// Starts the WebSocket monitoring services.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
         public void StartServices(CancellationToken cancellationToken)
         {
             _logger.LogDebug("WebSocketMonitorServiceLite starting...");
@@ -56,6 +72,11 @@ namespace KalshiBotOverseer
             _logger.LogDebug("WebSocketMonitorServiceLite started.");
         }
 
+        /// <summary>
+        /// Shuts down the WebSocket monitoring services asynchronously.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ShutdownAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("WebSocketMonitorServiceLite.StopAsync called at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow,
@@ -100,12 +121,20 @@ namespace KalshiBotOverseer
             }
         }
 
+        /// <summary>
+        /// Triggers an immediate WebSocket connection check asynchronously.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task TriggerConnectionCheckAsync()
         {
             _logger.LogDebug("Triggering immediate WebSocket connection check");
             await MonitorExchangeStatusAsync(immediate: true);
         }
 
+        /// <summary>
+        /// Checks if the WebSocket is connected.
+        /// </summary>
+        /// <returns>True if connected, false otherwise.</returns>
         public bool IsConnected()
         {
             bool monitorConnected = _isConnected;

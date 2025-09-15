@@ -7,7 +7,13 @@ namespace BacklashDTOs.KalshiAPI
     /// </summary>
     public class MarketResponse
     {
+        /// <summary>
+        /// Gets or sets the list of markets.
+        /// </summary>
         [JsonPropertyName("markets")] public List<KalshiMarket> Markets { get; set; } = new List<KalshiMarket>();
+        /// <summary>
+        /// Gets or sets the cursor for pagination.
+        /// </summary>
         [JsonPropertyName("cursor")] public string? Cursor { get; set; }
     }
 }
