@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
-using KalshiBotOverseer.Services;
+using BacklashOverseer.Services;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
@@ -10,11 +10,11 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
-using KalshiBotOverseer.Models;
+using BacklashOverseer.Models;
 using System.Threading;
 using System.Diagnostics;
 
-namespace KalshiBotOverseer
+namespace BacklashOverseer
 {
     /// <summary>
     /// Configuration options for the OverseerHub SignalR hub.

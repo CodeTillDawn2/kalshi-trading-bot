@@ -8,16 +8,16 @@ using KalshiBotAPI.WebSockets;
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
-using KalshiBotOverseer;
+using BacklashOverseer;
 using KalshiBotLogging;
-using KalshiBotOverseer.Services;
+using BacklashOverseer.Services;
 using BacklashDTOs.Configuration;
 using BacklashCommon.Services;
 using BacklashInterfaces.SmokehouseBot.Services;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Management;
-using KalshiBotOverseer.State;
+using BacklashOverseer.State;
 using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,10 +33,10 @@ using System.Text.Json;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Websockets;
 
-namespace KalshiBotOverseer
+namespace BacklashOverseer
 {
     /// <summary>
-    /// Configures services and the request pipeline for the KalshiBotOverseer application.
+    /// Configures services and the request pipeline for the BacklashOverseer application.
     /// </summary>
     public class Startup
     {
@@ -280,7 +280,7 @@ namespace KalshiBotOverseer
                 endpoints.MapGet("/health", async context =>
                 {
                     context.Response.ContentType = "application/json";
-                    await context.Response.WriteAsync("{\"status\":\"healthy\",\"service\":\"KalshiBotOverseer\"}");
+                    await context.Response.WriteAsync("{\"status\":\"healthy\",\"service\":\"BacklashOverseer\"}");
                 });
             });
         }

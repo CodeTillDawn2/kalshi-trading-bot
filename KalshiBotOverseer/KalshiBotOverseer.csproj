@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>BacklashOverseer</AssemblyName>
+    <RootNamespace>BacklashOverseer</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>

@@ -1,5 +1,5 @@
 // Updated Program.cs with web hosting
-using KalshiBotOverseer;
+using BacklashOverseer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,7 +72,7 @@ class Program
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseUrls("http://0.0.0.0:5000");
-                webBuilder.UseStartup<KalshiBotOverseer.Startup>();
+                webBuilder.UseStartup<BacklashOverseer.Startup>();
             });
     }
 }

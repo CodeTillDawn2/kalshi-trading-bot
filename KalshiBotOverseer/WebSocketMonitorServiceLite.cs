@@ -4,8 +4,9 @@ using Microsoft.Extensions.Logging;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs.KalshiAPI;
+using BacklashOverseer;
 
-namespace KalshiBotOverseer
+namespace BacklashOverseer
 {
     /// <summary>
     /// Lightweight service for monitoring WebSocket connections and exchange status.

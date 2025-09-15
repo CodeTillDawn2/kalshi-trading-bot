@@ -1,4 +1,4 @@
-namespace KalshiBotOverseer.State
+namespace BacklashOverseer.State
 {
     /// <summary>
     /// Configuration class for OverseerReadyStatus default states.

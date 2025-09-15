@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics.Metrics;
 
-namespace KalshiBotOverseer.State
+namespace BacklashOverseer.State
 {
     /// <summary>
     /// Manages the readiness status of different components within the Kalshi overseer system.
@@ -55,7 +55,7 @@ namespace KalshiBotOverseer.State
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config?.Value ?? new OverseerReadyConfig();
-            _meter = new Meter("KalshiBotOverseer.ReadyStatus");
+            _meter = new Meter("BacklashOverseer.ReadyStatus");
             _readinessTimingHistogram = _meter.CreateHistogram<double>("readiness_timing", unit: "ms", description: "Timing for readiness state changes");
             ResetAll();
         }

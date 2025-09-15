@@ -11,9 +11,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using KalshiBotOverseer.Services;
+using BacklashOverseer.Services;
 
-namespace KalshiBotOverseer.Controllers
+namespace BacklashOverseer.Controllers
 {
     /// <summary>
     /// ASP.NET Core Web API controller that provides endpoints for retrieving market watch data,

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using BacklashDTOs;
 using TradingSimulator;
 
-namespace SimulatorWinForms
+namespace TradingGUI
 {
     /// <summary>
     /// A comprehensive Windows Forms user control for visualizing and analyzing Kalshi trading market snapshots.

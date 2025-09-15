@@ -5,7 +5,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace KalshiBotOverseer.Services
+namespace BacklashOverseer.Services
 {
     /// <summary>
     /// Provides services for retrieving and processing snapshot group data from the database.

@@ -2,7 +2,7 @@ using BacklashBot.State.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.Metrics;
 
-namespace KalshiBotOverseer.State
+namespace BacklashOverseer.State
 {
     /// <summary>
     /// Manages the global cancellation state for the Kalshi overseer system.
@@ -44,7 +44,7 @@ namespace KalshiBotOverseer.State
         public OverseerStatusTracker(ILogger<OverseerStatusTracker> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _meter = new Meter("KalshiBotOverseer.StatusTracker");
+            _meter = new Meter("BacklashOverseer.StatusTracker");
             _cancellationCounter = _meter.CreateCounter<long>("cancellation_count", description: "Number of cancellation operations");
             _resetTimingHistogram = _meter.CreateHistogram<double>("reset_timing", unit: "ms", description: "Timing for reset operations");
             ResetAll();

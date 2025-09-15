@@ -6,7 +6,7 @@ using KalshiBotData.Data.Interfaces;
 using BacklashInterfaces.PerformanceMetrics;
 using System.Collections.Concurrent;
 
-namespace KalshiBotOverseer.Services
+namespace BacklashOverseer.Services
 {
     /// <summary>
     /// Centralized service for collecting and managing performance metrics across the KalshiBot Overseer system.

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Windows.Forms;
 
-namespace SimulatorWinForms
+namespace TradingGUI
 {
     /// <summary>
     /// Defines standard font sizes used throughout the application for consistent typography.

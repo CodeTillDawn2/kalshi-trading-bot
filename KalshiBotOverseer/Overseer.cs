@@ -16,10 +16,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
 using System.Linq;
-using KalshiBotOverseer.Services;
+using BacklashOverseer.Services;
 using Microsoft.Extensions.Options;
 
-namespace KalshiBotOverseer
+namespace BacklashOverseer
 {
     /// <summary>
     /// Configuration options for the Overseer system.
@@ -405,7 +405,7 @@ namespace KalshiBotOverseer
                     Port = 5000, // Default port
                     StartTime = DateTime.UtcNow,
                     IsActive = true,
-                    ServiceName = "KalshiBotOverseer",
+                    ServiceName = "BacklashOverseer",
                     LastHeartbeat = DateTime.UtcNow
                 };
 

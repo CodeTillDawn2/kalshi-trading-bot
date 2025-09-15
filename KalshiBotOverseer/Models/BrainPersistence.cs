@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace KalshiBotOverseer.Models
+namespace BacklashOverseer.Models
 {
     /// <summary>
     /// Configuration class for default values used in BrainPersistence initialization.

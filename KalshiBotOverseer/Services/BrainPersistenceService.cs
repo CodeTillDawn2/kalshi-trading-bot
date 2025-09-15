@@ -1,4 +1,4 @@
-using KalshiBotOverseer.Models;
+using BacklashOverseer.Models;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -9,7 +9,7 @@ using System.Timers;
 using System.Text.Json;
 using System.Linq;
 
-namespace KalshiBotOverseer.Services
+namespace BacklashOverseer.Services
 {
     /// <summary>
     /// Configuration options for the BrainPersistenceService.
