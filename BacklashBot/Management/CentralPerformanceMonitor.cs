@@ -41,7 +41,7 @@ namespace BacklashBot.Management
     /// - Market refresh cycle performance
     /// - System startup and shutdown states
     /// </remarks>
-    public class CentralPerformanceMonitor : ICentralPerformanceMonitor, IKalshiBotContextPerformanceMetrics
+    public class CentralPerformanceMonitor : ICentralPerformanceMonitor, IKalshiBotContextPerformanceMetrics, ISubscriptionManagerPerformanceMetrics
     {
         private readonly ILogger<ICentralPerformanceMonitor> _logger;
         private readonly IServiceFactory _serviceFactory;
@@ -69,6 +69,10 @@ namespace BacklashBot.Management
         private IStatusTrackerService _statusTrackerService;
         private IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? _databaseMetrics;
         private IReadOnlyDictionary<string, object>? _overseerClientServiceMetrics;
+
+        // SubscriptionManager performance metrics
+        private IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)>? _subscriptionManagerOperationMetrics;
+        private IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)>? _subscriptionManagerLockMetrics;
 
         public bool IsStartingUp { get; set; } = false;
         public bool IsShuttingDown { get; set; } = false;
@@ -582,5 +586,57 @@ namespace BacklashBot.Management
                     orderBookQueueAvg, _executionConfig.QueueCountAlertThreshold);
             }
         }
+
+        #region ISubscriptionManagerPerformanceMetrics Implementation
+
+        /// <summary>
+        /// Posts operation performance metrics from SubscriptionManager.
+        /// </summary>
+        /// <param name="metrics">Dictionary containing operation names and their performance statistics.</param>
+        public void PostOperationMetrics(IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)> metrics)
+        {
+            _subscriptionManagerOperationMetrics = metrics;
+            _logger.LogDebug("SubscriptionManager operation metrics posted: {Count} operations", metrics?.Count ?? 0);
+        }
+
+        /// <summary>
+        /// Posts lock contention metrics from SubscriptionManager.
+        /// </summary>
+        /// <param name="metrics">Dictionary containing lock names and their contention statistics.</param>
+        public void PostLockContentionMetrics(IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)> metrics)
+        {
+            _subscriptionManagerLockMetrics = metrics;
+            _logger.LogDebug("SubscriptionManager lock contention metrics posted: {Count} locks", metrics?.Count ?? 0);
+        }
+
+        /// <summary>
+        /// Gets the current operation performance metrics.
+        /// </summary>
+        /// <returns>Dictionary containing operation names and their performance statistics.</returns>
+        public IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)> GetOperationMetrics()
+        {
+            return _subscriptionManagerOperationMetrics ?? new Dictionary<string, (long, long, long)>();
+        }
+
+        /// <summary>
+        /// Gets the current lock contention metrics.
+        /// </summary>
+        /// <returns>Dictionary containing lock names and their contention statistics.</returns>
+        public IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)> GetLockContentionMetrics()
+        {
+            return _subscriptionManagerLockMetrics ?? new Dictionary<string, (long, long, long)>();
+        }
+
+        /// <summary>
+        /// Resets all SubscriptionManager performance metrics.
+        /// </summary>
+        public void ResetSubscriptionManagerMetrics()
+        {
+            _subscriptionManagerOperationMetrics = null;
+            _subscriptionManagerLockMetrics = null;
+            _logger.LogInformation("SubscriptionManager performance metrics reset");
+        }
+
+        #endregion
     }
 }

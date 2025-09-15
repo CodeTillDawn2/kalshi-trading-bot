@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using BacklashInterfaces.Enums;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashBot.State.Interfaces;
 using System.Collections.Concurrent;
 using System.Text.Json;
@@ -21,6 +22,7 @@ namespace KalshiBotAPI.Websockets
         private readonly IWebSocketConnectionManager _connectionManager;
         private readonly IDataCache _dataCache;
         private readonly IStatusTrackerService _statusTrackerService;
+        private readonly ISubscriptionManagerPerformanceMetrics? _performanceMetrics;
         private readonly ConcurrentDictionary<string, (int Sid, HashSet<string> Markets)> _channelSubscriptions = new();
         private readonly ConcurrentDictionary<string, bool> _pendingMarketSubscriptions = new ConcurrentDictionary<string, bool>();
         private readonly ConcurrentDictionary<int, (DateTime SentTime, string Message, string Channel, string[] MarketTickers)> _pendingSubscriptionConfirmations = new ConcurrentDictionary<int, (DateTime, string, string, string[])>();
@@ -47,11 +49,17 @@ namespace KalshiBotAPI.Websockets
         private readonly int _maxQueueSize = 1000;
         private readonly int _batchSize = 10;
         private readonly int _healthCheckIntervalMs = 30000;
+        private readonly bool _enableMetrics = true;
 
         // Performance metrics
         private readonly ConcurrentDictionary<string, long> _operationTimings = new();
         private readonly ConcurrentDictionary<string, long> _operationCounts = new();
         private readonly ConcurrentDictionary<string, long> _successCounts = new();
+
+        // Lock contention metrics
+        private readonly ConcurrentDictionary<string, long> _lockAcquisitionTimes = new();
+        private readonly ConcurrentDictionary<string, long> _lockContentionCounts = new();
+        private readonly ConcurrentDictionary<string, long> _lockWaitTimes = new();
 
         // Subscription deduplication
         private readonly ConcurrentDictionary<string, DateTime> _recentSubscriptions = new();
@@ -70,17 +78,20 @@ namespace KalshiBotAPI.Websockets
         /// <param name="dataCache">Provides access to cached market data and watched markets list.</param>
         /// <param name="statusTrackerService">Provides system status and cancellation token management.</param>
         /// <param name="configuration">Configuration for subscription manager settings.</param>
+        /// <param name="performanceMetrics">Optional service for posting performance metrics.</param>
         public SubscriptionManager(
             ILogger<SubscriptionManager> logger,
             IWebSocketConnectionManager connectionManager,
             IDataCache dataCache,
             IStatusTrackerService statusTrackerService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ISubscriptionManagerPerformanceMetrics? performanceMetrics = null)
         {
             _logger = logger;
             _connectionManager = connectionManager;
             _dataCache = dataCache;
             _statusTrackerService = statusTrackerService;
+            _performanceMetrics = performanceMetrics;
             _processingCancellationToken = statusTrackerService.GetCancellationToken();
 
             // Load configuration values
@@ -91,6 +102,7 @@ namespace KalshiBotAPI.Websockets
             _maxQueueSize = subscriptionConfig.GetValue("MaxQueueSize", 1000);
             _batchSize = subscriptionConfig.GetValue("BatchSize", 10);
             _healthCheckIntervalMs = subscriptionConfig.GetValue("HealthCheckIntervalMs", 30000);
+            _enableMetrics = subscriptionConfig.GetValue("EnableMetrics", true);
 
             // Initialize message type counts
             _messageTypeCounts.TryAdd("OrderBook", 0);
@@ -226,7 +238,17 @@ namespace KalshiBotAPI.Websockets
                     return;
                 }
 
+                // Track semaphore contention
+                var semaphoreWaitStart = DateTime.UtcNow;
+                await _channelSubscriptionSynchronizationSemaphore.WaitAsync(_processingCancellationToken);
+                var semaphoreWaitTime = DateTime.UtcNow - semaphoreWaitStart;
+                RecordLockMetrics("ChannelSubscriptionSemaphore", semaphoreWaitTime, semaphoreWaitTime > TimeSpan.Zero);
+
+                // Track lock contention
+                var lockWaitStart = DateTime.UtcNow;
                 _subscriptionLock.EnterWriteLock();
+                var lockWaitTime = DateTime.UtcNow - lockWaitStart;
+                RecordLockMetrics("SubscriptionLock", lockWaitTime, lockWaitTime > TimeSpan.Zero);
                 try
                 {
                     _processingCancellationToken.ThrowIfCancellationRequested();
@@ -387,6 +409,7 @@ namespace KalshiBotAPI.Websockets
             finally
             {
                 _subscriptionLock.ExitWriteLock();
+                _channelSubscriptionSynchronizationSemaphore.Release();
                 var duration = DateTime.UtcNow - startTime;
                 RecordOperationMetrics("Subscribe", duration, success);
             }
@@ -478,6 +501,13 @@ namespace KalshiBotAPI.Websockets
             }
 
             var channel = GetChannelName(channelAction);
+
+            // Track semaphore contention
+            var semaphoreWaitStart = DateTime.UtcNow;
+            await _subscriptionUpdateSynchronizationSemaphore.WaitAsync(_processingCancellationToken);
+            var semaphoreWaitTime = DateTime.UtcNow - semaphoreWaitStart;
+            RecordLockMetrics("SubscriptionUpdateSemaphore", semaphoreWaitTime, semaphoreWaitTime > TimeSpan.Zero);
+
             _subscriptionLock.EnterWriteLock();
             try
             {
@@ -592,6 +622,7 @@ namespace KalshiBotAPI.Websockets
             finally
             {
                 _subscriptionLock.ExitWriteLock();
+                _subscriptionUpdateSynchronizationSemaphore.Release();
                 var duration = DateTime.UtcNow - startTime;
                 RecordOperationMetrics("Update", duration, success);
             }
@@ -846,8 +877,14 @@ namespace KalshiBotAPI.Websockets
         public void ClearOrderBookQueue(string marketTicker)
         {
             _logger.LogDebug("Clearing orderbook message queue for market: {MarketTicker}", marketTicker);
+
+            // Track lock contention
+            var lockWaitStart = DateTime.UtcNow;
             lock (_orderBookQueueSynchronizationLock)
             {
+                var lockWaitTime = DateTime.UtcNow - lockWaitStart;
+                RecordLockMetrics("OrderBookQueueLock", lockWaitTime, lockWaitTime > TimeSpan.Zero);
+
                 var tempQueue = new PriorityQueue<(JsonElement Data, string OfferType, long Seq, Guid EventId), long>();
                 while (_orderBookUpdateQueue.TryDequeue(out var message, out var seq))
                 {
@@ -881,8 +918,12 @@ namespace KalshiBotAPI.Websockets
             while (!_processingCancellationToken.IsCancellationRequested)
             {
                 bool hasPendingUpdates;
+                var lockWaitStart = DateTime.UtcNow;
                 lock (_orderBookQueueSynchronizationLock)
                 {
+                    var lockWaitTime = DateTime.UtcNow - lockWaitStart;
+                    RecordLockMetrics("OrderBookQueueLock", lockWaitTime, lockWaitTime > TimeSpan.Zero);
+
                     hasPendingUpdates = _orderBookUpdateQueue.Count > 0 &&
                                 _orderBookUpdateQueue.UnorderedItems.Any(item =>
                                     item.Element.Data.GetProperty("msg").GetProperty("market_ticker").GetString() == marketTicker);
@@ -1043,8 +1084,12 @@ namespace KalshiBotAPI.Websockets
                         _logger.LogDebug("Processing order book message with seq {Seq}", seq);
 
                         // Update last sequence number
+                        var lockWaitStart = DateTime.UtcNow;
                         lock (_sequenceNumberSynchronizationLock)
                         {
+                            var lockWaitTime = DateTime.UtcNow - lockWaitStart;
+                            RecordLockMetrics("SequenceNumberLock", lockWaitTime, lockWaitTime > TimeSpan.Zero);
+
                             if (seq > _latestProcessedSequenceNumber)
                             {
                                 _latestProcessedSequenceNumber = seq;
@@ -1140,6 +1185,8 @@ namespace KalshiBotAPI.Websockets
         /// <param name="success">Whether the operation was successful.</param>
         private void RecordOperationMetrics(string operation, TimeSpan duration, bool success)
         {
+            if (!_enableMetrics) return;
+
             _operationTimings.AddOrUpdate(operation, duration.Ticks, (key, oldValue) => (oldValue + duration.Ticks) / 2);
             _operationCounts.AddOrUpdate(operation, 1, (key, oldValue) => oldValue + 1);
             if (success)
@@ -1149,11 +1196,34 @@ namespace KalshiBotAPI.Websockets
         }
 
         /// <summary>
+        /// Records lock contention metrics.
+        /// </summary>
+        /// <param name="lockName">The name of the lock (e.g., "SubscriptionLock", "QueueLock").</param>
+        /// <param name="waitTime">The time spent waiting for the lock.</param>
+        /// <param name="contended">Whether the lock was contended (wait time > 0).</param>
+        private void RecordLockMetrics(string lockName, TimeSpan waitTime, bool contended)
+        {
+            if (!_enableMetrics) return;
+
+            _lockAcquisitionTimes.AddOrUpdate(lockName, 1, (key, oldValue) => oldValue + 1);
+            _lockWaitTimes.AddOrUpdate(lockName, waitTime.Ticks, (key, oldValue) => (oldValue + waitTime.Ticks) / 2);
+            if (contended)
+            {
+                _lockContentionCounts.AddOrUpdate(lockName, 1, (key, oldValue) => oldValue + 1);
+            }
+        }
+
+        /// <summary>
         /// Gets performance metrics for subscription operations.
         /// </summary>
-        /// <returns>A dictionary containing operation metrics.</returns>
+        /// <returns>A dictionary containing operation metrics, or empty if metrics are disabled.</returns>
         public ConcurrentDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)> GetPerformanceMetrics()
         {
+            if (!_enableMetrics)
+            {
+                return new ConcurrentDictionary<string, (long, long, long)>();
+            }
+
             var metrics = new ConcurrentDictionary<string, (long, long, long)>();
             foreach (var operation in _operationTimings.Keys)
             {
@@ -1162,6 +1232,42 @@ namespace KalshiBotAPI.Websockets
                 var successOps = _successCounts.GetOrAdd(operation, 0);
                 metrics[operation] = (avgTicks, totalOps, successOps);
             }
+
+            // Post metrics to performance monitoring service if available
+            if (_performanceMetrics != null)
+            {
+                _performanceMetrics.PostOperationMetrics(metrics);
+            }
+
+            return metrics;
+        }
+
+        /// <summary>
+        /// Gets lock contention metrics.
+        /// </summary>
+        /// <returns>A dictionary containing lock metrics, or empty if metrics are disabled.</returns>
+        public ConcurrentDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)> GetLockMetrics()
+        {
+            if (!_enableMetrics)
+            {
+                return new ConcurrentDictionary<string, (long, long, long)>();
+            }
+
+            var metrics = new ConcurrentDictionary<string, (long, long, long)>();
+            foreach (var lockName in _lockAcquisitionTimes.Keys)
+            {
+                var acquisitionCount = _lockAcquisitionTimes.GetOrAdd(lockName, 0);
+                var avgWaitTicks = _lockWaitTimes.GetOrAdd(lockName, 0);
+                var contentionCount = _lockContentionCounts.GetOrAdd(lockName, 0);
+                metrics[lockName] = (acquisitionCount, avgWaitTicks, contentionCount);
+            }
+
+            // Post metrics to performance monitoring service if available
+            if (_performanceMetrics != null)
+            {
+                _performanceMetrics.PostLockContentionMetrics(metrics);
+            }
+
             return metrics;
         }
 
