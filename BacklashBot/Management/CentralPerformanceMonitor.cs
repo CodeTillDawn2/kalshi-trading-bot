@@ -56,6 +56,7 @@ namespace BacklashBot.Management
 
         private bool _timerRunning = false;
         private readonly ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>> _queueCountSamples;
+        private readonly ConcurrentDictionary<string, List<(DateTime Timestamp, double AvgTime, int TotalOps)>> _orderBookServiceMetrics;
 
         public double LastRefreshCycleSeconds { get; set; }
         public double LastRefreshCycleInterval { get; set; }
@@ -125,6 +126,7 @@ namespace BacklashBot.Management
             BrainInstance = _executionConfig.BrainInstance;
             _logger.LogInformation("PERFMON: Initialized with BrainInstance='{BrainInstance}' from config", BrainInstance);
             _queueCountSamples = new ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>>();
+            _orderBookServiceMetrics = new ConcurrentDictionary<string, List<(DateTime Timestamp, double AvgTime, int TotalOps)>>();
             _databaseMetrics = null;
         }
 
@@ -271,6 +273,29 @@ namespace BacklashBot.Management
                             _ => new List<(DateTime Timestamp, int Count)> { (timestamp, notificationQueueCount) },
                             (_, list) => { list.Add((timestamp, notificationQueueCount)); return list; });
 
+                        // Collect OrderBookService performance metrics every second
+                        if (_orderbookService != null)
+                        {
+                            var eventMetrics = _orderbookService.GetEventQueueProcessingMetrics();
+                            var tickerMetrics = _orderbookService.GetTickerQueueProcessingMetrics();
+                            var notificationMetrics = _orderbookService.GetNotificationQueueProcessingMetrics();
+
+                            _orderBookServiceMetrics.AddOrUpdate(
+                                "EventQueueProcessing",
+                                _ => new List<(DateTime Timestamp, double AvgTime, int TotalOps)> { (timestamp, eventMetrics.AverageProcessingTimeMs, eventMetrics.TotalOperations) },
+                                (_, list) => { list.Add((timestamp, eventMetrics.AverageProcessingTimeMs, eventMetrics.TotalOperations)); return list; });
+
+                            _orderBookServiceMetrics.AddOrUpdate(
+                                "TickerQueueProcessing",
+                                _ => new List<(DateTime Timestamp, double AvgTime, int TotalOps)> { (timestamp, tickerMetrics.AverageProcessingTimeMs, tickerMetrics.TotalOperations) },
+                                (_, list) => { list.Add((timestamp, tickerMetrics.AverageProcessingTimeMs, tickerMetrics.TotalOperations)); return list; });
+
+                            _orderBookServiceMetrics.AddOrUpdate(
+                                "NotificationQueueProcessing",
+                                _ => new List<(DateTime Timestamp, double AvgTime, int TotalOps)> { (timestamp, notificationMetrics.AverageProcessingTimeMs, notificationMetrics.TotalOperations) },
+                                (_, list) => { list.Add((timestamp, notificationMetrics.AverageProcessingTimeMs, notificationMetrics.TotalOperations)); return list; });
+                        }
+
                         marketCheckCounter++;
                         await Task.Delay(frontEndRefreshInterval, _statusTrackerService.GetCancellationToken());
                     }
@@ -414,6 +439,87 @@ namespace BacklashBot.Management
         /// <summary>
         /// Checks for performance alerts based on configured thresholds and logs warnings if exceeded.
         /// </summary>
+        /// <summary>
+        /// Calculates rolling averages for OrderBookService processing metrics over the last 5 minutes.
+        /// </summary>
+        /// <returns>A tuple containing the average processing times and total operations for EventQueue, TickerQueue, and NotificationQueue.</returns>
+        /// <remarks>
+        /// This method provides a snapshot of OrderBookService performance by:
+        /// - Filtering samples to the last 5 minutes
+        /// - Computing averages for each processing metric
+        /// - Cleaning up old samples to prevent memory growth
+        ///
+        /// Used for monitoring OrderBookService performance and detecting potential bottlenecks.
+        /// </remarks>
+        public (double EventQueueAvgTime, double TickerQueueAvgTime, double NotificationQueueAvgTime, int EventQueueTotalOps, int TickerQueueTotalOps, int NotificationQueueTotalOps) GetOrderBookServiceProcessingMetricsRollingAverages()
+        {
+            var fiveMinutesAgo = DateTime.UtcNow.AddMinutes(-5);
+
+            double GetAverageTime(string metricName, out int totalOps)
+            {
+                totalOps = 0;
+                if (!_orderBookServiceMetrics.TryGetValue(metricName, out var samples))
+                    return 0.0;
+
+                var recentSamples = samples
+                    .Where(s => s.Timestamp >= fiveMinutesAgo)
+                    .ToList();
+
+                if (!recentSamples.Any())
+                    return 0.0;
+
+                double avgTime = recentSamples.Average(s => s.AvgTime);
+                totalOps = recentSamples.Sum(s => s.TotalOps);
+
+                _orderBookServiceMetrics[metricName] = recentSamples;
+
+                return avgTime;
+            }
+
+            var eventAvg = GetAverageTime("EventQueueProcessing", out var eventTotalOps);
+            var tickerAvg = GetAverageTime("TickerQueueProcessing", out var tickerTotalOps);
+            var notificationAvg = GetAverageTime("NotificationQueueProcessing", out var notificationTotalOps);
+
+            return (eventAvg, tickerAvg, notificationAvg, eventTotalOps, tickerTotalOps, notificationTotalOps);
+        }
+
+        /// <summary>
+        /// Gets the latest OrderBookService processing metrics.
+        /// </summary>
+        /// <returns>A tuple containing the most recent processing times and total operations for EventQueue, TickerQueue, and NotificationQueue.</returns>
+        public (double EventQueueTime, double TickerQueueTime, double NotificationQueueTime, int EventQueueOps, int TickerQueueOps, int NotificationQueueOps) GetLatestOrderBookServiceProcessingMetrics()
+        {
+            double GetLatestTime(string metricName, out int totalOps)
+            {
+                totalOps = 0;
+                if (!_orderBookServiceMetrics.TryGetValue(metricName, out var samples) || !samples.Any())
+                    return 0.0;
+
+                var latest = samples.Last();
+                totalOps = latest.TotalOps;
+                return latest.AvgTime;
+            }
+
+            var eventTime = GetLatestTime("EventQueueProcessing", out var eventOps);
+            var tickerTime = GetLatestTime("TickerQueueProcessing", out var tickerOps);
+            var notificationTime = GetLatestTime("NotificationQueueProcessing", out var notificationOps);
+
+            return (eventTime, tickerTime, notificationTime, eventOps, tickerOps, notificationOps);
+        }
+
+        /// <summary>
+        /// Gets OrderBookService market lock wait metrics for a specific market.
+        /// </summary>
+        /// <param name="marketTicker">The market ticker to get metrics for.</param>
+        /// <returns>A tuple containing the average wait time and total operations for the specified market.</returns>
+        public (double AverageWaitTimeMs, int TotalOperations) GetOrderBookServiceMarketLockWaitMetrics(string marketTicker)
+        {
+            if (_orderbookService == null)
+                return (0.0, 0);
+
+            return _orderbookService.GetMarketLockWaitMetrics(marketTicker);
+        }
+
         /// <remarks>
         /// This method evaluates current performance metrics against configured alert thresholds:
         /// - Queue high count percentage exceeding threshold

@@ -197,12 +197,15 @@ namespace BacklashBot.Services
                 {
                     orderbook = new List<OrderbookData>();
                 }
-                var waitTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                _marketLockWaitDurations.AddOrUpdate(
-                    marketTicker,
-                    _ => new List<long> { (long)waitTimeMs },
-                    (_, list) => { list.Add((long)waitTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
-                );
+                if (_config.OrderBookService_EnableMetrics)
+                {
+                    var waitTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                    _marketLockWaitDurations.AddOrUpdate(
+                        marketTicker,
+                        _ => new List<long> { (long)waitTimeMs },
+                        (_, list) => { list.Add((long)waitTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
+                    );
+                }
                 if (_serviceFactory.GetKalshiWebSocketClient().IsConnected() && _serviceFactory.GetDataCache().Markets[marketTicker].OrderbookData.Any())
                 {
                     NotifyOrderBookUpdated(marketTicker);
@@ -445,6 +448,7 @@ namespace BacklashBot.Services
         /// <returns>A tuple containing average processing time in milliseconds and total operations count.</returns>
         public (double AverageProcessingTimeMs, int TotalOperations) GetEventQueueProcessingMetrics()
         {
+            if (!_config.OrderBookService_EnableMetrics) return (0.0, 0);
             var times = _eventQueueProcessingTimes.GetOrAdd("event", _ => new List<long>());
             if (times.Count == 0) return (0.0, 0);
             return (times.Average(), times.Count);
@@ -457,6 +461,7 @@ namespace BacklashBot.Services
         /// <returns>A tuple containing average processing time in milliseconds and total operations count.</returns>
         public (double AverageProcessingTimeMs, int TotalOperations) GetTickerQueueProcessingMetrics()
         {
+            if (!_config.OrderBookService_EnableMetrics) return (0.0, 0);
             var times = _tickerQueueProcessingTimes.GetOrAdd("ticker", _ => new List<long>());
             if (times.Count == 0) return (0.0, 0);
             return (times.Average(), times.Count);
@@ -469,6 +474,7 @@ namespace BacklashBot.Services
         /// <returns>A tuple containing average processing time in milliseconds and total operations count.</returns>
         public (double AverageProcessingTimeMs, int TotalOperations) GetNotificationQueueProcessingMetrics()
         {
+            if (!_config.OrderBookService_EnableMetrics) return (0.0, 0);
             var times = _notificationQueueProcessingTimes.GetOrAdd("notification", _ => new List<long>());
             if (times.Count == 0) return (0.0, 0);
             return (times.Average(), times.Count);
@@ -482,6 +488,7 @@ namespace BacklashBot.Services
         /// <returns>A tuple containing average wait time in milliseconds and total operations count.</returns>
         public (double AverageWaitTimeMs, int TotalOperations) GetMarketLockWaitMetrics(string marketTicker)
         {
+            if (!_config.OrderBookService_EnableMetrics) return (0.0, 0);
             if (_marketLockWaitDurations.TryGetValue(marketTicker, out var times))
             {
                 if (times.Count == 0) return (0.0, 0);
@@ -585,12 +592,15 @@ namespace BacklashBot.Services
 
                     _logger.LogDebug("Processing notification for {MarketTicker}", marketTicker);
                     OrderBookUpdated?.Invoke(this, marketTicker);
-                    var processingTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                    _notificationQueueProcessingTimes.AddOrUpdate(
-                        "notification",
-                        _ => new List<long> { (long)processingTimeMs },
-                        (_, list) => { list.Add((long)processingTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
-                    );
+                    if (_config.OrderBookService_EnableMetrics)
+                    {
+                        var processingTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                        _notificationQueueProcessingTimes.AddOrUpdate(
+                            "notification",
+                            _ => new List<long> { (long)processingTimeMs },
+                            (_, list) => { list.Add((long)processingTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
+                        );
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -654,12 +664,15 @@ namespace BacklashBot.Services
                         _logger.LogDebug("Releasing semaphore for {MarketTicker}, Seq: {Seq}", marketTicker, seq);
                         semaphore.Release();
                     }
-                    var processingTimeMs = (DateTime.UtcNow - queueStartTime).TotalMilliseconds;
-                    _eventQueueProcessingTimes.AddOrUpdate(
-                        "event",
-                        _ => new List<long> { (long)processingTimeMs },
-                        (_, list) => { list.Add((long)processingTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
-                    );
+                    if (_config.OrderBookService_EnableMetrics)
+                    {
+                        var processingTimeMs = (DateTime.UtcNow - queueStartTime).TotalMilliseconds;
+                        _eventQueueProcessingTimes.AddOrUpdate(
+                            "event",
+                            _ => new List<long> { (long)processingTimeMs },
+                            (_, list) => { list.Add((long)processingTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
+                        );
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -699,12 +712,15 @@ namespace BacklashBot.Services
                         break;
                     }
                     GenerateTickerFromOrderBook(marketTicker);
-                    var processingTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                    _tickerQueueProcessingTimes.AddOrUpdate(
-                        "ticker",
-                        _ => new List<long> { (long)processingTimeMs },
-                        (_, list) => { list.Add((long)processingTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
-                    );
+                    if (_config.OrderBookService_EnableMetrics)
+                    {
+                        var processingTimeMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                        _tickerQueueProcessingTimes.AddOrUpdate(
+                            "ticker",
+                            _ => new List<long> { (long)processingTimeMs },
+                            (_, list) => { list.Add((long)processingTimeMs); return list.TakeLast(MaxWaitTimeSamples).ToList(); }
+                        );
+                    }
                 }
                 catch (ObjectDisposedException)
                 {
