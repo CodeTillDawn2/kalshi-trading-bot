@@ -11,6 +11,7 @@ using BacklashDTOs.Configuration;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs;
+using BacklashInterfaces.Enums;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -113,6 +114,53 @@ namespace KalshiBotTests
 
             // Setup default mock behaviors
             _connectionManagerMock.Setup(cm => cm.IsConnected()).Returns(true);
+            _connectionManagerMock.Setup(cm => cm.ConnectAsync(It.IsAny<int>())).Returns(Task.CompletedTask);
+            _connectionManagerMock.Setup(cm => cm.StopAsync()).Returns(Task.CompletedTask);
+            _connectionManagerMock.Setup(cm => cm.GetWebSocket()).Returns((ClientWebSocket)null);
+            _connectionManagerMock.Setup(cm => cm.ResetConnectionAsync()).Returns(Task.CompletedTask);
+            _connectionManagerMock.Setup(cm => cm.SendMessageAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
+            _connectionManagerMock.Setup(cm => cm.ReceiveAsync()).Returns(Task.CompletedTask);
+            _connectionManagerMock.Setup(cm => cm.DisableReconnect());
+            _connectionManagerMock.Setup(cm => cm.EnableReconnect());
+            _connectionManagerMock.Setup(cm => cm.ConnectSemaphoreCount).Returns(0);
+
+            _subscriptionManagerMock.Setup(sm => sm.EventCounts).Returns(new System.Collections.Concurrent.ConcurrentDictionary<string, long>());
+            _subscriptionManagerMock.Setup(sm => sm.WatchedMarkets).Returns(new HashSet<string>());
+            _subscriptionManagerMock.Setup(sm => sm.StartAsync()).Returns(Task.CompletedTask);
+            _subscriptionManagerMock.Setup(sm => sm.SubscribeToChannelAsync(It.IsAny<string>(), It.IsAny<string[]>())).Returns(Task.CompletedTask);
+            _subscriptionManagerMock.Setup(sm => sm.SubscribeToWatchedMarketsAsync()).Returns(Task.CompletedTask);
+            _subscriptionManagerMock.Setup(sm => sm.UpdateSubscriptionAsync(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+            _subscriptionManagerMock.Setup(sm => sm.UnsubscribeFromChannelAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
+            _subscriptionManagerMock.Setup(sm => sm.UnsubscribeFromAllAsync()).Returns(Task.CompletedTask);
+            _subscriptionManagerMock.Setup(sm => sm.ResubscribeAsync(It.IsAny<bool>())).Returns(Task.CompletedTask);
+            _subscriptionManagerMock.Setup(sm => sm.GetChannelName(It.IsAny<string>())).Returns("test");
+            _subscriptionManagerMock.Setup(sm => sm.GenerateNextMessageId()).Returns(1);
+            _subscriptionManagerMock.Setup(sm => sm.IsSubscribed(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            _subscriptionManagerMock.Setup(sm => sm.CanSubscribeToMarket(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            _subscriptionManagerMock.Setup(sm => sm.SetSubscriptionState(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SubscriptionState>()));
+            _subscriptionManagerMock.Setup(sm => sm.ClearOrderBookQueue(It.IsAny<string>()));
+            _subscriptionManagerMock.Setup(sm => sm.WaitForEmptyOrderBookQueueAsync(It.IsAny<string>(), It.IsAny<TimeSpan>())).Returns(Task.CompletedTask);
+            _subscriptionManagerMock.Setup(sm => sm.ResetEventCounts());
+            _subscriptionManagerMock.Setup(sm => sm.GetEventCountsByMarket(It.IsAny<string>())).Returns((0, 0, 0));
+            _subscriptionManagerMock.Setup(sm => sm.UpdateSubscriptionStateFromConfirmationAsync(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+            _subscriptionManagerMock.Setup(sm => sm.RemovePendingConfirmation(It.IsAny<int>())).Returns(false);
+            _subscriptionManagerMock.Setup(sm => sm.GetPendingConfirm(It.IsAny<int>())).Returns((string.Empty, new string[0]));
+            _subscriptionManagerMock.Setup(sm => sm.SubscriptionUpdateSemaphoreCount).Returns(0);
+            _subscriptionManagerMock.Setup(sm => sm.ChannelSubscriptionSemaphoreCount).Returns(0);
+            _subscriptionManagerMock.Setup(sm => sm.QueuedSubscriptionUpdatesCount).Returns(0);
+
+            _messageProcessorMock.Setup(mp => mp.OrderBookMessageQueueCount).Returns(0);
+            _messageProcessorMock.Setup(mp => mp.PendingConfirmsCount).Returns(0);
+            _messageProcessorMock.Setup(mp => mp.LastSequenceNumber).Returns(0);
+            _messageProcessorMock.Setup(mp => mp.StartProcessingAsync()).Returns(Task.CompletedTask);
+            _messageProcessorMock.Setup(mp => mp.StopProcessingAsync()).Returns(Task.CompletedTask);
+            _messageProcessorMock.Setup(mp => mp.ResetEventCounts());
+            _messageProcessorMock.Setup(mp => mp.ClearOrderBookQueue(It.IsAny<string>()));
+            _messageProcessorMock.Setup(mp => mp.WaitForEmptyOrderBookQueueAsync(It.IsAny<string>(), It.IsAny<TimeSpan>())).Returns(Task.CompletedTask);
+            _messageProcessorMock.Setup(mp => mp.GetEventCountsByMarket(It.IsAny<string>())).Returns((0, 0, 0));
+            _messageProcessorMock.Setup(mp => mp.SetWriteToSql(It.IsAny<bool>()));
+
+            _connectionManagerMock.Setup(cm => cm.IsConnected()).Returns(true);
             _subscriptionManagerMock.Setup(sm => sm.EventCounts).Returns(new System.Collections.Concurrent.ConcurrentDictionary<string, long>());
             _subscriptionManagerMock.Setup(sm => sm.WatchedMarkets).Returns(new HashSet<string>());
             _messageProcessorMock.Setup(mp => mp.OrderBookMessageQueueCount).Returns(0);
@@ -208,7 +256,8 @@ namespace KalshiBotTests
                 _subscriptionManagerMock.Object,
                 _messageProcessorMock.Object,
                 _dataCacheMock.Object,
-                false);
+                null, // performanceMetrics
+                false); // writeToSql
         }
 
         /// <summary>

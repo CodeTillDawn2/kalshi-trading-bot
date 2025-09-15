@@ -4,7 +4,7 @@ using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
-using KalshiBotAPI.Websockets;
+using KalshiBotAPI.WebSockets;
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
@@ -12,6 +12,11 @@ using KalshiBotOverseer;
 using KalshiBotLogging;
 using KalshiBotOverseer.Services;
 using BacklashDTOs.Configuration;
+using BacklashCommon.Services;
+using BacklashInterfaces.SmokehouseBot.Services;
+using BacklashBot.Services.Interfaces;
+using BacklashBot.Management.Interfaces;
+using BacklashBot.Management;
 using KalshiBotOverseer.State;
 using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.AspNetCore.Builder;
@@ -26,6 +31,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 using BacklashInterfaces.PerformanceMetrics;
+using KalshiBotAPI.Websockets;
 
 namespace KalshiBotOverseer
 {
@@ -177,8 +183,29 @@ namespace KalshiBotOverseer
 
             // Register PerformanceMetricsService
             services.AddSingleton<PerformanceMetricsService>();
+            services.AddSingleton<IPerformanceMonitor>(provider =>
+                provider.GetRequiredService<PerformanceMetricsService>());
             services.AddSingleton<IWebSocketPerformanceMetrics>(provider =>
                 (IWebSocketPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
+            services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
+                (INightActivitiesPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
+
+            // Register ExecutionConfig
+            services.Configure<ExecutionConfig>(Configuration.GetSection("Execution"));
+
+            // Register services needed for OvernightActivitiesHelper
+            services.AddScoped<IInterestScoreService, InterestScoreService>();
+            services.AddScoped<IMarketAnalysisHelper, MarketAnalysisHelper>();
+
+            // Register OvernightActivitiesHelper
+            services.AddScoped<IOvernightActivitiesHelper>(provider =>
+                new BacklashCommon.Services.OvernightActivitiesHelper(
+                    provider.GetRequiredService<ILogger<IOvernightActivitiesHelper>>(),
+                    null, // interestScoreHelper parameter not used in constructor
+                    provider.GetRequiredService<IMarketAnalysisHelper>(),
+                    provider.GetRequiredService<IOptions<ExecutionConfig>>(),
+                    provider.GetRequiredService<ISqlDataService>(),
+                    provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
 
             // Register BrainPersistenceService
             services.AddSingleton<BrainPersistenceService>(sp => new BrainPersistenceService(

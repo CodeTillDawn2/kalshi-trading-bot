@@ -13,7 +13,7 @@ namespace KalshiBotOverseer.Services
     /// This service aggregates metrics from various components including WebSocket operations, API calls,
     /// SignalR communications, overnight tasks, and snapshot processing.
     /// </summary>
-    public class PerformanceMetricsService : IKalshiBotContextPerformanceMetrics, IWebSocketPerformanceMetrics, ISqlDataServicePerformanceMetrics, ISubscriptionManagerPerformanceMetrics, IMessageProcessorPerformanceMetrics
+    public class PerformanceMetricsService : IKalshiBotContextPerformanceMetrics, IWebSocketPerformanceMetrics, ISqlDataServicePerformanceMetrics, ISubscriptionManagerPerformanceMetrics, IMessageProcessorPerformanceMetrics, IPerformanceMonitor
     {
         private readonly ILogger<PerformanceMetricsService> _logger;
 
@@ -1078,6 +1078,75 @@ namespace KalshiBotOverseer.Services
                 _messageProcessorLastDuplicateWarningTime = DateTime.MinValue;
                 _messageProcessorMessageTypeCounts = null;
                 _logger.LogInformation("MessageProcessor performance metrics reset");
+            }
+        }
+
+        #endregion
+
+        #region IPerformanceMonitor Implementation
+
+        /// <summary>
+        /// Records the execution time for a specific method or operation.
+        /// </summary>
+        /// <param name="methodName">The name of the method or operation.</param>
+        /// <param name="milliseconds">The execution time in milliseconds.</param>
+        public void RecordExecutionTime(string methodName, long milliseconds)
+        {
+            // Store in API metrics for consistency
+            lock (_apiLock)
+            {
+                _totalApiFetchTime += milliseconds;
+                _apiFetchCount++;
+                _lastApiFetchTime = DateTime.UtcNow;
+            }
+
+            _logger.LogDebug("Execution time recorded: {MethodName}={Milliseconds}ms", methodName, milliseconds);
+        }
+
+        /// <summary>
+        /// Records simulation performance metrics from StrategySimulation.
+        /// </summary>
+        /// <param name="simulationName">The name of the simulation.</param>
+        /// <param name="metrics">The detailed metrics dictionary from StrategySimulation.GetDetailedPerformanceMetrics().</param>
+        public void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics)
+        {
+            _logger.LogInformation("Simulation metrics recorded for {SimulationName}: {MetricsCount} metrics", simulationName, metrics.Count);
+
+            // Log key metrics for monitoring
+            foreach (var kvp in metrics)
+            {
+                _logger.LogDebug("Simulation metric: {Key}={Value}", kvp.Key, kvp.Value);
+            }
+        }
+
+        /// <summary>
+        /// Records comprehensive performance metrics.
+        /// </summary>
+        /// <param name="methodName">The name of the method or operation.</param>
+        /// <param name="totalExecutionTimeMs">Total time spent on execution.</param>
+        /// <param name="totalItemsProcessed">Number of items processed.</param>
+        /// <param name="totalItemsFound">Number of items found.</param>
+        /// <param name="itemCheckTimes">Dictionary of item names to their processing times.</param>
+        public void RecordPerformanceMetrics(
+            string methodName,
+            long totalExecutionTimeMs,
+            int totalItemsProcessed,
+            int totalItemsFound,
+            Dictionary<string, long>? itemCheckTimes = null)
+        {
+            _logger.LogInformation("Performance metrics recorded for {MethodName}: TotalTime={TotalTime}ms, ItemsProcessed={Processed}, ItemsFound={Found}",
+                methodName, totalExecutionTimeMs, totalItemsProcessed, totalItemsFound);
+
+            // Record as API fetch for consistency
+            RecordExecutionTime(methodName, totalExecutionTimeMs);
+
+            // Log individual item times if provided
+            if (itemCheckTimes != null && itemCheckTimes.Count > 0)
+            {
+                foreach (var kvp in itemCheckTimes)
+                {
+                    _logger.LogDebug("Item processing time: {ItemName}={Time}ms", kvp.Key, kvp.Value);
+                }
             }
         }
 

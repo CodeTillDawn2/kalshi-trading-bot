@@ -173,8 +173,6 @@ namespace TradingSimulator
             _performanceMonitor = new PerformanceMonitor();
 
             _overseer = new TradingOverseer(_scopeFactory, _snapshotService, config, overseerLoggerMock.Object, _performanceMonitor);
-            _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, marketAnalysisLoggerMock.Object);
-            _overseer = new TradingOverseer(_scopeFactory, _snapshotService, config, overseerLoggerMock.Object);
             _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 

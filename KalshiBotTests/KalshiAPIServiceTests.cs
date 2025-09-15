@@ -16,6 +16,7 @@ using BacklashDTOs.Data;
 using BacklashDTOs.Helpers;
 using BacklashDTOs.KalshiAPI;
 using BacklashInterfaces.Constants;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace KalshiBotTests
 {
@@ -49,6 +50,11 @@ namespace KalshiBotTests
         /// Mock status tracker service for managing cancellation tokens and operation status.
         /// </summary>
         private Mock<IStatusTrackerService> _statusTrackerMock;
+
+        /// <summary>
+        /// Mock performance monitor for recording execution times and metrics.
+        /// </summary>
+        private Mock<IPerformanceMonitor> _performanceMonitorMock;
 
         /// <summary>
         /// Options wrapper for Kalshi configuration settings.
@@ -217,6 +223,7 @@ namespace KalshiBotTests
             _scopeFactoryMock = new Mock<IServiceScopeFactory>();
             _statusTrackerMock = new Mock<IStatusTrackerService>();
             _statusTrackerMock.Setup(s => s.GetCancellationToken()).Returns(CancellationToken.None);
+            _performanceMonitorMock = new Mock<IPerformanceMonitor>();
 
             // Mock the DB context to avoid actual database interactions (focus on API calls)
             _contextMock = new Mock<IKalshiBotContext>();
@@ -247,7 +254,8 @@ namespace KalshiBotTests
                 _configuration,
                 _scopeFactoryMock.Object,
                 _statusTrackerMock.Object,
-                _kalshiConfigOptions
+                _kalshiConfigOptions,
+                _performanceMonitorMock.Object
             );
         }
 
@@ -1097,7 +1105,8 @@ namespace KalshiBotTests
                 _configuration,
                 _scopeFactoryMock.Object,
                 _statusTrackerMock.Object,
-                invalidOptions
+                invalidOptions,
+                _performanceMonitorMock.Object
             );
 
             try
@@ -1189,7 +1198,7 @@ namespace KalshiBotTests
 
             var ex1 = Assert.Throws<ArgumentException>(() =>
                 new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options1));
+                    _statusTrackerMock.Object, options1, _performanceMonitorMock.Object));
             Assert.That(ex1.Message, Does.Contain("KeyId"), "Expected KeyId validation message");
 
             // Test missing KeyFile
@@ -1203,7 +1212,7 @@ namespace KalshiBotTests
 
             var ex2 = Assert.Throws<ArgumentException>(() =>
                 new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options2));
+                    _statusTrackerMock.Object, options2, _performanceMonitorMock.Object));
             Assert.That(ex2.Message, Does.Contain("KeyFile"), "Expected KeyFile validation message");
 
             // Test missing Environment
@@ -1217,7 +1226,7 @@ namespace KalshiBotTests
 
             var ex3 = Assert.Throws<ArgumentException>(() =>
                 new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options3));
+                    _statusTrackerMock.Object, options3, _performanceMonitorMock.Object));
             Assert.That(ex3.Message, Does.Contain("Environment"), "Expected Environment validation message");
 
             Console.WriteLine("✅ PASSED: Configuration validation works correctly");
@@ -1247,7 +1256,7 @@ namespace KalshiBotTests
 
             var ex = Assert.Throws<ArgumentException>(() =>
                 new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options));
+                    _statusTrackerMock.Object, options, _performanceMonitorMock.Object));
             Assert.That(ex.Message, Does.Contain("does not exist"), "Expected file existence validation message");
 
             Console.WriteLine("✅ PASSED: Key file validation works correctly");
@@ -1272,7 +1281,8 @@ namespace KalshiBotTests
                 _configuration,
                 _scopeFactoryMock.Object,
                 _statusTrackerMock.Object,
-                _kalshiConfigOptions
+                _kalshiConfigOptions,
+                _performanceMonitorMock.Object
             );
 
             // Verify the service was created

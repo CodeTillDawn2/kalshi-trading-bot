@@ -218,7 +218,7 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClie
 ));
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>
-    new BacklashCommon.Services.OvernightActivitiesHelper(
+    new OvernightActivitiesHelper(
         provider.GetRequiredService<ILogger<BacklashCommon.Services.OvernightActivitiesHelper>>(),
         provider.GetRequiredService<IInterestScoreService>(),
         provider.GetRequiredService<IMarketAnalysisHelper>(),

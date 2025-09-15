@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
-using BacklashBot.Management.Interfaces;
+using BacklashInterfaces.PerformanceMetrics;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
@@ -45,7 +45,7 @@ namespace KalshiBotAPI.KalshiAPI
         private readonly string _connectionString;
         private Dictionary<string, string> AuthHeaders = new Dictionary<string, string>();
         private IStatusTrackerService _statusTrackerService;
-        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         private readonly ConcurrentDictionary<string, ConcurrentBag<long>> _methodExecutionDurations = new();
         private readonly ConcurrentDictionary<string, ConcurrentBag<long>> _calculationExecutionDurations = new();
@@ -70,12 +70,12 @@ namespace KalshiBotAPI.KalshiAPI
             IServiceScopeFactory scopeFactory,
             IStatusTrackerService statusTrackerService,
             IOptions<KalshiConfig> kalshiConfig,
-            ICentralPerformanceMonitor centralPerformanceMonitor)
+            IPerformanceMonitor performanceMonitor)
         {
             _logger = logger;
             _statusTrackerService = statusTrackerService;
             _kalshiConfig = kalshiConfig.Value;
-            _centralPerformanceMonitor = centralPerformanceMonitor;
+            _performanceMonitor = performanceMonitor;
             _enablePerformanceMetrics = _kalshiConfig.KalshiAPIServiceEnablePerformanceMetrics;
 
             // Initialize connection string from configuration
@@ -2330,8 +2330,8 @@ namespace KalshiBotAPI.KalshiAPI
             var bag = _methodExecutionDurations.GetOrAdd(methodName, _ => new ConcurrentBag<long>());
             bag.Add(elapsedMs);
 
-            // Post to central performance monitor for unified tracking
-            _centralPerformanceMonitor.RecordExecutionTime(methodName, elapsedMs);
+            // Post to performance monitor for unified tracking
+            _performanceMonitor.RecordExecutionTime(methodName, elapsedMs);
         }
 
         /// <summary>
