@@ -1,12 +1,3 @@
-/// <summary>
-/// Orchestrates trading scenario simulations and performance analysis for the Kalshi trading bot.
-/// This class serves as the central coordinator for running trading strategies against historical market snapshots,
-/// generating detailed performance reports, and calculating equity metrics. It integrates with the simulation engine,
-/// equity calculator, and report generator to provide comprehensive backtesting capabilities.
-/// Supports asynchronous operations for efficient performance monitoring and analysis.
-/// Includes input validation to prevent null reference exceptions with warning logs, performance metrics logging at debug level,
-/// and async method implementations for better performance in high-throughput scenarios.
-/// </summary>
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -19,9 +10,19 @@ using TradingStrategies.Extensions;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Trading.Overseer.ReportGenerator;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace TradingStrategies
 {
+    /// <summary>
+    /// Orchestrates trading scenario simulations and performance analysis for the Kalshi trading bot.
+    /// This class serves as the central coordinator for running trading strategies against historical market snapshots,
+    /// generating detailed performance reports, and calculating equity metrics. It integrates with the simulation engine,
+    /// equity calculator, and report generator to provide comprehensive backtesting capabilities.
+    /// Supports asynchronous operations for efficient performance monitoring and analysis.
+    /// Includes input validation to prevent null reference exceptions with warning logs, configurable performance metrics logging at debug level,
+    /// and async method implementations for better performance in high-throughput scenarios.
+    /// </summary>
     public class TradingOverseer
     {
         private readonly IServiceScopeFactory _scopeFactory;
@@ -29,21 +30,27 @@ namespace TradingStrategies
         private readonly SimulationEngine _simulationEngine;
         private readonly EquityCalculator _equityCalculator;
         private readonly ILogger<TradingOverseer> _logger;
+        private readonly PerformanceMonitor _performanceMonitor;
+        private readonly bool _enablePerformanceMetrics;
         private readonly string _cacheDirectory = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
 
         /// <summary>
         /// Initializes a new instance of the TradingOverseer class.
-        /// Sets up dependencies for simulation, equity calculation, and snapshot services.
+        /// Sets up dependencies for simulation, equity calculation, snapshot services, and performance monitoring.
         /// </summary>
         /// <param name="scopeFactory">Factory for creating service scopes to resolve dependencies.</param>
         /// <param name="snapshotService">Service for managing trading snapshot data.</param>
         /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
         /// <param name="logger">Logger for recording warnings and errors.</param>
-        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, IConfiguration configuration, ILogger<TradingOverseer> logger)
+        /// <param name="performanceMonitor">Monitor for recording performance metrics.</param>
+        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, IConfiguration configuration, ILogger<TradingOverseer> logger, PerformanceMonitor performanceMonitor)
         {
             _scopeFactory = scopeFactory;
             _snapshotService = snapshotService;
             _logger = logger;
+            _performanceMonitor = performanceMonitor;
+            _enablePerformanceMetrics = configuration.GetValue<bool>("TradingOverseer:EnablePerformanceMetrics", false);
+            _performanceMonitor.EnablePerformanceMetrics = _enablePerformanceMetrics;
             _simulationEngine = new SimulationEngine(configuration);
             _equityCalculator = new EquityCalculator();
         }
@@ -55,7 +62,7 @@ namespace TradingStrategies
         /// Executes a trading scenario simulation against a series of market snapshots.
         /// This method orchestrates the complete simulation process, including running strategies,
         /// generating performance reports, and returning detailed results for analysis.
-        /// Includes input validation to prevent null reference exceptions, performance metrics logging,
+        /// Includes input validation to prevent null reference exceptions, configurable performance metrics logging and recording,
         /// and asynchronous execution for high-throughput scenarios.
         /// </summary>
         /// <param name="scenario">The trading scenario containing strategies and market conditions to simulate.</param>
@@ -101,7 +108,7 @@ namespace TradingStrategies
                 }
             }
 
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            var stopwatch = _enablePerformanceMetrics ? System.Diagnostics.Stopwatch.StartNew() : null;
 
             bool isSingleStrategy = scenario.StrategiesByMarketConditions.Values.All(hs => hs.Count <= 1);
 
@@ -109,8 +116,25 @@ namespace TradingStrategies
 
             var pathData = await GeneratePerformanceReportsAndMetrics(group, activePaths, snapshots, initialCash, writeToFile);
 
-            stopwatch.Stop();
-            _logger.LogDebug("Simulation execution time: {Elapsed} ms, Snapshots processed: {Count}, Paths generated: {Paths}, Memory usage: {Memory} bytes", stopwatch.Elapsed.TotalMilliseconds, snapshots.Count, activePaths.Count, GC.GetTotalMemory(true));
+            if (_enablePerformanceMetrics && stopwatch != null)
+            {
+                stopwatch.Stop();
+                var memoryUsage = GC.GetTotalMemory(true);
+                _logger.LogDebug("Simulation execution time: {Elapsed} ms, Snapshots processed: {Count}, Paths generated: {Paths}, Memory usage: {Memory} bytes", stopwatch.Elapsed.TotalMilliseconds, snapshots.Count, activePaths.Count, memoryUsage);
+
+                // Record metrics to PerformanceMonitor
+                var itemCheckTimes = new Dictionary<string, long>
+                {
+                    { "MemoryUsage", memoryUsage }
+                };
+                _performanceMonitor.RecordPerformanceMetrics(
+                    methodName: "TestScenario",
+                    totalExecutionTimeMs: (long)stopwatch.Elapsed.TotalMilliseconds,
+                    totalItemsProcessed: snapshots.Count,
+                    totalItemsFound: activePaths.Count,
+                    itemCheckTimes: itemCheckTimes
+                );
+            }
 
             return pathData;
         }
