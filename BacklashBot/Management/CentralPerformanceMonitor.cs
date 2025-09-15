@@ -41,7 +41,7 @@ namespace BacklashBot.Management
     /// - Market refresh cycle performance
     /// - System startup and shutdown states
     /// </remarks>
-    public class CentralPerformanceMonitor : ICentralPerformanceMonitor, IKalshiBotContextPerformanceMetrics
+    public class CentralPerformanceMonitor : ICentralPerformanceMonitor, IKalshiBotContextPerformanceMetrics, INightActivitiesPerformanceMetrics
     {
         private readonly ILogger<ICentralPerformanceMonitor> _logger;
         private readonly IServiceFactory _serviceFactory;
@@ -412,6 +412,48 @@ namespace BacklashBot.Management
         }
 
         /// <summary>
+        /// Records overnight activities performance metrics from the common OvernightActivitiesHelper.
+        /// </summary>
+        /// <param name="metrics">The performance metrics from overnight activities.</param>
+        /// <remarks>
+        /// This method receives comprehensive performance data from the OvernightActivitiesHelper
+        /// and integrates it with the central performance monitoring system for analysis and alerting.
+        /// </remarks>
+        public void RecordOvernightActivitiesMetrics(INightActivitiesPerformanceMetrics metrics)
+        {
+            var (totalTime, marketsProcessed, apiCalls, errors, peakMemory, startTime, endTime, taskDurations) = metrics.GetOvernightPerformanceMetrics();
+
+            // Record execution time
+            RecordExecutionTime("OvernightActivities", totalTime);
+
+            // Log comprehensive overnight performance summary
+            _logger.LogInformation("OVERNIGHT PERFORMANCE: Total={TotalTime}ms, Markets={Markets}, API Calls={ApiCalls}, Errors={Errors}, Peak Memory={PeakMemory}MB",
+                totalTime, marketsProcessed, apiCalls, errors, peakMemory);
+
+            // Log individual task performances
+            foreach (var task in taskDurations)
+            {
+                _logger.LogInformation("OVERNIGHT TASK: {TaskName}={Duration}ms", task.Key, task.Value);
+            }
+
+            // Check for overnight performance alerts
+            if (totalTime > 300000) // 5 minutes
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Overnight activities took {TotalTime}ms (>5 minutes)", totalTime);
+            }
+
+            if (errors > 10)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Overnight activities had {ErrorCount} errors", errors);
+            }
+
+            if (peakMemory > 1000) // 1GB
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Overnight activities used {PeakMemory}MB peak memory (>1GB)", peakMemory);
+            }
+        }
+
+        /// <summary>
         /// Checks for performance alerts based on configured thresholds and logs warnings if exceeded.
         /// </summary>
         /// <remarks>
@@ -459,5 +501,85 @@ namespace BacklashBot.Management
                     orderBookQueueAvg, _executionConfig.QueueCountAlertThreshold);
             }
         }
+
+        #region INightActivitiesPerformanceMetrics Implementation
+
+        /// <summary>
+        /// Gets the current overnight activities performance metrics.
+        /// </summary>
+        /// <returns>Tuple containing comprehensive performance data.</returns>
+        public (long TotalExecutionTimeMs, int MarketsProcessed, int ApiCallsMade, int ErrorsEncountered,
+                long PeakMemoryUsageMB, DateTime StartTime, DateTime EndTime,
+                Dictionary<string, long> TaskDurations) GetOvernightPerformanceMetrics()
+        {
+            // This is a placeholder implementation since CentralPerformanceMonitor doesn't track these specific metrics
+            // The actual metrics are tracked by the OvernightActivitiesHelper itself
+            return (0, 0, 0, 0, 0, DateTime.MinValue, DateTime.MinValue, new Dictionary<string, long>());
+        }
+
+        /// <summary>
+        /// Records an overnight task execution with performance data.
+        /// </summary>
+        /// <param name="taskName">The name of the task.</param>
+        /// <param name="duration">The execution duration in milliseconds.</param>
+        /// <param name="success">Whether the task was successful.</param>
+        public void RecordOvernightTask(string taskName, long duration, bool success)
+        {
+            RecordExecutionTime(taskName, duration);
+            if (!success)
+            {
+                _logger.LogWarning("Overnight task '{TaskName}' failed after {Duration}ms", taskName, duration);
+            }
+        }
+
+        /// <summary>
+        /// Records an API call made during overnight processing.
+        /// </summary>
+        public void RecordApiCall()
+        {
+            // API calls are tracked through the existing RecordExecutionTime method
+            // This is a no-op since we don't have a separate counter for overnight API calls
+        }
+
+        /// <summary>
+        /// Records an error that occurred during overnight processing.
+        /// </summary>
+        public void RecordError()
+        {
+            // Errors are logged through the existing logging mechanism
+            // This is a no-op since we don't have a separate error counter for overnight activities
+        }
+
+        /// <summary>
+        /// Records the number of markets processed.
+        /// </summary>
+        /// <param name="count">The number of markets processed.</param>
+        public void RecordMarketsProcessed(int count)
+        {
+            // Market processing counts are tracked through the existing market refresh metrics
+            // This is a no-op since we don't have a separate counter for overnight market processing
+        }
+
+        /// <summary>
+        /// Records memory usage during overnight processing.
+        /// </summary>
+        /// <param name="memoryMB">Current memory usage in MB.</param>
+        public void RecordMemoryUsage(long memoryMB)
+        {
+            // Memory usage is not specifically tracked in CentralPerformanceMonitor
+            // This is a no-op since we don't have memory tracking for overnight activities
+        }
+
+        /// <summary>
+        /// Gets a formatted performance summary string.
+        /// </summary>
+        /// <returns>Formatted performance summary.</returns>
+        public string GetPerformanceSummary()
+        {
+            var summary = "Central Performance Monitor - Overnight Activities Summary";
+            return summary;
+        }
+
+        #endregion
     }
 }

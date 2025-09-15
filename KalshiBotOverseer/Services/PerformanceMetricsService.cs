@@ -461,6 +461,54 @@ namespace KalshiBotOverseer.Services
         }
 
         /// <summary>
+        /// Records overnight activities performance metrics from the common OvernightActivitiesHelper.
+        /// </summary>
+        /// <param name="metrics">The performance metrics from overnight activities.</param>
+        /// <remarks>
+        /// This method receives comprehensive performance data from the OvernightActivitiesHelper
+        /// and integrates it with the overseer performance monitoring system.
+        /// </remarks>
+        public void RecordOvernightActivitiesMetrics(INightActivitiesPerformanceMetrics metrics)
+        {
+            var (totalTime, marketsProcessed, apiCalls, errors, peakMemory, startTime, endTime, taskDurations) = metrics.GetOvernightPerformanceMetrics();
+
+            // Record as an overnight task
+            RecordOvernightTask("OvernightActivities", TimeSpan.FromMilliseconds(totalTime), errors == 0);
+
+            // Record API calls
+            for (int i = 0; i < apiCalls; i++)
+            {
+                RecordApiFetch(TimeSpan.Zero); // We don't have individual API call times, so record as 0
+            }
+
+            // Log comprehensive overnight performance summary
+            _logger.LogInformation("OVERNIGHT PERFORMANCE: Total={TotalTime}ms, Markets={Markets}, API Calls={ApiCalls}, Errors={Errors}, Peak Memory={PeakMemory}MB",
+                totalTime, marketsProcessed, apiCalls, errors, peakMemory);
+
+            // Log individual task performances
+            foreach (var task in taskDurations)
+            {
+                _logger.LogInformation("OVERNIGHT TASK: {TaskName}={Duration}ms", task.Key, task.Value);
+            }
+
+            // Check for overnight performance alerts
+            if (totalTime > 300000) // 5 minutes
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Overnight activities took {TotalTime}ms (>5 minutes)", totalTime);
+            }
+
+            if (errors > 10)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Overnight activities had {ErrorCount} errors", errors);
+            }
+
+            if (peakMemory > 1000) // 1GB
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Overnight activities used {PeakMemory}MB peak memory (>1GB)", peakMemory);
+            }
+        }
+
+        /// <summary>
         /// Logs the current metrics status for debugging purposes.
         /// </summary>
         public void LogMetricsStatus()

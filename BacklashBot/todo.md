@@ -73,8 +73,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## TradingStrategies.TradingOverseer
 
-## TradingSimulator.Simulator.SimulatorReporting
-
 ## KalshiBotOverseer.OvernightActivitiesHelper
 
 ## TradingGUI.MainForm

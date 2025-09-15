@@ -1,3 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,39 +15,121 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
-using System.Diagnostics;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace BacklashCommon.Services
 {
+    /// <summary>
+    /// Internal performance metrics class for tracking overnight activities execution.
+    /// This class holds all the performance data collected during overnight task processing.
+    /// </summary>
     public class PerformanceMetrics
     {
+        /// <summary>
+        /// Gets or sets the total execution time in milliseconds for all overnight tasks.
+        /// </summary>
         public long TotalExecutionTimeMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of markets processed during overnight activities.
+        /// </summary>
         public int MarketsProcessed { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of API calls made during overnight processing.
+        /// </summary>
         public int ApiCallsMade { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of errors encountered during overnight processing.
+        /// </summary>
         public int ErrorsEncountered { get; set; }
+
+        /// <summary>
+        /// Gets or sets the peak memory usage in MB during overnight processing.
+        /// </summary>
         public long PeakMemoryUsageMB { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start time of the overnight activities execution.
+        /// </summary>
         public DateTime StartTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the end time of the overnight activities execution.
+        /// </summary>
         public DateTime EndTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the dictionary of individual task durations in milliseconds.
+        /// Key is the task name, value is the duration in milliseconds.
+        /// </summary>
         public Dictionary<string, long> TaskDurations { get; set; } = new();
     }
 
-    public class OvernightActivitiesHelper : IOvernightActivitiesHelper
+    /// <summary>
+    /// Common implementation of overnight activities helper that orchestrates all background
+    /// maintenance tasks for the Kalshi trading bot. This class handles market data refresh,
+    /// interest score calculations, snapshot imports, cleanup operations, and performance monitoring.
+    /// </summary>
+    /// <remarks>
+    /// This implementation provides:
+    /// - Comprehensive performance tracking and metrics collection
+    /// - Dynamic batch processing with adaptive sizing based on performance
+    /// - Robust error handling and retry mechanisms
+    /// - Memory and resource usage monitoring
+    /// - Detailed logging for monitoring and debugging
+    /// - Cancellation support for graceful shutdowns
+    /// </remarks>
+    public class OvernightActivitiesHelper : IOvernightActivitiesHelper, INightActivitiesPerformanceMetrics
     {
         private readonly ILogger<IOvernightActivitiesHelper> _logger;
         private readonly IMarketAnalysisHelper _analysisHelper;
         private readonly ExecutionConfig _executionConfig;
         private readonly ISqlDataService _sqlDataService;
         private readonly PerformanceMetrics _performanceMetrics = new();
+        private readonly INightActivitiesPerformanceMetrics? _performanceMonitor;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OvernightActivitiesHelper"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance for recording operations and performance data.</param>
+        /// <param name="interestScoreHelper">The interest score service (injected but not used in constructor).</param>
+        /// <param name="analysisHelper">The market analysis helper for generating snapshot groups.</param>
+        /// <param name="executionConfig">The execution configuration options.</param>
+        /// <param name="sqlDataService">The SQL data service for snapshot operations.</param>
+        /// <param name="performanceMonitor">Optional performance monitor for tracking metrics (uses interface segregation).</param>
         public OvernightActivitiesHelper(ILogger<IOvernightActivitiesHelper> logger, IInterestScoreService interestScoreHelper,
-            IMarketAnalysisHelper analysisHelper, IOptions<ExecutionConfig> executionConfig, ISqlDataService sqlDataService)
+            IMarketAnalysisHelper analysisHelper, IOptions<ExecutionConfig> executionConfig, ISqlDataService sqlDataService,
+            INightActivitiesPerformanceMetrics? performanceMonitor = null)
         {
             _logger = logger;
             _analysisHelper = analysisHelper;
             _executionConfig = executionConfig.Value;
             _sqlDataService = sqlDataService;
+            _performanceMonitor = performanceMonitor;
         }
 
+        /// <summary>
+        /// Executes the complete set of overnight maintenance tasks for the trading bot.
+        /// This method orchestrates all background operations including market data refresh,
+        /// interest score calculations, snapshot imports, cleanup operations, and performance monitoring.
+        /// </summary>
+        /// <param name="scopeFactory">The service scope factory for creating scoped service instances.</param>
+        /// <param name="cancellationToken">The cancellation token to monitor for cancellation requests.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// This method performs the following tasks in order:
+        /// 1. Refreshes all open markets
+        /// 2. Refreshes likely closed markets with dynamic batching
+        /// 3. Calculates interest scores for active markets
+        /// 4. Imports snapshots from files (executed twice for completeness)
+        /// 5. Removes old market watches
+        /// 6. Generates snapshot groups for analysis
+        /// 7. Deletes unrecorded markets
+        ///
+        /// All tasks are individually timed and tracked for performance monitoring.
+        /// </remarks>
         public async Task RunOvernightTasks(IServiceScopeFactory scopeFactory, CancellationToken cancellationToken = default)
         {
             var totalStopwatch = Stopwatch.StartNew();
@@ -92,6 +181,9 @@ namespace BacklashCommon.Services
 
                 _logger.LogInformation("OVERNIGHT-All tasks completed successfully in {TotalDuration}ms. Performance metrics: {Metrics}",
                     _performanceMetrics.TotalExecutionTimeMs, FormatPerformanceSummary());
+
+                // Post metrics to the performance monitor if available
+                _performanceMonitor?.RecordOvernightTask("OvernightActivities", _performanceMetrics.TotalExecutionTimeMs, true);
             }
             catch (Exception ex)
             {
@@ -104,6 +196,14 @@ namespace BacklashCommon.Services
             }
         }
 
+        /// <summary>
+        /// Deletes markets that have ended but were never recorded with snapshots.
+        /// This cleanup operation removes inactive markets that don't have any snapshot data,
+        /// helping to maintain database integrity and reduce storage overhead.
+        /// </summary>
+        /// <param name="scopeFactory">The service scope factory for creating scoped service instances.</param>
+        /// <param name="cancellationToken">The cancellation token to monitor for cancellation requests.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task DeleteUnrecordedMarkets(IServiceScopeFactory scopeFactory, CancellationToken cancellationToken)
         {
             using var scope = scopeFactory.CreateScope();
@@ -117,6 +217,14 @@ namespace BacklashCommon.Services
             }
         }
 
+        /// <summary>
+        /// Deletes processed snapshot data that is no longer needed for analysis.
+        /// This method removes candlestick data files for markets that have been fully processed,
+        /// helping to manage disk space and maintain efficient storage utilization.
+        /// </summary>
+        /// <param name="scopeFactory">The service scope factory for creating database contexts.</param>
+        /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task DeleteProcessedSnapshots(IServiceScopeFactory scopeFactory, CancellationToken cancellationToken)
         {
             using var scope = scopeFactory.CreateScope();
@@ -393,5 +501,85 @@ namespace BacklashCommon.Services
 
             return summary;
         }
+
+        #region INightActivitiesPerformanceMetrics Implementation
+
+        /// <summary>
+        /// Gets the current overnight activities performance metrics.
+        /// </summary>
+        /// <returns>Tuple containing comprehensive performance data.</returns>
+        public (long TotalExecutionTimeMs, int MarketsProcessed, int ApiCallsMade, int ErrorsEncountered,
+                long PeakMemoryUsageMB, DateTime StartTime, DateTime EndTime,
+                Dictionary<string, long> TaskDurations) GetOvernightPerformanceMetrics()
+        {
+            return (_performanceMetrics.TotalExecutionTimeMs,
+                    _performanceMetrics.MarketsProcessed,
+                    _performanceMetrics.ApiCallsMade,
+                    _performanceMetrics.ErrorsEncountered,
+                    _performanceMetrics.PeakMemoryUsageMB,
+                    _performanceMetrics.StartTime,
+                    _performanceMetrics.EndTime,
+                    new Dictionary<string, long>(_performanceMetrics.TaskDurations));
+        }
+
+        /// <summary>
+        /// Records an overnight task execution with performance data.
+        /// </summary>
+        /// <param name="taskName">The name of the task.</param>
+        /// <param name="duration">The execution duration in milliseconds.</param>
+        /// <param name="success">Whether the task was successful.</param>
+        public void RecordOvernightTask(string taskName, long duration, bool success)
+        {
+            _performanceMetrics.TaskDurations[taskName] = duration;
+            if (!success)
+            {
+                _performanceMetrics.ErrorsEncountered++;
+            }
+        }
+
+        /// <summary>
+        /// Records an API call made during overnight processing.
+        /// </summary>
+        public void RecordApiCall()
+        {
+            _performanceMetrics.ApiCallsMade++;
+        }
+
+        /// <summary>
+        /// Records an error that occurred during overnight processing.
+        /// </summary>
+        public void RecordError()
+        {
+            _performanceMetrics.ErrorsEncountered++;
+        }
+
+        /// <summary>
+        /// Records the number of markets processed.
+        /// </summary>
+        /// <param name="count">The number of markets processed.</param>
+        public void RecordMarketsProcessed(int count)
+        {
+            _performanceMetrics.MarketsProcessed += count;
+        }
+
+        /// <summary>
+        /// Records memory usage during overnight processing.
+        /// </summary>
+        /// <param name="memoryMB">Current memory usage in MB.</param>
+        public void RecordMemoryUsage(long memoryMB)
+        {
+            _performanceMetrics.PeakMemoryUsageMB = Math.Max(_performanceMetrics.PeakMemoryUsageMB, memoryMB);
+        }
+
+        /// <summary>
+        /// Gets a formatted performance summary string.
+        /// </summary>
+        /// <returns>Formatted performance summary.</returns>
+        public string GetPerformanceSummary()
+        {
+            return FormatPerformanceSummary();
+        }
+
+        #endregion
     }
 }
