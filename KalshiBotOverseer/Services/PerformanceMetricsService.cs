@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using KalshiBotData.Data.Interfaces;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace KalshiBotOverseer.Services
 {
@@ -10,7 +12,7 @@ namespace KalshiBotOverseer.Services
     /// This service aggregates metrics from various components including WebSocket operations, API calls,
     /// SignalR communications, overnight tasks, and snapshot processing.
     /// </summary>
-    public class PerformanceMetricsService
+    public class PerformanceMetricsService : IKalshiBotContextPerformanceMetrics
     {
         private readonly ILogger<PerformanceMetricsService> _logger;
 
@@ -43,6 +45,31 @@ namespace KalshiBotOverseer.Services
         // System health metrics
         private int _marketRefreshFailureCount;
         private DateTime? _lastMarketRefreshFailure;
+
+        // Database metrics
+        private Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> _databaseMetrics = new();
+
+        /// <summary>
+        /// Gets the current database performance metrics.
+        /// </summary>
+        public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> DatabaseMetrics => _databaseMetrics;
+
+        /// <summary>
+        /// Gets the current database performance metrics.
+        /// </summary>
+        /// <returns>Dictionary containing operation names and their performance statistics.</returns>
+        public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetPerformanceMetrics()
+        {
+            return _databaseMetrics;
+        }
+
+        /// <summary>
+        /// Resets all performance metrics.
+        /// </summary>
+        public void ResetPerformanceMetrics()
+        {
+            _databaseMetrics.Clear();
+        }
 
         // Locks for thread safety
         private readonly object _webSocketLock = new();
@@ -294,6 +321,34 @@ namespace KalshiBotOverseer.Services
             lock (_healthLock)
             {
                 return (_marketRefreshFailureCount, _lastMarketRefreshFailure);
+            }
+        }
+
+        #endregion
+
+        #region Database Metrics
+
+        /// <summary>
+        /// Records database performance metrics.
+        /// </summary>
+        /// <param name="metrics">Dictionary containing database operation metrics.</param>
+        public void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics)
+        {
+            lock (_snapshotLock) // reusing snapshot lock for database metrics
+            {
+                _databaseMetrics = new Dictionary<string, (int, int, TimeSpan, double)>(metrics);
+                _logger.LogDebug("Database metrics recorded: {Count} operations", metrics.Count);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current database performance metrics.
+        /// </summary>
+        public Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetDatabaseMetrics()
+        {
+            lock (_snapshotLock)
+            {
+                return new Dictionary<string, (int, int, TimeSpan, double)>(_databaseMetrics);
             }
         }
 

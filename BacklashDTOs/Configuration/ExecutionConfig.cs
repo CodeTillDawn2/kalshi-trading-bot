@@ -207,5 +207,11 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         /// <value>Default is true.</value>
         public bool EnableCandlestickServicePerformanceMetrics { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets whether to enable database performance metrics collection in CentralPerformanceMonitor.
+        /// </summary>
+        /// <value>Default is true.</value>
+        public bool CentralPerformanceMonitor_EnableDatabaseMetrics { get; set; } = true;
     }
 }

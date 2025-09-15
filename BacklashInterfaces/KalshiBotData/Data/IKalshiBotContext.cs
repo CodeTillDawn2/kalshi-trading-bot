@@ -167,5 +167,28 @@ namespace KalshiBotData.Data.Interfaces
         Task<List<BacklashDTOs.Data.OverseerInfo>> GetActiveOverseerInfos();
         Task<BacklashDTOs.Data.OverseerInfo?> GetOverseerInfoByHostName(string hostName);
         #endregion
+
+        #region Performance Metrics
+        IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetPerformanceMetrics();
+        void ResetPerformanceMetrics();
+        #endregion
+    }
+
+    /// <summary>
+    /// Interface for accessing database performance metrics from different monitoring services.
+    /// This allows the KalshiBotContext to post metrics to the appropriate service based on the project.
+    /// </summary>
+    public interface IDatabasePerformanceMetrics
+    {
+        /// <summary>
+        /// Gets the current database performance metrics.
+        /// </summary>
+        IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> DatabaseMetrics { get; }
+
+        /// <summary>
+        /// Records database performance metrics.
+        /// </summary>
+        /// <param name="metrics">Dictionary containing database operation metrics.</param>
+        void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics);
     }
 }
