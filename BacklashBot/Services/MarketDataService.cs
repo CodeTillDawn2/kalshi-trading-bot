@@ -773,6 +773,8 @@ namespace BacklashBot.Services
             _logger.LogInformation("Sync-Sync needed for: {MarketTicker}", marketTicker);
             var semaphore = _marketLocks.GetOrAdd(marketTicker, _ => new SemaphoreSlim(1, 1));
             var stopwatch = Stopwatch.StartNew();
+            var process = Process.GetCurrentProcess();
+            var startCpuTime = process.TotalProcessorTime;
             bool lockAcquired = false;
             try
             {
@@ -833,6 +835,19 @@ namespace BacklashBot.Services
                 {
                     semaphore.Release();
                     _logger.LogInformation("Released sync lock for {MarketTicker}", marketTicker);
+                }
+                // Log performance metrics if enabled
+                if (_marketDataConfig.EnablePerformanceMetrics)
+                {
+                    var endCpuTime = process.TotalProcessorTime;
+                    var cpuTimeUsed = endCpuTime - startCpuTime;
+                    var elapsed = stopwatch.Elapsed;
+                    var cpuUsagePercent = (cpuTimeUsed.TotalMilliseconds / elapsed.TotalMilliseconds) * 100 / Environment.ProcessorCount;
+                    var memoryUsageMB = GC.GetTotalMemory(false) / 1024.0 / 1024.0;
+                    var cacheSize = _serviceFactory.GetDataCache().Markets.Count;
+                    var watchedMarkets = _serviceFactory.GetDataCache().WatchedMarkets.Count;
+                    _logger.LogInformation("Performance-Sync for {MarketTicker}: Elapsed={Elapsed}ms, CPU Usage={CpuUsage:F2}%, Memory={Memory:F2}MB, Markets Cache={CacheSize}, Watched Markets={WatchedMarkets}",
+                        marketTicker, elapsed.TotalMilliseconds, cpuUsagePercent, memoryUsageMB, cacheSize, watchedMarkets);
                 }
             }
         }

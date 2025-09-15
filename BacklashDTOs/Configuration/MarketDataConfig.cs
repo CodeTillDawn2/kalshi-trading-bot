@@ -24,6 +24,11 @@ public class MarketDataConfig : IValidateOptions<MarketDataConfig>
     public int ApiRetryTimeoutMs { get; set; } = 30000;
 
     /// <summary>
+    /// Gets or sets a value indicating whether performance metrics logging is enabled for MarketDataService. Default is false.
+    /// </summary>
+    public bool EnablePerformanceMetrics { get; set; } = false;
+
+    /// <summary>
     /// Validates the configuration options.
     /// </summary>
     /// <param name="name">The name of the options instance being validated.</param>
