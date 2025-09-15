@@ -63,6 +63,11 @@ namespace BacklashBot.Management
         public double LastRefreshUsagePercentage { get; set; }
         public bool LastRefreshTimeAcceptable { get; set; }
         public DateTime? LastPerformanceSampleDate { get; set; }
+        public TimeSpan LastRefreshCpuTime { get; set; }
+        public long LastRefreshMemoryUsage { get; set; }
+        public double LastRefreshThroughput { get; set; }
+        public TimeSpan LastRefreshAverageTimePerMarket { get; set; }
+        public int LastRefreshCount { get; set; }
         private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
         private IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? _databaseMetrics;
@@ -242,9 +247,30 @@ namespace BacklashBot.Management
                                 LastRefreshTimeAcceptable = dto != null && LastRefreshUsagePercentage >= dto.UsageMin && LastRefreshUsagePercentage <= dto.UsageMax;
                                 LastPerformanceSampleDate = DateTime.UtcNow;
 
+                                // Collect additional metrics if enabled
+                                try
+                                {
+                                    LastRefreshCpuTime = marketRefreshService.LastCpuTime;
+                                    LastRefreshMemoryUsage = marketRefreshService.LastMemoryUsage;
+                                    LastRefreshThroughput = marketRefreshService.RefreshThroughput;
+                                    LastRefreshAverageTimePerMarket = marketRefreshService.AverageRefreshTimePerMarket;
+                                    LastRefreshCount = marketRefreshService.LastRefreshCount;
+                                }
+                                catch (InvalidOperationException ex)
+                                {
+                                    _logger.LogDebug("MarketRefreshService performance metrics are disabled: {Message}", ex.Message);
+                                    // Reset to defaults
+                                    LastRefreshCpuTime = TimeSpan.Zero;
+                                    LastRefreshMemoryUsage = 0;
+                                    LastRefreshThroughput = 0;
+                                    LastRefreshAverageTimePerMarket = TimeSpan.Zero;
+                                    LastRefreshCount = 0;
+                                }
+
                                 _logger.LogInformation(
-                                    "{Service} processing time: Elapsed={ElapsedSeconds:F2}s, Markets={MarketCount}, Usage={UsagePercentage:F2}%, Acceptable={IsAcceptable}",
-                                    marketServiceName, LastRefreshCycleSeconds, LastRefreshMarketCount, LastRefreshUsagePercentage, LastRefreshTimeAcceptable);
+                                    "{Service} processing time: Elapsed={ElapsedSeconds:F2}s, Markets={MarketCount}, Usage={UsagePercentage:F2}%, Acceptable={IsAcceptable}, CpuTime={CpuTime}, Memory={Memory}MB, Throughput={Throughput:F2}/s",
+                                    marketServiceName, LastRefreshCycleSeconds, LastRefreshMarketCount, LastRefreshUsagePercentage, LastRefreshTimeAcceptable,
+                                    LastRefreshCpuTime.TotalSeconds, LastRefreshMemoryUsage / (1024 * 1024), LastRefreshThroughput);
 
                                 // Check for performance alerts
                                 CheckPerformanceAlerts();

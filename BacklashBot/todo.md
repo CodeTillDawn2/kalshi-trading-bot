@@ -67,10 +67,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## BacklashBot.Services.MarketRefreshService
 
-## BacklashBot.Services.MarketDataInitializer
-
-## BacklashBot.Services.BroadcastService
-
 ## TradingGUI.MainForm
 
 
