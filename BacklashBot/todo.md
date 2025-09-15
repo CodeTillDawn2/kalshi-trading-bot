@@ -33,49 +33,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## TradingSimulator.CachedMarketData
 
-## KalshiBotAPI.Websockets.MessageProcessor
-
-## KalshiBotContext.Data.SqlDataService
-
-## KalshiBotOverseer.Services.BrainPersistenceService
-
-## KalshiBotOverseer.Controllers.MarketWatchController
-
-## KalshiBotOverseer.Models.BrainPersistence
-
-## KalshiBotAPI.Websockets.KalshiWebSocketClient
-
-## KalshiBotAPI.Websockets.SubscriptionManager
-
-## BacklashBot.Services.OverseerClientService
-
-## BacklashPatterns.PatternSearch
-
-## KalshiBotAPI.KalshiAPI.KalshiAPIService
-
-## BacklashBot.Management.BrainStatusService
-
-## BacklashBot.Management.MarketAnalysisHelper
-
-## BacklashBot.Services.InterestScoreService
-
-## BacklashBot.Services.OrderBookService
-
-## BacklashPatterns.PatternUtils
-
-## BacklashBot.Services.KaslhiBotScopeManagerService
-
-## BacklashBot.Services.MarketRefreshService
-
-## BacklashBot.Services.MarketDataInitializer
-
-## BacklashBot.Services.BroadcastService
-
-## TradingStrategies.TradingOverseer
-
-## TradingSimulator.Simulator.SimulatorReporting
-
-## KalshiBotOverseer.OvernightActivitiesHelper
 
 ## TradingGUI.MainForm
 

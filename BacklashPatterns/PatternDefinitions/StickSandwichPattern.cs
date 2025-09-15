@@ -41,7 +41,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Indicates a potential reversal as the middle candle s move is rejected.
         /// Source: https://www.tradingview.com/education/stick-sandwich/
         /// </summary>
-        public static StickSandwichPattern? IsPattern(
+        public static async Task<StickSandwichPattern?> IsPatternAsync(
             int index,
             bool isBullish,
             CandleMids[] prices,
@@ -54,9 +54,9 @@ namespace BacklashPatterns.PatternDefinitions
             int c2 = index - 1; // Second candle
             int c3 = index;     // Third candle
 
-            var metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
             double body1 = metrics1.BodySize;
             double body2 = metrics2.BodySize;

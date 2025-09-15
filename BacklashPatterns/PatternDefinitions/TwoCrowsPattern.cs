@@ -42,7 +42,7 @@ namespace BacklashPatterns.PatternDefinitions
          *   3. Third candle: Bearish, opens within the second candle s range, closes near or below the first candle s close.
          * - Indication: Suggests selling pressure overcoming buying momentum, potential reversal to downtrend.
          */
-        public static TwoCrowsPattern? IsPattern(
+        public static async Task<TwoCrowsPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -54,9 +54,9 @@ namespace BacklashPatterns.PatternDefinitions
             int c3 = index;     // Third candle
             if (c1 < 0 || c3 >= prices.Length) return null;
 
-            var metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
             // First candle: Bullish, minimal body size
             if (!metrics1.IsBullish || metrics1.BodySize < 0.1) return null;

@@ -35,7 +35,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Indicates continuation of the prior trend after a brief pullback.
         /// Source: https://www.investopedia.com/terms/t/tasukigap.asp
         /// </summary>
-        public static TasukiGapPattern? IsPattern(
+        public static async Task<TasukiGapPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             bool isBullish,
@@ -48,9 +48,9 @@ namespace BacklashPatterns.PatternDefinitions
             int c2 = index - 1; // Second candle
             int c3 = index;     // Third candle
 
-            var metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
             // Trend check using LookbackMeanTrend (3 candles)
             bool hasTrend = isBullish ? metrics3.GetLookbackMeanTrend(3) > TrendThreshold

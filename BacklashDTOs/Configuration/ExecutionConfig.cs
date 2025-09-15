@@ -270,5 +270,11 @@ namespace BacklashDTOs.Configuration
         /// </summary>
         /// <value>Default is true.</value>
         public bool CentralPerformanceMonitor_EnableDatabaseMetrics { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets whether to enable performance metrics collection for MarketAnalysisHelper operations.
+        /// </summary>
+        /// <value>Default is true.</value>
+        public bool EnableMarketAnalysisHelperPerformanceMetrics { get; set; } = true;
     }
 }

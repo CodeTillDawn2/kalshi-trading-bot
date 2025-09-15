@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -10,7 +11,7 @@ namespace TradingStrategies.Trading.Overseer
     /// from StrategySimulation, with typed access via SimulationPerformanceMetrics.
     /// All metrics collection can be enabled/disabled via the EnablePerformanceMetrics property.
     /// </summary>
-    public class PerformanceMonitor : IPerformanceMonitor
+    public class PerformanceMonitor : BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor
     {
         private readonly ConcurrentDictionary<string, List<PerformanceRecord>> _performanceRecords;
         private readonly ConcurrentDictionary<string, Dictionary<string, object>> _simulationMetrics;
@@ -259,6 +260,155 @@ namespace TradingStrategies.Trading.Overseer
 
 
         /// <summary>
+        /// Records PatternUtils-specific performance metrics.
+        /// </summary>
+        /// <param name="totalCalculations">Total number of calculations performed.</param>
+        /// <param name="totalCalculationTimeMs">Total time spent on calculations in milliseconds.</param>
+        /// <param name="cacheHits">Number of cache hits.</param>
+        /// <param name="cacheMisses">Number of cache misses.</param>
+        /// <param name="throughput">Calculations per second (optional).</param>
+        /// <param name="cpuTimeMs">CPU time used in milliseconds (optional).</param>
+        /// <param name="memoryUsage">Memory usage in bytes (optional).</param>
+        /// <param name="configurationStatus">Current configuration status dictionary (optional).</param>
+        /// <remarks>
+        /// This method is specifically designed to integrate with PatternUtils performance metrics.
+        /// All parameters are optional to support different levels of metric collection.
+        /// Metrics collection is gated by EnablePerformanceMetrics flag.
+        /// </remarks>
+        public void RecordPatternUtilsMetrics(
+            int totalCalculations,
+            long totalCalculationTimeMs,
+            int cacheHits,
+            int cacheMisses,
+            double? throughput = null,
+            double? cpuTimeMs = null,
+            long? memoryUsage = null,
+            Dictionary<string, bool>? configurationStatus = null)
+        {
+            if (!EnablePerformanceMetrics) return;
+
+            var metrics = new Dictionary<string, object>
+            {
+                ["TotalCalculations"] = totalCalculations,
+                ["TotalCalculationTimeMs"] = totalCalculationTimeMs,
+                ["CacheHits"] = cacheHits,
+                ["CacheMisses"] = cacheMisses,
+                ["CacheHitRate"] = cacheHits + cacheMisses > 0 ? (double)cacheHits / (cacheHits + cacheMisses) * 100.0 : 0.0,
+                ["AverageCalculationTimeMs"] = totalCalculations > 0 ? (double)totalCalculationTimeMs / totalCalculations : 0.0
+            };
+
+            if (throughput.HasValue) metrics["Throughput"] = throughput.Value;
+            if (cpuTimeMs.HasValue) metrics["CpuTimeMs"] = cpuTimeMs.Value;
+            if (memoryUsage.HasValue) metrics["MemoryUsage"] = memoryUsage.Value;
+            if (configurationStatus != null) metrics["ConfigurationStatus"] = configurationStatus;
+
+            _simulationMetrics["PatternUtils"] = metrics;
+        }
+
+        /// <summary>
+        /// Records PatternUtils scalability test results.
+        /// </summary>
+        /// <param name="scalabilityResults">Dictionary mapping data sizes to throughput measurements.</param>
+        /// <remarks>
+        /// Metrics collection is gated by EnablePerformanceMetrics flag.
+        /// </remarks>
+        public void RecordPatternUtilsScalability(Dictionary<int, double> scalabilityResults)
+        {
+            if (!EnablePerformanceMetrics) return;
+            _simulationMetrics["PatternUtils.Scalability"] = new Dictionary<string, object>
+            {
+                ["ScalabilityResults"] = scalabilityResults,
+                ["Timestamp"] = DateTime.UtcNow
+            };
+        }
+
+        /// <summary>
+        /// Records PatternUtils CPU profiling results.
+        /// </summary>
+        /// <param name="cpuTimeMs">CPU time used in milliseconds.</param>
+        /// <param name="throughput">Calculations per second achieved.</param>
+        /// <param name="dataSize">Size of data processed.</param>
+        /// <remarks>
+        /// Metrics collection is gated by EnablePerformanceMetrics flag.
+        /// </remarks>
+        public void RecordPatternUtilsCpuProfile(double cpuTimeMs, double throughput, int dataSize)
+        {
+            if (!EnablePerformanceMetrics) return;
+            _simulationMetrics["PatternUtils.CpuProfile"] = new Dictionary<string, object>
+            {
+                ["CpuTimeMs"] = cpuTimeMs,
+                ["Throughput"] = throughput,
+                ["DataSize"] = dataSize,
+                ["Timestamp"] = DateTime.UtcNow
+            };
+        }
+
+        /// <summary>
+        /// Gets PatternUtils performance metrics.
+        /// </summary>
+        /// <returns>The PatternUtils metrics dictionary.</returns>
+        public Dictionary<string, object> GetPatternUtilsMetrics()
+        {
+            return GetSimulationMetrics("PatternUtils");
+        }
+
+        /// <summary>
+        /// Gets PatternUtils scalability results.
+        /// </summary>
+        /// <returns>The scalability results dictionary.</returns>
+        public Dictionary<string, object> GetPatternUtilsScalability()
+        {
+            return GetSimulationMetrics("PatternUtils.Scalability");
+        }
+
+        /// <summary>
+        /// Gets PatternUtils CPU profiling results.
+        /// </summary>
+        /// <returns>The CPU profiling results dictionary.</returns>
+        public Dictionary<string, object> GetPatternUtilsCpuProfile()
+        {
+            return GetSimulationMetrics("PatternUtils.CpuProfile");
+        }
+
+        /// <summary>
+        /// Gets typed PatternUtils performance metrics.
+        /// </summary>
+        /// <returns>The typed PatternUtils metrics record.</returns>
+        public PatternUtilsPerformanceMetrics GetTypedPatternUtilsMetrics()
+        {
+            var metrics = GetPatternUtilsMetrics();
+            return ConvertToPatternUtilsPerformanceMetrics(metrics);
+        }
+
+        /// <summary>
+        /// Converts raw PatternUtils metrics to typed record.
+        /// </summary>
+        /// <param name="metrics">The raw metrics dictionary.</param>
+        /// <returns>The typed PatternUtils performance metrics.</returns>
+        private PatternUtilsPerformanceMetrics ConvertToPatternUtilsPerformanceMetrics(Dictionary<string, object> metrics)
+        {
+            if (metrics.Count == 0)
+            {
+                return new PatternUtilsPerformanceMetrics(
+                    0, 0, 0, 0, 0.0, 0.0, null, null, null, null
+                );
+            }
+
+            return new PatternUtilsPerformanceMetrics(
+                TotalCalculations: (int)metrics.GetValueOrDefault("TotalCalculations", 0),
+                TotalCalculationTimeMs: (long)metrics.GetValueOrDefault("TotalCalculationTimeMs", 0L),
+                CacheHits: (int)metrics.GetValueOrDefault("CacheHits", 0),
+                CacheMisses: (int)metrics.GetValueOrDefault("CacheMisses", 0),
+                CacheHitRate: (double)metrics.GetValueOrDefault("CacheHitRate", 0.0),
+                AverageCalculationTimeMs: (double)metrics.GetValueOrDefault("AverageCalculationTimeMs", 0.0),
+                Throughput: metrics.TryGetValue("Throughput", out var t) ? (double?)t : null,
+                CpuTimeMs: metrics.TryGetValue("CpuTimeMs", out var c) ? (double?)c : null,
+                MemoryUsage: metrics.TryGetValue("MemoryUsage", out var m) ? (long?)m : null,
+                ConfigurationStatus: metrics.TryGetValue("ConfigurationStatus", out var config) ? (Dictionary<string, bool>)config : null
+            );
+        }
+
+        /// <summary>
         /// Gets all recorded execution times for a specific method (for backward compatibility).
         /// </summary>
         /// <param name="methodName">The name of the method to get times for.</param>
@@ -322,5 +472,23 @@ namespace TradingStrategies.Trading.Overseer
         double DecisionThresholdMs,
         double BandWidthRatioThreshold,
         int TradeRateLimitPerSnapshot
+    );
+
+    /// <summary>
+    /// Typed performance metrics for PatternUtils operations.
+    /// Provides strongly-typed access to PatternUtils performance data including
+    /// calculation counts, cache statistics, throughput, and configuration status.
+    /// </summary>
+    public record PatternUtilsPerformanceMetrics(
+        int TotalCalculations,
+        long TotalCalculationTimeMs,
+        int CacheHits,
+        int CacheMisses,
+        double CacheHitRate,
+        double AverageCalculationTimeMs,
+        double? Throughput,
+        double? CpuTimeMs,
+        long? MemoryUsage,
+        Dictionary<string, bool>? ConfigurationStatus
     );
 }

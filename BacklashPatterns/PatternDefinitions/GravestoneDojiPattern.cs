@@ -62,13 +62,13 @@ public class GravestoneDojiPattern : PatternDefinition
     {
     }
 
-    public static GravestoneDojiPattern? IsPattern(
+    public static async Task<GravestoneDojiPattern?> IsPatternAsync(
         Dictionary<int, CandleMetrics> metricsCache,
         int index,
         int trendLookback,
         CandleMids[] prices)
     {
-        var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+        var metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
         if (metrics.TotalRange < MinRange || metrics.BodySize > BodyMax ||
             metrics.BodySize > BodyRangeRatio * metrics.TotalRange ||

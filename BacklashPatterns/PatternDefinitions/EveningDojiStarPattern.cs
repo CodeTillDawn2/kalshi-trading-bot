@@ -41,7 +41,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static EveningDojiStarPattern? IsPattern(
+        public static async Task<EveningDojiStarPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -53,9 +53,9 @@ namespace BacklashPatterns.PatternDefinitions
             int secondIdx = index - 1;
             int thirdIdx = index;
 
-            var firstMetrics = GetCandleMetrics(ref metricsCache, firstIdx, prices, trendLookback, false);
-            var secondMetrics = GetCandleMetrics(ref metricsCache, secondIdx, prices, trendLookback, false);
-            var thirdMetrics = GetCandleMetrics(ref metricsCache, thirdIdx, prices, trendLookback, true);
+            var firstMetrics = await GetCandleMetricsAsync(metricsCache, firstIdx, prices, trendLookback, false);
+            var secondMetrics = await GetCandleMetricsAsync(metricsCache, secondIdx, prices, trendLookback, false);
+            var thirdMetrics = await GetCandleMetricsAsync(metricsCache, thirdIdx, prices, trendLookback, true);
 
             if (!firstMetrics.IsBullish || firstMetrics.BodySize < MinBodySize) return null;
 

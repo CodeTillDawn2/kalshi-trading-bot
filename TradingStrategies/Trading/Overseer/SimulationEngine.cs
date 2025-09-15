@@ -47,7 +47,7 @@ namespace TradingStrategies.Trading.Overseer
         public SimulationEngine(IConfiguration configuration, PerformanceMonitor? performanceMonitor = null)
         {
             _marketTypeService = new MarketTypeService();
-            _patternDetectionService = new PatternDetectionService(configuration);
+            _patternDetectionService = new PatternDetectionService(configuration, performanceMonitor);
             _performanceMonitor = performanceMonitor;
             _enablePerformanceMetrics = configuration.GetValue<bool>("SimulationEngine:EnablePerformanceMetrics", true);
         }

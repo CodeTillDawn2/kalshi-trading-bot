@@ -7,6 +7,7 @@ using KalshiBotData.Data;
 using KalshiBotData.Data.Interfaces;
 using System.Timers;
 using System.Text.Json;
+using System.Linq;
 
 namespace KalshiBotOverseer.Services
 {
@@ -46,6 +47,11 @@ namespace KalshiBotOverseer.Services
         public bool EnablePersistence { get; set; } = false;
 
         /// <summary>
+        /// Gets or sets whether to enable BrainPersistenceService performance metrics collection.
+        /// </summary>
+        public bool EnableBrainPersistenceServicePerformanceMetrics { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the interval in minutes for saving data to persistence store.
         /// </summary>
         public int PersistenceSaveIntervalMinutes { get; set; } = 5;
@@ -65,8 +71,13 @@ namespace KalshiBotOverseer.Services
         private readonly BrainPersistenceServiceConfig _config;
         private readonly ILogger<BrainPersistenceService>? _logger;
         private readonly IKalshiBotContext? _context;
+        private readonly PerformanceMetricsService? _performanceMetricsService;
         private readonly Stopwatch _serviceStopwatch = new();
         private long _totalOperations;
+        private readonly Dictionary<string, List<long>> _operationTimings = new();
+        private readonly Dictionary<string, int> _trimmingCounts = new();
+        private long _totalLockWaitTime;
+        private int _lockContentionCount;
         private readonly object _metricsLock = new();
         private readonly System.Timers.Timer? _persistenceTimer;
         private bool _isInitialized;
@@ -78,14 +89,17 @@ namespace KalshiBotOverseer.Services
         /// <param name="config">Configuration options including history limits, metric names, and persistence settings.</param>
         /// <param name="context">Optional database context for persistence operations. Required when EnablePersistence is true.</param>
         /// <param name="logger">Optional logger for service operations and performance metrics.</param>
+        /// <param name="performanceMetricsService">Optional performance metrics service for transmitting metrics.</param>
         public BrainPersistenceService(
             IOptions<BrainPersistenceServiceConfig> config,
             IKalshiBotContext? context = null,
-            ILogger<BrainPersistenceService>? logger = null)
+            ILogger<BrainPersistenceService>? logger = null,
+            PerformanceMetricsService? performanceMetricsService = null)
         {
             _config = config?.Value ?? new BrainPersistenceServiceConfig();
             _context = context;
             _logger = logger;
+            _performanceMetricsService = performanceMetricsService;
             _serviceStopwatch.Start();
 
             if (_config.EnablePersistence && _context != null)
@@ -260,6 +274,15 @@ namespace KalshiBotOverseer.Services
                 if (history.Count > _config.MaxHistoryEntries)
                 {
                     history.RemoveRange(0, history.Count - _config.MaxHistoryEntries);
+                    if (_config.EnableBrainPersistenceServicePerformanceMetrics)
+                    {
+                        lock (_metricsLock)
+                        {
+                            if (!_trimmingCounts.ContainsKey(metricName))
+                                _trimmingCounts[metricName] = 0;
+                            _trimmingCounts[metricName]++;
+                        }
+                    }
                 }
 
                 await SaveBrainAsync(brain);
@@ -280,12 +303,22 @@ namespace KalshiBotOverseer.Services
         /// <param name="elapsedMilliseconds">The time taken for the operation in milliseconds.</param>
         private void RecordOperationMetrics(string operationName, long elapsedMilliseconds)
         {
-            if (!_config.EnablePerformanceMetrics)
+            if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
                 return;
 
+            var lockStart = Stopwatch.GetTimestamp();
             lock (_metricsLock)
             {
+                var lockWaitTicks = Stopwatch.GetTimestamp() - lockStart;
+                _totalLockWaitTime += (long)(lockWaitTicks * 1000.0 / Stopwatch.Frequency);
+                _lockContentionCount++;
                 _totalOperations++;
+                if (!_operationTimings.ContainsKey(operationName))
+                    _operationTimings[operationName] = new List<long>();
+                _operationTimings[operationName].Add(elapsedMilliseconds);
+                // Keep only last 1000 entries to prevent unbounded growth
+                if (_operationTimings[operationName].Count > 1000)
+                    _operationTimings[operationName].RemoveAt(0);
                 _logger?.LogDebug("Operation {OperationName} completed in {ElapsedMs}ms", operationName, elapsedMilliseconds);
             }
         }
@@ -324,6 +357,15 @@ namespace KalshiBotOverseer.Services
                     if (history.Count > _config.MaxHistoryEntries)
                     {
                         history.RemoveRange(0, history.Count - _config.MaxHistoryEntries);
+                        if (_config.EnableBrainPersistenceServicePerformanceMetrics)
+                        {
+                            lock (_metricsLock)
+                            {
+                                if (!_trimmingCounts.ContainsKey(metricName))
+                                    _trimmingCounts[metricName] = 0;
+                                _trimmingCounts[metricName]++;
+                            }
+                        }
                     }
                     hasChanges = true;
                 }
@@ -447,6 +489,7 @@ namespace KalshiBotOverseer.Services
         private async void OnPersistenceTimerElapsed(object? sender, ElapsedEventArgs e)
         {
             await PersistAllBrainsAsync();
+            TransmitMetrics();
         }
 
         /// <summary>
@@ -510,6 +553,108 @@ namespace KalshiBotOverseer.Services
                 }
                 return total;
             }
+        }
+
+        /// <summary>
+        /// Gets operation performance statistics including averages and percentiles.
+        /// </summary>
+        public IReadOnlyDictionary<string, (long AverageMs, long P50Ms, long P95Ms, long P99Ms)> GetOperationStats()
+        {
+            if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
+                return new Dictionary<string, (long, long, long, long)>();
+
+            var result = new Dictionary<string, (long, long, long, long)>();
+            lock (_metricsLock)
+            {
+                foreach (var kvp in _operationTimings)
+                {
+                    var times = kvp.Value.OrderBy(x => x).ToList();
+                    if (times.Count == 0) continue;
+                    var avg = (long)times.Average();
+                    var p50 = times[times.Count / 2];
+                    var p95Index = (int)(times.Count * 0.95);
+                    var p95 = times[Math.Min(p95Index, times.Count - 1)];
+                    var p99Index = (int)(times.Count * 0.99);
+                    var p99 = times[Math.Min(p99Index, times.Count - 1)];
+                    result[kvp.Key] = (avg, p50, p95, p99);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the count of history trimmings per metric type.
+        /// </summary>
+        public IReadOnlyDictionary<string, int> TrimmingCounts => _config.EnableBrainPersistenceServicePerformanceMetrics ? _trimmingCounts : new Dictionary<string, int>();
+
+        /// <summary>
+        /// Gets lock contention metrics.
+        /// </summary>
+        public (long TotalWaitTimeMs, int ContentionCount) LockMetrics
+        {
+            get
+            {
+                if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
+                    return (0, 0);
+
+                lock (_metricsLock)
+                {
+                    return (_totalLockWaitTime, _lockContentionCount);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Estimates memory usage for a specific brain instance.
+        /// </summary>
+        public long GetMemoryUsageForBrain(string brainInstanceName)
+        {
+            if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
+                return 0;
+
+            if (!_brains.TryGetValue(brainInstanceName, out var brain))
+                return 0;
+            // Rough estimate based on JSON serialization size
+            try
+            {
+                var json = JsonSerializer.Serialize(brain);
+                return json.Length * 2; // Approximate bytes (UTF-16 to bytes)
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets current thread pool information.
+        /// </summary>
+        public (int AvailableWorkerThreads, int AvailableCompletionPortThreads, int MaxWorkerThreads, int MaxCompletionPortThreads) GetThreadPoolInfo()
+        {
+            ThreadPool.GetAvailableThreads(out int worker, out int completion);
+            ThreadPool.GetMaxThreads(out int maxWorker, out int maxCompletion);
+            return (worker, completion, maxWorker, maxCompletion);
+        }
+
+        /// <summary>
+        /// Transmits current performance metrics to the PerformanceMetricsService.
+        /// </summary>
+        private void TransmitMetrics()
+        {
+            if (_performanceMetricsService == null || !_config.EnableBrainPersistenceServicePerformanceMetrics)
+                return;
+
+            var operationStats = GetOperationStats();
+            var trimmingCounts = TrimmingCounts;
+            var lockMetrics = LockMetrics;
+            var memoryUsage = new Dictionary<string, long>();
+            foreach (var brainName in _brains.Keys)
+            {
+                memoryUsage[brainName] = GetMemoryUsageForBrain(brainName);
+            }
+            var threadPoolInfo = GetThreadPoolInfo();
+
+            _performanceMetricsService.RecordBrainPersistenceMetrics(operationStats, trimmingCounts, lockMetrics, memoryUsage, threadPoolInfo);
         }
 
         /// <summary>

@@ -103,14 +103,17 @@ namespace TradingStrategies.Trading.Overseer
     public class PatternDetectionService
     {
         private readonly PatternDetectionConfig _config;
+        private readonly BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? _performanceMonitor;
 
         /// <summary>
         /// Initializes a new instance of the PatternDetectionService with configuration from appsettings.json.
         /// </summary>
         /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
-        public PatternDetectionService(IConfiguration configuration)
+        /// <param name="performanceMonitor">Optional performance monitor for recording metrics.</param>
+        public PatternDetectionService(IConfiguration configuration, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null)
         {
             _config = new PatternDetectionConfig();
+            _performanceMonitor = performanceMonitor;
 
             // Bind PatternDetectionServiceConfig section (service-specific settings)
             var serviceConfig = configuration.GetSection("PatternDetectionServiceConfig");
@@ -126,9 +129,11 @@ namespace TradingStrategies.Trading.Overseer
         /// This constructor is for backward compatibility and testing purposes.
         /// </summary>
         /// <param name="config">The configuration for pattern detection parameters.</param>
-        public PatternDetectionService(PatternDetectionConfig config)
+        /// <param name="performanceMonitor">Optional performance monitor for recording metrics.</param>
+        public PatternDetectionService(PatternDetectionConfig config, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null)
         {
             _config = config ?? new PatternDetectionConfig();
+            _performanceMonitor = performanceMonitor;
         }
 
         /// <summary>
@@ -189,7 +194,7 @@ namespace TradingStrategies.Trading.Overseer
                 var metrics = _config.EnablePatternDetectionMetrics ? new BacklashPatterns.PatternDetectionMetrics() : null;
 
                 // Execute pattern detection asynchronously with custom config and metrics
-                var patterns = PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics).GetAwaiter().GetResult();
+                var patterns = PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics, _performanceMonitor).GetAwaiter().GetResult();
 
                 // Filter patterns based on configured pattern types if specified
                 var filteredPatterns = FilterPatternsByTypes(patterns, _config.PatternTypes);
@@ -326,7 +331,7 @@ namespace TradingStrategies.Trading.Overseer
                 var metrics = _config.EnablePatternDetectionMetrics ? new BacklashPatterns.PatternDetectionMetrics() : null;
 
                 // Execute pattern detection asynchronously with custom config and metrics
-                var patterns = await PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics);
+                var patterns = await PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics, _performanceMonitor);
 
                 // Filter patterns based on configured pattern types if specified
                 var filteredPatterns = FilterPatternsByTypes(patterns, _config.PatternTypes);

@@ -42,7 +42,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Bearish: Occurs in an uptrend; first candle is bullish, second is bearish, both open at nearly the same price.
         /// Indicates: Continuation of the existing trend (bullish or bearish) with a strong move after a brief pause.
         /// </summary>
-        public static SeparatingLinesPattern? IsPattern(
+        public static async Task<SeparatingLinesPattern?> IsPatternAsync(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
@@ -53,8 +53,8 @@ namespace BacklashPatterns.PatternDefinitions
             if (index < 1 || index >= prices.Length) return null;
 
             // Lazy load metrics for the two candles
-            var prevMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, trendLookback, false);
-            var currMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var prevMetrics = await GetCandleMetricsAsync(metricsCache, index - 1, prices, trendLookback, false);
+            var currMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Calculate the pattern's total range (highest high - lowest low across both candles)
             double patternHigh = Math.Max(prices[index].High, prices[index - 1].High);

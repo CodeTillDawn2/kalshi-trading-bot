@@ -50,7 +50,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static HomingPigeonPattern? IsPattern(
+        public static async Task<HomingPigeonPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -61,8 +61,8 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMids previousPrice = prices[index - 1];
             CandleMids currentPrice = prices[index];
 
-            var previousMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, trendLookback, false);
-            var currentMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var previousMetrics = await GetCandleMetricsAsync(metricsCache, index - 1, prices, trendLookback, false);
+            var currentMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Direction check
             if (!previousMetrics.IsBearish || !currentMetrics.IsBearish) return null;

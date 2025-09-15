@@ -55,7 +55,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static BreakawayPattern? IsPattern(
+        public static async Task<BreakawayPattern?> IsPatternAsync(
             int index,
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -67,11 +67,11 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { startIndex, startIndex + 1, startIndex + 2, startIndex + 3, startIndex + 4 };
 
-            var metrics1 = GetCandleMetrics(ref metricsCache, startIndex, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, startIndex + 1, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, startIndex + 2, prices, trendLookback, false);
-            var metrics4 = GetCandleMetrics(ref metricsCache, startIndex + 3, prices, trendLookback, false);
-            var metrics5 = GetCandleMetrics(ref metricsCache, startIndex + 4, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, startIndex, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, startIndex + 1, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, startIndex + 2, prices, trendLookback, false);
+            var metrics4 = await GetCandleMetricsAsync(metricsCache, startIndex + 3, prices, trendLookback, false);
+            var metrics5 = await GetCandleMetricsAsync(metricsCache, startIndex + 4, prices, trendLookback, true);
 
             // Check trend and first candle
             double meanTrend = metrics5.GetLookbackMeanTrend(5);
@@ -84,7 +84,7 @@ namespace BacklashPatterns.PatternDefinitions
             bool isConsolidation = true;
             for (int i = startIndex + 1; i <= startIndex + 3; i++)
             {
-                var metrics = GetCandleMetrics(ref metricsCache, i, prices, trendLookback, false);
+                var metrics = await GetCandleMetricsAsync(metricsCache, i, prices, trendLookback, false);
                 if (metrics.BodySize > ConsolidationBodyMax || metrics.TotalRange > ConsolidationRangeMax)
                 {
                     isConsolidation = false;

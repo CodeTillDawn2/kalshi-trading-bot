@@ -31,14 +31,14 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static ClosingMarubozuPattern_old? IsPattern(
+        public static async Task<ClosingMarubozuPattern_old?> IsPatternAsync(
             int index,
             Dictionary<int, CandleMetrics> metricsCache,
             CandleMids[] prices,
             int trendLookback,
             bool isBullish)
         {
-            CandleMetrics candleMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            CandleMetrics candleMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
             var candles = new List<int> { index };
 
             // Check minimum body size

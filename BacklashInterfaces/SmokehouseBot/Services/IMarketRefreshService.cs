@@ -9,5 +9,11 @@ namespace BacklashBot.Services.Interfaces
 
         TimeSpan LastWorkDuration { get; }
         int LastWorkMarketCount { get; }
+        long TotalRefreshOperations { get; }
+        TimeSpan AverageRefreshTimePerMarket { get; }
+        int LastRefreshCount { get; }
+        TimeSpan LastCpuTime { get; }
+        long LastMemoryUsage { get; }
+        double RefreshThroughput { get; }
     }
 }

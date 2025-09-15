@@ -84,7 +84,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="isBullish">True for bullish pattern, false for bearish.</param>
         /// <param name="trendLookback">Number of candles to look back for trend and average range.</param>
         /// <returns>A BreakawayPattern instance if detected, otherwise null.</returns>
-        public static BreakawayPattern? IsPattern(
+        public static async Task<BreakawayPattern?> IsPatternAsync(
              int index,
              CandleMids[] prices,
              Dictionary<int, CandleMetrics> metricsCache,
@@ -98,11 +98,11 @@ namespace BacklashPatterns.PatternDefinitions
             var candles = new List<int> { startIndex, startIndex + 1, startIndex + 2, startIndex + 3, index };
 
             // Get metrics for all five candles
-            var metrics1 = GetCandleMetrics(ref metricsCache, startIndex, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, startIndex + 1, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, startIndex + 2, prices, trendLookback, false);
-            var metrics4 = GetCandleMetrics(ref metricsCache, startIndex + 3, prices, trendLookback, false);
-            var metrics5 = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, startIndex, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, startIndex + 1, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, startIndex + 2, prices, trendLookback, false);
+            var metrics4 = await GetCandleMetricsAsync(metricsCache, startIndex + 3, prices, trendLookback, false);
+            var metrics5 = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Calculate lookback average range before the pattern
             double avgRange = metrics5.LookbackAvgRange[PatternSize - 1];

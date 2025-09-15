@@ -80,7 +80,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="metricsCache">Cache of candle metrics.</param>
         /// <param name="trendLookback">Number of candles to look back for trend and average range.</param>
         /// <returns>A ConcealingBabySwallowPattern instance if detected, otherwise null.</returns>
-        public static ConcealingBabySwallowPattern? IsPattern(
+        public static async Task<ConcealingBabySwallowPattern?> IsPatternAsync(
             int index,
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -90,10 +90,10 @@ namespace BacklashPatterns.PatternDefinitions
             int startIndex = index - (PatternSize - 1);
             var candles = new List<int> { startIndex, startIndex + 1, startIndex + 2, index };
 
-            var firstMetrics = GetCandleMetrics(ref metricsCache, startIndex, prices, trendLookback, false);
-            var secondMetrics = GetCandleMetrics(ref metricsCache, startIndex + 1, prices, trendLookback, false);
-            var thirdMetrics = GetCandleMetrics(ref metricsCache, startIndex + 2, prices, trendLookback, false);
-            var fourthMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var firstMetrics = await GetCandleMetricsAsync(metricsCache, startIndex, prices, trendLookback, false);
+            var secondMetrics = await GetCandleMetricsAsync(metricsCache, startIndex + 1, prices, trendLookback, false);
+            var thirdMetrics = await GetCandleMetricsAsync(metricsCache, startIndex + 2, prices, trendLookback, false);
+            var fourthMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             CandleMids firstPrices = prices[startIndex];
             CandleMids secondPrices = prices[startIndex + 1];

@@ -43,7 +43,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static DarkCloudCoverPattern? IsPattern(
+        public static async Task<DarkCloudCoverPattern?> IsPatternAsync(
             int index,
             CandleMids[] prices,
             int trendLookback,
@@ -52,8 +52,8 @@ namespace BacklashPatterns.PatternDefinitions
             if (index < 1 || index >= prices.Length) return null;
             var candles = new List<int> { index - 1, index };
 
-            var prevMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, trendLookback, false);
-            var currMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var prevMetrics = await GetCandleMetricsAsync(metricsCache, index - 1, prices, trendLookback, false);
+            var currMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
             var prevPrices = prices[index - 1];
             var currPrices = prices[index];
 

@@ -49,7 +49,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static StalledPattern? IsPattern(
+        public static async Task<StalledPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -67,9 +67,9 @@ namespace BacklashPatterns.PatternDefinitions
             if (c1 < 0 || c3 >= prices.Length) return null;
 
             // Lazy load metrics for all three candles
-            var metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
             // First candle: Must be bullish with a significant body
             if (!metrics1.IsBullish || metrics1.BodySize < MinBodySize) return null;

@@ -52,7 +52,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static AbandonedBabyPattern? IsPattern(
+        public static async Task<AbandonedBabyPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -65,7 +65,7 @@ namespace BacklashPatterns.PatternDefinitions
             int middleIndex = index - 1;
 
             // Doji check: Body = 1 or = 10% of range, range = 1
-            var middleMetrics = GetCandleMetrics(ref metricsCache, middleIndex, prices, trendLookback, false);
+            var middleMetrics = await GetCandleMetricsAsync(metricsCache, middleIndex, prices, trendLookback, false);
             if (middleMetrics.TotalRange < MinRange ||
                 (middleMetrics.BodySize > DojiBodyMax &&
                  middleMetrics.BodySize > DojiBodyRangeRatio * middleMetrics.TotalRange))
@@ -77,8 +77,8 @@ namespace BacklashPatterns.PatternDefinitions
             candles.Insert(0, firstIndex);
             CandleMids firstPrices = prices[firstIndex];
             CandleMids middlePrices = prices[middleIndex];
-            var firstMetrics = GetCandleMetrics(ref metricsCache, firstIndex, prices, trendLookback, false);
-            var thirdMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var firstMetrics = await GetCandleMetricsAsync(metricsCache, firstIndex, prices, trendLookback, false);
+            var thirdMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             double trendThreshold = 0.5; // Adjustable threshold for trend flexibility
 

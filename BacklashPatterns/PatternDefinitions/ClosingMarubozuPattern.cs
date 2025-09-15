@@ -70,7 +70,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="trendLookback">Number of candles to look back for trend and average range.</param>
         /// <param name="isBullish">True for bullish pattern, false for bearish.</param>
         /// <returns>A ClosingMarubozuPattern instance if detected, otherwise null.</returns>
-        public static ClosingMarubozuPattern? IsPattern(
+        public static async Task<ClosingMarubozuPattern?> IsPatternAsync(
             int index,
             Dictionary<int, CandleMetrics> metricsCache,
             CandleMids[] prices,
@@ -78,7 +78,7 @@ namespace BacklashPatterns.PatternDefinitions
             bool isBullish)
         {
             var candles = new List<int> { index };
-            CandleMetrics candleMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            CandleMetrics candleMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             double avgRange = candleMetrics.LookbackAvgRange[PatternSize - 1];
             double minBodySize = MinBodyToAvgRangeRatio * avgRange;

@@ -59,7 +59,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static MorningDojiStarPattern? IsPattern(
+        public static async Task<MorningDojiStarPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -67,9 +67,9 @@ namespace BacklashPatterns.PatternDefinitions
         {
             if (index < 2) return null;
 
-            CandleMetrics firstMetrics = GetCandleMetrics(ref metricsCache, index - 2, prices, trendLookback, false);
-            CandleMetrics secondMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, trendLookback, false);
-            CandleMetrics thirdMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            CandleMetrics firstMetrics = await GetCandleMetricsAsync(metricsCache, index - 2, prices, trendLookback, false);
+            CandleMetrics secondMetrics = await GetCandleMetricsAsync(metricsCache, index - 1, prices, trendLookback, false);
+            CandleMetrics thirdMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Require a downtrend based on the mean trend
             if (thirdMetrics.GetLookbackMeanTrend(3) > TrendThreshold) return null;

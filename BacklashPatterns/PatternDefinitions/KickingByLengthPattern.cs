@@ -58,14 +58,14 @@ namespace BacklashPatterns.PatternDefinitions
         /// Indicates: A strong reversal due to an abrupt momentum shift, supported by large bodies and a gap.
         /// Note: Original logic relaxed strictness from pure Marubozu and adjusted trend thresholds.
         /// </summary>
-        public static KickingByLengthPattern? IsPattern(
+        public static async Task<KickingByLengthPattern?> IsPatternAsync(
                 int index, int trendLookback, bool isBullish,
                 Dictionary<int, CandleMetrics> metricsCache, CandleMids[] prices)
         {
             if (index < 1) return null;
 
-            var prevMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, trendLookback, false);
-            var currMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var prevMetrics = await GetCandleMetricsAsync(metricsCache, index - 1, prices, trendLookback, false);
+            var currMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Trend check
             if (isBullish && currMetrics.GetLookbackMeanTrend(2) >= -TrendThreshold) return null;

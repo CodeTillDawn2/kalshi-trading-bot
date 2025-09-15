@@ -9,6 +9,12 @@ using BacklashBot.State;
 using BacklashDTOs.Data;
 using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
+using System.Diagnostics;
+using System.Threading;
+using System.Timers;
+using BacklashBot.Management;
+using BacklashInterfaces.PerformanceMetrics;
+using Microsoft.Extensions.Configuration;
 
 namespace BacklashBot.Services
 {
@@ -16,12 +22,22 @@ namespace BacklashBot.Services
     /// Service for managing dependency injection scopes in the Kalshi trading bot system.
     /// This service handles the creation, initialization, and disposal of service scopes,
     /// ensuring proper resource management and access to scoped services throughout the application.
+    /// Includes configurable performance metrics for monitoring scope efficiency.
     /// </summary>
     public class KaslhiBotScopeManagerService : IScopeManagerService
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<IScopeManagerService> _logger;
         private IServiceScope? _scope;
+
+        // Performance metrics fields
+        private int _initializeScopeCallCount = 0;
+        private int _createScopeCallCount = 0;
+        private DateTime? _scopeCreationTime;
+        private System.Timers.Timer? _metricsTimer;
+        private readonly CentralPerformanceMonitor _monitor;
+        private readonly IConfiguration _config;
+        private readonly bool _enableMetrics;
 
         /// <summary>
         /// Gets the current active service scope, or null if no scope has been initialized.
@@ -34,10 +50,21 @@ namespace BacklashBot.Services
         /// </summary>
         /// <param name="serviceProvider">The root service provider for creating scopes.</param>
         /// <param name="logger">The logger instance for recording service operations.</param>
-        public KaslhiBotScopeManagerService(IServiceProvider serviceProvider, ILogger<IScopeManagerService> logger)
+        /// <param name="monitor">The central performance monitor for posting metrics.</param>
+        /// <param name="config">The configuration instance for reading settings.</param>
+        public KaslhiBotScopeManagerService(IServiceProvider serviceProvider, ILogger<IScopeManagerService> logger, CentralPerformanceMonitor monitor, IConfiguration config)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _monitor = monitor;
+            _config = config;
+            _enableMetrics = _config.GetValue<bool>("Execution:KaslhiBotScopeManagerService_EnableMetrics", true);
+            if (_enableMetrics)
+            {
+                _metricsTimer = new System.Timers.Timer(60000); // 1 minute
+                _metricsTimer.Elapsed += (sender, e) => LogMetrics();
+                _metricsTimer.Start();
+            }
         }
 
         /// <summary>
@@ -55,6 +82,11 @@ namespace BacklashBot.Services
 
             _scope = _serviceProvider.CreateScope();
             var sp = _scope.ServiceProvider;
+            Stopwatch? stopwatch = null;
+            if (_enableMetrics)
+            {
+                stopwatch = Stopwatch.StartNew();
+            }
 
             // Resolve critical services to validate scope initialization
             var configuration = sp.GetRequiredService<IConfiguration>();
@@ -79,6 +111,15 @@ namespace BacklashBot.Services
             var marketFactory = sp.GetRequiredService<Func<MarketDTO, MarketData>>();
             var marketDataService = sp.GetRequiredService<IMarketDataService>();
             var orderBookService = sp.GetRequiredService<IOrderBookService>();
+
+            if (_enableMetrics)
+            {
+                stopwatch?.Stop();
+                _logger.LogInformation($"InitializeScope execution time: {stopwatch?.ElapsedMilliseconds} ms");
+                _monitor.RecordExecutionTime("InitializeScope", stopwatch?.ElapsedMilliseconds ?? 0);
+                _initializeScopeCallCount++;
+                _scopeCreationTime = DateTime.UtcNow;
+            }
         }
 
         /// <summary>
@@ -100,6 +141,10 @@ namespace BacklashBot.Services
         /// <returns>A new service scope instance.</returns>
         public IServiceScope CreateScope()
         {
+            if (_enableMetrics)
+            {
+                _createScopeCallCount++;
+            }
             return _serviceProvider.CreateScope();
         }
 
@@ -109,8 +154,31 @@ namespace BacklashBot.Services
         /// </summary>
         public void Dispose()
         {
+            if (_enableMetrics && _scopeCreationTime.HasValue)
+            {
+                var lifetime = DateTime.UtcNow - _scopeCreationTime.Value;
+                _logger.LogInformation($"Managed scope lifetime: {lifetime.TotalMilliseconds} ms");
+                _monitor.RecordExecutionTime("ScopeLifetime", (long)lifetime.TotalMilliseconds);
+                _scopeCreationTime = null;
+            }
             _scope?.Dispose();
             _scope = null;
+            if (_enableMetrics)
+            {
+                _metricsTimer?.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Logs the current performance metrics if enabled.
+        /// </summary>
+        public void LogMetrics()
+        {
+            if (_enableMetrics)
+            {
+                _logger.LogInformation($"Total InitializeScope calls: {_initializeScopeCallCount}");
+                _logger.LogInformation($"Total CreateScope calls: {_createScopeCallCount}");
+            }
         }
     }
 }

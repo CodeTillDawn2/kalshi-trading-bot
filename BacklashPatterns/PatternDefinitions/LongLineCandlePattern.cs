@@ -55,14 +55,14 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Indicates strong directional momentum.
         /// Your original logic includes a contextual range check against lookback average.
         /// </summary>
-        public static LongLineCandlePattern? IsPattern(
+        public static async Task<LongLineCandlePattern?> IsPatternAsync(
             Dictionary<int, CandleMetrics> metricsCache,
             bool isBullish,
             int index,
             int trendLookback,
             CandleMids[] prices)
         {
-            var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Check if the total range meets the minimum requirement for significance
             if (metrics.TotalRange < MinRange) return null;

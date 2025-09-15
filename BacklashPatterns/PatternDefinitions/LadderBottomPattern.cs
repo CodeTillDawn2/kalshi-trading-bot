@@ -46,7 +46,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Occurs after a downtrend, signaling exhaustion and reversal.
         /// Indicates: Potential bullish reversal as selling pressure weakens.
         /// </summary>
-        public static LadderBottomPattern? IsPattern(
+        public static async Task<LadderBottomPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -61,7 +61,7 @@ namespace BacklashPatterns.PatternDefinitions
             var metrics = new CandleMetrics[5];
             for (int i = 0; i < 5; i++)
             {
-                metrics[i] = GetCandleMetrics(ref metricsCache, startIndex + i, prices, trendLookback, true);
+                metrics[i] = await GetCandleMetricsAsync(metricsCache, startIndex + i, prices, trendLookback, true);
             }
 
             // Relaxed descending closes (from original)

@@ -80,7 +80,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static BeltHoldPattern? IsPattern(
+        public static async Task<BeltHoldPattern?> IsPatternAsync(
         int index,
         int trendLookback,
         CandleMids[] prices,
@@ -91,7 +91,7 @@ namespace BacklashPatterns.PatternDefinitions
             if (index < 5) return null;
             CandleMids currentPrices = prices[index];
 
-            CandleMetrics currentMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            CandleMetrics currentMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
             var candles = new List<int> { index };
 
 

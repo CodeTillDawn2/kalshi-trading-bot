@@ -57,7 +57,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static HangingManPattern? IsPattern(
+        public static async Task<HangingManPattern?> IsPatternAsync(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             CandleMids[] prices,
@@ -65,7 +65,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
             if (index < 1) return null;
 
-            var currentMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var currentMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             if (currentMetrics.TotalRange < MinRange) return null;
             if (currentMetrics.BodySize > BodyMax) return null;

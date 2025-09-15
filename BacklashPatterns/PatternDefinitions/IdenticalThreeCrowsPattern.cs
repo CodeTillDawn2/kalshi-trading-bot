@@ -56,7 +56,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static IdenticalThreeCrowsPattern? IsPattern(
+        public static async Task<IdenticalThreeCrowsPattern?> IsPatternAsync(
             int index,
             CandleMids[] prices,
             int trendLookback,
@@ -68,9 +68,9 @@ namespace BacklashPatterns.PatternDefinitions
             int i2 = index - 1;
             int i3 = index;
 
-            var metrics1 = GetCandleMetrics(ref metricsCache, i1, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, i2, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, i3, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, i1, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, i2, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, i3, prices, trendLookback, true);
 
             // Direction check
             if (!metrics1.IsBearish || !metrics2.IsBearish || !metrics3.IsBearish) return null;

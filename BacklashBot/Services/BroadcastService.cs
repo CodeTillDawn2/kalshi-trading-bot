@@ -8,9 +8,12 @@ using Microsoft.AspNetCore.SignalR;
 using BacklashBot.Hubs;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using BacklashBot.Management.Interfaces;
+using BacklashBot.Management;
 using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
+using System.Text.Json;
 
 namespace BacklashBot.Services
 {
@@ -29,6 +32,7 @@ namespace BacklashBot.Services
         private readonly IScopeManagerService _scopeManagerService;
         private readonly IStatusTrackerService _statusTracker;
         private readonly ExecutionConfig _executionConfig;
+        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
 
         /// <summary>
         /// The interval in seconds between broadcast operations.
@@ -66,6 +70,51 @@ namespace BacklashBot.Services
         private object _metricsLock = new object();
 
         /// <summary>
+        /// Total size of broadcast data payloads in bytes.
+        /// </summary>
+        private long _totalDataSize = 0;
+
+        /// <summary>
+        /// Average broadcasts per minute.
+        /// </summary>
+        private double _broadcastsPerMinute = 0;
+
+        /// <summary>
+        /// Total memory used during broadcasts in bytes.
+        /// </summary>
+        private long _totalMemoryUsed = 0;
+
+        /// <summary>
+        /// Average CPU usage during broadcasts as percentage.
+        /// </summary>
+        private double _averageCpuDuringBroadcast = 0;
+
+        /// <summary>
+        /// Last broadcast timestamp for interval tracking.
+        /// </summary>
+        private DateTime _lastBroadcastTime = DateTime.MinValue;
+
+        /// <summary>
+        /// Total deviation from expected broadcast intervals in seconds.
+        /// </summary>
+        private double _totalIntervalDeviation = 0;
+
+        /// <summary>
+        /// Number of intervals measured.
+        /// </summary>
+        private long _intervalCount = 0;
+
+        /// <summary>
+        /// Service start time for throughput calculation.
+        /// </summary>
+        private DateTime _serviceStartTime;
+
+        /// <summary>
+        /// Enable all performance metrics tracking for this service.
+        /// </summary>
+        private bool _enablePerformanceMetrics = false;
+
+        /// <summary>
         /// Initializes a new instance of the BroadcastService with required dependencies.
         /// </summary>
         /// <param name="hubContext">SignalR hub context for broadcasting messages to connected clients</param>
@@ -82,7 +131,8 @@ namespace BacklashBot.Services
             IServiceScopeFactory scopeFactory,
             ILogger<IBroadcastService> logger,
             IScopeManagerService scopeManagerService,
-            IOptions<ExecutionConfig> executionConfig)
+            IOptions<ExecutionConfig> executionConfig,
+            ICentralPerformanceMonitor centralPerformanceMonitor)
         {
             _scopeManagerService = scopeManagerService;
             _hubContext = hubContext;
@@ -91,11 +141,16 @@ namespace BacklashBot.Services
             _scopeFactory = scopeFactory;
             _logger = logger;
             _executionConfig = executionConfig.Value;
+            _centralPerformanceMonitor = centralPerformanceMonitor;
+            _serviceStartTime = DateTime.Now;
 
             // Configure broadcast settings from ExecutionConfig
             _broadcastIntervalSeconds = GetConfigValue(_executionConfig, "BroadcastIntervalSeconds", 30);
             _maxRetryAttempts = GetConfigValue(_executionConfig, "BroadcastMaxRetryAttempts", 3);
             _retryDelay = TimeSpan.FromSeconds(GetConfigValue(_executionConfig, "BroadcastRetryDelaySeconds", 1));
+
+            // Configure metric tracking flag
+            _enablePerformanceMetrics = GetConfigBoolValue(_executionConfig, "BroadcastService_EnablePerformanceMetrics", false);
         }
 
         /// <summary>
@@ -160,6 +215,24 @@ namespace BacklashBot.Services
         {
             var stopwatch = Stopwatch.StartNew();
             bool broadcastSuccessful = false;
+
+            // Track broadcast interval adherence
+            if (_enablePerformanceMetrics)
+            {
+                DateTime now = DateTime.Now;
+                if (_lastBroadcastTime != DateTime.MinValue)
+                {
+                    double actualInterval = (now - _lastBroadcastTime).TotalSeconds;
+                    double deviation = Math.Abs(actualInterval - _broadcastIntervalSeconds);
+                    lock (_metricsLock)
+                    {
+                        _totalIntervalDeviation += deviation;
+                        _intervalCount++;
+                    }
+                }
+                _lastBroadcastTime = now;
+            }
+
             var cancellationToken = _statusTracker.GetCancellationToken();
             cancellationToken.ThrowIfCancellationRequested();
             if (!BacklashBotHub.HasConnectedClients())
@@ -222,6 +295,24 @@ namespace BacklashBot.Services
                     LastPerformanceSampleDate = performanceTracker.LastPerformanceSampleDate
                 };
 
+                // Track data payload size
+                if (_enablePerformanceMetrics)
+                {
+                    string json = JsonSerializer.Serialize(checkInData);
+                    long dataSize = System.Text.Encoding.UTF8.GetByteCount(json);
+                    lock (_metricsLock)
+                    {
+                        _totalDataSize += dataSize;
+                    }
+                }
+
+                // Track memory usage before broadcast
+                long memoryBefore = 0;
+                if (_enablePerformanceMetrics)
+                {
+                    memoryBefore = GC.GetTotalMemory(false);
+                }
+
                 for (int attempt = 1; attempt <= _maxRetryAttempts; attempt++)
                 {
                     try
@@ -246,6 +337,17 @@ namespace BacklashBot.Services
                         }
                     }
                 }
+
+                // Track memory usage after broadcast
+                if (_enablePerformanceMetrics)
+                {
+                    long memoryAfter = GC.GetTotalMemory(false);
+                    long memoryUsed = memoryAfter - memoryBefore;
+                    lock (_metricsLock)
+                    {
+                        _totalMemoryUsed += memoryUsed;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -265,6 +367,31 @@ namespace BacklashBot.Services
                     {
                         _failedBroadcasts++;
                     }
+                    // Calculate throughput
+                    if (_enablePerformanceMetrics)
+                    {
+                        _broadcastsPerMinute = (_successfulBroadcasts + _failedBroadcasts) / (DateTime.Now - _serviceStartTime).TotalMinutes;
+                    }
+                }
+
+                // Post metrics to central performance monitor
+                if (_centralPerformanceMonitor is CentralPerformanceMonitor monitor)
+                {
+                    double avgTime = _successfulBroadcasts + _failedBroadcasts > 0 ? _totalBroadcastTime / (_successfulBroadcasts + _failedBroadcasts) : 0;
+                    double successRate = _successfulBroadcasts + _failedBroadcasts > 0 ? (_successfulBroadcasts * 100.0) / (_successfulBroadcasts + _failedBroadcasts) : 0;
+                    double avgDeviation = _intervalCount > 0 ? (_totalIntervalDeviation / _intervalCount) * 1000 : 0;
+
+                    monitor.RecordBroadcastMetrics(
+                        _successfulBroadcasts,
+                        _failedBroadcasts,
+                        _totalBroadcastTime,
+                        avgTime,
+                        successRate,
+                        _totalDataSize,
+                        _broadcastsPerMinute,
+                        _totalMemoryUsed,
+                        avgDeviation
+                    );
                 }
             }
         }
@@ -323,6 +450,23 @@ namespace BacklashBot.Services
         {
             var property = config.GetType().GetProperty(propertyName);
             if (property != null && property.GetValue(config) is int value && value > 0)
+            {
+                return value;
+            }
+            return defaultValue;
+        }
+
+        /// <summary>
+        /// Retrieves a boolean configuration value from ExecutionConfig using reflection, with a default fallback.
+        /// </summary>
+        /// <param name="config">The ExecutionConfig instance</param>
+        /// <param name="propertyName">The name of the property to retrieve</param>
+        /// <param name="defaultValue">The default value if property is not found or invalid</param>
+        /// <returns>The configuration value or default</returns>
+        private bool GetConfigBoolValue(ExecutionConfig config, string propertyName, bool defaultValue)
+        {
+            var property = config.GetType().GetProperty(propertyName);
+            if (property != null && property.GetValue(config) is bool value)
             {
                 return value;
             }
@@ -398,6 +542,62 @@ namespace BacklashBot.Services
                 {
                     var total = _successfulBroadcasts + _failedBroadcasts;
                     return total > 0 ? (_successfulBroadcasts * 100.0) / total : 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the total size of broadcast data payloads in bytes.
+        /// </summary>
+        public long TotalDataSize
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _totalDataSize;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the average broadcasts per minute.
+        /// </summary>
+        public double BroadcastsPerMinute
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _broadcastsPerMinute;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the total memory used during broadcasts in bytes.
+        /// </summary>
+        public long TotalMemoryUsed
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _totalMemoryUsed;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the average interval deviation in milliseconds.
+        /// </summary>
+        public double AverageIntervalDeviationMs
+        {
+            get
+            {
+                lock (_metricsLock)
+                {
+                    return _intervalCount > 0 ? (_totalIntervalDeviation / _intervalCount) * 1000 : 0;
                 }
             }
         }

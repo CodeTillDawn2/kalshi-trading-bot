@@ -1,5 +1,7 @@
+using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Threading;
 
@@ -18,6 +20,8 @@ namespace BacklashBot.Services
         private readonly IStatusTrackerService _statusTracker;
         private readonly IBotReadyStatus _readyStatus;
         private readonly IScopeManagerService _scopeManagerService;
+        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
+        private readonly bool _enablePerformanceMetrics;
         /// <summary>
         /// Gets the duration of the last market data initialization operation.
         /// </summary>
@@ -26,6 +30,30 @@ namespace BacklashBot.Services
         /// Gets the number of markets processed during the last initialization.
         /// </summary>
         public int LastInitializationMarketCount { get; private set; }
+        /// <summary>
+        /// Gets the average time spent initializing each market.
+        /// </summary>
+        public TimeSpan AverageMarketInitializationTime { get; private set; }
+        /// <summary>
+        /// Gets the change in memory usage during initialization (bytes).
+        /// </summary>
+        public long MemoryUsageDelta { get; private set; }
+        /// <summary>
+        /// Gets the CPU time used during initialization.
+        /// </summary>
+        public TimeSpan CpuTimeDelta { get; private set; }
+        /// <summary>
+        /// Gets the number of successfully initialized markets.
+        /// </summary>
+        public int SuccessfulMarketInitializations { get; private set; }
+        /// <summary>
+        /// Gets the number of failed market initializations.
+        /// </summary>
+        public int FailedMarketInitializations { get; private set; }
+        /// <summary>
+        /// Gets the total time spent waiting during initialization (delays and WebSocket waits).
+        /// </summary>
+        public TimeSpan TotalWaitTime { get; private set; }
 
         /// <summary>
         /// Validates a market ticker for basic format requirements.
@@ -58,14 +86,18 @@ namespace BacklashBot.Services
         /// <param name="scopeManagerService">Service for managing dependency injection scopes.</param>
         /// <param name="readyStatus">Service tracking the application's readiness status.</param>
         /// <param name="statusTracker">Service for tracking application status and cancellation tokens.</param>
+        /// <param name="centralPerformanceMonitor">Central performance monitoring service.</param>
+        /// <param name="configuration">Configuration for enabling/disabling performance metrics.</param>
         public MarketDataInitializer(ILogger<IMarketDataInitializer> logger, IServiceFactory serviceFactory, IScopeManagerService scopeManagerService, IBotReadyStatus readyStatus,
-            IStatusTrackerService statusTracker)
+            IStatusTrackerService statusTracker, ICentralPerformanceMonitor centralPerformanceMonitor, IConfiguration configuration)
         {
             _logger = logger;
             _statusTracker = statusTracker;
             _readyStatus = readyStatus;
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
+            _centralPerformanceMonitor = centralPerformanceMonitor;
+            _enablePerformanceMetrics = configuration.GetValue<bool>("MarketDataInitializer:EnablePerformanceMetrics", false);
         }
 
         /// <summary>
@@ -79,6 +111,13 @@ namespace BacklashBot.Services
         {
             var initializationStartTime = DateTime.UtcNow;
             var stopwatch = Stopwatch.StartNew();
+            var initialMemory = _enablePerformanceMetrics ? GC.GetTotalMemory(false) : 0;
+            var initialCpu = _enablePerformanceMetrics ? Process.GetCurrentProcess().TotalProcessorTime : TimeSpan.Zero;
+            TimeSpan totalMarketTime = TimeSpan.Zero;
+            int processedMarkets = 0;
+            int successfulInitializations = 0;
+            int failedInitializations = 0;
+            TimeSpan totalWaitTime = TimeSpan.Zero;
             List<string> watchedMarkets = null;
 
             _logger.LogDebug("MarketDataInitializer.SetupAsync started at {0}, CancellationToken.IsCancellationRequested={IsRequested}", DateTime.UtcNow, _statusTracker.GetCancellationToken().IsCancellationRequested);
@@ -116,10 +155,12 @@ namespace BacklashBot.Services
 
                             if (!ValidateMarketTicker(ticker))
                             {
+                                if (_enablePerformanceMetrics) failedInitializations++;
                                 _logger.LogWarning("Skipping initialization for invalid ticker: {Ticker}", ticker);
                                 continue;
                             }
 
+                            var marketStart = _enablePerformanceMetrics ? DateTime.UtcNow : DateTime.MinValue;
                             _logger.LogDebug("Initializing market {MarketTicker} on low-priority thread", ticker);
                             if (!_serviceFactory.GetDataCache().Markets.ContainsKey(ticker))
                             {
@@ -128,7 +169,8 @@ namespace BacklashBot.Services
                                 _logger.LogDebug("Subscribed to market {MarketTicker}", ticker);
                                 _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                                 _logger.LogDebug("Waiting for initial WebSocket data for {MarketTicker}", ticker);
-                                await WaitForInitialDataAsync(ticker);
+                                var waitTime = await WaitForInitialDataAsync(ticker);
+                                if (_enablePerformanceMetrics) totalWaitTime += waitTime;
                                 _logger.LogDebug("Received initial WebSocket data for {MarketTicker}", ticker);
                             }
                             else
@@ -137,9 +179,16 @@ namespace BacklashBot.Services
                                 await _serviceFactory.GetMarketDataService().SyncMarketDataAsync(ticker);
                                 _logger.LogDebug("Synced market data for {MarketTicker}", ticker);
                             }
+                            if (_enablePerformanceMetrics)
+                            {
+                                processedMarkets++;
+                                totalMarketTime += DateTime.UtcNow - marketStart;
+                                successfulInitializations++;
+                            }
                             _logger.LogDebug("Completed initialization for {MarketTicker}", ticker);
 
                             // Add 100ms delay between market initializations to prevent rate limiting
+                            if (_enablePerformanceMetrics) totalWaitTime += TimeSpan.FromMilliseconds(100);
                             await Task.Delay(100, _statusTracker.GetCancellationToken());
                         }
 
@@ -169,8 +218,42 @@ namespace BacklashBot.Services
                 // Collect performance metrics
                 LastInitializationDuration = DateTime.UtcNow - initializationStartTime;
                 LastInitializationMarketCount = watchedMarkets?.Count ?? 0;
+                if (_enablePerformanceMetrics)
+                {
+                    AverageMarketInitializationTime = processedMarkets > 0 ? totalMarketTime / processedMarkets : TimeSpan.Zero;
+                    MemoryUsageDelta = GC.GetTotalMemory(false) - initialMemory;
+                    CpuTimeDelta = Process.GetCurrentProcess().TotalProcessorTime - initialCpu;
+                    SuccessfulMarketInitializations = successfulInitializations;
+                    FailedMarketInitializations = failedInitializations;
+                    TotalWaitTime = totalWaitTime;
+                    _logger.LogInformation("Performance metrics: Avg market time {AvgTime}, Memory delta {Memory} bytes, CPU time {Cpu}, Success {Success}, Fail {Fail}, Total wait {Wait}",
+                        AverageMarketInitializationTime, MemoryUsageDelta, CpuTimeDelta, SuccessfulMarketInitializations, FailedMarketInitializations, TotalWaitTime);
+                }
+                else
+                {
+                    AverageMarketInitializationTime = TimeSpan.Zero;
+                    MemoryUsageDelta = 0;
+                    CpuTimeDelta = TimeSpan.Zero;
+                    SuccessfulMarketInitializations = 0;
+                    FailedMarketInitializations = 0;
+                    TotalWaitTime = TimeSpan.Zero;
+                }
                 stopwatch.Stop();
                 _logger.LogInformation("Market data initialization completed in {Duration} for {Count} markets", LastInitializationDuration, LastInitializationMarketCount);
+
+                // Post metrics to central performance monitor
+                if (_enablePerformanceMetrics)
+                {
+                    _centralPerformanceMonitor.RecordMarketDataInitializerMetrics(
+                        LastInitializationDuration,
+                        LastInitializationMarketCount,
+                        AverageMarketInitializationTime,
+                        MemoryUsageDelta,
+                        CpuTimeDelta,
+                        SuccessfulMarketInitializations,
+                        FailedMarketInitializations,
+                        TotalWaitTime);
+                }
             }
             catch (OperationCanceledException)
             {
@@ -182,6 +265,24 @@ namespace BacklashBot.Services
                 // Collect metrics even on cancellation
                 LastInitializationDuration = DateTime.UtcNow - initializationStartTime;
                 LastInitializationMarketCount = watchedMarkets?.Count ?? 0;
+                if (_enablePerformanceMetrics)
+                {
+                    AverageMarketInitializationTime = processedMarkets > 0 ? totalMarketTime / processedMarkets : TimeSpan.Zero;
+                    MemoryUsageDelta = GC.GetTotalMemory(false) - initialMemory;
+                    CpuTimeDelta = Process.GetCurrentProcess().TotalProcessorTime - initialCpu;
+                    SuccessfulMarketInitializations = successfulInitializations;
+                    FailedMarketInitializations = failedInitializations;
+                    TotalWaitTime = totalWaitTime;
+                }
+                else
+                {
+                    AverageMarketInitializationTime = TimeSpan.Zero;
+                    MemoryUsageDelta = 0;
+                    CpuTimeDelta = TimeSpan.Zero;
+                    SuccessfulMarketInitializations = 0;
+                    FailedMarketInitializations = 0;
+                    TotalWaitTime = TimeSpan.Zero;
+                }
                 stopwatch.Stop();
             }
             catch (Exception ex)
@@ -194,6 +295,24 @@ namespace BacklashBot.Services
                 // Collect metrics even on error
                 LastInitializationDuration = DateTime.UtcNow - initializationStartTime;
                 LastInitializationMarketCount = watchedMarkets?.Count ?? 0;
+                if (_enablePerformanceMetrics)
+                {
+                    AverageMarketInitializationTime = processedMarkets > 0 ? totalMarketTime / processedMarkets : TimeSpan.Zero;
+                    MemoryUsageDelta = GC.GetTotalMemory(false) - initialMemory;
+                    CpuTimeDelta = Process.GetCurrentProcess().TotalProcessorTime - initialCpu;
+                    SuccessfulMarketInitializations = successfulInitializations;
+                    FailedMarketInitializations = failedInitializations;
+                    TotalWaitTime = totalWaitTime;
+                }
+                else
+                {
+                    AverageMarketInitializationTime = TimeSpan.Zero;
+                    MemoryUsageDelta = 0;
+                    CpuTimeDelta = TimeSpan.Zero;
+                    SuccessfulMarketInitializations = 0;
+                    FailedMarketInitializations = 0;
+                    TotalWaitTime = TimeSpan.Zero;
+                }
                 stopwatch.Stop();
                 throw;
             }
@@ -209,8 +328,8 @@ namespace BacklashBot.Services
         /// has been fully populated before proceeding with initialization.
         /// </summary>
         /// <param name="marketTicker">The market ticker symbol to wait for data on.</param>
-        /// <returns>A task representing the asynchronous wait operation.</returns>
-        private async Task WaitForInitialDataAsync(string marketTicker)
+        /// <returns>A task representing the asynchronous wait operation, returning the time spent waiting.</returns>
+        private async Task<TimeSpan> WaitForInitialDataAsync(string marketTicker)
         {
             const int maxWaitSeconds = 3;
             const int pollIntervalMs = 500;
@@ -229,15 +348,17 @@ namespace BacklashBot.Services
                     if (marketData != null)
                     {
                         _logger.LogDebug("Initial data received for {MarketTicker}", marketTicker);
-                        return;
+                        return DateTime.UtcNow - startTime;
                     }
                     await Task.Delay(pollIntervalMs, _statusTracker.GetCancellationToken());
                 }
                 _logger.LogWarning("Timeout for {MarketTicker} after {MaxWaitSeconds}s. Proceeding with available data.", marketTicker, maxWaitSeconds);
+                return TimeSpan.FromSeconds(maxWaitSeconds);
             }
             catch (OperationCanceledException)
             {
                 _logger.LogDebug("WaitForInitialDataAsync cancelled for {MarketTicker} at {0}", marketTicker, DateTime.UtcNow);
+                return DateTime.UtcNow - startTime;
             }
             finally
             {

@@ -13,6 +13,7 @@ using KalshiBotLogging;
 using KalshiBotOverseer.Services;
 using BacklashDTOs.Configuration;
 using KalshiBotOverseer.State;
+using BacklashInterfaces.PerformanceMetrics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -107,7 +108,10 @@ namespace KalshiBotOverseer
                 sp.GetRequiredService<ISubscriptionManager>(),
                 sp.GetRequiredService<IMessageProcessor>(),
                 sp.GetRequiredService<IDataCache>(),
-                false
+                sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
+                sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents,
+                sp.GetRequiredService<IOptions<KalshiConfig>>().Value.WebSocketBufferSize,
+                sp.GetRequiredService<IConfiguration>().GetSection("Kalshi:KalshiWebSocketClient:EnablePerformanceMetrics").Get<bool?>() ?? true
             ));
             services.AddScoped<ISqlDataService, SqlDataService>();
             services.AddScoped<KalshiBotContext>(provider => new KalshiBotContext(Configuration));
@@ -173,10 +177,16 @@ namespace KalshiBotOverseer
 
             // Register PerformanceMetricsService
             services.AddSingleton<PerformanceMetricsService>();
-            services.AddSingleton<IMessageProcessorPerformanceMetrics>(sp => sp.GetRequiredService<PerformanceMetricsService>());
+            services.AddSingleton<IWebSocketPerformanceMetrics>(provider =>
+                (IWebSocketPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
 
             // Register BrainPersistenceService
-            services.AddSingleton<BrainPersistenceService>();
+            services.AddSingleton<BrainPersistenceService>(sp => new BrainPersistenceService(
+                sp.GetRequiredService<IOptions<BrainPersistenceServiceConfig>>(),
+                null, // context optional for singleton
+                sp.GetRequiredService<ILogger<BrainPersistenceService>>(),
+                sp.GetRequiredService<PerformanceMetricsService>()
+            ));
 
             // Add MVC for controllers
             services.AddControllers()

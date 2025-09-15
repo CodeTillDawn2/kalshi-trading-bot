@@ -13,6 +13,7 @@ using TradingStrategies.Strategies;
 using System.Threading;
 using System.Diagnostics;
 using System.ComponentModel.DataAnnotations;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace TradingSimulator
 {
@@ -114,7 +115,7 @@ namespace TradingSimulator
         /// <summary>
         /// Performance monitor for centralized metrics collection.
         /// </summary>
-        private readonly IPerformanceMonitor _performanceMonitor;
+        private readonly BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor _performanceMonitor;
 
         /// <summary>
         /// Performance metrics for tracking processing rates and queue depths.
@@ -141,7 +142,7 @@ namespace TradingSimulator
             HashSet<string> processedMarkets,
             MarketProcessorConfig config,
             SimulatorReporting simulatorReporting,
-            IPerformanceMonitor performanceMonitor)
+            BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor performanceMonitor)
         {
             _overseer = overseer;
             _scopeFactory = scopeFactory;

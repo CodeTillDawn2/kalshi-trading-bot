@@ -48,7 +48,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static HikkakePattern? IsPattern(
+        public static async Task<HikkakePattern?> IsPatternAsync(
             int index,
             int trendLookback,
             bool isBullish,
@@ -61,9 +61,9 @@ namespace BacklashPatterns.PatternDefinitions
             int secondIdx = index - 1;
             int thirdIdx = index;
 
-            var firstMetrics = GetCandleMetrics(ref metricsCache, firstIdx, prices, trendLookback, false);
-            var secondMetrics = GetCandleMetrics(ref metricsCache, secondIdx, prices, trendLookback, false);
-            var thirdMetrics = GetCandleMetrics(ref metricsCache, thirdIdx, prices, trendLookback, true);
+            var firstMetrics = await GetCandleMetricsAsync(metricsCache, firstIdx, prices, trendLookback, false);
+            var secondMetrics = await GetCandleMetricsAsync(metricsCache, secondIdx, prices, trendLookback, false);
+            var thirdMetrics = await GetCandleMetricsAsync(metricsCache, thirdIdx, prices, trendLookback, true);
 
             var firstAsk = prices[firstIdx];
             var secondAsk = prices[secondIdx];

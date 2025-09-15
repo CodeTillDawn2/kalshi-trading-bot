@@ -37,7 +37,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Typically appears in a trend context (bullish after downtrend, bearish after uptrend).
         /// Your original logic matches this strict definition with a minimum range and trend check.
         /// </summary>
-        public static MarubozuPattern? IsPattern(
+        public static async Task<MarubozuPattern?> IsPatternAsync(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
@@ -45,7 +45,7 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMids[] prices)
         {
             // Lazy load metrics for the current candle
-            var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Check if the total range meets the minimum requirement for significance
             if (metrics.TotalRange < MinRange) return null;

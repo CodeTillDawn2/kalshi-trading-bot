@@ -30,6 +30,36 @@ namespace BacklashBot.Management.Interfaces
         void UpdateWebSocketMetricsRecordingStatus(bool isRecording);
 
         /// <summary>
+        /// Records MarketDataInitializer performance metrics.
+        /// </summary>
+        /// <param name="totalDuration">Total initialization duration.</param>
+        /// <param name="marketCount">Number of markets processed.</param>
+        /// <param name="averageMarketTime">Average time per market.</param>
+        /// <param name="memoryDelta">Memory usage change in bytes.</param>
+        /// <param name="cpuTime">CPU time used.</param>
+        /// <param name="successfulMarkets">Number of successfully initialized markets.</param>
+        /// <param name="failedMarkets">Number of failed market initializations.</param>
+        /// <param name="totalWaitTime">Total time spent waiting.</param>
+        void RecordMarketDataInitializerMetrics(
+            TimeSpan totalDuration,
+            int marketCount,
+            TimeSpan averageMarketTime,
+            long memoryDelta,
+            TimeSpan cpuTime,
+            int successfulMarkets,
+            int failedMarkets,
+            TimeSpan totalWaitTime);
+
+        /// <summary>
+        /// Records MarketAnalysisHelper performance metrics.
+        /// </summary>
+        /// <param name="totalMarkets">Total number of markets processed.</param>
+        /// <param name="totalTimeMs">Total processing time in milliseconds.</param>
+        /// <param name="averageTimeMs">Average time per market in milliseconds.</param>
+        /// <param name="errorCount">Number of errors encountered.</param>
+        void RecordMarketAnalysisHelperMetrics(int totalMarkets, long totalTimeMs, double averageTimeMs, int errorCount);
+
+        /// <summary>
         /// Records OverseerClientService performance metrics.
         /// </summary>
         /// <param name="metrics">Dictionary containing OverseerClientService performance metrics.</param>

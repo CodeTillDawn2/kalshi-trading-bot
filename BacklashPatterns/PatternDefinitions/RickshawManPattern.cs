@@ -78,14 +78,14 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Close is near the candle’s midpoint.
         /// Indicates: Indecision in the market, often appearing at tops or bottoms, suggesting a potential reversal.
         /// </summary>
-        public static RickshawManPattern? IsPattern(
+        public static async Task<RickshawManPattern?> IsPatternAsync(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
             CandleMids[] prices)
         {
             // Lazy load metrics for the current candle
-            var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Check if total range and body size meet requirements
             if (metrics.TotalRange < MinRange ||

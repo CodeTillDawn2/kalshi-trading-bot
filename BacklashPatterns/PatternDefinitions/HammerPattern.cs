@@ -43,7 +43,7 @@ public class HammerPattern : PatternDefinition
     {
     }
 
-    public static HammerPattern? IsPattern(
+    public static async Task<HammerPattern?> IsPatternAsync(
         Dictionary<int, CandleMetrics> metricsCache,
         int index,
         int trendLookback,
@@ -51,7 +51,7 @@ public class HammerPattern : PatternDefinition
     {
         if (index < 1) return null;
 
-        var candleMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+        var candleMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
         if (candleMetrics.TotalRange < MinRange) return null;
         if (candleMetrics.BodySize > BodyRangeRatio * candleMetrics.TotalRange) return null;

@@ -28,26 +28,108 @@ namespace BacklashBot.Services
         /// Event raised when a market's data has been updated.
         /// </summary>
         public event EventHandler<string> OnMarketUpdated;
+        private TimeSpan _lastWorkDuration;
         /// <summary>
         /// Gets the duration of the last market refresh operation.
         /// </summary>
-        public TimeSpan LastWorkDuration { get; private set; }
+        public TimeSpan LastWorkDuration
+        {
+            get
+            {
+                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                    throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
+                return _lastWorkDuration;
+            }
+            private set { _lastWorkDuration = value; }
+        }
+        private int _lastWorkMarketCount;
         /// <summary>
         /// Gets the number of markets processed in the last refresh operation.
         /// </summary>
-        public int LastWorkMarketCount { get; private set; }
+        public int LastWorkMarketCount
+        {
+            get
+            {
+                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                    throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
+                return _lastWorkMarketCount;
+            }
+            private set { _lastWorkMarketCount = value; }
+        }
         /// <summary>
         /// Gets the total number of refresh operations performed.
         /// </summary>
         public long TotalRefreshOperations { get; private set; }
+        private TimeSpan _averageRefreshTimePerMarket;
         /// <summary>
         /// Gets the average time spent per market refresh in the last operation.
         /// </summary>
-        public TimeSpan AverageRefreshTimePerMarket { get; private set; }
+        public TimeSpan AverageRefreshTimePerMarket
+        {
+            get
+            {
+                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                    throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
+                return _averageRefreshTimePerMarket;
+            }
+            private set { _averageRefreshTimePerMarket = value; }
+        }
+        private int _lastRefreshCount;
         /// <summary>
         /// Gets the total number of markets refreshed in the last operation.
         /// </summary>
-        public int LastRefreshCount { get; private set; }
+        public int LastRefreshCount
+        {
+            get
+            {
+                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                    throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
+                return _lastRefreshCount;
+            }
+            private set { _lastRefreshCount = value; }
+        }
+        private TimeSpan _lastCpuTime;
+        /// <summary>
+        /// Gets the CPU time used in the last refresh operation.
+        /// </summary>
+        public TimeSpan LastCpuTime
+        {
+            get
+            {
+                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                    throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
+                return _lastCpuTime;
+            }
+            private set { _lastCpuTime = value; }
+        }
+        private long _lastMemoryUsage;
+        /// <summary>
+        /// Gets the memory usage at the end of the last refresh operation.
+        /// </summary>
+        public long LastMemoryUsage
+        {
+            get
+            {
+                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                    throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
+                return _lastMemoryUsage;
+            }
+            private set { _lastMemoryUsage = value; }
+        }
+        private double _refreshThroughput;
+        /// <summary>
+        /// Gets the throughput (markets refreshed per second) in the last operation.
+        /// </summary>
+        public double RefreshThroughput
+        {
+            get
+            {
+                if (!_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+                    throw new InvalidOperationException("Performance metrics are not enabled for MarketRefreshService.");
+                return _refreshThroughput;
+            }
+            private set { _refreshThroughput = value; }
+        }
         private TimeSpan RefreshInterval => _updateInterval;
         private readonly IScopeManagerService _scopeManagerService;
 
@@ -242,6 +324,13 @@ namespace BacklashBot.Services
 
             var workStartTime = DateTime.UtcNow;
             var stopwatch = Stopwatch.StartNew();
+            var startCpu = TimeSpan.Zero;
+            var startMemory = 0L;
+            if (_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+            {
+                startCpu = System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime;
+                startMemory = System.GC.GetTotalMemory(false);
+            }
             int MarketsRefreshed = 0;
 
             foreach (var marketTicker in watchedMarkets)
@@ -361,6 +450,17 @@ namespace BacklashBot.Services
             LastRefreshCount = MarketsRefreshed;
             TotalRefreshOperations++;
             AverageRefreshTimePerMarket = LastWorkMarketCount > 0 ? TimeSpan.FromTicks(LastWorkDuration.Ticks / LastWorkMarketCount) : TimeSpan.Zero;
+            if (_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+            {
+                var endCpu = System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime;
+                var endMemory = System.GC.GetTotalMemory(false);
+                LastCpuTime = endCpu - startCpu;
+                LastMemoryUsage = endMemory;
+            }
+            if (_tradingConfig.MarketRefreshService_EnablePerformanceMetrics)
+            {
+                RefreshThroughput = LastWorkDuration.TotalSeconds > 0 ? (double)LastRefreshCount / LastWorkDuration.TotalSeconds : 0;
+            }
             stopwatch.Stop();
         }
 

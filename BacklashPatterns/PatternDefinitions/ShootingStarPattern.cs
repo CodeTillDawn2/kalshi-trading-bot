@@ -66,7 +66,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static ShootingStarPattern? IsPattern(
+        public static async Task<ShootingStarPattern?> IsPatternAsync(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
@@ -76,7 +76,7 @@ namespace BacklashPatterns.PatternDefinitions
             if (index < 1) return null;
 
             // Lazy load metrics for the current candle
-            var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Require an uptrend (original: meanTrend > 0.3, trendConsistency >= 0.4)
             if (metrics.GetLookbackMeanTrend(1) <= TrendThreshold || metrics.GetLookbackTrendConsistency(1) < ConsistencyThreshold) return null;

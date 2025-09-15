@@ -45,7 +45,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static ThreeOutsidePattern? IsPattern(
+        public static async Task<ThreeOutsidePattern?> IsPatternAsync(
             int index,
             int trendLookback,
             bool isBullish,
@@ -59,9 +59,9 @@ namespace BacklashPatterns.PatternDefinitions
             int thirdIndex = index;
 
             // Lazy load metrics for the three candles
-            var metrics1 = GetCandleMetrics(ref metricsCache, firstIndex, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, secondIndex, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, thirdIndex, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, firstIndex, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, secondIndex, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, thirdIndex, prices, trendLookback, true);
 
             double body1 = metrics1.BodySize;
             double body2 = metrics2.BodySize;

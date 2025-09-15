@@ -65,7 +65,7 @@ namespace BacklashPatterns.PatternDefinitions
         ///   and closes above the midpoint of the first candle s body but below its open.
         /// Indicates: Potential reversal from bearish to bullish momentum as buyers step in after a gap down.
         /// </summary>
-        public static PiercingPattern? IsPattern(
+        public static async Task<PiercingPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -75,8 +75,8 @@ namespace BacklashPatterns.PatternDefinitions
             if (index - 1 < 0 || index >= prices.Length) return null;
 
             // Lazy load metrics for the two candles
-            var prevMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, trendLookback, false);
-            var currMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var prevMetrics = await GetCandleMetricsAsync(metricsCache, index - 1, prices, trendLookback, false);
+            var currMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Require a downtrend using CandleMetrics method
             if (currMetrics.GetLookbackMeanTrend(2) > TrendThreshold) return null;

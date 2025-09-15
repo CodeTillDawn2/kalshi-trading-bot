@@ -3,6 +3,7 @@ using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
 using TradingStrategies.Configuration;
 using static BacklashInterfaces.Enums.StrategyEnums;
+using BacklashInterfaces.PerformanceMetrics;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Options;

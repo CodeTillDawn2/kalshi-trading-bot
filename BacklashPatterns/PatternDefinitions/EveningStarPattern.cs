@@ -43,7 +43,7 @@ public class EveningStarPattern : PatternDefinition
     {
     }
 
-    public static EveningStarPattern? IsPattern(
+    public static async Task<EveningStarPattern?> IsPatternAsync(
         int index,
         CandleMids[] prices,
         int trendLookback,
@@ -55,9 +55,9 @@ public class EveningStarPattern : PatternDefinition
         int secondIndex = index - 1;
         int thirdIndex = index;
 
-        var firstMetrics = GetCandleMetrics(ref metricsCache, firstIndex, prices, trendLookback, false);
-        var secondMetrics = GetCandleMetrics(ref metricsCache, secondIndex, prices, trendLookback, false);
-        var thirdMetrics = GetCandleMetrics(ref metricsCache, thirdIndex, prices, trendLookback, true);
+        var firstMetrics = await GetCandleMetricsAsync(metricsCache, firstIndex, prices, trendLookback, false);
+        var secondMetrics = await GetCandleMetricsAsync(metricsCache, secondIndex, prices, trendLookback, false);
+        var thirdMetrics = await GetCandleMetricsAsync(metricsCache, thirdIndex, prices, trendLookback, true);
 
         if (thirdMetrics.GetLookbackMeanTrend(3) <= TrendThreshold ||
             thirdMetrics.GetLookbackTrendConsistency(3) < TrendConsistencyThreshold) return null;
