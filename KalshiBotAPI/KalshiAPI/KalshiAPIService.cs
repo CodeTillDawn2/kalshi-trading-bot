@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using BacklashBot.Management.Interfaces;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashDTOs.Helpers;
@@ -44,22 +45,38 @@ namespace KalshiBotAPI.KalshiAPI
         private readonly string _connectionString;
         private Dictionary<string, string> AuthHeaders = new Dictionary<string, string>();
         private IStatusTrackerService _statusTrackerService;
+        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
 
         private readonly ConcurrentDictionary<string, ConcurrentBag<long>> _methodExecutionDurations = new();
         private readonly ConcurrentDictionary<string, ConcurrentBag<long>> _calculationExecutionDurations = new();
+        private readonly ConcurrentDictionary<string, ConcurrentBag<long>> _apiResponseDurations = new();
+        private readonly ConcurrentDictionary<string, ConcurrentBag<int>> _errorCounts = new();
+        private readonly bool _enablePerformanceMetrics;
 
         private readonly Dictionary<string, (int Minutes, int DbType, int MaxDays, int CushionSeconds)> _intervals;
 
+        /// <summary>
+        /// Initializes a new instance of the KalshiAPIService class.
+        /// </summary>
+        /// <param name="logger">Logger instance for recording API operations and errors.</param>
+        /// <param name="config">Configuration instance for accessing connection strings and settings.</param>
+        /// <param name="scopeFactory">Factory for creating service scopes for database operations.</param>
+        /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens.</param>
+        /// <param name="kalshiConfig">Configuration options specific to Kalshi API integration.</param>
+        /// <param name="centralPerformanceMonitor">Central performance monitor for unified metrics collection.</param>
         public KalshiAPIService(
             ILogger<IKalshiAPIService> logger,
             IConfiguration config,
             IServiceScopeFactory scopeFactory,
             IStatusTrackerService statusTrackerService,
-            IOptions<KalshiConfig> kalshiConfig)
+            IOptions<KalshiConfig> kalshiConfig,
+            ICentralPerformanceMonitor centralPerformanceMonitor)
         {
             _logger = logger;
             _statusTrackerService = statusTrackerService;
             _kalshiConfig = kalshiConfig.Value;
+            _centralPerformanceMonitor = centralPerformanceMonitor;
+            _enablePerformanceMetrics = _kalshiConfig.KalshiAPIServiceEnablePerformanceMetrics;
 
             // Initialize connection string from configuration
             _connectionString = config.GetConnectionString("DefaultConnection") ?? throw new ArgumentNullException("DefaultConnection connection string not configured");
@@ -94,7 +111,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// <returns>A dictionary containing the authentication headers (KALSHI-ACCESS-KEY, KALSHI-ACCESS-SIGNATURE, KALSHI-ACCESS-TIMESTAMP).</returns>
         private Dictionary<string, string> GenerateAuthHeaders(string method, string path)
         {
-            var stopwatch = Stopwatch.StartNew();
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
             try
             {
                 var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
@@ -113,8 +130,11 @@ namespace KalshiBotAPI.KalshiAPI
             }
             finally
             {
-                stopwatch.Stop();
-                RecordMethodExecutionDuration(nameof(GenerateAuthHeaders), stopwatch.ElapsedMilliseconds);
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    RecordMethodExecutionDuration(nameof(GenerateAuthHeaders), stopwatch.ElapsedMilliseconds);
+                }
             }
         }
 
@@ -136,7 +156,7 @@ namespace KalshiBotAPI.KalshiAPI
     string? eventTicker = null, string? seriesTicker = null, string? maxCloseTs = null,
     string? minCloseTs = null, string? status = null, string[]? tickers = null, bool updateNotFoundToClosed = true)
         {
-            var stopwatch = Stopwatch.StartNew();
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
             try
             {
                 int processedCount = 0;
@@ -187,7 +207,13 @@ namespace KalshiBotAPI.KalshiAPI
 
                         try
                         {
+                            var apiStopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
                             var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                            if (apiStopwatch != null)
+                            {
+                                apiStopwatch.Stop();
+                                RecordApiResponseDuration(nameof(FetchMarketsAsync), apiStopwatch.ElapsedMilliseconds);
+                            }
                             response.EnsureSuccessStatusCode();
                             jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
                             responseData = JsonSerializer.Deserialize<MarketResponse>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -196,12 +222,14 @@ namespace KalshiBotAPI.KalshiAPI
                         {
                             responseWasSuccessful = false;
                             _logger.LogWarning(ex, "Failed to deserialize response for {Url}, json={0}", url, jsonString);
+                            RecordError(nameof(FetchMarketsAsync));
                         }
                         catch (HttpRequestException ex)
                         {
                             responseWasSuccessful = false;
                             _logger.LogWarning("HTTP request failed for {Url}. Message: {message}", url, ex.Message);
                             errorCount++;
+                            RecordError(nameof(FetchMarketsAsync));
                             break;
                         }
 
@@ -344,8 +372,11 @@ namespace KalshiBotAPI.KalshiAPI
                     }
                 }
 
-                stopwatch.Stop();
-                RecordMethodExecutionDuration(nameof(FetchMarketsAsync), stopwatch.ElapsedMilliseconds);
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    RecordMethodExecutionDuration(nameof(FetchMarketsAsync), stopwatch.ElapsedMilliseconds);
+                }
                 return (processedCount, errorCount);
             }
             catch (OperationCanceledException)
@@ -368,7 +399,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// <returns>The exchange schedule response containing schedule details, or an empty response if the operation fails.</returns>
         public async Task<ExchangeScheduleResponse> GetExchangeScheduleAsync()
         {
-            var stopwatch = Stopwatch.StartNew();
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
             string url = "exchange/schedule";
             try
             {
@@ -388,8 +419,11 @@ namespace KalshiBotAPI.KalshiAPI
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                 );
 
-                stopwatch.Stop();
-                RecordMethodExecutionDuration(nameof(GetExchangeScheduleAsync), stopwatch.ElapsedMilliseconds);
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    RecordMethodExecutionDuration(nameof(GetExchangeScheduleAsync), stopwatch.ElapsedMilliseconds);
+                }
                 return scheduleData ?? new ExchangeScheduleResponse();
             }
             catch (OperationCanceledException)
@@ -400,6 +434,7 @@ namespace KalshiBotAPI.KalshiAPI
             catch (Exception ex)
             {
                 _logger.LogWarning("Unexpected error in GetExchangeScheduleAsync: {ExceptionType} - {Message}", ex.GetType().Name, ex.Message);
+                RecordError(nameof(GetExchangeScheduleAsync));
                 return new ExchangeScheduleResponse();
             }
         }
@@ -1170,7 +1205,13 @@ namespace KalshiBotAPI.KalshiAPI
                     request.Headers.Add(header.Key, header.Value);
                 }
 
+                var apiStopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
                 var response = await _httpClient.SendAsync(request, _statusTrackerService.GetCancellationToken());
+                if (apiStopwatch != null)
+                {
+                    apiStopwatch.Stop();
+                    RecordApiResponseDuration(nameof(GetExchangeScheduleAsync), apiStopwatch.ElapsedMilliseconds);
+                }
                 response.EnsureSuccessStatusCode();
                 var jsonString = await response.Content.ReadAsStringAsync(_statusTrackerService.GetCancellationToken());
 
@@ -2285,8 +2326,12 @@ namespace KalshiBotAPI.KalshiAPI
         /// <param name="elapsedMs">The execution time in milliseconds.</param>
         private void RecordMethodExecutionDuration(string methodName, long elapsedMs)
         {
+            if (!_enablePerformanceMetrics) return;
             var bag = _methodExecutionDurations.GetOrAdd(methodName, _ => new ConcurrentBag<long>());
             bag.Add(elapsedMs);
+
+            // Post to central performance monitor for unified tracking
+            _centralPerformanceMonitor.RecordExecutionTime(methodName, elapsedMs);
         }
 
         /// <summary>
@@ -2298,8 +2343,35 @@ namespace KalshiBotAPI.KalshiAPI
         /// <param name="elapsedMs">The execution time in milliseconds.</param>
         private void RecordCalculationExecutionDuration(string calculationName, long elapsedMs)
         {
+            if (!_enablePerformanceMetrics) return;
             var bag = _calculationExecutionDurations.GetOrAdd(calculationName, _ => new ConcurrentBag<long>());
             bag.Add(elapsedMs);
+        }
+
+        /// <summary>
+        /// Records the execution duration of API response times for performance monitoring.
+        /// Stores the elapsed time in a thread-safe concurrent bag for later analysis.
+        /// Used to track timing of HTTP requests to the Kalshi API.
+        /// </summary>
+        /// <param name="methodName">The name of the method making the API call.</param>
+        /// <param name="elapsedMs">The execution time in milliseconds.</param>
+        private void RecordApiResponseDuration(string methodName, long elapsedMs)
+        {
+            if (!_enablePerformanceMetrics) return;
+            var bag = _apiResponseDurations.GetOrAdd(methodName, _ => new ConcurrentBag<long>());
+            bag.Add(elapsedMs);
+        }
+
+        /// <summary>
+        /// Records an error occurrence for a specific method for reliability monitoring.
+        /// Adds an error count in a thread-safe manner.
+        /// </summary>
+        /// <param name="methodName">The name of the method where the error occurred.</param>
+        private void RecordError(string methodName)
+        {
+            if (!_enablePerformanceMetrics) return;
+            var bag = _errorCounts.GetOrAdd(methodName, _ => new ConcurrentBag<int>());
+            bag.Add(1);
         }
 
         /// <summary>
@@ -2364,6 +2436,64 @@ namespace KalshiBotAPI.KalshiAPI
                     var max = durations.Max();
                     metrics[kvp.Key] = (count, average, min, max);
                 }
+            }
+            return metrics;
+        }
+
+        /// <summary>
+        /// Gets the API response durations for performance monitoring.
+        /// Returns a dictionary mapping method names to their API response time measurements.
+        /// </summary>
+        /// <returns>A concurrent dictionary containing API response durations.</returns>
+        public ConcurrentDictionary<string, ConcurrentBag<long>> GetApiResponseDurations()
+        {
+            return _apiResponseDurations;
+        }
+
+        /// <summary>
+        /// Gets the error counts for reliability monitoring.
+        /// Returns a dictionary mapping method names to their error count measurements.
+        /// </summary>
+        /// <returns>A concurrent dictionary containing error counts.</returns>
+        public ConcurrentDictionary<string, ConcurrentBag<int>> GetErrorCounts()
+        {
+            return _errorCounts;
+        }
+
+        /// <summary>
+        /// Gets aggregated performance metrics for API response times.
+        /// Returns statistics like average, min, max response times for each method.
+        /// </summary>
+        /// <returns>A dictionary containing aggregated API response performance metrics.</returns>
+        public Dictionary<string, (int Count, double AverageMs, long MinMs, long MaxMs)> GetApiResponsePerformanceMetrics()
+        {
+            var metrics = new Dictionary<string, (int, double, long, long)>();
+            foreach (var kvp in _apiResponseDurations)
+            {
+                var durations = kvp.Value.ToArray();
+                if (durations.Length > 0)
+                {
+                    var count = durations.Length;
+                    var average = durations.Average();
+                    var min = durations.Min();
+                    var max = durations.Max();
+                    metrics[kvp.Key] = (count, average, min, max);
+                }
+            }
+            return metrics;
+        }
+
+        /// <summary>
+        /// Gets aggregated error metrics for reliability monitoring.
+        /// Returns the total error count for each method.
+        /// </summary>
+        /// <returns>A dictionary containing total error counts per method.</returns>
+        public Dictionary<string, int> GetErrorMetrics()
+        {
+            var metrics = new Dictionary<string, int>();
+            foreach (var kvp in _errorCounts)
+            {
+                metrics[kvp.Key] = kvp.Value.Sum();
             }
             return metrics;
         }

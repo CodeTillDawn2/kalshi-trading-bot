@@ -61,6 +61,12 @@ public class KalshiConfig
     public bool? WebSocketEnableMetrics { get; set; } = true;
 
     /// <summary>
+    /// Gets or sets whether KalshiAPIService performance metrics collection is enabled.
+    /// When disabled, method execution times, API response times, and error counts are not tracked to reduce overhead. Defaults to true.
+    /// </summary>
+    public bool KalshiAPIServiceEnablePerformanceMetrics { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets the configuration for candlestick lookback periods in days.
     /// Controls how far back in time to fetch candlestick data for different intervals.
     /// </summary>
