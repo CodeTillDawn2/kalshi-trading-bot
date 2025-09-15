@@ -1,14 +1,17 @@
 using KalshiBotData.Data.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using NJsonSchema;
 using BacklashBot.Helpers;
 using BacklashBot.Services.Interfaces;
+using BacklashBot.Management.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Converters;
 using BacklashDTOs.Data;
 using BacklashDTOs.Exceptions;
 using BacklashInterfaces.Constants;
 using System.Diagnostics;
+using System.Threading;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -33,6 +36,7 @@ namespace BacklashBot.Services
         private readonly ILogger<ITradingSnapshotService> _logger;
         private readonly IOptions<SnapshotConfig> _snapshotConfig;
         private readonly IOptions<TradingConfig> _tradingConfig;
+        private readonly ICentralPerformanceMonitor? _centralPerformanceMonitor;
         private DateTime? _lastSavedSnapshotTimestamp; // Actual timestamp of the last saved snapshot
 
         /// <summary>
@@ -48,6 +52,15 @@ namespace BacklashBot.Services
         private readonly TimeSpan _snapshotTimingTolerance;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly string _snapshotStorageDirectory;
+        private readonly bool _enablePerformanceMetrics;
+
+        // Performance metrics tracking
+        private int _totalSnapshotsAttempted = 0;
+        private int _onTimeSnapshots = 0;
+        private double _totalLatencyMs = 0;
+        private long _totalMemoryUsed = 0;
+        private TimeSpan _totalCpuUsed = TimeSpan.Zero;
+        private int _concurrentOperations = 0;
 
         /// <summary>
         /// Initializes a new instance of the TradingSnapshotService with required dependencies.
@@ -56,16 +69,21 @@ namespace BacklashBot.Services
         /// <param name="snapshotConfig">Configuration options for snapshot behavior including tolerance settings.</param>
         /// <param name="tradingConfig">Configuration options for trading parameters including decision frequency.</param>
         /// <param name="scopeFactory">Factory for creating service scopes to access database services.</param>
+        /// <param name="configuration">Configuration for accessing app settings.</param>
+        /// <param name="centralPerformanceMonitor">Central performance monitor for recording execution times.</param>
         public TradingSnapshotService(
             ILogger<ITradingSnapshotService> logger,
             IOptions<SnapshotConfig> snapshotConfig,
             IOptions<TradingConfig> tradingConfig,
-            IServiceScopeFactory scopeFactory)
+            IServiceScopeFactory scopeFactory,
+            IConfiguration configuration,
+            ICentralPerformanceMonitor? centralPerformanceMonitor = null)
         {
             _logger = logger;
             _snapshotConfig = snapshotConfig;
             _tradingConfig = tradingConfig;
             _serviceScopeFactory = scopeFactory;
+            _centralPerformanceMonitor = centralPerformanceMonitor;
             _decisionFrequencyInterval = TimeSpan.FromSeconds(tradingConfig.Value.DecisionFrequencySeconds);
             _snapshotTimingTolerance = TimeSpan.FromSeconds(snapshotConfig.Value.SnapshotToleranceSeconds);
 
@@ -77,6 +95,8 @@ namespace BacklashBot.Services
             {
                 Directory.CreateDirectory(_snapshotStorageDirectory);
             }
+
+            _enablePerformanceMetrics = configuration.GetValue<bool>("TradingSnapshotService:EnablePerformanceMetrics", false);
         }
 
         /// <summary>
@@ -97,6 +117,19 @@ namespace BacklashBot.Services
         public async Task<List<string>> SaveSnapshotAsync(string BrainInstance, CacheSnapshot cacheSnapshot)
         {
             var stopwatch = Stopwatch.StartNew();
+            Interlocked.Increment(ref _concurrentOperations);
+            long memoryBefore = 0;
+            Process process = null;
+            TimeSpan cpuBefore = TimeSpan.Zero;
+            if (_enablePerformanceMetrics)
+            {
+                _totalSnapshotsAttempted++;
+                var latencyMs = (DateTime.Now - cacheSnapshot.Timestamp).TotalMilliseconds;
+                _totalLatencyMs += latencyMs;
+                memoryBefore = GC.GetTotalMemory(false);
+                process = Process.GetCurrentProcess();
+                cpuBefore = process.TotalProcessorTime;
+            }
             try
             {
                 // Input validation for snapshot data integrity
@@ -157,6 +190,8 @@ namespace BacklashBot.Services
                     }
                 }
 
+                if (_enablePerformanceMetrics) _onTimeSnapshots++;
+
                 var options = new JsonSerializerOptions
                 {
                     WriteIndented = false,
@@ -169,6 +204,7 @@ namespace BacklashBot.Services
                 var schemaData = schema.ToJson();
 
                 int SavedCount = 0;
+                Stopwatch ioStopwatch = null;
 
                 if (cacheSnapshot.LastWebSocketTimestamp <= cacheSnapshot.Timestamp.AddMinutes(-10) && cacheSnapshot.Markets.Count > 5)
                 {
@@ -232,7 +268,9 @@ namespace BacklashBot.Services
                         var fileJson = JsonSerializer.Serialize(snapshotsToSave, options);
                         var fileName = $"Snapshot_{timestampString}.json";
                         var fullPath = Path.Combine(_snapshotStorageDirectory, fileName);
+                        if (_enablePerformanceMetrics) ioStopwatch = Stopwatch.StartNew();
                         await File.WriteAllTextAsync(fullPath, fileJson, Encoding.Unicode);
+                        if (_enablePerformanceMetrics) ioStopwatch.Stop();
                         _logger.LogInformation("Saved {Count} snapshots to file: {FilePath}", SavedCount, fullPath);
                     }
 
@@ -241,13 +279,41 @@ namespace BacklashBot.Services
                     _isFirstSnapshotTaken = false;
                 }
 
+                Interlocked.Decrement(ref _concurrentOperations);
                 stopwatch.Stop();
-                _logger.LogInformation("Snapshot save operation completed in {ElapsedMilliseconds}ms for {Count} snapshots", stopwatch.ElapsedMilliseconds, snapshotsActuallySaved.Count);
+
+                if (_enablePerformanceMetrics && _centralPerformanceMonitor != null)
+                {
+                    _centralPerformanceMonitor.RecordExecutionTime("TradingSnapshotService.SaveSnapshotAsync", stopwatch.ElapsedMilliseconds);
+                }
+
+                if (_enablePerformanceMetrics)
+                {
+                    long memoryAfter = GC.GetTotalMemory(false);
+                    TimeSpan cpuAfter = process.TotalProcessorTime;
+                    long memoryUsed = memoryAfter - memoryBefore;
+                    double cpuUsedMs = (cpuAfter - cpuBefore).TotalMilliseconds;
+                    _totalMemoryUsed += memoryUsed;
+                    _totalCpuUsed += (cpuAfter - cpuBefore);
+                    double ioTimeMs = ioStopwatch?.Elapsed.TotalMilliseconds ?? 0;
+                    int queueDepth = _concurrentOperations;
+                    double throughput = snapshotsActuallySaved.Count / stopwatch.Elapsed.TotalSeconds;
+                    double adherence = _totalSnapshotsAttempted > 0 ? (_onTimeSnapshots / (double)_totalSnapshotsAttempted) * 100 : 0;
+                    double avgLatency = _totalSnapshotsAttempted > 0 ? _totalLatencyMs / _totalSnapshotsAttempted : 0;
+                    _logger.LogInformation("Snapshot save operation completed in {ElapsedMilliseconds}ms for {Count} snapshots (throughput: {Throughput:F2} snaps/sec, adherence: {Adherence:F1}%, avg latency: {AvgLatency:F2}ms, memory used: {MemoryUsed} bytes, CPU used: {CpuUsedMs:F2}ms, I/O time: {IoTimeMs:F2}ms, queue depth: {QueueDepth})",
+                        stopwatch.ElapsedMilliseconds, snapshotsActuallySaved.Count, throughput, adherence, avgLatency, memoryUsed, cpuUsedMs, ioTimeMs, queueDepth);
+                }
+                else
+                {
+                    _logger.LogInformation("Snapshot save operation completed in {ElapsedMilliseconds}ms for {Count} snapshots", stopwatch.ElapsedMilliseconds, snapshotsActuallySaved.Count);
+                }
+
                 return snapshotsActuallySaved;
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
+                Interlocked.Decrement(ref _concurrentOperations);
                 _logger.LogWarning(ex, "Error saving snapshot at {Timestamp} after {ElapsedMilliseconds}ms", cacheSnapshot.Timestamp, stopwatch.ElapsedMilliseconds);
                 return new List<string>();
             }
@@ -269,6 +335,16 @@ namespace BacklashBot.Services
         public async Task<Dictionary<string, List<MarketSnapshot>>> LoadManySnapshots(List<SnapshotDTO> snapshots, bool forceLoad = false)
         {
             var stopwatch = Stopwatch.StartNew();
+            Interlocked.Increment(ref _concurrentOperations);
+            long memoryBefore = 0;
+            Process process = null;
+            TimeSpan cpuBefore = TimeSpan.Zero;
+            if (_enablePerformanceMetrics)
+            {
+                memoryBefore = GC.GetTotalMemory(false);
+                process = Process.GetCurrentProcess();
+                cpuBefore = process.TotalProcessorTime;
+            }
             try
             {
                 var result = new Dictionary<string, List<MarketSnapshot>>();
@@ -335,15 +411,42 @@ namespace BacklashBot.Services
                     }
                 });
 
+                Interlocked.Decrement(ref _concurrentOperations);
                 stopwatch.Stop();
-                _logger.LogInformation("Snapshot load operation completed in {ElapsedMilliseconds}ms for {TotalSnapshots} snapshots across {MarketCount} markets",
-                    stopwatch.ElapsedMilliseconds, snapshots.Count, result.Count);
+
+                if (_enablePerformanceMetrics && _centralPerformanceMonitor != null)
+                {
+                    _centralPerformanceMonitor.RecordExecutionTime("TradingSnapshotService.LoadManySnapshots", stopwatch.ElapsedMilliseconds);
+                }
+
+                if (_enablePerformanceMetrics)
+                {
+                    long memoryAfter = GC.GetTotalMemory(false);
+                    TimeSpan cpuAfter = process.TotalProcessorTime;
+                    long memoryUsed = memoryAfter - memoryBefore;
+                    double cpuUsedMs = (cpuAfter - cpuBefore).TotalMilliseconds;
+                    _totalMemoryUsed += memoryUsed;
+                    _totalCpuUsed += (cpuAfter - cpuBefore);
+                    int queueDepth = _concurrentOperations;
+                    double throughput = snapshots.Count / stopwatch.Elapsed.TotalSeconds;
+                    int batchSize = groupedSnapshots.Count;
+                    int concurrency = parallelOptions.MaxDegreeOfParallelism;
+                    _logger.LogInformation("Snapshot load operation completed in {ElapsedMilliseconds}ms for {TotalSnapshots} snapshots across {MarketCount} markets (throughput: {Throughput:F2} snaps/sec, batch size: {BatchSize} groups, concurrency: {Concurrency}, memory used: {MemoryUsed} bytes, CPU used: {CpuUsedMs:F2}ms, queue depth: {QueueDepth})",
+                        stopwatch.ElapsedMilliseconds, snapshots.Count, result.Count, throughput, batchSize, concurrency, memoryUsed, cpuUsedMs, queueDepth);
+                }
+                else
+                {
+                    _logger.LogInformation("Snapshot load operation completed in {ElapsedMilliseconds}ms for {TotalSnapshots} snapshots across {MarketCount} markets",
+                        stopwatch.ElapsedMilliseconds, snapshots.Count, result.Count);
+                }
+
                 await Task.CompletedTask;
                 return result;
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
+                Interlocked.Decrement(ref _concurrentOperations);
                 _logger.LogError(ex, "Error loading multiple snapshots after {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return new Dictionary<string, List<MarketSnapshot>>();
             }

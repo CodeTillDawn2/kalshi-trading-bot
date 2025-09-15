@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using BacklashBot.Services;
 using BacklashBot.Services.Interfaces;
+using BacklashBot.Management;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using System.Text;
@@ -106,6 +107,7 @@ namespace KalshiBotTests
             services.AddScoped<IKalshiBotContext>(sp => sp.GetRequiredService<KalshiBotContext>());
             _sp = services.BuildServiceProvider();
             _scopeFactory = _sp.GetRequiredService<IServiceScopeFactory>();
+            var centralPerformanceMonitor = _sp.GetRequiredService<CentralPerformanceMonitor>();
 
             // Options from config
             _snapOpts  = Options.Create(config.GetSection("Snapshots").Get<SnapshotConfig>());
@@ -113,7 +115,7 @@ namespace KalshiBotTests
 
             // Snapshot loader (same implementation you use elsewhere)
             _snapshotService = new TradingSnapshotService(
-                NullLogger<ITradingSnapshotService>.Instance, _snapOpts, _tradeOpts, _scopeFactory);
+                NullLogger<ITradingSnapshotService>.Instance, _snapOpts, _tradeOpts, _scopeFactory, config, centralPerformanceMonitor);
 
             _outDir = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
             Directory.CreateDirectory(_outDir);
