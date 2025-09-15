@@ -412,6 +412,58 @@ namespace BacklashBot.Management
         }
 
         /// <summary>
+        /// Records broadcast service performance metrics.
+        /// </summary>
+        /// <param name="successfulBroadcasts">Number of successful broadcasts.</param>
+        /// <param name="failedBroadcasts">Number of failed broadcasts.</param>
+        /// <param name="totalBroadcastTimeMs">Total time spent on broadcasts in milliseconds.</param>
+        /// <param name="averageBroadcastTimeMs">Average broadcast time in milliseconds.</param>
+        /// <param name="broadcastSuccessRate">Success rate percentage.</param>
+        /// <param name="totalDataSize">Total size of broadcast data in bytes.</param>
+        /// <param name="broadcastsPerMinute">Average broadcasts per minute.</param>
+        /// <param name="totalMemoryUsed">Total memory used during broadcasts in bytes.</param>
+        /// <param name="averageIntervalDeviationMs">Average interval deviation in milliseconds.</param>
+        /// <remarks>
+        /// This method receives broadcast performance metrics from BroadcastService
+        /// and integrates them with the central performance monitoring system.
+        /// </remarks>
+        public void RecordBroadcastMetrics(
+            long successfulBroadcasts,
+            long failedBroadcasts,
+            double totalBroadcastTimeMs,
+            double averageBroadcastTimeMs,
+            double broadcastSuccessRate,
+            long totalDataSize,
+            double broadcastsPerMinute,
+            long totalMemoryUsed,
+            double averageIntervalDeviationMs)
+        {
+            // Record execution time for broadcast operations
+            RecordExecutionTime("BroadcastService", (long)totalBroadcastTimeMs);
+
+            // Log broadcast performance summary
+            _logger.LogInformation(
+                "BROADCAST PERFORMANCE: Success={Successful}/{Total}, SuccessRate={SuccessRate:F2}%, AvgTime={AvgTime:F2}ms, DataSize={DataSize} bytes, Throughput={Throughput:F2}/min, Memory={Memory} bytes, IntervalDeviation={Deviation:F2}ms",
+                successfulBroadcasts, successfulBroadcasts + failedBroadcasts, broadcastSuccessRate, averageBroadcastTimeMs, totalDataSize, broadcastsPerMinute, totalMemoryUsed, averageIntervalDeviationMs);
+
+            // Check for broadcast performance alerts
+            if (broadcastSuccessRate < 95.0)
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Broadcast success rate {SuccessRate:F2}% is below 95%", broadcastSuccessRate);
+            }
+
+            if (averageBroadcastTimeMs > 1000) // 1 second
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Average broadcast time {AvgTime:F2}ms exceeds 1 second", averageBroadcastTimeMs);
+            }
+
+            if (averageIntervalDeviationMs > 5000) // 5 seconds
+            {
+                _logger.LogWarning("PERFORMANCE ALERT: Average interval deviation {Deviation:F2}ms exceeds 5 seconds", averageIntervalDeviationMs);
+            }
+        }
+
+        /// <summary>
         /// Records overnight activities performance metrics from the common OvernightActivitiesHelper.
         /// </summary>
         /// <param name="metrics">The performance metrics from overnight activities.</param>
