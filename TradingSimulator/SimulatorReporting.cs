@@ -32,7 +32,7 @@ namespace TradingSimulator.Simulator
         public string LogFilePrefix { get; set; } = "discrepancies";
         public bool EnableParallelProcessing { get; set; } = false;
         public int MaxDegreeOfParallelism { get; set; } = Environment.ProcessorCount;
-        public bool EnablePerformanceMetrics { get; set; } = true;
+        public bool EnablePerformanceMetrics { get; set; } = false;
     }
 
     /// <summary>
