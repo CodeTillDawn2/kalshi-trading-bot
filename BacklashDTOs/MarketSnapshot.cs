@@ -22,11 +22,17 @@ namespace BacklashDTOs
     /// </summary>
     public class MarketSnapshot
     {
+        /// <summary>
+        /// Initializes a new instance of the MarketSnapshot class for JSON deserialization.
+        /// </summary>
         public MarketSnapshot()
         {
             // Required for JSON deserialization
         }
 
+        /// <summary>
+        /// Initializes a new instance of the MarketSnapshot class with the specified market data.
+        /// </summary>
         public MarketSnapshot(
             DateTime marketTimestamp,
             string marketTicker,
@@ -283,12 +289,29 @@ namespace BacklashDTOs
             RecentCandlesticks = recentCandlesticks;
         }
 
+        /// <summary>
+        /// Gets or sets the timestamp when this snapshot was taken.
+        /// </summary>
         public DateTime Timestamp { get; set; }
 
+        /// <summary>
+        /// Gets or sets the market ticker symbol.
+        /// </summary>
         public string? MarketTicker { get; set; }
+
+        /// <summary>
+        /// Gets or sets the market category.
+        /// </summary>
         public string? MarketCategory { get; set; }
 
+        /// <summary>
+        /// Gets or sets the market status.
+        /// </summary>
         public string? MarketStatus { get; set; }
+
+        /// <summary>
+        /// Gets or sets the snapshot schema version for backward compatibility.
+        /// </summary>
         public int SnapshotSchemaVersion { get; set; }
 
         #region Order Book Data
@@ -307,9 +330,24 @@ namespace BacklashDTOs
 
         #region Historical Prices
 
+        /// <summary>
+        /// Gets or sets the short-term slope of "Yes" bid prices per minute.
+        /// </summary>
         public double YesBidSlopePerMinute_Short { get; set; }
+
+        /// <summary>
+        /// Gets or sets the short-term slope of "No" bid prices per minute.
+        /// </summary>
         public double NoBidSlopePerMinute_Short { get; set; }
+
+        /// <summary>
+        /// Gets or sets the medium-term slope of "Yes" bid prices per minute.
+        /// </summary>
         public double YesBidSlopePerMinute_Medium { get; set; }
+
+        /// <summary>
+        /// Gets or sets the medium-term slope of "No" bid prices per minute.
+        /// </summary>
         public double NoBidSlopePerMinute_Medium { get; set; }
 
         /// <summary>
@@ -537,9 +575,24 @@ namespace BacklashDTOs
 
         #region Trade Metrics
 
+        /// <summary>
+        /// Gets or sets the Average Directional Index (ADX) indicator.
+        /// </summary>
         public double? ADX { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Plus Directional Indicator (+DI).
+        /// </summary>
         public double? PlusDI { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Minus Directional Indicator (-DI).
+        /// </summary>
         public double? MinusDI { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Parabolic SAR (PSAR) indicator.
+        /// </summary>
         public double? PSAR { get; set; }
 
 
@@ -1014,7 +1067,14 @@ namespace BacklashDTOs
 
 
 
+        /// <summary>
+        /// Gets or sets the total bid volume for "Yes" side.
+        /// </summary>
         public double TotalBidVolume_Yes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total bid volume for "No" side.
+        /// </summary>
         public double TotalBidVolume_No { get; set; }
         #endregion
 
@@ -1273,6 +1333,9 @@ namespace BacklashDTOs
         /// </summary>
         public string? GoodBadPriceNo { get; set; }
 
+        /// <summary>
+        /// Gets or sets the market type.
+        /// </summary>
         public string? MarketType { get; set; }
 
 
@@ -1339,6 +1402,10 @@ namespace BacklashDTOs
         #endregion
 
 
+        /// <summary>
+        /// Calculates and returns a liquidity score for the market based on various metrics.
+        /// </summary>
+        /// <returns>The calculated liquidity score.</returns>
         public double CalculateLiquidityScore()
         {
             // Early exit for illiquid markets
@@ -1444,6 +1511,10 @@ namespace BacklashDTOs
             }
         }
 
+        /// <summary>
+        /// Upgrades the snapshot to the specified schema version for backward compatibility.
+        /// </summary>
+        /// <param name="CurrentVersion">The target schema version.</param>
         public void UpgradeSnapshot(int CurrentVersion)
         {
             while (SnapshotSchemaVersion < CurrentVersion)
@@ -1468,6 +1539,10 @@ namespace BacklashDTOs
             }
         }
 
+        /// <summary>
+        /// Gets the "Yes" bid orders as a dictionary of price to quantity.
+        /// </summary>
+        /// <returns>A dictionary where keys are prices and values are quantities.</returns>
         public Dictionary<int, int> GetYesBids()
         {
             var dict = new Dictionary<int, int>();
@@ -1481,6 +1556,10 @@ namespace BacklashDTOs
             return dict;
         }
 
+        /// <summary>
+        /// Gets the "No" bid orders as a dictionary of price to quantity.
+        /// </summary>
+        /// <returns>A dictionary where keys are prices and values are quantities.</returns>
         public Dictionary<int, int> GetNoBids()
         {
             var dict = new Dictionary<int, int>();
@@ -1507,82 +1586,125 @@ namespace BacklashDTOs
         private double _currentAverageTradeSize_Yes;
         private double _currentAverageTradeSize_No;
 
+        /// <summary>
+        /// Gets or sets the current trade rate for "Yes" side per minute.
+        /// </summary>
         public double CurrentTradeRatePerMinute_Yes
         {
             get => _currentTradeRatePerMinute_Yes;
             set => _currentTradeRatePerMinute_Yes = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current trade rate for "No" side per minute.
+        /// </summary>
         public double CurrentTradeRatePerMinute_No
         {
             get => _currentTradeRatePerMinute_No;
             set => _currentTradeRatePerMinute_No = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current trade volume for "No" side per minute.
+        /// </summary>
         public double CurrentTradeVolumePerMinute_No
         {
             get => _currentTradeVolumePerMinute_No;
             set => _currentTradeVolumePerMinute_No = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current trade volume for "Yes" side per minute.
+        /// </summary>
         public double CurrentTradeVolumePerMinute_Yes
         {
             get => _currentTradeVolumePerMinute_Yes;
             set => _currentTradeVolumePerMinute_Yes = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current trade count for "Yes" side.
+        /// </summary>
         public double CurrentTradeCount_Yes
         {
             get => _currentTradeCount_Yes;
             set => _currentTradeCount_Yes = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current trade count for "No" side.
+        /// </summary>
         public double CurrentTradeCount_No
         {
             get => _currentTradeCount_No;
             set => _currentTradeCount_No = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current order volume for "Yes" bid per minute.
+        /// </summary>
         public double CurrentOrderVolumePerMinute_YesBid
         {
             get => _currentOrderVolumePerMinute_YesBid;
             set => _currentOrderVolumePerMinute_YesBid = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current order volume for "No" bid per minute.
+        /// </summary>
         public double CurrentOrderVolumePerMinute_NoBid
         {
             get => _currentOrderVolumePerMinute_NoBid;
             set => _currentOrderVolumePerMinute_NoBid = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current non-trade-related order count for "Yes" side.
+        /// </summary>
         public double CurrentNonTradeRelatedOrderCount_Yes
         {
             get => _currentNonTradeRelatedOrderCount_Yes;
             set => _currentNonTradeRelatedOrderCount_Yes = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current non-trade-related order count for "No" side.
+        /// </summary>
         public double CurrentNonTradeRelatedOrderCount_No
         {
             get => _currentNonTradeRelatedOrderCount_No;
             set => _currentNonTradeRelatedOrderCount_No = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current average trade size for "Yes" side.
+        /// </summary>
         public double CurrentAverageTradeSize_Yes
         {
             get => _currentAverageTradeSize_Yes;
             set => _currentAverageTradeSize_Yes = value;
         }
 
+        /// <summary>
+        /// Gets or sets the current average trade size for "No" side.
+        /// </summary>
         public double CurrentAverageTradeSize_No
         {
             get => _currentAverageTradeSize_No;
             set => _currentAverageTradeSize_No = value;
         }
 
+        /// <summary>
+        /// Gets or sets the list of recent pseudo candlesticks.
+        /// </summary>
         public List<PseudoCandlestick>? RecentCandlesticks { get { return _recentCandlesticks; } set { _recentCandlesticks = value; } }
 
         private List<PseudoCandlestick>? _recentCandlesticks;
 
+        /// <summary>
+        /// Creates a deep copy of the current MarketSnapshot instance.
+        /// </summary>
+        /// <returns>A new MarketSnapshot instance with the same values.</returns>
         public MarketSnapshot Clone()
         {
             return new MarketSnapshot
@@ -1725,8 +1847,19 @@ namespace BacklashDTOs
         }
 
 
+        /// <summary>
+        /// Represents a difference between two MarketSnapshot instances.
+        /// </summary>
+        /// <param name="Path">The path to the differing property.</param>
+        /// <param name="Left">The value from the left snapshot.</param>
+        /// <param name="Right">The value from the right snapshot.</param>
         public sealed record Difference(string Path, object? Left, object? Right);
 
+        /// <summary>
+        /// Compares this MarketSnapshot with another and returns a list of differences.
+        /// </summary>
+        /// <param name="other">The other MarketSnapshot to compare with.</param>
+        /// <returns>A list of differences.</returns>
         public List<Difference> Diff(MarketSnapshot other)
         {
             var diffs = new List<Difference>();
@@ -1814,8 +1947,14 @@ namespace BacklashDTOs
 
     }
 
+    /// <summary>
+    /// JSON converter for MACD tuples.
+    /// </summary>
     public class MACDConverter : JsonConverter<(double? MACD, double? Signal, double? Histogram)>
     {
+        /// <summary>
+        /// Reads the MACD tuple from JSON.
+        /// </summary>
         public override (double? MACD, double? Signal, double? Histogram) Read(
             ref Utf8JsonReader reader,
             Type typeToConvert,
@@ -1846,6 +1985,15 @@ namespace BacklashDTOs
             throw new JsonException();
         }
 
+        /// <summary>
+        /// Writes the MACD tuple to JSON.
+        /// </summary>
+        /// <summary>
+        /// Writes the Bollinger Bands tuple to JSON.
+        /// </summary>
+        /// <summary>
+        /// Writes the Stochastic Oscillator tuple to JSON.
+        /// </summary>
         public override void Write(
             Utf8JsonWriter writer,
             (double? MACD, double? Signal, double? Histogram) value,
@@ -1868,8 +2016,14 @@ namespace BacklashDTOs
         }
     }
 
+    /// <summary>
+    /// JSON converter for Bollinger Bands tuples.
+    /// </summary>
     public class BollingerBandsConverter : JsonConverter<(double? Lower, double? Middle, double? Upper)>
     {
+        /// <summary>
+        /// Reads the Bollinger Bands tuple from JSON.
+        /// </summary>
         public override (double? Lower, double? Middle, double? Upper) Read(
             ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
@@ -1919,8 +2073,14 @@ namespace BacklashDTOs
         }
     }
 
+    /// <summary>
+    /// JSON converter for Stochastic Oscillator tuples.
+    /// </summary>
     public class StochasticOscillatorConverter : JsonConverter<(double? K, double? D)>
     {
+        /// <summary>
+        /// Reads the Stochastic Oscillator tuple from JSON.
+        /// </summary>
         public override (double? K, double? D) Read(
             ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

@@ -1,5 +1,9 @@
 namespace BacklashInterfaces.Enums
 {
+    /// <summary>
+    /// Contains enumeration types used throughout the trading strategy system
+    /// for defining market conditions, actions, and various trading parameters.
+    /// </summary>
     public class StrategyEnums
     {
 
@@ -226,22 +230,89 @@ namespace BacklashInterfaces.Enums
 
         public enum Conditions_MarketCategory
         {
+            /// <summary>
+            /// Markets related to climate and weather conditions.
+            /// </summary>
             ClimateAndWeather,
+
+            /// <summary>
+            /// Markets related to companies and corporate events.
+            /// </summary>
             Companies,
+
+            /// <summary>
+            /// Markets related to COVID-19 and pandemic conditions.
+            /// </summary>
             COVID19,
+
+            /// <summary>
+            /// Markets related to cryptocurrency and blockchain.
+            /// </summary>
             Crypto,
+
+            /// <summary>
+            /// Markets related to economic indicators and conditions.
+            /// </summary>
             Economics,
+
+            /// <summary>
+            /// Markets related to education and academic topics.
+            /// </summary>
             Education,
+
+            /// <summary>
+            /// Markets related to elections and political voting.
+            /// </summary>
             Elections,
+
+            /// <summary>
+            /// Markets related to entertainment and media.
+            /// </summary>
             Entertainment,
+
+            /// <summary>
+            /// Markets related to financial markets and instruments.
+            /// </summary>
             Financials,
+
+            /// <summary>
+            /// Markets related to health and medical topics.
+            /// </summary>
             Health,
+
+            /// <summary>
+            /// Markets related to mentions and social media buzz.
+            /// </summary>
             Mentions,
+
+            /// <summary>
+            /// Markets related to politics and government.
+            /// </summary>
             Politics,
+
+            /// <summary>
+            /// Markets related to science and technology.
+            /// </summary>
             ScienceAndTechnology,
+
+            /// <summary>
+            /// Markets related to social issues and culture.
+            /// </summary>
             Social,
+
+            /// <summary>
+            /// Markets related to sports and athletics.
+            /// </summary>
             Sports,
+
+            /// <summary>
+            /// Markets related to transportation and travel.
+            /// </summary>
             Transportation,
+
+            /// <summary>
+            /// Markets related to world events and global topics.
+            /// </summary>
             World
         }
     }

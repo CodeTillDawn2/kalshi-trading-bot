@@ -42,13 +42,35 @@ namespace TradingSimulator.Simulator
     /// </summary>
     public class PerformanceMetrics
     {
+        /// <summary>
+        /// Gets or sets the total time spent on analysis.
+        /// </summary>
         public TimeSpan TotalAnalysisTime { get; set; }
+        /// <summary>
+        /// Gets or sets the time spent on rolling observations.
+        /// </summary>
         public TimeSpan RollingObservationsTime { get; set; }
+        /// <summary>
+        /// Gets or sets the time spent on computing expected flows.
+        /// </summary>
         public TimeSpan ExpectedFlowsTime { get; set; }
+        /// <summary>
+        /// Gets or sets the time spent on spike suppression.
+        /// </summary>
         public TimeSpan SpikeSuppressionTime { get; set; }
+        /// <summary>
+        /// Gets or sets the number of snapshots processed.
+        /// </summary>
         public int SnapshotsProcessed { get; set; }
+        /// <summary>
+        /// Gets or sets the number of discrepancies detected.
+        /// </summary>
         public int DiscrepanciesDetected { get; set; }
 
+        /// <summary>
+        /// Returns a string representation of the performance metrics.
+        /// </summary>
+        /// <returns>A formatted string containing performance metrics.</returns>
         public override string ToString()
         {
             return $"Analysis Time: {TotalAnalysisTime.TotalMilliseconds:F2}ms, " +
@@ -81,12 +103,20 @@ namespace TradingSimulator.Simulator
         private readonly AnalysisConfiguration _config;
         private readonly PerformanceMetrics _metrics;
 
+        /// <summary>
+        /// Initializes a new instance of the SimulatorReporting class.
+        /// </summary>
+        /// <param name="config">The analysis configuration to use. If null, default configuration is used.</param>
         public SimulatorReporting(AnalysisConfiguration config = null)
         {
             _config = config ?? new AnalysisConfiguration();
             _metrics = new PerformanceMetrics();
         }
 
+        /// <summary>
+        /// Gets the current performance metrics for the analysis.
+        /// </summary>
+        /// <returns>The performance metrics instance.</returns>
         public PerformanceMetrics GetPerformanceMetrics() => _metrics;
 
         /// <summary>

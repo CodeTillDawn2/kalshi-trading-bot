@@ -5,9 +5,20 @@ using System.Collections.Generic;
 
 namespace KalshiBotTests
 {
+    /// <summary>
+    /// NUnit test fixture for validating the SnapshotDiscrepancyValidator functionality.
+    /// This test class provides comprehensive testing for snapshot validation logic including
+    /// orderbook validation, price overlap detection, and rate discrepancy analysis.
+    /// Tests cover various edge cases and validation scenarios to ensure data integrity.
+    /// </summary>
     [TestFixture]
     public class SnapshotDiscrepancyValidatorTests
     {
+        /// <summary>
+        /// Tests that a valid snapshot with all required data passes validation.
+        /// Verifies that the validator correctly identifies a well-formed snapshot
+        /// with proper orderbook, non-overlapping prices, and acceptable rate discrepancies.
+        /// </summary>
         [Test]
         public void ValidateDiscrepancies_ValidSnapshot_ReturnsValidResult()
         {
@@ -38,6 +49,11 @@ namespace KalshiBotTests
             Assert.That(result.IsRateDiscrepancy, Is.False);
         }
 
+        /// <summary>
+        /// Tests that a snapshot with missing orderbook data fails validation.
+        /// Verifies that the validator correctly identifies when orderbook data is null
+        /// and marks the snapshot as invalid with appropriate error flags.
+        /// </summary>
         [Test]
         public void ValidateDiscrepancies_MissingOrderbook_ReturnsInvalidResult()
         {
@@ -68,6 +84,11 @@ namespace KalshiBotTests
             Assert.That(result.IsRateDiscrepancy, Is.False);
         }
 
+        /// <summary>
+        /// Tests that a snapshot with empty orderbook data fails validation.
+        /// Verifies that the validator correctly identifies when orderbook data exists
+        /// but contains no entries, marking the snapshot as invalid.
+        /// </summary>
         [Test]
         public void ValidateDiscrepancies_EmptyOrderbook_ReturnsInvalidResult()
         {
@@ -98,6 +119,11 @@ namespace KalshiBotTests
             Assert.That(result.IsRateDiscrepancy, Is.False);
         }
 
+        /// <summary>
+        /// Tests that a snapshot with overlapping bid/ask prices fails validation.
+        /// Verifies that the validator correctly identifies when bid prices overlap with ask prices,
+        /// which indicates invalid market data that should be rejected.
+        /// </summary>
         [Test]
         public void ValidateDiscrepancies_OverlappingPrices_ReturnsInvalidResult()
         {
@@ -128,6 +154,11 @@ namespace KalshiBotTests
             Assert.That(result.IsRateDiscrepancy, Is.False);
         }
 
+        /// <summary>
+        /// Tests that a snapshot with rate discrepancy exceeding default threshold fails validation.
+        /// Verifies that the validator correctly identifies when order/trade volume rates
+        /// differ significantly from velocity metrics, indicating potential data inconsistency.
+        /// </summary>
         [Test]
         public void ValidateDiscrepancies_RateDiscrepancyExceedsDefaultThreshold_ReturnsInvalidResult()
         {
@@ -158,6 +189,11 @@ namespace KalshiBotTests
             Assert.That(result.IsRateDiscrepancy, Is.True);
         }
 
+        /// <summary>
+        /// Tests that a snapshot with rate discrepancy below custom threshold passes validation.
+        /// Verifies that the validator accepts snapshots when discrepancies are within
+        /// acceptable custom threshold limits, allowing for configurable validation rules.
+        /// </summary>
         [Test]
         public void ValidateDiscrepancies_RateDiscrepancyBelowCustomThreshold_ReturnsValidResult()
         {
@@ -188,6 +224,11 @@ namespace KalshiBotTests
             Assert.That(result.IsRateDiscrepancy, Is.False);
         }
 
+        /// <summary>
+        /// Tests that a snapshot with rate discrepancy exceeding custom threshold fails validation.
+        /// Verifies that the validator correctly rejects snapshots when discrepancies exceed
+        /// user-defined threshold limits, ensuring strict data quality control.
+        /// </summary>
         [Test]
         public void ValidateDiscrepancies_RateDiscrepancyExceedsCustomThreshold_ReturnsInvalidResult()
         {
@@ -218,6 +259,11 @@ namespace KalshiBotTests
             Assert.That(result.IsRateDiscrepancy, Is.True);
         }
 
+        /// <summary>
+        /// Tests that rate discrepancy checks are skipped when change metrics are not mature.
+        /// Verifies that the validator bypasses rate validation for immature data,
+        /// allowing snapshots to pass validation during early market periods.
+        /// </summary>
         [Test]
         public void ValidateDiscrepancies_ChangeMetricsNotMature_SkipsRateCheck()
         {
@@ -248,6 +294,11 @@ namespace KalshiBotTests
             Assert.That(result.IsRateDiscrepancy, Is.False);
         }
 
+        /// <summary>
+        /// Tests that overlap checks are skipped when best prices are zero.
+        /// Verifies that the validator handles edge cases where bid prices are zero,
+        /// preventing false overlap detection in illiquid or invalid market conditions.
+        /// </summary>
         [Test]
         public void ValidateDiscrepancies_ZeroBestPrices_SkipsOverlapCheck()
         {

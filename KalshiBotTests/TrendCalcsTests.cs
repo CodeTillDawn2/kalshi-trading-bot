@@ -17,6 +17,11 @@ namespace KalshiBotTests
         private Mock<ILogger> _loggerMock;
         private TrendCalculationConfig _config;
 
+        /// <summary>
+        /// Sets up the test environment before each test method.
+        /// Initializes mock logger, creates default configuration, and configures
+        /// the TrendCalcs class with test settings for isolated testing.
+        /// </summary>
         [SetUp]
         public void Setup()
         {
@@ -26,6 +31,11 @@ namespace KalshiBotTests
             TrendCalcs.SetLogger(_loggerMock.Object);
         }
 
+        /// <summary>
+        /// Tests the CalculateBullishCandleRatio method with valid input parameters.
+        /// Verifies that the method correctly calculates the ratio of bullish candles
+        /// within the specified lookback period and applies smoothing offset.
+        /// </summary>
         [Test]
         public void TestCalculateBullishCandleRatio_ValidInput()
         {
@@ -51,6 +61,11 @@ namespace KalshiBotTests
             Assert.That(result, Is.EqualTo(expected).Within(0.001));
         }
 
+        /// <summary>
+        /// Tests the CalculateBullishCandleRatio method with null prices array.
+        /// Verifies that the method handles null input gracefully by returning 0.0
+        /// and logging a warning message.
+        /// </summary>
         [Test]
         public void TestCalculateBullishCandleRatio_NullPrices()
         {
@@ -67,6 +82,11 @@ namespace KalshiBotTests
             _loggerMock.Verify(l => l.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
         }
 
+        /// <summary>
+        /// Tests the CalculateBullishCandleRatio method with an invalid index parameter.
+        /// Verifies that the method handles out-of-bounds indices gracefully by returning 0.0
+        /// and logging a warning message.
+        /// </summary>
         [Test]
         public void TestCalculateBullishCandleRatio_InvalidIndex()
         {
@@ -83,6 +103,11 @@ namespace KalshiBotTests
             _loggerMock.Verify(l => l.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
         }
 
+        /// <summary>
+        /// Tests the CalculateBullishCandleRatio method with a lookback parameter exceeding maximum allowed value.
+        /// Verifies that the method handles out-of-range lookback values gracefully by clamping
+        /// the value and returning 0.0 when insufficient data is available.
+        /// </summary>
         [Test]
         public void TestCalculateBullishCandleRatio_LookbackOutOfRange()
         {
@@ -99,6 +124,11 @@ namespace KalshiBotTests
             _loggerMock.Verify(l => l.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
         }
 
+        /// <summary>
+        /// Tests the asynchronous version of CalculateBullishCandleRatio method.
+        /// Verifies that the async method produces the same results as the synchronous version
+        /// and correctly calculates bullish candle ratios with proper smoothing.
+        /// </summary>
         [Test]
         public async Task TestCalculateBullishCandleRatioAsync()
         {
@@ -121,6 +151,11 @@ namespace KalshiBotTests
             Assert.That(result, Is.EqualTo(expected).Within(0.001));
         }
 
+        /// <summary>
+        /// Tests the CalculateTrendConsistencyRatio method with valid input parameters.
+        /// Verifies that the method correctly calculates the ratio of consistent price movements
+        /// within the specified lookback period, accounting for smoothing offset.
+        /// </summary>
         [Test]
         public void TestCalculateTrendConsistencyRatio_ValidInput()
         {
@@ -148,6 +183,11 @@ namespace KalshiBotTests
             Assert.That(result, Is.EqualTo(expected).Within(0.001));
         }
 
+        /// <summary>
+        /// Tests the CalculateTrendDirectionRatio method for bullish trend detection.
+        /// Verifies that the method correctly calculates the ratio of bullish price movements
+        /// within the specified lookback period when isBullish parameter is set to true.
+        /// </summary>
         [Test]
         public void TestCalculateTrendDirectionRatio_Bullish()
         {

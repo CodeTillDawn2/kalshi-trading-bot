@@ -13,15 +13,54 @@ namespace BacklashInterfaces.Constants
         /// </summary>
         public enum MarketStatus
         {
+            /// <summary>
+            /// Market has been finalized and trading is complete.
+            /// </summary>
             Finalized,
+
+            /// <summary>
+            /// Market is actively trading and accepting orders.
+            /// </summary>
             Active,
+
+            /// <summary>
+            /// Market has been marked as invalid or problematic.
+            /// </summary>
             Bad,
+
+            /// <summary>
+            /// Market is open for trading but not yet active.
+            /// </summary>
             Open,
+
+            /// <summary>
+            /// Market has been closed and no longer accepts orders.
+            /// </summary>
             Closed,
+
+            /// <summary>
+            /// Market outcome has been determined.
+            /// </summary>
             Determined,
+
+            /// <summary>
+            /// Market is inactive and not available for trading.
+            /// </summary>
             Inactive,
+
+            /// <summary>
+            /// Market has been initialized but not yet opened.
+            /// </summary>
             Initialized,
+
+            /// <summary>
+            /// Market has been settled and payouts distributed.
+            /// </summary>
             Settled,
+
+            /// <summary>
+            /// Market has not yet opened for trading.
+            /// </summary>
             Unopened
         }
 
@@ -30,8 +69,19 @@ namespace BacklashInterfaces.Constants
         /// </summary>
         public enum TimeInterval
         {
+            /// <summary>
+            /// One-minute time interval for candlestick data.
+            /// </summary>
             Minute,
+
+            /// <summary>
+            /// One-hour time interval for candlestick data.
+            /// </summary>
             Hour,
+
+            /// <summary>
+            /// One-day time interval for candlestick data.
+            /// </summary>
             Day
         }
 
@@ -40,11 +90,34 @@ namespace BacklashInterfaces.Constants
         /// </summary>
         public enum FeedType
         {
+            /// <summary>
+            /// Feed type for ticker updates containing price and volume information.
+            /// </summary>
             Ticker,
+
+            /// <summary>
+            /// Feed type for orderbook updates containing bid/ask price changes.
+            /// </summary>
             Orderbook,
+
+            /// <summary>
+            /// Feed type for fill updates containing executed trade information.
+            /// </summary>
             Fill,
+
+            /// <summary>
+            /// Feed type for lifecycle updates containing market status changes.
+            /// </summary>
             Lifecycle,
+
+            /// <summary>
+            /// Feed type for trade updates containing individual trade executions.
+            /// </summary>
             Trade,
+
+            /// <summary>
+            /// Feed type for event lifecycle updates containing event-level status changes.
+            /// </summary>
             Event_Lifecycle
         }
 
@@ -53,10 +126,29 @@ namespace BacklashInterfaces.Constants
         /// </summary>
         public enum ScriptType
         {
+            /// <summary>
+            /// Script type identifier for market-related API endpoints.
+            /// </summary>
             Market,
+
+            /// <summary>
+            /// Script type identifier for event-related API endpoints.
+            /// </summary>
             Event,
+
+            /// <summary>
+            /// Script type identifier for series-related API endpoints.
+            /// </summary>
             Series,
+
+            /// <summary>
+            /// Script type identifier for candlestick data API endpoints.
+            /// </summary>
             Candlestick,
+
+            /// <summary>
+            /// Script type identifier for chart candlestick data API endpoints.
+            /// </summary>
             ChartCandlesticks
         }
         #endregion

@@ -38,11 +38,29 @@ using TradingSimulator.Simulator;
 
 namespace TradingSimulator
 {
+    /// <summary>
+    /// Delegate for trading strategy functions that process market data snapshots.
+    /// </summary>
+    /// <typeparam name="T">The type of market data being processed.</typeparam>
+    /// <param name="currentData">The current market snapshot data.</param>
+    /// <param name="previousData">The previous market snapshot data for comparison.</param>
+    /// <param name="config">The snapshot configuration settings.</param>
+    /// <param name="context">The trading context containing shared variables and decisions.</param>
     public delegate void TradingStrategyFunc<T>(T currentData, T previousData, SnapshotConfig config, TradingContext context);
 
+    /// <summary>
+    /// Context object containing shared variables and trading decisions for strategy execution.
+    /// </summary>
     public class TradingContext
     {
+        /// <summary>
+        /// Gets or sets the dictionary of shared variables accessible across trading strategies.
+        /// </summary>
         public Dictionary<string, double> SharedVariables { get; set; } = new Dictionary<string, double>();
+
+        /// <summary>
+        /// Gets or sets the current trading decision made by the strategy.
+        /// </summary>
         public TradingDecision Decision { get; set; } = new TradingDecision();
     }
 
@@ -75,8 +93,19 @@ namespace TradingSimulator
         private HashSet<string> _processedMarkets;
         private string _cacheDirectory;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;
+        /// <summary>
+        /// Event raised to report test progress information.
+        /// </summary>
         public event Action<string> OnTestProgress;
+
+        /// <summary>
+        /// Event raised when profit/loss is updated for a market.
+        /// </summary>
         public event Action<string, double> OnProfitLossUpdate;
+
+        /// <summary>
+        /// Event raised when a market has been processed.
+        /// </summary>
         public event Action<string> OnMarketProcessed;
         private SimulatorReporting _simulatorReporting;
 
@@ -454,15 +483,49 @@ namespace TradingSimulator
             return validBases;
         }
 
+        /// <summary>
+        /// Enumeration of available trading strategy families for simulation.
+        /// </summary>
         public enum StrategyFamily
         {
+            /// <summary>
+            /// Bollinger Bands based trading strategies.
+            /// </summary>
             Bollinger,
+
+            /// <summary>
+            /// Flow momentum based trading strategies.
+            /// </summary>
             FlowMo,
+
+            /// <summary>
+            /// Try again pattern based trading strategies.
+            /// </summary>
             TryAgain,
+
+            /// <summary>
+            /// Slow momentum based trading strategies.
+            /// </summary>
             SloMo,
+
+            /// <summary>
+            /// Breakout pattern based trading strategies.
+            /// </summary>
             Breakout,
+
+            /// <summary>
+            /// Nothing happens pattern based trading strategies.
+            /// </summary>
             NothingHappens,
+
+            /// <summary>
+            /// Machine learning shared entry seeker strategies.
+            /// </summary>
             MLShared,
+
+            /// <summary>
+            /// Momentum based trading strategies.
+            /// </summary>
             Momentum
         }
 

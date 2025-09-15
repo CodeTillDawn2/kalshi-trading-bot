@@ -108,12 +108,40 @@ namespace KalshiBotTests
         /// Test category constants for organizing tests by API operation type.
         /// </summary>
         public const string MarketDataCategory = "MarketData";
+
+        /// <summary>
+        /// Test category for order-related operations and trading functionality.
+        /// </summary>
         public const string OrderOperationsCategory = "OrderOperations";
+
+        /// <summary>
+        /// Test category for account balance and account-related data operations.
+        /// </summary>
         public const string AccountDataCategory = "AccountData";
+
+        /// <summary>
+        /// Test category for metadata operations like series and event information.
+        /// </summary>
         public const string MetadataCategory = "Metadata";
+
+        /// <summary>
+        /// Test category for performance and timing validation tests.
+        /// </summary>
         public const string PerformanceCategory = "Performance";
+
+        /// <summary>
+        /// Test category for error handling and exception scenarios.
+        /// </summary>
         public const string ErrorHandlingCategory = "ErrorHandling";
+
+        /// <summary>
+        /// Test category for input parameter validation tests.
+        /// </summary>
         public const string InputValidationCategory = "InputValidation";
+
+        /// <summary>
+        /// Test category for configuration validation and setup tests.
+        /// </summary>
         public const string ConfigurationCategory = "Configuration";
 
         /// <summary>
