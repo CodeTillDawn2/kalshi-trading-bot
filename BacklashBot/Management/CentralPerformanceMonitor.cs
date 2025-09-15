@@ -41,7 +41,7 @@ namespace BacklashBot.Management
     /// - Market refresh cycle performance
     /// - System startup and shutdown states
     /// </remarks>
-    public class CentralPerformanceMonitor : ICentralPerformanceMonitor, IKalshiBotContextPerformanceMetrics, ISubscriptionManagerPerformanceMetrics
+    public class CentralPerformanceMonitor : ICentralPerformanceMonitor, IKalshiBotContextPerformanceMetrics, ISubscriptionManagerPerformanceMetrics, IMessageProcessorPerformanceMetrics
     {
         private readonly ILogger<ICentralPerformanceMonitor> _logger;
         private readonly IServiceFactory _serviceFactory;
@@ -73,6 +73,17 @@ namespace BacklashBot.Management
         // SubscriptionManager performance metrics
         private IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)>? _subscriptionManagerOperationMetrics;
         private IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)>? _subscriptionManagerLockMetrics;
+
+        // MessageProcessor performance metrics
+        private long _messageProcessorTotalMessagesProcessed;
+        private long _messageProcessorTotalProcessingTimeMs;
+        private double _messageProcessorAverageProcessingTimeMs;
+        private double _messageProcessorMessagesPerSecond;
+        private int _messageProcessorOrderBookQueueDepth;
+        private int _messageProcessorDuplicateMessageCount;
+        private int _messageProcessorDuplicatesInWindow;
+        private DateTime _messageProcessorLastDuplicateWarningTime;
+        private IReadOnlyDictionary<string, long>? _messageProcessorMessageTypeCounts;
 
         public bool IsStartingUp { get; set; } = false;
         public bool IsShuttingDown { get; set; } = false;
@@ -635,6 +646,101 @@ namespace BacklashBot.Management
             _subscriptionManagerOperationMetrics = null;
             _subscriptionManagerLockMetrics = null;
             _logger.LogInformation("SubscriptionManager performance metrics reset");
+        }
+
+        #endregion
+
+        #region IMessageProcessorPerformanceMetrics Implementation
+
+        /// <summary>
+        /// Posts message processing performance metrics from MessageProcessor.
+        /// </summary>
+        /// <param name="totalMessagesProcessed">Total number of messages processed since last reset.</param>
+        /// <param name="totalProcessingTimeMs">Total processing time in milliseconds since last reset.</param>
+        /// <param name="averageProcessingTimeMs">Average processing time per message in milliseconds.</param>
+        /// <param name="messagesPerSecond">Current messages per second rate.</param>
+        /// <param name="orderBookQueueDepth">Current depth of the order book update queue.</param>
+        public void PostMessageProcessingMetrics(long totalMessagesProcessed, long totalProcessingTimeMs,
+            double averageProcessingTimeMs, double messagesPerSecond, int orderBookQueueDepth)
+        {
+            _messageProcessorTotalMessagesProcessed = totalMessagesProcessed;
+            _messageProcessorTotalProcessingTimeMs = totalProcessingTimeMs;
+            _messageProcessorAverageProcessingTimeMs = averageProcessingTimeMs;
+            _messageProcessorMessagesPerSecond = messagesPerSecond;
+            _messageProcessorOrderBookQueueDepth = orderBookQueueDepth;
+            _logger.LogDebug("MessageProcessor metrics posted: {TotalMessages} messages, {AvgTime:F2}ms avg, {MsgsPerSec:F2} msg/sec, QueueDepth={QueueDepth}",
+                totalMessagesProcessed, averageProcessingTimeMs, messagesPerSecond, orderBookQueueDepth);
+        }
+
+        /// <summary>
+        /// Posts duplicate message detection metrics from MessageProcessor.
+        /// </summary>
+        /// <param name="duplicateMessageCount">Total number of duplicate messages detected.</param>
+        /// <param name="duplicatesInWindow">Number of duplicates detected in the current time window.</param>
+        /// <param name="lastDuplicateWarningTime">Timestamp of the last duplicate message warning.</param>
+        public void PostDuplicateMessageMetrics(int duplicateMessageCount, int duplicatesInWindow, DateTime lastDuplicateWarningTime)
+        {
+            _messageProcessorDuplicateMessageCount = duplicateMessageCount;
+            _messageProcessorDuplicatesInWindow = duplicatesInWindow;
+            _messageProcessorLastDuplicateWarningTime = lastDuplicateWarningTime;
+            _logger.LogDebug("MessageProcessor duplicate metrics posted: {DuplicateCount} total, {DuplicatesInWindow} in window",
+                duplicateMessageCount, duplicatesInWindow);
+        }
+
+        /// <summary>
+        /// Posts message type distribution metrics from MessageProcessor.
+        /// </summary>
+        /// <param name="messageTypeCounts">Dictionary containing counts for each message type processed.</param>
+        public void PostMessageTypeMetrics(IReadOnlyDictionary<string, long> messageTypeCounts)
+        {
+            _messageProcessorMessageTypeCounts = messageTypeCounts;
+            _logger.LogDebug("MessageProcessor message type metrics posted: {Count} types", messageTypeCounts?.Count ?? 0);
+        }
+
+        /// <summary>
+        /// Gets the current message processing performance metrics.
+        /// </summary>
+        /// <returns>Tuple containing current performance metrics.</returns>
+        public (long TotalMessagesProcessed, long TotalProcessingTimeMs, double AverageProcessingTimeMs,
+            double MessagesPerSecond, int OrderBookQueueDepth) GetMessageProcessingMetrics()
+        {
+            return (_messageProcessorTotalMessagesProcessed, _messageProcessorTotalProcessingTimeMs,
+                _messageProcessorAverageProcessingTimeMs, _messageProcessorMessagesPerSecond, _messageProcessorOrderBookQueueDepth);
+        }
+
+        /// <summary>
+        /// Gets the current duplicate message metrics.
+        /// </summary>
+        /// <returns>Tuple containing duplicate message statistics.</returns>
+        public (int DuplicateMessageCount, int DuplicatesInWindow, DateTime LastDuplicateWarningTime) GetDuplicateMessageMetrics()
+        {
+            return (_messageProcessorDuplicateMessageCount, _messageProcessorDuplicatesInWindow, _messageProcessorLastDuplicateWarningTime);
+        }
+
+        /// <summary>
+        /// Gets the current message type distribution metrics.
+        /// </summary>
+        /// <returns>Dictionary containing message type counts.</returns>
+        public IReadOnlyDictionary<string, long> GetMessageTypeMetrics()
+        {
+            return _messageProcessorMessageTypeCounts ?? new Dictionary<string, long>();
+        }
+
+        /// <summary>
+        /// Resets all MessageProcessor performance metrics.
+        /// </summary>
+        public void ResetMessageProcessorMetrics()
+        {
+            _messageProcessorTotalMessagesProcessed = 0;
+            _messageProcessorTotalProcessingTimeMs = 0;
+            _messageProcessorAverageProcessingTimeMs = 0;
+            _messageProcessorMessagesPerSecond = 0;
+            _messageProcessorOrderBookQueueDepth = 0;
+            _messageProcessorDuplicateMessageCount = 0;
+            _messageProcessorDuplicatesInWindow = 0;
+            _messageProcessorLastDuplicateWarningTime = DateTime.MinValue;
+            _messageProcessorMessageTypeCounts = null;
+            _logger.LogInformation("MessageProcessor performance metrics reset");
         }
 
         #endregion

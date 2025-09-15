@@ -24,6 +24,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using BacklashInterfaces.PerformanceMetrics;
 
 namespace KalshiBotOverseer
 {
@@ -86,7 +87,8 @@ namespace KalshiBotOverseer
                 sp.GetRequiredService<IStatusTrackerService>(),
                 sp.GetRequiredService<ISqlDataService>(),
                 sp.GetRequiredService<IKalshiAPIService>(),
-                sp.GetRequiredService<IOptions<KalshiConfig>>().Value
+                sp.GetRequiredService<IOptions<KalshiConfig>>().Value,
+                sp.GetRequiredService<IMessageProcessorPerformanceMetrics>()
             ));
             services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
                 sp.GetRequiredService<ILogger<SubscriptionManager>>(),
@@ -171,6 +173,7 @@ namespace KalshiBotOverseer
 
             // Register PerformanceMetricsService
             services.AddSingleton<PerformanceMetricsService>();
+            services.AddSingleton<IMessageProcessorPerformanceMetrics>(sp => sp.GetRequiredService<PerformanceMetricsService>());
 
             // Register BrainPersistenceService
             services.AddSingleton<BrainPersistenceService>();

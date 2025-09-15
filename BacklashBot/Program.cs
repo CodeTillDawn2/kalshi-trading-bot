@@ -25,6 +25,7 @@ using TradingStrategies.Helpers.Interfaces;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using KalshiBotLogging;
+using BacklashInterfaces.PerformanceMetrics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +78,7 @@ builder.Services.AddSingleton<ICentralBrain, CentralBrain>();
 builder.Services.AddSingleton<ICentralErrorHandler, CentralErrorHandler>();
 builder.Services.AddSingleton<IScopeManagerService, KaslhiBotScopeManagerService>();
 builder.Services.AddSingleton<ICentralPerformanceMonitor, CentralPerformanceMonitor>();
+builder.Services.AddSingleton<IMessageProcessorPerformanceMetrics>(sp => (IMessageProcessorPerformanceMetrics)sp.GetRequiredService<ICentralPerformanceMonitor>());
 builder.Services.AddSingleton<IMarketManagerService, MarketManagerService>();
 builder.Services.AddSingleton<IStatusTrackerService, KalshiBotStatusTracker>();
 builder.Services.AddSingleton<IBotReadyStatus, KalshiBotReadyStatus>();
@@ -185,7 +187,8 @@ builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<ISqlDataService>(),
     sp.GetRequiredService<IKalshiAPIService>(),
-    sp.GetRequiredService<IOptions<KalshiConfig>>().Value
+    sp.GetRequiredService<IOptions<KalshiConfig>>().Value,
+    sp.GetRequiredService<IMessageProcessorPerformanceMetrics>()
 ));
 builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
     sp.GetRequiredService<ILogger<SubscriptionManager>>(),
