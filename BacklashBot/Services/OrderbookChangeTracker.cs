@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
+using BacklashBot.Management.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Exceptions;
 using System.Collections.Concurrent;
@@ -37,6 +38,9 @@ namespace BacklashBot.Services
         private readonly IScopeManagerService _scopeManagerService;
 
         private IStatusTrackerService _statusTrackerService;
+        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
+
+        private readonly bool _enablePerformanceMetrics;
 
         private readonly ConcurrentQueue<OrderbookChange> _orderbookChanges = new ConcurrentQueue<OrderbookChange>();
         private readonly ConcurrentQueue<TradeEvent> _tradeEvents = new ConcurrentQueue<TradeEvent>();
@@ -126,6 +130,17 @@ namespace BacklashBot.Services
         private int _maxQueueDepth = 0;
         private DateTime _lastMetricsReset = DateTime.UtcNow;
 
+        // Event processing latency metrics
+        private long _totalEventProcessingTimeMs = 0;
+        private int _eventProcessingCount = 0;
+
+        // Timer accuracy metrics
+        private DateTime _lastRecalculationTimerElapsed = DateTime.MinValue;
+        private DateTime _lastLogTimerElapsed = DateTime.MinValue;
+        private long _totalTimerDriftMs = 0;
+        private int _timerCallbackCount = 0;
+        private long _totalTimerExecutionTimeMs = 0;
+
         /// <summary>
         /// Initializes a new instance of the OrderbookChangeTracker for the specified market.
         /// Sets up timers for periodic metric recalculation and log output, initializes event queues,
@@ -137,6 +152,7 @@ namespace BacklashBot.Services
         /// <param name="config">Trading configuration containing time windows and thresholds</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens</param>
+        /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics</param>
         /// <exception cref="ArgumentNullException">Thrown when marketTicker, logger, config, or statusTrackerService is null</exception>
         public OrderbookChangeTracker(
             string marketTicker,
@@ -144,7 +160,8 @@ namespace BacklashBot.Services
             IDataCache cache,
             IOptions<TradingConfig> config,
             IScopeManagerService scopeManagerService,
-            IStatusTrackerService statusTrackerService)
+            IStatusTrackerService statusTrackerService,
+            ICentralPerformanceMonitor centralPerformanceMonitor)
         {
             _marketTicker = marketTicker ?? throw new ArgumentNullException(nameof(marketTicker));
             _scopeManagerService = scopeManagerService;
@@ -152,6 +169,9 @@ namespace BacklashBot.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _statusTrackerService = statusTrackerService;
+            _centralPerformanceMonitor = centralPerformanceMonitor ?? throw new ArgumentNullException(nameof(centralPerformanceMonitor));
+
+            _enablePerformanceMetrics = _config.Value.OrderbookChangeTracker_EnablePerformanceMetrics;
 
             _recalculationTimer = new System.Timers.Timer(10000); // 10 seconds
             _recalculationTimer.Elapsed += (sender, e) => OnRecalculationTimerElapsed(sender, e);
@@ -202,9 +222,30 @@ namespace BacklashBot.Services
         }
         private void OnLogOutputTimerElapsed(object sender, ElapsedEventArgs e)
         {
+            var timerExecutionStopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
+            if (_enablePerformanceMetrics)
+            {
+                if (_lastLogTimerElapsed != DateTime.MinValue)
+                {
+                    var expectedInterval = TimeSpan.FromMinutes(5);
+                    var actualInterval = DateTime.UtcNow - _lastLogTimerElapsed;
+                    var drift = actualInterval - expectedInterval;
+                    _totalTimerDriftMs += (long)drift.TotalMilliseconds;
+                }
+
+                _lastLogTimerElapsed = DateTime.UtcNow;
+                _timerCallbackCount++;
+            }
+
             if (_cancellationToken.IsCancellationRequested)
             {
                 _logger.LogDebug("Log output cancelled for {MarketTicker}", _marketTicker);
+                if (timerExecutionStopwatch != null)
+                {
+                    timerExecutionStopwatch.Stop();
+                    _totalTimerExecutionTimeMs += timerExecutionStopwatch.ElapsedMilliseconds;
+                }
                 return;
             }
 
@@ -215,6 +256,12 @@ namespace BacklashBot.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to process log output for {MarketTicker}", _marketTicker);
+            }
+
+            if (timerExecutionStopwatch != null)
+            {
+                timerExecutionStopwatch.Stop();
+                _totalTimerExecutionTimeMs += timerExecutionStopwatch.ElapsedMilliseconds;
             }
         }
         #endregion
@@ -297,6 +344,14 @@ namespace BacklashBot.Services
                 ["CurrentTradeQueueDepth"] = _tradeEvents.Count,
                 ["UptimeSeconds"] = uptime.TotalSeconds,
                 ["OperationsPerSecond"] = uptime.TotalSeconds > 0 ? Math.Round(_totalMatchingOperations / uptime.TotalSeconds, 2) : 0.0,
+                ["TotalEventProcessingTimeMs"] = _totalEventProcessingTimeMs,
+                ["EventProcessingCount"] = _eventProcessingCount,
+                ["AverageEventProcessingTimeMs"] = _eventProcessingCount > 0 ? Math.Round((double)_totalEventProcessingTimeMs / _eventProcessingCount, 2) : 0.0,
+                ["TotalTimerDriftMs"] = _totalTimerDriftMs,
+                ["TimerCallbackCount"] = _timerCallbackCount,
+                ["AverageTimerDriftMs"] = _timerCallbackCount > 1 ? Math.Round((double)_totalTimerDriftMs / (_timerCallbackCount - 1), 2) : 0.0,
+                ["TotalTimerExecutionTimeMs"] = _totalTimerExecutionTimeMs,
+                ["AverageTimerExecutionTimeMs"] = _timerCallbackCount > 0 ? Math.Round((double)_totalTimerExecutionTimeMs / _timerCallbackCount, 2) : 0.0,
                 ["LastMetricsReset"] = _lastMetricsReset
             };
         }
@@ -311,6 +366,13 @@ namespace BacklashBot.Services
             _totalProcessingTimeMs = 0;
             _totalQueueProcessingTimeMs = 0;
             _maxQueueDepth = 0;
+            _totalEventProcessingTimeMs = 0;
+            _eventProcessingCount = 0;
+            _totalTimerDriftMs = 0;
+            _timerCallbackCount = 0;
+            _totalTimerExecutionTimeMs = 0;
+            _lastRecalculationTimerElapsed = DateTime.MinValue;
+            _lastLogTimerElapsed = DateTime.MinValue;
             _lastMetricsReset = DateTime.UtcNow;
             _logger.LogInformation("Performance metrics reset for {MarketTicker}", _marketTicker);
         }
@@ -332,6 +394,7 @@ namespace BacklashBot.Services
         /// </remarks>
         public void ProcessOrderbookSnapshot(List<OrderbookData> originalOrderbook, List<OrderbookData> newOrderbook)
         {
+            var eventProcessingStopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
             var queueProcessingStopwatch = Stopwatch.StartNew();
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -396,6 +459,13 @@ namespace BacklashBot.Services
 
             _logger.LogDebug("Completed orderbook snapshot processing for {MarketTicker} in {ProcessingTime}ms, QueueDepth={QueueDepth}",
                 _marketTicker, queueProcessingStopwatch.ElapsedMilliseconds, currentQueueDepth);
+
+            if (eventProcessingStopwatch != null)
+            {
+                eventProcessingStopwatch.Stop();
+                _totalEventProcessingTimeMs += eventProcessingStopwatch.ElapsedMilliseconds;
+                _eventProcessingCount++;
+            }
         }
 
         /// <summary>
@@ -445,6 +515,8 @@ namespace BacklashBot.Services
                 return;
             }
 
+            var eventProcessingStopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             if (deltaContracts != 0)
             {
                 var change = new OrderbookChange
@@ -476,6 +548,13 @@ namespace BacklashBot.Services
                 _logger.LogDebug("Logged change for {MarketTicker}: ChangeID={ChangeID}, Side={Side}, Price={Price}, Delta={Delta}, Sequence={Sequence}, IsTradeRelated={IsTradeRelated}, IsCanceled={IsCanceled}",
                     _marketTicker, change.Id, side, price, deltaContracts, change.Sequence, change.IsTradeRelated, change.IsCanceled);
                 MetricsNeedRecalculation = true;
+
+                if (eventProcessingStopwatch != null)
+                {
+                    eventProcessingStopwatch.Stop();
+                    _totalEventProcessingTimeMs += eventProcessingStopwatch.ElapsedMilliseconds;
+                    _eventProcessingCount++;
+                }
             }
         }
 
@@ -540,6 +619,8 @@ namespace BacklashBot.Services
                 return;
             }
 
+            var eventProcessingStopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             var trade = new TradeEvent
             {
                 TakerSide = takerSide,
@@ -580,6 +661,13 @@ namespace BacklashBot.Services
                 _marketTicker, takerSide, yesPrice, noPrice, count, timestamp, trade.HasMatchingOrderbookChange, trade.Id);
 
             MetricsNeedRecalculation = true;
+
+            if (eventProcessingStopwatch != null)
+            {
+                eventProcessingStopwatch.Stop();
+                _totalEventProcessingTimeMs += eventProcessingStopwatch.ElapsedMilliseconds;
+                _eventProcessingCount++;
+            }
         }
 
         private bool FindMatchingOrderbookChange(TradeEvent trade)
@@ -773,7 +861,50 @@ namespace BacklashBot.Services
         #region Metric Recalculation
         private void OnRecalculationTimerElapsed(object sender, ElapsedEventArgs e)
         {
+            var timerExecutionStopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
+            if (_enablePerformanceMetrics)
+            {
+                if (_lastRecalculationTimerElapsed != DateTime.MinValue)
+                {
+                    var expectedInterval = TimeSpan.FromSeconds(10);
+                    var actualInterval = DateTime.UtcNow - _lastRecalculationTimerElapsed;
+                    var drift = actualInterval - expectedInterval;
+                    _totalTimerDriftMs += (long)drift.TotalMilliseconds;
+                }
+
+                _lastRecalculationTimerElapsed = DateTime.UtcNow;
+                _timerCallbackCount++;
+            }
+
             RecalculateAllMetrics();
+
+            if (timerExecutionStopwatch != null)
+            {
+                timerExecutionStopwatch.Stop();
+                _totalTimerExecutionTimeMs += timerExecutionStopwatch.ElapsedMilliseconds;
+            }
+
+            // Post metrics to central performance monitor
+            if (_enablePerformanceMetrics)
+            {
+                if (_eventProcessingCount > 0)
+                {
+                    long avgEventProcessingTime = _totalEventProcessingTimeMs / _eventProcessingCount;
+                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageEventProcessingTimeMs", avgEventProcessingTime);
+                }
+
+                if (_timerCallbackCount > 1)
+                {
+                    long avgDrift = _totalTimerDriftMs / (_timerCallbackCount - 1);
+                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageTimerDriftMs", avgDrift);
+                }
+                if (_timerCallbackCount > 0)
+                {
+                    long avgExecutionTime = _totalTimerExecutionTimeMs / _timerCallbackCount;
+                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageTimerExecutionTimeMs", avgExecutionTime);
+                }
+            }
         }
 
         /// <summary>
