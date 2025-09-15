@@ -53,6 +53,7 @@ namespace BacklashBot.Management
         public string? BrainInstance { get; private set; }
         public TimeSpan RefreshInterval { get; private set; }
         public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? DatabaseMetrics => _databaseMetrics;
+        public IReadOnlyDictionary<string, object>? OverseerClientServiceMetrics => _overseerClientServiceMetrics;
 
         private bool _timerRunning = false;
         private readonly ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>> _queueCountSamples;
@@ -67,6 +68,7 @@ namespace BacklashBot.Management
         private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
         private IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? _databaseMetrics;
+        private IReadOnlyDictionary<string, object>? _overseerClientServiceMetrics;
 
         public bool IsStartingUp { get; set; } = false;
         public bool IsShuttingDown { get; set; } = false;
@@ -428,12 +430,27 @@ namespace BacklashBot.Management
         }
 
         /// <summary>
+        /// Records OverseerClientService performance metrics.
+        /// </summary>
+        /// <param name="metrics">Dictionary containing OverseerClientService performance metrics.</param>
+        /// <remarks>
+        /// This method is called by OverseerClientService to post its performance metrics
+        /// to the central performance monitor for tracking and analysis.
+        /// </remarks>
+        public void RecordOverseerClientServiceMetrics(Dictionary<string, object> metrics)
+        {
+            _overseerClientServiceMetrics = metrics;
+            _logger.LogDebug("OverseerClientService metrics recorded: {Count} metrics", metrics?.Count ?? 0);
+        }
+
+        /// <summary>
         /// Resets all performance metrics.
         /// </summary>
         public void ResetPerformanceMetrics()
         {
             _databaseMetrics = null;
-            _logger.LogInformation("Database performance metrics reset");
+            _overseerClientServiceMetrics = null;
+            _logger.LogInformation("All performance metrics reset");
         }
 
         /// <summary>

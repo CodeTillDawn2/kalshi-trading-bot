@@ -28,5 +28,16 @@ namespace BacklashBot.Management.Interfaces
         /// </summary>
         /// <param name="isRecording">True if WebSocket metrics are being recorded, false otherwise.</param>
         void UpdateWebSocketMetricsRecordingStatus(bool isRecording);
+
+        /// <summary>
+        /// Records OverseerClientService performance metrics.
+        /// </summary>
+        /// <param name="metrics">Dictionary containing OverseerClientService performance metrics.</param>
+        void RecordOverseerClientServiceMetrics(Dictionary<string, object> metrics);
+
+        /// <summary>
+        /// Gets the OverseerClientService performance metrics.
+        /// </summary>
+        IReadOnlyDictionary<string, object>? OverseerClientServiceMetrics { get; }
     }
 }

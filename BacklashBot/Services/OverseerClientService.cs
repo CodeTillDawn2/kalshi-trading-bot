@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashDTOs.Configuration;
 using BacklashDTOs;
 using BacklashInterfaces.SmokehouseBot.Services;
+using BacklashBot.Management;
 
 namespace BacklashBot.Services
 {
@@ -50,6 +52,7 @@ namespace BacklashBot.Services
 
         private readonly ILogger<OverseerClientService> _logger;
         private readonly IServiceFactory _serviceFactory;
+        private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
         private HubConnection? _hubConnection;
         private Timer? _checkInTimer;
         private Timer? _overseerDiscoveryTimer;
@@ -73,11 +76,32 @@ namespace BacklashBot.Services
         private int _circuitBreakerFailureCount = 0; // Current failure count for circuit breaker
         private DateTime _circuitBreakerLastFailure = DateTime.MinValue; // Last failure time
         private readonly object _circuitBreakerLock = new object(); // Lock for circuit breaker state
+        private readonly bool _enablePerformanceMetrics; // Whether to collect performance metrics
+
         // Performance metrics
         private int _connectionAttemptCount = 0; // Total connection attempts
         private int _connectionSuccessCount = 0; // Successful connections
         private TimeSpan _totalDiscoveryTime = TimeSpan.Zero; // Total time spent on discovery
         private int _discoveryOperationCount = 0; // Number of discovery operations
+
+        // Latency metrics
+        private TimeSpan _totalHandshakeTime = TimeSpan.Zero;
+        private int _handshakeCount = 0;
+        private TimeSpan _totalCheckInTime = TimeSpan.Zero;
+        private int _checkInCount = 0;
+        private TimeSpan _totalConnectionAttemptTime = TimeSpan.Zero;
+        private int _connectionAttemptTimeCount = 0;
+
+        // Throughput metrics
+        private int _messagesSent = 0;
+        private int _messagesReceived = 0;
+        private DateTime _lastThroughputReset = DateTime.UtcNow;
+
+        // Error granularity
+        private int _timeoutFailureCount = 0;
+        private int _authFailureCount = 0;
+        private int _networkFailureCount = 0;
+        private int _otherFailureCount = 0;
 
         /// <summary>
         /// Initializes a new instance of the OverseerClientService with required dependencies.
@@ -85,13 +109,16 @@ namespace BacklashBot.Services
         /// <param name="logger">The logger instance for recording service operations and errors.</param>
         /// <param name="serviceFactory">Factory for accessing other bot services like market data and error handlers.</param>
         /// <param name="executionConfig">Configuration options including the brain instance name.</param>
+        /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics.</param>
         public OverseerClientService(
             ILogger<OverseerClientService> logger,
             IServiceFactory serviceFactory,
-            IOptions<ExecutionConfig> executionConfig)
+            IOptions<ExecutionConfig> executionConfig,
+            ICentralPerformanceMonitor centralPerformanceMonitor)
         {
             _logger = logger;
             _serviceFactory = serviceFactory;
+            _centralPerformanceMonitor = centralPerformanceMonitor;
             _clientId = Guid.NewGuid().ToString();
 
             // Read brain instance name from configuration, fallback to hardcoded if not set
@@ -105,6 +132,7 @@ namespace BacklashBot.Services
             _checkInInterval = TimeSpan.FromSeconds(executionConfig.Value.OverseerCheckInIntervalSeconds);
             _circuitBreakerFailureThreshold = executionConfig.Value.OverseerCircuitBreakerFailureThreshold;
             _circuitBreakerTimeout = TimeSpan.FromMinutes(executionConfig.Value.OverseerCircuitBreakerTimeoutMinutes);
+            _enablePerformanceMetrics = executionConfig.Value.OverseerClientService_EnablePerformanceMetrics;
         }
 
         /// <summary>
@@ -386,6 +414,7 @@ namespace BacklashBot.Services
             await _connectionOperationSemaphore.WaitAsync(semaphoreTimeout.Token);
             _logger.LogDebug("OVERSEER- Semaphore acquired successfully");
 
+            var connectionStopwatch = Stopwatch.StartNew();
             try
             {
                 _logger.LogInformation("OVERSEER- Attempting connection to overseer at {Url} (Reason: {Reason})", overseerUrl, reason);
@@ -461,16 +490,51 @@ namespace BacklashBot.Services
                 _logger.LogDebug("OVERSEER- About to perform handshake");
                 await PerformHandshakeAsync();
                 _logger.LogDebug("OVERSEER- Handshake completed");
+
+                connectionStopwatch.Stop();
+                if (_enablePerformanceMetrics)
+                {
+                    lock (_circuitBreakerLock)
+                    {
+                        _totalConnectionAttemptTime += connectionStopwatch.Elapsed;
+                        _connectionAttemptTimeCount++;
+                    }
+                }
             }
             catch (TaskCanceledException)
             {
                 _logger.LogWarning("OVERSEER- Connection attempt timed out after {Timeout} seconds", _connectionTimeout.TotalSeconds);
+                if (_enablePerformanceMetrics)
+                {
+                    lock (_circuitBreakerLock)
+                    {
+                        _timeoutFailureCount++;
+                    }
+                }
                 RecordConnectionAttempt(false);
             }
             catch (Exception ex)
             {
                 _logger.LogWarning("OVERSEER- Exception in AttemptConnectionAsync: {Message}", ex.Message);
                 _logger.LogWarning("OVERSEER- Stack trace: {StackTrace}", ex.StackTrace);
+                if (_enablePerformanceMetrics)
+                {
+                    lock (_circuitBreakerLock)
+                    {
+                        if (ex.Message.Contains("auth", StringComparison.OrdinalIgnoreCase) || ex.Message.Contains("unauthorized", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _authFailureCount++;
+                        }
+                        else if (ex is System.Net.Http.HttpRequestException || ex.Message.Contains("network", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _networkFailureCount++;
+                        }
+                        else
+                        {
+                            _otherFailureCount++;
+                        }
+                    }
+                }
                 RecordConnectionAttempt(false);
             }
             finally
@@ -755,8 +819,69 @@ namespace BacklashBot.Services
         public int CircuitBreakerFailureCount => _circuitBreakerFailureCount;
 
         /// <summary>
+        /// Gets the total time spent on handshake operations.
+        /// </summary>
+        public TimeSpan TotalHandshakeTime => _totalHandshakeTime;
+
+        /// <summary>
+        /// Gets the number of handshake operations performed.
+        /// </summary>
+        public int HandshakeCount => _handshakeCount;
+
+        /// <summary>
+        /// Gets the total time spent on check-in operations.
+        /// </summary>
+        public TimeSpan TotalCheckInTime => _totalCheckInTime;
+
+        /// <summary>
+        /// Gets the number of check-in operations performed.
+        /// </summary>
+        public int CheckInCount => _checkInCount;
+
+        /// <summary>
+        /// Gets the total time spent on connection attempt operations.
+        /// </summary>
+        public TimeSpan TotalConnectionAttemptTime => _totalConnectionAttemptTime;
+
+        /// <summary>
+        /// Gets the number of connection attempt operations performed.
+        /// </summary>
+        public int ConnectionAttemptTimeCount => _connectionAttemptTimeCount;
+
+        /// <summary>
+        /// Gets the number of messages sent.
+        /// </summary>
+        public int MessagesSent => _messagesSent;
+
+        /// <summary>
+        /// Gets the number of messages received.
+        /// </summary>
+        public int MessagesReceived => _messagesReceived;
+
+        /// <summary>
+        /// Gets the count of timeout failures.
+        /// </summary>
+        public int TimeoutFailureCount => _timeoutFailureCount;
+
+        /// <summary>
+        /// Gets the count of authentication failures.
+        /// </summary>
+        public int AuthFailureCount => _authFailureCount;
+
+        /// <summary>
+        /// Gets the count of network failures.
+        /// </summary>
+        public int NetworkFailureCount => _networkFailureCount;
+
+        /// <summary>
+        /// Gets the count of other failures.
+        /// </summary>
+        public int OtherFailureCount => _otherFailureCount;
+
+        /// <summary>
         /// Gets the current performance metrics for the overseer client service.
         /// Includes connection success rates, discovery timing, and circuit breaker status.
+        /// Additional metrics are included only if performance metrics are enabled.
         /// </summary>
         /// <returns>A dictionary containing metric names and values.</returns>
         public Dictionary<string, object> GetMetrics()
@@ -766,7 +891,7 @@ namespace BacklashBot.Services
                 var successRate = _connectionAttemptCount > 0 ? (double)_connectionSuccessCount / _connectionAttemptCount : 0.0;
                 var avgDiscoveryTime = _discoveryOperationCount > 0 ? _totalDiscoveryTime.TotalMilliseconds / _discoveryOperationCount : 0.0;
 
-                return new Dictionary<string, object>
+                var metrics = new Dictionary<string, object>
                 {
                     ["ConnectionAttempts"] = _connectionAttemptCount,
                     ["ConnectionSuccesses"] = _connectionSuccessCount,
@@ -777,6 +902,33 @@ namespace BacklashBot.Services
                     ["TotalDiscoveryTimeMs"] = _totalDiscoveryTime.TotalMilliseconds,
                     ["IsCircuitBreakerOpen"] = IsCircuitBreakerOpen()
                 };
+
+                if (_enablePerformanceMetrics)
+                {
+                    var avgHandshakeTime = _handshakeCount > 0 ? _totalHandshakeTime.TotalMilliseconds / _handshakeCount : 0.0;
+                    var avgCheckInTime = _checkInCount > 0 ? _totalCheckInTime.TotalMilliseconds / _checkInCount : 0.0;
+                    var avgConnectionAttemptTime = _connectionAttemptTimeCount > 0 ? _totalConnectionAttemptTime.TotalMilliseconds / _connectionAttemptTimeCount : 0.0;
+                    var messagesPerSecond = (DateTime.UtcNow - _lastThroughputReset).TotalSeconds > 0 ? (_messagesSent + _messagesReceived) / (DateTime.UtcNow - _lastThroughputReset).TotalSeconds : 0.0;
+
+                    metrics.Add("AverageHandshakeTimeMs", avgHandshakeTime);
+                    metrics.Add("TotalHandshakeTimeMs", _totalHandshakeTime.TotalMilliseconds);
+                    metrics.Add("HandshakeCount", _handshakeCount);
+                    metrics.Add("AverageCheckInTimeMs", avgCheckInTime);
+                    metrics.Add("TotalCheckInTimeMs", _totalCheckInTime.TotalMilliseconds);
+                    metrics.Add("CheckInCount", _checkInCount);
+                    metrics.Add("AverageConnectionAttemptTimeMs", avgConnectionAttemptTime);
+                    metrics.Add("TotalConnectionAttemptTimeMs", _totalConnectionAttemptTime.TotalMilliseconds);
+                    metrics.Add("ConnectionAttemptTimeCount", _connectionAttemptTimeCount);
+                    metrics.Add("MessagesSent", _messagesSent);
+                    metrics.Add("MessagesReceived", _messagesReceived);
+                    metrics.Add("MessagesPerSecond", messagesPerSecond);
+                    metrics.Add("TimeoutFailureCount", _timeoutFailureCount);
+                    metrics.Add("AuthFailureCount", _authFailureCount);
+                    metrics.Add("NetworkFailureCount", _networkFailureCount);
+                    metrics.Add("OtherFailureCount", _otherFailureCount);
+                }
+
+                return metrics;
             }
         }
 
@@ -810,7 +962,21 @@ namespace BacklashBot.Services
 
                 _logger.LogInformation("OVERSEER- Sending handshake with ClientId={ClientId}, ClientName={ClientName}, ClientType={ClientType}, AuthToken={HasToken}",
                     _clientId, _clientName, _clientType, !string.IsNullOrEmpty(_authToken));
+
+                var stopwatch = Stopwatch.StartNew();
                 await _hubConnection.InvokeAsync("Handshake", _clientId, _clientName, _clientType, _authToken);
+                stopwatch.Stop();
+
+                if (_enablePerformanceMetrics)
+                {
+                    lock (_circuitBreakerLock)
+                    {
+                        _totalHandshakeTime += stopwatch.Elapsed;
+                        _handshakeCount++;
+                        _messagesSent++;
+                    }
+                }
+
                 _logger.LogInformation("OVERSEER- Handshake sent successfully to overseer");
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
@@ -837,12 +1003,23 @@ namespace BacklashBot.Services
 
             try
             {
+                // Post metrics to central performance monitor
+                var metrics = GetMetrics();
+                _centralPerformanceMonitor.RecordOverseerClientServiceMetrics(metrics);
+
                 // Log metrics every 10 check-ins
                 if (_connectionSuccessCount > 0 && _connectionSuccessCount % 10 == 0)
                 {
-                    var metrics = GetMetrics();
-                    _logger.LogInformation("OVERSEER- Performance Metrics: Attempts={Attempts}, Successes={Successes}, SuccessRate={Rate:P2}, AvgDiscoveryTime={AvgTime:F2}ms, CircuitBreakerOpen={Open}",
-                        metrics["ConnectionAttempts"], metrics["ConnectionSuccesses"], metrics["ConnectionSuccessRate"], metrics["AverageDiscoveryTimeMs"], metrics["IsCircuitBreakerOpen"]);
+                    if (_enablePerformanceMetrics)
+                    {
+                        _logger.LogInformation("OVERSEER- Performance Metrics: Attempts={Attempts}, Successes={Successes}, SuccessRate={Rate:P2}, AvgDiscoveryTime={AvgTime:F2}ms, AvgHandshakeTime={Handshake:F2}ms, AvgCheckInTime={CheckIn:F2}ms, MessagesSent={Sent}, MessagesReceived={Received}, CircuitBreakerOpen={Open}",
+                            metrics["ConnectionAttempts"], metrics["ConnectionSuccesses"], metrics["ConnectionSuccessRate"], metrics["AverageDiscoveryTimeMs"], metrics["AverageHandshakeTimeMs"], metrics["AverageCheckInTimeMs"], metrics["MessagesSent"], metrics["MessagesReceived"], metrics["IsCircuitBreakerOpen"]);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("OVERSEER- Performance Metrics: Attempts={Attempts}, Successes={Successes}, SuccessRate={Rate:P2}, AvgDiscoveryTime={AvgTime:F2}ms, CircuitBreakerOpen={Open}",
+                            metrics["ConnectionAttempts"], metrics["ConnectionSuccesses"], metrics["ConnectionSuccessRate"], metrics["AverageDiscoveryTimeMs"], metrics["IsCircuitBreakerOpen"]);
+                    }
                 }
 
                 _logger.LogDebug("OVERSEER- Preparing CheckIn data...");
@@ -891,7 +1068,20 @@ namespace BacklashBot.Services
                 _logger.LogDebug("OVERSEER- Sending CheckIn to overseer: {MarketCount} markets, ErrorCount: {ErrorCount}, LastSnapshot: {LastSnapshot}",
                     markets.Count, errorHandler.ErrorCount, checkInData.LastSnapshot);
 
+                var stopwatch = Stopwatch.StartNew();
                 await _hubConnection.InvokeAsync("CheckIn", checkInData);
+                stopwatch.Stop();
+
+                if (_enablePerformanceMetrics)
+                {
+                    lock (_circuitBreakerLock)
+                    {
+                        _totalCheckInTime += stopwatch.Elapsed;
+                        _checkInCount++;
+                        _messagesSent++;
+                    }
+                }
+
                 _logger.LogInformation("OVERSEER- CheckIn sent successfully to overseer at {Url}", _currentOverseerUrl);
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("cannot be called if the connection is not active"))
@@ -914,16 +1104,37 @@ namespace BacklashBot.Services
 
         private void HandleHandshakeResponse(HandshakeResponse response)
         {
+            if (_enablePerformanceMetrics)
+            {
+                lock (_circuitBreakerLock)
+                {
+                    _messagesReceived++;
+                }
+            }
             _logger.LogInformation("OVERSEER- Handshake response received from overseer: Success={Success}, Message={Message}", response.Success, response.Message);
         }
 
         private void HandleCheckInResponse(CheckInResponse response)
         {
+            if (_enablePerformanceMetrics)
+            {
+                lock (_circuitBreakerLock)
+                {
+                    _messagesReceived++;
+                }
+            }
             _logger.LogInformation("OVERSEER- CheckIn response received from overseer: Success={Success}, Message={Message}, TargetTickers={Count}", response.Success, response.Message, response.TargetTickers.Length);
         }
 
         private void HandleMessageResponse(MessageResponse response)
         {
+            if (_enablePerformanceMetrics)
+            {
+                lock (_circuitBreakerLock)
+                {
+                    _messagesReceived++;
+                }
+            }
             _logger.LogInformation("OVERSEER- Message response received from overseer: Success={Success}, MessageType={Type}, Message={Message}", response.Success, response.MessageType, response.Message);
         }
 

@@ -136,6 +136,13 @@ namespace BacklashDTOs.Configuration
         public int OverseerCircuitBreakerTimeoutMinutes { get; set; } = 5;
 
         /// <summary>
+        /// Gets or sets whether to enable performance metrics collection for OverseerClientService operations.
+        /// When disabled, metrics collection is skipped to improve performance.
+        /// </summary>
+        /// <value>Default is true.</value>
+        public bool OverseerClientService_EnablePerformanceMetrics { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the batch size for overnight market refresh operations.
         /// </summary>
         /// <value>Default is 20 markets per batch.</value>
