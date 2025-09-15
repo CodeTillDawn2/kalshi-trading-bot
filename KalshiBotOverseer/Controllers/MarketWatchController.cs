@@ -9,6 +9,7 @@ using BacklashInterfaces.Constants;
 using BacklashBot.KalshiAPI.Interfaces;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using KalshiBotOverseer.Services;
 
@@ -19,7 +20,8 @@ namespace KalshiBotOverseer.Controllers
     /// brain instance locks, trading positions, orders, account information, and snapshot data.
     /// This controller serves as the primary interface for the Kalshi trading bot's monitoring and
     /// data retrieval operations, utilizing caching for performance optimization and integrating
-    /// with database and external API services.
+    /// with database and external API services. Includes configurable performance metrics tracking
+    /// for cache operations and system monitoring.
     /// </summary>
     [ApiController]
     [Route("v1/[controller]")]
@@ -31,12 +33,27 @@ namespace KalshiBotOverseer.Controllers
         private readonly SnapshotAggregationService _snapshotService;
         private readonly ILogger<MarketWatchController> _logger;
         private readonly IConfiguration _configuration;
+        private readonly PerformanceMetricsService _performanceMetricsService;
         private const string MarketsCacheKey = "ActiveMarkets";
         private const string BrainInstancesCacheKey = "BrainInstances";
         private const string AllBrainInstancesCacheKey = "AllBrainInstances";
         private const string LogDataCacheKey = "LogData";
         private readonly TimeSpan MarketsCacheDuration;
         private readonly TimeSpan LogDataCacheDuration; // Shorter cache for log data
+
+        // Performance metrics configuration
+        private readonly bool _enablePerformanceMetrics;
+        private readonly bool _enableCachePerformanceMetrics;
+
+        // Local cache metrics for batch posting
+        private long _localCacheHits;
+        private long _localCacheMisses;
+
+        private class LogData
+        {
+            public Dictionary<string, DateTime?> SnapshotData { get; set; }
+            public Dictionary<string, DateTime?> ErrorData { get; set; }
+        }
 
         /// <summary>
         /// Initializes a new instance of the MarketWatchController with required dependencies.
@@ -46,8 +63,9 @@ namespace KalshiBotOverseer.Controllers
         /// <param name="apiService">Service for interacting with Kalshi API.</param>
         /// <param name="snapshotService">Service for managing market snapshots.</param>
         /// <param name="logger">Logger for recording operational information and errors.</param>
-        /// <param name="configuration">Configuration for cache durations and other settings.</param>
-        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotAggregationService snapshotService, ILogger<MarketWatchController> logger, IConfiguration configuration)
+        /// <param name="configuration">Configuration for cache durations and performance metrics settings.</param>
+        /// <param name="performanceMetricsService">Service for tracking performance metrics and cache statistics.</param>
+        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotAggregationService snapshotService, ILogger<MarketWatchController> logger, IConfiguration configuration, PerformanceMetricsService performanceMetricsService)
         {
             _context = context;
             _cache = cache;
@@ -55,9 +73,13 @@ namespace KalshiBotOverseer.Controllers
             _snapshotService = snapshotService;
             _logger = logger;
             _configuration = configuration;
+            _performanceMetricsService = performanceMetricsService;
 
             MarketsCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("CacheConfig:MarketsCacheDurationMinutes", 15));
             LogDataCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("CacheConfig:LogDataCacheDurationMinutes", 5));
+            
+            _enablePerformanceMetrics = _configuration.GetValue<bool>("MarketWatchController:EnablePerformanceMetrics", true);
+            _enableCachePerformanceMetrics = _configuration.GetValue<bool>("MarketWatchController:EnableCachePerformanceMetrics", true);
         }
 
         /// <summary>
@@ -84,27 +106,66 @@ namespace KalshiBotOverseer.Controllers
             try
             {
                 // Get cached active markets or fetch fresh data
-                var markets = await _cache.GetOrCreateAsync(MarketsCacheKey, async entry =>
+                List<MarketDTO> markets;
+                if (_cache.TryGetValue(MarketsCacheKey, out var cachedMarkets))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetMarketsFiltered(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active })).ToList();
-                });
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheHits++;
+                    }
+                    markets = (List<MarketDTO>)cachedMarkets;
+                }
+                else
+                {
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheMisses++;
+                    }
+                    markets = (await _context.GetMarketsFiltered(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active })).ToList();
+                    _cache.Set(MarketsCacheKey, markets, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = MarketsCacheDuration });
+                }
 
                 // Get cached brain instances for lookup
-                var brainInstancesByLock = await _cache.GetOrCreateAsync(BrainInstancesCacheKey, async entry =>
+                Dictionary<Guid, string> brainInstancesByLock;
+                if (_cache.TryGetValue(BrainInstancesCacheKey, out var cachedBrainInstances))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetBrainInstancesFiltered(hasBrainLock: true))
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheHits++;
+                    }
+                    brainInstancesByLock = (Dictionary<Guid, string>)cachedBrainInstances;
+                }
+                else
+                {
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheMisses++;
+                    }
+                    brainInstancesByLock = (await _context.GetBrainInstancesFiltered(hasBrainLock: true))
                         .Where(bi => bi.BrainLock.HasValue)
                         .ToDictionary(bi => bi.BrainLock!.Value, bi => bi.BrainInstanceName!);
-                });
+                    _cache.Set(BrainInstancesCacheKey, brainInstancesByLock, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = MarketsCacheDuration });
+                }
 
                 // Get all brain instances for comprehensive lookup
-                var allBrainInstances = await _cache.GetOrCreateAsync(AllBrainInstancesCacheKey, async entry =>
+                List<BrainInstanceDTO> allBrainInstances;
+                if (_cache.TryGetValue(AllBrainInstancesCacheKey, out var cachedAllBrainInstances))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetBrainInstancesFiltered()).ToList();
-                });
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheHits++;
+                    }
+                    allBrainInstances = (List<BrainInstanceDTO>)cachedAllBrainInstances;
+                }
+                else
+                {
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheMisses++;
+                    }
+                    allBrainInstances = (await _context.GetBrainInstancesFiltered()).ToList();
+                    _cache.Set(AllBrainInstancesCacheKey, allBrainInstances, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = MarketsCacheDuration });
+                }
 
                 // Get market watches for active markets only
                 var activeMarketTickers = markets.Where(m => m.market_ticker != null).Select(m => m.market_ticker!).ToHashSet();
@@ -149,6 +210,7 @@ namespace KalshiBotOverseer.Controllers
                     };
                 }).ToList();
 
+                PostCacheMetrics();
                 stopwatch.Stop();
                 _logger.LogInformation("GetMarketWatchData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(marketWatchData);
@@ -175,27 +237,66 @@ namespace KalshiBotOverseer.Controllers
             try
             {
                 // Get cached active markets
-                var markets = await _cache.GetOrCreateAsync(MarketsCacheKey, async entry =>
+                List<MarketDTO> markets;
+                if (_cache.TryGetValue(MarketsCacheKey, out var cachedMarkets))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetMarketsFiltered(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active })).ToList();
-                });
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheHits++;
+                    }
+                    markets = (List<MarketDTO>)cachedMarkets;
+                }
+                else
+                {
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheMisses++;
+                    }
+                    markets = (await _context.GetMarketsFiltered(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active })).ToList();
+                    _cache.Set(MarketsCacheKey, markets, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = MarketsCacheDuration });
+                }
 
                 // Get all brain instances from database (not just those with BrainLock)
-                var allBrainInstances = await _cache.GetOrCreateAsync(AllBrainInstancesCacheKey, async entry =>
+                List<BrainInstanceDTO> allBrainInstances;
+                if (_cache.TryGetValue(AllBrainInstancesCacheKey, out var cachedAllBrainInstances))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetBrainInstancesFiltered()).ToList();
-                });
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheHits++;
+                    }
+                    allBrainInstances = (List<BrainInstanceDTO>)cachedAllBrainInstances;
+                }
+                else
+                {
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheMisses++;
+                    }
+                    allBrainInstances = (await _context.GetBrainInstancesFiltered()).ToList();
+                    _cache.Set(AllBrainInstancesCacheKey, allBrainInstances, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = MarketsCacheDuration });
+                }
 
                 // Get cached brain instances with BrainLock for lookup
-                var brainInstancesByLock = await _cache.GetOrCreateAsync(BrainInstancesCacheKey, async entry =>
+                Dictionary<Guid, string> brainInstancesByLock;
+                if (_cache.TryGetValue(BrainInstancesCacheKey, out var cachedBrainInstances))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetBrainInstancesFiltered(hasBrainLock: true))
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheHits++;
+                    }
+                    brainInstancesByLock = (Dictionary<Guid, string>)cachedBrainInstances;
+                }
+                else
+                {
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheMisses++;
+                    }
+                    brainInstancesByLock = (await _context.GetBrainInstancesFiltered(hasBrainLock: true))
                         .Where(bi => bi.BrainLock.HasValue)
                         .ToDictionary(bi => bi.BrainLock.Value, bi => bi.BrainInstanceName);
-                });
+                    _cache.Set(BrainInstancesCacheKey, brainInstancesByLock, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = MarketsCacheDuration });
+                }
 
                 // Get market watches for active markets only
                 var activeMarketTickers = markets.Where(m => m.market_ticker != null).Select(m => m.market_ticker!).ToHashSet();
@@ -204,12 +305,24 @@ namespace KalshiBotOverseer.Controllers
                 // Get snapshot and error data from LogEntry table for brain instances (optimized with caching)
                 var brainInstanceNames = allBrainInstances.Select(bi => bi.BrainInstanceName).Distinct().ToList();
 
-                var brainInstanceLogData = await _cache.GetOrCreateAsync(LogDataCacheKey, async entry =>
+                LogData brainInstanceLogData;
+                if (_cache.TryGetValue(LogDataCacheKey, out var cachedLogData))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = LogDataCacheDuration;
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheHits++;
+                    }
+                    brainInstanceLogData = (LogData)cachedLogData;
+                }
+                else
+                {
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheMisses++;
+                    }
 
-                    var snapshotData = new Dictionary<string, DateTime?>();
-                    var errorData = new Dictionary<string, DateTime?>();
+                    var localSnapshotData = new Dictionary<string, DateTime?>();
+                    var localErrorData = new Dictionary<string, DateTime?>();
 
                     if (brainInstanceNames.Any())
                     {
@@ -228,7 +341,7 @@ namespace KalshiBotOverseer.Controllers
                                     if (snapshotLogs != null && snapshotLogs.Any() && snapshotLogs.First().Message != null &&
                                         snapshotLogs.First().Message.Contains("snapshot", StringComparison.OrdinalIgnoreCase))
                                     {
-                                        snapshotData[brainInstanceName] = snapshotLogs.First().Timestamp;
+                                        localSnapshotData[brainInstanceName] = snapshotLogs.First().Timestamp;
                                     }
 
                                     // Query for error messages
@@ -239,7 +352,7 @@ namespace KalshiBotOverseer.Controllers
 
                                     if (errorLogs != null && errorLogs.Any())
                                     {
-                                        errorData[brainInstanceName] = errorLogs.First().Timestamp;
+                                        localErrorData[brainInstanceName] = errorLogs.First().Timestamp;
                                     }
                                 }
                                 catch (Exception ex)
@@ -254,8 +367,9 @@ namespace KalshiBotOverseer.Controllers
                         }
                     }
 
-                    return new { SnapshotData = snapshotData, ErrorData = errorData };
-                });
+                    brainInstanceLogData = new LogData { SnapshotData = localSnapshotData, ErrorData = localErrorData };
+                    _cache.Set(LogDataCacheKey, brainInstanceLogData, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = LogDataCacheDuration });
+                }
 
                 var snapshotData = brainInstanceLogData.SnapshotData;
                 var errorData = brainInstanceLogData.ErrorData;
@@ -299,6 +413,7 @@ namespace KalshiBotOverseer.Controllers
                 .ThenBy(bl => bl.BrainInstanceName)
                 .ToList();
 
+                PostCacheMetrics();
                 stopwatch.Stop();
                 _logger.LogInformation("GetBrainLocksData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(brainLockGroups);
@@ -325,16 +440,30 @@ namespace KalshiBotOverseer.Controllers
             try
             {
                 // Get market positions with optional filtering
-                var positions = await _cache.GetOrCreateAsync($"Positions_{currentOnly}", async entry =>
+                List<MarketPositionDTO> positions;
+                var positionsKey = $"Positions_{currentOnly}";
+                if (_cache.TryGetValue(positionsKey, out var cachedPositions))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheHits++;
+                    }
+                    positions = (List<MarketPositionDTO>)cachedPositions;
+                }
+                else
+                {
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheMisses++;
+                    }
 
                     // If currentOnly is true, only get positions where Position != 0
                     // If false, get all positions (historical + current)
                     bool? hasPosition = currentOnly ? true : null;
 
-                    return (await _context.GetMarketPositions(hasPosition: hasPosition)).ToList();
-                });
+                    positions = (await _context.GetMarketPositions(hasPosition: hasPosition)).ToList();
+                    _cache.Set(positionsKey, positions, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = MarketsCacheDuration });
+                }
 
                 var positionsData = positions.Select(p => new
                 {
@@ -349,6 +478,7 @@ namespace KalshiBotOverseer.Controllers
                     LastModified = p.LastModified
                 }).ToList();
 
+                PostCacheMetrics();
                 stopwatch.Stop();
                 _logger.LogInformation("GetPositionsData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(positionsData);
@@ -374,11 +504,24 @@ namespace KalshiBotOverseer.Controllers
             try
             {
                 // Get orders data
-                var orders = await _cache.GetOrCreateAsync("Orders", async entry =>
+                List<OrderDTO> orders;
+                if (_cache.TryGetValue("Orders", out var cachedOrders))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetOrders()).ToList();
-                });
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheHits++;
+                    }
+                    orders = (List<OrderDTO>)cachedOrders;
+                }
+                else
+                {
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheMisses++;
+                    }
+                    orders = (await _context.GetOrders()).ToList();
+                    _cache.Set("Orders", orders, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = MarketsCacheDuration });
+                }
 
                 var ordersData = orders.Select(o => new
                 {
@@ -394,6 +537,7 @@ namespace KalshiBotOverseer.Controllers
                     UpdatedAt = o.LastUpdateTimeUTC
                 }).ToList();
 
+                PostCacheMetrics();
                 stopwatch.Stop();
                 _logger.LogInformation("GetOrdersData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(ordersData);
@@ -436,6 +580,19 @@ namespace KalshiBotOverseer.Controllers
                 stopwatch.Stop();
                 _logger.LogError(ex, "Failed to retrieve account data in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return StatusCode(500, new { error = "Failed to retrieve account data", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Posts accumulated cache performance metrics to the performance metrics service.
+        /// </summary>
+        private void PostCacheMetrics()
+        {
+            if (_enablePerformanceMetrics && (_localCacheHits > 0 || _localCacheMisses > 0))
+            {
+                _performanceMetricsService.PostCacheMetrics(_localCacheHits, _localCacheMisses);
+                _localCacheHits = 0;
+                _localCacheMisses = 0;
             }
         }
 
@@ -515,18 +672,44 @@ namespace KalshiBotOverseer.Controllers
             try
             {
                 // Get all brain instances from database
-                var brainInstances = await _cache.GetOrCreateAsync(AllBrainInstancesCacheKey, async entry =>
+                List<BrainInstanceDTO> brainInstances;
+                if (_cache.TryGetValue(AllBrainInstancesCacheKey, out var cachedBrainInstances))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetBrainInstancesFiltered()).ToList();
-                });
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheHits++;
+                    }
+                    brainInstances = (List<BrainInstanceDTO>)cachedBrainInstances;
+                }
+                else
+                {
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheMisses++;
+                    }
+                    brainInstances = (await _context.GetBrainInstancesFiltered()).ToList();
+                    _cache.Set(AllBrainInstancesCacheKey, brainInstances, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = MarketsCacheDuration });
+                }
 
                 // Get all market watches
-                var marketWatches = await _cache.GetOrCreateAsync("AllMarketWatches", async entry =>
+                List<MarketWatchDTO> marketWatches;
+                if (_cache.TryGetValue("AllMarketWatches", out var cachedMarketWatches))
                 {
-                    entry.AbsoluteExpirationRelativeToNow = MarketsCacheDuration;
-                    return (await _context.GetMarketWatches()).ToList();
-                });
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheHits++;
+                    }
+                    marketWatches = (List<MarketWatchDTO>)cachedMarketWatches;
+                }
+                else
+                {
+                    if (_enablePerformanceMetrics)
+                    {
+                        _localCacheMisses++;
+                    }
+                    marketWatches = (await _context.GetMarketWatches()).ToList();
+                    _cache.Set("AllMarketWatches", marketWatches, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = MarketsCacheDuration });
+                }
 
                 // Create a lookup for brain instances by BrainLock
                 var brainLookup = brainInstances
@@ -575,6 +758,7 @@ namespace KalshiBotOverseer.Controllers
                     });
                 }
 
+                PostCacheMetrics();
                 stopwatch.Stop();
                 _logger.LogInformation("GetBrainsData completed in {ElapsedMilliseconds}ms", stopwatch.ElapsedMilliseconds);
                 return Ok(brainData);

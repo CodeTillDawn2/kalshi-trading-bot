@@ -52,6 +52,10 @@ namespace KalshiBotOverseer.Services
         // Database metrics
         private Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> _databaseMetrics = new();
 
+        // Cache metrics
+        private long _cacheHits;
+        private long _cacheMisses;
+
         // SubscriptionManager performance metrics
         private IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)>? _subscriptionManagerOperationMetrics;
         private IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)>? _subscriptionManagerLockMetrics;
@@ -85,6 +89,7 @@ namespace KalshiBotOverseer.Services
         private readonly object _overnightLock = new();
         private readonly object _snapshotLock = new();
         private readonly object _healthLock = new();
+        private readonly object _cacheLock = new();
 
         /// <summary>
         /// Initializes a new instance of the PerformanceMetricsService.
@@ -376,6 +381,72 @@ namespace KalshiBotOverseer.Services
 
         #endregion
 
+        #region Cache Metrics
+
+        /// <summary>
+        /// Records a cache hit event.
+        /// </summary>
+        public void RecordCacheHit()
+        {
+            lock (_cacheLock)
+            {
+                _cacheHits++;
+            }
+        }
+
+        /// <summary>
+        /// Records a cache miss event.
+        /// </summary>
+        public void RecordCacheMiss()
+        {
+            lock (_cacheLock)
+            {
+                _cacheMisses++;
+            }
+        }
+
+        /// <summary>
+        /// Posts cache performance metrics from a component.
+        /// </summary>
+        /// <param name="cacheHits">Number of cache hits to add.</param>
+        /// <param name="cacheMisses">Number of cache misses to add.</param>
+        public void PostCacheMetrics(long cacheHits, long cacheMisses)
+        {
+            lock (_cacheLock)
+            {
+                _cacheHits += cacheHits;
+                _cacheMisses += cacheMisses;
+                _logger.LogDebug("Cache metrics posted: Hits={Hits}, Misses={Misses}", cacheHits, cacheMisses);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current cache metrics.
+        /// </summary>
+        public (long CacheHits, long CacheMisses, double HitRate) GetCacheMetrics()
+        {
+            lock (_cacheLock)
+            {
+                long total = _cacheHits + _cacheMisses;
+                double hitRate = total > 0 ? (_cacheHits / (double)total) * 100 : 0;
+                return (_cacheHits, _cacheMisses, hitRate);
+            }
+        }
+
+        /// <summary>
+        /// Resets the cache metrics.
+        /// </summary>
+        public void ResetCacheMetrics()
+        {
+            lock (_cacheLock)
+            {
+                _cacheHits = 0;
+                _cacheMisses = 0;
+            }
+        }
+
+        #endregion
+
         #region Database Metrics
 
         /// <summary>
@@ -456,6 +527,15 @@ namespace KalshiBotOverseer.Services
             {
                 status["MarketRefreshFailureCount"] = _marketRefreshFailureCount;
                 status["LastMarketRefreshFailure"] = _lastMarketRefreshFailure;
+            }
+
+            // Cache metrics
+            lock (_cacheLock)
+            {
+                status["CacheHits"] = _cacheHits;
+                status["CacheMisses"] = _cacheMisses;
+                long total = _cacheHits + _cacheMisses;
+                status["CacheHitRate"] = total > 0 ? (_cacheHits / (double)total) * 100 : 0;
             }
 
             status["LastMetricsReset"] = _lastMetricsReset;
