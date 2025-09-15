@@ -1,5 +1,9 @@
 using BacklashDTOs;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Text.Json;
+using System.IO;
 
 namespace TradingStrategies.Extensions
 {
@@ -9,9 +13,63 @@ namespace TradingStrategies.Extensions
     /// stored in MarketSnapshot, enabling efficient computation of spreads, depths, volumes, and other trading indicators.
     /// All calculations are performed in a stateless manner, ensuring thread safety and reusability across different
     /// market simulation scenarios.
+    ///
+    /// Performance monitoring can be configured via MarketSnapshotExtensions:EnablePerformanceMetrics setting.
     /// </summary>
     public static class MarketSnapshotExtensions
     {
+        private static readonly bool _enablePerformanceMetrics;
+        private static ILogger _logger;
+
+        /// <summary>
+        /// Static constructor to initialize configuration and logging for performance metrics.
+        /// </summary>
+        static MarketSnapshotExtensions()
+        {
+            // Note: In a real application, these would be injected via DI
+            // For now, we'll use a simple approach that can be configured
+            _enablePerformanceMetrics = GetPerformanceMetricsEnabled();
+        }
+
+        /// <summary>
+        /// Gets whether performance metrics are enabled for this class.
+        /// Configuration key: MarketSnapshotExtensions:EnablePerformanceMetrics
+        /// Can be configured via environment variable or appsettings.json
+        /// </summary>
+        private static bool GetPerformanceMetricsEnabled()
+        {
+            try
+            {
+                // First try environment variable
+                var envValue = Environment.GetEnvironmentVariable("MarketSnapshotExtensions_EnablePerformanceMetrics");
+                if (!string.IsNullOrEmpty(envValue) && bool.TryParse(envValue, out var envResult))
+                {
+                    return envResult;
+                }
+
+                // Try to read from appsettings.json if it exists
+                var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
+                if (File.Exists(configPath))
+                {
+                    var configJson = File.ReadAllText(configPath);
+                    var config = JsonDocument.Parse(configJson);
+
+                    if (config.RootElement.TryGetProperty("MarketSnapshotExtensions", out var marketSnapshotExtensions) &&
+                        marketSnapshotExtensions.TryGetProperty("EnablePerformanceMetrics", out var enableMetrics))
+                    {
+                        return enableMetrics.GetBoolean();
+                    }
+                }
+
+                // Default to disabled for performance
+                return false;
+            }
+            catch
+            {
+                // If configuration fails, default to disabled
+                return false;
+            }
+        }
         /// <summary>
         /// Updates all order book-related metrics in the MarketSnapshot based on the current state of the SimulatedOrderbook.
         /// This method recalculates spreads, depths, volumes, ranges, imbalances, and center of mass values to reflect
@@ -41,7 +99,8 @@ namespace TradingStrategies.Extensions
         {
             if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
             if (book == null) throw new ArgumentNullException(nameof(book));
-            var stopwatch = Stopwatch.StartNew();
+
+            var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
 
             // Update best prices from order book
             snapshot.BestYesBid = book.GetBestYesBid();
@@ -82,8 +141,23 @@ namespace TradingStrategies.Extensions
             snapshot.YesBidCenterOfMass = CalculateCenterOfMass(book.YesBids);
             snapshot.NoBidCenterOfMass = CalculateCenterOfMass(book.NoBids);
 
-            stopwatch.Stop();
-            Console.WriteLine($"UpdateOrderbookMetricsFromSimulated took {stopwatch.ElapsedMilliseconds} ms");
+            if (_enablePerformanceMetrics && stopwatch != null)
+            {
+                stopwatch.Stop();
+                LogPerformanceMetrics(stopwatch.ElapsedMilliseconds);
+            }
+        }
+
+        /// <summary>
+        /// Logs performance metrics for the order book calculations.
+        /// Only logs when performance metrics are enabled.
+        /// </summary>
+        /// <param name="elapsedMilliseconds">Time taken for the calculations in milliseconds.</param>
+        private static void LogPerformanceMetrics(long elapsedMilliseconds)
+        {
+            // Use a simple console output for now, but this could be enhanced to use proper logging
+            // In a real application, this would use ILogger or integrate with performance monitoring
+            Console.WriteLine($"MarketSnapshotExtensions.UpdateOrderbookMetricsFromSimulated took {elapsedMilliseconds} ms");
         }
 
         /// <summary>
