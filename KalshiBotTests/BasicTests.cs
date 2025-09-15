@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -97,7 +98,8 @@ namespace KalshiBotTests
             _calculationOptions = TestHelper.GetCalculationConfig();
             _marginFactor = 0.001; // 0.1% margin factor
 
-            _snapshotService = new TradingSnapshotService(_tradingSnapshotServiceLoggerMock.Object, _snapshotOptions, _tradingOptions, _scopeFactory);
+            var config = new ConfigurationBuilder().Build();
+            _snapshotService = new TradingSnapshotService(_tradingSnapshotServiceLoggerMock.Object, _snapshotOptions, _tradingOptions, _scopeFactory, config);
         }
 
         /// <summary>
