@@ -68,7 +68,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static InvertedHammerPattern? IsPattern(
+        public static async Task<InvertedHammerPattern?> IsPatternAsync(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
@@ -76,7 +76,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
             if (index < 1) return null;
 
-            CandleMetrics metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            CandleMetrics metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Downtrend check
             if (metrics.GetLookbackMeanTrend(1) > TrendThreshold) return null;

@@ -60,7 +60,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Indicates a pause in a trend followed by continuation.
         /// Your original logic relaxes body sizes and containment strictness.
         /// </summary>
-        public static MatHoldPattern? IsPattern(
+        public static async Task<MatHoldPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             bool isBullish,
@@ -75,11 +75,11 @@ namespace BacklashPatterns.PatternDefinitions
             if (c1 < 0 || c5 >= prices.Length) return null;
 
             // Lazy load metrics for all five candles
-            var metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, false);
-            var metrics4 = GetCandleMetrics(ref metricsCache, c4, prices, trendLookback, false);
-            var metrics5 = GetCandleMetrics(ref metricsCache, c5, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, false);
+            var metrics4 = await GetCandleMetricsAsync(metricsCache, c4, prices, trendLookback, false);
+            var metrics5 = await GetCandleMetricsAsync(metricsCache, c5, prices, trendLookback, true);
 
             // Retrieve price values for all five candles
             var ask1 = prices[c1]; var ask2 = prices[c2]; var ask3 = prices[c3];

@@ -57,12 +57,12 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static HighWaveCandlePattern? IsPattern(int index, int trendLookback, CandleMids[] prices, Dictionary<int, CandleMetrics> metricsCache)
+        public static async Task<HighWaveCandlePattern?> IsPatternAsync(int index, int trendLookback, CandleMids[] prices, Dictionary<int, CandleMetrics> metricsCache)
         {
 
             if (index < 1) return null;
 
-            var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             if (metrics.TotalRange < MinRange) return null;
             if (metrics.TotalRange < MinRangeVsLookback * metrics.GetLookbackAvgRange(1)) return null;

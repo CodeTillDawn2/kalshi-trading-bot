@@ -47,7 +47,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static ThrustingPattern? IsPattern(
+        public static async Task<ThrustingPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             bool isBullish,
@@ -59,8 +59,8 @@ namespace BacklashPatterns.PatternDefinitions
             int prevIndex = index - 1;
             int currIndex = index;
 
-            var prevMetrics = GetCandleMetrics(ref metricsCache, prevIndex, prices, trendLookback, false);
-            var currMetrics = GetCandleMetrics(ref metricsCache, currIndex, prices, trendLookback, true);
+            var prevMetrics = await GetCandleMetricsAsync(metricsCache, prevIndex, prices, trendLookback, false);
+            var currMetrics = await GetCandleMetricsAsync(metricsCache, currIndex, prices, trendLookback, true);
             CandleMids prevPrices = prices[prevIndex];
             CandleMids currPrices = prices[currIndex];
 

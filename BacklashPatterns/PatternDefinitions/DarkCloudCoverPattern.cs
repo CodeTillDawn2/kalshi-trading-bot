@@ -61,7 +61,7 @@ public class DarkCloudCoverPattern2 : PatternDefinition
     {
     }
 
-    public static DarkCloudCoverPattern? IsPattern(
+    public static async Task<DarkCloudCoverPattern?> IsPatternAsync(
         int index,
         CandleMids[] prices,
         int trendLookback,
@@ -70,8 +70,8 @@ public class DarkCloudCoverPattern2 : PatternDefinition
         if (index < PatternSize - 1 + trendLookback) return null; // Ensure enough lookback
         var candles = new List<int> { index - 1, index };
 
-        var prevMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, trendLookback, false);
-        var currMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+        var prevMetrics = await GetCandleMetricsAsync(metricsCache, index - 1, prices, trendLookback, false);
+        var currMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
         var prevPrices = prices[index - 1];
         var currPrices = prices[index];
 

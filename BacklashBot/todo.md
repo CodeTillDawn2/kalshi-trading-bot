@@ -63,8 +63,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## BacklashPatterns.PatternUtils
 
-## BacklashBot.Services.KaslhiBotScopeManagerService
-
 ## TradingGUI.MainForm
 
 

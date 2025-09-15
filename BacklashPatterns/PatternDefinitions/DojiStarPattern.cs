@@ -45,7 +45,7 @@ public class DojiStarPattern : PatternDefinition
         IsBullish = isBullish;
     }
 
-    public static DojiStarPattern? IsPattern(
+    public static async Task<DojiStarPattern?> IsPatternAsync(
         int index,
         int trendLookback,
         CandleMids[] prices,
@@ -53,8 +53,8 @@ public class DojiStarPattern : PatternDefinition
     {
         if (index < 1) return null;
 
-        var firstMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, trendLookback, false);
-        var secondMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+        var firstMetrics = await GetCandleMetricsAsync(metricsCache, index - 1, prices, trendLookback, false);
+        var secondMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
         var firstAsk = prices[index - 1];
         var secondAsk = prices[index];
 

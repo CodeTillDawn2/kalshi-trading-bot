@@ -27,7 +27,7 @@ public class EngulfingPattern : PatternDefinition
         IsBullish = isBullish;
     }
 
-    public static EngulfingPattern? IsPattern(
+    public static async Task<EngulfingPattern?> IsPatternAsync(
         int index,
         Dictionary<int, CandleMetrics> metricsCache,
         CandleMids[] prices,
@@ -36,8 +36,8 @@ public class EngulfingPattern : PatternDefinition
     {
         if (index < 1) return null;
 
-        var currMetrics = GetCandleMetrics(ref metricsCache, index, prices, 2, true);
-        var prevMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, 2, false);
+        var currMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, 2, true);
+        var prevMetrics = await GetCandleMetricsAsync(metricsCache, index - 1, prices, 2, false);
 
         bool hasTrend = isBullish
             ? currMetrics.GetLookbackMeanTrend(2) < 0 && Math.Abs(currMetrics.GetLookbackMeanTrend(2)) >= TrendThreshold &&

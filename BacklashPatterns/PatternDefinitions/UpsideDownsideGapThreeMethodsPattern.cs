@@ -27,7 +27,7 @@ public class UpsideDownsideGapThreeMethodsPattern : PatternDefinition
     {
     }
 
-    public static UpsideDownsideGapThreeMethodsPattern? IsPattern(
+    public static async Task<UpsideDownsideGapThreeMethodsPattern?> IsPatternAsync(
         int index,
         int trendLookback,
         bool isBullish,
@@ -40,9 +40,9 @@ public class UpsideDownsideGapThreeMethodsPattern : PatternDefinition
         int c2 = index - 1; // Second candle
         int c3 = index;     // Third candle
 
-        CandleMetrics metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-        CandleMetrics metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-        CandleMetrics metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
+        CandleMetrics metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+        CandleMetrics metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+        CandleMetrics metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
         if (isBullish)
         {

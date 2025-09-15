@@ -44,7 +44,7 @@ public class DragonflyDojiPattern : PatternDefinition
     {
     }
 
-    public static DragonflyDojiPattern? IsPattern(
+    public static async Task<DragonflyDojiPattern?> IsPatternAsync(
         Dictionary<int, CandleMetrics> metricsCache,
         int index,
         int trendLookback,
@@ -52,7 +52,7 @@ public class DragonflyDojiPattern : PatternDefinition
     {
         if (index < 0 || index >= prices.Length) return null;
 
-        var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+        var metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
         if (!(metrics.TotalRange >= MinRange && metrics.BodySize <= BodyMax &&
               metrics.BodySize <= BodyRangeRatio * metrics.TotalRange &&

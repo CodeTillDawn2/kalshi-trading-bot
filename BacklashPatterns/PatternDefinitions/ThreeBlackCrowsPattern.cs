@@ -42,7 +42,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static ThreeBlackCrowsPattern? IsPattern(
+        public static async Task<ThreeBlackCrowsPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -54,9 +54,9 @@ namespace BacklashPatterns.PatternDefinitions
             int c2 = index - 1; // Second candle
             int c3 = index;     // Third candle
 
-            var metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
             // All bearish
             if (!metrics1.IsBearish || !metrics2.IsBearish || !metrics3.IsBearish) return null;

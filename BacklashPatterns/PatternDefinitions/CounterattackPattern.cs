@@ -138,7 +138,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="metricsCache">Cache of candle metrics.</param>
         /// <param name="isBullish">True for bullish pattern, false for bearish.</param>
         /// <returns>A CounterattackPattern instance if detected, otherwise null.</returns>
-        public static CounterattackPattern? IsPattern(
+        public static async Task<CounterattackPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -151,8 +151,8 @@ namespace BacklashPatterns.PatternDefinitions
             var candles = new List<int> { startIndex, index };
 
             // Get metrics
-            var prevMetrics = GetCandleMetrics(ref metricsCache, startIndex, prices, trendLookback, false);
-            var currMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var prevMetrics = await GetCandleMetricsAsync(metricsCache, startIndex, prices, trendLookback, false);
+            var currMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
             var previousPrices = prices[startIndex];
             var currentPrices = prices[index];
 

@@ -74,7 +74,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static ThreeStarsInTheSouthPattern? IsPattern(
+        public static async Task<ThreeStarsInTheSouthPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -88,9 +88,9 @@ namespace BacklashPatterns.PatternDefinitions
 
             if (c1 < 0 || c3 >= prices.Length) return null;
 
-            var metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
             if (metrics1.BodySize < MinBodySize || !metrics1.IsBearish || metrics1.LowerWick < LowerWickFactor * metrics1.BodySize) return null;
 

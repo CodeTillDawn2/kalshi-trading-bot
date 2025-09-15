@@ -60,7 +60,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static InNeckPattern? IsPattern(
+        public static async Task<InNeckPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -71,8 +71,8 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMids previousPrice = prices[index - 1];
             CandleMids currentPrice = prices[index];
 
-            var previousMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, trendLookback, false);
-            var currentMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var previousMetrics = await GetCandleMetricsAsync(metricsCache, index - 1, prices, trendLookback, false);
+            var currentMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Direction and body size check
             if (!previousMetrics.IsBearish || previousMetrics.BodySize < MinBodySize) return null;

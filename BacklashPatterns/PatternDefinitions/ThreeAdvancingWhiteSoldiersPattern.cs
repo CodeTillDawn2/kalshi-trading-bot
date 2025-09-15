@@ -38,7 +38,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// each closing higher than the previous. Signals strong buying pressure and a potential trend reversal.
         /// Source: https://www.investopedia.com/terms/t/three_white_soldiers.asp
         /// </summary>
-        public static ThreeAdvancingWhiteSoldiersPattern? IsPattern(
+        public static async Task<ThreeAdvancingWhiteSoldiersPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -50,9 +50,9 @@ namespace BacklashPatterns.PatternDefinitions
             int c3 = index;     // Third candle
             if (c1 < 0 || c3 >= prices.Length) return null;
 
-            var metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
             // Check each candle: Bullish, significant body, small wicks
             if (metrics1.BodySize < MinBodySize || !metrics1.IsBullish ||

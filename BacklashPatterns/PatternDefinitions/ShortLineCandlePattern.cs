@@ -50,7 +50,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static ShortLineCandlePattern? IsPattern(
+        public static async Task<ShortLineCandlePattern?> IsPatternAsync(
             int index,
             int trendLookback,
             bool isBullish,
@@ -61,7 +61,7 @@ namespace BacklashPatterns.PatternDefinitions
             if (index < 1) return null;
 
             // Retrieve metrics for the current candle
-            var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Check if the candle has a small body (original logic: <= 2.0)
             bool isShort = metrics.BodySize <= MaxBodySize;

@@ -72,7 +72,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Bullish Tristar: Potential reversal from downtrend to uptrend due to exhaustion of sellers.
         /// - Bearish Tristar: Potential reversal from uptrend to downtrend due to exhaustion of buyers.
         /// </summary>
-        public static TristarPattern? IsPattern(
+        public static async Task<TristarPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             bool isBullish,
@@ -88,9 +88,9 @@ namespace BacklashPatterns.PatternDefinitions
 
 
             // Lazy load metrics (matches original structure)
-            var metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
             // Check all three are Doji using original loosened criteria (from IsLoosenedDoji)
             bool allDoji = IsLoosenedDoji(metrics1, c1, prices) &&

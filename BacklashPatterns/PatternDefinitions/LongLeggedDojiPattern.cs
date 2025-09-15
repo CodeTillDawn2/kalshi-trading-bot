@@ -63,14 +63,14 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Wicks roughly balanced, though slight asymmetry is allowed.
         /// Indicates: Potential reversal or continuation depending on prior trend, due to high indecision.
         /// </summary>
-        public static LongLeggedDojiPattern? IsPattern(
+        public static async Task<LongLeggedDojiPattern?> IsPatternAsync(
              Dictionary<int, CandleMetrics> metricsCache,
              int index,
              int trendLookback,
              CandleMids[] prices)
         {
             // Lazy load metrics for the current candle
-            var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             if (metrics.TotalRange <= 0) return null; // Reject if no range (invalid candle)
 

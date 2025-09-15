@@ -47,7 +47,7 @@ namespace BacklashPatterns.PatternDefinitions
          *   3. Third candle: Bullish, opens below second close, closes above it.
          * - Indication: Indicates potential exhaustion of sellers, possible trend reversal upward.
          */
-        public static Unique3RiverPattern? IsPattern(
+        public static async Task<Unique3RiverPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -59,9 +59,9 @@ namespace BacklashPatterns.PatternDefinitions
             int c3 = index;     // Third candle
             if (c1 < 0 || c3 >= prices.Length) return null;
 
-            var metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-            var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-            var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
+            var metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+            var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+            var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
             // First candle: Bearish, significant body
             if (metrics1.BodySize < MinFirstBodySize || !metrics1.IsBearish) return null;

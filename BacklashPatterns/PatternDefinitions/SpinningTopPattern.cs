@@ -58,14 +58,14 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static SpinningTopPattern? IsPattern(
+        public static async Task<SpinningTopPattern?> IsPatternAsync(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
             CandleMids[] prices)
         {
             // Retrieve metrics for the current candle with lazy loading
-            var metrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            var metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Early exit if the total range doesn’t meet the minimum requirement
             if (metrics.TotalRange < MinRange) return null;

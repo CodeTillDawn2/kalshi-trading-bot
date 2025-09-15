@@ -31,7 +31,7 @@ public class DownsideGapThreeMethodsPattern : PatternDefinition
     {
     }
 
-    public static DownsideGapThreeMethodsPattern? IsPattern(
+    public static async Task<DownsideGapThreeMethodsPattern?> IsPatternAsync(
         int index,
         CandleMids[] prices,
         int trendLookback,
@@ -43,9 +43,9 @@ public class DownsideGapThreeMethodsPattern : PatternDefinition
         int c2 = index - 1;
         int c3 = index;
 
-        var metrics1 = GetCandleMetrics(ref metricsCache, c1, prices, trendLookback, false);
-        var metrics2 = GetCandleMetrics(ref metricsCache, c2, prices, trendLookback, false);
-        var metrics3 = GetCandleMetrics(ref metricsCache, c3, prices, trendLookback, true);
+        var metrics1 = await GetCandleMetricsAsync(metricsCache, c1, prices, trendLookback, false);
+        var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
+        var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
         var asks = prices.Skip(index - 2).Take(3).ToArray();
 

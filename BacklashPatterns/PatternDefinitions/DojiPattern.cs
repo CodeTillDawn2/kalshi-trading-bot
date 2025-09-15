@@ -25,7 +25,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Maximum body size relative to the candle's total range.
         /// Purpose: Ensures the body is small compared to the candle's range, indicating indecision.
         /// Default: 0.1 (10% of total range).
-        /// Range: 0.05–0.15 (0.05 for stricter Doji, 0.15 for broader interpretation).
+        /// Range: 0.05ï¿½0.15 (0.05 for stricter Doji, 0.15 for broader interpretation).
         /// </summary>
         public static double BodyToRangeMax { get; set; } = 0.1;
 
@@ -33,7 +33,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Maximum body size relative to the lookback average range.
         /// Purpose: Caps body size against prior volatility for consistency across timeframes.
         /// Default: 0.05 (5% of average range).
-        /// Range: 0.03–0.07 (0.03 for tighter control, 0.07 for looser fit).
+        /// Range: 0.03ï¿½0.07 (0.03 for tighter control, 0.07 for looser fit).
         /// </summary>
         public static double BodyToAvgRangeMax { get; set; } = 0.05;
 
@@ -41,7 +41,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum total range relative to the lookback average range.
         /// Purpose: Ensures the candle is significant compared to prior volatility, filtering stagnation.
         /// Default: 1.5 (1.5x average range).
-        /// Range: 1.2–2.0 (1.2 for more frequent detection, 2.0 for stricter significance).
+        /// Range: 1.2ï¿½2.0 (1.2 for more frequent detection, 2.0 for stricter significance).
         /// </summary>
         public static double MinRangeToAvgRangeRatio { get; set; } = 1.5;
 
@@ -49,7 +49,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Maximum wick ratio (larger wick / smaller wick).
         /// Purpose: Ensures upper and lower wicks are reasonably balanced for a classic Doji.
         /// Default: 1.5 (larger wick = 1.5x smaller wick).
-        /// Range: 1.2–2.0 (1.2 for stricter balance, 2.0 for looser balance).
+        /// Range: 1.2ï¿½2.0 (1.2 for stricter balance, 2.0 for looser balance).
         /// </summary>
         public static double MaxWickRatio { get; set; } = 1.5;
 
@@ -57,7 +57,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum trend direction ratio in the lookback period to confirm a prior trend.
         /// Purpose: Ensures a consistent prior trend (bullish or bearish) for meaningful indecision.
         /// Default: 0.6 (60% of candles in one direction).
-        /// Range: 0.5–0.8 (0.5 for moderate trends, 0.8 for strong trends).
+        /// Range: 0.5ï¿½0.8 (0.5 for moderate trends, 0.8 for strong trends).
         /// </summary>
         public static double TrendDirectionRatioMin { get; set; } = 0.6;
 
@@ -83,7 +83,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="trendLookback">Number of candles to look back for trend and average range.</param>
         /// <param name="prices">Array of candle price data.</param>
         /// <returns>A DojiPattern instance if detected, otherwise null.</returns>
-        public static DojiPattern? IsPattern(
+        public static async Task<DojiPattern?> IsPatternAsync(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
@@ -96,7 +96,7 @@ namespace BacklashPatterns.PatternDefinitions
             var candles = new List<int> { index };
 
             // Get metrics for the candle
-            CandleMetrics indexMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            CandleMetrics indexMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
             // Calculate lookback average range before the pattern
             double avgRange = indexMetrics.LookbackAvgRange[PatternSize - 1]; // Use PatternSize for consistency

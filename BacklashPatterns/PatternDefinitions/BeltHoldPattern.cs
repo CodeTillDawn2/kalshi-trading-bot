@@ -151,7 +151,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="metricsCache">Cache of precomputed candle metrics.</param>
         /// <param name="isBullish">True to check for bullish pattern, false for bearish.</param>
         /// <returns>A BeltHoldPattern instance if the pattern is detected, otherwise null.</returns>
-        public static BeltHoldPattern? IsPattern(
+        public static async Task<BeltHoldPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -161,7 +161,7 @@ namespace BacklashPatterns.PatternDefinitions
             if (index < (PatternSize - 1) + trendLookback) return null;
             CandleMids currentPrices = prices[index];
 
-            CandleMetrics currentMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
+            CandleMetrics currentMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
             var candles = new List<int> { index };
 
             // Step 1: Shape and Direction

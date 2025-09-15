@@ -52,7 +52,7 @@ namespace BacklashPatterns.PatternDefinitions
         {
         }
 
-        public static OnNeckPattern? IsPattern(
+        public static async Task<OnNeckPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -63,8 +63,8 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMids currentPrices = prices[index];
             CandleMids previousPrices = prices[index - 1];
 
-            CandleMetrics currMetrics = GetCandleMetrics(ref metricsCache, index, prices, trendLookback, true);
-            CandleMetrics prevMetrics = GetCandleMetrics(ref metricsCache, index - 1, prices, trendLookback, false);
+            CandleMetrics currMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
+            CandleMetrics prevMetrics = await GetCandleMetricsAsync(metricsCache, index - 1, prices, trendLookback, false);
 
             // First candle must be bearish with a significant body, second must be bullish
             if (!prevMetrics.IsBearish || prevMetrics.BodySize < MinBodySize || !currMetrics.IsBullish)

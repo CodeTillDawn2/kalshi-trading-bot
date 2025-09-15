@@ -32,7 +32,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Indicates a potential reversal with minimal trend confirmation.
         /// Your original logic uses a very loose definition compared to the standard Hikkake.
         /// </summary>
-        public static ModifiedHikkakePattern? IsPattern(
+        public static async Task<ModifiedHikkakePattern?> IsPatternAsync(
             int index,
             bool isBullish,
             CandleMids[] prices,
@@ -51,8 +51,8 @@ namespace BacklashPatterns.PatternDefinitions
             var thirdMid = prices[thirdIdx];
 
             // Lazy load metrics for the three candles
-            var secondMetrics = GetCandleMetrics(ref metricsCache, secondIdx, prices, trendLookback, false);
-            var thirdMetrics = GetCandleMetrics(ref metricsCache, thirdIdx, prices, trendLookback, true);
+            var secondMetrics = await GetCandleMetricsAsync(metricsCache, secondIdx, prices, trendLookback, false);
+            var thirdMetrics = await GetCandleMetricsAsync(metricsCache, thirdIdx, prices, trendLookback, true);
 
             // Very loose breakout/breakdown: Any directional move from first close
             bool breakoutCondition = isBullish

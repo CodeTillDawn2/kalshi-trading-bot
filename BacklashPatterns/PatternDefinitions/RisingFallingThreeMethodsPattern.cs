@@ -61,7 +61,7 @@ namespace BacklashPatterns.PatternDefinitions
         ///   closing below the first.
         /// Indicates: Continuation of the prior trend (bullish for Rising, bearish for Falling) after a brief consolidation.
         /// </summary>
-        public static RisingFallingThreeMethodsPattern? IsPattern(
+        public static async Task<RisingFallingThreeMethodsPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
@@ -74,11 +74,11 @@ namespace BacklashPatterns.PatternDefinitions
             var asks = prices.Skip(startIndex).Take(5).ToArray();
 
             // Lazy load metrics for all 5 candles
-            CandleMetrics metrics1 = GetCandleMetrics(ref metricsCache, startIndex, prices, trendLookback, false);
-            CandleMetrics metrics2 = GetCandleMetrics(ref metricsCache, startIndex + 1, prices, trendLookback, false);
-            CandleMetrics metrics3 = GetCandleMetrics(ref metricsCache, startIndex + 2, prices, trendLookback, false);
-            CandleMetrics metrics4 = GetCandleMetrics(ref metricsCache, startIndex + 3, prices, trendLookback, false);
-            CandleMetrics metrics5 = GetCandleMetrics(ref metricsCache, startIndex + 4, prices, trendLookback, true);
+            CandleMetrics metrics1 = await GetCandleMetricsAsync(metricsCache, startIndex, prices, trendLookback, false);
+            CandleMetrics metrics2 = await GetCandleMetricsAsync(metricsCache, startIndex + 1, prices, trendLookback, false);
+            CandleMetrics metrics3 = await GetCandleMetricsAsync(metricsCache, startIndex + 2, prices, trendLookback, false);
+            CandleMetrics metrics4 = await GetCandleMetricsAsync(metricsCache, startIndex + 3, prices, trendLookback, false);
+            CandleMetrics metrics5 = await GetCandleMetricsAsync(metricsCache, startIndex + 4, prices, trendLookback, true);
 
             // Check if first candle has a significant body
             if (metrics1.BodySize < MinBodySizeMajor) return null;
