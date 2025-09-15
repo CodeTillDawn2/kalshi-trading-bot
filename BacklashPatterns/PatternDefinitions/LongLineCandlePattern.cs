@@ -49,8 +49,8 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Identifies a Long Line Candle pattern, a single-candle pattern indicating strong momentum.
         /// Requirements (sourced from TradingView and adapted to your logic):
-        /// - A candle with a large body relative to its range (typically > 60-70%).
-        /// - Small upper and lower wicks (typically < 20-30% of range).
+        /// - A candle with a large body relative to its range (typically &gt; 60-70%).
+        /// - Small upper and lower wicks (typically &lt; 20-30% of range).
         /// - Appears in a trend context (bullish after downtrend, bearish after uptrend).
         /// - Indicates strong directional momentum.
         /// Your original logic includes a contextual range check against lookback average.

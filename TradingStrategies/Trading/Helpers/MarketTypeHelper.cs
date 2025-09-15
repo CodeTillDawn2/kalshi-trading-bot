@@ -194,8 +194,8 @@ namespace TradingStrategies.Trading.Helpers
         /// 3. If within bands, evaluating band width for volatility/stable/bouncing classification
         ///
         /// Band width thresholds:
-        /// - > 0.1: Volatile (wide bands indicate high volatility)
-        /// - < 0.05: Stable (narrow bands indicate low volatility)
+        /// - &gt; 0.1: Volatile (wide bands indicate high volatility)
+        /// - &lt; 0.05: Stable (narrow bands indicate low volatility)
         /// - 0.05-0.1: Bouncing (moderate volatility with price oscillation)
         ///
         /// Falls back to Stable if Bollinger Band data is unavailable.
@@ -237,8 +237,8 @@ namespace TradingStrategies.Trading.Helpers
         /// Uses the snapshot's CalculateLiquidityScore() method which evaluates multiple factors
         /// including spread, depth, volume, and slippage estimates. The score is categorized as:
         ///
-        /// - High: Score > 80 (excellent liquidity, easy to trade large volumes)
-        /// - Low: Score < 30 (poor liquidity, difficult to trade without price impact)
+        /// - High: Score &gt; 80 (excellent liquidity, easy to trade large volumes)
+        /// - Low: Score &lt; 30 (poor liquidity, difficult to trade without price impact)
         /// - Moderate: Score 30-80 (acceptable liquidity for normal trading)
         ///
         /// This condition helps identify markets where trading costs and execution quality vary significantly.
@@ -268,7 +268,7 @@ namespace TradingStrategies.Trading.Helpers
         ///
         /// - Far: > 14 days (long-term market, stable conditions expected)
         /// - Near: 1-14 days (medium-term, some urgency but not immediate)
-        /// - Imminent: < 1 day (short-term, high urgency, potential volatility spikes)
+        /// - Imminent: &lt; 1 day (short-term, high urgency, potential volatility spikes)
         ///
         /// Markets without time data (e.g., perpetual markets) default to Far.
         /// This condition is crucial for strategies that need to account for time decay and closing volatility.
@@ -300,8 +300,8 @@ namespace TradingStrategies.Trading.Helpers
         /// Measures market activity by summing trade rates for both sides (yes and no contracts).
         /// Activity levels are categorized as:
         ///
-        /// - High: > 5 trades/minute (very active market with frequent trading)
-        /// - Low: < 1 trade/minute (quiet market with infrequent trading)
+        /// - High: &gt; 5 trades/minute (very active market with frequent trading)
+        /// - Low: &lt; 1 trade/minute (quiet market with infrequent trading)
         /// - Moderate: 1-5 trades/minute (normal activity levels)
         ///
         /// This condition helps identify markets with different liquidity and momentum characteristics,

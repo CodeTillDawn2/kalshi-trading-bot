@@ -38,11 +38,11 @@ namespace KalshiBotTests
         }
 
         /// <summary>
-        /// Creates and returns an IOptions<TradingConfig> instance with predefined test values for trading-related settings.
+        /// Creates and returns an IOptions&lt;TradingConfig&gt; instance with predefined test values for trading-related settings.
         /// These values represent common configuration parameters used in testing scenarios, such as decision frequency and window durations.
         /// The returned options object can be injected into services that depend on TradingConfig for isolated testing.
         /// </summary>
-        /// <returns>An IOptions<TradingConfig> instance configured with standard test values.</returns>
+        /// <returns>An IOptions&lt;TradingConfig&gt; instance configured with standard test values.</returns>
         public static IOptions<TradingConfig> GetTradingConfig()
         {
             var tradingConfig = new TradingConfig
@@ -56,12 +56,12 @@ namespace KalshiBotTests
         }
 
         /// <summary>
-        /// Creates and returns an IOptions<CalculationConfig> instance with predefined test values for technical indicator and calculation settings.
+        /// Creates and returns an IOptions&lt;CalculationConfig&gt; instance with predefined test values for technical indicator and calculation settings.
         /// These values represent standard periods and parameters for various trading indicators (RSI, MACD, EMA, Bollinger Bands, etc.) used in testing.
         /// The configuration includes settings for short, medium, and long-term calculations across multiple technical analysis tools.
         /// The returned options object enables consistent testing of calculation logic without external configuration dependencies.
         /// </summary>
-        /// <returns>An IOptions<CalculationConfig> instance configured with comprehensive test values for technical indicators.</returns>
+        /// <returns>An IOptions&lt;CalculationConfig&gt; instance configured with comprehensive test values for technical indicators.</returns>
         public static IOptions<CalculationConfig> GetCalculationConfig()
         {
             var calculationConfig = new CalculationConfig
@@ -168,7 +168,7 @@ namespace KalshiBotTests
         /// Creates and returns an IOptions<TradingConfig> instance with scenario-based test values.
         /// </summary>
         /// <param name="scenario">The test scenario to use for configuration values.</param>
-        /// <returns>An IOptions<TradingConfig> instance configured for the specified scenario.</returns>
+        /// <returns>An IOptions&lt;TradingConfig&gt; instance configured for the specified scenario.</returns>
         public static IOptions<TradingConfig> GetTradingConfig(TestScenario scenario)
         {
             var config = new TradingConfig();
@@ -204,7 +204,7 @@ namespace KalshiBotTests
         /// Creates and returns an IOptions<CalculationConfig> instance with scenario-based test values.
         /// </summary>
         /// <param name="scenario">The test scenario to use for configuration values.</param>
-        /// <returns>An IOptions<CalculationConfig> instance configured for the specified scenario.</returns>
+        /// <returns>An IOptions&lt;CalculationConfig&gt; instance configured for the specified scenario.</returns>
         public static IOptions<CalculationConfig> GetCalculationConfig(TestScenario scenario)
         {
             var config = new CalculationConfig();
@@ -273,7 +273,7 @@ namespace KalshiBotTests
         /// Loads TradingConfig from a JSON file.
         /// </summary>
         /// <param name="filePath">Path to the JSON configuration file.</param>
-        /// <returns>An IOptions<TradingConfig> instance loaded from the file.</returns>
+        /// <returns>An IOptions&lt;TradingConfig&gt; instance loaded from the file.</returns>
         public static IOptions<TradingConfig> LoadTradingConfigFromFile(string filePath)
         {
             if (!File.Exists(filePath)) throw new FileNotFoundException("Configuration file not found", filePath);
@@ -287,7 +287,7 @@ namespace KalshiBotTests
         /// Loads CalculationConfig from a JSON file.
         /// </summary>
         /// <param name="filePath">Path to the JSON configuration file.</param>
-        /// <returns>An IOptions<CalculationConfig> instance loaded from the file.</returns>
+        /// <returns>An IOptions&lt;CalculationConfig&gt; instance loaded from the file.</returns>
         public static IOptions<CalculationConfig> LoadCalculationConfigFromFile(string filePath)
         {
             if (!File.Exists(filePath)) throw new FileNotFoundException("Configuration file not found", filePath);

@@ -18,7 +18,7 @@ namespace TradingStrategies.Configuration
         /// Number of periods to use for short-term RSI (Relative Strength Index) calculations.
         /// RSI measures price momentum on a scale of 0-100, commonly used for overbought/oversold signals.
         /// Shorter periods (e.g., 14) provide more responsive but potentially noisier signals.
-        /// Validation ensures: 1 ≤ Short < Medium < Long.
+        /// Validation ensures: 1 &le; Short &lt; Medium &lt; Long.
         /// </summary>
         [Range(1, int.MaxValue, ErrorMessage = "RSI_Short_Periods must be greater than 0.")]
         public int RSI_Short_Periods { get; set; }
@@ -26,7 +26,7 @@ namespace TradingStrategies.Configuration
         /// <summary>
         /// Number of periods to use for medium-term RSI calculations.
         /// Used for intermediate trend analysis, balancing responsiveness with signal reliability.
-        /// Validation ensures: 1 ≤ Short < Medium < Long.
+        /// Validation ensures: 1 &le; Short &lt; Medium &lt; Long.
         /// </summary>
         [Range(1, int.MaxValue, ErrorMessage = "RSI_Medium_Periods must be greater than 0.")]
         public int RSI_Medium_Periods { get; set; }
@@ -34,7 +34,7 @@ namespace TradingStrategies.Configuration
         /// <summary>
         /// Number of periods to use for long-term RSI calculations.
         /// Provides broader trend context, less sensitive to short-term price fluctuations.
-        /// Validation ensures: 1 ≤ Short < Medium < Long.
+        /// Validation ensures: 1 &le; Short &lt; Medium &lt; Long.
         /// </summary>
         [Range(1, int.MaxValue, ErrorMessage = "RSI_Long_Periods must be greater than 0.")]
         public int RSI_Long_Periods { get; set; }
@@ -43,7 +43,7 @@ namespace TradingStrategies.Configuration
         /// Fast EMA period for medium-term MACD (Moving Average Convergence Divergence) calculations.
         /// MACD shows the relationship between two moving averages of price, used for momentum analysis.
         /// The fast period must be shorter than the slow period for proper convergence/divergence signals.
-        /// Validation ensures: 1 ≤ FastPeriod < SlowPeriod.
+        /// Validation ensures: 1 &le; FastPeriod &lt; SlowPeriod.
         /// </summary>
         [Range(1, int.MaxValue, ErrorMessage = "MACD_Medium_FastPeriod must be greater than 0.")]
         public int MACD_Medium_FastPeriod { get; set; }
@@ -51,7 +51,7 @@ namespace TradingStrategies.Configuration
         /// <summary>
         /// Slow EMA period for medium-term MACD calculations.
         /// Longer period provides the baseline trend against which the fast period converges/diverges.
-        /// Validation ensures: 1 ≤ SlowPeriod, and FastPeriod < SlowPeriod.
+        /// Validation ensures: 1 &le; SlowPeriod, and FastPeriod &lt; SlowPeriod.
         /// </summary>
         [Range(1, int.MaxValue, ErrorMessage = "MACD_Medium_SlowPeriod must be greater than 0.")]
         public int MACD_Medium_SlowPeriod { get; set; }
@@ -111,7 +111,7 @@ namespace TradingStrategies.Configuration
         /// Standard deviation multiplier for medium-term Bollinger Bands.
         /// Controls band width - higher values create wider bands, lower values create tighter bands.
         /// Typically 2.0 for standard Bollinger Bands.
-        /// Validation ensures: StdDev ≥ 0.1.
+        /// Validation ensures: StdDev &ge; 0.1.
         /// </summary>
         [Range(0.1, double.MaxValue, ErrorMessage = "BollingerBands_Medium_StdDev must be greater than 0.")]
         public double BollingerBands_Medium_StdDev { get; set; }
@@ -119,7 +119,7 @@ namespace TradingStrategies.Configuration
         /// <summary>
         /// Number of periods for long-term Bollinger Bands calculations.
         /// Used for extended volatility analysis and major price level identification.
-        /// Validation ensures: 1 ≤ Long_Periods, and Medium_Periods < Long_Periods.
+        /// Validation ensures: 1 &le; Long_Periods, and Medium_Periods &lt; Long_Periods.
         /// </summary>
         [Range(1, int.MaxValue, ErrorMessage = "BollingerBands_Long_Periods must be greater than 0.")]
         public int BollingerBands_Long_Periods { get; set; }
@@ -127,7 +127,7 @@ namespace TradingStrategies.Configuration
         /// <summary>
         /// Standard deviation multiplier for long-term Bollinger Bands.
         /// Configures band sensitivity for long-term trend analysis.
-        /// Validation ensures: StdDev ≥ 0.1.
+        /// Validation ensures: StdDev &ge; 0.1.
         /// </summary>
         [Range(0.1, double.MaxValue, ErrorMessage = "BollingerBands_Long_StdDev must be greater than 0.")]
         public double BollingerBands_Long_StdDev { get; set; }
@@ -279,7 +279,7 @@ namespace TradingStrategies.Configuration
         /// Tolerance percentage used for depth calculations within a price range.
         /// Determines the percentage range around the best bid to include in depth calculations.
         /// Expressed as percentage (e.g., 10.0 for 10%).
-        /// Validation ensures: 0.1 ≤ TolerancePercentage ≤ 100.0.
+        /// Validation ensures: 0.1 &le; TolerancePercentage &le; 100.0.
         /// </summary>
         [Range(0.1, 100.0, ErrorMessage = "TolerancePercentage must be between 0.1 and 100.")]
         public double TolerancePercentage { get; set; } = 10.0;
@@ -288,7 +288,7 @@ namespace TradingStrategies.Configuration
         /// Trading fee rate applied to calculate expected fees.
         /// The fee is calculated as: roundup(fee_rate * contracts * price * (1 - price)).
         /// Expressed as decimal (e.g., 0.07 for 7%).
-        /// Validation ensures: 0.0 ≤ TradingFeeRate ≤ 1.0.
+        /// Validation ensures: 0.0 &le; TradingFeeRate &le; 1.0.
         /// </summary>
         [Range(0.0, 1.0, ErrorMessage = "TradingFeeRate must be between 0 and 1.")]
         public double TradingFeeRate { get; set; } = 0.07;
@@ -296,7 +296,7 @@ namespace TradingStrategies.Configuration
         /// <summary>
         /// Number of minutes for short-term slope calculations in price movement analysis.
         /// Used to calculate bid slope over a short timeframe for responsive signals.
-        /// Validation ensures: 1 ≤ ShortMinutes < MediumMinutes.
+        /// Validation ensures: 1 &le; ShortMinutes &lt; MediumMinutes.
         /// </summary>
         [Range(1, int.MaxValue, ErrorMessage = "SlopeShortMinutes must be greater than 0.")]
         public int SlopeShortMinutes { get; set; } = 5;
@@ -304,7 +304,7 @@ namespace TradingStrategies.Configuration
         /// <summary>
         /// Number of minutes for medium-term slope calculations in price movement analysis.
         /// Used to calculate bid slope over a medium timeframe for balanced signals.
-        /// Validation ensures: 1 ≤ MediumMinutes, and ShortMinutes < MediumMinutes.
+        /// Validation ensures: 1 &le; MediumMinutes, and ShortMinutes &lt; MediumMinutes.
         /// </summary>
         [Range(1, int.MaxValue, ErrorMessage = "SlopeMediumMinutes must be greater than 0.")]
         public int SlopeMediumMinutes { get; set; } = 15;
