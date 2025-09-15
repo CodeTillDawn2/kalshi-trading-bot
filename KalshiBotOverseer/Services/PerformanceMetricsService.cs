@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using KalshiBotData.Data.Interfaces;
 using BacklashInterfaces.PerformanceMetrics;
+using System.Collections.Concurrent;
 
 namespace KalshiBotOverseer.Services
 {
@@ -12,7 +13,7 @@ namespace KalshiBotOverseer.Services
     /// This service aggregates metrics from various components including WebSocket operations, API calls,
     /// SignalR communications, overnight tasks, and snapshot processing.
     /// </summary>
-    public class PerformanceMetricsService : IKalshiBotContextPerformanceMetrics
+    public class PerformanceMetricsService : IKalshiBotContextPerformanceMetrics, IWebSocketPerformanceMetrics
     {
         private readonly ILogger<PerformanceMetricsService> _logger;
 
@@ -51,6 +52,13 @@ namespace KalshiBotOverseer.Services
 
         // Database metrics
         private Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> _databaseMetrics = new();
+
+        // WebSocket metrics
+        private readonly ConcurrentDictionary<string, long> _webSocketProcessingTimeTicks = new();
+        private readonly ConcurrentDictionary<string, int> _webSocketProcessingCount = new();
+        private readonly ConcurrentDictionary<string, long> _webSocketBufferUsageBytes = new();
+        private readonly ConcurrentDictionary<string, TimeSpan> _webSocketOperationTimes = new();
+        private readonly ConcurrentDictionary<string, int> _webSocketSemaphoreWaitCount = new();
 
         /// <summary>
         /// Gets the current database performance metrics.
@@ -519,6 +527,97 @@ namespace KalshiBotOverseer.Services
             {
                 _logger.LogInformation("  {Key}: {Value}", kvp.Key, kvp.Value);
             }
+        }
+
+        #endregion
+
+        #region IWebSocketPerformanceMetrics Implementation
+
+        /// <summary>
+        /// Records WebSocket message processing performance.
+        /// </summary>
+        public void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes)
+        {
+            _webSocketProcessingTimeTicks.AddOrUpdate(messageType, 0, (k, v) => v + processingTimeTicks);
+            _webSocketProcessingCount.AddOrUpdate(messageType, 0, (k, v) => v + messageCount);
+            _webSocketBufferUsageBytes.AddOrUpdate(messageType, 0, (k, v) => v + bufferSizeBytes);
+            _logger.LogDebug("WebSocket message processing recorded: Type={Type}, TimeTicks={TimeTicks}, Count={Count}, BufferBytes={BufferBytes}",
+                messageType, processingTimeTicks, messageCount, bufferSizeBytes);
+        }
+
+        /// <summary>
+        /// Records WebSocket connection performance.
+        /// </summary>
+        public void RecordWebSocketOperation(string operation, TimeSpan duration)
+        {
+            _webSocketOperationTimes[operation] = duration;
+            _logger.LogDebug("WebSocket operation recorded: {Operation}={Duration}ms", operation, duration.TotalMilliseconds);
+        }
+
+        /// <summary>
+        /// Records semaphore wait counts for WebSocket operations.
+        /// </summary>
+        public void RecordSemaphoreWait(string operation, int waitCount)
+        {
+            _webSocketSemaphoreWaitCount.AddOrUpdate(operation, 0, (k, v) => v + waitCount);
+            _logger.LogDebug("Semaphore wait recorded: {Operation}={WaitCount}", operation, waitCount);
+        }
+
+        /// <summary>
+        /// Gets the average processing times for WebSocket messages.
+        /// </summary>
+        public ConcurrentDictionary<string, double> GetAverageProcessingTimesMs()
+        {
+            return new ConcurrentDictionary<string, double>(
+                _webSocketProcessingTimeTicks.ToDictionary(
+                    kv => kv.Key,
+                    kv => _webSocketProcessingCount.TryGetValue(kv.Key, out var count) && count > 0
+                        ? TimeSpan.FromTicks(kv.Value / count).TotalMilliseconds
+                        : 0.0
+                )
+            );
+        }
+
+        /// <summary>
+        /// Gets the total buffer usage for WebSocket messages.
+        /// </summary>
+        public ConcurrentDictionary<string, long> GetBufferUsageBytes()
+        {
+            return new ConcurrentDictionary<string, long>(_webSocketBufferUsageBytes);
+        }
+
+        /// <summary>
+        /// Gets the average times for WebSocket operations.
+        /// </summary>
+        public ConcurrentDictionary<string, double> GetAsyncOperationTimesMs()
+        {
+            return new ConcurrentDictionary<string, double>(
+                _webSocketOperationTimes.ToDictionary(
+                    kv => kv.Key,
+                    kv => kv.Value.TotalMilliseconds
+                )
+            );
+        }
+
+        /// <summary>
+        /// Gets the semaphore wait counts for WebSocket operations.
+        /// </summary>
+        public ConcurrentDictionary<string, int> GetSemaphoreWaitCounts()
+        {
+            return new ConcurrentDictionary<string, int>(_webSocketSemaphoreWaitCount);
+        }
+
+        /// <summary>
+        /// Resets all WebSocket performance metrics.
+        /// </summary>
+        public void ResetWebSocketMetrics()
+        {
+            _webSocketProcessingTimeTicks.Clear();
+            _webSocketProcessingCount.Clear();
+            _webSocketBufferUsageBytes.Clear();
+            _webSocketOperationTimes.Clear();
+            _webSocketSemaphoreWaitCount.Clear();
+            _logger.LogInformation("WebSocket performance metrics reset");
         }
 
         #endregion

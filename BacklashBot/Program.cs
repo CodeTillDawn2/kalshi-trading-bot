@@ -81,6 +81,8 @@ builder.Services.AddSingleton<IScopeManagerService, KaslhiBotScopeManagerService
 builder.Services.AddSingleton<ICentralPerformanceMonitor, CentralPerformanceMonitor>();
 builder.Services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
     (INightActivitiesPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
+builder.Services.AddSingleton<IWebSocketPerformanceMetrics>(provider =>
+    (IWebSocketPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
 builder.Services.AddSingleton<IMarketManagerService, MarketManagerService>();
 builder.Services.AddSingleton<IStatusTrackerService, KalshiBotStatusTracker>();
 builder.Services.AddSingleton<IBotReadyStatus, KalshiBotReadyStatus>();
@@ -208,7 +210,10 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClie
     sp.GetRequiredService<ISubscriptionManager>(),
     sp.GetRequiredService<IMessageProcessor>(),
     sp.GetRequiredService<IDataCache>(),
-    sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents
+    sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
+    sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents,
+    sp.GetRequiredService<IOptions<KalshiConfig>>().Value.WebSocketBufferSize,
+    sp.GetRequiredService<IConfiguration>().GetSection("Kalshi:KalshiWebSocketClient:EnablePerformanceMetrics").Get<bool?>() ?? true
 ));
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>

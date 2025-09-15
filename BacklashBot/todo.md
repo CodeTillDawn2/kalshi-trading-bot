@@ -41,16 +41,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## KalshiBotOverseer.Controllers.MarketWatchController
 
-## KalshiBotOverseer.Models.BrainPersistence
-
-## KalshiBotAPI.Websockets.KalshiWebSocketClient
-
-## KalshiBotAPI.Websockets.SubscriptionManager
-
-## BacklashBot.Services.OverseerClientService
-
-## BacklashPatterns.PatternSearch
-
 
 ## TradingGUI.MainForm
 
