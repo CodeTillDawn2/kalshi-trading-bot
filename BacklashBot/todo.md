@@ -59,9 +59,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## BacklashBot.Services.InterestScoreService
 
-## BacklashBot.Services.OrderBookService
-
-## BacklashPatterns.PatternUtils
 
 ## TradingGUI.MainForm
 
