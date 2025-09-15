@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradingStrategies", "..\Tra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradingSimulator", "..\TradingSimulator\TradingSimulator.csproj", "{2534A9A8-FE6E-44C6-8581-23870A3474F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KalshiBotTests", "..\KalshiBotTests\KalshiBotTests.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567891}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KalshiBotTests", "..\KalshiBotTests\KalshiBotTests.csproj", "{F1A2B3C4-D5E6-7890-ABCD-EF123456789A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KalshiBotTasks", "..\KalshiBotTasks\KalshiBotTasks.csproj", "{8E118017-CAAB-405E-BC3A-C889DF51E52F}"
 EndProject
@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KalshiBotAPI", "..\KalshiBo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BacklashPatterns", "..\BacklashPatterns\BacklashPatterns.csproj", "{465584FB-CAA7-0BF2-BC77-79B8672D54C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KalshiBotLogging", "..\KalshiBotLogging\KalshiBotLogging.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KalshiBotLogging", "..\KalshiBotLogging\KalshiBotLogging.csproj", "{002F3807-EFDF-46EB-A43D-9457E2FE2431}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
@@ -53,10 +53,10 @@ Global
 		{2534A9A8-FE6E-44C6-8581-23870A3474F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2534A9A8-FE6E-44C6-8581-23870A3474F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2534A9A8-FE6E-44C6-8581-23870A3474F8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A1B2C3D4-E5F6-7890-ABCD-EF1234567891}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1B2C3D4-E5F6-7890-ABCD-EF1234567891}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1B2C3D4-E5F6-7890-ABCD-EF1234567891}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1B2C3D4-E5F6-7890-ABCD-EF1234567891}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1A2B3C4-D5E6-7890-ABCD-EF123456789A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1A2B3C4-D5E6-7890-ABCD-EF123456789A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1A2B3C4-D5E6-7890-ABCD-EF123456789A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1A2B3C4-D5E6-7890-ABCD-EF123456789A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8E118017-CAAB-405E-BC3A-C889DF51E52F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8E118017-CAAB-405E-BC3A-C889DF51E52F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E118017-CAAB-405E-BC3A-C889DF51E52F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -89,10 +89,10 @@ Global
 		{465584FB-CAA7-0BF2-BC77-79B8672D54C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{465584FB-CAA7-0BF2-BC77-79B8672D54C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{465584FB-CAA7-0BF2-BC77-79B8672D54C9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
+		{002F3807-EFDF-46EB-A43D-9457E2FE2431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{002F3807-EFDF-46EB-A43D-9457E2FE2431}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{002F3807-EFDF-46EB-A43D-9457E2FE2431}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{002F3807-EFDF-46EB-A43D-9457E2FE2431}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

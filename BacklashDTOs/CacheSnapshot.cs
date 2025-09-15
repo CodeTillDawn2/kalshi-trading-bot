@@ -4,22 +4,65 @@ using System.Text.Json.Serialization;
 
 namespace BacklashDTOs
 {
+    /// <summary>
+    /// Represents a snapshot of the trading system's state at a specific point in time.
+    /// </summary>
     public class CacheSnapshot
     {
+        /// <summary>
+        /// Gets or sets the timestamp when this snapshot was created.
+        /// </summary>
         public DateTime Timestamp { get; set; }
+
+        /// <summary>
+        /// Gets or sets the dictionary of market snapshots keyed by market ticker.
+        /// </summary>
         public Dictionary<string, MarketSnapshot> Markets { get; set; }
+
+        /// <summary>
+        /// Gets or sets the account balance at the time of the snapshot.
+        /// </summary>
         public double AccountBalance { get; set; }
+
+        /// <summary>
+        /// Gets or sets the portfolio value at the time of the snapshot.
+        /// </summary>
         public double PortfolioValue { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp of the last WebSocket message received.
+        /// </summary>
         public DateTime LastWebSocketTimestamp { get; set; }
+
+        /// <summary>
+        /// Gets or sets the software version used to create this snapshot.
+        /// </summary>
         public string? SoftwareVersion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the version number of this snapshot.
+        /// </summary>
         public int? SnapshotVersion { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CacheSnapshot"/> class for deserialization.
+        /// </summary>
         public CacheSnapshot()
         {
             // Parameterless constructor for deserialization
             Markets = new Dictionary<string, MarketSnapshot>();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CacheSnapshot"/> class with the specified parameters.
+        /// </summary>
+        /// <param name="snapshotDate">The date and time of the snapshot.</param>
+        /// <param name="softwareVersion">The software version.</param>
+        /// <param name="snapshotVersion">The snapshot version number.</param>
+        /// <param name="accountBalance">The account balance.</param>
+        /// <param name="portfolioValue">The portfolio value.</param>
+        /// <param name="lastWebSocketTimestamp">The timestamp of the last WebSocket message.</param>
+        /// <param name="marketSnapshots">The list of market snapshots.</param>
         public CacheSnapshot(DateTime snapshotDate, string softwareVersion, int? snapshotVersion, double accountBalance, double portfolioValue, DateTime lastWebSocketTimestamp, List<MarketSnapshot> marketSnapshots)
         {
             Timestamp = snapshotDate;
@@ -37,13 +80,27 @@ namespace BacklashDTOs
 
     }
 
+    /// <summary>
+    /// A JSON converter factory for simplified tuple types used in the application.
+    /// </summary>
     public class SimplifiedTupleConverter : JsonConverterFactory
     {
+        /// <summary>
+        /// Determines whether the converter can convert the specified type.
+        /// </summary>
+        /// <param name="typeToConvert">The type to convert.</param>
+        /// <returns>true if the converter can convert the type; otherwise, false.</returns>
         public override bool CanConvert(Type typeToConvert)
         {
             return typeToConvert == typeof((int, int, DateTime)) || typeToConvert == typeof((int, DateTime)) || typeToConvert == typeof((int, int));
         }
 
+        /// <summary>
+        /// Creates a converter for the specified type.
+        /// </summary>
+        /// <param name="typeToConvert">The type to convert.</param>
+        /// <param name="options">The serialization options.</param>
+        /// <returns>A JSON converter for the specified type.</returns>
         public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         {
             if (typeToConvert == typeof((int, int, DateTime)))

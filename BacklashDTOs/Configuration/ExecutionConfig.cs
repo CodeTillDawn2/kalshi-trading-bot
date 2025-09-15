@@ -1,18 +1,68 @@
 namespace BacklashDTOs.Configuration
 {
+    /// <summary>
+    /// Configuration class for execution settings.
+    /// </summary>
     public class ExecutionConfig
     {
+        /// <summary>
+        /// Gets or sets the timeout for market updates.
+        /// </summary>
         public int MarketUpdateTimeout { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether to launch the data dashboard.
+        /// </summary>
         public bool LaunchDataDashboard { get; set; }
+
+        /// <summary>
+        /// Gets or sets the brain instance identifier.
+        /// </summary>
         public string? BrainInstance { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether to run overnight activities.
+        /// </summary>
         public bool RunOvernightActivities { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of markets per subscription action.
+        /// </summary>
         public int MaxMarketsPerSubscriptionAction { get; set; }
+
+        /// <summary>
+        /// Gets or sets the hard data storage location.
+        /// </summary>
         public required string HardDataStorageLocation { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target count for queues.
+        /// </summary>
         public int QueuesTargetCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target percentage for queues.
+        /// </summary>
         public double QueuesTargetPercentage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the limit for the notification queue.
+        /// </summary>
         public int NotificationQueueLimit { get; set; } = 50;
+
+        /// <summary>
+        /// Gets or sets the limit for the orderbook queue.
+        /// </summary>
         public int OrderbookQueueLimit { get; set; } = 50;
+
+        /// <summary>
+        /// Gets or sets the limit for the event queue.
+        /// </summary>
         public int EventQueueLimit { get; set; } = 50;
+
+        /// <summary>
+        /// Gets or sets the limit for the ticker queue.
+        /// </summary>
         public int TickerQueueLimit { get; set; } = 50;
 
         /// <summary>

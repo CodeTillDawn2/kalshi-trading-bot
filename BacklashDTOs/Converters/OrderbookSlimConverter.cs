@@ -3,9 +3,19 @@ using System.Text.Json.Serialization;
 
 namespace BacklashDTOs.Converters
 {
-    // Slims rows: price->p, side y/n->s, resting_contracts->q, last_modified_date->t
+    /// <summary>
+    /// JSON converter for orderbook data that uses short property names for compactness.
+    /// Maps price->p, side y/n->s, resting_contracts->q, last_modified_date->t.
+    /// </summary>
     public sealed class OrderbookSlimConverter : JsonConverter<List<Dictionary<string, object>>>
     {
+        /// <summary>
+        /// Reads and converts the JSON to a list of orderbook rows, expanding short property names to long ones.
+        /// </summary>
+        /// <param name="reader">The UTF-8 JSON reader.</param>
+        /// <param name="typeToConvert">The type to convert.</param>
+        /// <param name="options">The serialization options.</param>
+        /// <returns>The deserialized list of orderbook rows.</returns>
         public override List<Dictionary<string, object>> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var list = new List<Dictionary<string, object>>();
@@ -87,6 +97,12 @@ namespace BacklashDTOs.Converters
             return list;
         }
 
+        /// <summary>
+        /// Writes the list of orderbook rows to JSON, shrinking long property names to short ones.
+        /// </summary>
+        /// <param name="writer">The UTF-8 JSON writer.</param>
+        /// <param name="value">The list of orderbook rows to serialize.</param>
+        /// <param name="options">The serialization options.</param>
         public override void Write(Utf8JsonWriter writer, List<Dictionary<string, object>> value, JsonSerializerOptions options)
         {
             writer.WriteStartArray();

@@ -214,6 +214,13 @@ namespace BacklashDTOs.Converters
             return d;
         }
 
+        /// <summary>
+        /// Reads and converts the JSON to a MarketSnapshot, expanding short property names to long ones.
+        /// </summary>
+        /// <param name="reader">The UTF-8 JSON reader.</param>
+        /// <param name="typeToConvert">The type to convert.</param>
+        /// <param name="options">The serialization options.</param>
+        /// <returns>The deserialized MarketSnapshot.</returns>
         public override BacklashDTOs.MarketSnapshot Read(ref Utf8JsonReader reader, System.Type typeToConvert, JsonSerializerOptions options)
         {
             using var doc = JsonDocument.ParseValue(ref reader);
@@ -227,6 +234,12 @@ namespace BacklashDTOs.Converters
             return JsonSerializer.Deserialize<BacklashDTOs.MarketSnapshot>(normalized, safe)!;
         }
 
+        /// <summary>
+        /// Writes the MarketSnapshot to JSON, shrinking long property names to short ones.
+        /// </summary>
+        /// <param name="writer">The UTF-8 JSON writer.</param>
+        /// <param name="value">The MarketSnapshot to serialize.</param>
+        /// <param name="options">The serialization options.</param>
         public override void Write(Utf8JsonWriter writer, BacklashDTOs.MarketSnapshot value, JsonSerializerOptions options)
         {
             var safe = CloneWithoutSelf(options);

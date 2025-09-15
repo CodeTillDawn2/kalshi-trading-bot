@@ -139,7 +139,11 @@ namespace TradingSimulator
 
             _snapshotPeriodHelper = new SnapshotPeriodHelper(_snapshotOptions.Value);
             _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, _snapshotOptions, _tradingOptions, _scopeFactory, config);
-            _overseer = new TradingOverseer(_scopeFactory, _snapshotService, config, overseerLoggerMock.Object);
+
+            // Initialize performance monitor first
+            _performanceMonitor = new PerformanceMonitor();
+
+            _overseer = new TradingOverseer(_scopeFactory, _snapshotService, config, overseerLoggerMock.Object, _performanceMonitor);
             _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 
@@ -150,9 +154,6 @@ namespace TradingSimulator
             _processedMarkets = new HashSet<string>();
             _cacheDirectory = _simulatorOptions.Value.CacheDirectory;
             Directory.CreateDirectory(_cacheDirectory); // ensure output dir exists
-
-            // Initialize performance monitor
-            _performanceMonitor = new PerformanceMonitor();
 
             // Initialize helper classes
             _dataLoader = new DataLoader(_snapshotService, _simulatorOptions);

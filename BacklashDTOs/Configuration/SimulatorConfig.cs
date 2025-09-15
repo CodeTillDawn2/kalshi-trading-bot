@@ -1,5 +1,8 @@
 namespace BacklashDTOs.Configuration
 {
+    /// <summary>
+    /// Configuration class for trading simulator settings.
+    /// </summary>
     public class SimulatorConfig
     {
         /// <summary>

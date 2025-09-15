@@ -21,6 +21,7 @@ using System.Text.Json.Serialization;
 using TradingSimulator.Strategies;
 using TradingStrategies.Classification;
 using TradingStrategies.Configuration;
+using BacklashBot.Management;
 
 
 namespace KalshiBotTasks
