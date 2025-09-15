@@ -50,6 +50,15 @@ namespace KalshiBotOverseer
         /// Default is 60.
         /// </summary>
         public int MaxCheckInRequestsPerMinute { get; set; } = 60;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether performance metrics collection is enabled.
+        /// When enabled, all performance metrics including latency tracking, message counting,
+        /// connection monitoring, and brain metrics are collected and recorded.
+        /// When disabled, only essential operations are performed with minimal overhead.
+        /// Default is false for performance reasons.
+        /// </summary>
+        public bool EnablePerformanceMetrics { get; set; } = false;
     }
 
     /// <summary>
@@ -254,6 +263,9 @@ namespace KalshiBotOverseer
                 ["MessagesPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.MessagesProcessed / minutesSinceReset : 0,
                 ["HandshakeRequestsPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.HandshakeRequests / minutesSinceReset : 0,
                 ["CheckInRequestsPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.CheckInRequests / minutesSinceReset : 0,
+                ["AverageHandshakeLatencyMs"] = _config.EnablePerformanceMetrics ? signalRMetrics.AvgHandshakeLatencyMs : 0,
+                ["AverageCheckInLatencyMs"] = _config.EnablePerformanceMetrics ? signalRMetrics.AvgCheckInLatencyMs : 0,
+                ["AverageMessageLatencyMs"] = _config.EnablePerformanceMetrics ? signalRMetrics.AvgMessageLatencyMs : 0,
                 ["CurrentConnectionCount"] = _connectedClients.Count,
                 ["LastMetricsReset"] = signalRMetrics.LastReset
             };
@@ -307,6 +319,8 @@ namespace KalshiBotOverseer
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task Handshake(string clientId, string clientName, string clientType)
         {
+            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             var httpContext = Context.GetHttpContext();
             var ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
@@ -322,8 +336,11 @@ namespace KalshiBotOverseer
                 return;
             }
 
-            _performanceMetrics.RecordSignalRHandshake();
-            _performanceMetrics.RecordSignalRMessage();
+            if (_config.EnablePerformanceMetrics)
+            {
+                _performanceMetrics.RecordSignalRHandshake();
+                _performanceMetrics.RecordSignalRMessage();
+            }
 
             _logger.LogInformation("Handshake request from client: {ClientId}, Name: {ClientName}, Type: {ClientType}",
                 clientId, clientName, clientType);
@@ -344,30 +361,33 @@ namespace KalshiBotOverseer
 
                 _clientInfo[Context.ConnectionId] = clientInfo;
 
-                // Log to database if available
-                try
+                // Log to database if available and performance metrics are enabled
+                if (_config.EnablePerformanceMetrics)
                 {
-                    using var scope = _scopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-
-                    var signalRClient = new BacklashDTOs.SignalRClient
+                    try
                     {
-                        ClientId = clientId,
-                        ClientName = clientName,
-                        IPAddress = ipAddress,
-                        ClientType = clientType,
-                        AuthToken = GenerateAuthToken(clientId, clientName),
-                        IsActive = true,
-                        ConnectionId = Context.ConnectionId,
-                        LastSeen = DateTime.UtcNow
-                    };
+                        using var scope = _scopeFactory.CreateScope();
+                        var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
 
-                    await context.AddOrUpdateSignalRClient(signalRClient);
-                    _logger.LogInformation("Client registered in database: {ClientId} from {IPAddress}", clientId, ipAddress);
-                }
-                catch (Exception dbEx)
-                {
-                    _logger.LogWarning(dbEx, "Failed to log client to database: {ClientId}", clientId);
+                        var signalRClient = new BacklashDTOs.SignalRClient
+                        {
+                            ClientId = clientId,
+                            ClientName = clientName,
+                            IPAddress = ipAddress,
+                            ClientType = clientType,
+                            AuthToken = GenerateAuthToken(clientId, clientName),
+                            IsActive = true,
+                            ConnectionId = Context.ConnectionId,
+                            LastSeen = DateTime.UtcNow
+                        };
+
+                        await context.AddOrUpdateSignalRClient(signalRClient);
+                        _logger.LogInformation("Client registered in database: {ClientId} from {IPAddress}", clientId, ipAddress);
+                    }
+                    catch (Exception dbEx)
+                    {
+                        _logger.LogWarning(dbEx, "Failed to log client to database: {ClientId}", clientId);
+                    }
                 }
 
                 // Send handshake response
@@ -390,10 +410,20 @@ namespace KalshiBotOverseer
                     Message = $"Handshake failed: {ex.Message}"
                 });
             }
+            finally
+            {
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    _performanceMetrics.RecordSignalRHandshakeLatency(stopwatch.Elapsed);
+                }
+            }
         }
 
         public async Task ProcessCheckIn(CheckInData checkInData)
         {
+            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             // Rate limiting check
             var clientId = Context.ConnectionId;
             if (IsRateLimited(clientId, "checkin", _config.MaxCheckInRequestsPerMinute))
@@ -407,8 +437,11 @@ namespace KalshiBotOverseer
                 return;
             }
 
-            _performanceMetrics.RecordSignalRCheckIn();
-            _performanceMetrics.RecordSignalRMessage();
+            if (_config.EnablePerformanceMetrics)
+            {
+                _performanceMetrics.RecordSignalRCheckIn();
+                _performanceMetrics.RecordSignalRMessage();
+            }
 
             _logger.LogInformation("CheckIn received from connection: {ConnectionId}", Context.ConnectionId);
 
@@ -467,7 +500,7 @@ namespace KalshiBotOverseer
                     clientInfo.ClientName, dbBrainExists);
 
                 // Update current market tickers in persistence service
-                if (!string.IsNullOrEmpty(clientInfo.ClientName))
+                if (_config.EnablePerformanceMetrics && !string.IsNullOrEmpty(clientInfo.ClientName))
                 {
                     try
                     {
@@ -507,22 +540,25 @@ namespace KalshiBotOverseer
                 }
 
                 // Update client last seen in database
-                try
+                if (_config.EnablePerformanceMetrics)
                 {
-                    using var scope = _scopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
-
-                    // Update client last seen
-                    var signalRClient = await context.GetSignalRClient(clientInfo.ClientId);
-                    if (signalRClient != null)
+                    try
                     {
-                        signalRClient.LastSeen = DateTime.UtcNow;
-                        await context.AddOrUpdateSignalRClient(signalRClient);
+                        using var scope = _scopeFactory.CreateScope();
+                        var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+
+                        // Update client last seen
+                        var signalRClient = await context.GetSignalRClient(clientInfo.ClientId);
+                        if (signalRClient != null)
+                        {
+                            signalRClient.LastSeen = DateTime.UtcNow;
+                            await context.AddOrUpdateSignalRClient(signalRClient);
+                        }
                     }
-                }
-                catch (Exception dbEx)
-                {
-                    _logger.LogWarning(dbEx, "Failed to log CheckIn to database for client: {ClientId}", clientInfo.ClientId);
+                    catch (Exception dbEx)
+                    {
+                        _logger.LogWarning(dbEx, "Failed to log CheckIn to database for client: {ClientId}", clientInfo.ClientId);
+                    }
                 }
 
                 // Get existing brain data for historical metrics
@@ -610,6 +646,14 @@ namespace KalshiBotOverseer
                     Message = $"CheckIn processing failed: {ex.Message}"
                 });
             }
+            finally
+            {
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    _performanceMetrics.RecordSignalRCheckInLatency(stopwatch.Elapsed);
+                }
+            }
         }
 
 
@@ -622,6 +666,8 @@ namespace KalshiBotOverseer
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task HandleOverseerMessage(string messageType, string message)
         {
+            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
             _logger.LogInformation("Received SendOverseerMessage: {MessageType} - {Message}", messageType, message);
 
             try
@@ -663,6 +709,14 @@ namespace KalshiBotOverseer
                     MessageType = messageType,
                     Message = $"Failed to process message: {ex.Message}"
                 });
+            }
+            finally
+            {
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    _performanceMetrics.RecordSignalRMessageLatency(stopwatch.Elapsed);
+                }
             }
         }
 

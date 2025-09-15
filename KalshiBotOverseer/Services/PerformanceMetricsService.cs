@@ -29,6 +29,9 @@ namespace KalshiBotOverseer.Services
         private long _totalMessagesProcessed;
         private long _totalHandshakeRequests;
         private long _totalCheckInRequests;
+        private List<long> _handshakeLatencies = new();
+        private List<long> _checkInLatencies = new();
+        private List<long> _messageLatencies = new();
         private DateTime _lastMetricsReset;
 
         // Overnight task metrics
@@ -162,13 +165,53 @@ namespace KalshiBotOverseer.Services
         }
 
         /// <summary>
-        /// Gets the current SignalR metrics.
+        /// Records the latency of a SignalR handshake operation.
         /// </summary>
-        public (long MessagesProcessed, long HandshakeRequests, long CheckInRequests, DateTime LastReset) GetSignalRMetrics()
+        /// <param name="latency">The latency duration.</param>
+        public void RecordSignalRHandshakeLatency(TimeSpan latency)
         {
             lock (_signalRLock)
             {
-                return (_totalMessagesProcessed, _totalHandshakeRequests, _totalCheckInRequests, _lastMetricsReset);
+                _handshakeLatencies.Add((long)latency.TotalMilliseconds);
+            }
+        }
+
+        /// <summary>
+        /// Records the latency of a SignalR check-in operation.
+        /// </summary>
+        /// <param name="latency">The latency duration.</param>
+        public void RecordSignalRCheckInLatency(TimeSpan latency)
+        {
+            lock (_signalRLock)
+            {
+                _checkInLatencies.Add((long)latency.TotalMilliseconds);
+            }
+        }
+
+        /// <summary>
+        /// Records the latency of a general SignalR message processing operation.
+        /// </summary>
+        /// <param name="latency">The latency duration.</param>
+        public void RecordSignalRMessageLatency(TimeSpan latency)
+        {
+            lock (_signalRLock)
+            {
+                _messageLatencies.Add((long)latency.TotalMilliseconds);
+            }
+        }
+
+        /// <summary>
+        /// Gets the current SignalR metrics.
+        /// </summary>
+        public (long MessagesProcessed, long HandshakeRequests, long CheckInRequests, DateTime LastReset,
+                double AvgHandshakeLatencyMs, double AvgCheckInLatencyMs, double AvgMessageLatencyMs) GetSignalRMetrics()
+        {
+            lock (_signalRLock)
+            {
+                return (_totalMessagesProcessed, _totalHandshakeRequests, _totalCheckInRequests, _lastMetricsReset,
+                        _handshakeLatencies.Count > 0 ? _handshakeLatencies.Average() : 0,
+                        _checkInLatencies.Count > 0 ? _checkInLatencies.Average() : 0,
+                        _messageLatencies.Count > 0 ? _messageLatencies.Average() : 0);
             }
         }
 
@@ -182,6 +225,9 @@ namespace KalshiBotOverseer.Services
                 _totalMessagesProcessed = 0;
                 _totalHandshakeRequests = 0;
                 _totalCheckInRequests = 0;
+                _handshakeLatencies.Clear();
+                _checkInLatencies.Clear();
+                _messageLatencies.Clear();
                 _lastMetricsReset = DateTime.UtcNow;
             }
         }
