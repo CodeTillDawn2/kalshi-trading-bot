@@ -5384,7 +5384,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Extensions.MarketSnapshotExtensions",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Extensions.MarketSnapshotExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for MarketSnapshot to compute and update order book metrics from simulated order book data.\nThis class serves as a bridge between the raw SimulatedOrderbook data structure and the calculated metrics\nstored in MarketSnapshot, enabling efficient computation of spreads, depths, volumes, and other trading indicators.\nAll calculations are performed in a stateless manner, ensuring thread safety and reusability across different\nmarket simulation scenarios.</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Extensions.MarketSnapshotExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for MarketSnapshot to compute and update order book metrics from simulated order book data.\nThis class serves as a bridge between the raw SimulatedOrderbook data structure and the calculated metrics\nstored in MarketSnapshot, enabling efficient computation of spreads, depths, volumes, and other trading indicators.\nAll calculations are performed in a stateless manner, ensuring thread safety and reusability across different\nmarket simulation scenarios.</p>\n<p sourcefile=\"api/TradingStrategies.Extensions.MarketSnapshotExtensions.yml\" sourcestartlinenumber=\"7\">Performance monitoring can be configured via MarketSnapshotExtensions:EnablePerformanceMetrics setting.</p>\n"
     },
     {
       "type": "ManagedReference",

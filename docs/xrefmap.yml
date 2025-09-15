@@ -2088,6 +2088,35 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Management.CentralPerformanceMonitor.StartTimer
   nameWithType: CentralPerformanceMonitor.StartTimer
+- uid: BacklashBot.Management.CentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(System.Boolean)
+  name: UpdateWebSocketMetricsRecordingStatus(bool)
+  href: api/BacklashBot.Management.CentralPerformanceMonitor.html#BacklashBot_Management_CentralPerformanceMonitor_UpdateWebSocketMetricsRecordingStatus_System_Boolean_
+  commentId: M:BacklashBot.Management.CentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(System.Boolean)
+  name.vb: UpdateWebSocketMetricsRecordingStatus(Boolean)
+  fullName: BacklashBot.Management.CentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(bool)
+  fullName.vb: BacklashBot.Management.CentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(Boolean)
+  nameWithType: CentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(bool)
+  nameWithType.vb: CentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(Boolean)
+- uid: BacklashBot.Management.CentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus*
+  name: UpdateWebSocketMetricsRecordingStatus
+  href: api/BacklashBot.Management.CentralPerformanceMonitor.html#BacklashBot_Management_CentralPerformanceMonitor_UpdateWebSocketMetricsRecordingStatus_
+  commentId: Overload:BacklashBot.Management.CentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus
+  isSpec: "True"
+  fullName: BacklashBot.Management.CentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus
+  nameWithType: CentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus
+- uid: BacklashBot.Management.CentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+  name: WebSocketConnectionManagerMetricsRecording
+  href: api/BacklashBot.Management.CentralPerformanceMonitor.html#BacklashBot_Management_CentralPerformanceMonitor_WebSocketConnectionManagerMetricsRecording
+  commentId: P:BacklashBot.Management.CentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+  fullName: BacklashBot.Management.CentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+  nameWithType: CentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+- uid: BacklashBot.Management.CentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording*
+  name: WebSocketConnectionManagerMetricsRecording
+  href: api/BacklashBot.Management.CentralPerformanceMonitor.html#BacklashBot_Management_CentralPerformanceMonitor_WebSocketConnectionManagerMetricsRecording_
+  commentId: Overload:BacklashBot.Management.CentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+  isSpec: "True"
+  fullName: BacklashBot.Management.CentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+  nameWithType: CentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
 - uid: BacklashBot.Management.Interfaces
   name: BacklashBot.Management.Interfaces
   href: api/BacklashBot.Management.Interfaces.html
@@ -2559,6 +2588,35 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.StartTimer
   nameWithType: ICentralPerformanceMonitor.StartTimer
+- uid: BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(System.Boolean)
+  name: UpdateWebSocketMetricsRecordingStatus(bool)
+  href: api/BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.html#BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_UpdateWebSocketMetricsRecordingStatus_System_Boolean_
+  commentId: M:BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(System.Boolean)
+  name.vb: UpdateWebSocketMetricsRecordingStatus(Boolean)
+  fullName: BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(bool)
+  fullName.vb: BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(Boolean)
+  nameWithType: ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(bool)
+  nameWithType.vb: ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus(Boolean)
+- uid: BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus*
+  name: UpdateWebSocketMetricsRecordingStatus
+  href: api/BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.html#BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_UpdateWebSocketMetricsRecordingStatus_
+  commentId: Overload:BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus
+  isSpec: "True"
+  fullName: BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus
+  nameWithType: ICentralPerformanceMonitor.UpdateWebSocketMetricsRecordingStatus
+- uid: BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+  name: WebSocketConnectionManagerMetricsRecording
+  href: api/BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.html#BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_WebSocketConnectionManagerMetricsRecording
+  commentId: P:BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+  fullName: BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+  nameWithType: ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+- uid: BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording*
+  name: WebSocketConnectionManagerMetricsRecording
+  href: api/BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.html#BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_WebSocketConnectionManagerMetricsRecording_
+  commentId: Overload:BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+  isSpec: "True"
+  fullName: BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
+  nameWithType: ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording
 - uid: BacklashBot.Management.Interfaces.IInterestScoreService
   name: IInterestScoreService
   href: api/BacklashBot.Management.Interfaces.IInterestScoreService.html
@@ -7517,15 +7575,15 @@ references:
   commentId: T:BacklashBot.Services.TradingSnapshotService
   fullName: BacklashBot.Services.TradingSnapshotService
   nameWithType: TradingSnapshotService
-- uid: BacklashBot.Services.TradingSnapshotService.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.ITradingSnapshotService},Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.SnapshotConfig},Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.TradingConfig},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory)
-  name: TradingSnapshotService(ILogger<ITradingSnapshotService>, IOptions<SnapshotConfig>, IOptions<TradingConfig>, IServiceScopeFactory)
-  href: api/BacklashBot.Services.TradingSnapshotService.html#BacklashBot_Services_TradingSnapshotService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_ITradingSnapshotService__Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_SnapshotConfig__Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_TradingConfig__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_
-  commentId: M:BacklashBot.Services.TradingSnapshotService.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.ITradingSnapshotService},Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.SnapshotConfig},Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.TradingConfig},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory)
-  name.vb: New(ILogger(Of ITradingSnapshotService), IOptions(Of SnapshotConfig), IOptions(Of TradingConfig), IServiceScopeFactory)
-  fullName: BacklashBot.Services.TradingSnapshotService.TradingSnapshotService(Microsoft.Extensions.Logging.ILogger<BacklashBot.Services.Interfaces.ITradingSnapshotService>, Microsoft.Extensions.Options.IOptions<TradingStrategies.Configuration.SnapshotConfig>, Microsoft.Extensions.Options.IOptions<TradingStrategies.Configuration.TradingConfig>, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory)
-  fullName.vb: BacklashBot.Services.TradingSnapshotService.New(Microsoft.Extensions.Logging.ILogger(Of BacklashBot.Services.Interfaces.ITradingSnapshotService), Microsoft.Extensions.Options.IOptions(Of TradingStrategies.Configuration.SnapshotConfig), Microsoft.Extensions.Options.IOptions(Of TradingStrategies.Configuration.TradingConfig), Microsoft.Extensions.DependencyInjection.IServiceScopeFactory)
-  nameWithType: TradingSnapshotService.TradingSnapshotService(ILogger<ITradingSnapshotService>, IOptions<SnapshotConfig>, IOptions<TradingConfig>, IServiceScopeFactory)
-  nameWithType.vb: TradingSnapshotService.New(ILogger(Of ITradingSnapshotService), IOptions(Of SnapshotConfig), IOptions(Of TradingConfig), IServiceScopeFactory)
+- uid: BacklashBot.Services.TradingSnapshotService.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.ITradingSnapshotService},Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.SnapshotConfig},Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.TradingConfig},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Configuration.IConfiguration,BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)
+  name: TradingSnapshotService(ILogger<ITradingSnapshotService>, IOptions<SnapshotConfig>, IOptions<TradingConfig>, IServiceScopeFactory, IConfiguration, ICentralPerformanceMonitor?)
+  href: api/BacklashBot.Services.TradingSnapshotService.html#BacklashBot_Services_TradingSnapshotService__ctor_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_ITradingSnapshotService__Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_SnapshotConfig__Microsoft_Extensions_Options_IOptions_TradingStrategies_Configuration_TradingConfig__Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Configuration_IConfiguration_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_
+  commentId: M:BacklashBot.Services.TradingSnapshotService.#ctor(Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.ITradingSnapshotService},Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.SnapshotConfig},Microsoft.Extensions.Options.IOptions{TradingStrategies.Configuration.TradingConfig},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Configuration.IConfiguration,BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)
+  name.vb: New(ILogger(Of ITradingSnapshotService), IOptions(Of SnapshotConfig), IOptions(Of TradingConfig), IServiceScopeFactory, IConfiguration, ICentralPerformanceMonitor)
+  fullName: BacklashBot.Services.TradingSnapshotService.TradingSnapshotService(Microsoft.Extensions.Logging.ILogger<BacklashBot.Services.Interfaces.ITradingSnapshotService>, Microsoft.Extensions.Options.IOptions<TradingStrategies.Configuration.SnapshotConfig>, Microsoft.Extensions.Options.IOptions<TradingStrategies.Configuration.TradingConfig>, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Configuration.IConfiguration, BacklashBot.Management.Interfaces.ICentralPerformanceMonitor?)
+  fullName.vb: BacklashBot.Services.TradingSnapshotService.New(Microsoft.Extensions.Logging.ILogger(Of BacklashBot.Services.Interfaces.ITradingSnapshotService), Microsoft.Extensions.Options.IOptions(Of TradingStrategies.Configuration.SnapshotConfig), Microsoft.Extensions.Options.IOptions(Of TradingStrategies.Configuration.TradingConfig), Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, Microsoft.Extensions.Configuration.IConfiguration, BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)
+  nameWithType: TradingSnapshotService.TradingSnapshotService(ILogger<ITradingSnapshotService>, IOptions<SnapshotConfig>, IOptions<TradingConfig>, IServiceScopeFactory, IConfiguration, ICentralPerformanceMonitor?)
+  nameWithType.vb: TradingSnapshotService.New(ILogger(Of ITradingSnapshotService), IOptions(Of SnapshotConfig), IOptions(Of TradingConfig), IServiceScopeFactory, IConfiguration, ICentralPerformanceMonitor)
 - uid: BacklashBot.Services.TradingSnapshotService.#ctor*
   name: TradingSnapshotService
   href: api/BacklashBot.Services.TradingSnapshotService.html#BacklashBot_Services_TradingSnapshotService__ctor_
@@ -7642,15 +7700,15 @@ references:
   commentId: T:BacklashBot.Services.WebSocketMonitorService
   fullName: BacklashBot.Services.WebSocketMonitorService
   nameWithType: WebSocketMonitorService
-- uid: BacklashBot.Services.WebSocketMonitorService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IWebSocketMonitorService},Microsoft.Extensions.Configuration.IConfiguration,BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IBotReadyStatus,BacklashBot.State.Interfaces.IStatusTrackerService)
-  name: WebSocketMonitorService(IServiceScopeFactory, IServiceFactory, ILogger<IWebSocketMonitorService>, IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
-  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IWebSocketMonitorService__Microsoft_Extensions_Configuration_IConfiguration_BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IBotReadyStatus_BacklashBot_State_Interfaces_IStatusTrackerService_
-  commentId: M:BacklashBot.Services.WebSocketMonitorService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IWebSocketMonitorService},Microsoft.Extensions.Configuration.IConfiguration,BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IBotReadyStatus,BacklashBot.State.Interfaces.IStatusTrackerService)
-  name.vb: New(IServiceScopeFactory, IServiceFactory, ILogger(Of IWebSocketMonitorService), IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
-  fullName: BacklashBot.Services.WebSocketMonitorService.WebSocketMonitorService(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger<BacklashBot.Services.Interfaces.IWebSocketMonitorService>, Microsoft.Extensions.Configuration.IConfiguration, BacklashBot.Services.Interfaces.IScopeManagerService, BacklashBot.State.Interfaces.IBotReadyStatus, BacklashBot.State.Interfaces.IStatusTrackerService)
-  fullName.vb: BacklashBot.Services.WebSocketMonitorService.New(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger(Of BacklashBot.Services.Interfaces.IWebSocketMonitorService), Microsoft.Extensions.Configuration.IConfiguration, BacklashBot.Services.Interfaces.IScopeManagerService, BacklashBot.State.Interfaces.IBotReadyStatus, BacklashBot.State.Interfaces.IStatusTrackerService)
-  nameWithType: WebSocketMonitorService.WebSocketMonitorService(IServiceScopeFactory, IServiceFactory, ILogger<IWebSocketMonitorService>, IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
-  nameWithType.vb: WebSocketMonitorService.New(IServiceScopeFactory, IServiceFactory, ILogger(Of IWebSocketMonitorService), IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService)
+- uid: BacklashBot.Services.WebSocketMonitorService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IWebSocketMonitorService},Microsoft.Extensions.Configuration.IConfiguration,BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IBotReadyStatus,BacklashBot.State.Interfaces.IStatusTrackerService,BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)
+  name: WebSocketMonitorService(IServiceScopeFactory, IServiceFactory, ILogger<IWebSocketMonitorService>, IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService, ICentralPerformanceMonitor)
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService__ctor_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_BacklashBot_Services_Interfaces_IServiceFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IWebSocketMonitorService__Microsoft_Extensions_Configuration_IConfiguration_BacklashBot_Services_Interfaces_IScopeManagerService_BacklashBot_State_Interfaces_IBotReadyStatus_BacklashBot_State_Interfaces_IStatusTrackerService_BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_
+  commentId: M:BacklashBot.Services.WebSocketMonitorService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,BacklashBot.Services.Interfaces.IServiceFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IWebSocketMonitorService},Microsoft.Extensions.Configuration.IConfiguration,BacklashBot.Services.Interfaces.IScopeManagerService,BacklashBot.State.Interfaces.IBotReadyStatus,BacklashBot.State.Interfaces.IStatusTrackerService,BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)
+  name.vb: New(IServiceScopeFactory, IServiceFactory, ILogger(Of IWebSocketMonitorService), IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService, ICentralPerformanceMonitor)
+  fullName: BacklashBot.Services.WebSocketMonitorService.WebSocketMonitorService(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger<BacklashBot.Services.Interfaces.IWebSocketMonitorService>, Microsoft.Extensions.Configuration.IConfiguration, BacklashBot.Services.Interfaces.IScopeManagerService, BacklashBot.State.Interfaces.IBotReadyStatus, BacklashBot.State.Interfaces.IStatusTrackerService, BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)
+  fullName.vb: BacklashBot.Services.WebSocketMonitorService.New(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory, BacklashBot.Services.Interfaces.IServiceFactory, Microsoft.Extensions.Logging.ILogger(Of BacklashBot.Services.Interfaces.IWebSocketMonitorService), Microsoft.Extensions.Configuration.IConfiguration, BacklashBot.Services.Interfaces.IScopeManagerService, BacklashBot.State.Interfaces.IBotReadyStatus, BacklashBot.State.Interfaces.IStatusTrackerService, BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)
+  nameWithType: WebSocketMonitorService.WebSocketMonitorService(IServiceScopeFactory, IServiceFactory, ILogger<IWebSocketMonitorService>, IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService, ICentralPerformanceMonitor)
+  nameWithType.vb: WebSocketMonitorService.New(IServiceScopeFactory, IServiceFactory, ILogger(Of IWebSocketMonitorService), IConfiguration, IScopeManagerService, IBotReadyStatus, IStatusTrackerService, ICentralPerformanceMonitor)
 - uid: BacklashBot.Services.WebSocketMonitorService.#ctor*
   name: WebSocketMonitorService
   href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService__ctor_
@@ -7661,6 +7719,19 @@ references:
   fullName.vb: BacklashBot.Services.WebSocketMonitorService.New
   nameWithType: WebSocketMonitorService.WebSocketMonitorService
   nameWithType.vb: WebSocketMonitorService.New
+- uid: BacklashBot.Services.WebSocketMonitorService.GetExtendedMetrics
+  name: GetExtendedMetrics()
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_GetExtendedMetrics
+  commentId: M:BacklashBot.Services.WebSocketMonitorService.GetExtendedMetrics
+  fullName: BacklashBot.Services.WebSocketMonitorService.GetExtendedMetrics()
+  nameWithType: WebSocketMonitorService.GetExtendedMetrics()
+- uid: BacklashBot.Services.WebSocketMonitorService.GetExtendedMetrics*
+  name: GetExtendedMetrics
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_GetExtendedMetrics_
+  commentId: Overload:BacklashBot.Services.WebSocketMonitorService.GetExtendedMetrics
+  isSpec: "True"
+  fullName: BacklashBot.Services.WebSocketMonitorService.GetExtendedMetrics
+  nameWithType: WebSocketMonitorService.GetExtendedMetrics
 - uid: BacklashBot.Services.WebSocketMonitorService.GetMetrics
   name: GetMetrics()
   href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_GetMetrics
@@ -7687,6 +7758,51 @@ references:
   isSpec: "True"
   fullName: BacklashBot.Services.WebSocketMonitorService.IsConnected
   nameWithType: WebSocketMonitorService.IsConnected
+- uid: BacklashBot.Services.WebSocketMonitorService.RecordMessageProcessed
+  name: RecordMessageProcessed()
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_RecordMessageProcessed
+  commentId: M:BacklashBot.Services.WebSocketMonitorService.RecordMessageProcessed
+  fullName: BacklashBot.Services.WebSocketMonitorService.RecordMessageProcessed()
+  nameWithType: WebSocketMonitorService.RecordMessageProcessed()
+- uid: BacklashBot.Services.WebSocketMonitorService.RecordMessageProcessed*
+  name: RecordMessageProcessed
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_RecordMessageProcessed_
+  commentId: Overload:BacklashBot.Services.WebSocketMonitorService.RecordMessageProcessed
+  isSpec: "True"
+  fullName: BacklashBot.Services.WebSocketMonitorService.RecordMessageProcessed
+  nameWithType: WebSocketMonitorService.RecordMessageProcessed
+- uid: BacklashBot.Services.WebSocketMonitorService.RecordWebSocketLatency(System.Int64)
+  name: RecordWebSocketLatency(long)
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_RecordWebSocketLatency_System_Int64_
+  commentId: M:BacklashBot.Services.WebSocketMonitorService.RecordWebSocketLatency(System.Int64)
+  name.vb: RecordWebSocketLatency(Long)
+  fullName: BacklashBot.Services.WebSocketMonitorService.RecordWebSocketLatency(long)
+  fullName.vb: BacklashBot.Services.WebSocketMonitorService.RecordWebSocketLatency(Long)
+  nameWithType: WebSocketMonitorService.RecordWebSocketLatency(long)
+  nameWithType.vb: WebSocketMonitorService.RecordWebSocketLatency(Long)
+- uid: BacklashBot.Services.WebSocketMonitorService.RecordWebSocketLatency*
+  name: RecordWebSocketLatency
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_RecordWebSocketLatency_
+  commentId: Overload:BacklashBot.Services.WebSocketMonitorService.RecordWebSocketLatency
+  isSpec: "True"
+  fullName: BacklashBot.Services.WebSocketMonitorService.RecordWebSocketLatency
+  nameWithType: WebSocketMonitorService.RecordWebSocketLatency
+- uid: BacklashBot.Services.WebSocketMonitorService.SetQueueDepth(System.Int32)
+  name: SetQueueDepth(int)
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_SetQueueDepth_System_Int32_
+  commentId: M:BacklashBot.Services.WebSocketMonitorService.SetQueueDepth(System.Int32)
+  name.vb: SetQueueDepth(Integer)
+  fullName: BacklashBot.Services.WebSocketMonitorService.SetQueueDepth(int)
+  fullName.vb: BacklashBot.Services.WebSocketMonitorService.SetQueueDepth(Integer)
+  nameWithType: WebSocketMonitorService.SetQueueDepth(int)
+  nameWithType.vb: WebSocketMonitorService.SetQueueDepth(Integer)
+- uid: BacklashBot.Services.WebSocketMonitorService.SetQueueDepth*
+  name: SetQueueDepth
+  href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_SetQueueDepth_
+  commentId: Overload:BacklashBot.Services.WebSocketMonitorService.SetQueueDepth
+  isSpec: "True"
+  fullName: BacklashBot.Services.WebSocketMonitorService.SetQueueDepth
+  nameWithType: WebSocketMonitorService.SetQueueDepth
 - uid: BacklashBot.Services.WebSocketMonitorService.ShutdownAsync(System.Threading.CancellationToken)
   name: ShutdownAsync(CancellationToken)
   href: api/BacklashBot.Services.WebSocketMonitorService.html#BacklashBot_Services_WebSocketMonitorService_ShutdownAsync_System_Threading_CancellationToken_
@@ -28478,6 +28594,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotAPI.Configuration.KalshiConfig.WebSocketBufferSize
   nameWithType: KalshiConfig.WebSocketBufferSize
+- uid: KalshiBotAPI.Configuration.KalshiConfig.WebSocketEnableMetrics
+  name: WebSocketEnableMetrics
+  href: api/KalshiBotAPI.Configuration.KalshiConfig.html#KalshiBotAPI_Configuration_KalshiConfig_WebSocketEnableMetrics
+  commentId: P:KalshiBotAPI.Configuration.KalshiConfig.WebSocketEnableMetrics
+  fullName: KalshiBotAPI.Configuration.KalshiConfig.WebSocketEnableMetrics
+  nameWithType: KalshiConfig.WebSocketEnableMetrics
+- uid: KalshiBotAPI.Configuration.KalshiConfig.WebSocketEnableMetrics*
+  name: WebSocketEnableMetrics
+  href: api/KalshiBotAPI.Configuration.KalshiConfig.html#KalshiBotAPI_Configuration_KalshiConfig_WebSocketEnableMetrics_
+  commentId: Overload:KalshiBotAPI.Configuration.KalshiConfig.WebSocketEnableMetrics
+  isSpec: "True"
+  fullName: KalshiBotAPI.Configuration.KalshiConfig.WebSocketEnableMetrics
+  nameWithType: KalshiConfig.WebSocketEnableMetrics
 - uid: KalshiBotAPI.Configuration.KalshiConfig.WebSocketMaxRetryAttempts
   name: WebSocketMaxRetryAttempts
   href: api/KalshiBotAPI.Configuration.KalshiConfig.html#KalshiBotAPI_Configuration_KalshiConfig_WebSocketMaxRetryAttempts
@@ -31762,15 +31891,15 @@ references:
   commentId: T:KalshiBotAPI.Websockets.WebSocketConnectionManager
   fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager
   nameWithType: WebSocketConnectionManager
-- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.#ctor(Microsoft.Extensions.Options.IOptions{KalshiBotAPI.Configuration.KalshiConfig},Microsoft.Extensions.Logging.ILogger{KalshiBotAPI.Websockets.WebSocketConnectionManager})
-  name: WebSocketConnectionManager(IOptions<KalshiConfig>, ILogger<WebSocketConnectionManager>)
-  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager__ctor_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_KalshiConfig__Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_WebSocketConnectionManager__
-  commentId: M:KalshiBotAPI.Websockets.WebSocketConnectionManager.#ctor(Microsoft.Extensions.Options.IOptions{KalshiBotAPI.Configuration.KalshiConfig},Microsoft.Extensions.Logging.ILogger{KalshiBotAPI.Websockets.WebSocketConnectionManager})
-  name.vb: New(IOptions(Of KalshiConfig), ILogger(Of WebSocketConnectionManager))
-  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.WebSocketConnectionManager(Microsoft.Extensions.Options.IOptions<KalshiBotAPI.Configuration.KalshiConfig>, Microsoft.Extensions.Logging.ILogger<KalshiBotAPI.Websockets.WebSocketConnectionManager>)
-  fullName.vb: KalshiBotAPI.Websockets.WebSocketConnectionManager.New(Microsoft.Extensions.Options.IOptions(Of KalshiBotAPI.Configuration.KalshiConfig), Microsoft.Extensions.Logging.ILogger(Of KalshiBotAPI.Websockets.WebSocketConnectionManager))
-  nameWithType: WebSocketConnectionManager.WebSocketConnectionManager(IOptions<KalshiConfig>, ILogger<WebSocketConnectionManager>)
-  nameWithType.vb: WebSocketConnectionManager.New(IOptions(Of KalshiConfig), ILogger(Of WebSocketConnectionManager))
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.#ctor(Microsoft.Extensions.Options.IOptions{KalshiBotAPI.Configuration.KalshiConfig},Microsoft.Extensions.Logging.ILogger{KalshiBotAPI.Websockets.WebSocketConnectionManager},BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)
+  name: WebSocketConnectionManager(IOptions<KalshiConfig>, ILogger<WebSocketConnectionManager>, ICentralPerformanceMonitor?)
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager__ctor_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_KalshiConfig__Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_WebSocketConnectionManager__BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_
+  commentId: M:KalshiBotAPI.Websockets.WebSocketConnectionManager.#ctor(Microsoft.Extensions.Options.IOptions{KalshiBotAPI.Configuration.KalshiConfig},Microsoft.Extensions.Logging.ILogger{KalshiBotAPI.Websockets.WebSocketConnectionManager},BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)
+  name.vb: New(IOptions(Of KalshiConfig), ILogger(Of WebSocketConnectionManager), ICentralPerformanceMonitor)
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.WebSocketConnectionManager(Microsoft.Extensions.Options.IOptions<KalshiBotAPI.Configuration.KalshiConfig>, Microsoft.Extensions.Logging.ILogger<KalshiBotAPI.Websockets.WebSocketConnectionManager>, BacklashBot.Management.Interfaces.ICentralPerformanceMonitor?)
+  fullName.vb: KalshiBotAPI.Websockets.WebSocketConnectionManager.New(Microsoft.Extensions.Options.IOptions(Of KalshiBotAPI.Configuration.KalshiConfig), Microsoft.Extensions.Logging.ILogger(Of KalshiBotAPI.Websockets.WebSocketConnectionManager), BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)
+  nameWithType: WebSocketConnectionManager.WebSocketConnectionManager(IOptions<KalshiConfig>, ILogger<WebSocketConnectionManager>, ICentralPerformanceMonitor?)
+  nameWithType.vb: WebSocketConnectionManager.New(IOptions(Of KalshiConfig), ILogger(Of WebSocketConnectionManager), ICentralPerformanceMonitor)
 - uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.#ctor*
   name: WebSocketConnectionManager
   href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager__ctor_
@@ -31807,6 +31936,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.AverageConnectionLatency
   nameWithType: WebSocketConnectionManager.AverageConnectionLatency
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.BandwidthBps
+  name: BandwidthBps
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_BandwidthBps
+  commentId: P:KalshiBotAPI.Websockets.WebSocketConnectionManager.BandwidthBps
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.BandwidthBps
+  nameWithType: WebSocketConnectionManager.BandwidthBps
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.BandwidthBps*
+  name: BandwidthBps
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_BandwidthBps_
+  commentId: Overload:KalshiBotAPI.Websockets.WebSocketConnectionManager.BandwidthBps
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.BandwidthBps
+  nameWithType: WebSocketConnectionManager.BandwidthBps
 - uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectAsync(System.Int32)
   name: ConnectAsync(int)
   href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectAsync_System_Int32_
@@ -31914,6 +32056,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.DisableReconnect
   nameWithType: WebSocketConnectionManager.DisableReconnect
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableMetrics
+  name: EnableMetrics
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_EnableMetrics
+  commentId: P:KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableMetrics
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableMetrics
+  nameWithType: WebSocketConnectionManager.EnableMetrics
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableMetrics*
+  name: EnableMetrics
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_EnableMetrics_
+  commentId: Overload:KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableMetrics
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableMetrics
+  nameWithType: WebSocketConnectionManager.EnableMetrics
 - uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableReconnect
   name: EnableReconnect()
   href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_EnableReconnect
@@ -31927,6 +32082,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableReconnect
   nameWithType: WebSocketConnectionManager.EnableReconnect
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.ErrorRate
+  name: ErrorRate
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_ErrorRate
+  commentId: P:KalshiBotAPI.Websockets.WebSocketConnectionManager.ErrorRate
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.ErrorRate
+  nameWithType: WebSocketConnectionManager.ErrorRate
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.ErrorRate*
+  name: ErrorRate
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_ErrorRate_
+  commentId: Overload:KalshiBotAPI.Websockets.WebSocketConnectionManager.ErrorRate
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.ErrorRate
+  nameWithType: WebSocketConnectionManager.ErrorRate
 - uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.GetWebSocket
   name: GetWebSocket()
   href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_GetWebSocket
@@ -31979,6 +32147,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.MessagesReceived
   nameWithType: WebSocketConnectionManager.MessagesReceived
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.QueueDepth
+  name: QueueDepth
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_QueueDepth
+  commentId: P:KalshiBotAPI.Websockets.WebSocketConnectionManager.QueueDepth
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.QueueDepth
+  nameWithType: WebSocketConnectionManager.QueueDepth
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.QueueDepth*
+  name: QueueDepth
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_QueueDepth_
+  commentId: Overload:KalshiBotAPI.Websockets.WebSocketConnectionManager.QueueDepth
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.QueueDepth
+  nameWithType: WebSocketConnectionManager.QueueDepth
 - uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.ReceiveAsync
   name: ReceiveAsync()
   href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_ReceiveAsync
@@ -32018,6 +32199,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.ResetConnectionAsync
   nameWithType: WebSocketConnectionManager.ResetConnectionAsync
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.RoundTripTime
+  name: RoundTripTime
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_RoundTripTime
+  commentId: P:KalshiBotAPI.Websockets.WebSocketConnectionManager.RoundTripTime
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.RoundTripTime
+  nameWithType: WebSocketConnectionManager.RoundTripTime
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.RoundTripTime*
+  name: RoundTripTime
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_RoundTripTime_
+  commentId: Overload:KalshiBotAPI.Websockets.WebSocketConnectionManager.RoundTripTime
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.RoundTripTime
+  nameWithType: WebSocketConnectionManager.RoundTripTime
 - uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.SendMessageAsync(System.String)
   name: SendMessageAsync(string)
   href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_SendMessageAsync_System_String_
@@ -32099,6 +32293,19 @@ references:
   isSpec: "True"
   fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalBytesReceived
   nameWithType: WebSocketConnectionManager.TotalBytesReceived
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalConnectedTimeMs
+  name: TotalConnectedTimeMs
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_TotalConnectedTimeMs
+  commentId: P:KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalConnectedTimeMs
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalConnectedTimeMs
+  nameWithType: WebSocketConnectionManager.TotalConnectedTimeMs
+- uid: KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalConnectedTimeMs*
+  name: TotalConnectedTimeMs
+  href: api/KalshiBotAPI.Websockets.WebSocketConnectionManager.html#KalshiBotAPI_Websockets_WebSocketConnectionManager_TotalConnectedTimeMs_
+  commentId: Overload:KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalConnectedTimeMs
+  isSpec: "True"
+  fullName: KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalConnectedTimeMs
+  nameWithType: WebSocketConnectionManager.TotalConnectedTimeMs
 - uid: KalshiBotData.Data
   name: KalshiBotData.Data
   href: api/KalshiBotData.Data.html

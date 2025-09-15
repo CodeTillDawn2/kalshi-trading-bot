@@ -157,19 +157,19 @@ Key features include:
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager__ctor_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_KalshiConfig__Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_WebSocketConnectionManager__.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.%23ctor(Microsoft.Extensions.Options.IOptions%7BKalshiBotAPI.Configuration.KalshiConfig%7D%2CMicrosoft.Extensions.Logging.ILogger%7BKalshiBotAPI.Websockets.WebSocketConnectionManager%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager__ctor_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_KalshiConfig__Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_WebSocketConnectionManager__BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.%23ctor(Microsoft.Extensions.Options.IOptions%7BKalshiBotAPI.Configuration.KalshiConfig%7D%2CMicrosoft.Extensions.Logging.ILogger%7BKalshiBotAPI.Websockets.WebSocketConnectionManager%7D%2CBacklashBot.Management.Interfaces.ICentralPerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L99">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L139">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager__ctor_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.#ctor*"></a>
-  <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager__ctor_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_KalshiConfig__Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_WebSocketConnectionManager__" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.#ctor(Microsoft.Extensions.Options.IOptions{KalshiBotAPI.Configuration.KalshiConfig},Microsoft.Extensions.Logging.ILogger{KalshiBotAPI.Websockets.WebSocketConnectionManager})">WebSocketConnectionManager(IOptions&lt;KalshiConfig&gt;, ILogger&lt;WebSocketConnectionManager&gt;)</h4>
+  <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager__ctor_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_KalshiConfig__Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_WebSocketConnectionManager__BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.#ctor(Microsoft.Extensions.Options.IOptions{KalshiBotAPI.Configuration.KalshiConfig},Microsoft.Extensions.Logging.ILogger{KalshiBotAPI.Websockets.WebSocketConnectionManager},BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)">WebSocketConnectionManager(IOptions&lt;KalshiConfig&gt;, ILogger&lt;WebSocketConnectionManager&gt;, ICentralPerformanceMonitor?)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the WebSocketConnectionManager class.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public WebSocketConnectionManager(IOptions&lt;KalshiConfig&gt; kalshiConfig, ILogger&lt;WebSocketConnectionManager&gt; logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public WebSocketConnectionManager(IOptions&lt;KalshiConfig&gt; kalshiConfig, ILogger&lt;WebSocketConnectionManager&gt; logger, ICentralPerformanceMonitor? performanceMonitor = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -193,9 +193,15 @@ Key features include:
         <td><p>Logger instance for recording connection operations and errors.</p>
 </td>
       </tr>
+      <tr>
+        <td><a class="xref" href="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.html">ICentralPerformanceMonitor</a></td>
+        <td><span class="parametername">performanceMonitor</span></td>
+        <td><p>Optional performance monitor for recording WebSocket metrics.</p>
+</td>
+      </tr>
     </tbody>
   </table>
-  <h5 id="KalshiBotAPI_Websockets_WebSocketConnectionManager__ctor_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_KalshiConfig__Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_WebSocketConnectionManager___remarks">Remarks</h5>
+  <h5 id="KalshiBotAPI_Websockets_WebSocketConnectionManager__ctor_Microsoft_Extensions_Options_IOptions_KalshiBotAPI_Configuration_KalshiConfig__Microsoft_Extensions_Logging_ILogger_KalshiBotAPI_Websockets_WebSocketConnectionManager__BacklashBot_Management_Interfaces_ICentralPerformanceMonitor__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>The constructor sets up the RSA private key for authentication by loading it from the
 configured key file. This key is used to generate signatures for WebSocket connection
 authentication with Kalshi's servers. It also initializes all configurable parameters
@@ -208,7 +214,7 @@ including retry delays, buffer sizes, timeouts, and cache durations for optimal 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_AverageBufferUtilization.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.AverageBufferUtilization%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L697">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L800">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_AverageBufferUtilization_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.AverageBufferUtilization*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_AverageBufferUtilization" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.AverageBufferUtilization">AverageBufferUtilization</h4>
@@ -244,7 +250,7 @@ Values much lower than 1.0 might indicate the buffer is oversized.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_AverageConnectionLatency.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.AverageConnectionLatency%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L621">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L724">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_AverageConnectionLatency_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.AverageConnectionLatency*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_AverageConnectionLatency" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.AverageConnectionLatency">AverageConnectionLatency</h4>
@@ -272,10 +278,44 @@ Values much lower than 1.0 might indicate the buffer is oversized.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_BandwidthBps.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.BandwidthBps%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L816">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_BandwidthBps_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.BandwidthBps*"></a>
+  <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_BandwidthBps" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.BandwidthBps">BandwidthBps</h4>
+  <div class="markdown level1 summary"><p>Gets the current bandwidth utilization in bytes per second.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double BandwidthBps { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_BandwidthBps_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Calculated as total bytes received divided by total connected time.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectSemaphoreCount.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectSemaphoreCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L596">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L699">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectSemaphoreCount_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectSemaphoreCount*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectSemaphoreCount" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectSemaphoreCount">ConnectSemaphoreCount</h4>
@@ -318,7 +358,7 @@ reset the WebSocket connection.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionAttempts.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionAttempts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L601">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L704">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionAttempts_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionAttempts*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionAttempts" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionAttempts">ConnectionAttempts</h4>
@@ -349,7 +389,7 @@ reset the WebSocket connection.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionFailureReasons.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionFailureReasons%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L653">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L756">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionFailureReasons_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionFailureReasons*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionFailureReasons" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionFailureReasons">ConnectionFailureReasons</h4>
@@ -384,7 +424,7 @@ to help diagnose connection issues and optimize retry strategies.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionFailures.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionFailures%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L644">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L747">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionFailures_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionFailures*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionFailures" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionFailures">ConnectionFailures</h4>
@@ -419,7 +459,7 @@ and identifying potential network or configuration issues.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionSuccessRate.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionSuccessRate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L611">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L714">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionSuccessRate_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionSuccessRate*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionSuccessRate" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionSuccessRate">ConnectionSuccessRate</h4>
@@ -450,7 +490,7 @@ and identifying potential network or configuration issues.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionSuccesses.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionSuccesses%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L606">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L709">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionSuccesses_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionSuccesses*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectionSuccesses" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectionSuccesses">ConnectionSuccesses</h4>
@@ -478,10 +518,76 @@ and identifying potential network or configuration issues.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_EnableMetrics.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L109">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_EnableMetrics_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableMetrics*"></a>
+  <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_EnableMetrics" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableMetrics">EnableMetrics</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether performance metrics collection is enabled.
+When disabled, metric tracking is skipped to reduce overhead.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool EnableMetrics { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_ErrorRate.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.ErrorRate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L824">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ErrorRate_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ErrorRate*"></a>
+  <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ErrorRate" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ErrorRate">ErrorRate</h4>
+  <div class="markdown level1 summary"><p>Gets the error rate (0.0 to 1.0) for message processing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double ErrorRate { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ErrorRate_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Ratio of messages with errors to total messages processed.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_MessageThroughput.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.MessageThroughput%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L635">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L738">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_MessageThroughput_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.MessageThroughput*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_MessageThroughput" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.MessageThroughput">MessageThroughput</h4>
@@ -516,7 +622,7 @@ for more accurate real-time throughput measurement.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_MessagesReceived.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.MessagesReceived%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L626">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L729">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_MessagesReceived_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.MessagesReceived*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_MessagesReceived" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.MessagesReceived">MessagesReceived</h4>
@@ -544,10 +650,44 @@ for more accurate real-time throughput measurement.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_QueueDepth.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.QueueDepth%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L840">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_QueueDepth_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.QueueDepth*"></a>
+  <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_QueueDepth" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.QueueDepth">QueueDepth</h4>
+  <div class="markdown level1 summary"><p>Gets the current queue depth (number of messages waiting to be processed).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int QueueDepth { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_QueueDepth_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Currently returns 0 as messages are processed immediately without queuing.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_ReconnectionCount.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.ReconnectionCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L616">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L719">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ReconnectionCount_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ReconnectionCount*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ReconnectionCount" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ReconnectionCount">ReconnectionCount</h4>
@@ -575,10 +715,44 @@ for more accurate real-time throughput measurement.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_RoundTripTime.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.RoundTripTime%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L808">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_RoundTripTime_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.RoundTripTime*"></a>
+  <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_RoundTripTime" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.RoundTripTime">RoundTripTime</h4>
+  <div class="markdown level1 summary"><p>Gets the round-trip time (RTT) in milliseconds (proxied by average connection latency).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double RoundTripTime { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_RoundTripTime_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Since WebSocket is asynchronous and receive-only, this uses connection latency as a proxy for RTT.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_SignatureCacheHitRate.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.SignatureCacheHitRate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L662">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L765">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_SignatureCacheHitRate_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.SignatureCacheHitRate*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_SignatureCacheHitRate" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.SignatureCacheHitRate">SignatureCacheHitRate</h4>
@@ -613,7 +787,7 @@ Higher values suggest better cache performance and reduced CPU usage for authent
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_SignatureCacheHits.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.SignatureCacheHits%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L670">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L773">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_SignatureCacheHits_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.SignatureCacheHits*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_SignatureCacheHits" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.SignatureCacheHits">SignatureCacheHits</h4>
@@ -647,7 +821,7 @@ Higher values suggest better cache performance and reduced CPU usage for authent
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_SignatureCacheMisses.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.SignatureCacheMisses%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L678">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L781">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_SignatureCacheMisses_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.SignatureCacheMisses*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_SignatureCacheMisses" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.SignatureCacheMisses">SignatureCacheMisses</h4>
@@ -681,7 +855,7 @@ Higher values suggest better cache performance and reduced CPU usage for authent
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_TotalBytesReceived.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalBytesReceived%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L687">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L790">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_TotalBytesReceived_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalBytesReceived*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_TotalBytesReceived" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalBytesReceived">TotalBytesReceived</h4>
@@ -711,6 +885,40 @@ Higher values suggest better cache performance and reduced CPU usage for authent
   <div class="markdown level1 remarks"><p>Cumulative count of all data received through the WebSocket connection.
 Useful for monitoring data transfer volumes and connection efficiency.</p>
 </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_TotalConnectedTimeMs.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalConnectedTimeMs%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L832">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_TotalConnectedTimeMs_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalConnectedTimeMs*"></a>
+  <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_TotalConnectedTimeMs" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.TotalConnectedTimeMs">TotalConnectedTimeMs</h4>
+  <div class="markdown level1 summary"><p>Gets the total connected time in milliseconds.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long TotalConnectedTimeMs { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_TotalConnectedTimeMs_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Cumulative time the WebSocket has been connected across all sessions.</p>
+</div>
   <h3 id="methods">Methods
 </h3>
   <span class="small pull-right mobile-hide">
@@ -718,7 +926,7 @@ Useful for monitoring data transfer volumes and connection efficiency.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectAsync_System_Int32_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectAsync(System.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L144">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L198">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectAsync_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ConnectAsync_System_Int32_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ConnectAsync(System.Int32)">ConnectAsync(int)</h4>
@@ -803,7 +1011,7 @@ concurrent connection attempts that could cause race conditions.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_DisableReconnect.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.DisableReconnect%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L390">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L464">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_DisableReconnect_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.DisableReconnect*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_DisableReconnect" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.DisableReconnect">DisableReconnect()</h4>
@@ -825,7 +1033,7 @@ remains unchanged until explicitly modified.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_EnableReconnect.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableReconnect%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L404">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L478">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_EnableReconnect_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableReconnect*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_EnableReconnect" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.EnableReconnect">EnableReconnect()</h4>
@@ -846,7 +1054,7 @@ This is the default behavior for maintaining reliable connections to Kalshi's pl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_GetWebSocket.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.GetWebSocket%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L573">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L676">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_GetWebSocket_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.GetWebSocket*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_GetWebSocket" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.GetWebSocket">GetWebSocket()</h4>
@@ -889,7 +1097,7 @@ the WebSocket instance is not modified while being accessed.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_IsConnected.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.IsConnected%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L370">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L444">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_IsConnected_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.IsConnected*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_IsConnected" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.IsConnected">IsConnected()</h4>
@@ -934,7 +1142,7 @@ attempting to send messages or perform connection-dependent operations.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_ReceiveAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.ReceiveAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L439">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L513">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ReceiveAsync_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ReceiveAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ReceiveAsync" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ReceiveAsync">ReceiveAsync()</h4>
@@ -1004,7 +1212,7 @@ should be called from the main WebSocket client orchestrator.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_ResetConnectionAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.ResetConnectionAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L255">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L329">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ResetConnectionAsync_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ResetConnectionAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_ResetConnectionAsync" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.ResetConnectionAsync">ResetConnectionAsync()</h4>
@@ -1050,7 +1258,7 @@ will only clean up the existing connection without establishing a new one.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_SendMessageAsync_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.SendMessageAsync(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L330">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L404">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_SendMessageAsync_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.SendMessageAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_SendMessageAsync_System_String_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.SendMessageAsync(System.String)">SendMessageAsync(string)</h4>
@@ -1129,7 +1337,7 @@ will throw an InvalidOperationException with details about the connection status
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager_StopAsync.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager.StopAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L530">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L626">View Source</a>
   </span>
   <a id="KalshiBotAPI_Websockets_WebSocketConnectionManager_StopAsync_" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.StopAsync*"></a>
   <h4 id="KalshiBotAPI_Websockets_WebSocketConnectionManager_StopAsync" data-uid="KalshiBotAPI.Websockets.WebSocketConnectionManager.StopAsync">StopAsync()</h4>
@@ -1186,7 +1394,7 @@ application shutdown or when manual connection control is required.
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Websockets_WebSocketConnectionManager.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Websockets.WebSocketConnectionManager%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L49" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Websockets/WebSocketConnectionManager.cs/#L50" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

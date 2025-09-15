@@ -126,7 +126,7 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Configuration_KalshiConfig_CandlestickCushion.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Configuration.KalshiConfig.CandlestickCushion%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Configuration/KalshiConfig.cs/#L67">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Configuration/KalshiConfig.cs/#L73">View Source</a>
   </span>
   <a id="KalshiBotAPI_Configuration_KalshiConfig_CandlestickCushion_" data-uid="KalshiBotAPI.Configuration.KalshiConfig.CandlestickCushion*"></a>
   <h4 id="KalshiBotAPI_Configuration_KalshiConfig_CandlestickCushion" data-uid="KalshiBotAPI.Configuration.KalshiConfig.CandlestickCushion">CandlestickCushion</h4>
@@ -158,7 +158,7 @@ Defines the overlap period to avoid gaps when fetching historical data in chunks
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Configuration_KalshiConfig_CandlestickLookback.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Configuration.KalshiConfig.CandlestickLookback%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Configuration/KalshiConfig.cs/#L61">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Configuration/KalshiConfig.cs/#L67">View Source</a>
   </span>
   <a id="KalshiBotAPI_Configuration_KalshiConfig_CandlestickLookback_" data-uid="KalshiBotAPI.Configuration.KalshiConfig.CandlestickLookback*"></a>
   <h4 id="KalshiBotAPI_Configuration_KalshiConfig_CandlestickLookback" data-uid="KalshiBotAPI.Configuration.KalshiConfig.CandlestickLookback">CandlestickLookback</h4>
@@ -283,7 +283,7 @@ Controls how far back in time to fetch candlestick data for different intervals.
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Configuration_KalshiConfig_MessageProcessor.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Configuration.KalshiConfig.MessageProcessor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Configuration/KalshiConfig.cs/#L73">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Configuration/KalshiConfig.cs/#L79">View Source</a>
   </span>
   <a id="KalshiBotAPI_Configuration_KalshiConfig_MessageProcessor_" data-uid="KalshiBotAPI.Configuration.KalshiConfig.MessageProcessor*"></a>
   <h4 id="KalshiBotAPI_Configuration_KalshiConfig_MessageProcessor" data-uid="KalshiBotAPI.Configuration.KalshiConfig.MessageProcessor">MessageProcessor</h4>
@@ -337,6 +337,38 @@ Controls message batching, queue sizes, timeouts, and performance metrics.</p>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotAPI_Configuration_KalshiConfig_WebSocketEnableMetrics.md&amp;value=---%0Auid%3A%20KalshiBotAPI.Configuration.KalshiConfig.WebSocketEnableMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotAPI/Configuration/KalshiConfig.cs/#L61">View Source</a>
+  </span>
+  <a id="KalshiBotAPI_Configuration_KalshiConfig_WebSocketEnableMetrics_" data-uid="KalshiBotAPI.Configuration.KalshiConfig.WebSocketEnableMetrics*"></a>
+  <h4 id="KalshiBotAPI_Configuration_KalshiConfig_WebSocketEnableMetrics" data-uid="KalshiBotAPI.Configuration.KalshiConfig.WebSocketEnableMetrics">WebSocketEnableMetrics</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether WebSocket performance metrics collection is enabled.
+When disabled, metric tracking is skipped to reduce overhead. Defaults to true.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool? WebSocketEnableMetrics { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>?</td>
         <td></td>
       </tr>
     </tbody>
