@@ -103,6 +103,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iasyncdisposable">IAsyncDisposable</a></div>
     <div><a class="xref" href="KalshiBotData.Data.Interfaces.IKalshiBotContext.html">IKalshiBotContext</a></div>
     <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    <div><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IKalshiBotContextPerformanceMetrics.html">IKalshiBotContextPerformanceMetrics</a></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -267,7 +268,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
   <h6><strong>Assembly</strong>: KalshiBotData.dll</h6>
   <h5 id="KalshiBotData_Data_KalshiBotContext_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class KalshiBotContext : DbContext, IInfrastructure&lt;IServiceProvider&gt;, IDbContextDependencies, IDbSetCache, IDbContextPoolable, IResettableService, IAsyncDisposable, IKalshiBotContext, IDisposable</code></pre>
+    <pre><code class="lang-csharp hljs">public class KalshiBotContext : DbContext, IInfrastructure&lt;IServiceProvider&gt;, IDbContextDependencies, IDbSetCache, IDbContextPoolable, IResettableService, IAsyncDisposable, IKalshiBotContext, IDisposable, IKalshiBotContextPerformanceMetrics</code></pre>
   </div>
   <h5 id="KalshiBotData_Data_KalshiBotContext_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks"><p>This context manages the complete lifecycle of trading data, including:</p>
@@ -288,7 +289,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext__ctor_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_KalshiBotData_Data_KalshiBotContext__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.%23ctor(Microsoft.Extensions.Configuration.IConfiguration%2CMicrosoft.Extensions.Logging.ILogger%7BKalshiBotData.Data.KalshiBotContext%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L84">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L85">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext__ctor_" data-uid="KalshiBotData.Data.KalshiBotContext.#ctor*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext__ctor_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_KalshiBotData_Data_KalshiBotContext__" data-uid="KalshiBotData.Data.KalshiBotContext.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{KalshiBotData.Data.KalshiBotContext})">KalshiBotContext(IConfiguration, ILogger&lt;KalshiBotContext&gt;?)</h4>
@@ -346,7 +347,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddAnnouncements_System_Collections_Generic_List_BacklashDTOs_Data_AnnouncementDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddAnnouncements(System.Collections.Generic.List%7BBacklashDTOs.Data.AnnouncementDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1584">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1585">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddAnnouncements_" data-uid="KalshiBotData.Data.KalshiBotContext.AddAnnouncements*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddAnnouncements_System_Collections_Generic_List_BacklashDTOs_Data_AnnouncementDTO__" data-uid="KalshiBotData.Data.KalshiBotContext.AddAnnouncements(System.Collections.Generic.List{BacklashDTOs.Data.AnnouncementDTO})">AddAnnouncements(List&lt;AnnouncementDTO&gt;)</h4>
@@ -393,7 +394,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddExchangeSchedule_BacklashDTOs_Data_ExchangeScheduleDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddExchangeSchedule(BacklashDTOs.Data.ExchangeScheduleDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1593">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1594">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddExchangeSchedule_" data-uid="KalshiBotData.Data.KalshiBotContext.AddExchangeSchedule*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddExchangeSchedule_BacklashDTOs_Data_ExchangeScheduleDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddExchangeSchedule(BacklashDTOs.Data.ExchangeScheduleDTO)">AddExchangeSchedule(ExchangeScheduleDTO)</h4>
@@ -440,7 +441,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddLogEntry_BacklashDTOs_Data_LogEntryDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddLogEntry(BacklashDTOs.Data.LogEntryDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1536">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1537">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddLogEntry_" data-uid="KalshiBotData.Data.KalshiBotContext.AddLogEntry*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddLogEntry_BacklashDTOs_Data_LogEntryDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddLogEntry(BacklashDTOs.Data.LogEntryDTO)">AddLogEntry(LogEntryDTO)</h4>
@@ -487,7 +488,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateBrainInstance_BacklashDTOs_Data_BrainInstanceDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateBrainInstance(BacklashDTOs.Data.BrainInstanceDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1268">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1269">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateBrainInstance_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateBrainInstance*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateBrainInstance_BacklashDTOs_Data_BrainInstanceDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateBrainInstance(BacklashDTOs.Data.BrainInstanceDTO)">AddOrUpdateBrainInstance(BrainInstanceDTO)</h4>
@@ -534,7 +535,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateCandlestick_BacklashDTOs_Data_CandlestickDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateCandlestick(BacklashDTOs.Data.CandlestickDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L803">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L804">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateCandlestick_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateCandlestick*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateCandlestick_BacklashDTOs_Data_CandlestickDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateCandlestick(BacklashDTOs.Data.CandlestickDTO)">AddOrUpdateCandlestick(CandlestickDTO)</h4>
@@ -581,7 +582,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateEvent_BacklashDTOs_Data_EventDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateEvent(BacklashDTOs.Data.EventDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L290">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L291">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateEvent_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateEvent*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateEvent_BacklashDTOs_Data_EventDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateEvent(BacklashDTOs.Data.EventDTO)">AddOrUpdateEvent(EventDTO)</h4>
@@ -628,7 +629,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateEvents_System_Collections_Generic_List_BacklashDTOs_Data_EventDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateEvents(System.Collections.Generic.List%7BBacklashDTOs.Data.EventDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L321">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L322">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateEvents_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateEvents*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateEvents_System_Collections_Generic_List_BacklashDTOs_Data_EventDTO__" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateEvents(System.Collections.Generic.List{BacklashDTOs.Data.EventDTO})">AddOrUpdateEvents(List&lt;EventDTO&gt;)</h4>
@@ -675,7 +676,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarket_BacklashDTOs_Data_MarketDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarket(BacklashDTOs.Data.MarketDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L467">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L468">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarket_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarket*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarket_BacklashDTOs_Data_MarketDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarket(BacklashDTOs.Data.MarketDTO)">AddOrUpdateMarket(MarketDTO)</h4>
@@ -722,7 +723,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarketPosition_BacklashDTOs_Data_MarketPositionDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarketPosition(BacklashDTOs.Data.MarketPositionDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1047">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1048">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarketPosition_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarketPosition*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarketPosition_BacklashDTOs_Data_MarketPositionDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarketPosition(BacklashDTOs.Data.MarketPositionDTO)">AddOrUpdateMarketPosition(MarketPositionDTO)</h4>
@@ -769,7 +770,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarketWatch_BacklashDTOs_Data_MarketWatchDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarketWatch(BacklashDTOs.Data.MarketWatchDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L947">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L948">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarketWatch_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarketWatch*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarketWatch_BacklashDTOs_Data_MarketWatchDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarketWatch(BacklashDTOs.Data.MarketWatchDTO)">AddOrUpdateMarketWatch(MarketWatchDTO)</h4>
@@ -816,7 +817,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarketWatches_System_Collections_Generic_List_BacklashDTOs_Data_MarketWatchDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarketWatches(System.Collections.Generic.List%7BBacklashDTOs.Data.MarketWatchDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L929">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L930">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarketWatches_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarketWatches*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarketWatches_System_Collections_Generic_List_BacklashDTOs_Data_MarketWatchDTO__" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarketWatches(System.Collections.Generic.List{BacklashDTOs.Data.MarketWatchDTO})">AddOrUpdateMarketWatches(List&lt;MarketWatchDTO&gt;)</h4>
@@ -863,7 +864,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarkets_System_Collections_Generic_List_BacklashDTOs_Data_MarketDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarkets(System.Collections.Generic.List%7BBacklashDTOs.Data.MarketDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L506">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L507">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarkets_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarkets*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateMarkets_System_Collections_Generic_List_BacklashDTOs_Data_MarketDTO__" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateMarkets(System.Collections.Generic.List{BacklashDTOs.Data.MarketDTO})">AddOrUpdateMarkets(List&lt;MarketDTO&gt;)</h4>
@@ -910,7 +911,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateOrder_BacklashDTOs_Data_OrderDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateOrder(BacklashDTOs.Data.OrderDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1085">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1086">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateOrder_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateOrder*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateOrder_BacklashDTOs_Data_OrderDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateOrder(BacklashDTOs.Data.OrderDTO)">AddOrUpdateOrder(OrderDTO)</h4>
@@ -957,7 +958,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateOverseerInfo_BacklashDTOs_Data_OverseerInfo_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateOverseerInfo(BacklashDTOs.Data.OverseerInfo)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1697">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1698">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateOverseerInfo_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateOverseerInfo*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateOverseerInfo_BacklashDTOs_Data_OverseerInfo_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateOverseerInfo(BacklashDTOs.Data.OverseerInfo)">AddOrUpdateOverseerInfo(OverseerInfo)</h4>
@@ -1004,7 +1005,7 @@ Implements IKalshiBotContext interface for dependency injection and testing.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateSeries_BacklashDTOs_Data_SeriesDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateSeries(BacklashDTOs.Data.SeriesDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L146">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L147">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSeries_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSeries*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSeries_BacklashDTOs_Data_SeriesDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSeries(BacklashDTOs.Data.SeriesDTO)">AddOrUpdateSeries(SeriesDTO)</h4>
@@ -1090,7 +1091,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateSignalRClient_BacklashDTOs_SignalRClient_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateSignalRClient(BacklashDTOs.SignalRClient)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1642">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1643">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSignalRClient_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSignalRClient*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSignalRClient_BacklashDTOs_SignalRClient_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSignalRClient(BacklashDTOs.SignalRClient)">AddOrUpdateSignalRClient(SignalRClient)</h4>
@@ -1137,7 +1138,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshot_BacklashDTOs_Data_SnapshotDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshot(BacklashDTOs.Data.SnapshotDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1139">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1140">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshot_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshot*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshot_BacklashDTOs_Data_SnapshotDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshot(BacklashDTOs.Data.SnapshotDTO)">AddOrUpdateSnapshot(SnapshotDTO)</h4>
@@ -1184,7 +1185,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshotGroup_BacklashDTOs_Data_SnapshotGroupDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshotGroup(BacklashDTOs.Data.SnapshotGroupDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1376">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1377">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshotGroup_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshotGroup*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshotGroup_BacklashDTOs_Data_SnapshotGroupDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshotGroup(BacklashDTOs.Data.SnapshotGroupDTO)">AddOrUpdateSnapshotGroup(SnapshotGroupDTO)</h4>
@@ -1231,7 +1232,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshotGroups_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshotGroups(System.Collections.Generic.List%7BBacklashDTOs.Data.SnapshotGroupDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1390">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1391">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshotGroups_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshotGroups*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshotGroups_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotGroupDTO__" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshotGroups(System.Collections.Generic.List{BacklashDTOs.Data.SnapshotGroupDTO})">AddOrUpdateSnapshotGroups(List&lt;SnapshotGroupDTO&gt;)</h4>
@@ -1278,7 +1279,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshots_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshots(System.Collections.Generic.List%7BBacklashDTOs.Data.SnapshotDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1170">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1171">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshots_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshots*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateSnapshots_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotDTO__" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateSnapshots(System.Collections.Generic.List{BacklashDTOs.Data.SnapshotDTO})">AddOrUpdateSnapshots(List&lt;SnapshotDTO&gt;)</h4>
@@ -1325,7 +1326,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateTicker_BacklashDTOs_Data_TickerDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateTicker(BacklashDTOs.Data.TickerDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L719">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L720">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateTicker_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateTicker*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateTicker_BacklashDTOs_Data_TickerDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateTicker(BacklashDTOs.Data.TickerDTO)">AddOrUpdateTicker(TickerDTO)</h4>
@@ -1372,7 +1373,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateTickers_System_Collections_Generic_List_BacklashDTOs_Data_TickerDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateTickers(System.Collections.Generic.List%7BBacklashDTOs.Data.TickerDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L695">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L696">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateTickers_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateTickers*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateTickers_System_Collections_Generic_List_BacklashDTOs_Data_TickerDTO__" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateTickers(System.Collections.Generic.List{BacklashDTOs.Data.TickerDTO})">AddOrUpdateTickers(List&lt;TickerDTO&gt;)</h4>
@@ -1419,7 +1420,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateWeightSet_BacklashDTOs_Data_WeightSetDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateWeightSet(BacklashDTOs.Data.WeightSetDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1459">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1460">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateWeightSet_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateWeightSet*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateWeightSet_BacklashDTOs_Data_WeightSetDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateWeightSet(BacklashDTOs.Data.WeightSetDTO)">AddOrUpdateWeightSet(WeightSetDTO)</h4>
@@ -1466,7 +1467,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOrUpdateWeightSets_System_Collections_Generic_List_BacklashDTOs_Data_WeightSetDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOrUpdateWeightSets(System.Collections.Generic.List%7BBacklashDTOs.Data.WeightSetDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1513">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1514">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateWeightSets_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateWeightSets*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOrUpdateWeightSets_System_Collections_Generic_List_BacklashDTOs_Data_WeightSetDTO__" data-uid="KalshiBotData.Data.KalshiBotContext.AddOrUpdateWeightSets(System.Collections.Generic.List{BacklashDTOs.Data.WeightSetDTO})">AddOrUpdateWeightSets(List&lt;WeightSetDTO&gt;)</h4>
@@ -1513,7 +1514,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddOverseerLogEntry_BacklashDTOs_Data_LogEntryDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddOverseerLogEntry(BacklashDTOs.Data.LogEntryDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1542">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1543">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddOverseerLogEntry_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOverseerLogEntry*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddOverseerLogEntry_BacklashDTOs_Data_LogEntryDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddOverseerLogEntry(BacklashDTOs.Data.LogEntryDTO)">AddOverseerLogEntry(LogEntryDTO)</h4>
@@ -1560,7 +1561,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddSnapshotSchema_BacklashDTOs_Data_SnapshotSchemaDTO_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddSnapshotSchema(BacklashDTOs.Data.SnapshotSchemaDTO)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1216">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1217">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddSnapshotSchema_" data-uid="KalshiBotData.Data.KalshiBotContext.AddSnapshotSchema*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddSnapshotSchema_BacklashDTOs_Data_SnapshotSchemaDTO_" data-uid="KalshiBotData.Data.KalshiBotContext.AddSnapshotSchema(BacklashDTOs.Data.SnapshotSchemaDTO)">AddSnapshotSchema(SnapshotSchemaDTO)</h4>
@@ -1607,7 +1608,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_AddSnapshots_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.AddSnapshots(System.Collections.Generic.List%7BBacklashDTOs.Data.SnapshotDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1189">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1190">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_AddSnapshots_" data-uid="KalshiBotData.Data.KalshiBotContext.AddSnapshots*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_AddSnapshots_System_Collections_Generic_List_BacklashDTOs_Data_SnapshotDTO__" data-uid="KalshiBotData.Data.KalshiBotContext.AddSnapshots(System.Collections.Generic.List{BacklashDTOs.Data.SnapshotDTO})">AddSnapshots(List&lt;SnapshotDTO&gt;)</h4>
@@ -1654,7 +1655,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_DeactivateSignalRClient_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.DeactivateSignalRClient(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1684">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1685">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_DeactivateSignalRClient_" data-uid="KalshiBotData.Data.KalshiBotContext.DeactivateSignalRClient*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_DeactivateSignalRClient_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.DeactivateSignalRClient(System.String)">DeactivateSignalRClient(string)</h4>
@@ -1701,7 +1702,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_DeleteBrainPersistence_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.DeleteBrainPersistence(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1317">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1318">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_DeleteBrainPersistence_" data-uid="KalshiBotData.Data.KalshiBotContext.DeleteBrainPersistence*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_DeleteBrainPersistence_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.DeleteBrainPersistence(System.String)">DeleteBrainPersistence(string)</h4>
@@ -1748,7 +1749,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_DeleteMarket_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.DeleteMarket(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L498">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L499">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_DeleteMarket_" data-uid="KalshiBotData.Data.KalshiBotContext.DeleteMarket*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_DeleteMarket_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.DeleteMarket(System.String)">DeleteMarket(string)</h4>
@@ -1795,7 +1796,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_DeleteWeightSet_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.DeleteWeightSet(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1521">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1522">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_DeleteWeightSet_" data-uid="KalshiBotData.Data.KalshiBotContext.DeleteWeightSet*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_DeleteWeightSet_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.DeleteWeightSet(System.String)">DeleteWeightSet(string)</h4>
@@ -1842,7 +1843,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetActiveOverseerInfos.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetActiveOverseerInfos%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1715">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1716">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetActiveOverseerInfos_" data-uid="KalshiBotData.Data.KalshiBotContext.GetActiveOverseerInfos*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetActiveOverseerInfos" data-uid="KalshiBotData.Data.KalshiBotContext.GetActiveOverseerInfos">GetActiveOverseerInfos()</h4>
@@ -1872,7 +1873,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetAllBrainPersistenceNames.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetAllBrainPersistenceNames%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1329">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1330">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetAllBrainPersistenceNames_" data-uid="KalshiBotData.Data.KalshiBotContext.GetAllBrainPersistenceNames*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetAllBrainPersistenceNames" data-uid="KalshiBotData.Data.KalshiBotContext.GetAllBrainPersistenceNames">GetAllBrainPersistenceNames()</h4>
@@ -1902,7 +1903,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetBrainInstance_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetBrainInstance(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1237">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1238">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetBrainInstance_" data-uid="KalshiBotData.Data.KalshiBotContext.GetBrainInstance*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetBrainInstance_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetBrainInstance(System.String)">GetBrainInstance(string?)</h4>
@@ -1949,7 +1950,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetBrainInstanceByName_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetBrainInstanceByName(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1231">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1232">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetBrainInstanceByName_" data-uid="KalshiBotData.Data.KalshiBotContext.GetBrainInstanceByName*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetBrainInstanceByName_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetBrainInstanceByName(System.String)">GetBrainInstanceByName(string?)</h4>
@@ -1996,7 +1997,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetBrainInstancesFiltered_System_String_System_Nullable_System_Boolean__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetBrainInstancesFiltered(System.String%2CSystem.Nullable%7BSystem.Boolean%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1242">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1243">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetBrainInstancesFiltered_" data-uid="KalshiBotData.Data.KalshiBotContext.GetBrainInstancesFiltered*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetBrainInstancesFiltered_System_String_System_Nullable_System_Boolean__" data-uid="KalshiBotData.Data.KalshiBotContext.GetBrainInstancesFiltered(System.String,System.Nullable{System.Boolean})">GetBrainInstancesFiltered(string?, bool?)</h4>
@@ -2048,7 +2049,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetCandlesticks_System_String_System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetCandlesticks(System.String%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L736">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L737">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetCandlesticks_" data-uid="KalshiBotData.Data.KalshiBotContext.GetCandlesticks*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetCandlesticks_System_String_System_Nullable_System_Int32__" data-uid="KalshiBotData.Data.KalshiBotContext.GetCandlesticks(System.String,System.Nullable{System.Int32})">GetCandlesticks(string, int?)</h4>
@@ -2100,7 +2101,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetEventByTicker_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetEventByTicker(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L257">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L258">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetEventByTicker_" data-uid="KalshiBotData.Data.KalshiBotContext.GetEventByTicker*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetEventByTicker_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetEventByTicker(System.String)">GetEventByTicker(string)</h4>
@@ -2166,7 +2167,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetFinalizedMarketWatches_System_Guid_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetFinalizedMarketWatches(System.Guid)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L917">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L918">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetFinalizedMarketWatches_" data-uid="KalshiBotData.Data.KalshiBotContext.GetFinalizedMarketWatches*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetFinalizedMarketWatches_System_Guid_" data-uid="KalshiBotData.Data.KalshiBotContext.GetFinalizedMarketWatches(System.Guid)">GetFinalizedMarketWatches(Guid)</h4>
@@ -2213,7 +2214,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetFinalizedMarketWatchesByBrainLock_System_Guid_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetFinalizedMarketWatchesByBrainLock(System.Guid)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L792">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L793">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetFinalizedMarketWatchesByBrainLock_" data-uid="KalshiBotData.Data.KalshiBotContext.GetFinalizedMarketWatchesByBrainLock*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetFinalizedMarketWatchesByBrainLock_System_Guid_" data-uid="KalshiBotData.Data.KalshiBotContext.GetFinalizedMarketWatchesByBrainLock(System.Guid)">GetFinalizedMarketWatchesByBrainLock(Guid)</h4>
@@ -2260,7 +2261,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetInactiveMarketTickersWithoutSnapshots.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetInactiveMarketTickersWithoutSnapshots%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L441">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L442">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetInactiveMarketTickersWithoutSnapshots_" data-uid="KalshiBotData.Data.KalshiBotContext.GetInactiveMarketTickersWithoutSnapshots*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetInactiveMarketTickersWithoutSnapshots" data-uid="KalshiBotData.Data.KalshiBotContext.GetInactiveMarketTickersWithoutSnapshots">GetInactiveMarketTickersWithoutSnapshots()</h4>
@@ -2290,7 +2291,7 @@ Performs idempotent operations with case-insensitive deduplication.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetInactiveMarketsWithNoSnapshots.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetInactiveMarketsWithNoSnapshots%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L428">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L429">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetInactiveMarketsWithNoSnapshots_" data-uid="KalshiBotData.Data.KalshiBotContext.GetInactiveMarketsWithNoSnapshots*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetInactiveMarketsWithNoSnapshots" data-uid="KalshiBotData.Data.KalshiBotContext.GetInactiveMarketsWithNoSnapshots">GetInactiveMarketsWithNoSnapshots()</h4>
@@ -2326,7 +2327,7 @@ snapshot data, which may be candidates for cleanup or special handling.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetLastCandlestick_System_String_System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetLastCandlestick(System.String%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L745">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L746">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetLastCandlestick_" data-uid="KalshiBotData.Data.KalshiBotContext.GetLastCandlestick*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetLastCandlestick_System_String_System_Nullable_System_Int32__" data-uid="KalshiBotData.Data.KalshiBotContext.GetLastCandlestick(System.String,System.Nullable{System.Int32})">GetLastCandlestick(string, int?)</h4>
@@ -2378,7 +2379,7 @@ snapshot data, which may be candidates for cleanup or special handling.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetLatestCandlestick_System_String_System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetLatestCandlestick(System.String%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L754">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L755">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetLatestCandlestick_" data-uid="KalshiBotData.Data.KalshiBotContext.GetLatestCandlestick*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetLatestCandlestick_System_String_System_Nullable_System_Int32__" data-uid="KalshiBotData.Data.KalshiBotContext.GetLatestCandlestick(System.String,System.Nullable{System.Int32})">GetLatestCandlestick(string, int?)</h4>
@@ -2430,7 +2431,7 @@ snapshot data, which may be candidates for cleanup or special handling.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetLogEntries_System_String_System_String_System_Nullable_System_DateTime__System_Nullable_System_DateTime__System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetLogEntries(System.String%2CSystem.String%2CSystem.Nullable%7BSystem.DateTime%7D%2CSystem.Nullable%7BSystem.DateTime%7D%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1548">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1549">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetLogEntries_" data-uid="KalshiBotData.Data.KalshiBotContext.GetLogEntries*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetLogEntries_System_String_System_String_System_Nullable_System_DateTime__System_Nullable_System_DateTime__System_Nullable_System_Int32__" data-uid="KalshiBotData.Data.KalshiBotContext.GetLogEntries(System.String,System.String,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Nullable{System.Int32})">GetLogEntries(string?, string?, DateTime?, DateTime?, int?)</h4>
@@ -2497,7 +2498,7 @@ snapshot data, which may be candidates for cleanup or special handling.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetLogEntriesFiltered_System_String_System_String_System_Nullable_System_DateTime__System_Nullable_System_DateTime__System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetLogEntriesFiltered(System.String%2CSystem.String%2CSystem.Nullable%7BSystem.DateTime%7D%2CSystem.Nullable%7BSystem.DateTime%7D%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1575">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1576">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetLogEntriesFiltered_" data-uid="KalshiBotData.Data.KalshiBotContext.GetLogEntriesFiltered*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetLogEntriesFiltered_System_String_System_String_System_Nullable_System_DateTime__System_Nullable_System_DateTime__System_Nullable_System_Int32__" data-uid="KalshiBotData.Data.KalshiBotContext.GetLogEntriesFiltered(System.String,System.String,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Nullable{System.Int32})">GetLogEntriesFiltered(string?, string?, DateTime?, DateTime?, int?)</h4>
@@ -2564,7 +2565,7 @@ snapshot data, which may be candidates for cleanup or special handling.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketByTicker_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketByTicker(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L363">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L364">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketByTicker_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketByTicker*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketByTicker_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketByTicker(System.String)">GetMarketByTicker(string)</h4>
@@ -2630,7 +2631,7 @@ snapshot data, which may be candidates for cleanup or special handling.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketLiquidityStates.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketLiquidityStates%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1602">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1603">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketLiquidityStates_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketLiquidityStates*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketLiquidityStates" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketLiquidityStates">GetMarketLiquidityStates()</h4>
@@ -2660,7 +2661,7 @@ snapshot data, which may be candidates for cleanup or special handling.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketPosition_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketPosition(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1027">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1028">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketPosition_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketPosition*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketPosition_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketPosition(System.String)">GetMarketPosition(string)</h4>
@@ -2707,7 +2708,7 @@ snapshot data, which may be candidates for cleanup or special handling.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketPositions_System_Collections_Generic_HashSet_System_String__System_Nullable_System_Boolean__System_Nullable_System_Boolean__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketPositions(System.Collections.Generic.HashSet%7BSystem.String%7D%2CSystem.Nullable%7BSystem.Boolean%7D%2CSystem.Nullable%7BSystem.Boolean%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1033">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1034">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketPositions_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketPositions*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketPositions_System_Collections_Generic_HashSet_System_String__System_Nullable_System_Boolean__System_Nullable_System_Boolean__" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketPositions(System.Collections.Generic.HashSet{System.String},System.Nullable{System.Boolean},System.Nullable{System.Boolean})">GetMarketPositions(HashSet&lt;string&gt;?, bool?, bool?)</h4>
@@ -2764,7 +2765,7 @@ snapshot data, which may be candidates for cleanup or special handling.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketStatus_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketStatus(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L652">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L653">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketStatus_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketStatus*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketStatus_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketStatus(System.String)">GetMarketStatus(string)</h4>
@@ -2818,7 +2819,7 @@ using RIGHT OUTER JOINs to ensure all relationships are verified in one database
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketTickersWithSnapshots.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketTickersWithSnapshots%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L797">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L798">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketTickersWithSnapshots_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketTickersWithSnapshots*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketTickersWithSnapshots" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketTickersWithSnapshots">GetMarketTickersWithSnapshots()</h4>
@@ -2848,7 +2849,7 @@ using RIGHT OUTER JOINs to ensure all relationships are verified in one database
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketWatch_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketWatch(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L857">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L858">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketWatch_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketWatch*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketWatch_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketWatch(System.String)">GetMarketWatch(string)</h4>
@@ -2895,7 +2896,7 @@ using RIGHT OUTER JOINs to ensure all relationships are verified in one database
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketWatchByTicker_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketWatchByTicker(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L759">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L760">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketWatchByTicker_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketWatchByTicker*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketWatchByTicker_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketWatchByTicker(System.String)">GetMarketWatchByTicker(string)</h4>
@@ -2942,7 +2943,7 @@ using RIGHT OUTER JOINs to ensure all relationships are verified in one database
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketWatches_System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_Guid__System_Collections_Generic_HashSet_System_Guid__System_Nullable_System_Boolean__System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_DateTime__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketWatches(System.Collections.Generic.HashSet%7BSystem.String%7D%2CSystem.Collections.Generic.HashSet%7BSystem.Guid%7D%2CSystem.Collections.Generic.HashSet%7BSystem.Guid%7D%2CSystem.Nullable%7BSystem.Boolean%7D%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.DateTime%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L864">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L865">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketWatches_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketWatches*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketWatches_System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_Guid__System_Collections_Generic_HashSet_System_Guid__System_Nullable_System_Boolean__System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_DateTime__" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketWatches(System.Collections.Generic.HashSet{System.String},System.Collections.Generic.HashSet{System.Guid},System.Collections.Generic.HashSet{System.Guid},System.Nullable{System.Boolean},System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.DateTime})">GetMarketWatches(HashSet&lt;string&gt;?, HashSet&lt;Guid&gt;?, HashSet&lt;Guid&gt;?, bool?, double?, double?, DateTime?)</h4>
@@ -3019,7 +3020,7 @@ using RIGHT OUTER JOINs to ensure all relationships are verified in one database
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketWatchesFiltered_System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_Guid__System_Collections_Generic_HashSet_System_Guid__System_Nullable_System_Boolean__System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_DateTime__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketWatchesFiltered(System.Collections.Generic.HashSet%7BSystem.String%7D%2CSystem.Collections.Generic.HashSet%7BSystem.Guid%7D%2CSystem.Collections.Generic.HashSet%7BSystem.Guid%7D%2CSystem.Nullable%7BSystem.Boolean%7D%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.DateTime%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L774">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L775">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketWatchesFiltered_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketWatchesFiltered*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketWatchesFiltered_System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_Guid__System_Collections_Generic_HashSet_System_Guid__System_Nullable_System_Boolean__System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_DateTime__" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketWatchesFiltered(System.Collections.Generic.HashSet{System.String},System.Collections.Generic.HashSet{System.Guid},System.Collections.Generic.HashSet{System.Guid},System.Nullable{System.Boolean},System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.DateTime})">GetMarketWatchesFiltered(HashSet&lt;string&gt;?, HashSet&lt;Guid&gt;?, HashSet&lt;Guid&gt;?, bool?, double?, double?, DateTime?)</h4>
@@ -3096,7 +3097,7 @@ using RIGHT OUTER JOINs to ensure all relationships are verified in one database
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarkets_System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Nullable_System_Boolean__System_Nullable_System_Double__System_Nullable_System_DateTime__System_Nullable_System_DateTime__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarkets(System.Collections.Generic.HashSet%7BSystem.String%7D%2CSystem.Collections.Generic.HashSet%7BSystem.String%7D%2CSystem.Collections.Generic.HashSet%7BSystem.String%7D%2CSystem.Collections.Generic.HashSet%7BSystem.String%7D%2CSystem.Nullable%7BSystem.Boolean%7D%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.DateTime%7D%2CSystem.Nullable%7BSystem.DateTime%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L594">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L595">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarkets_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarkets*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarkets_System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Nullable_System_Boolean__System_Nullable_System_Double__System_Nullable_System_DateTime__System_Nullable_System_DateTime__" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarkets(System.Collections.Generic.HashSet{System.String},System.Collections.Generic.HashSet{System.String},System.Collections.Generic.HashSet{System.String},System.Collections.Generic.HashSet{System.String},System.Nullable{System.Boolean},System.Nullable{System.Double},System.Nullable{System.DateTime},System.Nullable{System.DateTime})">GetMarkets(HashSet&lt;string&gt;?, HashSet&lt;string&gt;?, HashSet&lt;string&gt;?, HashSet&lt;string&gt;?, bool?, double?, DateTime?, DateTime?)</h4>
@@ -3192,7 +3193,7 @@ with efficient database queries that combine multiple filter conditions.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketsFiltered_System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Nullable_System_Boolean__System_Nullable_System_Double__System_Nullable_System_DateTime__System_Nullable_System_DateTime__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketsFiltered(System.Collections.Generic.HashSet%7BSystem.String%7D%2CSystem.Collections.Generic.HashSet%7BSystem.String%7D%2CSystem.Collections.Generic.HashSet%7BSystem.String%7D%2CSystem.Collections.Generic.HashSet%7BSystem.String%7D%2CSystem.Nullable%7BSystem.Boolean%7D%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.DateTime%7D%2CSystem.Nullable%7BSystem.DateTime%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L766">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L767">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketsFiltered_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketsFiltered*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketsFiltered_System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Collections_Generic_HashSet_System_String__System_Nullable_System_Boolean__System_Nullable_System_Double__System_Nullable_System_DateTime__System_Nullable_System_DateTime__" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketsFiltered(System.Collections.Generic.HashSet{System.String},System.Collections.Generic.HashSet{System.String},System.Collections.Generic.HashSet{System.String},System.Collections.Generic.HashSet{System.String},System.Nullable{System.Boolean},System.Nullable{System.Double},System.Nullable{System.DateTime},System.Nullable{System.DateTime})">GetMarketsFiltered(HashSet&lt;string&gt;?, HashSet&lt;string&gt;?, HashSet&lt;string&gt;?, HashSet&lt;string&gt;?, bool?, double?, DateTime?, DateTime?)</h4>
@@ -3274,7 +3275,7 @@ with efficient database queries that combine multiple filter conditions.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetMarketsWithSnapshots.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetMarketsWithSnapshots%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L414">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L415">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetMarketsWithSnapshots_" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketsWithSnapshots*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetMarketsWithSnapshots" data-uid="KalshiBotData.Data.KalshiBotContext.GetMarketsWithSnapshots">GetMarketsWithSnapshots()</h4>
@@ -3310,7 +3311,7 @@ available for analysis or backtesting purposes.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetOrders_System_String_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetOrders(System.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1074">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1075">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetOrders_" data-uid="KalshiBotData.Data.KalshiBotContext.GetOrders*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetOrders_System_String_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetOrders(System.String,System.String)">GetOrders(string?, string?)</h4>
@@ -3362,7 +3363,7 @@ available for analysis or backtesting purposes.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetOverseerInfoByHostName_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetOverseerInfoByHostName(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1723">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1724">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetOverseerInfoByHostName_" data-uid="KalshiBotData.Data.KalshiBotContext.GetOverseerInfoByHostName*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetOverseerInfoByHostName_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetOverseerInfoByHostName(System.String)">GetOverseerInfoByHostName(string)</h4>
@@ -3409,7 +3410,7 @@ available for analysis or backtesting purposes.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1792">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1793">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetPerformanceMetrics_" data-uid="KalshiBotData.Data.KalshiBotContext.GetPerformanceMetrics*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetPerformanceMetrics" data-uid="KalshiBotData.Data.KalshiBotContext.GetPerformanceMetrics">GetPerformanceMetrics()</h4>
@@ -3441,7 +3442,7 @@ available for analysis or backtesting purposes.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetProcessedMarkets.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetProcessedMarkets%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L454">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L455">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetProcessedMarkets_" data-uid="KalshiBotData.Data.KalshiBotContext.GetProcessedMarkets*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetProcessedMarkets" data-uid="KalshiBotData.Data.KalshiBotContext.GetProcessedMarkets">GetProcessedMarkets()</h4>
@@ -3477,7 +3478,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSeriesByTicker_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSeriesByTicker(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L104">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L105">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSeriesByTicker_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSeriesByTicker*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSeriesByTicker_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSeriesByTicker(System.String)">GetSeriesByTicker(string)</h4>
@@ -3543,7 +3544,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSignalRClient_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSignalRClient(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1637">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1638">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSignalRClient_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSignalRClient*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSignalRClient_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSignalRClient(System.String)">GetSignalRClient(string)</h4>
@@ -3590,7 +3591,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSignalRClientById_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSignalRClientById(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1632">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1633">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSignalRClientById_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSignalRClientById*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSignalRClientById_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSignalRClientById(System.String)">GetSignalRClientById(string)</h4>
@@ -3637,7 +3638,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSignalRClients_System_String_System_String_System_Nullable_System_Boolean__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSignalRClients(System.String%2CSystem.String%2CSystem.Nullable%7BSystem.Boolean%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1620">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1621">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSignalRClients_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSignalRClients*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSignalRClients_System_String_System_String_System_Nullable_System_Boolean__" data-uid="KalshiBotData.Data.KalshiBotContext.GetSignalRClients(System.String,System.String,System.Nullable{System.Boolean})">GetSignalRClients(string?, string?, bool?)</h4>
@@ -3694,7 +3695,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSnapshotCount_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSnapshotCount(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1195">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1196">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSnapshotCount_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotCount*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSnapshotCount_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotCount(System.String)">GetSnapshotCount(string)</h4>
@@ -3741,7 +3742,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSnapshotGroupNames.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSnapshotGroupNames%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1350">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1351">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSnapshotGroupNames_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotGroupNames*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSnapshotGroupNames" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotGroupNames">GetSnapshotGroupNames()</h4>
@@ -3771,7 +3772,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSnapshotGroups_System_Collections_Generic_List_System_String__System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSnapshotGroups(System.Collections.Generic.List%7BSystem.String%7D%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1339">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1340">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSnapshotGroups_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotGroups*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSnapshotGroups_System_Collections_Generic_List_System_String__System_Nullable_System_Int32__" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotGroups(System.Collections.Generic.List{System.String},System.Nullable{System.Int32})">GetSnapshotGroups(List&lt;string&gt;?, int?)</h4>
@@ -3823,7 +3824,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSnapshotGroupsFiltered_System_Collections_Generic_List_System_String__System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSnapshotGroupsFiltered(System.Collections.Generic.List%7BSystem.String%7D%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L781">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L782">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSnapshotGroupsFiltered_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotGroupsFiltered*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSnapshotGroupsFiltered_System_Collections_Generic_List_System_String__System_Nullable_System_Int32__" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotGroupsFiltered(System.Collections.Generic.List{System.String},System.Nullable{System.Int32})">GetSnapshotGroupsFiltered(List&lt;string&gt;?, int?)</h4>
@@ -3875,7 +3876,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSnapshotSchema_System_Int32_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSnapshotSchema(System.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1202">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1203">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSnapshotSchema_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotSchema*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSnapshotSchema_System_Int32_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotSchema(System.Int32)">GetSnapshotSchema(int)</h4>
@@ -3922,7 +3923,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSnapshotSchemas.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSnapshotSchemas%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1208">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1209">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSnapshotSchemas_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotSchemas*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSnapshotSchemas" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotSchemas">GetSnapshotSchemas()</h4>
@@ -3952,7 +3953,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSnapshots_System_String_System_Nullable_System_Boolean__System_Nullable_System_DateTime__System_Nullable_System_DateTime__System_Nullable_System_Int32__System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSnapshots(System.String%2CSystem.Nullable%7BSystem.Boolean%7D%2CSystem.Nullable%7BSystem.DateTime%7D%2CSystem.Nullable%7BSystem.DateTime%7D%2CSystem.Nullable%7BSystem.Int32%7D%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1119">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1120">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSnapshots_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshots*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSnapshots_System_String_System_Nullable_System_Boolean__System_Nullable_System_DateTime__System_Nullable_System_DateTime__System_Nullable_System_Int32__System_Nullable_System_Int32__" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshots(System.String,System.Nullable{System.Boolean},System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Nullable{System.Int32},System.Nullable{System.Int32})">GetSnapshots(string?, bool?, DateTime?, DateTime?, int?, int?)</h4>
@@ -4024,7 +4025,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetSnapshotsFiltered_System_String_System_Nullable_System_Boolean__System_Nullable_System_DateTime__System_Nullable_System_DateTime__System_Nullable_System_Int32__System_Nullable_System_Int32__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetSnapshotsFiltered(System.String%2CSystem.Nullable%7BSystem.Boolean%7D%2CSystem.Nullable%7BSystem.DateTime%7D%2CSystem.Nullable%7BSystem.DateTime%7D%2CSystem.Nullable%7BSystem.Int32%7D%2CSystem.Nullable%7BSystem.Int32%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L786">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L787">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetSnapshotsFiltered_" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotsFiltered*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetSnapshotsFiltered_System_String_System_Nullable_System_Boolean__System_Nullable_System_DateTime__System_Nullable_System_DateTime__System_Nullable_System_Int32__System_Nullable_System_Int32__" data-uid="KalshiBotData.Data.KalshiBotContext.GetSnapshotsFiltered(System.String,System.Nullable{System.Boolean},System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Nullable{System.Int32},System.Nullable{System.Int32})">GetSnapshotsFiltered(string?, bool?, DateTime?, DateTime?, int?, int?)</h4>
@@ -4096,7 +4097,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetStaleBrains_System_Guid_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetStaleBrains(System.Guid)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1253">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1254">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetStaleBrains_" data-uid="KalshiBotData.Data.KalshiBotContext.GetStaleBrains*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetStaleBrains_System_Guid_" data-uid="KalshiBotData.Data.KalshiBotContext.GetStaleBrains(System.Guid)">GetStaleBrains(Guid)</h4>
@@ -4143,7 +4144,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetTickers_System_String_System_Nullable_System_DateTime__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetTickers(System.String%2CSystem.Nullable%7BSystem.DateTime%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L684">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L685">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetTickers_" data-uid="KalshiBotData.Data.KalshiBotContext.GetTickers*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetTickers_System_String_System_Nullable_System_DateTime__" data-uid="KalshiBotData.Data.KalshiBotContext.GetTickers(System.String,System.Nullable{System.DateTime})">GetTickers(string?, DateTime?)</h4>
@@ -4195,7 +4196,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetUngroupedSnapshots_System_Int32_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetUngroupedSnapshots(System.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1357">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1358">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetUngroupedSnapshots_" data-uid="KalshiBotData.Data.KalshiBotContext.GetUngroupedSnapshots*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetUngroupedSnapshots_System_Int32_" data-uid="KalshiBotData.Data.KalshiBotContext.GetUngroupedSnapshots(System.Int32)">GetUngroupedSnapshots(int)</h4>
@@ -4242,7 +4243,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetWeightSetByStrategyName_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetWeightSetByStrategyName(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1410">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1411">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetWeightSetByStrategyName_" data-uid="KalshiBotData.Data.KalshiBotContext.GetWeightSetByStrategyName*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetWeightSetByStrategyName_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetWeightSetByStrategyName(System.String)">GetWeightSetByStrategyName(string)</h4>
@@ -4289,7 +4290,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetWeightSets_System_Collections_Generic_HashSet_System_String__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetWeightSets(System.Collections.Generic.HashSet%7BSystem.String%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1424">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1425">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetWeightSets_" data-uid="KalshiBotData.Data.KalshiBotContext.GetWeightSets*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetWeightSets_System_Collections_Generic_HashSet_System_String__" data-uid="KalshiBotData.Data.KalshiBotContext.GetWeightSets(System.Collections.Generic.HashSet{System.String})">GetWeightSets(HashSet&lt;string&gt;?)</h4>
@@ -4336,7 +4337,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_GetWeightSetsByMarketTicker_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.GetWeightSetsByMarketTicker(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1444">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1445">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_GetWeightSetsByMarketTicker_" data-uid="KalshiBotData.Data.KalshiBotContext.GetWeightSetsByMarketTicker*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_GetWeightSetsByMarketTicker_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.GetWeightSetsByMarketTicker(System.String)">GetWeightSetsByMarketTicker(string)</h4>
@@ -4383,7 +4384,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_ImportJsonCandlesticks.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.ImportJsonCandlesticks%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L847">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L848">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_ImportJsonCandlesticks_" data-uid="KalshiBotData.Data.KalshiBotContext.ImportJsonCandlesticks*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_ImportJsonCandlesticks" data-uid="KalshiBotData.Data.KalshiBotContext.ImportJsonCandlesticks">ImportJsonCandlesticks()</h4>
@@ -4413,7 +4414,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_LoadBrainPersistence_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.LoadBrainPersistence(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1308">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1309">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_LoadBrainPersistence_" data-uid="KalshiBotData.Data.KalshiBotContext.LoadBrainPersistence*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_LoadBrainPersistence_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.LoadBrainPersistence(System.String)">LoadBrainPersistence(string)</h4>
@@ -4460,7 +4461,7 @@ into snapshot groups for analysis, indicating they have completed their lifecycl
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_OnConfiguring_Microsoft_EntityFrameworkCore_DbContextOptionsBuilder_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1828">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1829">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_OnConfiguring_" data-uid="KalshiBotData.Data.KalshiBotContext.OnConfiguring*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_OnConfiguring_Microsoft_EntityFrameworkCore_DbContextOptionsBuilder_" data-uid="KalshiBotData.Data.KalshiBotContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">OnConfiguring(DbContextOptionsBuilder)</h4>
@@ -4500,7 +4501,7 @@ It sets up the SQL Server provider with the connection string from configuration
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_OnModelCreating_Microsoft_EntityFrameworkCore_ModelBuilder_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1846">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1847">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_OnModelCreating_" data-uid="KalshiBotData.Data.KalshiBotContext.OnModelCreating*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_OnModelCreating_Microsoft_EntityFrameworkCore_ModelBuilder_" data-uid="KalshiBotData.Data.KalshiBotContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">OnModelCreating(ModelBuilder)</h4>
@@ -4547,7 +4548,7 @@ It sets up the SQL Server provider with the connection string from configuration
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_RemoveClosedWatches.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.RemoveClosedWatches%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L887">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L888">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_RemoveClosedWatches_" data-uid="KalshiBotData.Data.KalshiBotContext.RemoveClosedWatches*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_RemoveClosedWatches" data-uid="KalshiBotData.Data.KalshiBotContext.RemoveClosedWatches">RemoveClosedWatches()</h4>
@@ -4577,7 +4578,7 @@ It sets up the SQL Server provider with the connection string from configuration
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_RemoveMarketPosition_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.RemoveMarketPosition(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1062">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1063">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_RemoveMarketPosition_" data-uid="KalshiBotData.Data.KalshiBotContext.RemoveMarketPosition*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_RemoveMarketPosition_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.RemoveMarketPosition(System.String)">RemoveMarketPosition(string)</h4>
@@ -4624,7 +4625,7 @@ It sets up the SQL Server provider with the connection string from configuration
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_RemoveMarketWatches_System_Collections_Generic_List_BacklashDTOs_Data_MarketWatchDTO__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.RemoveMarketWatches(System.Collections.Generic.List%7BBacklashDTOs.Data.MarketWatchDTO%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L978">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L979">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_RemoveMarketWatches_" data-uid="KalshiBotData.Data.KalshiBotContext.RemoveMarketWatches*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_RemoveMarketWatches_System_Collections_Generic_List_BacklashDTOs_Data_MarketWatchDTO__" data-uid="KalshiBotData.Data.KalshiBotContext.RemoveMarketWatches(System.Collections.Generic.List{BacklashDTOs.Data.MarketWatchDTO})">RemoveMarketWatches(List&lt;MarketWatchDTO&gt;)</h4>
@@ -4671,7 +4672,7 @@ It sets up the SQL Server provider with the connection string from configuration
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_RemoveOrphanedBrainLocks.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.RemoveOrphanedBrainLocks%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1009">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1010">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_RemoveOrphanedBrainLocks_" data-uid="KalshiBotData.Data.KalshiBotContext.RemoveOrphanedBrainLocks*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_RemoveOrphanedBrainLocks" data-uid="KalshiBotData.Data.KalshiBotContext.RemoveOrphanedBrainLocks">RemoveOrphanedBrainLocks()</h4>
@@ -4701,7 +4702,7 @@ It sets up the SQL Server provider with the connection string from configuration
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_ResetPerformanceMetrics.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.ResetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1812">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1813">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_ResetPerformanceMetrics_" data-uid="KalshiBotData.Data.KalshiBotContext.ResetPerformanceMetrics*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_ResetPerformanceMetrics" data-uid="KalshiBotData.Data.KalshiBotContext.ResetPerformanceMetrics">ResetPerformanceMetrics()</h4>
@@ -4717,7 +4718,7 @@ It sets up the SQL Server provider with the connection string from configuration
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_RetrieveCandlesticksAsync_System_Threading_CancellationToken_System_Int32_System_String_System_DateTime_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.RetrieveCandlesticksAsync(System.Threading.CancellationToken%2CSystem.Int32%2CSystem.String%2CSystem.DateTime)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L819">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L820">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_RetrieveCandlesticksAsync_" data-uid="KalshiBotData.Data.KalshiBotContext.RetrieveCandlesticksAsync*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_RetrieveCandlesticksAsync_System_Threading_CancellationToken_System_Int32_System_String_System_DateTime_" data-uid="KalshiBotData.Data.KalshiBotContext.RetrieveCandlesticksAsync(System.Threading.CancellationToken,System.Int32,System.String,System.DateTime)">RetrieveCandlesticksAsync(CancellationToken, int, string, DateTime)</h4>
@@ -4779,7 +4780,7 @@ It sets up the SQL Server provider with the connection string from configuration
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_SaveBrainPersistence_System_String_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.SaveBrainPersistence(System.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1283">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1284">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_SaveBrainPersistence_" data-uid="KalshiBotData.Data.KalshiBotContext.SaveBrainPersistence*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_SaveBrainPersistence_System_String_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.SaveBrainPersistence(System.String,System.String)">SaveBrainPersistence(string, string)</h4>
@@ -4831,7 +4832,7 @@ It sets up the SQL Server provider with the connection string from configuration
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_UpdateMarketLastCandlestick_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.UpdateMarketLastCandlestick(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L626">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L627">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_UpdateMarketLastCandlestick_" data-uid="KalshiBotData.Data.KalshiBotContext.UpdateMarketLastCandlestick*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_UpdateMarketLastCandlestick_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.UpdateMarketLastCandlestick(System.String)">UpdateMarketLastCandlestick(string)</h4>
@@ -4878,7 +4879,7 @@ It sets up the SQL Server provider with the connection string from configuration
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_UpdateSignalRClientConnection_System_String_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.UpdateSignalRClientConnection(System.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1663">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1664">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_UpdateSignalRClientConnection_" data-uid="KalshiBotData.Data.KalshiBotContext.UpdateSignalRClientConnection*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_UpdateSignalRClientConnection_System_String_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.UpdateSignalRClientConnection(System.String,System.String)">UpdateSignalRClientConnection(string, string)</h4>
@@ -4930,7 +4931,7 @@ It sets up the SQL Server provider with the connection string from configuration
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext_UpdateSignalRClientLastSeen_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext.UpdateSignalRClientLastSeen(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1674">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L1675">View Source</a>
   </span>
   <a id="KalshiBotData_Data_KalshiBotContext_UpdateSignalRClientLastSeen_" data-uid="KalshiBotData.Data.KalshiBotContext.UpdateSignalRClientLastSeen*"></a>
   <h4 id="KalshiBotData_Data_KalshiBotContext_UpdateSignalRClientLastSeen_System_String_" data-uid="KalshiBotData.Data.KalshiBotContext.UpdateSignalRClientLastSeen(System.String)">UpdateSignalRClientLastSeen(string)</h4>
@@ -4997,6 +4998,9 @@ It sets up the SQL Server provider with the connection string from configuration
   <div>
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
   </div>
+  <div>
+      <a class="xref" href="BacklashInterfaces.PerformanceMetrics.IKalshiBotContextPerformanceMetrics.html">IKalshiBotContextPerformanceMetrics</a>
+  </div>
 
 </article>
           </div>
@@ -5009,7 +5013,7 @@ It sets up the SQL Server provider with the connection string from configuration
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_KalshiBotContext.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.KalshiBotContext%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L34" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/KalshiBotContext.cs/#L35" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

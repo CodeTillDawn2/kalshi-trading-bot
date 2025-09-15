@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class OrderbookSlimConverter | Kalshi Trading Bot Documentation ">
     
-    
+    <meta name="description" content="JSON converter for orderbook data that uses short property names for compactness. Maps price-&amp;gt;p, side y/n-&amp;gt;s, resting_contracts-&amp;gt;q, last_modified_date-&amp;gt;t.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,9 @@
 
 
   <h1 id="BacklashDTOs_Converters_OrderbookSlimConverter" data-uid="BacklashDTOs.Converters.OrderbookSlimConverter" class="text-break">Class OrderbookSlimConverter</h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>JSON converter for orderbook data that uses short property names for compactness.
+Maps price-&gt;p, side y/n-&gt;s, resting_contracts-&gt;q, last_modified_date-&gt;t.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
@@ -151,11 +153,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_Converters_OrderbookSlimConverter_Read_System_Text_Json_Utf8JsonReader__System_Type_System_Text_Json_JsonSerializerOptions_.md&amp;value=---%0Auid%3A%20BacklashDTOs.Converters.OrderbookSlimConverter.Read(System.Text.Json.Utf8JsonReader%40%2CSystem.Type%2CSystem.Text.Json.JsonSerializerOptions)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/OrderbookSlimConverter.cs/#L9">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/OrderbookSlimConverter.cs/#L19">View Source</a>
   </span>
   <a id="BacklashDTOs_Converters_OrderbookSlimConverter_Read_" data-uid="BacklashDTOs.Converters.OrderbookSlimConverter.Read*"></a>
   <h4 id="BacklashDTOs_Converters_OrderbookSlimConverter_Read_System_Text_Json_Utf8JsonReader__System_Type_System_Text_Json_JsonSerializerOptions_" data-uid="BacklashDTOs.Converters.OrderbookSlimConverter.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">Read(ref Utf8JsonReader, Type, JsonSerializerOptions)</h4>
-  <div class="markdown level1 summary"><p>Reads and converts the JSON to type <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List&lt;Dictionary&lt;string, object&gt;&gt;</a>.</p>
+  <div class="markdown level1 summary"><p>Reads and converts the JSON to a list of orderbook rows, expanding short property names to long ones.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -175,7 +177,7 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.json.utf8jsonreader">Utf8JsonReader</a></td>
         <td><span class="parametername">reader</span></td>
-        <td><p>The reader.</p>
+        <td><p>The UTF-8 JSON reader.</p>
 </td>
       </tr>
       <tr>
@@ -187,7 +189,7 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.json.jsonserializeroptions">JsonSerializerOptions</a></td>
         <td><span class="parametername">options</span></td>
-        <td><p>An object that specifies serialization options to use.</p>
+        <td><p>The serialization options.</p>
 </td>
       </tr>
     </tbody>
@@ -203,7 +205,7 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;&gt;</td>
-        <td><p>The converted value.</p>
+        <td><p>The deserialized list of orderbook rows.</p>
 </td>
       </tr>
     </tbody>
@@ -215,11 +217,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_Converters_OrderbookSlimConverter_Write_System_Text_Json_Utf8JsonWriter_System_Collections_Generic_List_System_Collections_Generic_Dictionary_System_String_System_Object___System_Text_Json_JsonSerializerOptions_.md&amp;value=---%0Auid%3A%20BacklashDTOs.Converters.OrderbookSlimConverter.Write(System.Text.Json.Utf8JsonWriter%2CSystem.Collections.Generic.List%7BSystem.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Object%7D%7D%2CSystem.Text.Json.JsonSerializerOptions)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/OrderbookSlimConverter.cs/#L90">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/OrderbookSlimConverter.cs/#L106">View Source</a>
   </span>
   <a id="BacklashDTOs_Converters_OrderbookSlimConverter_Write_" data-uid="BacklashDTOs.Converters.OrderbookSlimConverter.Write*"></a>
   <h4 id="BacklashDTOs_Converters_OrderbookSlimConverter_Write_System_Text_Json_Utf8JsonWriter_System_Collections_Generic_List_System_Collections_Generic_Dictionary_System_String_System_Object___System_Text_Json_JsonSerializerOptions_" data-uid="BacklashDTOs.Converters.OrderbookSlimConverter.Write(System.Text.Json.Utf8JsonWriter,System.Collections.Generic.List{System.Collections.Generic.Dictionary{System.String,System.Object}},System.Text.Json.JsonSerializerOptions)">Write(Utf8JsonWriter, List&lt;Dictionary&lt;string, object&gt;&gt;, JsonSerializerOptions)</h4>
-  <div class="markdown level1 summary"><p>Writes a specified value as JSON.</p>
+  <div class="markdown level1 summary"><p>Writes the list of orderbook rows to JSON, shrinking long property names to short ones.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -239,19 +241,19 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.json.utf8jsonwriter">Utf8JsonWriter</a></td>
         <td><span class="parametername">writer</span></td>
-        <td><p>The writer to write to.</p>
+        <td><p>The UTF-8 JSON writer.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;&gt;</td>
         <td><span class="parametername">value</span></td>
-        <td><p>The value to convert to JSON.</p>
+        <td><p>The list of orderbook rows to serialize.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.json.jsonserializeroptions">JsonSerializerOptions</a></td>
         <td><span class="parametername">options</span></td>
-        <td><p>An object that specifies serialization options to use.</p>
+        <td><p>The serialization options.</p>
 </td>
       </tr>
     </tbody>
@@ -270,7 +272,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_Converters_OrderbookSlimConverter.md&amp;value=---%0Auid%3A%20BacklashDTOs.Converters.OrderbookSlimConverter%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/OrderbookSlimConverter.cs/#L7" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/OrderbookSlimConverter.cs/#L10" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

@@ -94,11 +94,15 @@ Orderbook rows remain handled by OrderbookSlimConverter.</li>
 </ul>
 </section>
       <h4><a class="xref" href="BacklashDTOs.Converters.OrderbookSlimConverter.html">OrderbookSlimConverter</a></h4>
-      <section></section>
+      <section><p>JSON converter for orderbook data that uses short property names for compactness.
+Maps price-&gt;p, side y/n-&gt;s, resting_contracts-&gt;q, last_modified_date-&gt;t.</p>
+</section>
       <h4><a class="xref" href="BacklashDTOs.Converters.RawJsonStringConverter.html">RawJsonStringConverter</a></h4>
-      <section></section>
+      <section><p>JSON converter that preserves raw JSON strings, handling embedded JSON objects/arrays or legacy quoted strings.</p>
+</section>
       <h4><a class="xref" href="BacklashDTOs.Converters.ShortIsoDateTimeConverter.html">ShortIsoDateTimeConverter</a></h4>
-      <section></section>
+      <section><p>JSON converter for DateTime that uses compact ISO-8601 format without fractional seconds and has a tolerant reader.</p>
+</section>
 
 
 </article>

@@ -363,6 +363,37 @@
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_OverseerClientServiceMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.OverseerClientServiceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L71">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_OverseerClientServiceMetrics_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.OverseerClientServiceMetrics*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_OverseerClientServiceMetrics" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.OverseerClientServiceMetrics">OverseerClientServiceMetrics</h4>
+  <div class="markdown level1 summary"><p>Gets the OverseerClientService performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IReadOnlyDictionary&lt;string, object&gt;? OverseerClientServiceMetrics { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_WebSocketConnectionManagerMetricsRecording.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.WebSocketConnectionManagerMetricsRecording%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
@@ -535,6 +566,168 @@
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
         <td><span class="parametername">milliseconds</span></td>
         <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketAnalysisHelperMetrics_System_Int32_System_Int64_System_Double_System_Int32_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketAnalysisHelperMetrics(System.Int32%2CSystem.Int64%2CSystem.Double%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L60">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketAnalysisHelperMetrics_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketAnalysisHelperMetrics*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketAnalysisHelperMetrics_System_Int32_System_Int64_System_Double_System_Int32_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketAnalysisHelperMetrics(System.Int32,System.Int64,System.Double,System.Int32)">RecordMarketAnalysisHelperMetrics(int, long, double, int)</h4>
+  <div class="markdown level1 summary"><p>Records MarketAnalysisHelper performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void RecordMarketAnalysisHelperMetrics(int totalMarkets, long totalTimeMs, double averageTimeMs, int errorCount)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">totalMarkets</span></td>
+        <td><p>Total number of markets processed.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td><span class="parametername">totalTimeMs</span></td>
+        <td><p>Total processing time in milliseconds.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">averageTimeMs</span></td>
+        <td><p>Average time per market in milliseconds.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">errorCount</span></td>
+        <td><p>Number of errors encountered.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketDataInitializerMetrics_System_TimeSpan_System_Int32_System_TimeSpan_System_Int64_System_TimeSpan_System_Int32_System_Int32_System_TimeSpan_.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketDataInitializerMetrics(System.TimeSpan%2CSystem.Int32%2CSystem.TimeSpan%2CSystem.Int64%2CSystem.TimeSpan%2CSystem.Int32%2CSystem.Int32%2CSystem.TimeSpan)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L43">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketDataInitializerMetrics_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketDataInitializerMetrics*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordMarketDataInitializerMetrics_System_TimeSpan_System_Int32_System_TimeSpan_System_Int64_System_TimeSpan_System_Int32_System_Int32_System_TimeSpan_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordMarketDataInitializerMetrics(System.TimeSpan,System.Int32,System.TimeSpan,System.Int64,System.TimeSpan,System.Int32,System.Int32,System.TimeSpan)">RecordMarketDataInitializerMetrics(TimeSpan, int, TimeSpan, long, TimeSpan, int, int, TimeSpan)</h4>
+  <div class="markdown level1 summary"><p>Records MarketDataInitializer performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void RecordMarketDataInitializerMetrics(TimeSpan totalDuration, int marketCount, TimeSpan averageMarketTime, long memoryDelta, TimeSpan cpuTime, int successfulMarkets, int failedMarkets, TimeSpan totalWaitTime)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td><span class="parametername">totalDuration</span></td>
+        <td><p>Total initialization duration.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">marketCount</span></td>
+        <td><p>Number of markets processed.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td><span class="parametername">averageMarketTime</span></td>
+        <td><p>Average time per market.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td><span class="parametername">memoryDelta</span></td>
+        <td><p>Memory usage change in bytes.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td><span class="parametername">cpuTime</span></td>
+        <td><p>CPU time used.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">successfulMarkets</span></td>
+        <td><p>Number of successfully initialized markets.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">failedMarkets</span></td>
+        <td><p>Number of failed market initializations.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td><span class="parametername">totalWaitTime</span></td>
+        <td><p>Total time spent waiting.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordOverseerClientServiceMetrics_System_Collections_Generic_Dictionary_System_String_System_Object__.md&amp;value=---%0Auid%3A%20BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordOverseerClientServiceMetrics(System.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Object%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/SmokehouseBot/Management/ICentralPerformanceMonitor.cs/#L66">View Source</a>
+  </span>
+  <a id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordOverseerClientServiceMetrics_" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordOverseerClientServiceMetrics*"></a>
+  <h4 id="BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_RecordOverseerClientServiceMetrics_System_Collections_Generic_Dictionary_System_String_System_Object__" data-uid="BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.RecordOverseerClientServiceMetrics(System.Collections.Generic.Dictionary{System.String,System.Object})">RecordOverseerClientServiceMetrics(Dictionary&lt;string, object&gt;)</h4>
+  <div class="markdown level1 summary"><p>Records OverseerClientService performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void RecordOverseerClientServiceMetrics(Dictionary&lt;string, object&gt; metrics)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td><span class="parametername">metrics</span></td>
+        <td><p>Dictionary containing OverseerClientService performance metrics.</p>
+</td>
       </tr>
     </tbody>
   </table>

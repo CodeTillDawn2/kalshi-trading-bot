@@ -418,20 +418,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BacklashBot.Management.OvernightActivitiesHelper.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BacklashBot.Management.OvernightActivitiesHelper.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BacklashBot.Management.OvernightActivitiesHelper",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BacklashBot.Management.TargetCalculationService.yml",
       "output": {
         ".html": {
@@ -750,7 +736,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.KaslhiBotScopeManagerService",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Services.KaslhiBotScopeManagerService.yml\" sourcestartlinenumber=\"1\">Service for managing dependency injection scopes in the Kalshi trading bot system.\nThis service handles the creation, initialization, and disposal of service scopes,\nensuring proper resource management and access to scoped services throughout the application.</p>\n"
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.KaslhiBotScopeManagerService.yml\" sourcestartlinenumber=\"1\">Service for managing dependency injection scopes in the Kalshi trading bot system.\nThis service handles the creation, initialization, and disposal of service scopes,\nensuring proper resource management and access to scoped services throughout the application.\nIncludes configurable performance metrics for monitoring scope efficiency.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1100,7 +1086,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.BollingerBandsConverter",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.BollingerBandsConverter.yml\" sourcestartlinenumber=\"1\">JSON converter for Bollinger Bands tuples.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1114,7 +1100,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.CacheSnapshot",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.CacheSnapshot.yml\" sourcestartlinenumber=\"1\">Represents a snapshot of the trading system's state at a specific point in time.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1128,7 +1114,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.CandleMids",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.CandleMids.yml\" sourcestartlinenumber=\"1\">Helper class to cache candlestick mid-price values.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1142,7 +1128,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.CandlestickData",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.CandlestickData.yml\" sourcestartlinenumber=\"1\">Represents candlestick data for a market.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1184,7 +1170,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Configuration.ExecutionConfig",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.ExecutionConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for execution settings.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1212,7 +1198,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Configuration.LoggingConfig",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.LoggingConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for logging settings.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1240,7 +1226,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Configuration.SimulatorConfig",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Configuration.SimulatorConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for trading simulator settings.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1282,7 +1268,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Converters.OrderbookSlimConverter",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Converters.OrderbookSlimConverter.yml\" sourcestartlinenumber=\"1\">JSON converter for orderbook data that uses short property names for compactness.\nMaps price-&gt;p, side y/n-&gt;s, resting_contracts-&gt;q, last_modified_date-&gt;t.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1296,7 +1282,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Converters.RawJsonStringConverter",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Converters.RawJsonStringConverter.yml\" sourcestartlinenumber=\"1\">JSON converter that preserves raw JSON strings, handling embedded JSON objects/arrays or legacy quoted strings.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1310,7 +1296,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Converters.ShortIsoDateTimeConverter",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Converters.ShortIsoDateTimeConverter.yml\" sourcestartlinenumber=\"1\">JSON converter for DateTime that uses compact ISO-8601 format without fractional seconds and has a tolerant reader.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1338,7 +1324,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.AnnouncementDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.AnnouncementDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for announcements.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1352,7 +1338,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.BrainInstanceDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.BrainInstanceDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for brain instance configuration.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1366,7 +1352,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.CandlestickDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.CandlestickDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for candlestick data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1380,7 +1366,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.EventDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.EventDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for event data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1394,7 +1380,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.ExchangeScheduleDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.ExchangeScheduleDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for exchange schedule data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1408,7 +1394,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.LogEntryDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.LogEntryDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for log entry data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1422,7 +1408,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.MaintenanceWindowDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.MaintenanceWindowDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for maintenance window data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1436,7 +1422,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.MarketDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.MarketDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for market data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1450,7 +1436,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.MarketPositionDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.MarketPositionDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for market position data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1464,7 +1450,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.MarketWatchDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.MarketWatchDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for market watch data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1478,7 +1464,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.OrderDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.OrderDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for order data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1492,7 +1478,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.OverseerInfo",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.OverseerInfo.yml\" sourcestartlinenumber=\"1\">Entity class for overseer information stored in the database.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1506,7 +1492,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.SeriesDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.SeriesDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for series data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1520,7 +1506,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.SeriesSettlementSourceDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.SeriesSettlementSourceDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for series settlement source data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1534,7 +1520,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.SeriesTagDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.SeriesTagDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for series tag data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1548,7 +1534,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.SnapshotDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.SnapshotDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for market snapshot data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1562,7 +1548,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.SnapshotGroupDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.SnapshotGroupDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for snapshot group data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1576,7 +1562,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.SnapshotSchemaDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.SnapshotSchemaDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for snapshot schema data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1590,7 +1576,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.StandardHoursDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.StandardHoursDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for standard hours data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1604,7 +1590,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.StandardHoursSessionDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.StandardHoursSessionDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for standard hours session data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1618,7 +1604,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.TickerDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.TickerDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for ticker data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1632,7 +1618,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.WeightSetDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.WeightSetDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for weight set data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1646,7 +1632,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Data.WeightSetMarketDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Data.WeightSetMarketDTO.yml\" sourcestartlinenumber=\"1\">Data transfer object for weight set market data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1674,7 +1660,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.ErrorHandlerTaskInfo",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.ErrorHandlerTaskInfo.yml\" sourcestartlinenumber=\"1\">Represents information about an error handler task.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1688,7 +1674,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.EventLifecycleEventArgs",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.EventLifecycleEventArgs.yml\" sourcestartlinenumber=\"1\">Event arguments for event lifecycle events.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1702,7 +1688,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.CandlestickFetchException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.CandlestickFetchException.yml\" sourcestartlinenumber=\"1\">Exception thrown when there is an error fetching candlestick data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1716,7 +1702,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.CandlestickTransientFailureException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.CandlestickTransientFailureException.yml\" sourcestartlinenumber=\"1\">Exception thrown when there is a transient failure in candlestick data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1730,7 +1716,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.ConnectionDisruptionException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.ConnectionDisruptionException.yml\" sourcestartlinenumber=\"1\">Exception thrown when there is a connection disruption.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1744,7 +1730,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.DeadLockException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.DeadLockException.yml\" sourcestartlinenumber=\"1\">Exception thrown when a deadlock occurs.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1758,7 +1744,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.IBacklashBotException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.IBacklashBotException.yml\" sourcestartlinenumber=\"1\">Interface for BacklashBot exceptions.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1772,7 +1758,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.KalshiKeyFileNotFoundException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.KalshiKeyFileNotFoundException.yml\" sourcestartlinenumber=\"1\">Exception thrown when the Kalshi key file is not found.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1786,7 +1772,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.KnownDuplicateInsertException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.KnownDuplicateInsertException.yml\" sourcestartlinenumber=\"1\">Exception thrown when a known duplicate insert occurs.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1800,7 +1786,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.MarketInterestScoreDeadlockException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.MarketInterestScoreDeadlockException.yml\" sourcestartlinenumber=\"1\">Exception thrown when a deadlock occurs in market interest score.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1814,7 +1800,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.MarketInvalidException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.MarketInvalidException.yml\" sourcestartlinenumber=\"1\">Exception thrown when market data is invalid.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1828,7 +1814,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.MarketTransientFailureException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.MarketTransientFailureException.yml\" sourcestartlinenumber=\"1\">Exception thrown when there is a transient failure in market data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1842,7 +1828,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.NotInCacheException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.NotInCacheException.yml\" sourcestartlinenumber=\"1\">Exception thrown when data is not found in cache.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1856,7 +1842,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.OrderbookTransientFailureException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.OrderbookTransientFailureException.yml\" sourcestartlinenumber=\"1\">Exception thrown when there is a transient failure in the orderbook.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1870,7 +1856,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.ProcessingThresholdExceededException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.ProcessingThresholdExceededException.yml\" sourcestartlinenumber=\"1\">Exception thrown when processing threshold is exceeded.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1884,7 +1870,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.SnapshotInvalidException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.SnapshotInvalidException.yml\" sourcestartlinenumber=\"1\">Exception thrown when snapshot data is invalid.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1898,7 +1884,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.TradeMissedException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.TradeMissedException.yml\" sourcestartlinenumber=\"1\">Exception thrown when a trade is missed.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1912,7 +1898,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.UnhandledSmokehouseException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.UnhandledSmokehouseException.yml\" sourcestartlinenumber=\"1\">Exception for unhandled Smokehouse errors.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1926,7 +1912,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Exceptions.WebSocketRetryFailedException",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Exceptions.WebSocketRetryFailedException.yml\" sourcestartlinenumber=\"1\">Exception thrown when WebSocket retry fails.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1954,7 +1940,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.FillEventArgs",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.FillEventArgs.yml\" sourcestartlinenumber=\"1\">Event arguments for fill events.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1968,7 +1954,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.Helpers.UnixHelper",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.Helpers.UnixHelper.yml\" sourcestartlinenumber=\"1\">Provides utility methods for working with Unix timestamps.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2010,7 +1996,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.AnnouncementApi",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.AnnouncementApi.yml\" sourcestartlinenumber=\"1\">Represents an announcement from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2024,7 +2010,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.AnnouncementResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.AnnouncementResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing a list of announcements from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2038,7 +2024,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.ApiError",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.ApiError.yml\" sourcestartlinenumber=\"1\">Represents an error response from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2066,7 +2052,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.BatchOrderResponseItem",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.BatchOrderResponseItem.yml\" sourcestartlinenumber=\"1\">Represents an item in the batch order response from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2080,7 +2066,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.BatchOrdersRequest",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.BatchOrdersRequest.yml\" sourcestartlinenumber=\"1\">Represents a request to create multiple orders in batch from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2094,7 +2080,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.BatchOrdersResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.BatchOrdersResponse.yml\" sourcestartlinenumber=\"1\">Represents the response for batch orders from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2108,7 +2094,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.CancelOrderResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.CancelOrderResponse.yml\" sourcestartlinenumber=\"1\">Represents the response for canceling an order from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2136,7 +2122,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.CreateOrderRequest",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.CreateOrderRequest.yml\" sourcestartlinenumber=\"1\">Represents a request to create an order on the Kalshi platform.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2150,7 +2136,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.CreateOrderResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.CreateOrderResponse.yml\" sourcestartlinenumber=\"1\">Represents the response for creating an order from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2164,7 +2150,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.DeleteBatchOrderResponseItem",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.DeleteBatchOrderResponseItem.yml\" sourcestartlinenumber=\"1\">Represents an item in the delete batch order response from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2178,7 +2164,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.DeleteOrdersBatchRequest",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.DeleteOrdersBatchRequest.yml\" sourcestartlinenumber=\"1\">Represents a request to delete multiple orders in batch from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2192,7 +2178,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.DeleteOrdersBatchResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.DeleteOrdersBatchResponse.yml\" sourcestartlinenumber=\"1\">Represents the response for deleting multiple orders in batch from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2206,7 +2192,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.EventMetadataResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.EventMetadataResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing event metadata from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2234,7 +2220,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.EventResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.EventResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing an event from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2248,7 +2234,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.ExchangeSchedule",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.ExchangeSchedule.yml\" sourcestartlinenumber=\"1\">Represents the exchange schedule from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2262,7 +2248,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.ExchangeScheduleResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.ExchangeScheduleResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing the exchange schedule from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2290,7 +2276,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.Fill",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.Fill.yml\" sourcestartlinenumber=\"1\">Represents a fill (trade execution) from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2304,7 +2290,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.FillsResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.FillsResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing a list of fills from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2318,7 +2304,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.IncentiveProgram",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.IncentiveProgram.yml\" sourcestartlinenumber=\"1\">Represents an incentive program from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2332,7 +2318,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.IncentiveProgramsResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.IncentiveProgramsResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing a list of incentive programs from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2346,7 +2332,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.KalshiEvent",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.KalshiEvent.yml\" sourcestartlinenumber=\"1\">Represents a Kalshi event.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2374,7 +2360,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.KalshiSeries",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.KalshiSeries.yml\" sourcestartlinenumber=\"1\">Represents a Kalshi series.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2388,7 +2374,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.MaintenanceWindowApi",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.MaintenanceWindowApi.yml\" sourcestartlinenumber=\"1\">Represents a maintenance window.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2444,7 +2430,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.OrderDetails",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.OrderDetails.yml\" sourcestartlinenumber=\"1\">Represents the details of an order from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2458,7 +2444,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.OrderQueuePositionResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.OrderQueuePositionResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing the queue position of an order from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2472,7 +2458,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.OrderResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.OrderResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing an order from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2500,7 +2486,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.OrdersResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.OrdersResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing a list of orders from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2556,7 +2542,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.QueuePositionItem",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.QueuePositionItem.yml\" sourcestartlinenumber=\"1\">Represents an item containing queue position information for an order.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2570,7 +2556,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.QueuePositionsResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.QueuePositionsResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing a list of queue positions from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2584,7 +2570,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.ScheduleData",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.ScheduleData.yml\" sourcestartlinenumber=\"1\">Represents the schedule data.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2598,7 +2584,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.SeriesResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.SeriesResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing a series from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2612,7 +2598,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.Settlement",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.Settlement.yml\" sourcestartlinenumber=\"1\">Represents a settlement from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2626,7 +2612,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.SettlementSource",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.SettlementSource.yml\" sourcestartlinenumber=\"1\">Represents a settlement source from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2640,7 +2626,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.SettlementsResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.SettlementsResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing a list of settlements from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2654,7 +2640,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.StandardHours",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.StandardHours.yml\" sourcestartlinenumber=\"1\">Represents the standard hours for trading.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2668,7 +2654,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.StandardHoursApi",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.StandardHoursApi.yml\" sourcestartlinenumber=\"1\">Represents the standard hours for trading.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2682,7 +2668,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.TotalRestingOrderValueResponse",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.TotalRestingOrderValueResponse.yml\" sourcestartlinenumber=\"1\">Represents the response containing the total resting order value from the Kalshi API.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2696,7 +2682,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.TradingPeriod",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.TradingPeriod.yml\" sourcestartlinenumber=\"1\">Represents a trading period with open and close times.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2710,7 +2696,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.KalshiAPI.TradingSession",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.KalshiAPI.TradingSession.yml\" sourcestartlinenumber=\"1\">Represents a trading session.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2738,7 +2724,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.MACDConverter",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.MACDConverter.yml\" sourcestartlinenumber=\"1\">JSON converter for MACD tuples.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2752,7 +2738,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.MarketLifecycleEventArgs",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.MarketLifecycleEventArgs.yml\" sourcestartlinenumber=\"1\">Event arguments for market lifecycle events.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2766,7 +2752,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.MarketLiquidityStatsDTO",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.MarketLiquidityStatsDTO.yml\" sourcestartlinenumber=\"1\">Represents market liquidity statistics.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2780,7 +2766,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.MarketSnapshot.Difference",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.MarketSnapshot.Difference.yml\" sourcestartlinenumber=\"1\">Represents a difference between two MarketSnapshot instances.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2822,7 +2808,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.OrderBookEventArgs",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.OrderBookEventArgs.yml\" sourcestartlinenumber=\"1\">Event arguments for order book events.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2836,7 +2822,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.OrderbookChange",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.OrderbookChange.yml\" sourcestartlinenumber=\"1\">Represents a change in the orderbook.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2864,7 +2850,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.PerformanceMetrics",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.PerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Represents performance metrics.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2878,7 +2864,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.PseudoCandlestick",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.PseudoCandlestick.yml\" sourcestartlinenumber=\"1\">Represents a pseudo candlestick data point.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2892,7 +2878,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.SignalRClient",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.SignalRClient.yml\" sourcestartlinenumber=\"1\">Represents a SignalR client.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2906,7 +2892,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.SimplifiedTupleConverter",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.SimplifiedTupleConverter.yml\" sourcestartlinenumber=\"1\">A JSON converter factory for simplified tuple types used in the application.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2920,7 +2906,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.SimulatedOrderbook",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.SimulatedOrderbook.yml\" sourcestartlinenumber=\"1\">Represents a simulated orderbook for trading operations.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2934,7 +2920,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.StatusChangedEventArgs",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.StatusChangedEventArgs.yml\" sourcestartlinenumber=\"1\">Provides data for the status changed event.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2948,7 +2934,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.StochasticOscillatorConverter",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.StochasticOscillatorConverter.yml\" sourcestartlinenumber=\"1\">JSON converter for Stochastic Oscillator tuples.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2962,7 +2948,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.SupportResistanceLevel",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.SupportResistanceLevel.yml\" sourcestartlinenumber=\"1\">Represents a support or resistance level in trading.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2976,7 +2962,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.TickerEventArgs",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.TickerEventArgs.yml\" sourcestartlinenumber=\"1\">Event arguments for ticker events.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -2990,7 +2976,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.TradeEvent",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.TradeEvent.yml\" sourcestartlinenumber=\"1\">Represents a trade event in the market.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3004,7 +2990,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.TradeEventArgs",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.TradeEventArgs.yml\" sourcestartlinenumber=\"1\">Event arguments for trade events.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3242,7 +3228,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.Enums.StrategyEnums",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Enums.StrategyEnums.yml\" sourcestartlinenumber=\"1\">Contains enumeration types used throughout the trading strategy system\nfor defining market conditions, actions, and various trading parameters.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3270,6 +3256,118 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.Enums",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.PerformanceMetrics.IKalshiBotContextPerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.PerformanceMetrics.IKalshiBotContextPerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.PerformanceMetrics.IKalshiBotContextPerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.PerformanceMetrics.IKalshiBotContextPerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Interface for accessing performance metrics from KalshiBotContext.\nThis interface provides a standardized way to access database operation performance data.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.PerformanceMetrics.IMessageProcessorPerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.PerformanceMetrics.IMessageProcessorPerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.PerformanceMetrics.IMessageProcessorPerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.PerformanceMetrics.IMessageProcessorPerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Interface for posting MessageProcessor performance metrics to central monitoring services.\nThis interface provides a standardized way to collect and aggregate performance data\nfrom WebSocket message processing operations including throughput, latency, and queue metrics.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.PerformanceMetrics.INightActivitiesPerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.PerformanceMetrics.INightActivitiesPerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.PerformanceMetrics.INightActivitiesPerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.PerformanceMetrics.INightActivitiesPerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Interface for accessing performance metrics from OvernightActivitiesHelper.\nThis interface provides a standardized way to access overnight task performance data.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor",
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Interface for recording performance metrics.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Interface for receiving performance metrics from SqlDataService.\nClasses implementing this interface will automatically receive performance data\nfrom the SqlDataService when metrics collection is enabled.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.PerformanceMetrics.ISubscriptionManagerPerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.PerformanceMetrics.ISubscriptionManagerPerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.PerformanceMetrics.ISubscriptionManagerPerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.PerformanceMetrics.ISubscriptionManagerPerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Interface for posting SubscriptionManager performance metrics to central monitoring services.\nThis interface provides a standardized way to collect and aggregate performance data\nfrom WebSocket subscription operations and lock contention monitoring.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.PerformanceMetrics.IWebSocketPerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.PerformanceMetrics.IWebSocketPerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.PerformanceMetrics.IWebSocketPerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.PerformanceMetrics.IWebSocketPerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Interface for recording and accessing WebSocket performance metrics.\nThis interface provides a standardized way to track WebSocket connection,\nmessage processing, and subscription performance data.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashInterfaces.PerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashInterfaces.PerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashInterfaces.PerformanceMetrics",
       "Summary": null
     },
     {
@@ -3579,6 +3677,20 @@
       "IsMRef": true,
       "Title": "KalshiBotAPI.Websockets",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/KalshiBotData.Data.Interfaces.IDatabasePerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/KalshiBotData.Data.Interfaces.IDatabasePerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "KalshiBotData.Data.Interfaces.IDatabasePerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/KalshiBotData.Data.Interfaces.IDatabasePerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Interface for accessing database performance metrics from different monitoring services.\nThis allows the KalshiBotContext to post metrics to the appropriate service based on the project.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4502,7 +4614,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotOverseer.Controllers.MarketWatchController",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Controllers.MarketWatchController.yml\" sourcestartlinenumber=\"1\">ASP.NET Core Web API controller that provides endpoints for retrieving market watch data,\nbrain instance locks, trading positions, orders, account information, and snapshot data.\nThis controller serves as the primary interface for the Kalshi trading bot's monitoring and\ndata retrieval operations, utilizing caching for performance optimization and integrating\nwith database and external API services.</p>\n"
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Controllers.MarketWatchController.yml\" sourcestartlinenumber=\"1\">ASP.NET Core Web API controller that provides endpoints for retrieving market watch data,\nbrain instance locks, trading positions, orders, account information, and snapshot data.\nThis controller serves as the primary interface for the Kalshi trading bot's monitoring and\ndata retrieval operations, utilizing caching for performance optimization and integrating\nwith database and external API services. Includes configurable performance metrics tracking\nfor cache operations and system monitoring.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4601,20 +4713,6 @@
       "IsMRef": true,
       "Title": "KalshiBotOverseer.Models",
       "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.OvernightActivitiesHelper.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.OvernightActivitiesHelper.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.OvernightActivitiesHelper",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.OvernightActivitiesHelper.yml\" sourcestartlinenumber=\"1\">Service class that handles overnight maintenance tasks for the Kalshi trading bot overseer.\nThis includes refreshing market data, calculating interest scores, importing snapshots,\ncleaning up old watches, and generating snapshot groups for market analysis.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4768,7 +4866,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotOverseer.Startup",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Startup.yml\" sourcestartlinenumber=\"1\">Configures services and the request pipeline for the KalshiBotOverseer application.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4838,7 +4936,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotOverseer.WebSocketMonitorServiceLite",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.WebSocketMonitorServiceLite.yml\" sourcestartlinenumber=\"1\">Lightweight service for monitoring WebSocket connections and exchange status.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5174,7 +5272,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingSimulator.TradingContext",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/TradingSimulator.TradingContext.yml\" sourcestartlinenumber=\"1\">Context object containing shared variables and trading decisions for strategy execution.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5188,7 +5286,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingSimulator.TradingSimulatorService.StrategyFamily",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/TradingSimulator.TradingSimulatorService.StrategyFamily.yml\" sourcestartlinenumber=\"1\">Enumeration of available trading strategy families for simulation.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5216,7 +5314,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingSimulator.TradingStrategyFunc<T>",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/TradingSimulator.TradingStrategyFunc-1.yml\" sourcestartlinenumber=\"1\">Delegate for trading strategy functions that process market data snapshots.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5962,20 +6060,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Trading.Overseer.IPerformanceMonitor.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/TradingStrategies.Trading.Overseer.IPerformanceMonitor.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "TradingStrategies.Trading.Overseer.IPerformanceMonitor",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.IPerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Interface for recording performance metrics.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Overseer.MarketTypeService.yml",
       "output": {
         ".html": {
@@ -6018,6 +6102,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.PatternUtilsPerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.PatternUtilsPerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.PatternUtilsPerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PatternUtilsPerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Typed performance metrics for PatternUtils operations.\nProvides strongly-typed access to PatternUtils performance data including\ncalculation counts, cache statistics, throughput, and configuration status.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Overseer.PerformanceMonitor.yml",
       "output": {
         ".html": {
@@ -6028,7 +6126,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Trading.Overseer.PerformanceMonitor",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Generic performance monitor for tracking various metrics\nin the trading simulator. This class collects comprehensive performance data\nincluding execution times, memory usage, trade counts, and detailed metrics.</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Generic performance monitor for tracking various metrics\nin the trading simulator. This class collects comprehensive performance data\nincluding execution times, memory usage, trade counts, and detailed metrics.\nIt supports both general operation metrics and specialized simulation performance metrics\nfrom StrategySimulation, with typed access via SimulationPerformanceMetrics.\nAll metrics collection can be enabled/disabled via the EnablePerformanceMetrics property.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -6158,6 +6256,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.SimulationPerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.SimulationPerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.SimulationPerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.SimulationPerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Typed performance metrics for trading strategy simulations.\nExposes all metrics from StrategySimulation.GetDetailedPerformanceMetrics() in a strongly-typed format.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Overseer.StrategySimulation.yml",
       "output": {
         ".html": {
@@ -6196,7 +6308,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.TradingOverseer",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/TradingStrategies.TradingOverseer.yml\" sourcestartlinenumber=\"1\">Orchestrates trading scenario simulations and performance analysis for the Kalshi trading bot.\nThis class serves as the central coordinator for running trading strategies against historical market snapshots,\ngenerating detailed performance reports, and calculating equity metrics. It integrates with the simulation engine,\nequity calculator, and report generator to provide comprehensive backtesting capabilities.\nSupports asynchronous operations for efficient performance monitoring and analysis.\nIncludes input validation to prevent null reference exceptions with warning logs, configurable performance metrics logging at debug level,\nand async method implementations for better performance in high-throughput scenarios.</p>\n"
     },
     {
       "type": "ManagedReference",

@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class PerformanceMonitor | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Generic performance monitor for tracking various metrics in the trading simulator. This class collects comprehensive performance data including execution times, memory usage, trade counts, and detailed metrics.">
+    <meta name="description" content="Generic performance monitor for tracking various metrics in the trading simulator. This class collects comprehensive performance data including execution times, memory usage, trade counts, and detailed metrics. It supports both general operation metrics and specialized simulation performance metrics from StrategySimulation, with typed access via SimulationPerformanceMetrics. All metrics collection can be enabled/disabled via the EnablePerformanceMetrics property.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -83,7 +83,10 @@
   <h1 id="TradingStrategies_Trading_Overseer_PerformanceMonitor" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor" class="text-break">Class PerformanceMonitor</h1>
   <div class="markdown level0 summary"><p>Generic performance monitor for tracking various metrics
 in the trading simulator. This class collects comprehensive performance data
-including execution times, memory usage, trade counts, and detailed metrics.</p>
+including execution times, memory usage, trade counts, and detailed metrics.
+It supports both general operation metrics and specialized simulation performance metrics
+from StrategySimulation, with typed access via SimulationPerformanceMetrics.
+All metrics collection can be enabled/disabled via the EnablePerformanceMetrics property.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -93,7 +96,7 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
   </div>
   <div class="implements">
     <h5>Implements</h5>
-    <div><a class="xref" href="TradingStrategies.Trading.Overseer.IPerformanceMonitor.html">IPerformanceMonitor</a></div>
+    <div><a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -132,7 +135,7 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor__ctor.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L18">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L29">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor__ctor_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.#ctor*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor__ctor" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.#ctor">PerformanceMonitor()</h4>
@@ -143,6 +146,41 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public PerformanceMonitor()</code></pre>
   </div>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_EnablePerformanceMetrics.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.EnablePerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L24">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_EnablePerformanceMetrics_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.EnablePerformanceMetrics*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_EnablePerformanceMetrics" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.EnablePerformanceMetrics">EnablePerformanceMetrics</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether performance metrics collection is enabled.
+When disabled, metric recording methods will return early without storing data.
+Default is true. Can be configured from appsettings.json Simulation:Simulation_EnablePerformanceMetrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool EnablePerformanceMetrics { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
 </h3>
   <span class="small pull-right mobile-hide">
@@ -150,7 +188,7 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_Clear.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L176">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L243">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_Clear_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_Clear" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.Clear">Clear()</h4>
@@ -166,7 +204,7 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetAllPerformanceStats.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L186">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L253">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetAllPerformanceStats_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetAllPerformanceStats" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetAllPerformanceStats">GetAllPerformanceStats()</h4>
@@ -198,7 +236,7 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetExecutionTimes_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L200">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L416">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetExecutionTimes_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetExecutionTimes_System_String_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetExecutionTimes(System.String)">GetExecutionTimes(string)</h4>
@@ -248,7 +286,7 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredMethods.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L159">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L226">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredMethods_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredMethods" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredMethods">GetMonitoredMethods()</h4>
@@ -280,7 +318,7 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredSimulations.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L168">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L235">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredSimulations_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetMonitoredSimulations" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetMonitoredSimulations">GetMonitoredSimulations()</h4>
@@ -309,10 +347,106 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPatternUtilsCpuProfile.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPatternUtilsCpuProfile%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L368">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPatternUtilsCpuProfile_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPatternUtilsCpuProfile*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPatternUtilsCpuProfile" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPatternUtilsCpuProfile">GetPatternUtilsCpuProfile()</h4>
+  <div class="markdown level1 summary"><p>Gets PatternUtils CPU profiling results.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;string, object&gt; GetPatternUtilsCpuProfile()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td><p>The CPU profiling results dictionary.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPatternUtilsMetrics.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPatternUtilsMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L350">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPatternUtilsMetrics_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPatternUtilsMetrics*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPatternUtilsMetrics" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPatternUtilsMetrics">GetPatternUtilsMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets PatternUtils performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;string, object&gt; GetPatternUtilsMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td><p>The PatternUtils metrics dictionary.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPatternUtilsScalability.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPatternUtilsScalability%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L359">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPatternUtilsScalability_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPatternUtilsScalability*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPatternUtilsScalability" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPatternUtilsScalability">GetPatternUtilsScalability()</h4>
+  <div class="markdown level1 summary"><p>Gets PatternUtils scalability results.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;string, object&gt; GetPatternUtilsScalability()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td><p>The scalability results dictionary.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceRecords_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L86">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L106">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceRecords_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceRecords_System_String_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceRecords(System.String)">GetPerformanceRecords(string)</h4>
@@ -362,7 +496,7 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceStats_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L106">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L173">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceStats_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetPerformanceStats_System_String_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetPerformanceStats(System.String)">GetPerformanceStats(string)</h4>
@@ -412,7 +546,7 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetSimulationMetrics_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L96">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L116">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetSimulationMetrics_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetSimulationMetrics_System_String_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetSimulationMetrics(System.String)">GetSimulationMetrics(string)</h4>
@@ -459,10 +593,92 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetTypedPatternUtilsMetrics.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetTypedPatternUtilsMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L377">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetTypedPatternUtilsMetrics_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetTypedPatternUtilsMetrics*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetTypedPatternUtilsMetrics" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetTypedPatternUtilsMetrics">GetTypedPatternUtilsMetrics()</h4>
+  <div class="markdown level1 summary"><p>Gets typed PatternUtils performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PatternUtilsPerformanceMetrics GetTypedPatternUtilsMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="TradingStrategies.Trading.Overseer.PatternUtilsPerformanceMetrics.html">PatternUtilsPerformanceMetrics</a></td>
+        <td><p>The typed PatternUtils metrics record.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_GetTypedSimulationMetrics_System_String_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.GetTypedSimulationMetrics(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L126">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetTypedSimulationMetrics_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetTypedSimulationMetrics*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_GetTypedSimulationMetrics_System_String_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.GetTypedSimulationMetrics(System.String)">GetTypedSimulationMetrics(string)</h4>
+  <div class="markdown level1 summary"><p>Gets typed simulation performance metrics for a specific simulation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SimulationPerformanceMetrics GetTypedSimulationMetrics(string simulationName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">simulationName</span></td>
+        <td><p>The name of the simulation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="TradingStrategies.Trading.Overseer.SimulationPerformanceMetrics.html">SimulationPerformanceMetrics</a></td>
+        <td><p>The typed performance metrics record.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordExecutionTime_System_String_System_Int64_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime(System.String%2CSystem.Int64)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L76">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L95">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordExecutionTime_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordExecutionTime_System_String_System_Int64_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordExecutionTime(System.String,System.Int64)">RecordExecutionTime(string, long)</h4>
@@ -499,14 +715,182 @@ including execution times, memory usage, trade counts, and detailed metrics.</p>
   </table>
   <h5 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordExecutionTime_System_String_System_Int64__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>This method is provided for backward compatibility with the IPerformanceMonitor interface.
-For comprehensive metrics, use RecordPerformanceMetrics.</p>
+For comprehensive metrics, use RecordPerformanceMetrics.
+Metrics collection is gated by EnablePerformanceMetrics flag.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsCpuProfile_System_Double_System_Double_System_Int32_.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPatternUtilsCpuProfile(System.Double%2CSystem.Double%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L334">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsCpuProfile_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPatternUtilsCpuProfile*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsCpuProfile_System_Double_System_Double_System_Int32_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPatternUtilsCpuProfile(System.Double,System.Double,System.Int32)">RecordPatternUtilsCpuProfile(double, double, int)</h4>
+  <div class="markdown level1 summary"><p>Records PatternUtils CPU profiling results.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RecordPatternUtilsCpuProfile(double cpuTimeMs, double throughput, int dataSize)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">cpuTimeMs</span></td>
+        <td><p>CPU time used in milliseconds.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">throughput</span></td>
+        <td><p>Calculations per second achieved.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">dataSize</span></td>
+        <td><p>Size of data processed.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsCpuProfile_System_Double_System_Double_System_Int32__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Metrics collection is gated by EnablePerformanceMetrics flag.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsMetrics_System_Int32_System_Int64_System_Int32_System_Int32_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Int64__System_Collections_Generic_Dictionary_System_String_System_Boolean__.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPatternUtilsMetrics(System.Int32%2CSystem.Int64%2CSystem.Int32%2CSystem.Int32%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Double%7D%2CSystem.Nullable%7BSystem.Int64%7D%2CSystem.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Boolean%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L278">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsMetrics_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPatternUtilsMetrics*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsMetrics_System_Int32_System_Int64_System_Int32_System_Int32_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Int64__System_Collections_Generic_Dictionary_System_String_System_Boolean__" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPatternUtilsMetrics(System.Int32,System.Int64,System.Int32,System.Int32,System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Int64},System.Collections.Generic.Dictionary{System.String,System.Boolean})">RecordPatternUtilsMetrics(int, long, int, int, double?, double?, long?, Dictionary&lt;string, bool&gt;?)</h4>
+  <div class="markdown level1 summary"><p>Records PatternUtils-specific performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RecordPatternUtilsMetrics(int totalCalculations, long totalCalculationTimeMs, int cacheHits, int cacheMisses, double? throughput = null, double? cpuTimeMs = null, long? memoryUsage = null, Dictionary&lt;string, bool&gt;? configurationStatus = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">totalCalculations</span></td>
+        <td><p>Total number of calculations performed.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td><span class="parametername">totalCalculationTimeMs</span></td>
+        <td><p>Total time spent on calculations in milliseconds.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">cacheHits</span></td>
+        <td><p>Number of cache hits.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">cacheMisses</span></td>
+        <td><p>Number of cache misses.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">throughput</span></td>
+        <td><p>Calculations per second (optional).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><span class="parametername">cpuTimeMs</span></td>
+        <td><p>CPU time used in milliseconds (optional).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</td>
+        <td><span class="parametername">memoryUsage</span></td>
+        <td><p>Memory usage in bytes (optional).</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</td>
+        <td><span class="parametername">configurationStatus</span></td>
+        <td><p>Current configuration status dictionary (optional).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsMetrics_System_Int32_System_Int64_System_Int32_System_Int32_System_Nullable_System_Double__System_Nullable_System_Double__System_Nullable_System_Int64__System_Collections_Generic_Dictionary_System_String_System_Boolean___remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method is specifically designed to integrate with PatternUtils performance metrics.
+All parameters are optional to support different levels of metric collection.
+Metrics collection is gated by EnablePerformanceMetrics flag.</p>
+</div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsScalability_System_Collections_Generic_Dictionary_System_Int32_System_Double__.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPatternUtilsScalability(System.Collections.Generic.Dictionary%7BSystem.Int32%2CSystem.Double%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L315">View Source</a>
+  </span>
+  <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsScalability_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPatternUtilsScalability*"></a>
+  <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsScalability_System_Collections_Generic_Dictionary_System_Int32_System_Double__" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPatternUtilsScalability(System.Collections.Generic.Dictionary{System.Int32,System.Double})">RecordPatternUtilsScalability(Dictionary&lt;int, double&gt;)</h4>
+  <div class="markdown level1 summary"><p>Records PatternUtils scalability test results.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RecordPatternUtilsScalability(Dictionary&lt;int, double&gt; scalabilityResults)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</td>
+        <td><span class="parametername">scalabilityResults</span></td>
+        <td><p>Dictionary mapping data sizes to throughput measurements.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPatternUtilsScalability_System_Collections_Generic_Dictionary_System_Int32_System_Double___remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Metrics collection is gated by EnablePerformanceMetrics flag.</p>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPerformanceMetrics_System_String_System_Int64_System_Int32_System_Int32_System_Collections_Generic_Dictionary_System_String_System_Int64__.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics(System.String%2CSystem.Int64%2CSystem.Int32%2CSystem.Int32%2CSystem.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Int64%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L36">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L48">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPerformanceMetrics_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPerformanceMetrics_System_String_System_Int64_System_Int32_System_Int32_System_Collections_Generic_Dictionary_System_String_System_Int64__" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordPerformanceMetrics(System.String,System.Int64,System.Int32,System.Int32,System.Collections.Generic.Dictionary{System.String,System.Int64})">RecordPerformanceMetrics(string, long, int, int, Dictionary&lt;string, long&gt;?)</h4>
@@ -561,14 +945,15 @@ For comprehensive metrics, use RecordPerformanceMetrics.</p>
   </table>
   <h5 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordPerformanceMetrics_System_String_System_Int64_System_Int32_System_Int32_System_Collections_Generic_Dictionary_System_String_System_Int64___remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>All performance metrics are stored in a thread-safe concurrent dictionary with timestamps.
-This data can be used for detailed performance analysis and optimization.</p>
+This data can be used for detailed performance analysis and optimization.
+Metrics collection is gated by EnablePerformanceMetrics flag.</p>
 </div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object__.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics(System.String%2CSystem.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Object%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L62">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L79">View Source</a>
   </span>
   <a id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordSimulationMetrics_" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics*"></a>
   <h4 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object__" data-uid="TradingStrategies.Trading.Overseer.PerformanceMonitor.RecordSimulationMetrics(System.String,System.Collections.Generic.Dictionary{System.String,System.Object})">RecordSimulationMetrics(string, Dictionary&lt;string, object&gt;)</h4>
@@ -603,9 +988,12 @@ This data can be used for detailed performance analysis and optimization.</p>
       </tr>
     </tbody>
   </table>
+  <h5 id="TradingStrategies_Trading_Overseer_PerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object___remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Metrics collection is gated by EnablePerformanceMetrics flag.</p>
+</div>
   <h3 id="implements">Implements</h3>
   <div>
-      <a class="xref" href="TradingStrategies.Trading.Overseer.IPerformanceMonitor.html">IPerformanceMonitor</a>
+      <a class="xref" href="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.html">IPerformanceMonitor</a>
   </div>
 
 </article>
@@ -619,7 +1007,7 @@ This data can be used for detailed performance analysis and optimization.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=TradingStrategies_Trading_Overseer_PerformanceMonitor.md&amp;value=---%0Auid%3A%20TradingStrategies.Trading.Overseer.PerformanceMonitor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L10" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/TradingStrategies/Trading/Overseer/PerformanceMonitor.cs/#L14" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

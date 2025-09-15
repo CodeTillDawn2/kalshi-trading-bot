@@ -140,20 +140,20 @@ Input validation ensures JSON data integrity before queuing operations.</p>
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService__ctor_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_ISqlDataService__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.%23ctor(Microsoft.Extensions.Configuration.IConfiguration%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.ISqlDataService%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService__ctor_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_ISqlDataService__System_Collections_Generic_IEnumerable_BacklashInterfaces_PerformanceMetrics_ISqlDataServicePerformanceMetrics__.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.%23ctor(Microsoft.Extensions.Configuration.IConfiguration%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.ISqlDataService%7D%2CSystem.Collections.Generic.IEnumerable%7BBacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L121">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L149">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService__ctor_" data-uid="KalshiBotData.Data.SqlDataService.#ctor*"></a>
-  <h4 id="KalshiBotData_Data_SqlDataService__ctor_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_ISqlDataService__" data-uid="KalshiBotData.Data.SqlDataService.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.ISqlDataService})">SqlDataService(IConfiguration, ILogger&lt;ISqlDataService&gt;)</h4>
+  <h4 id="KalshiBotData_Data_SqlDataService__ctor_Microsoft_Extensions_Configuration_IConfiguration_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_ISqlDataService__System_Collections_Generic_IEnumerable_BacklashInterfaces_PerformanceMetrics_ISqlDataServicePerformanceMetrics__" data-uid="KalshiBotData.Data.SqlDataService.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.ISqlDataService},System.Collections.Generic.IEnumerable{BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics})">SqlDataService(IConfiguration, ILogger&lt;ISqlDataService&gt;, IEnumerable&lt;ISqlDataServicePerformanceMetrics&gt;?)</h4>
   <div class="markdown level1 summary"><p>Initializes a new instance of the SqlDataService with configuration and logging dependencies.
 Sets up concurrent queues for different data types and starts background worker tasks for processing.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SqlDataService(IConfiguration configuration, ILogger&lt;ISqlDataService&gt; logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public SqlDataService(IConfiguration configuration, ILogger&lt;ISqlDataService&gt; logger, IEnumerable&lt;ISqlDataServicePerformanceMetrics&gt;? performanceMetricsReceivers = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -177,16 +177,86 @@ Sets up concurrent queues for different data types and starts background worker 
         <td><p>Logger for recording service operations and errors.</p>
 </td>
       </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BacklashInterfaces.PerformanceMetrics.ISqlDataServicePerformanceMetrics.html">ISqlDataServicePerformanceMetrics</a>&gt;</td>
+        <td><span class="parametername">performanceMetricsReceivers</span></td>
+        <td><p>Collection of services that will receive performance metrics automatically.</p>
+</td>
+      </tr>
     </tbody>
   </table>
   <h3 id="properties">Properties
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_AverageLatencyMs.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.AverageLatencyMs%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L784">View Source</a>
+  </span>
+  <a id="KalshiBotData_Data_SqlDataService_AverageLatencyMs_" data-uid="KalshiBotData.Data.SqlDataService.AverageLatencyMs*"></a>
+  <h4 id="KalshiBotData_Data_SqlDataService_AverageLatencyMs" data-uid="KalshiBotData.Data.SqlDataService.AverageLatencyMs">AverageLatencyMs</h4>
+  <div class="markdown level1 summary"><p>Gets the average latency in milliseconds for processed operations.
+Returns 0 if performance metrics are disabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double AverageLatencyMs { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_CpuUsage.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.CpuUsage%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L797">View Source</a>
+  </span>
+  <a id="KalshiBotData_Data_SqlDataService_CpuUsage_" data-uid="KalshiBotData.Data.SqlDataService.CpuUsage*"></a>
+  <h4 id="KalshiBotData_Data_SqlDataService_CpuUsage" data-uid="KalshiBotData.Data.SqlDataService.CpuUsage">CpuUsage</h4>
+  <div class="markdown level1 summary"><p>Gets the current CPU usage percentage.
+Returns 0 if performance metrics are disabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double CpuUsage { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_EventLifecycleQueueDepth.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.EventLifecycleQueueDepth%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L701">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L740">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_EventLifecycleQueueDepth_" data-uid="KalshiBotData.Data.SqlDataService.EventLifecycleQueueDepth*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_EventLifecycleQueueDepth" data-uid="KalshiBotData.Data.SqlDataService.EventLifecycleQueueDepth">EventLifecycleQueueDepth</h4>
@@ -217,7 +287,7 @@ Sets up concurrent queues for different data types and starts background worker 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_FillQueueDepth.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.FillQueueDepth%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L696">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L735">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_FillQueueDepth_" data-uid="KalshiBotData.Data.SqlDataService.FillQueueDepth*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_FillQueueDepth" data-uid="KalshiBotData.Data.SqlDataService.FillQueueDepth">FillQueueDepth</h4>
@@ -248,7 +318,7 @@ Sets up concurrent queues for different data types and starts background worker 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_MarketLifecycleQueueDepth.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.MarketLifecycleQueueDepth%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L706">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L745">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_MarketLifecycleQueueDepth_" data-uid="KalshiBotData.Data.SqlDataService.MarketLifecycleQueueDepth*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_MarketLifecycleQueueDepth" data-uid="KalshiBotData.Data.SqlDataService.MarketLifecycleQueueDepth">MarketLifecycleQueueDepth</h4>
@@ -276,10 +346,74 @@ Sets up concurrent queues for different data types and starts background worker 
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_MemoryUsageMB.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.MemoryUsageMB%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L818">View Source</a>
+  </span>
+  <a id="KalshiBotData_Data_SqlDataService_MemoryUsageMB_" data-uid="KalshiBotData.Data.SqlDataService.MemoryUsageMB*"></a>
+  <h4 id="KalshiBotData_Data_SqlDataService_MemoryUsageMB" data-uid="KalshiBotData.Data.SqlDataService.MemoryUsageMB">MemoryUsageMB</h4>
+  <div class="markdown level1 summary"><p>Gets the current memory usage in MB.
+Returns 0 if performance metrics are disabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double MemoryUsageMB { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_OperationsPerSecond.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.OperationsPerSecond%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L770">View Source</a>
+  </span>
+  <a id="KalshiBotData_Data_SqlDataService_OperationsPerSecond_" data-uid="KalshiBotData.Data.SqlDataService.OperationsPerSecond*"></a>
+  <h4 id="KalshiBotData_Data_SqlDataService_OperationsPerSecond" data-uid="KalshiBotData.Data.SqlDataService.OperationsPerSecond">OperationsPerSecond</h4>
+  <div class="markdown level1 summary"><p>Gets the operations per second (throughput) since service start.
+Returns 0 if performance metrics are disabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double OperationsPerSecond { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_OrderBookQueueDepth.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.OrderBookQueueDepth%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L686">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L725">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_OrderBookQueueDepth_" data-uid="KalshiBotData.Data.SqlDataService.OrderBookQueueDepth*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_OrderBookQueueDepth" data-uid="KalshiBotData.Data.SqlDataService.OrderBookQueueDepth">OrderBookQueueDepth</h4>
@@ -310,7 +444,7 @@ Sets up concurrent queues for different data types and starts background worker 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_SuccessRate.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.SuccessRate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L711">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L750">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_SuccessRate_" data-uid="KalshiBotData.Data.SqlDataService.SuccessRate*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_SuccessRate" data-uid="KalshiBotData.Data.SqlDataService.SuccessRate">SuccessRate</h4>
@@ -341,7 +475,7 @@ Sets up concurrent queues for different data types and starts background worker 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_TotalFailed.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.TotalFailed%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L681">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L720">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_TotalFailed_" data-uid="KalshiBotData.Data.SqlDataService.TotalFailed*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_TotalFailed" data-uid="KalshiBotData.Data.SqlDataService.TotalFailed">TotalFailed</h4>
@@ -372,7 +506,7 @@ Sets up concurrent queues for different data types and starts background worker 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_TotalProcessed.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.TotalProcessed%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L676">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L715">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_TotalProcessed_" data-uid="KalshiBotData.Data.SqlDataService.TotalProcessed*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_TotalProcessed" data-uid="KalshiBotData.Data.SqlDataService.TotalProcessed">TotalProcessed</h4>
@@ -403,7 +537,7 @@ Sets up concurrent queues for different data types and starts background worker 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_TotalQueuedOperations.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.TotalQueuedOperations%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L723">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L762">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_TotalQueuedOperations_" data-uid="KalshiBotData.Data.SqlDataService.TotalQueuedOperations*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_TotalQueuedOperations" data-uid="KalshiBotData.Data.SqlDataService.TotalQueuedOperations">TotalQueuedOperations</h4>
@@ -434,7 +568,7 @@ Sets up concurrent queues for different data types and starts background worker 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_TradeQueueDepth.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.TradeQueueDepth%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L691">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L730">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_TradeQueueDepth_" data-uid="KalshiBotData.Data.SqlDataService.TradeQueueDepth*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_TradeQueueDepth" data-uid="KalshiBotData.Data.SqlDataService.TradeQueueDepth">TradeQueueDepth</h4>
@@ -467,7 +601,7 @@ Sets up concurrent queues for different data types and starts background worker 
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_Dispose.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L731">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L874">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_Dispose_" data-uid="KalshiBotData.Data.SqlDataService.Dispose*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_Dispose" data-uid="KalshiBotData.Data.SqlDataService.Dispose">Dispose()</h4>
@@ -484,7 +618,7 @@ Waits for worker tasks to complete gracefully within a timeout period.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_ExecuteSnapshotImportJobAsync_System_Threading_CancellationToken_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.ExecuteSnapshotImportJobAsync(System.Threading.CancellationToken)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L162">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L194">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_ExecuteSnapshotImportJobAsync_" data-uid="KalshiBotData.Data.SqlDataService.ExecuteSnapshotImportJobAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_ExecuteSnapshotImportJobAsync_System_Threading_CancellationToken_" data-uid="KalshiBotData.Data.SqlDataService.ExecuteSnapshotImportJobAsync(System.Threading.CancellationToken)">ExecuteSnapshotImportJobAsync(CancellationToken)</h4>
@@ -556,7 +690,7 @@ Monitors the job execution status and waits for completion, with retry logic for
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreEventLifecycleAsync_System_Text_Json_JsonElement_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreEventLifecycleAsync(System.Text.Json.JsonElement)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L540">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L577">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreEventLifecycleAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreEventLifecycleAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreEventLifecycleAsync_System_Text_Json_JsonElement_" data-uid="KalshiBotData.Data.SqlDataService.StoreEventLifecycleAsync(System.Text.Json.JsonElement)">StoreEventLifecycleAsync(JsonElement)</h4>
@@ -608,7 +742,7 @@ Includes input validation and queue size checks.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreFillAsync_System_Text_Json_JsonElement_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreFillAsync(System.Text.Json.JsonElement)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L476">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L512">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreFillAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreFillAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreFillAsync_System_Text_Json_JsonElement_" data-uid="KalshiBotData.Data.SqlDataService.StoreFillAsync(System.Text.Json.JsonElement)">StoreFillAsync(JsonElement)</h4>
@@ -660,7 +794,7 @@ Includes input validation and queue size checks.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreMarketLifecycleAsync_System_Text_Json_JsonElement_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreMarketLifecycleAsync(System.Text.Json.JsonElement)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L599">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L637">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreMarketLifecycleAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreMarketLifecycleAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreMarketLifecycleAsync_System_Text_Json_JsonElement_" data-uid="KalshiBotData.Data.SqlDataService.StoreMarketLifecycleAsync(System.Text.Json.JsonElement)">StoreMarketLifecycleAsync(JsonElement)</h4>
@@ -712,7 +846,7 @@ Includes input validation and queue size checks.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreOrderBookAsync_System_Text_Json_JsonElement_System_String_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreOrderBookAsync(System.Text.Json.JsonElement%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L266">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L298">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreOrderBookAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreOrderBookAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreOrderBookAsync_System_Text_Json_JsonElement_System_String_" data-uid="KalshiBotData.Data.SqlDataService.StoreOrderBookAsync(System.Text.Json.JsonElement,System.String)">StoreOrderBookAsync(JsonElement, string)</h4>
@@ -770,7 +904,7 @@ Includes input validation and queue size checks.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreTickerAsync_System_Text_Json_JsonElement_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreTickerAsync(System.Text.Json.JsonElement)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L358">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L392">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreTickerAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreTickerAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreTickerAsync_System_Text_Json_JsonElement_" data-uid="KalshiBotData.Data.SqlDataService.StoreTickerAsync(System.Text.Json.JsonElement)">StoreTickerAsync(JsonElement)</h4>
@@ -822,7 +956,7 @@ Includes input validation and queue size checks.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService_StoreTradeAsync_System_Text_Json_JsonElement_.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService.StoreTradeAsync(System.Text.Json.JsonElement)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L420">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L455">View Source</a>
   </span>
   <a id="KalshiBotData_Data_SqlDataService_StoreTradeAsync_" data-uid="KalshiBotData.Data.SqlDataService.StoreTradeAsync*"></a>
   <h4 id="KalshiBotData_Data_SqlDataService_StoreTradeAsync_System_Text_Json_JsonElement_" data-uid="KalshiBotData.Data.SqlDataService.StoreTradeAsync(System.Text.Json.JsonElement)">StoreTradeAsync(JsonElement)</h4>
@@ -888,7 +1022,7 @@ Includes input validation and queue size checks.</p>
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=KalshiBotData_Data_SqlDataService.md&amp;value=---%0Auid%3A%20KalshiBotData.Data.SqlDataService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L33" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/KalshiBotContext/Data/SqlDataService.cs/#L35" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

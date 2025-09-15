@@ -118,10 +118,18 @@ various technical analysis formations including single-candle, multi-candle, and
 <p>This service is used by the SimulationEngine during backtesting and strategy evaluation to enrich
 market analysis with technical pattern recognition capabilities.</p>
 </section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PatternUtilsPerformanceMetrics.html">PatternUtilsPerformanceMetrics</a></h4>
+      <section><p>Typed performance metrics for PatternUtils operations.
+Provides strongly-typed access to PatternUtils performance data including
+calculation counts, cache statistics, throughput, and configuration status.</p>
+</section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PerformanceMonitor.html">PerformanceMonitor</a></h4>
       <section><p>Generic performance monitor for tracking various metrics
 in the trading simulator. This class collects comprehensive performance data
-including execution times, memory usage, trade counts, and detailed metrics.</p>
+including execution times, memory usage, trade counts, and detailed metrics.
+It supports both general operation metrics and specialized simulation performance metrics
+from StrategySimulation, with typed access via SimulationPerformanceMetrics.
+All metrics collection can be enabled/disabled via the EnablePerformanceMetrics property.</p>
 </section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PerformanceRecord.html">PerformanceRecord</a></h4>
       <section><p>Represents a single performance record.</p>
@@ -168,18 +176,16 @@ and generating detailed event logs for backtesting and performance analysis.</p>
 This class encapsulates all the essential data needed to track the evolution of a trading strategy
 simulation over time, including position, cash balance, risk metrics, and order book state.</p>
 </section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.SimulationPerformanceMetrics.html">SimulationPerformanceMetrics</a></h4>
+      <section><p>Typed performance metrics for trading strategy simulations.
+Exposes all metrics from StrategySimulation.GetDetailedPerformanceMetrics() in a strongly-typed format.</p>
+</section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.StrategySimulation.html">StrategySimulation</a></h4>
       <section><p>Simulates trading strategies against historical market snapshots, managing position, cash, and order book state.
 This class processes market data sequentially, applies trading decisions from strategies, and tracks performance metrics.
 It maintains a simulated order book and resting orders to accurately model market interactions during backtesting.
 As a developer, this class is the core execution engine for strategy evaluation, handling the complex interplay
 between market data, strategy decisions, order book dynamics, and position management.</p>
-</section>
-    <h3 id="interfaces">
-Interfaces
-</h3>
-      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.IPerformanceMonitor.html">IPerformanceMonitor</a></h4>
-      <section><p>Interface for recording performance metrics.</p>
 </section>
 
 

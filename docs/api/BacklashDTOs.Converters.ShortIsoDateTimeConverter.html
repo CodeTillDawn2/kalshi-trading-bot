@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class ShortIsoDateTimeConverter | Kalshi Trading Bot Documentation ">
     
-    
+    <meta name="description" content="JSON converter for DateTime that uses compact ISO-8601 format without fractional seconds and has a tolerant reader.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,8 @@
 
 
   <h1 id="BacklashDTOs_Converters_ShortIsoDateTimeConverter" data-uid="BacklashDTOs.Converters.ShortIsoDateTimeConverter" class="text-break">Class ShortIsoDateTimeConverter</h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>JSON converter for DateTime that uses compact ISO-8601 format without fractional seconds and has a tolerant reader.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
@@ -139,11 +140,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_Converters_ShortIsoDateTimeConverter_Read_System_Text_Json_Utf8JsonReader__System_Type_System_Text_Json_JsonSerializerOptions_.md&amp;value=---%0Auid%3A%20BacklashDTOs.Converters.ShortIsoDateTimeConverter.Read(System.Text.Json.Utf8JsonReader%40%2CSystem.Type%2CSystem.Text.Json.JsonSerializerOptions)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/ShortIsoDateTimeConverter.cs/#L10">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/ShortIsoDateTimeConverter.cs/#L19">View Source</a>
   </span>
   <a id="BacklashDTOs_Converters_ShortIsoDateTimeConverter_Read_" data-uid="BacklashDTOs.Converters.ShortIsoDateTimeConverter.Read*"></a>
   <h4 id="BacklashDTOs_Converters_ShortIsoDateTimeConverter_Read_System_Text_Json_Utf8JsonReader__System_Type_System_Text_Json_JsonSerializerOptions_" data-uid="BacklashDTOs.Converters.ShortIsoDateTimeConverter.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">Read(ref Utf8JsonReader, Type, JsonSerializerOptions)</h4>
-  <div class="markdown level1 summary"><p>Reads and converts the JSON to type <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a>.</p>
+  <div class="markdown level1 summary"><p>Reads the JSON value and converts it to a DateTime, supporting string and number formats.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -163,7 +164,7 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.json.utf8jsonreader">Utf8JsonReader</a></td>
         <td><span class="parametername">reader</span></td>
-        <td><p>The reader.</p>
+        <td><p>The UTF-8 JSON reader.</p>
 </td>
       </tr>
       <tr>
@@ -175,7 +176,7 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.json.jsonserializeroptions">JsonSerializerOptions</a></td>
         <td><span class="parametername">options</span></td>
-        <td><p>An object that specifies serialization options to use.</p>
+        <td><p>The serialization options.</p>
 </td>
       </tr>
     </tbody>
@@ -191,7 +192,7 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
-        <td><p>The converted value.</p>
+        <td><p>The parsed DateTime.</p>
 </td>
       </tr>
     </tbody>
@@ -203,11 +204,11 @@
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_Converters_ShortIsoDateTimeConverter_Write_System_Text_Json_Utf8JsonWriter_System_DateTime_System_Text_Json_JsonSerializerOptions_.md&amp;value=---%0Auid%3A%20BacklashDTOs.Converters.ShortIsoDateTimeConverter.Write(System.Text.Json.Utf8JsonWriter%2CSystem.DateTime%2CSystem.Text.Json.JsonSerializerOptions)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/ShortIsoDateTimeConverter.cs/#L24">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/ShortIsoDateTimeConverter.cs/#L39">View Source</a>
   </span>
   <a id="BacklashDTOs_Converters_ShortIsoDateTimeConverter_Write_" data-uid="BacklashDTOs.Converters.ShortIsoDateTimeConverter.Write*"></a>
   <h4 id="BacklashDTOs_Converters_ShortIsoDateTimeConverter_Write_System_Text_Json_Utf8JsonWriter_System_DateTime_System_Text_Json_JsonSerializerOptions_" data-uid="BacklashDTOs.Converters.ShortIsoDateTimeConverter.Write(System.Text.Json.Utf8JsonWriter,System.DateTime,System.Text.Json.JsonSerializerOptions)">Write(Utf8JsonWriter, DateTime, JsonSerializerOptions)</h4>
-  <div class="markdown level1 summary"><p>Writes a specified value as JSON.</p>
+  <div class="markdown level1 summary"><p>Writes the DateTime value to JSON in compact ISO-8601 format.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
@@ -227,19 +228,19 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.json.utf8jsonwriter">Utf8JsonWriter</a></td>
         <td><span class="parametername">writer</span></td>
-        <td><p>The writer to write to.</p>
+        <td><p>The UTF-8 JSON writer.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
         <td><span class="parametername">value</span></td>
-        <td><p>The value to convert to JSON.</p>
+        <td><p>The DateTime value to write.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.json.jsonserializeroptions">JsonSerializerOptions</a></td>
         <td><span class="parametername">options</span></td>
-        <td><p>An object that specifies serialization options to use.</p>
+        <td><p>The serialization options.</p>
 </td>
       </tr>
     </tbody>
@@ -258,7 +259,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashDTOs_Converters_ShortIsoDateTimeConverter.md&amp;value=---%0Auid%3A%20BacklashDTOs.Converters.ShortIsoDateTimeConverter%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/ShortIsoDateTimeConverter.cs/#L8" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashDTOs/Converters/ShortIsoDateTimeConverter.cs/#L10" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>
