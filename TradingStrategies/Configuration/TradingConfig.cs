@@ -221,6 +221,39 @@ public class TradingConfig
     public bool MarketRefreshService_EnablePerformanceMetrics { get; set; } = true;
 
     /// <summary>
+    /// Cache expiration time in minutes for market type results in MarketTypeService.
+    /// This controls how long cached market type classifications are retained before requiring re-computation.
+    /// Longer expiration reduces computational overhead but may use stale classifications.
+    /// Typical values: 15-60 minutes depending on market volatility and freshness requirements.
+    /// Default: 30 minutes
+    /// </summary>
+    public int? MarketTypeCacheExpirationMinutes { get; set; } = 30;
+
+    /// <summary>
+    /// Enables or disables performance metrics collection in MarketTypeService.
+    /// When enabled, collects cache hit/miss statistics, classification timing, and count metrics.
+    /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
+    /// Default: true
+    /// </summary>
+    public bool MarketTypeService_EnablePerformanceMetrics { get; set; } = true;
+
+    /// <summary>
+    /// Enables or disables performance metrics collection in StrategySelectionHelper.
+    /// When enabled, collects strategy instantiation timing and memory allocation metrics for each strategy instance.
+    /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
+    /// Default: false (due to performance impact of individual instance tracking)
+    /// </summary>
+    public bool StrategySelectionHelper_EnablePerformanceMetrics { get; set; } = false;
+
+    /// <summary>
+    /// Enables or disables performance metrics collection in EquityCalculator.
+    /// When enabled, measures execution time for each equity calculation and collects timing statistics.
+    /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
+    /// Default: true
+    /// </summary>
+    public bool EquityCalculator_EnablePerformanceMetrics { get; set; } = true;
+
+    /// <summary>
     /// Validates the configuration parameters to ensure they are within acceptable ranges and prevent invalid combinations.
     /// This method should be called during application startup to catch misconfigurations early.
     /// Throws ArgumentException if any parameter is invalid.

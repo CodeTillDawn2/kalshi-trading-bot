@@ -2,6 +2,8 @@ using BacklashDTOs;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using TradingStrategies.Configuration;
+using TradingStrategies.Trading.Overseer;
 
 namespace TradingStrategies.Trading.Overseer
 {
@@ -30,7 +32,17 @@ namespace TradingStrategies.Trading.Overseer
     /// </remarks>
     public class EquityCalculator
     {
+        private readonly TradingConfig _config;
         private readonly List<long> _calculationTimes = new List<long>();
+
+        /// <summary>
+        /// Initializes a new instance of the EquityCalculator class.
+        /// </summary>
+        /// <param name="config">The trading configuration containing performance metrics settings.</param>
+        public EquityCalculator(TradingConfig config)
+        {
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+        }
 
         /// <summary>
         /// Calculates the total equity value for a given simulation path at the current market snapshot.
@@ -61,7 +73,8 @@ namespace TradingStrategies.Trading.Overseer
         ///
         /// Example usage:
         /// <code>
-        /// var calculator = new EquityCalculator();
+        /// var config = new TradingConfig();
+        /// var calculator = new EquityCalculator(config);
         /// double totalEquity = calculator.GetEquity(simulationPath, marketSnapshot);
         /// // Or asynchronously:
         /// double totalEquityAsync = await calculator.GetEquityAsync(simulationPath, marketSnapshot);
@@ -75,13 +88,16 @@ namespace TradingStrategies.Trading.Overseer
             if (path == null)
                 throw new ArgumentNullException(nameof(path), "Simulation path cannot be null");
 
-            var stopwatch = Stopwatch.StartNew();
+            var stopwatch = _config.EquityCalculator_EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
 
             double equity = path.Cash;
             if (path.SimulatedBook == null)
             {
-                stopwatch.Stop();
-                _calculationTimes.Add(stopwatch.ElapsedMilliseconds);
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    _calculationTimes.Add(stopwatch.ElapsedMilliseconds);
+                }
                 return equity;
             }
 
@@ -112,8 +128,11 @@ namespace TradingStrategies.Trading.Overseer
                     equity += Math.Abs(path.Position) * midNo;
             }
 
-            stopwatch.Stop();
-            _calculationTimes.Add(stopwatch.ElapsedMilliseconds);
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                _calculationTimes.Add(stopwatch.ElapsedMilliseconds);
+            }
             return equity;
         }
 
@@ -133,27 +152,28 @@ namespace TradingStrategies.Trading.Overseer
         /// <summary>
         /// Gets all recorded calculation times in milliseconds.
         /// </summary>
-        /// <returns>An array of calculation times in milliseconds.</returns>
+        /// <returns>An array of calculation times in milliseconds. Returns empty array if performance metrics are disabled.</returns>
         /// <remarks>
         /// This method provides access to the performance metrics collected during equity calculations.
         /// Each value represents the time taken for a single GetEquity or GetEquityAsync call.
+        /// If performance metrics are disabled, returns an empty array.
         /// </remarks>
         public long[] GetCalculationTimes()
         {
-            return _calculationTimes.ToArray();
+            return _config.EquityCalculator_EnablePerformanceMetrics ? _calculationTimes.ToArray() : Array.Empty<long>();
         }
 
         /// <summary>
         /// Gets performance statistics for equity calculations.
         /// </summary>
-        /// <returns>A tuple containing count, average time, min time, and max time in milliseconds.</returns>
+        /// <returns>A tuple containing count, average time, min time, and max time in milliseconds. Returns (0, 0, 0, 0) if performance metrics are disabled.</returns>
         /// <remarks>
         /// Returns comprehensive statistics about the performance of equity calculations.
-        /// If no calculations have been performed, returns (0, 0, 0, 0).
+        /// If no calculations have been performed or metrics are disabled, returns (0, 0, 0, 0).
         /// </remarks>
         public (int Count, double AverageMs, long MinMs, long MaxMs) GetCalculationStatistics()
         {
-            if (_calculationTimes.Count == 0)
+            if (!_config.EquityCalculator_EnablePerformanceMetrics || _calculationTimes.Count == 0)
                 return (0, 0, 0, 0);
 
             return (
@@ -174,6 +194,30 @@ namespace TradingStrategies.Trading.Overseer
         public void ClearCalculationTimes()
         {
             _calculationTimes.Clear();
+        }
+
+        /// <summary>
+        /// Posts aggregated performance metrics to the PerformanceMonitor.
+        /// </summary>
+        /// <param name="performanceMonitor">The performance monitor to record metrics to.</param>
+        /// <remarks>
+        /// This method aggregates all recorded calculation times and posts them to the PerformanceMonitor
+        /// for comprehensive performance analysis. Only posts if performance metrics are enabled.
+        /// </remarks>
+        public void PostMetrics(PerformanceMonitor performanceMonitor)
+        {
+            if (!performanceMonitor.EnablePerformanceMetrics || !_config.EquityCalculator_EnablePerformanceMetrics) return;
+
+            long totalExecutionTimeMs = _calculationTimes.Sum();
+            int totalCalculations = _calculationTimes.Count;
+
+            performanceMonitor.RecordPerformanceMetrics(
+                methodName: "EquityCalculator.GetEquity",
+                totalExecutionTimeMs: totalExecutionTimeMs,
+                totalItemsProcessed: totalCalculations,
+                totalItemsFound: 0,
+                itemCheckTimes: null
+            );
         }
     }
 }

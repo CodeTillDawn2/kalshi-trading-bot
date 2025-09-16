@@ -1,5 +1,6 @@
 using BacklashDTOs;
 using TradingStrategies.Trading.Helpers;
+using TradingStrategies.Configuration;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using System.Diagnostics;
 using System.Collections.Concurrent;
@@ -55,6 +56,11 @@ namespace TradingStrategies.Trading.Overseer
         private readonly TimeSpan _cacheExpiration;
 
         /// <summary>
+        /// Flag to enable or disable performance metrics collection.
+        /// </summary>
+        private readonly bool _enablePerformanceMetrics;
+
+        /// <summary>
         /// Performance metrics: cache hits.
         /// </summary>
         private long _cacheHits;
@@ -77,17 +83,19 @@ namespace TradingStrategies.Trading.Overseer
         /// <summary>
         /// Initializes a new instance of the MarketTypeService class.
         /// </summary>
-        /// <param name="cacheExpiration">The time span after which cache entries expire. If null, defaults to 30 minutes.</param>
+        /// <param name="config">The trading configuration containing settings for cache expiration and performance metrics. If null, defaults are used.</param>
         /// <remarks>
         /// Creates the MarketTypeHelper instance and initializes the cache with configurable expiration.
         /// The cache expiration can be configured via TradingConfig:MarketTypeCacheExpirationMinutes in appsettings.json.
+        /// Performance metrics collection can be enabled/disabled via TradingConfig:MarketTypeService_EnablePerformanceMetrics.
         /// This constructor sets up the service for immediate use in market type classification.
         /// </remarks>
-        public MarketTypeService(TimeSpan? cacheExpiration = null)
+        public MarketTypeService(TradingConfig? config = null)
         {
             _marketTypeHelper = new MarketTypeHelper();
             _marketTypeCache = new ConcurrentDictionary<string, (MarketType Type, DateTime CachedAt)>();
-            _cacheExpiration = cacheExpiration ?? TimeSpan.FromMinutes(30);
+            _cacheExpiration = config != null && config.MarketTypeCacheExpirationMinutes.HasValue ? TimeSpan.FromMinutes(config.MarketTypeCacheExpirationMinutes.Value) : TimeSpan.FromMinutes(30);
+            _enablePerformanceMetrics = config?.MarketTypeService_EnablePerformanceMetrics ?? true;
         }
 
         /// <summary>
@@ -125,18 +133,21 @@ namespace TradingStrategies.Trading.Overseer
                     }
                     else
                     {
-                        _cacheHits++;
+                        if (_enablePerformanceMetrics) _cacheHits++;
                         snapshot.MarketType = cached.Type.ToString();
                         return;
                     }
                 }
 
-                _cacheMisses++;
-                var stopwatch = Stopwatch.StartNew();
+                if (_enablePerformanceMetrics) _cacheMisses++;
+                var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
                 var type = _marketTypeHelper.GetMarketType(snapshot);
-                stopwatch.Stop();
-                _totalClassificationTime += stopwatch.Elapsed;
-                _classificationCount++;
+                if (_enablePerformanceMetrics)
+                {
+                    stopwatch.Stop();
+                    _totalClassificationTime += stopwatch.Elapsed;
+                    _classificationCount++;
+                }
                 _marketTypeCache[key] = (type, DateTime.Now);
                 snapshot.MarketType = type.ToString();
             }
@@ -175,18 +186,21 @@ namespace TradingStrategies.Trading.Overseer
                     }
                     else
                     {
-                        _cacheHits++;
+                        if (_enablePerformanceMetrics) _cacheHits++;
                         snapshot.MarketType = cached.Type.ToString();
                         return;
                     }
                 }
 
-                _cacheMisses++;
-                var stopwatch = Stopwatch.StartNew();
+                if (_enablePerformanceMetrics) _cacheMisses++;
+                var stopwatch = _enablePerformanceMetrics ? Stopwatch.StartNew() : null;
                 var type = await Task.Run(() => _marketTypeHelper.GetMarketType(snapshot));
-                stopwatch.Stop();
-                _totalClassificationTime += stopwatch.Elapsed;
-                _classificationCount++;
+                if (_enablePerformanceMetrics)
+                {
+                    stopwatch.Stop();
+                    _totalClassificationTime += stopwatch.Elapsed;
+                    _classificationCount++;
+                }
                 _marketTypeCache[key] = (type, DateTime.Now);
                 snapshot.MarketType = type.ToString();
             }
@@ -240,5 +254,24 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         /// <returns>The classification count.</returns>
         public int GetClassificationCount() => _classificationCount;
+
+        /// <summary>
+        /// Posts the current performance metrics to the specified performance monitor.
+        /// </summary>
+        /// <param name="performanceMonitor">The performance monitor to post metrics to. If null, no action is taken.</param>
+        public void PostMetrics(PerformanceMonitor performanceMonitor)
+        {
+            if (performanceMonitor != null)
+            {
+                var metrics = new Dictionary<string, object>
+                {
+                    ["CacheHits"] = _cacheHits,
+                    ["CacheMisses"] = _cacheMisses,
+                    ["AverageClassificationTimeMs"] = GetAverageClassificationTime().TotalMilliseconds,
+                    ["ClassificationCount"] = _classificationCount
+                };
+                performanceMonitor.RecordSimulationMetrics("MarketTypeService", metrics);
+            }
+        }
     }
 }

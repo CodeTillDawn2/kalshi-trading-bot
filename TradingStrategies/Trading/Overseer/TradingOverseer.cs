@@ -7,6 +7,7 @@ using BacklashDTOs.Data;
 using TradingStrategies.Strategies;
 using TradingStrategies.Trading.Overseer;
 using TradingStrategies.Extensions;
+using TradingStrategies.Configuration;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Trading.Overseer.ReportGenerator;
 using System.Threading.Tasks;
@@ -52,7 +53,9 @@ namespace TradingStrategies
             _enablePerformanceMetrics = configuration.GetValue<bool>("TradingOverseer:EnablePerformanceMetrics", false);
             _performanceMonitor.EnablePerformanceMetrics = _enablePerformanceMetrics;
             _simulationEngine = new SimulationEngine(configuration);
-            _equityCalculator = new EquityCalculator();
+            var tradingConfig = new TradingConfig();
+            configuration.GetSection("TradingConfig").Bind(tradingConfig);
+            _equityCalculator = new EquityCalculator(tradingConfig);
         }
 
         private record SnapshotMetadata(string MarketTicker, DateTime StartTime, DateTime EndTime);
@@ -135,6 +138,9 @@ namespace TradingStrategies
                     itemCheckTimes: itemCheckTimes
                 );
             }
+
+            // Post EquityCalculator metrics automatically
+            _equityCalculator.PostMetrics(_performanceMonitor);
 
             return pathData;
         }
