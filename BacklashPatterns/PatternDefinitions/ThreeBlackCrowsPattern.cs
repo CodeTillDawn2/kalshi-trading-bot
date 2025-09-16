@@ -33,15 +33,42 @@ namespace BacklashPatterns.PatternDefinitions
         /// Strictest: 0.5 (strong uptrend), Loosest: 0.1 (weak uptrend).
         /// </summary>
         public static double TrendThreshold { get; } = 0.3;
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "ThreeBlackCrows";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
+        /// <summary>
+        /// Initializes a new instance of the ThreeBlackCrowsPattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
         public ThreeBlackCrowsPattern(List<int> candles) : base(candles)
         {
         }
 
+        /// <summary>
+        /// Determines if a Three Black Crows pattern exists at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the third candle.</param>
+        /// <param name="trendLookback">The trend lookback period.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<ThreeBlackCrowsPattern?> IsPatternAsync(
             int index,
             int trendLookback,

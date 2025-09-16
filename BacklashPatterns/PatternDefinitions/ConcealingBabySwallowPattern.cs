@@ -26,7 +26,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum body size for the first and second candles relative to the lookback average range.
         /// Purpose: Ensures the first two candles are strong bearish compared to prior volatility.
         /// Default: 1.5 (1.5 times the average range)
-        /// Range: 1.0–2.0 (1.0 for moderate strength, 2.0 for very strong bearish candles).
+        /// Range: 1.0ï¿½2.0 (1.0 for moderate strength, 2.0 for very strong bearish candles).
         /// </summary>
         public static double MinBodyToAvgRangeRatio { get; set; } = 0.5;
 
@@ -34,7 +34,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Maximum wick size for the first and second candles relative to the lookback average range.
         /// Purpose: Maintains near-Marubozu shape by limiting wick size relative to prior volatility.
         /// Default: 0.3 (30% of average range)
-        /// Range: 0.2–0.5 (0.2 for strict Marubozu, 0.5 for slightly larger wicks).
+        /// Range: 0.2ï¿½0.5 (0.2 for strict Marubozu, 0.5 for slightly larger wicks).
         /// </summary>
         public static double WickToAvgRangeMax { get; set; } = 1.0;
 
@@ -42,15 +42,15 @@ namespace BacklashPatterns.PatternDefinitions
         /// Maximum gap allowance between the first and second candles relative to the lookback average range.
         /// Purpose: Allows a small gap; set to 0.0 to relax requirement in markets without gaps.
         /// Default: 0.0 (no gap required)
-        /// Range: 0.0–0.3 (0.0 for no gap, 0.3 for small gaps relative to volatility).
+        /// Range: 0.0ï¿½0.3 (0.0 for no gap, 0.3 for small gaps relative to volatility).
         /// </summary>
         public static double GapToAvgRangeMax { get; set; } = 0.0;
 
         /// <summary>
         /// Maximum body size for the third candle relative to the lookback average range.
-        /// Purpose: Ensures slowing momentum by limiting the third candle’s body size.
+        /// Purpose: Ensures slowing momentum by limiting the third candleï¿½s body size.
         /// Default: 0.8 (80% of average range)
-        /// Range: 0.5–1.0 (0.5 for very slow momentum, 1.0 for moderate slowing).
+        /// Range: 0.5ï¿½1.0 (0.5 for very slow momentum, 1.0 for moderate slowing).
         /// </summary>
         public static double MaxThirdBodyToAvgRange { get; set; } = 1.5;
 
@@ -58,16 +58,35 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum bearish trend direction ratio in the lookback period to confirm a prior downtrend.
         /// Purpose: Ensures a consistent downtrend before the pattern forms.
         /// Default: 0.6 (60% bearish candles)
-        /// Range: 0.5–0.8 (0.5 for moderate downtrend, 0.8 for strong downtrend).
+        /// Range: 0.5ï¿½0.8 (0.5 for moderate downtrend, 0.8 for strong downtrend).
         /// </summary>
         public static double BearishTrendDirectionRatioMin { get; set; } = 0.3;
 
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "ConcealingBabySwallow";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the ConcealingBabySwallowPattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
         public ConcealingBabySwallowPattern(List<int> candles) : base(candles)
         {
         }

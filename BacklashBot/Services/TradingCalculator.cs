@@ -45,6 +45,7 @@ namespace BacklashBot.Services
         /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price data.</param>
         /// <param name="periods">The number of periods to use for the RSI calculation (typically 14).</param>
         /// <returns>The RSI value (0-100) or null if insufficient data or invalid calculation.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when pseudoCandles is null.</exception>
         /// <exception cref="ArgumentException">Thrown when periods is less than 1.</exception>
         /// <remarks>
         /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
@@ -159,6 +160,7 @@ namespace BacklashBot.Services
         /// <param name="longPeriod">The period for the long EMA (typically 26).</param>
         /// <param name="signalPeriod">The period for the signal line EMA (typically 9).</param>
         /// <returns>A tuple containing MACD line, signal line, and histogram values, or nulls if insufficient data.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when pseudoCandlesticks is null.</exception>
         /// <remarks>
         /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
         /// <see cref="CalculateMACDAsync(List{PseudoCandlestick}, int, int, int)"/>
@@ -260,6 +262,7 @@ namespace BacklashBot.Services
         /// <param name="period">The period for the moving average and standard deviation calculation (typically 20).</param>
         /// <param name="stdDevMultiplier">The multiplier for standard deviation to determine band width (typically 2.0).</param>
         /// <returns>A tuple containing lower band, middle band (SMA), and upper band values, or nulls if insufficient data.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when pseudoCandles is null.</exception>
         /// <exception cref="ArgumentException">Thrown when period is less than 1 or multiplier is negative.</exception>
         /// <remarks>
         /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
@@ -368,6 +371,7 @@ namespace BacklashBot.Services
         /// <param name="kPeriod">The period for %K calculation (typically 14).</param>
         /// <param name="dPeriod">The period for %D moving average (typically 3).</param>
         /// <returns>A tuple containing %K and %D values (0-100), or nulls if insufficient data.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when pseudoCandles is null.</exception>
         /// <exception cref="ArgumentException">Thrown when periods are less than 1.</exception>
         /// <remarks>
         /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
@@ -474,6 +478,7 @@ namespace BacklashBot.Services
         /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price data.</param>
         /// <param name="period">The period for averaging the true range (typically 14).</param>
         /// <returns>The ATR value or null if insufficient data or invalid calculation.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when pseudoCandles is null.</exception>
         /// <exception cref="ArgumentException">Thrown when period is less than 1.</exception>
         /// <remarks>
         /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
@@ -572,6 +577,7 @@ namespace BacklashBot.Services
         /// <param name="pseudoCandles">The list of pseudo-candlesticks containing price and volume data.</param>
         /// <param name="periods">The number of periods to include in the VWAP calculation.</param>
         /// <returns>The VWAP value or null if insufficient data or zero volume.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when pseudoCandles is null.</exception>
         /// <exception cref="ArgumentException">Thrown when periods is less than 1.</exception>
         /// <remarks>
         /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
@@ -929,20 +935,20 @@ namespace BacklashBot.Services
         /// Calculates the Parabolic Stop and Reverse (PSAR) value for a series of pseudo-candlesticks in the Kalshi marketplace.
         /// This indicator is valuable for event-driven contracts where price trends can emerge rapidly due to evolving news or data releases influencing outcome probabilities.
         /// It identifies trend directions and provides dynamic trailing stop levels, aiding risk management in volatile, bounded-price environments (1 to 99 cents per contract).
-        /// However, in ranging or sideways markets common when events are distant or uncertain PSAR may generate frequent false reversal signals (whipsaws), potentially leading to unnecessary trades.
+        /// However, in ranging or sideways markets, common when events are distant or uncertain, PSAR may generate frequent false reversal signals (whipsaws), potentially leading to unnecessary trades.
         /// It performs best when combined with trend-confirming indicators like the Average Directional Index (ADX) to filter signals.
         /// </summary>
-        /// <param name="candlesticks">The list of candlesticks containing ask and bid prices for high, low, and close.</param>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing mid-high, mid-low, and mid-close prices.</param>
         /// <returns>The current PSAR value, or null if insufficient data or invalid computation.</returns>
         /// <remarks>
-        /// Input validation includes null check for the candlesticks list and parameter validation with exceptions.
+        /// Input validation includes null check for the pseudoCandles list and parameter validation with exceptions.
         /// Parameters are sourced from configuration where applicable (e.g., PSAR acceleration factors).
         /// Different PSAR values indicate the following in Kalshi's context:
         /// - A PSAR value below the current price (e.g., PSAR at 45 when the mid-close is 60) suggests an uptrend, signaling potential buying opportunities or holding long ("Yes") positions, with the PSAR serving as a rising trailing stop.
         /// - A PSAR value above the current price (e.g., PSAR at 75 when the mid-close is 60) indicates a downtrend, implying selling pressure or short ("No") positions, with the PSAR acting as a falling trailing stop.
         /// - Crossovers, where the price moves beyond the PSAR, denote potential trend reversals: a price rising above PSAR flips to bullish, while falling below flips to bearish.
         /// - Acceleration factor (AF) increases (up to the maximum, typically 0.20) amplify the PSAR's sensitivity in strong trends, tightening stops to lock in gains.
-        /// <see cref="CalculatePSARAsync(List{CandlestickData})"/>
+        /// <see cref="CalculatePSARAsync(List{PseudoCandlestick})"/>
         /// </remarks>
         public double? CalculatePSAR(List<PseudoCandlestick> pseudoCandles)
         {
@@ -1033,14 +1039,14 @@ namespace BacklashBot.Services
         /// Calculates the Parabolic Stop and Reverse (PSAR) value asynchronously for a series of pseudo-candlesticks in the Kalshi marketplace.
         /// This indicator is valuable for event-driven contracts where price trends can emerge rapidly due to evolving news or data releases influencing outcome probabilities.
         /// It identifies trend directions and provides dynamic trailing stop levels, aiding risk management in volatile, bounded-price environments (1 to 99 cents per contract).
-        /// However, in ranging or sideways marketscommon when events are distant or uncertainPSAR may generate frequent false reversal signals (whipsaws), potentially leading to unnecessary trades.
+        /// However, in ranging or sideways markets common when events are distant or uncertain, PSAR may generate frequent false reversal signals (whipsaws), potentially leading to unnecessary trades.
         /// It performs best when combined with trend-confirming indicators like the Average Directional Index (ADX) to filter signals.
         /// </summary>
-        /// <param name="candlesticks">The list of candlesticks containing ask and bid prices for high, low, and close.</param>
+        /// <param name="pseudoCandles">The list of pseudo-candlesticks containing mid-high, mid-low, and mid-close prices.</param>
         /// <returns>A task that represents the asynchronous operation, containing the current PSAR value, or null if insufficient data or invalid computation.</returns>
         /// <remarks>
         /// Asynchronous execution using Task.Run for performance in high-frequency scenarios.
-        /// <see cref="CalculatePSAR(List{CandlestickData})"/>
+        /// <see cref="CalculatePSAR(List{PseudoCandlestick})"/>
         /// </remarks>
         public async Task<double?> CalculatePSARAsync(List<PseudoCandlestick> pseudoCandles)
         {
@@ -1058,6 +1064,7 @@ namespace BacklashBot.Services
         /// </summary>
         /// <param name="pseudoCandles">The list of pseudo-candlesticks containing mid-high, mid-low, and mid-close prices.</param>
         /// <returns>A tuple containing ADX, +DI, and -DI values, or null values if insufficient data or invalid computation.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when pseudoCandles is null.</exception>
         /// <remarks>
         /// Input validation includes null check for the pseudo-candlesticks list, empty list handling with warnings, and data integrity checks with warnings for invalid candlestick data (e.g., negative prices, invalid timestamps).
         /// Parameters are sourced from configuration where applicable (e.g., ADX period).

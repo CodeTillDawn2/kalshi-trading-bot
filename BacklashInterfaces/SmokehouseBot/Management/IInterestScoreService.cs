@@ -1,9 +1,12 @@
-using BacklashBotData.Data.Interfaces;
+﻿using BacklashBotData.Data.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BacklashBot.Management.Interfaces
 {
+/// <summary>IInterestScoreService</summary>
+/// <summary>IInterestScoreService</summary>
     public interface IInterestScoreService
+/// <summary>GetMarketInterestScores</summary>
     {
         Task<List<(string Ticker, double Score)>> GetMarketInterestScores(
             IServiceScopeFactory scopeFactory,
@@ -14,7 +17,9 @@ namespace BacklashBot.Management.Interfaces
             double volumePercentileWeight = 0.15,
             double liquidityPercentileWeight = 0.06,
             double openInterestPercentileWeight = 0.06);
+/// <summary>CalculateMarketInterestScoreAsync</summary>
 
+/// <summary>CalculateMarketInterestScoreAsync</summary>
         Task<(double score,
             (double spreadTightness, double spreadWidth, double volume, double volumePercentile, double liquidityPercentile, double openInterestPercentile, double continuity) scoreParts)>
         CalculateMarketInterestScoreAsync(

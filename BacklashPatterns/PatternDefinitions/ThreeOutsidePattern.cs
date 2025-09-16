@@ -3,6 +3,9 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
+    /// <summary>
+    /// Represents a Three Outside candlestick pattern.
+    /// </summary>
     public class ThreeOutsidePattern : PatternDefinition
     {
         /// <summary>
@@ -35,16 +38,44 @@ namespace BacklashPatterns.PatternDefinitions
         /// - ThreeOutsideDown: A bearish reversal pattern after an uptrend. First candle is bullish, second candle is bearish and engulfs the first, third candle is bearish and confirms by closing lower.
         /// Requirements sourced from: https://www.investopedia.com/terms/t/three-outside-up-down.asp
         /// </summary>
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "ThreeOutside";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the ThreeOutsidePattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
         public ThreeOutsidePattern(List<int> candles) : base(candles)
         {
         }
 
+        /// <summary>
+        /// Determines if a Three Outside pattern exists at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the third candle.</param>
+        /// <param name="trendLookback">The trend lookback period.</param>
+        /// <param name="isBullish">Whether to check for bullish pattern.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<ThreeOutsidePattern?> IsPatternAsync(
             int index,
             int trendLookback,

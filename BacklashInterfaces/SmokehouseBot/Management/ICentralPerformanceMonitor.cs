@@ -1,14 +1,29 @@
-namespace BacklashBot.Management.Interfaces
+﻿namespace BacklashBot.Management.Interfaces
 {
+/// <summary>ICentralPerformanceMonitor</summary>
+/// <summary>ICentralPerformanceMonitor</summary>
     public interface ICentralPerformanceMonitor
+/// <summary>StartTimer</summary>
+/// <summary>RecordExecutionTime</summary>
     {
+/// <summary>GetQueueHighCountPercentage</summary>
         void RecordExecutionTime(string methodName, long milliseconds);
+/// <summary>Gets or sets the LastRefreshCycleSeconds.</summary>
+/// <summary>CalculateAverageWebsocketEventsReceived</summary>
         Task StartTimer();
+/// <summary>Gets or sets the LastRefreshUsagePercentage.</summary>
         (double EventQueueAvg, double TickerQueueAvg, double NotificationQueueAvg, double OrderBookQueueAvg) GetQueueCountRollingAverages();
+/// <summary>Gets or sets the IsStartingUp.</summary>
+/// <summary>Gets or sets the LastRefreshCycleSeconds.</summary>
         double CalculateAverageWebsocketEventsReceived(string marketTicker);
+/// <summary>Gets or sets the BrainInstance.</summary>
+/// <summary>Gets or sets the LastRefreshMarketCount.</summary>
         double GetQueueHighCountPercentage();
+/// <summary>Gets or sets the LastRefreshTimeAcceptable.</summary>
 
+/// <summary>Gets or sets the IsShuttingDown.</summary>
         double LastRefreshCycleSeconds { get; set; }
+/// <summary>Gets or sets the BrainInstance.</summary>
         double LastRefreshCycleInterval { get; set; }
         int LastRefreshMarketCount { get; set; }
         double LastRefreshUsagePercentage { get; set; }

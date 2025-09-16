@@ -38,18 +38,47 @@ namespace BacklashPatterns.PatternDefinitions
         /// Loosest: 0.4 (less consistent); Strictest: 0.8 (highly consistent).
         /// </summary>
         public static double TrendConsistencyThreshold { get; } = 0.6;
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "ShortLineCandle";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
         private readonly bool IsBullish;
 
+        /// <summary>
+        /// Initializes a new instance of the ShortLineCandlePattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
+        /// <param name="isBullish">Whether the pattern is bullish.</param>
         public ShortLineCandlePattern(List<int> candles, bool isBullish) : base(candles)
         {
             IsBullish = isBullish;
         }
 
+        /// <summary>
+        /// Determines if a Short Line Candle pattern exists at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the candle.</param>
+        /// <param name="trendLookback">The trend lookback period.</param>
+        /// <param name="isBullish">Whether to check for bullish pattern.</param>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<ShortLineCandlePattern?> IsPatternAsync(
             int index,
             int trendLookback,

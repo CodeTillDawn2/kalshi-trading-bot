@@ -3,6 +3,9 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
+    /// <summary>
+    /// Represents a Ladder Bottom candlestick pattern.
+    /// </summary>
     public class LadderBottomPattern : PatternDefinition
     {
         /// <summary>
@@ -28,12 +31,31 @@ namespace BacklashPatterns.PatternDefinitions
         /// Loosest: 0.1 (small drop); Strictest: 1.0 (significant drop required).
         /// </summary>
         public static double MinTotalDrop { get; } = 0.5;
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "LadderBottom";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the LadderBottomPattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
         public LadderBottomPattern(List<int> candles) : base(candles)
         {
         }

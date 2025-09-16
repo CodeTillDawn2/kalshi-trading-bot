@@ -1,9 +1,3 @@
-/// <summary>
-/// Service responsible for broadcasting system status and health information to connected SignalR clients.
-/// Manages periodic check-in broadcasts at configurable intervals containing brain instance status, market data, performance metrics,
-/// and system health indicators to keep monitoring systems and dashboards updated.
-/// Includes retry logic for failed SignalR sends and performance metrics collection.
-/// </summary>
 using Microsoft.AspNetCore.SignalR;
 using BacklashBot.Hubs;
 using BacklashBot.Services.Interfaces;
@@ -18,9 +12,10 @@ using System.Text.Json;
 namespace BacklashBot.Services
 {
     /// <summary>
-    /// Implements the broadcast service for real-time system status communication.
-    /// Handles periodic broadcasting of comprehensive system health data to connected clients
-    /// including performance metrics, market information, and operational status.
+    /// Service responsible for broadcasting system status and health information to connected SignalR clients.
+    /// Manages periodic check-in broadcasts at configurable intervals containing brain instance status, market data, performance metrics,
+    /// and system health indicators to keep monitoring systems and dashboards updated.
+    /// Includes retry logic for failed SignalR sends and performance metrics collection.
     /// </summary>
     public class BroadcastService : IBroadcastService
     {

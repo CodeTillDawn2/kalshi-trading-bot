@@ -3,17 +3,9 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
-    /*
-     * On-Neck Pattern:
-     * - Description: A two-candle continuation pattern in a downtrend where a bearish candle is followed by a bullish candle 
-     *   that opens near the previous close and closes at or very near it, indicating weak buying pressure and continuation 
-     *   of the downtrend.
-     * - Requirements (Source: Investopedia, BabyPips):
-     *   - Occurs in a downtrend.
-     *   - First candle: Bearish with a significant body.
-     *   - Second candle: Bullish, opens near the first candle s close, closes at or near the first candle s close.
-     *   - Indicates: Continuation of the downtrend due to inability of bulls to push prices higher.
-     */
+    /// <summary>
+    /// Represents an On Neck candlestick pattern.
+    /// </summary>
     public class OnNeckPattern : PatternDefinition
     {
         /// <summary>
@@ -43,15 +35,42 @@ namespace BacklashPatterns.PatternDefinitions
         /// Loosest: 3.0 (allows larger wicks); Strictest: 1.0 (minimal wick).
         /// </summary>
         public static double MaxUpperWick { get; } = 2.0;
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "OnNeck";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
+        /// <summary>
+        /// Initializes a new instance of the OnNeckPattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
         public OnNeckPattern(List<int> candles) : base(candles)
         {
         }
 
+        /// <summary>
+        /// Determines if an On Neck pattern exists at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the second candle.</param>
+        /// <param name="trendLookback">The trend lookback period.</param>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<OnNeckPattern?> IsPatternAsync(
             int index,
             int trendLookback,

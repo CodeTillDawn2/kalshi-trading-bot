@@ -43,8 +43,14 @@ namespace TradingGUI
         private List<PricePoint> _historicalPatternDataPoints = new List<PricePoint>();
         private readonly BacklashBotContext _context;
 
+        /// <summary>
+        /// Gets or sets the action to perform when the back button is clicked.
+        /// </summary>
         public Action? BackAction { get; set; }
 
+        /// <summary>
+        /// Gets or sets the cache directory path.
+        /// </summary>
         public string? CacheDir { get; set; }  // New property to receive cache dir from MainForm
 
         /// <summary>

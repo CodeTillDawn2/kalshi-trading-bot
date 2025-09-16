@@ -1,30 +1,94 @@
-using BacklashDTOs;
+﻿using BacklashDTOs;
 using BacklashPatterns;
 using BacklashPatterns.PatternDefinitions;
 using static BacklashPatterns.PatternUtils;
 
+/// <summary>DownsideGapThreeMethodsPattern</summary>
+/// <summary>DownsideGapThreeMethodsPattern</summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
 public class DownsideGapThreeMethodsPattern : PatternDefinition
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
 {
+/// <summary>
+/// </summary>
     /// <summary>
     /// Minimum body size for each candle to ensure significance.
     /// Strictest: 0.3 (small but notable body), Loosest: 1.0 (larger body still valid).
     /// </summary>
     public static double MinBodySize { get; set; } = 0.5;
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
 
+/// <summary>
+/// </summary>
     /// <summary>
     /// Minimum gap size between the first and second candles.
     /// Strictest: 0.2 (small gap), Loosest: 1.0 (larger gap still indicates separation).
     /// </summary>
     public static double GapSize { get; set; } = 0.5;
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
 
+/// <summary>
+/// </summary>
     /// <summary>
     /// Threshold for determining a bearish trend in the lookback period.
     /// Strictest: -0.1 (weak bearish trend), Loosest: -0.5 (strong bearish trend).
     /// </summary>
     public static double TrendThreshold { get; set; } = -0.3;
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
     public const string BaseName = "DownsideGapThreeMethods";
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
     public override string Name => BaseName;
     public override double Strength { get; protected set; }
+/// <summary>
+/// </summary>
     public override double Certainty { get; protected set; }
     public override double Uncertainty { get; protected set; }
     public DownsideGapThreeMethodsPattern(List<int> candles) : base(candles)

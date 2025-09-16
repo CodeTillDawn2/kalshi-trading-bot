@@ -49,15 +49,42 @@ namespace BacklashPatterns.PatternDefinitions
         /// Strictest: 1.25 (near equal); Loosest: 2.5 (slight imbalance).
         /// </summary>
         public static double WickSymmetryMax { get; set; } = 2.0;
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "SpinningTop";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
+        /// <summary>
+        /// Initializes a new instance of the SpinningTopPattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
         public SpinningTopPattern(List<int> candles) : base(candles)
         {
         }
 
+        /// <summary>
+        /// Determines if a Spinning Top pattern exists at the specified index.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="index">The index of the candle.</param>
+        /// <param name="trendLookback">The trend lookback period.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<SpinningTopPattern?> IsPatternAsync(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
@@ -67,7 +94,7 @@ namespace BacklashPatterns.PatternDefinitions
             // Retrieve metrics for the current candle with lazy loading
             var metrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
 
-            // Early exit if the total range doesn’t meet the minimum requirement
+            // Early exit if the total range doesnï¿½t meet the minimum requirement
             if (metrics.TotalRange < MinRange) return null;
 
             // Check if the candle meets the pattern criteria: small body and significant wicks

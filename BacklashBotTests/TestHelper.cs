@@ -165,11 +165,11 @@ namespace KalshiBotTests
         }
 
         /// <summary>
-        /// Creates and returns an IOptions<TradingConfig> instance with scenario-based test values.
+        /// Creates and returns an TradingConfig instance with scenario-based test values.
         /// </summary>
         /// <param name="scenario">The test scenario to use for configuration values.</param>
         /// <returns>An IOptions&lt;TradingConfig&gt; instance configured for the specified scenario.</returns>
-        public static IOptions<TradingConfig> GetTradingConfig(TestScenario scenario)
+        public static TradingConfig GetTradingConfig(TestScenario scenario)
         {
             var config = new TradingConfig();
             switch (scenario)
@@ -197,15 +197,15 @@ namespace KalshiBotTests
                     break;
             }
             ValidateTradingConfig(config);
-            return Options.Create(config);
+            return Options.Create(config).Value;
         }
 
         /// <summary>
-        /// Creates and returns an IOptions<CalculationConfig> instance with scenario-based test values.
+        /// Creates and returns an CalculationConfig instance with scenario-based test values.
         /// </summary>
         /// <param name="scenario">The test scenario to use for configuration values.</param>
         /// <returns>An IOptions&lt;CalculationConfig&gt; instance configured for the specified scenario.</returns>
-        public static IOptions<CalculationConfig> GetCalculationConfig(TestScenario scenario)
+        public static CalculationConfig GetCalculationConfig(TestScenario scenario)
         {
             var config = new CalculationConfig();
             switch (scenario)
@@ -266,7 +266,7 @@ namespace KalshiBotTests
                     break;
             }
             ValidateCalculationConfig(config);
-            return Options.Create(config);
+            return Options.Create(config).Value;
         }
 
         /// <summary>

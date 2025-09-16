@@ -3,6 +3,9 @@ using BacklashPatterns;
 using BacklashPatterns.PatternDefinitions;
 using static BacklashPatterns.PatternUtils;
 
+/// <summary>
+/// Represents a Hammer candlestick pattern.
+/// </summary>
 public class HammerPattern : PatternDefinition
 {
     /// <summary>
@@ -34,15 +37,42 @@ public class HammerPattern : PatternDefinition
     /// Strictest: -0.5 (strong downtrend); Loosest: -0.1 (weak downtrend).
     /// </summary>
     public static double TrendThreshold { get; set; } = -0.3;
+    /// <summary>
+    /// Gets the base name of the pattern.
+    /// </summary>
     public const string BaseName = "Hammer";
+    /// <summary>
+    /// Gets the name of the pattern.
+    /// </summary>
     public override string Name => BaseName;
+    /// <summary>
+    /// Gets the strength of the pattern.
+    /// </summary>
     public override double Strength { get; protected set; }
+    /// <summary>
+    /// Gets the certainty of the pattern.
+    /// </summary>
     public override double Certainty { get; protected set; }
+    /// <summary>
+    /// Gets the uncertainty of the pattern.
+    /// </summary>
     public override double Uncertainty { get; protected set; }
+    /// <summary>
+    /// Initializes a new instance of the HammerPattern class.
+    /// </summary>
+    /// <param name="candles">The list of candle indices.</param>
     public HammerPattern(List<int> candles) : base(candles)
     {
     }
 
+    /// <summary>
+    /// Asynchronously determines if a Hammer pattern is present at the specified index.
+    /// </summary>
+    /// <param name="metricsCache">The metrics cache.</param>
+    /// <param name="index">The index of the candle.</param>
+    /// <param name="trendLookback">The trend lookback period.</param>
+    /// <param name="prices">The array of candle prices.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
     public static async Task<HammerPattern?> IsPatternAsync(
         Dictionary<int, CandleMetrics> metricsCache,
         int index,

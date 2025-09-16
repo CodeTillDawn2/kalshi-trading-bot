@@ -11,7 +11,7 @@ namespace TradingStrategies.Trading.Overseer
     /// from StrategySimulation, with typed access via SimulationPerformanceMetrics.
     /// All metrics collection can be enabled/disabled via the EnablePerformanceMetrics property.
     /// </summary>
-    public class PerformanceMonitor : BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor
+    public class PerformanceMonitor : IPerformanceMonitor
     {
         private readonly ConcurrentDictionary<string, List<PerformanceRecord>> _performanceRecords;
         private readonly ConcurrentDictionary<string, Dictionary<string, object>> _simulationMetrics;

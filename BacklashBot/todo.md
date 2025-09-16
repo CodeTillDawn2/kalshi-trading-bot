@@ -29,10 +29,6 @@ This document outlines the performance metrics tracked across various classes in
 
 ## TradingStrategies.Trading.Helpers.StrategySelectionHelper
 
-## TradingStrategies.Trading.Overseer.MarketTypeService
-
-## TradingSimulator.CachedMarketData
-
 
 ## TradingGUI.MainForm
 

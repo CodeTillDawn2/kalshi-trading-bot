@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591;8892;8618;8602;8604;1998;1571;1587</NoWarn>
+    <NoWarn>$(NoWarn);8892;8618;8602;8604;1998;1571;1587</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -43,18 +43,47 @@ namespace BacklashPatterns.PatternDefinitions
         /// Loosest value: 0.0 (no gap required in some interpretations, though a small gap is preferred).
         /// </summary>
         public static double GapSize { get; set; } = 0.2;
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "Breakaway";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
         private readonly bool IsBullish;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the BreakawayPattern_old class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
+        /// <param name="isBullish">Whether the pattern is bullish.</param>
         public BreakawayPattern_old(List<int> candles, bool isBullish) : base(candles)
         {
             IsBullish = isBullish;
         }
 
+        /// <summary>
+        /// Determines if a Breakaway pattern exists at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the fifth candle.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="isBullish">Whether to check for bullish pattern.</param>
+        /// <param name="trendLookback">The trend lookback period.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<BreakawayPattern?> IsPatternAsync(
             int index,
             CandleMids[] prices,

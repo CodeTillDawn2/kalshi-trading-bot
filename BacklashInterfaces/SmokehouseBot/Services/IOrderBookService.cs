@@ -1,14 +1,26 @@
-using BacklashDTOs;
+﻿using BacklashDTOs;
 
 namespace BacklashBot.Services.Interfaces
 {
+/// <summary>IOrderBookService</summary>
+/// <summary>IOrderBookService</summary>
     public interface IOrderBookService
+/// <summary>ConfigureWebSocketEventHandlers</summary>
+/// <summary>Gets or sets the OrderBookUpdated.</summary>
     {
+/// <summary>ClearQueueForMarketAsync</summary>
+/// <summary>GetCurrentOrderBook</summary>
         event EventHandler<string> OrderBookUpdated;
+/// <summary>IsEventQueueUnderLimit</summary>
+/// <summary>ClearQueueForMarketAsync</summary>
         void ConfigureWebSocketEventHandlers();
         List<OrderbookData> GetCurrentOrderBook(string marketTicker);
+/// <summary>GetQueueCounts</summary>
+/// <summary>IsEventQueueUnderLimit</summary>
         Task SyncOrderBookAsync(string marketTicker);
+/// <summary>StopServicesAsync</summary>
         void ClearQueueForMarketAsync(string marketTicker);
+/// <summary>GetQueueCounts</summary>
         Task StartServicesAsync();
 
         bool IsEventQueueUnderLimit(int limit);

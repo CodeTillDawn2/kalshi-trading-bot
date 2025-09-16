@@ -1,10 +1,3 @@
-/// <summary>
-/// Central orchestrator for the KalshiBot Overseer system that manages WebSocket connections,
-/// handles real-time market data events, coordinates periodic data fetching, and maintains
-/// system health monitoring. This class serves as the main entry point for overseer operations,
-/// integrating with WebSocket clients, database services, and SignalR hubs to provide
-/// comprehensive monitoring and control of the trading bot ecosystem.
-/// </summary>
 using KalshiBotAPI.WebSockets.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

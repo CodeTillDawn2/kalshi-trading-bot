@@ -3,6 +3,9 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
+    /// <summary>
+    /// Represents a Kicking By Length candlestick pattern.
+    /// </summary>
     public class KickingByLengthPattern : PatternDefinition
     {
         /// <summary>
@@ -36,13 +39,33 @@ namespace BacklashPatterns.PatternDefinitions
         /// Loosest: 0.1 (weak trend still sufficient for context).
         /// </summary>
         public static double TrendThreshold { get; set; } = 0.05;
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "KickingByLength";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
         private readonly bool IsBullish;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the KickingByLengthPattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
+        /// <param name="isBullish">Whether the pattern is bullish.</param>
         public KickingByLengthPattern(List<int> candles, bool isBullish) : base(candles)
         {
             IsBullish = isBullish;
