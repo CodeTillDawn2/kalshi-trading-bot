@@ -9,17 +9,31 @@ using BacklashBotData.Data.Interfaces;
 
 namespace TradingSimulator
 {
+    /// <summary>
+    /// Provides functionality for loading and filtering market snapshot data for the trading simulator.
+    /// </summary>
     public class DataLoader
     {
         private readonly ITradingSnapshotService _snapshotService;
         private readonly IOptions<SimulatorConfig> _simulatorOptions;
 
+        /// <summary>
+        /// Initializes a new instance of the DataLoader class.
+        /// </summary>
+        /// <param name="snapshotService">The trading snapshot service.</param>
+        /// <param name="simulatorOptions">The simulator configuration options.</param>
         public DataLoader(ITradingSnapshotService snapshotService, IOptions<SimulatorConfig> simulatorOptions)
         {
             _snapshotService = snapshotService;
             _simulatorOptions = simulatorOptions;
         }
 
+        /// <summary>
+        /// Gets filtered snapshot groups asynchronously based on the provided markets.
+        /// </summary>
+        /// <param name="context">The backlash bot context.</param>
+        /// <param name="marketsToRun">The list of markets to filter by, or null for all.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the filtered snapshot groups.</returns>
         public async Task<List<SnapshotGroupDTO>> GetFilteredSnapshotGroupsAsync(
             IBacklashBotContext context, List<string>? marketsToRun)
         {
@@ -41,6 +55,12 @@ namespace TradingSimulator
             return filtered;
         }
 
+        /// <summary>
+        /// Loads snapshots for a specific market asynchronously.
+        /// </summary>
+        /// <param name="context">The backlash bot context.</param>
+        /// <param name="marketName">The name of the market.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the list of market snapshots.</returns>
         public async Task<List<MarketSnapshot>> LoadSnapshotsForMarketAsync(
             IBacklashBotContext context, string marketName)
         {
@@ -68,6 +88,12 @@ namespace TradingSimulator
             return marketSnapshots;
         }
 
+        /// <summary>
+        /// Loads snapshots for multiple markets asynchronously.
+        /// </summary>
+        /// <param name="context">The backlash bot context.</param>
+        /// <param name="markets">The list of market names.</param>
+        /// <returns>A task that represents the asynchronous operation, containing a dictionary of market snapshots.</returns>
         public async Task<Dictionary<string, List<MarketSnapshot>>> LoadSnapshotsForMarketsAsync(
             IBacklashBotContext context, List<string> markets)
         {

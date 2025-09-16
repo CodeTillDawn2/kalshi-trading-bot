@@ -117,13 +117,33 @@ namespace BacklashPatterns.PatternDefinitions
         /// </value>
         public static double MinBodyBalanceRatio { get; set; } = 0.3;
 
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "Counterattack";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
         private readonly bool IsBullish;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the CounterattackPattern2 class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
+        /// <param name="isBullish">Whether the pattern is bullish.</param>
         public CounterattackPattern2(List<int> candles, bool isBullish) : base(candles)
         {
             IsBullish = isBullish;

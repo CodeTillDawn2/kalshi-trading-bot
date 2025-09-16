@@ -229,7 +229,7 @@ namespace TradingSimulator
         /// <param name="writeToFile">Whether to save the processed data to a cache file.</param>
         /// <param name="group">Optional snapshot group metadata for file naming and organization.</param>
         /// <param name="ignoreProcessedCache">Whether to ignore the processed markets cache and reprocess.</param>
-        /// <returns>A tuple containing final P&L, position, average cost, and various lists of price points for visualization.</returns>
+        /// <returns>A tuple containing final PandL, position, average cost, and various lists of price points for visualization.</returns>
         public async Task<(double finalPnL, int finalPosition, double finalAverageCost, List<PricePoint> bidPoints, List<PricePoint> askPoints,
             List<PricePoint> buyPoints, List<PricePoint> sellPoints, List<PricePoint> exitPoints,
             List<PricePoint> eventPoints, List<PricePoint> intendedLongPoints, List<PricePoint> intendedShortPoints,
@@ -335,7 +335,7 @@ namespace TradingSimulator
         /// <param name="writeToFile">Whether to save the processed data to a cache file.</param>
         /// <param name="progressPrefix">Optional prefix for progress reporting messages.</param>
         /// <param name="group">Optional snapshot group metadata for file naming.</param>
-        /// <returns>A tuple containing final P&L, position, average cost, and various lists of price points for visualization.</returns>
+        /// <returns>A tuple containing final PandL, position, average cost, and various lists of price points for visualization.</returns>
         private async Task<(double, int, double, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>,
             List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>,
             List<PricePoint>, List<PricePoint>, List<PricePoint>, List<PricePoint>)>
@@ -393,8 +393,6 @@ namespace TradingSimulator
         /// <param name="strategiesDict">Dictionary mapping market types to their associated trading strategies.</param>
         /// <param name="progressPrefix">Optional prefix for progress reporting messages.</param>
         /// <param name="writeToFile">Whether to save the processed data to cache files.</param>
-        /// <param name="group">Optional snapshot group metadata for file naming and organization.</param>
-        /// <param name="ignoreProcessedCache">Whether to ignore the processed markets cache and reprocess.</param>
         /// <param name="group">Optional snapshot group metadata for file naming and organization.</param>
         /// <param name="ignoreProcessedCache">Whether to ignore the processed markets cache and reprocess.</param>
         /// <returns>A dictionary mapping market tickers to their processing results.</returns>

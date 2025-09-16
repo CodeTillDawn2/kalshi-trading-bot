@@ -1,4 +1,4 @@
-using BacklashDTOs;
+﻿using BacklashDTOs;
 using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
@@ -47,10 +47,48 @@ namespace BacklashPatterns.PatternDefinitions
         /// Strictest: 0.5 (original), Loosest: 0.7 (allows slightly more trend, per loose indecision logic).
         /// </summary>
         public static double MaxTrendConsistency { get; } = 0.5;
+/// <summary>Gets or sets the BaseName.</summary>
+/// <summary>Gets or sets the BaseName.</summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
         public const string BaseName = "HighWaveCandle";
+/// <summary>
+/// </summary>
         public override string Name => BaseName;
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
         public override double Strength { get; protected set; }
         public override double Certainty { get; protected set; }
+/// <summary>
+/// </summary>
         public override double Uncertainty { get; protected set; }
 
         public HighWaveCandlePattern(List<int> candles) : base(candles)

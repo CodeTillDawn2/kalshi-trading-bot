@@ -3,6 +3,9 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
+    /// <summary>
+    /// Represents a Takuri candlestick pattern.
+    /// </summary>
     public class TakuriPattern : PatternDefinition
     {
         /// <summary>
@@ -40,12 +43,31 @@ namespace BacklashPatterns.PatternDefinitions
         /// Strictest: 0.6 (highly consistent); Loosest: 0.3 (minimally consistent).
         /// </summary>
         public static double MinTrendConsistency { get; set; } = 0.4;
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "Takuri";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the TakuriPattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
         public TakuriPattern(List<int> candles) : base(candles)
         {
         }
@@ -56,6 +78,14 @@ namespace BacklashPatterns.PatternDefinitions
         /// and little to no upper wick. Indicates strong buying pressure after a decline, suggesting a potential reversal.
         /// Source: https://www.babypips.com/learn/forex/takuri-line-candlestick-pattern
         /// </summary>
+        /// <summary>
+        /// Determines if a Takuri pattern exists at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the candle.</param>
+        /// <param name="trendLookback">The trend lookback period.</param>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<TakuriPattern?> IsPatternAsync(
             int index,
             int trendLookback,

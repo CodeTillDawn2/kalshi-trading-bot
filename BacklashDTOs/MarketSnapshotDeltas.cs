@@ -2,9 +2,17 @@ using System.Reflection;
 
 namespace BacklashDTOs
 {
+    /// <summary>
+    /// Represents the delta between two MarketSnapshot instances, tracking which properties have changed.
+    /// </summary>
     public sealed class MarketSnapshotDelta
     {
         private readonly MarketSnapshot _previous;
+        /// <summary>
+        /// Initializes a new instance of the MarketSnapshotDelta class.
+        /// </summary>
+        /// <param name="previous">The previous MarketSnapshot.</param>
+        /// <param name="current">The current MarketSnapshot.</param>
         private readonly MarketSnapshot _current;
         private readonly HashSet<string> _changed;
 
@@ -35,6 +43,10 @@ namespace BacklashDTOs
             return _changed.Contains(prop + "." + named) || _changed.Contains(prop + ".Item" + index1Based.ToString());
         }
 
+        /// <summary>
+        /// Gets the timestamp if it has changed, otherwise null.
+        /// </summary>
+        /// <returns>The timestamp or null if unchanged.</returns>
         public DateTime? Timestamp() => Changed("Timestamp") ? _current.Timestamp : (DateTime?)null;
         public string? MarketTicker() => Changed("MarketTicker") ? _current.MarketTicker : null;
         public string? MarketCategory() => Changed("MarketCategory") ? _current.MarketCategory : null;

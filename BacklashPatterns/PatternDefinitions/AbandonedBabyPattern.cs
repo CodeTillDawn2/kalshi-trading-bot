@@ -38,20 +38,51 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public static double MinRange { get; set; } = 0.5;
 
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "AbandonedBaby";
 
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
         private readonly bool IsBullish;
 
+        /// <summary>
+        /// Initializes a new instance of the AbandonedBabyPattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="isBullish">Whether the pattern is bullish.</param>
         public AbandonedBabyPattern(List<int> candles, CandleMids[] prices,
             double avgVolume, bool isBullish) : base(candles)
         {
             IsBullish = isBullish;
         }
 
+        /// <summary>
+        /// Asynchronously determines if an Abandoned Baby pattern is present at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the third candle.</param>
+        /// <param name="trendLookback">The trend lookback period.</param>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="isBullish">Whether to check for bullish pattern.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<AbandonedBabyPattern?> IsPatternAsync(
             int index,
             int trendLookback,
@@ -111,6 +142,12 @@ namespace BacklashPatterns.PatternDefinitions
         }
 
         // Keeping CalculateStrength as its an addition, not in original
+        /// <summary>
+        /// Calculates the strength of the pattern.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
         public void CalculateStrength(
             Dictionary<int, CandleMetrics> metricsCache,
             CandleMids[] prices,

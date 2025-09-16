@@ -3,6 +3,9 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
+    /// <summary>
+    /// Represents a Tasuki Gap candlestick pattern.
+    /// </summary>
     public class TasukiGapPattern : PatternDefinition
     {
         /// <summary>
@@ -16,13 +19,33 @@ namespace BacklashPatterns.PatternDefinitions
         /// Strictest: 1.0 (clear gap), Loosest: 0.1 (minimal gap).
         /// </summary>
         public static double MinGapSize { get; } = 0.5;
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "TasukiGap";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
         private readonly bool IsBullish;
 
+        /// <summary>
+        /// Initializes a new instance of the TasukiGapPattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
+        /// <param name="isBullish">Whether the pattern is bullish.</param>
         public TasukiGapPattern(List<int> candles, bool isBullish) : base(candles)
         {
             IsBullish = isBullish;
@@ -35,6 +58,15 @@ namespace BacklashPatterns.PatternDefinitions
         /// Indicates continuation of the prior trend after a brief pullback.
         /// Source: https://www.investopedia.com/terms/t/tasukigap.asp
         /// </summary>
+        /// <summary>
+        /// Determines if a Tasuki Gap pattern exists at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the third candle.</param>
+        /// <param name="trendLookback">The trend lookback period.</param>
+        /// <param name="isBullish">Whether to check for bullish pattern.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<TasukiGapPattern?> IsPatternAsync(
             int index,
             int trendLookback,

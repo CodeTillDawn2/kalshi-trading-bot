@@ -3,6 +3,9 @@ using BacklashPatterns;
 using BacklashPatterns.PatternDefinitions;
 using static BacklashPatterns.PatternUtils;
 
+/// <summary>
+/// Represents an Engulfing candlestick pattern.
+/// </summary>
 public class EngulfingPattern : PatternDefinition
 {
     /// <summary>
@@ -16,17 +19,46 @@ public class EngulfingPattern : PatternDefinition
     /// Strictest: 0.7 (highly consistent), Loosest: 0.2 (minimally consistent).
     /// </summary>
     public static double TrendConsistencyThreshold { get; set; } = 0.43;
+    /// <summary>
+    /// Gets the base name of the pattern.
+    /// </summary>
     public const string BaseName = "Engulfing";
+    /// <summary>
+    /// Gets the name of the pattern.
+    /// </summary>
     public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
     private readonly bool IsBullish;
+    /// <summary>
+    /// Gets the strength of the pattern.
+    /// </summary>
     public override double Strength { get; protected set; }
+    /// <summary>
+    /// Gets the certainty of the pattern.
+    /// </summary>
     public override double Certainty { get; protected set; }
+    /// <summary>
+    /// Gets the uncertainty of the pattern.
+    /// </summary>
     public override double Uncertainty { get; protected set; }
+    /// <summary>
+    /// Initializes a new instance of the EngulfingPattern class.
+    /// </summary>
+    /// <param name="candles">The list of candle indices.</param>
+    /// <param name="isBullish">Whether the pattern is bullish.</param>
     public EngulfingPattern(List<int> candles, bool isBullish) : base(candles)
     {
         IsBullish = isBullish;
     }
 
+    /// <summary>
+    /// Asynchronously determines if an Engulfing pattern is present at the specified index.
+    /// </summary>
+    /// <param name="index">The index of the second candle.</param>
+    /// <param name="metricsCache">The metrics cache.</param>
+    /// <param name="prices">The array of candle prices.</param>
+    /// <param name="meanTrend">The mean trend.</param>
+    /// <param name="isBullish">Whether to check for bullish pattern.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
     public static async Task<EngulfingPattern?> IsPatternAsync(
         int index,
         Dictionary<int, CandleMetrics> metricsCache,

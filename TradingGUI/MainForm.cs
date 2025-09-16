@@ -148,6 +148,10 @@ namespace TradingGUI
             // DI setup can be added here if needed in the future
         }
 
+        /// <summary>
+        /// Raises the Load event and initializes strategy controls after the form is fully loaded.
+        /// </summary>
+        /// <param name="e">An EventArgs that contains the event data.</param>
         protected override async void OnLoad(EventArgs e)
         {
             base.OnLoad(e);

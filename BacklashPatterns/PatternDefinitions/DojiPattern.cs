@@ -61,10 +61,28 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public static double TrendDirectionRatioMin { get; set; } = 0.6;
 
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "Doji";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
         /// <summary>

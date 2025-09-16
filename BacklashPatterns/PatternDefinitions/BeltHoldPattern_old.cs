@@ -1,4 +1,4 @@
-using BacklashDTOs;
+﻿using BacklashDTOs;
 using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
@@ -68,12 +68,52 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public static double MinBodySize { get; set; } = 6.0;
 
+/// <summary>Gets or sets the BaseName.</summary>
+/// <summary>Gets or sets the BaseName.</summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
         public const string BaseName = "BeltHold";
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
         private readonly bool IsBullish;
+/// <summary>
+/// </summary>
         public override double Strength { get; protected set; }
         public override double Certainty { get; protected set; }
         public override double Uncertainty { get; protected set; }
+/// <summary>
+/// </summary>
 
         public BeltHoldPattern_old(List<int> candles, bool isBullish) : base(candles)
         {

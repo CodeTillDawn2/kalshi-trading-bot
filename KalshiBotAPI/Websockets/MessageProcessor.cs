@@ -1,4 +1,4 @@
-using KalshiBotAPI.WebSockets.Interfaces;
+﻿using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotAPI.Configuration;
 using Microsoft.Extensions.Logging;
 using BacklashDTOs;
@@ -114,8 +114,44 @@ namespace KalshiBotAPI.Websockets
         private CancellationToken _processingCancellationToken;
         private DateTime _lastMessageTimestamp = DateTime.UtcNow;
 
+/// <summary>Gets or sets the OrderBookReceived.</summary>
+/// <summary>Gets or sets the OrderBookReceived.</summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
         public event EventHandler<OrderBookEventArgs>? OrderBookReceived;
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
         public event EventHandler<TickerEventArgs>? TickerReceived;
+/// <summary>
+/// </summary>
         public event EventHandler<TradeEventArgs>? TradeReceived;
         public event EventHandler<FillEventArgs>? FillReceived;
         public event EventHandler<MarketLifecycleEventArgs>? MarketLifecycleReceived;

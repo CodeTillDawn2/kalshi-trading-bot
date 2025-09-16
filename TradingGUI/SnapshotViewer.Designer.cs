@@ -11,6 +11,10 @@ namespace TradingGUI
         private System.Windows.Forms.ToolTip toolTip1;
         private FormsPlot secondaryChart;
 
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))

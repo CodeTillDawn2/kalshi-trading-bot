@@ -1,8 +1,3 @@
-/// <summary>
-/// Represents the persistent state of a brain instance in the Kalshi trading bot overseer system.
-/// This class encapsulates all the configuration, status, and historical performance data needed
-/// to maintain and restore a brain's operational state across application restarts.
-/// </summary>
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -73,8 +68,9 @@ namespace BacklashOverseer.Models
         }
     }
     /// <summary>
-    /// Core data model for brain persistence, containing configuration settings, operational status,
-    /// and historical performance metrics for a specific brain instance.
+    /// Represents the persistent state of a brain instance in the Kalshi trading bot overseer system.
+    /// This class encapsulates all the configuration, status, and historical performance data needed
+    /// to maintain and restore a brain's operational state across application restarts.
     /// </summary>
     public class BrainPersistence
     {

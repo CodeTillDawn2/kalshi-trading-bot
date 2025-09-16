@@ -13,25 +13,85 @@ namespace TradingSimulator.Simulator
     /// </summary>
     public class AnalysisConfiguration
     {
+        /// <summary>
+        /// Gets or sets the relative slack factor for threshold calculations.
+        /// </summary>
         public double RelativeSlack { get; set; } = 1.5;
+        /// <summary>
+        /// Gets or sets the averaging window in minutes for rolling calculations.
+        /// </summary>
         public double AveragingWindowMin { get; set; } = 5.0;
+        /// <summary>
+        /// Gets or sets the minimum absolute change to flag as a discrepancy.
+        /// </summary>
         public int MinAbsChangeToFlag { get; set; } = 500;
+        /// <summary>
+        /// Gets or sets the exponent for short interval scaling.
+        /// </summary>
         public double ShortIntervalExponent { get; set; } = 0.5;
+        /// <summary>
+        /// Gets or sets the gap threshold in minutes for rolling windows.
+        /// </summary>
         public double GapThresholdMin { get; set; } = 1.5;
+        /// <summary>
+        /// Gets or sets the leakage factor for tolerance calculations.
+        /// </summary>
         public double LeakageFactor { get; set; } = 0.05;
+        /// <summary>
+        /// Gets or sets the Winsorization percentage for outlier handling.
+        /// </summary>
         public double WinsorPct { get; set; } = 0.2;
+        /// <summary>
+        /// Gets or sets whether to use maximum magnitude for threshold calculations.
+        /// </summary>
         public bool UseMaxMagnitudeForThreshold { get; set; } = false;
+        /// <summary>
+        /// Gets or sets the ratio slack for discrepancy detection.
+        /// </summary>
         public double RatioSlack { get; set; } = 0.5;
+        /// <summary>
+        /// Gets or sets whether to hard flag on sign flips.
+        /// </summary>
         public bool HardFlagOnSignFlip { get; set; } = true;
+        /// <summary>
+        /// Gets or sets whether to suppress spike-driven discrepancies.
+        /// </summary>
         public bool SuppressSpikes { get; set; } = true;
+        /// <summary>
+        /// Gets or sets the dominance ratio for spike suppression.
+        /// </summary>
         public double DomRatio { get; set; } = 0.90;
+        /// <summary>
+        /// Gets or sets the gap share for spike suppression.
+        /// </summary>
         public double GapShare { get; set; } = 0.85;
+        /// <summary>
+        /// Gets or sets the edge multiplier for spike detection.
+        /// </summary>
         public double EdgeMult { get; set; } = 8.0;
+        /// <summary>
+        /// Gets or sets the ratio floor for calculations.
+        /// </summary>
         public double RatioFloor { get; set; } = 0.5;
+        /// <summary>
+        /// Gets or sets the directory for log files.
+        /// </summary>
         public string LogDirectory { get; set; } = Path.Combine("..", "..", "..", "..", "..", "TestingOutput");
+        /// <summary>
+        /// Gets or sets the prefix for log file names.
+        /// </summary>
         public string LogFilePrefix { get; set; } = "discrepancies";
+        /// <summary>
+        /// Gets or sets whether to enable parallel processing.
+        /// </summary>
         public bool EnableParallelProcessing { get; set; } = false;
+        /// <summary>
+        /// Gets or sets the maximum degree of parallelism.
+        /// </summary>
         public int MaxDegreeOfParallelism { get; set; } = Environment.ProcessorCount;
+        /// <summary>
+        /// Gets or sets whether to enable performance metrics collection.
+        /// </summary>
         public bool EnablePerformanceMetrics { get; set; } = false;
     }
 

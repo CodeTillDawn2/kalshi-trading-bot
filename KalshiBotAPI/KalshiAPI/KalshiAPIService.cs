@@ -63,7 +63,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// <param name="scopeFactory">Factory for creating service scopes for database operations.</param>
         /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens.</param>
         /// <param name="kalshiConfig">Configuration options specific to Kalshi API integration.</param>
-        /// <param name="centralPerformanceMonitor">Central performance monitor for unified metrics collection.</param>
+        /// <param name="performanceMonitor">Central performance monitor for unified metrics collection.</param>
         public KalshiAPIService(
             ILogger<IKalshiAPIService> logger,
             IConfiguration config,
@@ -310,7 +310,10 @@ namespace KalshiBotAPI.KalshiAPI
                         }
                         catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("Cannot insert duplicate key"))
                         {
-                            stopwatch.Stop();
+                            if (stopwatch != null)
+                            {
+                                stopwatch.Stop();
+                            }
                             _logger.LogWarning(ex, "Duplicate market encountered while saving market data");
                             return (0, 1);
                         }
@@ -447,6 +450,9 @@ namespace KalshiBotAPI.KalshiAPI
         /// <param name="marketTicker">The ticker symbol of the market for which to create the order.</param>
         /// <param name="orderRequest">The order details including action, type, side, count, and pricing information.</param>
         /// <returns>The API response containing order details if successful, null if the operation fails or is cancelled.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when marketTicker is null or empty.</exception>
+        /// <exception cref="ArgumentException">Thrown when required order fields are missing or invalid.</exception>
+        /// <exception cref="HttpRequestException">Thrown when the HTTP request to the API fails.</exception>
         public async Task<CreateOrderResponse?> CreateOrderAsync(string marketTicker, CreateOrderRequest orderRequest)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -522,6 +528,8 @@ namespace KalshiBotAPI.KalshiAPI
         /// </summary>
         /// <param name="orderId">The unique identifier of the order to cancel.</param>
         /// <returns>The API response containing cancellation details if successful, null if the operation fails or is cancelled.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when orderId is null or empty.</exception>
+        /// <exception cref="HttpRequestException">Thrown when the HTTP request to the API fails.</exception>
         public async Task<CancelOrderResponse?> CancelOrderAsync(string orderId)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -578,6 +586,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// </summary>
         /// <param name="seriesTicker">The ticker symbol of the series to retrieve.</param>
         /// <returns>The API response containing series details if successful, null if the operation fails or is cancelled.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when seriesTicker is null or empty.</exception>
         public async Task<SeriesResponse?> FetchSeriesAsync(string seriesTicker)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -673,6 +682,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// <param name="eventTicker">The ticker symbol of the event to retrieve.</param>
         /// <param name="withNestedMarkets">If true, includes detailed market data nested within the event response.</param>
         /// <returns>The API response containing event details if successful, null if the operation fails or is cancelled.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when eventTicker is null or empty.</exception>
         public async Task<EventResponse?> FetchEventAsync(string eventTicker, bool withNestedMarkets = false)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -981,6 +991,8 @@ namespace KalshiBotAPI.KalshiAPI
         /// <param name="endTs">Optional ending timestamp for the data range. If not provided, calculated based on interval.</param>
         /// <param name="updateLastCandlestick">If true and interval is "minute", updates the market's last candlestick timestamp.</param>
         /// <returns>A tuple containing the count of successfully processed candlesticks and the count of errors encountered.</returns>
+        /// <exception cref="ArgumentException">Thrown when interval is invalid.</exception>
+        /// <exception cref="HttpRequestException">Thrown when the HTTP request to the API fails.</exception>
         public async Task<(int ProcessedCount, int ErrorCount)> FetchCandlesticksAsync(
             string seriesTicker,
             string marketTicker,
@@ -1749,6 +1761,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// </summary>
         /// <param name="orderId">The unique identifier of the order to check.</param>
         /// <returns>The order queue position response, or null if the operation fails.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when orderId is null or empty.</exception>
         public async Task<OrderQueuePositionResponse?> GetOrderQueuePositionAsync(string orderId)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1801,6 +1814,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// </summary>
         /// <param name="orderId">The unique identifier of the order to retrieve details for.</param>
         /// <returns>The order details response, or null if the operation fails.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when orderId is null or empty.</exception>
         public async Task<OrderResponse?> GetOrderDetailsAsync(string orderId)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1907,6 +1921,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// </summary>
         /// <param name="request">The batch order request containing the list of orders to create.</param>
         /// <returns>The batch order response containing results for each order, or null if the operation fails.</returns>
+        /// <exception cref="ArgumentException">Thrown when the orders list is null, empty, or contains invalid orders.</exception>
         public async Task<BatchOrdersResponse?> CreateOrdersBatchAsync(BatchOrdersRequest request)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -1965,6 +1980,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// </summary>
         /// <param name="request">The batch delete request containing the list of order IDs to cancel.</param>
         /// <returns>The batch delete response containing results for each order cancellation, or null if the operation fails.</returns>
+        /// <exception cref="ArgumentException">Thrown when the order IDs list is null or empty.</exception>
         public async Task<DeleteOrdersBatchResponse?> DeleteOrdersBatchAsync(DeleteOrdersBatchRequest request)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -2023,6 +2039,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// </summary>
         /// <param name="orderGroupId">The unique identifier of the order group to reset.</param>
         /// <returns>True if the reset operation was successful, false otherwise.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when orderGroupId is null or empty.</exception>
         public async Task<bool> ResetOrderGroupAsync(string orderGroupId)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -2069,6 +2086,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// </summary>
         /// <param name="orderGroupId">The unique identifier of the order group to delete.</param>
         /// <returns>True if the delete operation was successful, false otherwise.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when orderGroupId is null or empty.</exception>
         public async Task<bool> DeleteOrderGroupAsync(string orderGroupId)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -2271,6 +2289,7 @@ namespace KalshiBotAPI.KalshiAPI
         /// </summary>
         /// <param name="eventTicker">The ticker symbol of the event to retrieve metadata for.</param>
         /// <returns>The event metadata response containing additional event information, or null if the operation fails.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when eventTicker is null or empty.</exception>
         public async Task<EventMetadataResponse?> GetEventMetadataAsync(string eventTicker)
         {
             var stopwatch = Stopwatch.StartNew();

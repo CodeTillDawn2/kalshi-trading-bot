@@ -389,17 +389,6 @@ CalculateMarketInterestScoreAsync(
                     return (0.0, (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
                 }
 
-                /// <summary>
-                /// Computes a percentile-based score for a given value using predefined thresholds.
-                /// The scoring system provides higher scores for values in the upper percentiles,
-                /// with a maximum score of 1.0 for values at or above the 99th percentile.
-                /// </summary>
-                /// <param name="value">The value to score.</param>
-                /// <param name="p90">The 90th percentile threshold value.</param>
-                /// <param name="p95">The 95th percentile threshold value.</param>
-                /// <param name="p99">The 99th percentile threshold value.</param>
-                /// <param name="maxValue">The maximum value in the dataset.</param>
-                /// <returns>A normalized score between 0.0 and 1.0 based on percentile ranking.</returns>
                 double ComputePercentileScore(double value, double p90, double p95, double p99, double maxValue)
                 {
                     if (value < p90) return 5 * (value / (p90 != 0 ? p90 : 1)) / 10.0;

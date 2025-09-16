@@ -1,4 +1,4 @@
-using BacklashDTOs;
+ï»¿using BacklashDTOs;
 using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
@@ -29,7 +29,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum body size for the candle relative to the lookback average range.
         /// Purpose: Ensures the candle indicates strong momentum compared to prior volatility.
         /// Default: 1.5 (1.5 times the average range)
-        /// Range: 1.0–2.0 (1.0 for moderate significance, 2.0 for very strong signals).
+        /// Range: 1.0â€“2.0 (1.0 for moderate significance, 2.0 for very strong signals).
         /// </summary>
         public static double MinBodyToAvgRangeRatio { get; set; } = 1.0;
 
@@ -37,12 +37,46 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum trend direction ratio in the lookback period to confirm a prior trend.
         /// Purpose: Ensures a consistent prior trend for continuation/reversal classification.
         /// Default: 0.6 (60% of candles in trend direction)
-        /// Range: 0.5–0.8 (0.5 for moderate consistency, 0.8 for strong, steady trends).
+        /// Range: 0.5â€“0.8 (0.5 for moderate consistency, 0.8 for strong, steady trends).
         /// </summary>
         public static double OptionalTrendDirectionRatioMin { get; set; } = 0.6;
 
+/// <summary>Gets or sets the BaseName.</summary>
+/// <summary>Gets or sets the BaseName.</summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
         public const string BaseName = "ClosingMarubozu";
+/// <summary>
+/// </summary>
         public override string Name => $"{BaseName}_{(IsBullish ? "Bullish" : "Bearish")}{(IsContinuation.HasValue ? (IsContinuation.Value ? "_Continuation" : "_Reversal") : "")}";
+/// <summary>
+/// </summary>
         private readonly bool IsBullish;
         private readonly bool? IsContinuation; // Nullable to allow unclassified cases
         public override double Strength { get; protected set; }

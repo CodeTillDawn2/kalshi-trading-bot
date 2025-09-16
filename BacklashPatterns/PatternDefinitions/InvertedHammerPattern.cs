@@ -58,16 +58,43 @@ namespace BacklashPatterns.PatternDefinitions
         /// Loosest: -0.1 (weak downtrend still valid).
         /// </summary>
         public static double TrendThreshold { get; set; } = -0.3;
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "InvertedHammer";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName;
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the InvertedHammerPattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
         public InvertedHammerPattern(List<int> candles) : base(candles)
         {
         }
 
+        /// <summary>
+        /// Determines if an Inverted Hammer pattern exists at the specified index.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="index">The index of the candle.</param>
+        /// <param name="trendLookback">The trend lookback period.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<InvertedHammerPattern?> IsPatternAsync(
             Dictionary<int, CandleMetrics> metricsCache,
             int index,

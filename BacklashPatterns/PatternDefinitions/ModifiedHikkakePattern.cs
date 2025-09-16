@@ -3,6 +3,9 @@ using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
+    /// <summary>
+    /// Represents a Modified Hikkake candlestick pattern.
+    /// </summary>
     public class ModifiedHikkakePattern : PatternDefinition
     {
         /// <summary>
@@ -11,13 +14,33 @@ namespace BacklashPatterns.PatternDefinitions
         /// - Loosest: 0.0 (any move qualifies, per your original loose definition and Investopedia s flexibility).
         /// </summary>
         public static double BreakoutThreshold { get; } = 0;
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "ModifiedHikkake";
+        /// <summary>
+        /// Gets the name of the pattern.
+        /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
         private readonly bool IsBullish;
 
+        /// <summary>
+        /// Initializes a new instance of the ModifiedHikkakePattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
+        /// <param name="isBullish">Whether the pattern is bullish.</param>
         public ModifiedHikkakePattern(List<int> candles, bool isBullish) : base(candles)
         {
             IsBullish = isBullish;

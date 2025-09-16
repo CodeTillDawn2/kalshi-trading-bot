@@ -1,4 +1,4 @@
-namespace BacklashInterfaces.Enums
+﻿namespace BacklashInterfaces.Enums
 {
     /// <summary>
     /// Contains enumeration types used throughout the trading strategy system
@@ -7,6 +7,9 @@ namespace BacklashInterfaces.Enums
     public class StrategyEnums
     {
 
+        /// <summary>
+        /// Defines different types of market conditions and behaviors for trading strategies.
+        /// </summary>
         public enum MarketType
         {
             /// <summary>
@@ -77,8 +80,11 @@ namespace BacklashInterfaces.Enums
             /// Event-specific market like awards or launches
             /// </summary>
             EventDriven
-        }
 
+        }
+        /// <summary>
+        /// Defines different types of trading actions that can be taken in response to market conditions.
+        /// </summary>
         public enum ActionType
         {
             /// <summary>
@@ -115,6 +121,9 @@ namespace BacklashInterfaces.Enums
             ShortPostYes
         }
 
+        /// <summary>
+        /// Defines different types of comparison operators used in trading strategy conditions.
+        /// </summary>
         public enum ComparisonOperator
         {
             /// <summary>
@@ -147,6 +156,9 @@ namespace BacklashInterfaces.Enums
             NotExists
         }
 
+        /// <summary>
+        /// Defines different types of price movement conditions for trading strategies.
+        /// </summary>
         public enum Conditions_PriceMovement
         {
             /// <summary>
@@ -167,6 +179,9 @@ namespace BacklashInterfaces.Enums
             Stable
         }
 
+        /// <summary>
+        /// Defines different levels of market liquidity conditions for trading strategies.
+        /// </summary>
         public enum Conditions_Liquidity
         {
             /// <summary>
@@ -183,6 +198,9 @@ namespace BacklashInterfaces.Enums
             Moderate
         }
 
+        /// <summary>
+        /// Defines different time-based conditions relative to market closing for trading strategies.
+        /// </summary>
         public enum Conditions_ClosingTime
         {
             /// <summary>
@@ -199,6 +217,9 @@ namespace BacklashInterfaces.Enums
             Imminent
         }
 
+        /// <summary>
+        /// Defines different levels of market activity conditions for trading strategies.
+        /// </summary>
         public enum Conditions_ActivityLevel
         {
             /// <summary>
@@ -215,19 +236,25 @@ namespace BacklashInterfaces.Enums
             Moderate
         }
 
+        /// <summary>
+        /// Defines different levels of market uncertainty conditions for trading strategies.
+        /// </summary>
         public enum Conditions_UncertaintySignal
         {
             /// <summary>
             /// Outcome is unclear or highly uncertain
             /// </summary>
             High,
+/// <summary>Gets or sets the Conditions_MarketCategory.</summary>
             /// <summary>
             /// Outcome is relatively clear or certain
             /// </summary>
             Low
         }
 
-
+        /// <summary>
+        /// Defines different categories of markets for trading strategies.
+        /// </summary>
         public enum Conditions_MarketCategory
         {
             /// <summary>

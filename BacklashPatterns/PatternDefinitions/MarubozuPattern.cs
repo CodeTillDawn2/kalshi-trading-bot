@@ -1,28 +1,81 @@
-using BacklashDTOs;
+﻿using BacklashDTOs;
 using static BacklashPatterns.PatternUtils;
 
 namespace BacklashPatterns.PatternDefinitions
 {
+/// <summary>MarubozuPattern</summary>
+/// <summary>MarubozuPattern</summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
+/// <summary>
+/// </summary>
     public class MarubozuPattern : PatternDefinition
+/// <summary>
+/// </summary>
     {
         /// <summary>
         /// Minimum total range for the candle to be considered significant.
         /// Loosest: 1.0 (allows smaller significant moves); Strictest: 5.0 (requires large moves).
         /// </summary>
         public static double MinRange { get; } = 3.0;
+/// <summary>
+/// </summary>
 
         /// <summary>
         /// Threshold for trend strength to validate prior trend context.
         /// Loosest: 0.1 (very weak trend); Strictest: 0.8 (strong trend required).
         /// </summary>
         public static double TrendThreshold { get; } = 0.5;
+/// <summary>
+/// </summary>
+        /// <summary>
+        /// Gets the base name of the pattern.
+        /// </summary>
         public const string BaseName = "Marubozu";
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the strength of the pattern.
+        /// </summary>
         public override double Strength { get; protected set; }
+        /// <summary>
+        /// Gets the certainty of the pattern.
+        /// </summary>
         public override double Certainty { get; protected set; }
+        /// <summary>
+        /// Gets the uncertainty of the pattern.
+        /// </summary>
         public override double Uncertainty { get; protected set; }
         private readonly bool IsBullish;
 
+        /// <summary>
+        /// Initializes a new instance of the MarubozuPattern class.
+        /// </summary>
+        /// <param name="candles">The list of candle indices.</param>
+        /// <param name="isBullish">Whether the pattern is bullish.</param>
         public MarubozuPattern(List<int> candles, bool isBullish) : base(candles)
         {
             IsBullish = isBullish;

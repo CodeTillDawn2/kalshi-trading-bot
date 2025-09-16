@@ -84,7 +84,6 @@ namespace TradingSimulator
         private Mock<ILogger<ITradingSnapshotService>> _snapshotLoggerMock;
         private Mock<ILogger<IInterestScoreService>> _interestScoreLoggerMock;
         private Mock<ILogger<TradingStrategy<MarketSnapshot>>> _strategyLoggerMock;
-        private Mock<ILogger<TradingOverseer>> _overseerLoggerMock;
         private IOptions<SnapshotConfig> _snapshotOptions;
         private IOptions<TradingConfig> _tradingOptions;
         private IServiceScopeFactory _scopeFactory;

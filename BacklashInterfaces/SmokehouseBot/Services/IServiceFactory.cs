@@ -1,4 +1,4 @@
-using KalshiBotAPI.WebSockets.Interfaces;
+﻿using KalshiBotAPI.WebSockets.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.State.Interfaces;
 using TradingStrategies.Helpers.Interfaces;
