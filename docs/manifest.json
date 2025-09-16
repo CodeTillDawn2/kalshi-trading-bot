@@ -148,7 +148,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.KalshiAPI.Interfaces.IKalshiAPIService.yml\" sourcestartlinenumber=\"1\">Interface for interacting with the Kalshi API to fetch market data, positions, orders, and other trading information.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -246,7 +246,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Management.Interfaces.IBrainStatusService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.IBrainStatusService.yml\" sourcestartlinenumber=\"1\">IBrainStatusService</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -260,7 +260,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Management.Interfaces.ICentralBrain",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.ICentralBrain.yml\" sourcestartlinenumber=\"1\">ICentralBrain</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -274,7 +274,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Management.Interfaces.ICentralErrorHandler",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.ICentralErrorHandler.yml\" sourcestartlinenumber=\"1\">ICentralErrorHandler</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -288,7 +288,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Management.Interfaces.ICentralPerformanceMonitor",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.yml\" sourcestartlinenumber=\"1\">ICentralPerformanceMonitor</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -302,7 +302,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Management.Interfaces.IInterestScoreService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.IInterestScoreService.yml\" sourcestartlinenumber=\"1\">IInterestScoreService</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -316,7 +316,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Management.Interfaces.IMarketAnalysisHelper",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.IMarketAnalysisHelper.yml\" sourcestartlinenumber=\"1\">IMarketAnalysisHelper</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -330,7 +330,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Management.Interfaces.IMarketManagerService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.IMarketManagerService.yml\" sourcestartlinenumber=\"1\">IMarketManagerService</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -344,7 +344,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Management.Interfaces.IOvernightActivitiesHelper",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.IOvernightActivitiesHelper.yml\" sourcestartlinenumber=\"1\">IOvernightActivitiesHelper</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -498,7 +498,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.BroadcastService",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Services.BroadcastService.yml\" sourcestartlinenumber=\"1\">Implements the broadcast service for real-time system status communication.\nHandles periodic broadcasting of comprehensive system health data to connected clients\nincluding performance metrics, market information, and operational status.</p>\n"
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.BroadcastService.yml\" sourcestartlinenumber=\"1\">Service responsible for broadcasting system status and health information to connected SignalR clients.\nManages periodic check-in broadcasts at configurable intervals containing brain instance status, market data, performance metrics,\nand system health indicators to keep monitoring systems and dashboards updated.\nIncludes retry logic for failed SignalR sends and performance metrics collection.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -554,7 +554,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.Interfaces.IBroadcastService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.Interfaces.IBroadcastService.yml\" sourcestartlinenumber=\"1\">IBroadcastService</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -582,7 +582,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.Interfaces.IMarketDataInitializer",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.Interfaces.IMarketDataInitializer.yml\" sourcestartlinenumber=\"1\">IMarketDataInitializer</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -596,7 +596,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.Interfaces.IMarketDataService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.Interfaces.IMarketDataService.yml\" sourcestartlinenumber=\"1\">IMarketDataService</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -610,7 +610,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.Interfaces.IMarketRefreshService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.Interfaces.IMarketRefreshService.yml\" sourcestartlinenumber=\"1\">IMarketRefreshService</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -624,7 +624,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.Interfaces.IOrderBookService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.Interfaces.IOrderBookService.yml\" sourcestartlinenumber=\"1\">IOrderBookService</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -638,7 +638,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.Interfaces.IOrderbookChangeTracker",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.Interfaces.IOrderbookChangeTracker.yml\" sourcestartlinenumber=\"1\">IOrderbookChangeTracker</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -652,7 +652,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.Interfaces.IScopeManagerService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.Interfaces.IScopeManagerService.yml\" sourcestartlinenumber=\"1\">IScopeManagerService</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -680,7 +680,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.Interfaces.ISqlDataService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.Interfaces.ISqlDataService.yml\" sourcestartlinenumber=\"1\">ISqlDataService</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -694,7 +694,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Services.Interfaces.ITradingSnapshotService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.Services.Interfaces.ITradingSnapshotService.yml\" sourcestartlinenumber=\"1\">ITradingSnapshotService</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -932,7 +932,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.State.Interfaces.IBotReadyStatus",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.State.Interfaces.IBotReadyStatus.yml\" sourcestartlinenumber=\"1\">IBotReadyStatus</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -946,7 +946,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.State.Interfaces.IDataCache",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.State.Interfaces.IDataCache.yml\" sourcestartlinenumber=\"1\">IDataCache</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -974,7 +974,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.State.Interfaces.IStatusTrackerService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashBot.State.Interfaces.IStatusTrackerService.yml\" sourcestartlinenumber=\"1\">IStatusTrackerService</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -1072,6 +1072,48 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Timers",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBotData.Data.Interfaces.IBacklashBotContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBotData.Data.Interfaces.IBacklashBotContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBotData.Data.Interfaces.IBacklashBotContext",
+      "Summary": "<p sourcefile=\"api/BacklashBotData.Data.Interfaces.IBacklashBotContext.yml\" sourcestartlinenumber=\"1\">Interface for the BacklashBot database context providing access to various data entities and operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBotData.Data.Interfaces.IDatabasePerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBotData.Data.Interfaces.IDatabasePerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBotData.Data.Interfaces.IDatabasePerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/BacklashBotData.Data.Interfaces.IDatabasePerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Interface for accessing database performance metrics from different monitoring services.\nThis allows the KalshiBotContext to post metrics to the appropriate service based on the project.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBotData.Data.Interfaces.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBotData.Data.Interfaces.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBotData.Data.Interfaces",
       "Summary": null
     },
     {
@@ -2794,7 +2836,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashDTOs.MarketSnapshotDelta",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashDTOs.MarketSnapshotDelta.yml\" sourcestartlinenumber=\"1\">Represents the delta between two MarketSnapshot instances, tracking which properties have changed.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3102,7 +3144,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.Enums.StrategyEnums.ActionType",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Enums.StrategyEnums.ActionType.yml\" sourcestartlinenumber=\"1\">Defines different types of trading actions that can be taken in response to market conditions.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3116,7 +3158,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Enums.StrategyEnums.ComparisonOperator.yml\" sourcestartlinenumber=\"1\">Defines different types of comparison operators used in trading strategy conditions.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3130,7 +3172,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.Enums.StrategyEnums.Conditions_ActivityLevel",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Enums.StrategyEnums.Conditions_ActivityLevel.yml\" sourcestartlinenumber=\"1\">Defines different levels of market activity conditions for trading strategies.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3144,7 +3186,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.Enums.StrategyEnums.Conditions_ClosingTime",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Enums.StrategyEnums.Conditions_ClosingTime.yml\" sourcestartlinenumber=\"1\">Defines different time-based conditions relative to market closing for trading strategies.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3158,7 +3200,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.Enums.StrategyEnums.Conditions_Liquidity",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Enums.StrategyEnums.Conditions_Liquidity.yml\" sourcestartlinenumber=\"1\">Defines different levels of market liquidity conditions for trading strategies.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3172,7 +3214,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.Enums.StrategyEnums.Conditions_MarketCategory",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Enums.StrategyEnums.Conditions_MarketCategory.yml\" sourcestartlinenumber=\"1\">Defines different categories of markets for trading strategies.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3186,7 +3228,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.Enums.StrategyEnums.Conditions_PriceMovement",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Enums.StrategyEnums.Conditions_PriceMovement.yml\" sourcestartlinenumber=\"1\">Defines different types of price movement conditions for trading strategies.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3200,7 +3242,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.Enums.StrategyEnums.Conditions_UncertaintySignal",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Enums.StrategyEnums.Conditions_UncertaintySignal.yml\" sourcestartlinenumber=\"1\">Defines different levels of market uncertainty conditions for trading strategies.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3214,7 +3256,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.Enums.StrategyEnums.MarketType",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.Enums.StrategyEnums.MarketType.yml\" sourcestartlinenumber=\"1\">Defines different types of market conditions and behaviors for trading strategies.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3396,7 +3438,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.SmokehouseBot.Services.IOverseerClientService",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.SmokehouseBot.Services.IOverseerClientService.yml\" sourcestartlinenumber=\"1\">Interface for overseeing client service operations in the trading bot system.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3438,6 +3480,370 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.SmokehouseBot.Timers",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.CheckInData.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.CheckInData.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.CheckInData",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.CheckInData.yml\" sourcestartlinenumber=\"1\">Data structure containing comprehensive information about a brain instance's current state,\nused during periodic check-in operations to report status to the overseer system.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Controllers.MarketWatchController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Controllers.MarketWatchController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Controllers.MarketWatchController",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Controllers.MarketWatchController.yml\" sourcestartlinenumber=\"1\">ASP.NET Core Web API controller that provides endpoints for retrieving market watch data,\nbrain instance locks, trading positions, orders, account information, and snapshot data.\nThis controller serves as the primary interface for the Kalshi trading bot's monitoring and\ndata retrieval operations, utilizing caching for performance optimization and integrating\nwith database and external API services. Includes configurable performance metrics tracking\nfor cache operations and system monitoring.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Controllers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Controllers.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Controllers",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Models.BrainPersistence.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Models.BrainPersistence.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Models.BrainPersistence",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Models.BrainPersistence.yml\" sourcestartlinenumber=\"1\">Represents the persistent state of a brain instance in the Kalshi trading bot overseer system.\nThis class encapsulates all the configuration, status, and historical performance data needed\nto maintain and restore a brain's operational state across application restarts.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Models.BrainPersistenceDefaults.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Models.BrainPersistenceDefaults.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Models.BrainPersistenceDefaults",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Models.BrainPersistenceDefaults.yml\" sourcestartlinenumber=\"1\">Configuration class for default values used in BrainPersistence initialization.\nProvides centralized configuration options that can be loaded from appsettings.json.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Models.BrainStatusData.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Models.BrainStatusData.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Models.BrainStatusData",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Models.BrainStatusData.yml\" sourcestartlinenumber=\"1\">Data transfer object representing the current status and configuration of a brain instance.\nUsed for communication between the brain and overseer systems, containing real-time\noperational data, performance metrics, and market watch information.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Models.MarketWatchData.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Models.MarketWatchData.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Models.MarketWatchData",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Models.MarketWatchData.yml\" sourcestartlinenumber=\"1\">Contains detailed information about a market being watched by a brain instance.\nIncludes interest scoring data, watch history, and performance metrics for the specific market.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Models.MetricHistory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Models.MetricHistory.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Models.MetricHistory",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Models.MetricHistory.yml\" sourcestartlinenumber=\"1\">Represents a single historical data point for a performance metric.\nUsed to track time-series data for various system performance indicators.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Models.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Models.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Models",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Overseer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Overseer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Overseer",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Overseer.yml\" sourcestartlinenumber=\"1\">Central orchestrator for the KalshiBot Overseer system that manages WebSocket connections,\nhandles real-time market data events, coordinates periodic data fetching, and maintains\nsystem health monitoring. This class serves as the main entry point for overseer operations,\nintegrating with WebSocket clients, database services, and SignalR hubs to provide\ncomprehensive monitoring and control of the trading bot ecosystem.</p>\n<p sourcefile=\"api/BacklashOverseer.Overseer.yml\" sourcestartlinenumber=\"7\">Key features:</p>\n<ul sourcefile=\"api/BacklashOverseer.Overseer.yml\" sourcestartlinenumber=\"8\">\n<li sourcefile=\"api/BacklashOverseer.Overseer.yml\" sourcestartlinenumber=\"8\">Configurable API fetch intervals (default: 10 minutes)</li>\n<li sourcefile=\"api/BacklashOverseer.Overseer.yml\" sourcestartlinenumber=\"9\">Configurable system info logging intervals (default: 1 minute)</li>\n<li sourcefile=\"api/BacklashOverseer.Overseer.yml\" sourcestartlinenumber=\"10\">Performance metrics collection for WebSocket events and API operations</li>\n<li sourcefile=\"api/BacklashOverseer.Overseer.yml\" sourcestartlinenumber=\"11\">Input validation for event data processing to prevent null reference exceptions</li>\n<li sourcefile=\"api/BacklashOverseer.Overseer.yml\" sourcestartlinenumber=\"12\">Progress reporting for long-running API fetch operations</li>\n<li sourcefile=\"api/BacklashOverseer.Overseer.yml\" sourcestartlinenumber=\"13\">Batch processing for brain persistence logging (default batch size: 50)</li>\n<li sourcefile=\"api/BacklashOverseer.Overseer.yml\" sourcestartlinenumber=\"14\">Configurable SignalR broadcast batch sizes (default: 10)</li>\n</ul>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.OverseerConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.OverseerConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.OverseerConfig",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.OverseerConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the Overseer system.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.OverseerHub.ClientInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.OverseerHub.ClientInfo.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.OverseerHub.ClientInfo",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.OverseerHub.ClientInfo.yml\" sourcestartlinenumber=\"1\">Represents information about a connected client, including identification,\nconnection details, and last activity timestamp.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.OverseerHub.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.OverseerHub.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.OverseerHub",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.OverseerHub.yml\" sourcestartlinenumber=\"1\">SignalR hub that manages real-time communication between the Kalshi trading bot overseer\nand connected clients. This hub handles client connections, authentication via handshakes,\nperiodic status check-ins from brain instances, and broadcasting of trading data and updates.\nIt serves as the central communication point for the overseer system, enabling real-time\nmonitoring and control of trading bot operations.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.OverseerHubConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.OverseerHubConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.OverseerHubConfig",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.OverseerHubConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the OverseerHub SignalR hub.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Services.BrainPersistenceService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Services.BrainPersistenceService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Services.BrainPersistenceService",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Services.BrainPersistenceService.yml\" sourcestartlinenumber=\"1\">Service responsible for managing brain instance states with configurable persistence options.\nThis service provides thread-safe operations for storing, retrieving, and updating brain\nconfiguration, market watch lists, and performance metrics history. It supports both\nin-memory storage and optional database persistence for recovery after application restarts.\nThe service includes configurable history retention, performance metrics collection,\nbatch operations, and comprehensive health monitoring.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Services.BrainPersistenceServiceConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Services.BrainPersistenceServiceConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Services.BrainPersistenceServiceConfig",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Services.BrainPersistenceServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the BrainPersistenceService.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Services.PerformanceMetricsService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Services.PerformanceMetricsService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Services.PerformanceMetricsService",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Services.PerformanceMetricsService.yml\" sourcestartlinenumber=\"1\">Centralized service for collecting and managing performance metrics across the KalshiBot Overseer system.\nThis service aggregates metrics from various components including WebSocket operations, API calls,\nSignalR communications, overnight tasks, and snapshot processing.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Services.SnapshotAggregationService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Services.SnapshotAggregationService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Services.SnapshotAggregationService",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Services.SnapshotAggregationService.yml\" sourcestartlinenumber=\"1\">Provides services for retrieving and processing snapshot group data from the database.\nThis service aggregates snapshot groups by market ticker, calculates recorded hours,\nmarket hours, and recorded hours percentages, and returns structured data for analysis.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Services.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Services.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Services",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Startup.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Startup.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Startup",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Startup.yml\" sourcestartlinenumber=\"1\">Configures services and the request pipeline for the BacklashOverseer application.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.State.OverseerReadyConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.State.OverseerReadyConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.State.OverseerReadyConfig",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.State.OverseerReadyConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for OverseerReadyStatus default states.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.State.OverseerReadyStatus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.State.OverseerReadyStatus.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.State.OverseerReadyStatus",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.State.OverseerReadyStatus.yml\" sourcestartlinenumber=\"1\">Manages the readiness status of different components within the Kalshi overseer system.\nThis class provides TaskCompletionSource objects to signal when various parts of the overseer\nhave completed their initialization or are ready for operation, with comprehensive logging and metrics.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.State.OverseerStatusTracker.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.State.OverseerStatusTracker.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.State.OverseerStatusTracker",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.State.OverseerStatusTracker.yml\" sourcestartlinenumber=\"1\">Manages the global cancellation state for the Kalshi overseer system.\nThis class provides a centralized CancellationTokenSource that can be used to coordinate\ngraceful shutdown and cancellation across all components of the overseer.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.State.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.State.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.State",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.WebSocketMonitorServiceLite.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.WebSocketMonitorServiceLite.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.WebSocketMonitorServiceLite",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.WebSocketMonitorServiceLite.yml\" sourcestartlinenumber=\"1\">Lightweight service for monitoring WebSocket connections and exchange status.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer",
       "Summary": null
     },
     {
@@ -3550,7 +3956,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.WebSockets.Interfaces.IKalshiWebSocketClient.yml\" sourcestartlinenumber=\"1\">IKalshiWebSocketClient</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3564,7 +3970,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.WebSockets.Interfaces.IMessageProcessor.yml\" sourcestartlinenumber=\"1\">IMessageProcessor</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3578,7 +3984,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "KalshiBotAPI.WebSockets.Interfaces.ISubscriptionManager",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/KalshiBotAPI.WebSockets.Interfaces.ISubscriptionManager.yml\" sourcestartlinenumber=\"1\">ISubscriptionManager</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3680,1280 +4086,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Data.Interfaces.IDatabasePerformanceMetrics.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Data.Interfaces.IDatabasePerformanceMetrics.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Data.Interfaces.IDatabasePerformanceMetrics",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Data.Interfaces.IDatabasePerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Interface for accessing database performance metrics from different monitoring services.\nThis allows the KalshiBotContext to post metrics to the appropriate service based on the project.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Data.Interfaces.IKalshiBotContext.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Data.Interfaces.IKalshiBotContext.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Data.Interfaces.IKalshiBotContext",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Data.Interfaces.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Data.Interfaces.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Data.Interfaces",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Data.KalshiBotContext.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Data.KalshiBotContext.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Data.KalshiBotContext",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Data.KalshiBotContext.yml\" sourcestartlinenumber=\"1\">Entity Framework DbContext implementation for the Kalshi trading bot system.\nProvides comprehensive data access layer for managing trading entities including markets,\nevents, series, snapshots, brain instances, and various trading-related data.\nImplements IKalshiBotContext interface for dependency injection and testing.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Data.SqlDataService.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Data.SqlDataService.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Data.SqlDataService",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Data.SqlDataService.yml\" sourcestartlinenumber=\"1\">Provides asynchronous data persistence services for real-time market data from Kalshi's trading platform.\nThis service manages concurrent queues for different data types (order book, trades, fills, lifecycle events)\nand processes them using configurable background worker tasks with retry logic for transient SQL errors.\nSupports batch processing, performance metrics collection, input validation, and configurable queue sizes\nto prevent resource exhaustion. Implements the ISqlDataService interface for dependency injection and proper resource management.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Data.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Data.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Data",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.AnnouncementExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.AnnouncementExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.AnnouncementExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.AnnouncementExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Announcement model and AnnouncementDTO,\nenabling seamless data transfer between the database layer and external interfaces.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.BrainInstanceExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.BrainInstanceExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.BrainInstanceExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.BrainInstanceExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between BrainInstance model and BrainInstanceDTO,\nfacilitating data transfer for brain instance management and monitoring operations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.CandlestickExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.CandlestickExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.CandlestickExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.CandlestickExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Candlestick model and CandlestickDTO,\nsupporting market data analysis and historical price information transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.EventExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.EventExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.EventExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.EventExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Event model and EventDTO,\nhandling event data transfer including associated series information.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.ExchangeScheduleExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.ExchangeScheduleExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.ExchangeScheduleExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.ExchangeScheduleExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between ExchangeSchedule model and ExchangeScheduleDTO,\nincluding nested maintenance windows and standard hours collections for comprehensive schedule data transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.ExtensionConfiguration.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.ExtensionConfiguration.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.ExtensionConfiguration",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.ExtensionConfiguration.yml\" sourcestartlinenumber=\"1\">Configuration class for extension methods, providing customizable options\nfor timestamp handling and other extension behaviors.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.LogEntryExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.LogEntryExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.LogEntryExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.LogEntryExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between LogEntry models and DTOs,\nsupporting both standard log entries and overseer-specific log entry variants for comprehensive logging data transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.MaintenanceWindowExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.MaintenanceWindowExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.MaintenanceWindowExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MaintenanceWindowExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between MaintenanceWindow model and MaintenanceWindowDTO,\nsupporting exchange maintenance schedule data transfer operations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.MarketExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.MarketExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.MarketExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MarketExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Market model and MarketDTO,\nsupporting comprehensive market data transfer including trading information and associated events.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.MarketPositionExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.MarketPositionExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.MarketPositionExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MarketPositionExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between MarketPosition model and MarketPositionDTO,\nsupporting trading position data transfer and portfolio management operations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.MarketWatchExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.MarketWatchExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.MarketWatchExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.MarketWatchExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between MarketWatch model and MarketWatchDTO,\nsupporting market monitoring and interest scoring data transfer operations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.OrderExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.OrderExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.OrderExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.OrderExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Order model and OrderDTO,\nsupporting comprehensive order management and trading operation data transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.SeriesExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.SeriesExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.SeriesExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SeriesExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Series model and SeriesDTO,\nincluding nested tags and settlement sources for comprehensive series data transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.SeriesSettlementSourceExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SeriesSettlementSourceExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SeriesSettlementSource model and SeriesSettlementSourceDTO,\nsupporting settlement source data transfer for series validation and reference.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.SeriesTagExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.SeriesTagExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.SeriesTagExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SeriesTagExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SeriesTag model and SeriesTagDTO,\nsupporting series categorization and tagging data transfer operations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.SnapshotExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.SnapshotExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.SnapshotExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SnapshotExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Snapshot model and SnapshotDTO,\nsupporting market snapshot data transfer for analysis and historical record keeping.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.SnapshotGroupExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.SnapshotGroupExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.SnapshotGroupExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SnapshotGroupExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SnapshotGroup model and SnapshotGroupDTO,\nsupporting grouped snapshot data transfer for market analysis over time periods.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.SnapshotSchemaExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.SnapshotSchemaExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.SnapshotSchemaExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.SnapshotSchemaExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between SnapshotSchema model and SnapshotSchemaDTO,\nsupporting schema versioning and definition data transfer for snapshot validation.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.StandardHoursExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.StandardHoursExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.StandardHoursExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.StandardHoursExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between StandardHours model and StandardHoursDTO,\nincluding nested sessions collection for comprehensive exchange hours data transfer.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.StandardHoursSessionExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.StandardHoursSessionExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.StandardHoursSessionExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.StandardHoursSessionExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between StandardHoursSession model and StandardHoursSessionDTO,\nsupporting individual session data transfer within exchange standard hours.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.TickerExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.TickerExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.TickerExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.TickerExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between Ticker model and TickerDTO,\nsupporting real-time market ticker data transfer and price information updates.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.WeightSetExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.WeightSetExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.WeightSetExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.WeightSetExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between WeightSet model and WeightSetDTO,\nsupporting trading strategy weight configuration data transfer and management.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.WeightSetMarketExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.WeightSetMarketExtensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions.WeightSetMarketExtensions",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Extensions.WeightSetMarketExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for converting between WeightSetMarket model and WeightSetMarketDTO,\nsupporting market-specific performance tracking within weight set configurations.\nIncludes performance metrics collection and batch transformation capabilities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Extensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Extensions.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Extensions",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.Announcement.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.Announcement.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.Announcement",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.Announcement.yml\" sourcestartlinenumber=\"1\">Represents a system announcement or notification in the Kalshi trading bot ecosystem.\nThis entity stores important messages, alerts, or updates that need to be communicated\nto users or other system components. Announcements can have different types and statuses\nto categorize their importance and delivery state.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.BrainInstance.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.BrainInstance.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.BrainInstance",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.BrainInstance.yml\" sourcestartlinenumber=\"1\">Represents a brain instance configuration and operational state in the trading bot system.\nThis entity manages the settings and runtime state for individual brain instances that\nexecute trading strategies, monitor markets, and capture snapshots. Each brain instance\ncan have different configurations for market watching, position tracking, and resource usage.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.BrainPersistenceEntity.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.BrainPersistenceEntity.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.BrainPersistenceEntity",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.BrainPersistenceEntity.yml\" sourcestartlinenumber=\"1\">Database entity for storing BrainPersistence data.\nUses JSON serialization to store complex nested objects.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.Candlestick.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.Candlestick.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.Candlestick",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.Event.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.Event.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.Event",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.EventLifecycle.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.EventLifecycle.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.EventLifecycle",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.EventLifecycle.yml\" sourcestartlinenumber=\"1\">Represents the complete lifecycle state and timing information for a trading event in the Kalshi system.\nThis entity tracks the progression of an event from opening to settlement, including all critical\ntimestamps and state changes. It serves as the authoritative source for event status and timing\nused throughout the trading bot for market state management and strategy execution.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.ExchangeSchedule.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.ExchangeSchedule.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.ExchangeSchedule",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.ExchangeSchedule.yml\" sourcestartlinenumber=\"1\">Represents the operational schedule and maintenance configuration for the Kalshi exchange.\nThis entity manages the overall timing and availability of the trading platform, including\nregular operating hours and scheduled maintenance periods. It serves as the master schedule\nthat coordinates all trading activities and system maintenance across the platform.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.Fill.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.Fill.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.Fill",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.Fill.yml\" sourcestartlinenumber=\"1\">Represents a trade execution (fill) in the Kalshi trading system.\nThis entity captures the details of individual trade executions, including pricing,\nquantity, and market information. Fills are generated when orders are matched\nand executed in the market, providing a complete audit trail of all trading activity.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.LogEntry.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.LogEntry.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.LogEntry",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.LogEntry.yml\" sourcestartlinenumber=\"1\">Represents a structured log entry in the Kalshi trading bot system.\nThis entity captures comprehensive logging information including severity levels,\ncontextual data, and system state for debugging and monitoring purposes.\nLog entries are used throughout the system for troubleshooting, performance monitoring,\nand maintaining an audit trail of system activities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.MaintenanceWindow.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.MaintenanceWindow.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.MaintenanceWindow",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.MaintenanceWindow.yml\" sourcestartlinenumber=\"1\">Represents a scheduled maintenance window for the Kalshi exchange.\nThis entity defines periods when the exchange is unavailable for trading due to\nplanned maintenance, upgrades, or system updates. Maintenance windows are critical\nfor coordinating system downtime and ensuring trading bots can react appropriately\nto planned service interruptions.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.Market.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.Market.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.Market",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.Market.yml\" sourcestartlinenumber=\"1\">Represents a tradable market with comprehensive pricing, volume, and status information.\nThis entity serves as the core data model for all market-related operations in the trading bot,\ncontaining real-time and historical market data, order book information, and market metadata.\nMaps to the Markets database table and is central to the trading system's data model.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.MarketPosition.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.MarketPosition.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.MarketPosition",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.MarketPosition.yml\" sourcestartlinenumber=\"1\">Represents the current trading position and performance metrics for a specific market.\nThis entity tracks real-time position information including exposure, P&amp;L, and order status\nfor individual markets. It serves as the primary source of position data for risk management,\nperformance monitoring, and trading decision making throughout the bot system.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.MarketType.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.MarketType.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.MarketType",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.MarketType.yml\" sourcestartlinenumber=\"1\">Represents a category or type classification for markets in the Kalshi trading system.\nThis entity provides a way to group and categorize different types of trading markets\nbased on their characteristics, such as binary outcome markets, range markets, or\nother specialized market types. Market types help in filtering, analysis, and\napplying different trading strategies based on market characteristics.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.MarketWatch.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.MarketWatch.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.MarketWatch",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.MarketWatch.yml\" sourcestartlinenumber=\"1\">Represents the watch status and monitoring configuration for a specific market.\nThis entity tracks which markets are being actively monitored by the trading bot,\nincluding interest scores, brain instance assignments, and activity metrics.\nMarketWatch entities are crucial for managing the bot's market coverage and\noptimizing resource allocation across different trading opportunities.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.Order.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.Order.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.Order",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.Order.yml\" sourcestartlinenumber=\"1\">Represents a trading order in the Kalshi system with comprehensive execution tracking.\nThis entity captures all aspects of an order's lifecycle including pricing, status,\nexecution details, and performance metrics. Orders are the fundamental unit of trading\nactivity and this entity provides complete visibility into order management and execution.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.OverseerLogEntry.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.OverseerLogEntry.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.OverseerLogEntry",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.OverseerLogEntry.yml\" sourcestartlinenumber=\"1\">Represents a log entry from the overseer system for monitoring and debugging.\nThis entity stores detailed logging information from the overseer component,\nincluding error details, environment context, and session tracking.\nMaps to the t_OverseerLogs database table.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.Series.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.Series.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.Series",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.SeriesSettlementSource.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.SeriesSettlementSource.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.SeriesSettlementSource",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.SeriesSettlementSource.yml\" sourcestartlinenumber=\"1\">Represents a settlement source reference for a trading series.\nThis entity links a series to external data sources that will be used to\ndetermine the final outcome and settlement value of the series contracts.\nSettlement sources provide the authoritative data that resolves the market\nand determines payouts to winning positions.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.SeriesTag.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.SeriesTag.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.SeriesTag",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.SeriesTag.yml\" sourcestartlinenumber=\"1\">Represents a tag or category label associated with a trading series.\nThis entity provides a flexible tagging system for categorizing and organizing\ntrading series based on various characteristics such as market type, theme,\nor other classification criteria. Tags enable efficient filtering and discovery\nof series with similar attributes.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.SignalRClient.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.SignalRClient.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.SignalRClient",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.SignalRClient.yml\" sourcestartlinenumber=\"1\">Represents a client connected to the system via SignalR for real-time communication.\nThis entity tracks client connections, authentication, and connection state for\nmanaging real-time data distribution to dashboards, overseer systems, and other\nconnected clients. It enables secure, authenticated real-time communication\nbetween the trading bot system and its clients.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.Snapshot.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.Snapshot.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.Snapshot",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.Snapshot.yml\" sourcestartlinenumber=\"1\">Represents a comprehensive snapshot of market state and trading activity at a specific point in time.\nThis entity captures detailed market data including pricing, volume, velocity metrics, and order book\ninformation for analysis, backtesting, and trading strategy evaluation. Snapshots serve as the\nprimary data structure for understanding market behavior and making informed trading decisions.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.SnapshotGroup.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.SnapshotGroup.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.SnapshotGroup",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.SnapshotSchema.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.SnapshotSchema.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.SnapshotSchema",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.SnapshotSchema.yml\" sourcestartlinenumber=\"1\">Represents the schema definition and versioning for market snapshots.\nThis entity defines the structure and format of snapshot data, ensuring\nconsistency and compatibility across different versions of the system.\nSchema definitions are crucial for data validation, migration, and\nmaintaining backward compatibility as the snapshot format evolves.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.StandardHours.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.StandardHours.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.StandardHours",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.StandardHours.yml\" sourcestartlinenumber=\"1\">Represents the standard operating hours configuration for the Kalshi exchange.\nThis entity defines the regular trading schedule and time periods when the exchange\nis open for business. Standard hours are used to coordinate trading activities,\nschedule maintenance, and ensure proper market operation timing across the platform.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.StandardHoursSession.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.StandardHoursSession.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.StandardHoursSession",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.StandardHoursSession.yml\" sourcestartlinenumber=\"1\">Represents a specific session within the standard operating hours of the Kalshi exchange.\nThis entity defines individual time periods on specific days when trading is active.\nSessions allow for flexible scheduling where different days may have different trading\nwindows, and multiple sessions can exist within a single day's operating hours.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.StratData.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.StratData.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.StratData",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.StratData.yml\" sourcestartlinenumber=\"1\">Represents strategy configuration and metadata for trading strategies in the Kalshi bot system.\nThis entity stores the definition and parameters of trading strategies, allowing for\nflexible strategy management and execution. Strategies can be stored as JSON configurations\nand instantiated dynamically based on market conditions and trading requirements.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.Ticker.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.Ticker.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.Ticker",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.Ticker.yml\" sourcestartlinenumber=\"1\">Represents real-time ticker data for a Kalshi market, capturing price and volume information at a specific point in time.\nThis entity stores the most recent market data including bid/ask prices, trading volume, and open interest.\nTicker data is crucial for real-time trading decisions and market analysis, providing the current state\nof market pricing and liquidity for individual contracts.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.Trade.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.Trade.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.Trade",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.Trade.yml\" sourcestartlinenumber=\"1\">Represents a completed trade execution in the Kalshi market.\nThis entity captures the details of individual trades including pricing,\nquantity, and market information. Trades are the fundamental records of\nmarket activity and provide the basis for volume analysis, price discovery,\nand market trend identification.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.WeightSet.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.WeightSet.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.WeightSet",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.WeightSet.yml\" sourcestartlinenumber=\"1\">Represents a set of trading weights for portfolio optimization and strategy allocation.\nThis entity defines how trading capital and resources should be distributed across\ndifferent markets and strategies. Weight sets enable sophisticated portfolio management\nby allowing dynamic allocation based on market conditions, risk parameters, and\nperformance metrics.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.WeightSetMarket.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.WeightSetMarket.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models.WeightSetMarket",
-      "Summary": "<p sourcefile=\"api/KalshiBotData.Models.WeightSetMarket.yml\" sourcestartlinenumber=\"1\">Represents the market-specific allocation and performance data within a weight set.\nThis entity defines how individual markets are weighted within a portfolio strategy,\ntracking both the allocation percentage and the realized performance. It enables\ngranular control over portfolio composition and performance attribution at the\nmarket level.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotData.Models.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotData.Models.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotData.Models",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotLogging.DatabaseLogger.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotLogging.DatabaseLogger.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotLogging.DatabaseLogger",
-      "Summary": "<p sourcefile=\"api/KalshiBotLogging.DatabaseLogger.yml\" sourcestartlinenumber=\"1\">Custom logger implementation that integrates with the KalshiBot logging infrastructure.\nThis logger provides comprehensive logging functionality by:</p>\n<ul sourcefile=\"api/KalshiBotLogging.DatabaseLogger.yml\" sourcestartlinenumber=\"3\">\n<li sourcefile=\"api/KalshiBotLogging.DatabaseLogger.yml\" sourcestartlinenumber=\"3\">Formatting log messages and outputting them to the console for immediate developer visibility (configurable verbosity)</li>\n<li sourcefile=\"api/KalshiBotLogging.DatabaseLogger.yml\" sourcestartlinenumber=\"4\">Enqueuing log entries for asynchronous database storage via the DatabaseLoggingQueue with batching support</li>\n<li sourcefile=\"api/KalshiBotLogging.DatabaseLogger.yml\" sourcestartlinenumber=\"5\">Forwarding warnings and errors to the error handler for centralized error management</li>\n<li sourcefile=\"api/KalshiBotLogging.DatabaseLogger.yml\" sourcestartlinenumber=\"6\">Supporting dynamic configuration for environment-specific settings including min log levels</li>\n<li sourcefile=\"api/KalshiBotLogging.DatabaseLogger.yml\" sourcestartlinenumber=\"7\">Maintaining structured logging with consistent metadata across all log entries</li>\n<li sourcefile=\"api/KalshiBotLogging.DatabaseLogger.yml\" sourcestartlinenumber=\"8\">Providing metrics and monitoring for queue depth and processing performance</li>\n</ul>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotLogging.DatabaseLoggerProvider.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotLogging.DatabaseLoggerProvider.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotLogging.DatabaseLoggerProvider",
-      "Summary": "<p sourcefile=\"api/KalshiBotLogging.DatabaseLoggerProvider.yml\" sourcestartlinenumber=\"1\">Provides logging to a database via a queue.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotLogging.DatabaseLoggingQueue.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotLogging.DatabaseLoggingQueue.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotLogging.DatabaseLoggingQueue",
-      "Summary": "<p sourcefile=\"api/KalshiBotLogging.DatabaseLoggingQueue.yml\" sourcestartlinenumber=\"1\">Background service that asynchronously processes log entries from a concurrent queue\nand persists them to the database with batching support for improved performance.\nAlso manages error handler queues for warnings and errors.\nSupports both regular application logging and overseer-specific logging contexts.\nProvides metrics and monitoring for queue depth and processing performance.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotLogging.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotLogging.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotLogging",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.CheckInData.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.CheckInData.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.CheckInData",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.CheckInData.yml\" sourcestartlinenumber=\"1\">Data structure containing comprehensive information about a brain instance's current state,\nused during periodic check-in operations to report status to the overseer system.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Controllers.MarketWatchController.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Controllers.MarketWatchController.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Controllers.MarketWatchController",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Controllers.MarketWatchController.yml\" sourcestartlinenumber=\"1\">ASP.NET Core Web API controller that provides endpoints for retrieving market watch data,\nbrain instance locks, trading positions, orders, account information, and snapshot data.\nThis controller serves as the primary interface for the Kalshi trading bot's monitoring and\ndata retrieval operations, utilizing caching for performance optimization and integrating\nwith database and external API services. Includes configurable performance metrics tracking\nfor cache operations and system monitoring.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Controllers.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Controllers.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Controllers",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Models.BrainPersistence.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Models.BrainPersistence.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Models.BrainPersistence",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Models.BrainPersistence.yml\" sourcestartlinenumber=\"1\">Core data model for brain persistence, containing configuration settings, operational status,\nand historical performance metrics for a specific brain instance.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Models.BrainPersistenceDefaults.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Models.BrainPersistenceDefaults.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Models.BrainPersistenceDefaults",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Models.BrainPersistenceDefaults.yml\" sourcestartlinenumber=\"1\">Configuration class for default values used in BrainPersistence initialization.\nProvides centralized configuration options that can be loaded from appsettings.json.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Models.BrainStatusData.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Models.BrainStatusData.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Models.BrainStatusData",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Models.BrainStatusData.yml\" sourcestartlinenumber=\"1\">Data transfer object representing the current status and configuration of a brain instance.\nUsed for communication between the brain and overseer systems, containing real-time\noperational data, performance metrics, and market watch information.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Models.MarketWatchData.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Models.MarketWatchData.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Models.MarketWatchData",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Models.MarketWatchData.yml\" sourcestartlinenumber=\"1\">Contains detailed information about a market being watched by a brain instance.\nIncludes interest scoring data, watch history, and performance metrics for the specific market.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Models.MetricHistory.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Models.MetricHistory.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Models.MetricHistory",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Models.MetricHistory.yml\" sourcestartlinenumber=\"1\">Represents a single historical data point for a performance metric.\nUsed to track time-series data for various system performance indicators.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Models.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Models.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Models",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Overseer.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Overseer.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Overseer",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"1\">Central orchestrator for the KalshiBot Overseer system that manages WebSocket connections,\nhandles real-time market data events, coordinates periodic data fetching, and maintains\nsystem health monitoring. This class serves as the main entry point for overseer operations,\nintegrating with WebSocket clients, database services, and SignalR hubs to provide\ncomprehensive monitoring and control of the trading bot ecosystem.</p>\n<p sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"7\">Key features:</p>\n<ul sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"8\">\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"8\">Configurable API fetch intervals (default: 10 minutes)</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"9\">Configurable system info logging intervals (default: 1 minute)</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"10\">Performance metrics collection for WebSocket events and API operations</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"11\">Input validation for event data processing to prevent null reference exceptions</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"12\">Progress reporting for long-running API fetch operations</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"13\">Batch processing for brain persistence logging (default batch size: 50)</li>\n<li sourcefile=\"api/KalshiBotOverseer.Overseer.yml\" sourcestartlinenumber=\"14\">Configurable SignalR broadcast batch sizes (default: 10)</li>\n</ul>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.OverseerConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.OverseerConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.OverseerConfig",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.OverseerConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the Overseer system.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.OverseerHub.ClientInfo.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.OverseerHub.ClientInfo.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.OverseerHub.ClientInfo",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.OverseerHub.ClientInfo.yml\" sourcestartlinenumber=\"1\">Represents information about a connected client, including identification,\nconnection details, and last activity timestamp.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.OverseerHub.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.OverseerHub.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.OverseerHub",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.OverseerHub.yml\" sourcestartlinenumber=\"1\">SignalR hub that manages real-time communication between the Kalshi trading bot overseer\nand connected clients. This hub handles client connections, authentication via handshakes,\nperiodic status check-ins from brain instances, and broadcasting of trading data and updates.\nIt serves as the central communication point for the overseer system, enabling real-time\nmonitoring and control of trading bot operations.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.OverseerHubConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.OverseerHubConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.OverseerHubConfig",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.OverseerHubConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the OverseerHub SignalR hub.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Services.BrainPersistenceService.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Services.BrainPersistenceService.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Services.BrainPersistenceService",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Services.BrainPersistenceService.yml\" sourcestartlinenumber=\"1\">Service responsible for managing brain instance states with configurable persistence options.\nThis service provides thread-safe operations for storing, retrieving, and updating brain\nconfiguration, market watch lists, and performance metrics history. It supports both\nin-memory storage and optional database persistence for recovery after application restarts.\nThe service includes configurable history retention, performance metrics collection,\nbatch operations, and comprehensive health monitoring.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Services.BrainPersistenceServiceConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Services.BrainPersistenceServiceConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Services.BrainPersistenceServiceConfig",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Services.BrainPersistenceServiceConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the BrainPersistenceService.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Services.PerformanceMetricsService.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Services.PerformanceMetricsService.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Services.PerformanceMetricsService",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Services.PerformanceMetricsService.yml\" sourcestartlinenumber=\"1\">Centralized service for collecting and managing performance metrics across the KalshiBot Overseer system.\nThis service aggregates metrics from various components including WebSocket operations, API calls,\nSignalR communications, overnight tasks, and snapshot processing.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Services.SnapshotAggregationService.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Services.SnapshotAggregationService.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Services.SnapshotAggregationService",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Services.SnapshotAggregationService.yml\" sourcestartlinenumber=\"1\">Provides services for retrieving and processing snapshot group data from the database.\nThis service aggregates snapshot groups by market ticker, calculates recorded hours,\nmarket hours, and recorded hours percentages, and returns structured data for analysis.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Services.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Services.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Services",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.Startup.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.Startup.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.Startup",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.Startup.yml\" sourcestartlinenumber=\"1\">Configures services and the request pipeline for the KalshiBotOverseer application.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.State.OverseerReadyConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.State.OverseerReadyConfig.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.State.OverseerReadyConfig",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.State.OverseerReadyConfig.yml\" sourcestartlinenumber=\"1\">Configuration class for OverseerReadyStatus default states.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.State.OverseerReadyStatus.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.State.OverseerReadyStatus.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.State.OverseerReadyStatus",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.State.OverseerReadyStatus.yml\" sourcestartlinenumber=\"1\">Manages the readiness status of different components within the Kalshi overseer system.\nThis class provides TaskCompletionSource objects to signal when various parts of the overseer\nhave completed their initialization or are ready for operation, with comprehensive logging and metrics.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.State.OverseerStatusTracker.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.State.OverseerStatusTracker.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.State.OverseerStatusTracker",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.State.OverseerStatusTracker.yml\" sourcestartlinenumber=\"1\">Manages the global cancellation state for the Kalshi overseer system.\nThis class provides a centralized CancellationTokenSource that can be used to coordinate\ngraceful shutdown and cancellation across all components of the overseer.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.State.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.State.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.State",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.WebSocketMonitorServiceLite.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.WebSocketMonitorServiceLite.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer.WebSocketMonitorServiceLite",
-      "Summary": "<p sourcefile=\"api/KalshiBotOverseer.WebSocketMonitorServiceLite.yml\" sourcestartlinenumber=\"1\">Lightweight service for monitoring WebSocket connections and exchange status.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/KalshiBotOverseer.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/KalshiBotOverseer.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "KalshiBotOverseer",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/TradingSimulator.CachedMarketData.yml",
       "output": {
         ".html": {
@@ -4978,7 +4110,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingSimulator.DataLoader",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/TradingSimulator.DataLoader.yml\" sourcestartlinenumber=\"1\">Provides functionality for loading and filtering market snapshot data for the trading simulator.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5356,7 +4488,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Classification.Interfaces.ISnapshotPeriodHelper",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Classification.Interfaces.ISnapshotPeriodHelper.yml\" sourcestartlinenumber=\"1\">ISnapshotPeriodHelper</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5524,7 +4656,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Helpers.Interfaces.ITradingCalculator",
-      "Summary": null
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Helpers.Interfaces.ITradingCalculator.yml\" sourcestartlinenumber=\"1\">ITradingCalculator</p>\n"
     },
     {
       "type": "ManagedReference",

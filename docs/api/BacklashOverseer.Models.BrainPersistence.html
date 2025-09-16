@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class BrainPersistence | Kalshi Trading Bot Documentation </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class BrainPersistence | Kalshi Trading Bot Documentation ">
+    
+    <meta name="description" content="Represents the persistent state of a brain instance in the Kalshi trading bot overseer system. This class encapsulates all the configuration, status, and historical performance data needed to maintain and restore a brain&#39;s operational state across application restarts.">
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle" data-toggle="collapse" href="#sidetoggle" aria-expanded="true" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BacklashOverseer.Models.BrainPersistence">
+
+
+
+  <h1 id="BacklashOverseer_Models_BrainPersistence" data-uid="BacklashOverseer.Models.BrainPersistence" class="text-break">Class BrainPersistence</h1>
+  <div class="markdown level0 summary"><p>Represents the persistent state of a brain instance in the Kalshi trading bot overseer system.
+This class encapsulates all the configuration, status, and historical performance data needed
+to maintain and restore a brain's operational state across application restarts.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">BrainPersistence</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="BacklashOverseer.html">BacklashOverseer</a>.<a class="xref" href="BacklashOverseer.Models.html">Models</a></h6>
+  <h6><strong>Assembly</strong>: BacklashOverseer.dll</h6>
+  <h5 id="BacklashOverseer_Models_BrainPersistence_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class BrainPersistence</code></pre>
+  </div>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_Brain.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.Brain%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L89">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_Brain_" data-uid="BacklashOverseer.Models.BrainPersistence.Brain*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_Brain" data-uid="BacklashOverseer.Models.BrainPersistence.Brain">Brain</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the unique GUID identifier for the brain.
+May be null if the brain hasn't been assigned an ID yet.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Guid? Brain { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_BrainInstanceName.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.BrainInstanceName%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L81">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_BrainInstanceName_" data-uid="BacklashOverseer.Models.BrainPersistence.BrainInstanceName*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_BrainInstanceName" data-uid="BacklashOverseer.Models.BrainPersistence.BrainInstanceName">BrainInstanceName</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the unique name identifier for this brain instance.
+Used as the primary key for brain management and persistence operations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;brainInstanceName&quot;)]
+public required string BrainInstanceName { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_CaptureSnapshots.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.CaptureSnapshots%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L113">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_CaptureSnapshots_" data-uid="BacklashOverseer.Models.BrainPersistence.CaptureSnapshots*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_CaptureSnapshots" data-uid="BacklashOverseer.Models.BrainPersistence.CaptureSnapshots">CaptureSnapshots</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether market snapshots should be captured.
+Snapshots provide point-in-time views of market state for analysis and backtesting.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool CaptureSnapshots { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_CpuUsageHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.CpuUsageHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L210">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_CpuUsageHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.CpuUsageHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_CpuUsageHistory" data-uid="BacklashOverseer.Models.BrainPersistence.CpuUsageHistory">CpuUsageHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking CPU usage over time.
+Used for performance analysis and resource optimization decisions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;cpuUsageHistory&quot;)]
+public List&lt;MetricHistory&gt; CpuUsageHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_CurrentMarketTickers.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.CurrentMarketTickers%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L157">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_CurrentMarketTickers_" data-uid="BacklashOverseer.Models.BrainPersistence.CurrentMarketTickers*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_CurrentMarketTickers" data-uid="BacklashOverseer.Models.BrainPersistence.CurrentMarketTickers">CurrentMarketTickers</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the list of market tickers currently being watched by this brain.
+Represents the active market watch list at any given time.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;currentMarketTickers&quot;)]
+public List&lt;string&gt; CurrentMarketTickers { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_ErrorCount.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.ErrorCount%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L192">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_ErrorCount_" data-uid="BacklashOverseer.Models.BrainPersistence.ErrorCount*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_ErrorCount" data-uid="BacklashOverseer.Models.BrainPersistence.ErrorCount">ErrorCount</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the total count of errors encountered by this brain instance.
+Used for monitoring system health and triggering error recovery procedures.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long ErrorCount { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_ErrorHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.ErrorHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L258">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_ErrorHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.ErrorHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_ErrorHistory" data-uid="BacklashOverseer.Models.BrainPersistence.ErrorHistory">ErrorHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking error counts over time.
+Used to identify patterns in system instability and recovery effectiveness.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;errorHistory&quot;)]
+public List&lt;MetricHistory&gt; ErrorHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_EventQueueHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.EventQueueHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L218">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_EventQueueHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.EventQueueHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_EventQueueHistory" data-uid="BacklashOverseer.Models.BrainPersistence.EventQueueHistory">EventQueueHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking event queue depth over time.
+Used to monitor system load and identify potential bottlenecks.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;eventQueueHistory&quot;)]
+public List&lt;MetricHistory&gt; EventQueueHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_IsShuttingDown.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.IsShuttingDown%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L186">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_IsShuttingDown_" data-uid="BacklashOverseer.Models.BrainPersistence.IsShuttingDown*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_IsShuttingDown" data-uid="BacklashOverseer.Models.BrainPersistence.IsShuttingDown">IsShuttingDown</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this brain instance is currently shutting down.
+Used to coordinate graceful shutdown and prevent new operations during teardown.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsShuttingDown { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_IsStartingUp.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.IsStartingUp%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L180">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_IsStartingUp_" data-uid="BacklashOverseer.Models.BrainPersistence.IsStartingUp*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_IsStartingUp" data-uid="BacklashOverseer.Models.BrainPersistence.IsStartingUp">IsStartingUp</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this brain instance is currently starting up.
+Used to track initialization state and prevent premature operations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsStartingUp { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_IsWebSocketConnected.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.IsWebSocketConnected%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L204">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_IsWebSocketConnected_" data-uid="BacklashOverseer.Models.BrainPersistence.IsWebSocketConnected*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_IsWebSocketConnected" data-uid="BacklashOverseer.Models.BrainPersistence.IsWebSocketConnected">IsWebSocketConnected</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this brain's WebSocket connection is currently active.
+Critical for real-time data streaming and market monitoring capabilities.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsWebSocketConnected { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_LastRefreshTimeAcceptable.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.LastRefreshTimeAcceptable%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L306">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_LastRefreshTimeAcceptable_" data-uid="BacklashOverseer.Models.BrainPersistence.LastRefreshTimeAcceptable*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_LastRefreshTimeAcceptable" data-uid="BacklashOverseer.Models.BrainPersistence.LastRefreshTimeAcceptable">LastRefreshTimeAcceptable</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the last refresh cycle completed within acceptable time limits.
+Used to monitor system performance and trigger optimization measures when needed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool LastRefreshTimeAcceptable { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_LastSeen.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.LastSeen%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L151">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_LastSeen_" data-uid="BacklashOverseer.Models.BrainPersistence.LastSeen*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_LastSeen" data-uid="BacklashOverseer.Models.BrainPersistence.LastSeen">LastSeen</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the timestamp of the last time this brain instance was seen or checked in.
+Used to determine if the brain is still active and responsive.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DateTime? LastSeen { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_LastSnapshot.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.LastSnapshot%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L198">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_LastSnapshot_" data-uid="BacklashOverseer.Models.BrainPersistence.LastSnapshot*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_LastSnapshot" data-uid="BacklashOverseer.Models.BrainPersistence.LastSnapshot">LastSnapshot</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the timestamp of the last snapshot taken by this brain instance.
+Used to track snapshot frequency and ensure regular data capture.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DateTime? LastSnapshot { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_ManagedWatchList.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.ManagedWatchList%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L107">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_ManagedWatchList_" data-uid="BacklashOverseer.Models.BrainPersistence.ManagedWatchList*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_ManagedWatchList" data-uid="BacklashOverseer.Models.BrainPersistence.ManagedWatchList">ManagedWatchList</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the market watch list should be managed automatically.
+When enabled, the brain will dynamically add/remove markets based on interest scores and performance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ManagedWatchList { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_MarketCountHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.MarketCountHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L250">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_MarketCountHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.MarketCountHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_MarketCountHistory" data-uid="BacklashOverseer.Models.BrainPersistence.MarketCountHistory">MarketCountHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking the number of markets being watched over time.
+Used to analyze market coverage trends and optimization effectiveness.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;marketCountHistory&quot;)]
+public List&lt;MetricHistory&gt; MarketCountHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_MinimumInterest.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.MinimumInterest%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L127">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_MinimumInterest_" data-uid="BacklashOverseer.Models.BrainPersistence.MinimumInterest*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_MinimumInterest" data-uid="BacklashOverseer.Models.BrainPersistence.MinimumInterest">MinimumInterest</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the minimum interest score required for a market to be considered for watching.
+Markets below this threshold will not be added to the watch list.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Range(0, 1.7976931348623157E+308)]
+[JsonPropertyName(&quot;minimumInterest&quot;)]
+public double MinimumInterest { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_Mode.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.Mode%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L173">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_Mode_" data-uid="BacklashOverseer.Models.BrainPersistence.Mode*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_Mode" data-uid="BacklashOverseer.Models.BrainPersistence.Mode">Mode</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the operational mode of this brain instance.
+Defaults to &quot;Autonomous&quot; but can be set to other modes like &quot;Manual&quot; or &quot;Simulation&quot;.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[JsonPropertyName(&quot;mode&quot;)]
+public string Mode { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_NotificationQueueHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.NotificationQueueHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L234">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_NotificationQueueHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.NotificationQueueHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_NotificationQueueHistory" data-uid="BacklashOverseer.Models.BrainPersistence.NotificationQueueHistory">NotificationQueueHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking notification queue depth over time.
+Used to monitor alert and notification processing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;notificationQueueHistory&quot;)]
+public List&lt;MetricHistory&gt; NotificationQueueHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_OrderbookQueueHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.OrderbookQueueHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L242">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_OrderbookQueueHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.OrderbookQueueHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_OrderbookQueueHistory" data-uid="BacklashOverseer.Models.BrainPersistence.OrderbookQueueHistory">OrderbookQueueHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking order book queue depth over time.
+Used to monitor order book update processing efficiency.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;orderbookQueueHistory&quot;)]
+public List&lt;MetricHistory&gt; OrderbookQueueHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_PerformanceSampleDateHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.PerformanceSampleDateHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L298">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_PerformanceSampleDateHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.PerformanceSampleDateHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_PerformanceSampleDateHistory" data-uid="BacklashOverseer.Models.BrainPersistence.PerformanceSampleDateHistory">PerformanceSampleDateHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking the dates of performance samples over time.
+Used to maintain chronological context for performance analysis.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;performanceSampleDateHistory&quot;)]
+public List&lt;MetricHistory&gt; PerformanceSampleDateHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_RefreshCycleIntervalHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.RefreshCycleIntervalHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L274">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_RefreshCycleIntervalHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.RefreshCycleIntervalHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_RefreshCycleIntervalHistory" data-uid="BacklashOverseer.Models.BrainPersistence.RefreshCycleIntervalHistory">RefreshCycleIntervalHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking refresh cycle intervals over time.
+Used to ensure consistent and timely market data updates.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;refreshCycleIntervalHistory&quot;)]
+public List&lt;MetricHistory&gt; RefreshCycleIntervalHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_RefreshCycleSecondsHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.RefreshCycleSecondsHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L266">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_RefreshCycleSecondsHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.RefreshCycleSecondsHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_RefreshCycleSecondsHistory" data-uid="BacklashOverseer.Models.BrainPersistence.RefreshCycleSecondsHistory">RefreshCycleSecondsHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking refresh cycle duration in seconds over time.
+Used to monitor and optimize market data refresh performance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;refreshCycleSecondsHistory&quot;)]
+public List&lt;MetricHistory&gt; RefreshCycleSecondsHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_RefreshMarketCountHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.RefreshMarketCountHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L282">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_RefreshMarketCountHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.RefreshMarketCountHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_RefreshMarketCountHistory" data-uid="BacklashOverseer.Models.BrainPersistence.RefreshMarketCountHistory">RefreshMarketCountHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking the number of markets refreshed per cycle over time.
+Used to monitor refresh efficiency and system throughput.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;refreshMarketCountHistory&quot;)]
+public List&lt;MetricHistory&gt; RefreshMarketCountHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_RefreshUsagePercentageHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.RefreshUsagePercentageHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L290">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_RefreshUsagePercentageHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.RefreshUsagePercentageHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_RefreshUsagePercentageHistory" data-uid="BacklashOverseer.Models.BrainPersistence.RefreshUsagePercentageHistory">RefreshUsagePercentageHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking CPU usage percentage during refresh cycles over time.
+Used to correlate resource usage with system performance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;refreshUsagePercentageHistory&quot;)]
+public List&lt;MetricHistory&gt; RefreshUsagePercentageHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_TargetMarketTickers.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.TargetMarketTickers%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L165">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_TargetMarketTickers_" data-uid="BacklashOverseer.Models.BrainPersistence.TargetMarketTickers*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_TargetMarketTickers" data-uid="BacklashOverseer.Models.BrainPersistence.TargetMarketTickers">TargetMarketTickers</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the list of market tickers targeted for watching by this brain.
+Represents the desired market watch list, which may differ from current during transitions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;targetMarketTickers&quot;)]
+public List&lt;string&gt; TargetMarketTickers { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_TargetWatches.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.TargetWatches%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L119">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_TargetWatches_" data-uid="BacklashOverseer.Models.BrainPersistence.TargetWatches*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_TargetWatches" data-uid="BacklashOverseer.Models.BrainPersistence.TargetWatches">TargetWatches</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the target number of markets this brain should actively watch.
+Used by the market management system to determine optimal watch list size.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Range(0, 2147483647)]
+[JsonPropertyName(&quot;targetWatches&quot;)]
+public int TargetWatches { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_TickerQueueHistory.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.TickerQueueHistory%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L226">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_TickerQueueHistory_" data-uid="BacklashOverseer.Models.BrainPersistence.TickerQueueHistory*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_TickerQueueHistory" data-uid="BacklashOverseer.Models.BrainPersistence.TickerQueueHistory">TickerQueueHistory</h4>
+  <div class="markdown level1 summary"><p>Historical performance metrics tracking ticker queue depth over time.
+Used to monitor market data processing efficiency.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Required]
+[JsonPropertyName(&quot;tickerQueueHistory&quot;)]
+public List&lt;MetricHistory&gt; TickerQueueHistory { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="BacklashOverseer.Models.MetricHistory.html">MetricHistory</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_UsageMax.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.UsageMax%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L143">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_UsageMax_" data-uid="BacklashOverseer.Models.BrainPersistence.UsageMax*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_UsageMax" data-uid="BacklashOverseer.Models.BrainPersistence.UsageMax">UsageMax</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the maximum CPU usage threshold for this brain instance.
+Used for performance monitoring and resource allocation decisions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Range(0, 100)]
+[JsonPropertyName(&quot;usageMax&quot;)]
+public double UsageMax { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_UsageMin.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.UsageMin%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L135">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_UsageMin_" data-uid="BacklashOverseer.Models.BrainPersistence.UsageMin*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_UsageMin" data-uid="BacklashOverseer.Models.BrainPersistence.UsageMin">UsageMin</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the minimum CPU usage threshold for this brain instance.
+Used for performance monitoring and resource allocation decisions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Range(0, 100)]
+[JsonPropertyName(&quot;usageMin&quot;)]
+public double UsageMin { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_WatchOrders.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.WatchOrders%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L101">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_WatchOrders_" data-uid="BacklashOverseer.Models.BrainPersistence.WatchOrders*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_WatchOrders" data-uid="BacklashOverseer.Models.BrainPersistence.WatchOrders">WatchOrders</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this brain should monitor order changes.
+When enabled, the brain will track order placements, fills, and cancellations.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool WatchOrders { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_WatchPositions.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.WatchPositions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L95">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_WatchPositions_" data-uid="BacklashOverseer.Models.BrainPersistence.WatchPositions*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_WatchPositions" data-uid="BacklashOverseer.Models.BrainPersistence.WatchPositions">WatchPositions</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this brain should monitor position changes.
+When enabled, the brain will track and respond to position updates in watched markets.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool WatchPositions { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_Clone.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.Clone%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L313">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_Clone_" data-uid="BacklashOverseer.Models.BrainPersistence.Clone*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_Clone" data-uid="BacklashOverseer.Models.BrainPersistence.Clone">Clone()</h4>
+  <div class="markdown level1 summary"><p>Creates a deep clone of this BrainPersistence instance.
+Uses JSON serialization for safe copying of complex nested objects.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BrainPersistence Clone()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashOverseer.Models.BrainPersistence.html">BrainPersistence</a></td>
+        <td><p>A new BrainPersistence instance with all properties deeply cloned.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_DeserializeWithMetrics_System_String_.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.DeserializeWithMetrics(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L336">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_DeserializeWithMetrics_" data-uid="BacklashOverseer.Models.BrainPersistence.DeserializeWithMetrics*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_DeserializeWithMetrics_System_String_" data-uid="BacklashOverseer.Models.BrainPersistence.DeserializeWithMetrics(System.String)">DeserializeWithMetrics(string)</h4>
+  <div class="markdown level1 summary"><p>Deserializes a JSON string to BrainPersistence with performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static (BrainPersistence Instance, long Milliseconds) DeserializeWithMetrics(string json)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">json</span></td>
+        <td><p>The JSON string to deserialize.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="BacklashOverseer.Models.BrainPersistence.html">BrainPersistence</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-backlashoverseer.models.brainpersistence,system.int64-.instance">Instance</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-backlashoverseer.models.brainpersistence,system.int64-.milliseconds">Milliseconds</a>)</td>
+        <td><p>A tuple containing the deserialized instance and the deserialization time in milliseconds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence_SerializeWithMetrics.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence.SerializeWithMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L323">View Source</a>
+  </span>
+  <a id="BacklashOverseer_Models_BrainPersistence_SerializeWithMetrics_" data-uid="BacklashOverseer.Models.BrainPersistence.SerializeWithMetrics*"></a>
+  <h4 id="BacklashOverseer_Models_BrainPersistence_SerializeWithMetrics" data-uid="BacklashOverseer.Models.BrainPersistence.SerializeWithMetrics">SerializeWithMetrics()</h4>
+  <div class="markdown level1 summary"><p>Serializes this BrainPersistence instance to JSON with performance metrics.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (string Json, long Milliseconds) SerializeWithMetrics()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.int64-.json">Json</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.string,system.int64-.milliseconds">Milliseconds</a>)</td>
+        <td><p>A tuple containing the JSON string and the serialization time in milliseconds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_Models_BrainPersistence.md&amp;value=---%0Auid%3A%20BacklashOverseer.Models.BrainPersistence%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/Models/BrainPersistence.cs/#L75" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      Generated by DocFX
+      
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

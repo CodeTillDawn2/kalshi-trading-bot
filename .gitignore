@@ -162,3 +162,4 @@ SimulatorGUI/SimulatorGUI.csproj.Backup.tmp
 BacklashBot/Logs/shutodown.log
 /TradingGUI/.vs
 /PatternsTest
+!docs/**

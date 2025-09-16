@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Class BroadcastService | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Implements the broadcast service for real-time system status communication. Handles periodic broadcasting of comprehensive system health data to connected clients including performance metrics, market information, and operational status.">
+    <meta name="description" content="Service responsible for broadcasting system status and health information to connected SignalR clients. Manages periodic check-in broadcasts at configurable intervals containing brain instance status, market data, performance metrics, and system health indicators to keep monitoring systems and dashboards updated. Includes retry logic for failed SignalR sends and performance metrics collection.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,9 +81,10 @@
 
 
   <h1 id="BacklashBot_Services_BroadcastService" data-uid="BacklashBot.Services.BroadcastService" class="text-break">Class BroadcastService</h1>
-  <div class="markdown level0 summary"><p>Implements the broadcast service for real-time system status communication.
-Handles periodic broadcasting of comprehensive system health data to connected clients
-including performance metrics, market information, and operational status.</p>
+  <div class="markdown level0 summary"><p>Service responsible for broadcasting system status and health information to connected SignalR clients.
+Manages periodic check-in broadcasts at configurable intervals containing brain instance status, market data, performance metrics,
+and system health indicators to keep monitoring systems and dashboards updated.
+Includes retry logic for failed SignalR sends and performance metrics collection.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
@@ -133,7 +134,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService__ctor_Microsoft_AspNetCore_SignalR_IHubContext_BacklashBot_Hubs_BacklashBotHub__BacklashBot_Services_Interfaces_IServiceFactory_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IBroadcastService__BacklashBot_Services_Interfaces_IScopeManagerService_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.%23ctor(Microsoft.AspNetCore.SignalR.IHubContext%7BBacklashBot.Hubs.BacklashBotHub%7D%2CBacklashBot.Services.Interfaces.IServiceFactory%2CBacklashBot.State.Interfaces.IStatusTrackerService%2CMicrosoft.Extensions.DependencyInjection.IServiceScopeFactory%2CMicrosoft.Extensions.Logging.ILogger%7BBacklashBot.Services.Interfaces.IBroadcastService%7D%2CBacklashBot.Services.Interfaces.IScopeManagerService%2CMicrosoft.Extensions.Options.IOptions%7BBacklashDTOs.Configuration.ExecutionConfig%7D%2CBacklashBot.Management.Interfaces.ICentralPerformanceMonitor)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L127">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L122">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService__ctor_" data-uid="BacklashBot.Services.BroadcastService.#ctor*"></a>
   <h4 id="BacklashBot_Services_BroadcastService__ctor_Microsoft_AspNetCore_SignalR_IHubContext_BacklashBot_Hubs_BacklashBotHub__BacklashBot_Services_Interfaces_IServiceFactory_BacklashBot_State_Interfaces_IStatusTrackerService_Microsoft_Extensions_DependencyInjection_IServiceScopeFactory_Microsoft_Extensions_Logging_ILogger_BacklashBot_Services_Interfaces_IBroadcastService__BacklashBot_Services_Interfaces_IScopeManagerService_Microsoft_Extensions_Options_IOptions_BacklashDTOs_Configuration_ExecutionConfig__BacklashBot_Management_Interfaces_ICentralPerformanceMonitor_" data-uid="BacklashBot.Services.BroadcastService.#ctor(Microsoft.AspNetCore.SignalR.IHubContext{BacklashBot.Hubs.BacklashBotHub},BacklashBot.Services.Interfaces.IServiceFactory,BacklashBot.State.Interfaces.IStatusTrackerService,Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{BacklashBot.Services.Interfaces.IBroadcastService},BacklashBot.Services.Interfaces.IScopeManagerService,Microsoft.Extensions.Options.IOptions{BacklashDTOs.Configuration.ExecutionConfig},BacklashBot.Management.Interfaces.ICentralPerformanceMonitor)">BroadcastService(IHubContext&lt;BacklashBotHub&gt;, IServiceFactory, IStatusTrackerService, IServiceScopeFactory, ILogger&lt;IBroadcastService&gt;, IScopeManagerService, IOptions&lt;ExecutionConfig&gt;, ICentralPerformanceMonitor)</h4>
@@ -210,7 +211,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_AverageBroadcastTimeMs.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.AverageBroadcastTimeMs%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L521">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L516">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_AverageBroadcastTimeMs_" data-uid="BacklashBot.Services.BroadcastService.AverageBroadcastTimeMs*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_AverageBroadcastTimeMs" data-uid="BacklashBot.Services.BroadcastService.AverageBroadcastTimeMs">AverageBroadcastTimeMs</h4>
@@ -241,7 +242,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_AverageIntervalDeviationMs.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.AverageIntervalDeviationMs%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L594">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L589">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_AverageIntervalDeviationMs_" data-uid="BacklashBot.Services.BroadcastService.AverageIntervalDeviationMs*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_AverageIntervalDeviationMs" data-uid="BacklashBot.Services.BroadcastService.AverageIntervalDeviationMs">AverageIntervalDeviationMs</h4>
@@ -272,7 +273,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_BroadcastSuccessRate.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.BroadcastSuccessRate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L537">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L532">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_BroadcastSuccessRate_" data-uid="BacklashBot.Services.BroadcastService.BroadcastSuccessRate*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_BroadcastSuccessRate" data-uid="BacklashBot.Services.BroadcastService.BroadcastSuccessRate">BroadcastSuccessRate</h4>
@@ -303,7 +304,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_BroadcastsPerMinute.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.BroadcastsPerMinute%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L566">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L561">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_BroadcastsPerMinute_" data-uid="BacklashBot.Services.BroadcastService.BroadcastsPerMinute*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_BroadcastsPerMinute" data-uid="BacklashBot.Services.BroadcastService.BroadcastsPerMinute">BroadcastsPerMinute</h4>
@@ -334,7 +335,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_FailedBroadcasts.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.FailedBroadcasts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L493">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L488">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_FailedBroadcasts_" data-uid="BacklashBot.Services.BroadcastService.FailedBroadcasts*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_FailedBroadcasts" data-uid="BacklashBot.Services.BroadcastService.FailedBroadcasts">FailedBroadcasts</h4>
@@ -365,7 +366,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_SuccessfulBroadcasts.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.SuccessfulBroadcasts%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L479">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L474">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_SuccessfulBroadcasts_" data-uid="BacklashBot.Services.BroadcastService.SuccessfulBroadcasts*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_SuccessfulBroadcasts" data-uid="BacklashBot.Services.BroadcastService.SuccessfulBroadcasts">SuccessfulBroadcasts</h4>
@@ -396,7 +397,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_TotalBroadcastTimeMs.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.TotalBroadcastTimeMs%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L507">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L502">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_TotalBroadcastTimeMs_" data-uid="BacklashBot.Services.BroadcastService.TotalBroadcastTimeMs*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_TotalBroadcastTimeMs" data-uid="BacklashBot.Services.BroadcastService.TotalBroadcastTimeMs">TotalBroadcastTimeMs</h4>
@@ -427,7 +428,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_TotalDataSize.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.TotalDataSize%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L552">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L547">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_TotalDataSize_" data-uid="BacklashBot.Services.BroadcastService.TotalDataSize*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_TotalDataSize" data-uid="BacklashBot.Services.BroadcastService.TotalDataSize">TotalDataSize</h4>
@@ -458,7 +459,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_TotalMemoryUsed.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.TotalMemoryUsed%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L580">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L575">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_TotalMemoryUsed_" data-uid="BacklashBot.Services.BroadcastService.TotalMemoryUsed*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_TotalMemoryUsed" data-uid="BacklashBot.Services.BroadcastService.TotalMemoryUsed">TotalMemoryUsed</h4>
@@ -491,7 +492,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_Dispose.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L608">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L603">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_Dispose_" data-uid="BacklashBot.Services.BroadcastService.Dispose*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_Dispose" data-uid="BacklashBot.Services.BroadcastService.Dispose">Dispose()</h4>
@@ -507,7 +508,7 @@ including performance metrics, market information, and operational status.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_StartServicesAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.StartServicesAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L161">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L156">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_StartServicesAsync_" data-uid="BacklashBot.Services.BroadcastService.StartServicesAsync*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_StartServicesAsync" data-uid="BacklashBot.Services.BroadcastService.StartServicesAsync">StartServicesAsync()</h4>
@@ -540,7 +541,7 @@ Creates a background task that broadcasts system status at configurable interval
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService_StopServicesAsync.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService.StopServicesAsync%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L418">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L413">View Source</a>
   </span>
   <a id="BacklashBot_Services_BroadcastService_StopServicesAsync_" data-uid="BacklashBot.Services.BroadcastService.StopServicesAsync*"></a>
   <h4 id="BacklashBot_Services_BroadcastService_StopServicesAsync" data-uid="BacklashBot.Services.BroadcastService.StopServicesAsync">StopServicesAsync()</h4>
@@ -587,7 +588,7 @@ Waits for the background broadcast task to complete and clears connected clients
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_BroadcastService.md&amp;value=---%0Auid%3A%20BacklashBot.Services.BroadcastService%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L25" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/BroadcastService.cs/#L20" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

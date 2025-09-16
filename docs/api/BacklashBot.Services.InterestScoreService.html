@@ -179,13 +179,13 @@ liquidity patterns, and market continuity to provide quantitative scores for mar
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_InterestScoreService_CalculateMarketInterestScoreAsync_KalshiBotData_Data_Interfaces_IKalshiBotContext_System_String_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.InterestScoreService.CalculateMarketInterestScoreAsync(KalshiBotData.Data.Interfaces.IKalshiBotContext%2CSystem.String%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_InterestScoreService_CalculateMarketInterestScoreAsync_BacklashBotData_Data_Interfaces_IBacklashBotContext_System_String_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_.md&amp;value=---%0Auid%3A%20BacklashBot.Services.InterestScoreService.CalculateMarketInterestScoreAsync(BacklashBotData.Data.Interfaces.IBacklashBotContext%2CSystem.String%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double%2CSystem.Double)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L285">View Source</a>
   </span>
   <a id="BacklashBot_Services_InterestScoreService_CalculateMarketInterestScoreAsync_" data-uid="BacklashBot.Services.InterestScoreService.CalculateMarketInterestScoreAsync*"></a>
-  <h4 id="BacklashBot_Services_InterestScoreService_CalculateMarketInterestScoreAsync_KalshiBotData_Data_Interfaces_IKalshiBotContext_System_String_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_" data-uid="BacklashBot.Services.InterestScoreService.CalculateMarketInterestScoreAsync(KalshiBotData.Data.Interfaces.IKalshiBotContext,System.String,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">CalculateMarketInterestScoreAsync(IKalshiBotContext, string, double, double, double, double, double, double, double)</h4>
+  <h4 id="BacklashBot_Services_InterestScoreService_CalculateMarketInterestScoreAsync_BacklashBotData_Data_Interfaces_IBacklashBotContext_System_String_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_" data-uid="BacklashBot.Services.InterestScoreService.CalculateMarketInterestScoreAsync(BacklashBotData.Data.Interfaces.IBacklashBotContext,System.String,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">CalculateMarketInterestScoreAsync(IBacklashBotContext, string, double, double, double, double, double, double, double)</h4>
   <div class="markdown level1 summary"><p>Calculates a comprehensive interest score for a specific market ticker.
 The score is computed using multiple weighted factors including spread characteristics,
 trading volume, liquidity, open interest, and market continuity. Thresholds and
@@ -203,7 +203,7 @@ configurable cache duration settings.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Task&lt;(double score, (double spreadTightness, double spreadWidth, double volume, double volumePercentile, double liquidityPercentile, double openInterestPercentile, double continuity) scoreParts)&gt; CalculateMarketInterestScoreAsync(IKalshiBotContext dbContext, string marketTicker, double spreadTightnessWeight = 0.2, double spreadWidthWeight = 0.15, double volumeWeight = 0.2, double volumePercentileWeight = 0.1, double liquidityPercentileWeight = 0.09, double openInterestPercentileWeight = 0.065, double continuityWeight = 0.145)</code></pre>
+    <pre><code class="lang-csharp hljs">public Task&lt;(double score, (double spreadTightness, double spreadWidth, double volume, double volumePercentile, double liquidityPercentile, double openInterestPercentile, double continuity) scoreParts)&gt; CalculateMarketInterestScoreAsync(IBacklashBotContext dbContext, string marketTicker, double spreadTightnessWeight = 0.2, double spreadWidthWeight = 0.15, double volumeWeight = 0.2, double volumePercentileWeight = 0.1, double liquidityPercentileWeight = 0.09, double openInterestPercentileWeight = 0.065, double continuityWeight = 0.145)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -216,7 +216,7 @@ configurable cache duration settings.</p>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="KalshiBotData.Data.Interfaces.IKalshiBotContext.html">IKalshiBotContext</a></td>
+        <td><a class="xref" href="BacklashBotData.Data.Interfaces.IBacklashBotContext.html">IBacklashBotContext</a></td>
         <td><span class="parametername">dbContext</span></td>
         <td><p>Database context for accessing market data.</p>
 </td>
@@ -308,7 +308,7 @@ configurable cache duration settings.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_InterestScoreService_GetCacheHitRate.md&amp;value=---%0Auid%3A%20BacklashBot.Services.InterestScoreService.GetCacheHitRate%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L488">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L477">View Source</a>
   </span>
   <a id="BacklashBot_Services_InterestScoreService_GetCacheHitRate_" data-uid="BacklashBot.Services.InterestScoreService.GetCacheHitRate*"></a>
   <h4 id="BacklashBot_Services_InterestScoreService_GetCacheHitRate" data-uid="BacklashBot.Services.InterestScoreService.GetCacheHitRate">GetCacheHitRate()</h4>
@@ -462,7 +462,7 @@ handling errors gracefully by assigning default scores to failed calculations.</
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashBot_Services_InterestScoreService_GetPerformanceMetrics.md&amp;value=---%0Auid%3A%20BacklashBot.Services.InterestScoreService.GetPerformanceMetrics%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L467">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashBot/Services/InterestScoreService.cs/#L456">View Source</a>
   </span>
   <a id="BacklashBot_Services_InterestScoreService_GetPerformanceMetrics_" data-uid="BacklashBot.Services.InterestScoreService.GetPerformanceMetrics*"></a>
   <h4 id="BacklashBot_Services_InterestScoreService_GetPerformanceMetrics" data-uid="BacklashBot.Services.InterestScoreService.GetPerformanceMetrics">GetPerformanceMetrics()</h4>

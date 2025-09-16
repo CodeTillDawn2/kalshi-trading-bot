@@ -86,9 +86,10 @@
 Classes
 </h3>
       <h4><a class="xref" href="BacklashBot.Services.BroadcastService.html">BroadcastService</a></h4>
-      <section><p>Implements the broadcast service for real-time system status communication.
-Handles periodic broadcasting of comprehensive system health data to connected clients
-including performance metrics, market information, and operational status.</p>
+      <section><p>Service responsible for broadcasting system status and health information to connected SignalR clients.
+Manages periodic check-in broadcasts at configurable intervals containing brain instance status, market data, performance metrics,
+and system health indicators to keep monitoring systems and dashboards updated.
+Includes retry logic for failed SignalR sends and performance metrics collection.</p>
 </section>
       <h4><a class="xref" href="BacklashBot.Services.CandlestickService.html">CandlestickService</a></h4>
       <section><p>Service responsible for managing candlestick data for trading markets.
