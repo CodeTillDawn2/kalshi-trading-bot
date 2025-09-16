@@ -110,6 +110,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Hubs.PerformanceMetricsData.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Hubs.PerformanceMetricsData.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Hubs.PerformanceMetricsData",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Hubs.PerformanceMetricsData.yml\" sourcestartlinenumber=\"1\">Data structure containing comprehensive performance metrics from the CentralPerformanceMonitor.\nUsed for detailed performance monitoring and analytics, including database operations,\nWebSocket metrics, queue depths, and system resource utilization.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/BacklashBot.Hubs.TargetTickersConfirmationResponse.yml",
       "output": {
         ".html": {
@@ -288,7 +302,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Management.Interfaces.ICentralPerformanceMonitor",
-      "Summary": "<p sourcefile=\"api/BacklashBot.Management.Interfaces.ICentralPerformanceMonitor.yml\" sourcestartlinenumber=\"1\">ICentralPerformanceMonitor</p>\n"
+      "Summary": null
     },
     {
       "type": "ManagedReference",
@@ -484,6 +498,34 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashBot.Middleware",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Performance.CentralPerformanceMetricExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Performance.CentralPerformanceMetricExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Performance.CentralPerformanceMetricExtensions",
+      "Summary": "<p sourcefile=\"api/BacklashBot.Performance.CentralPerformanceMetricExtensions.yml\" sourcestartlinenumber=\"1\">Extension methods to convert complex CentralPerformanceMonitor objects into simple PerformanceMetric instances\nfor uniform GUI handling across all performance monitors.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashBot.Performance.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashBot.Performance.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashBot.Performance",
       "Summary": null
     },
     {
@@ -3354,7 +3396,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor",
-      "Summary": "<p sourcefile=\"api/BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Interface for recording performance metrics.</p>\n"
+      "Summary": "<p sourcefile=\"api/BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Interface for recording performance metrics across the KalshiBot system.\nProvides standardized methods for tracking execution times and simulation metrics\nwith mandatory enablement status to control when metrics are actually recorded.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -3677,6 +3719,48 @@
       "IsMRef": true,
       "Title": "BacklashOverseer.OverseerHubConfig",
       "Summary": "<p sourcefile=\"api/BacklashOverseer.OverseerHubConfig.yml\" sourcestartlinenumber=\"1\">Configuration options for the OverseerHub SignalR hub.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Performance.PerformanceMetricsServiceExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Performance.PerformanceMetricsServiceExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Performance.PerformanceMetricsServiceExtensions",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.Performance.PerformanceMetricsServiceExtensions.yml\" sourcestartlinenumber=\"1\">Extension methods to convert complex PerformanceMetricsService objects into simple PerformanceMetric instances\nfor uniform GUI handling across all performance monitors.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.Performance.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.Performance.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.Performance",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BacklashOverseer.PerformanceMetricsData.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BacklashOverseer.PerformanceMetricsData.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BacklashOverseer.PerformanceMetricsData",
+      "Summary": "<p sourcefile=\"api/BacklashOverseer.PerformanceMetricsData.yml\" sourcestartlinenumber=\"1\">Data structure containing comprehensive performance metrics from the CentralPerformanceMonitor.\nUsed for detailed performance monitoring and analytics, including database operations,\nWebSocket metrics, queue depths, and system resource utilization.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -4464,20 +4548,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.ActionDecision.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/TradingStrategies.ActionDecision.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "TradingStrategies.ActionDecision",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.ActionDecision.yml\" sourcestartlinenumber=\"1\">Represents the output of a trading strategy's decision-making process in the Kalshi trading bot system.\nThis class encapsulates the recommended trading action, including the action type, associated parameters\nfor order execution, and explanatory information. It serves as the communication mechanism between\ntrading strategies and the simulation or execution engine, providing all necessary details for\nprocessing the recommended trade action.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Classification.Interfaces.ISnapshotPeriodHelper.yml",
       "output": {
         ".html": {
@@ -4615,6 +4685,20 @@
       "IsMRef": true,
       "Title": "TradingStrategies.Extensions.MarketSnapshotExtensions",
       "Summary": "<p sourcefile=\"api/TradingStrategies.Extensions.MarketSnapshotExtensions.yml\" sourcestartlinenumber=\"1\">Provides extension methods for MarketSnapshot to compute and update order book metrics from simulated order book data.\nThis class serves as a bridge between the raw SimulatedOrderbook data structure and the calculated metrics\nstored in MarketSnapshot, enabling efficient computation of spreads, depths, volumes, and other trading indicators.\nAll calculations are performed in a stateless manner, ensuring thread safety and reusability across different\nmarket simulation scenarios.</p>\n<p sourcefile=\"api/TradingStrategies.Extensions.MarketSnapshotExtensions.yml\" sourcestartlinenumber=\"7\">Performance monitoring can be configured via MarketSnapshotExtensions:EnablePerformanceMetrics setting.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Extensions.PerformanceMetricExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Extensions.PerformanceMetricExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Extensions.PerformanceMetricExtensions",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Extensions.PerformanceMetricExtensions.yml\" sourcestartlinenumber=\"1\">Extension methods to convert complex performance objects into simple PerformanceMetric instances\nfor uniform GUI handling across all performance monitors.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5178,6 +5262,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.ActionDecision.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.ActionDecision.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.ActionDecision",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.ActionDecision.yml\" sourcestartlinenumber=\"1\">Represents the output of a trading strategy's decision-making process in the Kalshi trading bot system.\nThis class encapsulates the recommended trading action, including the action type, associated parameters\nfor order execution, and explanatory information. It serves as the communication mechanism between\ntrading strategies and the simulation or execution engine, providing all necessary details for\nprocessing the recommended trade action.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Overseer.EquityCalculator.yml",
       "output": {
         ".html": {
@@ -5258,7 +5356,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Trading.Overseer.PerformanceMonitor",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Generic performance monitor for tracking various metrics\nin the trading simulator. This class collects comprehensive performance data\nincluding execution times, memory usage, trade counts, and detailed metrics.\nIt supports both general operation metrics and specialized simulation performance metrics\nfrom StrategySimulation, with typed access via SimulationPerformanceMetrics.\nAll metrics collection can be enabled/disabled via the EnablePerformanceMetrics property.</p>\n"
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.PerformanceMonitor.yml\" sourcestartlinenumber=\"1\">Generic performance monitor for tracking various metrics\nin the trading simulator. This class collects comprehensive performance data\nincluding execution times, memory usage, trade counts, and detailed metrics.\nIt supports both general operation metrics and specialized simulation performance metrics\nfrom StrategySimulation, with typed access via StrategySimulationPerformanceMetrics.\nAll metrics collection can be enabled/disabled via the EnablePerformanceMetrics property.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -5388,20 +5486,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.Trading.Overseer.SimulationPerformanceMetrics.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/TradingStrategies.Trading.Overseer.SimulationPerformanceMetrics.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "TradingStrategies.Trading.Overseer.SimulationPerformanceMetrics",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.SimulationPerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Typed performance metrics for trading strategy simulations.\nExposes all metrics from StrategySimulation.GetDetailedPerformanceMetrics() in a strongly-typed format.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Overseer.StrategySimulation.yml",
       "output": {
         ".html": {
@@ -5416,6 +5500,62 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.StrategySimulationPerformanceMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.StrategySimulationPerformanceMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.StrategySimulationPerformanceMetrics",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.StrategySimulationPerformanceMetrics.yml\" sourcestartlinenumber=\"1\">Typed performance metrics for trading strategy simulations.\nExposes all metrics from StrategySimulation.GetDetailedPerformanceMetrics() in a strongly-typed format.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.TradingOverseer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.TradingOverseer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.TradingOverseer",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.TradingOverseer.yml\" sourcestartlinenumber=\"1\">Orchestrates trading scenario simulations and performance analysis for the Kalshi trading bot.\nThis class serves as the central coordinator for running trading strategies against historical market snapshots,\ngenerating detailed performance reports, and calculating equity metrics. It integrates with the simulation engine,\nequity calculator, and report generator to provide comprehensive backtesting capabilities.\nSupports asynchronous operations for efficient performance monitoring and analysis.\nIncludes input validation to prevent null reference exceptions with warning logs, configurable performance metrics logging at debug level,\nand async method implementations for better performance in high-throughput scenarios.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.TradingStrategies.Performance.PerformanceMetricExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.TradingStrategies.Performance.PerformanceMetricExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.TradingStrategies.Performance.PerformanceMetricExtensions",
+      "Summary": "<p sourcefile=\"api/TradingStrategies.Trading.Overseer.TradingStrategies.Performance.PerformanceMetricExtensions.yml\" sourcestartlinenumber=\"1\">Extension methods to convert complex performance objects into simple PerformanceMetric instances\nfor uniform GUI handling across all performance monitors.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/TradingStrategies.Trading.Overseer.TradingStrategies.Performance.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/TradingStrategies.Trading.Overseer.TradingStrategies.Performance.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "TradingStrategies.Trading.Overseer.TradingStrategies.Performance",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/TradingStrategies.Trading.Overseer.yml",
       "output": {
         ".html": {
@@ -5426,34 +5566,6 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "TradingStrategies.Trading.Overseer",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.TradingOverseer.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/TradingStrategies.TradingOverseer.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "TradingStrategies.TradingOverseer",
-      "Summary": "<p sourcefile=\"api/TradingStrategies.TradingOverseer.yml\" sourcestartlinenumber=\"1\">Orchestrates trading scenario simulations and performance analysis for the Kalshi trading bot.\nThis class serves as the central coordinator for running trading strategies against historical market snapshots,\ngenerating detailed performance reports, and calculating equity metrics. It integrates with the simulation engine,\nequity calculator, and report generator to provide comprehensive backtesting capabilities.\nSupports asynchronous operations for efficient performance monitoring and analysis.\nIncludes input validation to prevent null reference exceptions with warning logs, configurable performance metrics logging at debug level,\nand async method implementations for better performance in high-throughput scenarios.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/TradingStrategies.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/TradingStrategies.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "TradingStrategies",
       "Summary": null
     },
     {

@@ -9,7 +9,7 @@
       <meta name="viewport" content="width=device-width">
       <meta name="title" content="Interface IPerformanceMonitor | Kalshi Trading Bot Documentation ">
     
-    <meta name="description" content="Interface for recording performance metrics.">
+    <meta name="description" content="Interface for recording performance metrics across the KalshiBot system. Provides standardized methods for tracking execution times and simulation metrics with mandatory enablement status to control when metrics are actually recorded.">
       <link rel="shortcut icon" href="../favicon.ico">
       <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
       <link rel="stylesheet" href="../styles/docfx.css">
@@ -81,7 +81,9 @@
 
 
   <h1 id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor" data-uid="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor" class="text-break">Interface IPerformanceMonitor</h1>
-  <div class="markdown level0 summary"><p>Interface for recording performance metrics.</p>
+  <div class="markdown level0 summary"><p>Interface for recording performance metrics across the KalshiBot system.
+Provides standardized methods for tracking execution times and simulation metrics
+with mandatory enablement status to control when metrics are actually recorded.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BacklashInterfaces.html">BacklashInterfaces</a>.<a class="xref" href="BacklashInterfaces.PerformanceMetrics.html">PerformanceMetrics</a></h6>
@@ -90,23 +92,28 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public interface IPerformanceMonitor</code></pre>
   </div>
+  <h5 id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>All methods require an explicit metricsEnabled parameter to ensure granular control
+over metric collection. This prevents unnecessary metric collection when monitoring
+is disabled and provides clear visibility into which components are recording metrics.</p>
+</div>
   <h3 id="methods">Methods
 </h3>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordExecutionTime_System_String_System_Int64_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordExecutionTime(System.String%2CSystem.Int64)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordExecutionTime_System_String_System_Int64_System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordExecutionTime(System.String%2CSystem.Int64%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/IPerformanceMonitor.cs/#L13">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/IPerformanceMonitor.cs/#L26">View Source</a>
   </span>
   <a id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordExecutionTime_" data-uid="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordExecutionTime*"></a>
-  <h4 id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordExecutionTime_System_String_System_Int64_" data-uid="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordExecutionTime(System.String,System.Int64)">RecordExecutionTime(string, long)</h4>
-  <div class="markdown level1 summary"><p>Records the execution time for a specific method or operation.</p>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordExecutionTime_System_String_System_Int64_System_Boolean_" data-uid="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordExecutionTime(System.String,System.Int64,System.Boolean)">RecordExecutionTime(string, long, bool)</h4>
+  <div class="markdown level1 summary"><p>Records the execution time for a specific method or operation with enablement status.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void RecordExecutionTime(string methodName, long milliseconds)</code></pre>
+    <pre><code class="lang-csharp hljs">void RecordExecutionTime(string methodName, long milliseconds, bool metricsEnabled)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -121,7 +128,7 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">methodName</span></td>
-        <td><p>The name of the method or operation.</p>
+        <td><p>The name of the method or operation being timed.</p>
 </td>
       </tr>
       <tr>
@@ -130,14 +137,25 @@
         <td><p>The execution time in milliseconds.</p>
 </td>
       </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">metricsEnabled</span></td>
+        <td><p>Whether performance metrics are enabled for the calling class/component.</p>
+</td>
+      </tr>
     </tbody>
   </table>
+  <h5 id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordExecutionTime_System_String_System_Int64_System_Boolean__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method allows the calling class to pass its enablement status, enabling
+more granular control over metric collection. Metrics are only recorded when
+both the caller has metrics enabled AND the monitor implementation allows it.</p>
+</div>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordPerformanceMetrics_System_String_System_Int64_System_Int32_System_Int32_System_Collections_Generic_Dictionary_System_String_System_Int64__.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordPerformanceMetrics(System.String%2CSystem.Int64%2CSystem.Int32%2CSystem.Int32%2CSystem.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Int64%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/IPerformanceMonitor.cs/#L30">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/IPerformanceMonitor.cs/#L49">View Source</a>
   </span>
   <a id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordPerformanceMetrics_" data-uid="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordPerformanceMetrics*"></a>
   <h4 id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordPerformanceMetrics_System_String_System_Int64_System_Int32_System_Int32_System_Collections_Generic_Dictionary_System_String_System_Int64__" data-uid="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordPerformanceMetrics(System.String,System.Int64,System.Int32,System.Int32,System.Collections.Generic.Dictionary{System.String,System.Int64})">RecordPerformanceMetrics(string, long, int, int, Dictionary&lt;string, long&gt;?)</h4>
@@ -192,19 +210,19 @@
   </table>
   <span class="small pull-right mobile-hide">
     <span class="divider">|</span>
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object__.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordSimulationMetrics(System.String%2CSystem.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Object%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object__System_Boolean_.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordSimulationMetrics(System.String%2CSystem.Collections.Generic.Dictionary%7BSystem.String%2CSystem.Object%7D%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/IPerformanceMonitor.cs/#L20">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/IPerformanceMonitor.cs/#L39">View Source</a>
   </span>
   <a id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordSimulationMetrics_" data-uid="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordSimulationMetrics*"></a>
-  <h4 id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object__" data-uid="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordSimulationMetrics(System.String,System.Collections.Generic.Dictionary{System.String,System.Object})">RecordSimulationMetrics(string, Dictionary&lt;string, object&gt;)</h4>
-  <div class="markdown level1 summary"><p>Records simulation performance metrics from StrategySimulation.</p>
+  <h4 id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object__System_Boolean_" data-uid="BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor.RecordSimulationMetrics(System.String,System.Collections.Generic.Dictionary{System.String,System.Object},System.Boolean)">RecordSimulationMetrics(string, Dictionary&lt;string, object&gt;, bool)</h4>
+  <div class="markdown level1 summary"><p>Records simulation performance metrics from StrategySimulation with enablement status.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void RecordSimulationMetrics(string simulationName, Dictionary&lt;string, object&gt; metrics)</code></pre>
+    <pre><code class="lang-csharp hljs">void RecordSimulationMetrics(string simulationName, Dictionary&lt;string, object&gt; metrics, bool metricsEnabled)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -219,17 +237,28 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">simulationName</span></td>
-        <td><p>The name of the simulation.</p>
+        <td><p>The name of the simulation (e.g., &quot;BollingerBreakout&quot;, &quot;StrategySimulation&quot;).</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
         <td><span class="parametername">metrics</span></td>
-        <td><p>The detailed metrics dictionary from StrategySimulation.GetDetailedPerformanceMetrics().</p>
+        <td><p>The detailed metrics dictionary containing performance data such as execution times, memory usage, trade counts.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">metricsEnabled</span></td>
+        <td><p>Whether performance metrics are enabled for the calling class/component.</p>
 </td>
       </tr>
     </tbody>
   </table>
+  <h5 id="BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor_RecordSimulationMetrics_System_String_System_Collections_Generic_Dictionary_System_String_System_Object__System_Boolean__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>This method allows the calling class to pass its enablement status, enabling
+more granular control over metric collection. The metrics dictionary typically
+includes keys like &quot;TotalExecutionTimeMs&quot;, &quot;TotalItemsProcessed&quot;, &quot;Timestamp&quot;, etc.</p>
+</div>
 
 </article>
           </div>
@@ -242,7 +271,7 @@
                     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashInterfaces_PerformanceMetrics_IPerformanceMonitor.md&amp;value=---%0Auid%3A%20BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Edit this page</a>
                   </li>
                   <li>
-                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/IPerformanceMonitor.cs/#L6" class="contribution-link">View Source</a>
+                    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashInterfaces/PerformanceMetrics/IPerformanceMonitor.cs/#L13" class="contribution-link">View Source</a>
                   </li>
                 </ul>
               </div>

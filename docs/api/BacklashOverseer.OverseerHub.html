@@ -258,7 +258,7 @@ monitoring and control of trading bot operations.</p>
     <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_HandleOverseerMessage_System_String_System_String_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.HandleOverseerMessage(System.String%2CSystem.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
   </span>
   <span class="small pull-right mobile-hide">
-    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L681">View Source</a>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L885">View Source</a>
   </span>
   <a id="BacklashOverseer_OverseerHub_HandleOverseerMessage_" data-uid="BacklashOverseer.OverseerHub.HandleOverseerMessage*"></a>
   <h4 id="BacklashOverseer_OverseerHub_HandleOverseerMessage_System_String_System_String_" data-uid="BacklashOverseer.OverseerHub.HandleOverseerMessage(System.String,System.String)">HandleOverseerMessage(string, string)</h4>
@@ -290,6 +290,120 @@ such as data refresh requests.</p>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
         <td><span class="parametername">message</span></td>
         <td><p>The message content or payload.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_HandlePerformanceMetrics_System_Object_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.HandlePerformanceMetrics(System.Object)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L808">View Source</a>
+  </span>
+  <a id="BacklashOverseer_OverseerHub_HandlePerformanceMetrics_" data-uid="BacklashOverseer.OverseerHub.HandlePerformanceMetrics*"></a>
+  <h4 id="BacklashOverseer_OverseerHub_HandlePerformanceMetrics_System_Object_" data-uid="BacklashOverseer.OverseerHub.HandlePerformanceMetrics(System.Object)">HandlePerformanceMetrics(object)</h4>
+  <div class="markdown level1 summary"><p>Handles incoming performance metrics from brain instances.
+Stores the metrics in the brain persistence service for monitoring and analysis.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task HandlePerformanceMetrics(object performanceMetrics)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">performanceMetrics</span></td>
+        <td><p>The comprehensive performance metrics data from a brain instance.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_HandlePerformanceMetricsUpdate_System_String_System_Object_System_DateTime_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.HandlePerformanceMetricsUpdate(System.String%2CSystem.Object%2CSystem.DateTime)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L853">View Source</a>
+  </span>
+  <a id="BacklashOverseer_OverseerHub_HandlePerformanceMetricsUpdate_" data-uid="BacklashOverseer.OverseerHub.HandlePerformanceMetricsUpdate*"></a>
+  <h4 id="BacklashOverseer_OverseerHub_HandlePerformanceMetricsUpdate_System_String_System_Object_System_DateTime_" data-uid="BacklashOverseer.OverseerHub.HandlePerformanceMetricsUpdate(System.String,System.Object,System.DateTime)">HandlePerformanceMetricsUpdate(string, object, DateTime)</h4>
+  <div class="markdown level1 summary"><p>Handles performance metrics updates from brain instances.
+Stores the comprehensive performance data for monitoring and display purposes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task HandlePerformanceMetricsUpdate(string brainInstanceName, object performanceMetrics, DateTime timestamp)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">brainInstanceName</span></td>
+        <td><p>The name of the brain instance sending the metrics.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">performanceMetrics</span></td>
+        <td><p>The comprehensive performance metrics data.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">timestamp</span></td>
+        <td><p>The timestamp when the metrics were sent.</p>
 </td>
       </tr>
     </tbody>
@@ -522,6 +636,56 @@ Includes rate limiting to prevent abuse.</p>
         <td><a class="xref" href="BacklashOverseer.CheckInData.html">CheckInData</a></td>
         <td><span class="parametername">checkInData</span></td>
         <td><p>The check-in data containing brain status information.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/new/main/apiSpec/new?filename=BacklashOverseer_OverseerHub_ProcessPerformanceMetrics_BacklashOverseer_PerformanceMetricsData_.md&amp;value=---%0Auid%3A%20BacklashOverseer.OverseerHub.ProcessPerformanceMetrics(BacklashOverseer.PerformanceMetricsData)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Edit this page</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/CodeTillDawn2/kalshi-trading-bot/blob/main/BacklashOverseer/OverseerHub.cs/#L678">View Source</a>
+  </span>
+  <a id="BacklashOverseer_OverseerHub_ProcessPerformanceMetrics_" data-uid="BacklashOverseer.OverseerHub.ProcessPerformanceMetrics*"></a>
+  <h4 id="BacklashOverseer_OverseerHub_ProcessPerformanceMetrics_BacklashOverseer_PerformanceMetricsData_" data-uid="BacklashOverseer.OverseerHub.ProcessPerformanceMetrics(BacklashOverseer.PerformanceMetricsData)">ProcessPerformanceMetrics(PerformanceMetricsData)</h4>
+  <div class="markdown level1 summary"><p>Processes performance metrics from a connected brain instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task ProcessPerformanceMetrics(PerformanceMetricsData performanceMetrics)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BacklashOverseer.PerformanceMetricsData.html">PerformanceMetricsData</a></td>
+        <td><span class="parametername">performanceMetrics</span></td>
+        <td><p>The performance metrics data containing detailed system performance information.</p>
 </td>
       </tr>
     </tbody>

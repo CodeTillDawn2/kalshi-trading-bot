@@ -85,6 +85,13 @@
     <h3 id="classes">
 Classes
 </h3>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.ActionDecision.html">ActionDecision</a></h4>
+      <section><p>Represents the output of a trading strategy's decision-making process in the Kalshi trading bot system.
+This class encapsulates the recommended trading action, including the action type, associated parameters
+for order execution, and explanatory information. It serves as the communication mechanism between
+trading strategies and the simulation or execution engine, providing all necessary details for
+processing the recommended trade action.</p>
+</section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.EquityCalculator.html">EquityCalculator</a></h4>
       <section><p>Provides methods for calculating the total equity value of a trading simulation path.
 This class is responsible for determining the current market value of positions held in a simulated trading environment,
@@ -128,7 +135,7 @@ calculation counts, cache statistics, throughput, and configuration status.</p>
 in the trading simulator. This class collects comprehensive performance data
 including execution times, memory usage, trade counts, and detailed metrics.
 It supports both general operation metrics and specialized simulation performance metrics
-from StrategySimulation, with typed access via SimulationPerformanceMetrics.
+from StrategySimulation, with typed access via StrategySimulationPerformanceMetrics.
 All metrics collection can be enabled/disabled via the EnablePerformanceMetrics property.</p>
 </section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.PerformanceRecord.html">PerformanceRecord</a></h4>
@@ -176,16 +183,25 @@ and generating detailed event logs for backtesting and performance analysis.</p>
 This class encapsulates all the essential data needed to track the evolution of a trading strategy
 simulation over time, including position, cash balance, risk metrics, and order book state.</p>
 </section>
-      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.SimulationPerformanceMetrics.html">SimulationPerformanceMetrics</a></h4>
-      <section><p>Typed performance metrics for trading strategy simulations.
-Exposes all metrics from StrategySimulation.GetDetailedPerformanceMetrics() in a strongly-typed format.</p>
-</section>
       <h4><a class="xref" href="TradingStrategies.Trading.Overseer.StrategySimulation.html">StrategySimulation</a></h4>
       <section><p>Simulates trading strategies against historical market snapshots, managing position, cash, and order book state.
 This class processes market data sequentially, applies trading decisions from strategies, and tracks performance metrics.
 It maintains a simulated order book and resting orders to accurately model market interactions during backtesting.
 As a developer, this class is the core execution engine for strategy evaluation, handling the complex interplay
 between market data, strategy decisions, order book dynamics, and position management.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.StrategySimulationPerformanceMetrics.html">StrategySimulationPerformanceMetrics</a></h4>
+      <section><p>Typed performance metrics for trading strategy simulations.
+Exposes all metrics from StrategySimulation.GetDetailedPerformanceMetrics() in a strongly-typed format.</p>
+</section>
+      <h4><a class="xref" href="TradingStrategies.Trading.Overseer.TradingOverseer.html">TradingOverseer</a></h4>
+      <section><p>Orchestrates trading scenario simulations and performance analysis for the Kalshi trading bot.
+This class serves as the central coordinator for running trading strategies against historical market snapshots,
+generating detailed performance reports, and calculating equity metrics. It integrates with the simulation engine,
+equity calculator, and report generator to provide comprehensive backtesting capabilities.
+Supports asynchronous operations for efficient performance monitoring and analysis.
+Includes input validation to prevent null reference exceptions with warning logs, configurable performance metrics logging at debug level,
+and async method implementations for better performance in high-throughput scenarios.</p>
 </section>
 
 
