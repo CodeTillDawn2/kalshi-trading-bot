@@ -2331,7 +2331,7 @@ namespace KalshiBotAPI.KalshiAPI
             bag.Add(elapsedMs);
 
             // Post to performance monitor for unified tracking
-            _performanceMonitor.RecordExecutionTime(methodName, elapsedMs);
+            _performanceMonitor.RecordExecutionTime(methodName, elapsedMs, _enablePerformanceMetrics);
         }
 
         /// <summary>

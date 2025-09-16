@@ -891,18 +891,18 @@ namespace BacklashBot.Services
                 if (_eventProcessingCount > 0)
                 {
                     long avgEventProcessingTime = _totalEventProcessingTimeMs / _eventProcessingCount;
-                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageEventProcessingTimeMs", avgEventProcessingTime);
+                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageEventProcessingTimeMs", avgEventProcessingTime, _enablePerformanceMetrics);
                 }
 
                 if (_timerCallbackCount > 1)
                 {
                     long avgDrift = _totalTimerDriftMs / (_timerCallbackCount - 1);
-                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageTimerDriftMs", avgDrift);
+                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageTimerDriftMs", avgDrift, _enablePerformanceMetrics);
                 }
                 if (_timerCallbackCount > 0)
                 {
                     long avgExecutionTime = _totalTimerExecutionTimeMs / _timerCallbackCount;
-                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageTimerExecutionTimeMs", avgExecutionTime);
+                    _centralPerformanceMonitor.RecordExecutionTime($"OrderbookChangeTracker_{_marketTicker}_AverageTimerExecutionTimeMs", avgExecutionTime, _enablePerformanceMetrics);
                 }
             }
         }

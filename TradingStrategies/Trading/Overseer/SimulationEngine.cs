@@ -197,7 +197,7 @@ namespace TradingStrategies.Trading.Overseer
                         ["IOWriteTime"] = LastIOWriteTime,
                         ["EnablePerformanceMetrics"] = _enablePerformanceMetrics
                     };
-                    _performanceMonitor.RecordSimulationMetrics("SimulationEngine", metrics);
+                    _performanceMonitor.RecordSimulationMetrics("SimulationEngine", metrics, _enablePerformanceMetrics);
                 }
             }
 
@@ -1010,13 +1010,17 @@ namespace TradingStrategies.Trading.Overseer
             // Record comprehensive performance metrics if monitor is available and metrics were collected
             if (_performanceMonitor != null && result.ExecutionTimeMs.HasValue)
             {
-                _performanceMonitor.RecordPerformanceMetrics(
-                    methodName: "PatternDetectionService.DetectPatterns",
-                    totalExecutionTimeMs: result.ExecutionTimeMs.Value,
-                    totalItemsProcessed: result.TotalCandlesProcessed ?? 0,
-                    totalItemsFound: result.TotalPatternsFound ?? 0,
-                    itemCheckTimes: result.PatternCheckTimes
-                );
+                var metricsDict = new Dictionary<string, object>
+                {
+                    ["MethodName"] = "PatternDetectionService.DetectPatterns",
+                    ["TotalExecutionTimeMs"] = result.ExecutionTimeMs.Value,
+                    ["TotalItemsProcessed"] = result.TotalCandlesProcessed ?? 0,
+                    ["TotalItemsFound"] = result.TotalPatternsFound ?? 0,
+                    ["ItemCheckTimes"] = result.PatternCheckTimes,
+                    ["Timestamp"] = DateTime.UtcNow
+                };
+
+                _performanceMonitor.RecordSimulationMetrics("PatternDetectionService", metricsDict, _enablePerformanceMetrics);
             }
 
             return result.Patterns;

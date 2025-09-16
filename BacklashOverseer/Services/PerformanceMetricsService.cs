@@ -16,6 +16,9 @@ namespace BacklashOverseer.Services
     {
         private readonly ILogger<PerformanceMetricsService> _logger;
 
+        // Configurable metrics data structure for GUI consumption
+        private Dictionary<string, object> _configurableMetrics;
+
         // WebSocket metrics
         private long _webSocketEventCount;
         private DateTime _lastWebSocketEventTime;
@@ -124,7 +127,21 @@ namespace BacklashOverseer.Services
         {
             _logger = logger;
             _lastMetricsReset = DateTime.UtcNow;
+            _configurableMetrics = new Dictionary<string, object>();
+            InitializeConfigurableMetrics();
             _logger.LogInformation("PerformanceMetricsService initialized");
+        }
+
+        /// <summary>
+        /// Initializes the configurable metrics data structure with default values.
+        /// </summary>
+        private void InitializeConfigurableMetrics()
+        {
+            _configurableMetrics = new Dictionary<string, object>
+            {
+                // Only include whether performance metrics are enabled for this class
+                ["EnablePerformanceMetrics"] = true
+            };
         }
 
         #region WebSocket Metrics
@@ -1103,6 +1120,25 @@ namespace BacklashOverseer.Services
         }
 
         /// <summary>
+        /// Records the execution time for a specific method or operation with enablement status.
+        /// </summary>
+        /// <param name="methodName">The name of the method or operation.</param>
+        /// <param name="milliseconds">The execution time in milliseconds.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        public void RecordExecutionTime(string methodName, long milliseconds, bool metricsEnabled)
+        {
+            // Store in API metrics for consistency
+            lock (_apiLock)
+            {
+                _totalApiFetchTime += milliseconds;
+                _apiFetchCount++;
+                _lastApiFetchTime = DateTime.UtcNow;
+            }
+
+            _logger.LogDebug("Execution time recorded: {MethodName}={Milliseconds}ms, MetricsEnabled={MetricsEnabled}", methodName, milliseconds, metricsEnabled);
+        }
+
+        /// <summary>
         /// Records simulation performance metrics from StrategySimulation.
         /// </summary>
         /// <param name="simulationName">The name of the simulation.</param>
@@ -1110,6 +1146,24 @@ namespace BacklashOverseer.Services
         public void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics)
         {
             _logger.LogInformation("Simulation metrics recorded for {SimulationName}: {MetricsCount} metrics", simulationName, metrics.Count);
+
+            // Log key metrics for monitoring
+            foreach (var kvp in metrics)
+            {
+                _logger.LogDebug("Simulation metric: {Key}={Value}", kvp.Key, kvp.Value);
+            }
+        }
+
+        /// <summary>
+        /// Records simulation performance metrics from StrategySimulation with enablement status.
+        /// </summary>
+        /// <param name="simulationName">The name of the simulation.</param>
+        /// <param name="metrics">The detailed metrics dictionary from StrategySimulation.GetDetailedPerformanceMetrics().</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        public void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics, bool metricsEnabled)
+        {
+            _logger.LogInformation("Simulation metrics recorded for {SimulationName}: {MetricsCount} metrics, MetricsEnabled={MetricsEnabled}",
+                simulationName, metrics.Count, metricsEnabled);
 
             // Log key metrics for monitoring
             foreach (var kvp in metrics)
@@ -1137,7 +1191,7 @@ namespace BacklashOverseer.Services
                 methodName, totalExecutionTimeMs, totalItemsProcessed, totalItemsFound);
 
             // Record as API fetch for consistency
-            RecordExecutionTime(methodName, totalExecutionTimeMs);
+            RecordExecutionTime(methodName, totalExecutionTimeMs, true);
 
             // Log individual item times if provided
             if (itemCheckTimes != null && itemCheckTimes.Count > 0)
@@ -1147,6 +1201,24 @@ namespace BacklashOverseer.Services
                     _logger.LogDebug("Item processing time: {ItemName}={Time}ms", kvp.Key, kvp.Value);
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets all configurable performance metrics for GUI consumption.
+        /// </summary>
+        /// <returns>Dictionary containing all configurable metrics.</returns>
+        public IReadOnlyDictionary<string, object> GetConfigurableMetrics()
+        {
+            return _configurableMetrics;
+        }
+
+        /// <summary>
+        /// Sends an empty result when performance metrics are disabled.
+        /// </summary>
+        private void SendEmptyResult()
+        {
+            // Initialize with false when metrics are disabled
+            _configurableMetrics["EnablePerformanceMetrics"] = false;
         }
 
         #endregion

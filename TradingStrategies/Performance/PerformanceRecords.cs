@@ -8,7 +8,8 @@ namespace TradingStrategies.Trading.Overseer
         long TotalExecutionTimeMs,
         int TotalItemsProcessed,
         int TotalItemsFound,
-        Dictionary<string, long> ItemCheckTimes
+        Dictionary<string, long> ItemCheckTimes,
+        bool? MetricsEnabled = null
     );
 
     /// <summary>

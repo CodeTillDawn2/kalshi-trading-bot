@@ -297,7 +297,7 @@ namespace TradingSimulator
                     OnTestProgress?.Invoke($"{progressPrefix}Processing timeout exceeded ({_config.ProcessingTimeoutSeconds}s) for {marketTicker}. Skipping.");
                     processingTime = DateTime.UtcNow - startTime;
                     _performanceMetrics.CompleteMarketProcessing(marketTicker, processingTime);
-                    _performanceMonitor.RecordExecutionTime("ProcessMarketTimeout", (long)processingTime.TotalMilliseconds);
+                    _performanceMonitor.RecordExecutionTime("ProcessMarketTimeout", (long)processingTime.TotalMilliseconds, _config.EnablePerformanceMetrics);
                     return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
                 }
 
@@ -309,7 +309,7 @@ namespace TradingSimulator
                     var result = await ProcessEventLogsAsync(marketSnapshots, eventLogs, marketTicker, writeToFile, progressPrefix, group);
                     processingTime = DateTime.UtcNow - startTime;
                     _performanceMetrics.CompleteMarketProcessing(marketTicker, processingTime);
-                    _performanceMonitor.RecordExecutionTime("ProcessMarket", (long)processingTime.TotalMilliseconds);
+                    _performanceMonitor.RecordExecutionTime("ProcessMarket", (long)processingTime.TotalMilliseconds, _config.EnablePerformanceMetrics);
                     return result;
                 }
             }
@@ -320,7 +320,7 @@ namespace TradingSimulator
 
             processingTime = DateTime.UtcNow - startTime;
             _performanceMetrics.CompleteMarketProcessing(marketTicker, processingTime);
-            _performanceMonitor.RecordExecutionTime("ProcessMarketError", (long)processingTime.TotalMilliseconds);
+            _performanceMonitor.RecordExecutionTime("ProcessMarketError", (long)processingTime.TotalMilliseconds, _config.EnablePerformanceMetrics);
             return (0, 0, 0.0, new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>(), new List<PricePoint>());
         }
 
@@ -468,7 +468,7 @@ namespace TradingSimulator
                 await Task.WhenAll(batchTasks);
                 var batchProcessingTime = DateTime.UtcNow - batchStartTime;
                 _performanceMetrics.RecordBatchProcessing(batch.Count, batchProcessingTime);
-                _performanceMonitor.RecordExecutionTime("ProcessBatch", (long)batchProcessingTime.TotalMilliseconds);
+                _performanceMonitor.RecordExecutionTime("ProcessBatch", (long)batchProcessingTime.TotalMilliseconds, _config.EnablePerformanceMetrics);
                 OnTestProgress?.Invoke($"{progressPrefix}Completed batch {i / _config.BatchSize + 1} in {batchProcessingTime.TotalSeconds:F2}s");
             }
 

@@ -55,6 +55,9 @@ namespace BacklashBot.Management
         public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? DatabaseMetrics => _databaseMetrics;
         public IReadOnlyDictionary<string, object>? OverseerClientServiceMetrics => _overseerClientServiceMetrics;
 
+        // Configurable metrics data structure for GUI consumption
+        private Dictionary<string, object> _configurableMetrics;
+
         private bool _timerRunning = false;
         private readonly ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>> _queueCountSamples;
         private readonly ConcurrentDictionary<string, List<(DateTime Timestamp, double AvgTime, int TotalOps)>> _orderBookServiceMetrics;
@@ -157,6 +160,20 @@ namespace BacklashBot.Management
             _queueCountSamples = new ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>>();
             _orderBookServiceMetrics = new ConcurrentDictionary<string, List<(DateTime Timestamp, double AvgTime, int TotalOps)>>();
             _databaseMetrics = null;
+            _configurableMetrics = new Dictionary<string, object>();
+            InitializeConfigurableMetrics();
+        }
+
+        /// <summary>
+        /// Initializes the configurable metrics data structure with default values.
+        /// </summary>
+        private void InitializeConfigurableMetrics()
+        {
+            _configurableMetrics = new Dictionary<string, object>
+            {
+                // Only include whether performance metrics are enabled for this class
+                ["EnablePerformanceMetrics"] = true
+            };
         }
 
         /// <summary>
@@ -217,11 +234,121 @@ namespace BacklashBot.Management
         /// </remarks>
         public void RecordExecutionTime(string methodName, long milliseconds)
         {
+            RecordExecutionTime(methodName, milliseconds, true);
+        }
+
+        /// <summary>
+        /// Records the execution time for a specific API method or operation with enablement status.
+        /// </summary>
+        /// <param name="methodName">The name of the method or operation being timed.</param>
+        /// <param name="milliseconds">The execution time in milliseconds.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for this operation.</param>
+        /// <remarks>
+        /// Execution times are stored in a thread-safe concurrent dictionary with timestamps.
+        /// This data can be used for performance analysis, bottleneck identification,
+        /// and optimization efforts. Multiple executions of the same method are accumulated
+        /// in a list for statistical analysis.
+        /// </remarks>
+        public void RecordExecutionTime(string methodName, long milliseconds, bool metricsEnabled)
+        {
+            // Check if performance metrics are enabled
+            if (!(_executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            {
+                return;
+            }
+
             var record = (Timestamp: DateTime.UtcNow, Milliseconds: milliseconds);
             ApiExecutionTimes.AddOrUpdate(
                 methodName,
                 _ => new List<(DateTime Timestamp, long Milliseconds)> { record },
                 (_, list) => { list.Add(record); return list; });
+        }
+
+        /// <summary>
+        /// Records simulation performance metrics from StrategySimulation.
+        /// This is the basic method without enablement status for backward compatibility.
+        /// </summary>
+        /// <param name="simulationName">The name of the simulation.</param>
+        /// <param name="metrics">The detailed metrics dictionary from StrategySimulation.GetDetailedPerformanceMetrics().</param>
+        /// <remarks>
+        /// This method delegates to the overloaded version with enablement status set to true.
+        /// </remarks>
+        public void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics)
+        {
+            RecordSimulationMetrics(simulationName, metrics, true);
+        }
+
+        /// <summary>
+        /// Records simulation performance metrics from StrategySimulation with enablement status.
+        /// This is the preferred method for new implementations.
+        /// </summary>
+        /// <param name="simulationName">The name of the simulation.</param>
+        /// <param name="metrics">The detailed metrics dictionary from StrategySimulation.GetDetailedPerformanceMetrics().</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        /// <remarks>
+        /// This method allows the calling class to pass its enablement status, enabling
+        /// more granular control over metric collection. The metrics dictionary typically
+        /// includes keys like "TotalExecutionTimeMs", "TotalItemsProcessed", "Timestamp", etc.
+        /// </remarks>
+        public void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics, bool metricsEnabled)
+        {
+            // Check if performance metrics are enabled
+            if (!(_executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            {
+                return;
+            }
+
+            // Add enablement status to the metrics
+            metrics["MetricsEnabled"] = metricsEnabled;
+            metrics["SimulationName"] = simulationName;
+            metrics["RecordedAt"] = DateTime.UtcNow;
+
+            _logger.LogDebug("Simulation metrics recorded: {SimulationName}, {MetricCount} metrics", simulationName, metrics.Count);
+        }
+
+        /// <summary>
+        /// Records comprehensive performance metrics.
+        /// </summary>
+        /// <param name="methodName">The name of the method or operation.</param>
+        /// <param name="totalExecutionTimeMs">Total time spent on execution.</param>
+        /// <param name="totalItemsProcessed">Number of items processed.</param>
+        /// <param name="totalItemsFound">Number of items found.</param>
+        /// <param name="itemCheckTimes">Dictionary of item names to their processing times.</param>
+        /// <remarks>
+        /// This method records detailed performance metrics including processing times
+        /// for individual items, useful for analyzing bottlenecks in batch operations.
+        /// </remarks>
+        public void RecordPerformanceMetrics(
+            string methodName,
+            long totalExecutionTimeMs,
+            int totalItemsProcessed,
+            int totalItemsFound,
+            Dictionary<string, long>? itemCheckTimes = null)
+        {
+            // Check if performance metrics are enabled
+            if (!(_executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true))
+            {
+                return;
+            }
+
+            // Record the total execution time
+            RecordExecutionTime(methodName, totalExecutionTimeMs, true);
+
+            // Log detailed performance information
+            _logger.LogInformation(
+                "PERFORMANCE METRICS: {MethodName} - TotalTime={TotalTime}ms, ItemsProcessed={Processed}, ItemsFound={Found}",
+                methodName, totalExecutionTimeMs, totalItemsProcessed, totalItemsFound);
+
+            if (itemCheckTimes != null && itemCheckTimes.Any())
+            {
+                var avgItemTime = itemCheckTimes.Values.Average();
+                var maxItemTime = itemCheckTimes.Values.Max();
+                var minItemTime = itemCheckTimes.Values.Min();
+
+                _logger.LogDebug(
+                    "ITEM PROCESSING: {MethodName} - AvgTime={Avg:F2}ms, MinTime={Min}ms, MaxTime={Max}ms, ItemCount={Count}",
+                    methodName, avgItemTime, minItemTime, maxItemTime, itemCheckTimes.Count);
+            }
         }
 
         /// <summary>
@@ -464,8 +591,27 @@ namespace BacklashBot.Management
         /// </remarks>
         public void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics)
         {
+            RecordDatabaseMetrics(metrics, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+        }
+
+        /// <summary>
+        /// Records database performance metrics from the KalshiBotContext with enablement status.
+        /// </summary>
+        /// <param name="metrics">Dictionary containing database operation metrics.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        /// <remarks>
+        /// This method allows the calling class to pass its enablement status, enabling
+        /// more granular control over metric collection.
+        /// </remarks>
+        public void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics, bool metricsEnabled)
+        {
+            if (!(_executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            {
+                return;
+            }
+
             _databaseMetrics = metrics;
-            _logger.LogDebug("Database metrics recorded: {Count} operations", metrics?.Count ?? 0);
+            _logger.LogDebug("Database metrics recorded: {Count} operations, MetricsEnabled={MetricsEnabled}", metrics?.Count ?? 0, metricsEnabled);
         }
 
         /// <summary>
@@ -487,8 +633,27 @@ namespace BacklashBot.Management
         /// </remarks>
         public void RecordOverseerClientServiceMetrics(Dictionary<string, object> metrics)
         {
+            RecordOverseerClientServiceMetrics(metrics, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+        }
+
+        /// <summary>
+        /// Records OverseerClientService performance metrics with enablement status.
+        /// </summary>
+        /// <param name="metrics">Dictionary containing OverseerClientService performance metrics.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        /// <remarks>
+        /// This method allows the calling class to pass its enablement status, enabling
+        /// more granular control over metric collection.
+        /// </remarks>
+        public void RecordOverseerClientServiceMetrics(Dictionary<string, object> metrics, bool metricsEnabled)
+        {
+            if (!(_executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            {
+                return;
+            }
+
             _overseerClientServiceMetrics = metrics;
-            _logger.LogDebug("OverseerClientService metrics recorded: {Count} metrics", metrics?.Count ?? 0);
+            _logger.LogDebug("OverseerClientService metrics recorded: {Count} metrics, MetricsEnabled={MetricsEnabled}", metrics?.Count ?? 0, metricsEnabled);
         }
 
         /// <summary>
@@ -528,13 +693,48 @@ namespace BacklashBot.Management
             long totalMemoryUsed,
             double averageIntervalDeviationMs)
         {
-            // Record execution time for broadcast operations
-            RecordExecutionTime("BroadcastService", (long)totalBroadcastTimeMs);
+            RecordBroadcastMetrics(successfulBroadcasts, failedBroadcasts, totalBroadcastTimeMs, averageBroadcastTimeMs,
+                broadcastSuccessRate, totalDataSize, broadcastsPerMinute, totalMemoryUsed, averageIntervalDeviationMs, true);
+        }
+
+        /// <summary>
+        /// Records broadcast service performance metrics with enablement status.
+        /// </summary>
+        /// <param name="successfulBroadcasts">Number of successful broadcasts.</param>
+        /// <param name="failedBroadcasts">Number of failed broadcasts.</param>
+        /// <param name="totalBroadcastTimeMs">Total time spent on broadcasts in milliseconds.</param>
+        /// <param name="averageBroadcastTimeMs">Average broadcast time in milliseconds.</param>
+        /// <param name="broadcastSuccessRate">Success rate percentage.</param>
+        /// <param name="totalDataSize">Total size of broadcast data in bytes.</param>
+        /// <param name="broadcastsPerMinute">Average broadcasts per minute.</param>
+        /// <param name="totalMemoryUsed">Total memory used during broadcasts in bytes.</param>
+        /// <param name="averageIntervalDeviationMs">Average interval deviation in milliseconds.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        /// <remarks>
+        /// This method allows the calling class to pass its enablement status, enabling
+        /// more granular control over metric collection.
+        /// </remarks>
+        public void RecordBroadcastMetrics(
+            long successfulBroadcasts,
+            long failedBroadcasts,
+            double totalBroadcastTimeMs,
+            double averageBroadcastTimeMs,
+            double broadcastSuccessRate,
+            long totalDataSize,
+            double broadcastsPerMinute,
+            long totalMemoryUsed,
+            double averageIntervalDeviationMs,
+            bool metricsEnabled)
+        {
+            if (!metricsEnabled) return;
+
+            // Record execution time for broadcast operations with proper enablement status
+            RecordExecutionTime("BroadcastService", (long)totalBroadcastTimeMs, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
 
             // Log broadcast performance summary
             _logger.LogInformation(
-                "BROADCAST PERFORMANCE: Success={Successful}/{Total}, SuccessRate={SuccessRate:F2}%, AvgTime={AvgTime:F2}ms, DataSize={DataSize} bytes, Throughput={Throughput:F2}/min, Memory={Memory} bytes, IntervalDeviation={Deviation:F2}ms",
-                successfulBroadcasts, successfulBroadcasts + failedBroadcasts, broadcastSuccessRate, averageBroadcastTimeMs, totalDataSize, broadcastsPerMinute, totalMemoryUsed, averageIntervalDeviationMs);
+                "BROADCAST PERFORMANCE: Success={Successful}/{Total}, SuccessRate={SuccessRate:F2}%, AvgTime={AvgTime:F2}ms, DataSize={DataSize} bytes, Throughput={Throughput:F2}/min, Memory={Memory} bytes, IntervalDeviation={Deviation:F2}ms, MetricsEnabled={MetricsEnabled}",
+                successfulBroadcasts, successfulBroadcasts + failedBroadcasts, broadcastSuccessRate, averageBroadcastTimeMs, totalDataSize, broadcastsPerMinute, totalMemoryUsed, averageIntervalDeviationMs, metricsEnabled);
 
             // Check for broadcast performance alerts
             if (broadcastSuccessRate < 95.0)
@@ -578,13 +778,46 @@ namespace BacklashBot.Management
             int failedMarkets,
             TimeSpan totalWaitTime)
         {
-            // Record execution time
-            RecordExecutionTime("MarketDataInitializer", (long)totalDuration.TotalMilliseconds);
+            RecordMarketDataInitializerMetrics(totalDuration, marketCount, averageMarketTime, memoryDelta, cpuTime,
+                successfulMarkets, failedMarkets, totalWaitTime, true);
+        }
+
+        /// <summary>
+        /// Records MarketDataInitializer performance metrics with enablement status.
+        /// </summary>
+        /// <param name="totalDuration">Total initialization duration.</param>
+        /// <param name="marketCount">Number of markets processed.</param>
+        /// <param name="averageMarketTime">Average time per market.</param>
+        /// <param name="memoryDelta">Memory usage change in bytes.</param>
+        /// <param name="cpuTime">CPU time used.</param>
+        /// <param name="successfulMarkets">Number of successfully initialized markets.</param>
+        /// <param name="failedMarkets">Number of failed market initializations.</param>
+        /// <param name="totalWaitTime">Total time spent waiting.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        /// <remarks>
+        /// This method allows the calling class to pass its enablement status, enabling
+        /// more granular control over metric collection.
+        /// </remarks>
+        public void RecordMarketDataInitializerMetrics(
+            TimeSpan totalDuration,
+            int marketCount,
+            TimeSpan averageMarketTime,
+            long memoryDelta,
+            TimeSpan cpuTime,
+            int successfulMarkets,
+            int failedMarkets,
+            TimeSpan totalWaitTime,
+            bool metricsEnabled)
+        {
+            if (!metricsEnabled) return;
+
+            // Record execution time with proper enablement status
+            RecordExecutionTime("MarketDataInitializer", (long)totalDuration.TotalMilliseconds, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
 
             // Log performance summary
             _logger.LogInformation(
-                "MARKET DATA INITIALIZER PERFORMANCE: Duration={Duration}, Markets={Count}, AvgTime={AvgTime}, MemoryDelta={Memory} bytes, CpuTime={Cpu}, Success={Success}, Fail={Fail}, WaitTime={Wait}",
-                totalDuration, marketCount, averageMarketTime, memoryDelta, cpuTime, successfulMarkets, failedMarkets, totalWaitTime);
+                "MARKET DATA INITIALIZER PERFORMANCE: Duration={Duration}, Markets={Count}, AvgTime={AvgTime}, MemoryDelta={Memory} bytes, CpuTime={Cpu}, Success={Success}, Fail={Fail}, WaitTime={Wait}, MetricsEnabled={MetricsEnabled}",
+                totalDuration, marketCount, averageMarketTime, memoryDelta, cpuTime, successfulMarkets, failedMarkets, totalWaitTime, metricsEnabled);
 
             // Check for performance alerts
             if (totalDuration.TotalSeconds > 300) // 5 minutes
@@ -615,8 +848,8 @@ namespace BacklashBot.Management
         {
             var (totalTime, marketsProcessed, apiCalls, errors, peakMemory, startTime, endTime, taskDurations) = metrics.GetOvernightPerformanceMetrics();
 
-            // Record execution time
-            RecordExecutionTime("OvernightActivities", totalTime);
+            // Record execution time with proper enablement status
+            RecordExecutionTime("OvernightActivities", totalTime, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
 
             // Log comprehensive overnight performance summary
             _logger.LogInformation("OVERNIGHT PERFORMANCE: Total={TotalTime}ms, Markets={Markets}, API Calls={ApiCalls}, Errors={Errors}, Peak Memory={PeakMemory}MB",
@@ -798,7 +1031,7 @@ namespace BacklashBot.Management
         /// <param name="success">Whether the task was successful.</param>
         public void RecordOvernightTask(string taskName, long duration, bool success)
         {
-            RecordExecutionTime(taskName, duration);
+            RecordExecutionTime(taskName, duration, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
             if (!success)
             {
                 _logger.LogWarning("Overnight task '{TaskName}' failed after {Duration}ms", taskName, duration);
@@ -856,8 +1089,8 @@ namespace BacklashBot.Management
         /// </remarks>
         public void RecordMarketAnalysisHelperMetrics(int totalMarkets, long totalTimeMs, double averageTimeMs, int errorCount)
         {
-            // Record execution time
-            RecordExecutionTime("MarketAnalysisHelper.GenerateSnapshotGroups", totalTimeMs);
+            // Record execution time with proper enablement status
+            RecordExecutionTime("MarketAnalysisHelper.GenerateSnapshotGroups", totalTimeMs, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
 
             // Log performance summary
             _logger.LogInformation(
@@ -900,11 +1133,30 @@ namespace BacklashBot.Management
         /// </summary>
         public void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes)
         {
+            RecordWebSocketMessageProcessing(messageType, processingTimeTicks, messageCount, bufferSizeBytes, true);
+        }
+
+        /// <summary>
+        /// Records WebSocket message processing performance with enablement status.
+        /// </summary>
+        /// <param name="messageType">The type of WebSocket message being processed.</param>
+        /// <param name="processingTimeTicks">The processing time in ticks.</param>
+        /// <param name="messageCount">The number of messages processed.</param>
+        /// <param name="bufferSizeBytes">The buffer size used in bytes.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
+        /// <remarks>
+        /// This method allows the calling class to pass its enablement status, enabling
+        /// more granular control over metric collection.
+        /// </remarks>
+        public void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes, bool metricsEnabled)
+        {
+            if (!metricsEnabled) return;
+
             _webSocketProcessingTimeTicks.AddOrUpdate(messageType, 0, (k, v) => v + processingTimeTicks);
             _webSocketProcessingCount.AddOrUpdate(messageType, 0, (k, v) => v + messageCount);
             _webSocketBufferUsageBytes.AddOrUpdate(messageType, 0, (k, v) => v + bufferSizeBytes);
-            _logger.LogDebug("WebSocket message processing recorded: Type={Type}, TimeTicks={TimeTicks}, Count={Count}, BufferBytes={BufferBytes}",
-                messageType, processingTimeTicks, messageCount, bufferSizeBytes);
+            _logger.LogDebug("WebSocket message processing recorded: Type={Type}, TimeTicks={TimeTicks}, Count={Count}, BufferBytes={BufferBytes}, MetricsEnabled={MetricsEnabled}",
+                messageType, processingTimeTicks, messageCount, bufferSizeBytes, metricsEnabled);
         }
 
         /// <summary>
@@ -1220,6 +1472,24 @@ namespace BacklashBot.Management
             _messageProcessorLastDuplicateWarningTime = DateTime.MinValue;
             _messageProcessorMessageTypeCounts = null;
             _logger.LogInformation("MessageProcessor performance metrics reset");
+        }
+
+        /// <summary>
+        /// Gets all configurable performance metrics for GUI consumption.
+        /// </summary>
+        /// <returns>Dictionary containing all configurable metrics.</returns>
+        public IReadOnlyDictionary<string, object> GetConfigurableMetrics()
+        {
+            return _configurableMetrics;
+        }
+
+        /// <summary>
+        /// Sends the current enablement status to indicate whether this class is enabled for performance monitoring.
+        /// </summary>
+        private void SendEnablementStatus()
+        {
+            // Update the configurable metrics with current enablement status
+            _configurableMetrics["EnablePerformanceMetrics"] = true; // CentralPerformanceMonitor is always enabled
         }
 
         #endregion

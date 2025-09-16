@@ -6,6 +6,7 @@ using static TradingStrategies.Strategies.Strats.BollingerBreakout;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using TradingStrategies.Configuration;
+using TradingStrategies.Trading.Overseer;
 
 namespace TradingStrategies.Trading.Helpers
 {
@@ -148,7 +149,7 @@ namespace TradingStrategies.Trading.Helpers
                     ["Timestamp"] = DateTime.UtcNow
                 };
 
-                performanceMonitor.RecordSimulationMetrics($"StrategySelectionHelper.{strategyType}", metricsDict);
+                performanceMonitor.RecordSimulationMetrics($"StrategySelectionHelper.{strategyType}", metricsDict, EnablePerformanceMetrics);
             }
         }
         /// <summary>

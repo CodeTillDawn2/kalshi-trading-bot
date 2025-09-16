@@ -13,7 +13,7 @@ using static TradingStrategies.Trading.Overseer.ReportGenerator;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace TradingStrategies
+namespace TradingStrategies.Trading.Overseer
 {
     /// <summary>
     /// Orchestrates trading scenario simulations and performance analysis for the Kalshi trading bot.
@@ -126,17 +126,17 @@ namespace TradingStrategies
                 _logger.LogDebug("Simulation execution time: {Elapsed} ms, Snapshots processed: {Count}, Paths generated: {Paths}, Memory usage: {Memory} bytes", stopwatch.Elapsed.TotalMilliseconds, snapshots.Count, activePaths.Count, memoryUsage);
 
                 // Record metrics to PerformanceMonitor
-                var itemCheckTimes = new Dictionary<string, long>
+                var metricsDict = new Dictionary<string, object>
                 {
-                    { "MemoryUsage", memoryUsage }
+                    ["MethodName"] = "TestScenario",
+                    ["TotalExecutionTimeMs"] = (long)stopwatch.Elapsed.TotalMilliseconds,
+                    ["TotalItemsProcessed"] = snapshots.Count,
+                    ["TotalItemsFound"] = activePaths.Count,
+                    ["ItemCheckTimes"] = new Dictionary<string, long> { { "MemoryUsage", memoryUsage } },
+                    ["Timestamp"] = DateTime.UtcNow
                 };
-                _performanceMonitor.RecordPerformanceMetrics(
-                    methodName: "TestScenario",
-                    totalExecutionTimeMs: (long)stopwatch.Elapsed.TotalMilliseconds,
-                    totalItemsProcessed: snapshots.Count,
-                    totalItemsFound: activePaths.Count,
-                    itemCheckTimes: itemCheckTimes
-                );
+
+                _performanceMonitor.RecordSimulationMetrics("TradingOverseer", metricsDict, _enablePerformanceMetrics);
             }
 
             // Post EquityCalculator metrics automatically

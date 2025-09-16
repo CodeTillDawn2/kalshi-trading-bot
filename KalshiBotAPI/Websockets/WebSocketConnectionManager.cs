@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Exceptions;
 using BacklashBot.Management.Interfaces;
+using BacklashBot.Management;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
@@ -920,7 +921,7 @@ namespace KalshiBotAPI.Websockets
         {
             if (_performanceMonitor != null && _enableMetrics)
             {
-                _performanceMonitor.RecordExecutionTime($"WebSocketConnectionManager.{operation}", milliseconds);
+                _performanceMonitor.RecordExecutionTime($"WebSocketConnectionManager.{operation}", milliseconds, _enableMetrics);
             }
         }
 
@@ -937,19 +938,19 @@ namespace KalshiBotAPI.Websockets
 
             // Post connection success rate as execution time (using a fixed operation name)
             var successRateMs = (long)(ConnectionSuccessRate * 1000); // Convert to milliseconds for consistency
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.ConnectionSuccessRate", successRateMs);
+            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.ConnectionSuccessRate", successRateMs, _enableMetrics);
 
             // Post throughput as execution time
             var throughputMs = (long)(MessageThroughput * 1000); // Convert messages/sec to "milliseconds" equivalent
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.MessageThroughput", throughputMs);
+            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.MessageThroughput", throughputMs, _enableMetrics);
 
             // Post error rate
             var errorRateMs = (long)(ErrorRate * 1000);
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.ErrorRate", errorRateMs);
+            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.ErrorRate", errorRateMs, _enableMetrics);
 
             // Post bandwidth
             var bandwidthMs = (long)(BandwidthBps * 1000); // Convert bytes/sec to "milliseconds" equivalent
-            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.Bandwidth", bandwidthMs);
+            _performanceMonitor.RecordExecutionTime("WebSocketConnectionManager.Bandwidth", bandwidthMs, _enableMetrics);
 
             _logger.LogDebug("Posted WebSocketConnectionManager metrics snapshot to performance monitor");
         }

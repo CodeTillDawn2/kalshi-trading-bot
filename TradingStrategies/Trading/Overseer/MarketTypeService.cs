@@ -270,7 +270,7 @@ namespace TradingStrategies.Trading.Overseer
                     ["AverageClassificationTimeMs"] = GetAverageClassificationTime().TotalMilliseconds,
                     ["ClassificationCount"] = _classificationCount
                 };
-                performanceMonitor.RecordSimulationMetrics("MarketTypeService", metrics);
+                performanceMonitor.RecordSimulationMetrics("MarketTypeService", metrics, _enablePerformanceMetrics);
             }
         }
     }

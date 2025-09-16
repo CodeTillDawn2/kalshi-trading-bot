@@ -284,7 +284,7 @@ namespace BacklashBot.Services
 
                 if (_enablePerformanceMetrics && _centralPerformanceMonitor != null)
                 {
-                    _centralPerformanceMonitor.RecordExecutionTime("TradingSnapshotService.SaveSnapshotAsync", stopwatch.ElapsedMilliseconds);
+                    _centralPerformanceMonitor.RecordExecutionTime("TradingSnapshotService.SaveSnapshotAsync", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
                 }
 
                 if (_enablePerformanceMetrics)
@@ -416,7 +416,7 @@ namespace BacklashBot.Services
 
                 if (_enablePerformanceMetrics && _centralPerformanceMonitor != null)
                 {
-                    _centralPerformanceMonitor.RecordExecutionTime("TradingSnapshotService.LoadManySnapshots", stopwatch.ElapsedMilliseconds);
+                    _centralPerformanceMonitor.RecordExecutionTime("TradingSnapshotService.LoadManySnapshots", stopwatch.ElapsedMilliseconds, _enablePerformanceMetrics);
                 }
 
                 if (_enablePerformanceMetrics)

@@ -185,7 +185,7 @@ namespace BacklashBot.Services
             var performanceMonitor = _serviceFactory.GetPerformanceMonitor();
             if (performanceMonitor != null)
             {
-                performanceMonitor.RecordExecutionTime(operationName, elapsedMilliseconds);
+                performanceMonitor.RecordExecutionTime(operationName, elapsedMilliseconds, _executionConfig.EnableCandlestickServicePerformanceMetrics);
             }
         }
 
