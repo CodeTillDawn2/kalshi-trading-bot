@@ -70,11 +70,11 @@ namespace TradingGUI
 
             toolTip1.ShowAlways = true;
 
-            // Initialize database context with same config as SimulatorTests
-            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
+            // Initialize database context with TradingGUI's own configuration
+            var basePath = AppDomain.CurrentDomain.BaseDirectory;
             var config = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
             _context = new BacklashBotContext(config);
 

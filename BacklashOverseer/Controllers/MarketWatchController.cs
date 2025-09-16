@@ -43,8 +43,7 @@ namespace BacklashOverseer.Controllers
         private readonly TimeSpan LogDataCacheDuration; // Shorter cache for log data
 
         // Performance metrics configuration
-        private readonly bool _enablePerformanceMetrics;
-        private readonly bool _enableCachePerformanceMetrics;
+        private readonly bool _enableMarketWatchControllerPerformanceMetrics;
 
         // Local cache metrics for batch posting
         private long _localCacheHits;
@@ -76,11 +75,10 @@ namespace BacklashOverseer.Controllers
             _configuration = configuration;
             _performanceMetricsService = performanceMetricsService;
 
-            MarketsCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("CacheConfig:MarketsCacheDurationMinutes", 15));
-            LogDataCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("CacheConfig:LogDataCacheDurationMinutes", 5));
+            MarketsCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("MarketWatchController:MarketsCacheDurationMinutes", 15));
+            LogDataCacheDuration = TimeSpan.FromMinutes(_configuration.GetValue<int>("MarketWatchController:LogDataCacheDurationMinutes", 5));
             
-            _enablePerformanceMetrics = _configuration.GetValue<bool>("MarketWatchController:EnablePerformanceMetrics", true);
-            _enableCachePerformanceMetrics = _configuration.GetValue<bool>("MarketWatchController:EnableCachePerformanceMetrics", true);
+            _enableMarketWatchControllerPerformanceMetrics = _configuration.GetValue<bool>("MarketWatchController:EnableMarketWatchControllerPerformanceMetrics", true);
         }
 
         /// <summary>
@@ -110,7 +108,7 @@ namespace BacklashOverseer.Controllers
                 List<MarketDTO> markets;
                 if (_cache.TryGetValue(MarketsCacheKey, out var cachedMarkets))
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheHits++;
                     }
@@ -118,7 +116,7 @@ namespace BacklashOverseer.Controllers
                 }
                 else
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheMisses++;
                     }
@@ -130,7 +128,7 @@ namespace BacklashOverseer.Controllers
                 Dictionary<Guid, string> brainInstancesByLock;
                 if (_cache.TryGetValue(BrainInstancesCacheKey, out var cachedBrainInstances))
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheHits++;
                     }
@@ -138,7 +136,7 @@ namespace BacklashOverseer.Controllers
                 }
                 else
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheMisses++;
                     }
@@ -152,7 +150,7 @@ namespace BacklashOverseer.Controllers
                 List<BrainInstanceDTO> allBrainInstances;
                 if (_cache.TryGetValue(AllBrainInstancesCacheKey, out var cachedAllBrainInstances))
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheHits++;
                     }
@@ -160,7 +158,7 @@ namespace BacklashOverseer.Controllers
                 }
                 else
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheMisses++;
                     }
@@ -241,7 +239,7 @@ namespace BacklashOverseer.Controllers
                 List<MarketDTO> markets;
                 if (_cache.TryGetValue(MarketsCacheKey, out var cachedMarkets))
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheHits++;
                     }
@@ -249,7 +247,7 @@ namespace BacklashOverseer.Controllers
                 }
                 else
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheMisses++;
                     }
@@ -261,7 +259,7 @@ namespace BacklashOverseer.Controllers
                 List<BrainInstanceDTO> allBrainInstances;
                 if (_cache.TryGetValue(AllBrainInstancesCacheKey, out var cachedAllBrainInstances))
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheHits++;
                     }
@@ -269,7 +267,7 @@ namespace BacklashOverseer.Controllers
                 }
                 else
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheMisses++;
                     }
@@ -281,7 +279,7 @@ namespace BacklashOverseer.Controllers
                 Dictionary<Guid, string> brainInstancesByLock;
                 if (_cache.TryGetValue(BrainInstancesCacheKey, out var cachedBrainInstances))
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheHits++;
                     }
@@ -289,7 +287,7 @@ namespace BacklashOverseer.Controllers
                 }
                 else
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheMisses++;
                     }
@@ -309,7 +307,7 @@ namespace BacklashOverseer.Controllers
                 LogData brainInstanceLogData;
                 if (_cache.TryGetValue(LogDataCacheKey, out var cachedLogData))
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheHits++;
                     }
@@ -317,7 +315,7 @@ namespace BacklashOverseer.Controllers
                 }
                 else
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheMisses++;
                     }
@@ -445,7 +443,7 @@ namespace BacklashOverseer.Controllers
                 var positionsKey = $"Positions_{currentOnly}";
                 if (_cache.TryGetValue(positionsKey, out var cachedPositions))
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheHits++;
                     }
@@ -453,7 +451,7 @@ namespace BacklashOverseer.Controllers
                 }
                 else
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheMisses++;
                     }
@@ -508,7 +506,7 @@ namespace BacklashOverseer.Controllers
                 List<OrderDTO> orders;
                 if (_cache.TryGetValue("Orders", out var cachedOrders))
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheHits++;
                     }
@@ -516,7 +514,7 @@ namespace BacklashOverseer.Controllers
                 }
                 else
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheMisses++;
                     }
@@ -589,7 +587,7 @@ namespace BacklashOverseer.Controllers
         /// </summary>
         private void PostCacheMetrics()
         {
-            if (_enablePerformanceMetrics && (_localCacheHits > 0 || _localCacheMisses > 0))
+            if (_enableMarketWatchControllerPerformanceMetrics && (_localCacheHits > 0 || _localCacheMisses > 0))
             {
                 _performanceMetricsService.PostCacheMetrics(_localCacheHits, _localCacheMisses);
                 _localCacheHits = 0;
@@ -676,7 +674,7 @@ namespace BacklashOverseer.Controllers
                 List<BrainInstanceDTO> brainInstances;
                 if (_cache.TryGetValue(AllBrainInstancesCacheKey, out var cachedBrainInstances))
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheHits++;
                     }
@@ -684,7 +682,7 @@ namespace BacklashOverseer.Controllers
                 }
                 else
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheMisses++;
                     }
@@ -696,7 +694,7 @@ namespace BacklashOverseer.Controllers
                 List<MarketWatchDTO> marketWatches;
                 if (_cache.TryGetValue("AllMarketWatches", out var cachedMarketWatches))
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheHits++;
                     }
@@ -704,7 +702,7 @@ namespace BacklashOverseer.Controllers
                 }
                 else
                 {
-                    if (_enablePerformanceMetrics)
+                    if (_enableMarketWatchControllerPerformanceMetrics)
                     {
                         _localCacheMisses++;
                     }

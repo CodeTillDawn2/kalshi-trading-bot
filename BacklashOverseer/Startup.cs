@@ -9,7 +9,10 @@ using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
 
 using BacklashOverseer;
+using BacklashOverseer.Config;
+using BacklashCommon.Configuration;
 using KalshiBotLogging;
+using Microsoft.Extensions.Options;
 using BacklashOverseer.Services;
 using BacklashDTOs.Configuration;
 using BacklashCommon.Services;
@@ -30,6 +33,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using System.IO;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Websockets;
 using BacklashBotData.Data.Interfaces;
@@ -136,6 +140,39 @@ namespace BacklashOverseer
 
             // Configure OverseerHub settings
             services.Configure<OverseerHubConfig>(Configuration.GetSection("OverseerHub"));
+
+            // Configure Overseer settings
+            services.Configure<OverseerConfig>(Configuration.GetSection("Overseer"));
+
+            // Configure Performance settings
+            services.Configure<PerformanceConfig>(Configuration.GetSection("PerformanceMetricsService"));
+
+
+            // Configure MarketWatchController settings
+            services.Configure<MarketWatchControllerConfig>(Configuration.GetSection("MarketWatchController"));
+
+            // Configure SubscriptionManager settings
+            services.Configure<SubscriptionManagerConfig>(Configuration.GetSection("SubscriptionManager"));
+
+
+            // Configure Secrets settings
+            services.Configure<BacklashCommon.Configuration.SecretsConfig>(Configuration.GetSection("Secrets"));
+
+            // Resolve KeyFile path - combine secrets path with filename from secrets
+            services.PostConfigure<KalshiConfig>((config, secretsConfig) =>
+            {
+                if (!string.IsNullOrEmpty(config.KeyFile) && config.KeyFile.Contains("{Kalshi:KeyFile}"))
+                {
+                    // Get the key file name from secrets
+                    var keyFileName = Configuration.GetValue<string>("Kalshi:KeyFile");
+                    if (!string.IsNullOrEmpty(keyFileName))
+                    {
+                        // Combine secrets directory path with filename
+                        var secretsDir = Path.Combine(Directory.GetCurrentDirectory(), secretsConfig.SecretsPath);
+                        config.KeyFile = Path.Combine(secretsDir, keyFileName);
+                    }
+                }
+            });
 
             // Optional: Manual override if configuration binding fails
             services.PostConfigure<KalshiConfig>(config =>

@@ -10,7 +10,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashBotTests", "..\Back
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashDTOs", "..\BacklashDTOs\BacklashDTOs.csproj", "{8A84CDB4-160B-4FE4-88C2-68223D68C245}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KalshiBotData", "..\BacklashBotContext\KalshiBotData.csproj", "{FF123049-8B01-4626-B76C-E14FD2598C5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KalshiBotData", "..\BacklashBotData\BacklashBotData.csproj", "{FF123049-8B01-4626-B76C-E14FD2598C5A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradingStrategies", "..\TradingStrategies\TradingStrategies.csproj", "{428D98FB-D9B5-43FC-94F2-7982C938171F}"
 EndProject

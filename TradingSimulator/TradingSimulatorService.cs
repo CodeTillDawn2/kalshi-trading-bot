@@ -138,10 +138,11 @@ namespace TradingSimulator
         /// </summary>
         public void Setup()
         {
-            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
+            // Use the current directory (TradingGUI's directory) for configuration
+            var basePath = AppDomain.CurrentDomain.BaseDirectory;
             var config = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
 
             _snapshotLoggerMock = new Mock<ILogger<ITradingSnapshotService>>();
@@ -151,12 +152,12 @@ namespace TradingSimulator
             var marketAnalysisLoggerMock = new Mock<ILogger<MarketAnalysisHelper>>();
             var overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
-            var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>();
-            var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>();
-            var simulatorConfig = config.GetSection("Simulator").Get<SimulatorConfig>();
+            var snapshotConfig = config.GetSection("TradingSnapshotService").Get<SnapshotConfig>();
+            var tradingConfig = config.GetSection("TradingStrategy").Get<TradingConfig>();
+            var simulatorConfig = config.GetSection("TradingSimulatorService").Get<SimulatorConfig>();
             _snapshotOptions = Options.Create(snapshotConfig);
             _tradingOptions = Options.Create(tradingConfig);
-            _executionConfig = Options.Create(config.GetSection("Execution").Get<ExecutionConfig>());
+            _executionConfig = Options.Create(config.GetSection("MarketAnalysisHelper").Get<ExecutionConfig>());
             _simulatorOptions = Options.Create(simulatorConfig);
 
             var services = new ServiceCollection();

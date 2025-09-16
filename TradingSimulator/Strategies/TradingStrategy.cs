@@ -161,34 +161,8 @@ namespace TradingSimulator.Strategies
             _processedMarkets = new HashSet<string>();
             _simulationState = new SimulationState { StartTime = DateTime.UtcNow };
             Reset();
-            ValidateConfiguration();
         }
 
-        /// <summary>
-        /// Validates the trading configuration parameters for consistency and safety.
-        /// </summary>
-        private void ValidateConfiguration()
-        {
-            var config = _tradingOptions.Value;
-
-            if (config.MaxPositionSizePercent <= 0 || config.MaxPositionSizePercent > 1)
-                throw new ArgumentException("MaxPositionSizePercent must be between 0 and 1");
-
-            if (config.MaxTotalExposurePercent <= 0 || config.MaxTotalExposurePercent > 5)
-                throw new ArgumentException("MaxTotalExposurePercent must be between 0 and 5");
-
-            if (config.StopLossPercent < 0 || config.StopLossPercent > 1)
-                throw new ArgumentException("StopLossPercent must be between 0 and 1");
-
-            if (config.TakeProfitPercent < 0 || config.TakeProfitPercent > 2)
-                throw new ArgumentException("TakeProfitPercent must be between 0 and 2");
-
-            if (config.MaxConcurrentPositions <= 0 || config.MaxConcurrentPositions > 100)
-                throw new ArgumentException("MaxConcurrentPositions must be between 1 and 100");
-
-            if (config.MaxDrawdownPercent < 0 || config.MaxDrawdownPercent > 1)
-                throw new ArgumentException("MaxDrawdownPercent must be between 0 and 1");
-        }
 
         /// <summary>
         /// Resets the trading strategy state, clearing all positions and profit/loss tracking.
@@ -426,11 +400,6 @@ namespace TradingSimulator.Strategies
             double currentTotalCost = pos.TotalCost;
             const double betSize = 10.0;
 
-            // Apply risk management checks
-            if (!ApplyRiskManagement(market, snapshot, decision, timestamp))
-            {
-                return;
-            }
 
             switch (decision)
             {
@@ -439,11 +408,6 @@ namespace TradingSimulator.Strategies
                     {
                         int sharesToBuy = CalculateSharesToBuy(betSize, snapshot.BestYesAsk);
 
-                        // Validate position limits
-                        if (!ValidatePositionLimits(market, sharesToBuy, snapshot.BestYesAsk, decision))
-                        {
-                            return;
-                        }
 
                         double cost = sharesToBuy * (snapshot.BestYesAsk / 100.0);
                         _positionTracker[market] = (currentShares + sharesToBuy, currentTotalCost + cost);
@@ -480,11 +444,6 @@ namespace TradingSimulator.Strategies
                     {
                         int sharesToShort = CalculateSharesToBuy(betSize, snapshot.BestNoAsk);
 
-                        // Validate position limits
-                        if (!ValidatePositionLimits(market, sharesToShort, snapshot.BestNoAsk, decision))
-                        {
-                            return;
-                        }
 
                         double cost = sharesToShort * (snapshot.BestNoAsk / 100.0);
                         _positionTracker[market] = (currentShares - sharesToShort, currentTotalCost + cost);
@@ -648,105 +607,6 @@ namespace TradingSimulator.Strategies
             }
         }
 
-        /// <summary>
-        /// Applies comprehensive risk management rules including stop-loss, take-profit, and maximum drawdown protection.
-        /// Monitors position performance in real-time and automatically executes protective actions when risk thresholds are breached.
-        /// This method ensures portfolio safety by enforcing configured risk limits throughout the simulation.
-        /// </summary>
-        /// <param name="market">The market ticker symbol for risk assessment.</param>
-        /// <param name="snapshot">The current market snapshot for price reference.</param>
-        /// <param name="decision">The trading decision being evaluated.</param>
-        /// <param name="timestamp">The timestamp of the decision for logging.</param>
-        /// <returns>True if the trade should proceed under current risk conditions, false if risk management intervened.</returns>
-        private bool ApplyRiskManagement(string market, MarketSnapshot snapshot, TradingDecisionEnum decision, DateTime timestamp)
-        {
-            if (!_positionTracker.TryGetValue(market, out var pos) || pos.Shares == 0)
-            {
-                return true; // No position to manage
-            }
 
-            var config = _tradingOptions.Value;
-            double currentPrice = pos.Shares > 0 ? snapshot.BestYesBid / 100.0 : (100.0 - snapshot.BestNoBid) / 100.0;
-            double entryPrice = pos.TotalCost / Math.Abs(pos.Shares);
-            double priceChange = (currentPrice - entryPrice) / entryPrice;
-
-            // Check stop-loss
-            if (Math.Abs(priceChange) >= config.StopLossPercent)
-            {
-                var exitDecision = pos.Shares > 0 ? TradingDecisionEnum.Sell : TradingDecisionEnum.Buy;
-                OnSimulationProgress?.Invoke($"Stop-loss triggered for {market}: {priceChange:P2} change");
-                ProcessTradingDecision(market, snapshot, exitDecision, timestamp);
-                return false;
-            }
-
-            // Check take-profit
-            if (priceChange >= config.TakeProfitPercent)
-            {
-                OnSimulationProgress?.Invoke($"Take-profit triggered for {market}: {priceChange:P2} gain");
-                ProcessTradingDecision(market, snapshot, TradingDecisionEnum.Sell, timestamp);
-                return false;
-            }
-
-            // Check max drawdown
-            double portfolioValue = 1000.0; // Base portfolio value
-            double currentPortfolioValue = portfolioValue + _totalProfitLoss;
-            double drawdown = (portfolioValue - currentPortfolioValue) / portfolioValue;
-
-            if (drawdown >= config.MaxDrawdownPercent)
-            {
-                OnSimulationProgress?.Invoke($"Max drawdown reached: {drawdown:P2}. Stopping simulation.");
-                // Close all positions
-                foreach (var position in _positionTracker.Where(p => p.Value.Shares != 0))
-                {
-                    var exitDecision = position.Value.Shares > 0 ? TradingDecisionEnum.Sell : TradingDecisionEnum.Buy;
-                    ProcessTradingDecision(position.Key, snapshot, exitDecision, timestamp);
-                }
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Validates position size limits and risk management constraints before executing trades.
-        /// Checks maximum position size, total exposure limits, concurrent position limits,
-        /// and ensures the proposed trade complies with all configured risk parameters.
-        /// </summary>
-        /// <param name="market">The market ticker symbol for the trade.</param>
-        /// <param name="proposedShares">The proposed number of shares to trade.</param>
-        /// <param name="price">The price per share in cents.</param>
-        /// <param name="decision">The trading decision (buy/sell) being validated.</param>
-        /// <returns>True if the trade is allowed under current risk constraints, false otherwise.</returns>
-        private bool ValidatePositionLimits(string market, int proposedShares, int price, TradingDecisionEnum decision)
-        {
-            var config = _tradingOptions.Value;
-            double tradeValue = proposedShares * (price / 100.0);
-
-            // Check position size limit
-            double maxPositionValue = config.MaxPositionSizePercent * 1000.0; // Assuming $1000 base portfolio
-            if (tradeValue > maxPositionValue)
-            {
-                OnSimulationProgress?.Invoke($"Trade rejected for {market}: exceeds max position size (${maxPositionValue:F2})");
-                return false;
-            }
-
-            // Check total exposure limit
-            double currentExposure = _positionTracker.Sum(p => Math.Abs(p.Value.Shares) * 10.0); // Rough estimate
-            if (currentExposure + tradeValue > config.MaxTotalExposurePercent * 1000.0)
-            {
-                OnSimulationProgress?.Invoke($"Trade rejected for {market}: exceeds max total exposure");
-                return false;
-            }
-
-            // Check concurrent positions limit
-            int activePositions = _positionTracker.Count(p => p.Value.Shares != 0);
-            if (decision == TradingDecisionEnum.Buy && activePositions >= config.MaxConcurrentPositions)
-            {
-                OnSimulationProgress?.Invoke($"Trade rejected for {market}: exceeds max concurrent positions ({config.MaxConcurrentPositions})");
-                return false;
-            }
-
-            return true;
-        }
     }
 }

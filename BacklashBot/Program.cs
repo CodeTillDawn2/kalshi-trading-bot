@@ -215,7 +215,7 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClie
     sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
     sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents,
     sp.GetRequiredService<IOptions<KalshiConfig>>().Value.WebSocketBufferSize,
-    sp.GetRequiredService<IConfiguration>().GetSection("Kalshi:KalshiWebSocketClient:EnablePerformanceMetrics").Get<bool?>() ?? true
+    sp.GetRequiredService<IConfiguration>().GetSection("Kalshi:KalshiWebSocketClient:EnableKalshiWebSocketClientPerformanceMetrics").Get<bool?>() ?? true
 ));
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>

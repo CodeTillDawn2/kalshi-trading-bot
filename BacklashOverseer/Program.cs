@@ -1,5 +1,6 @@
 // Updated Program.cs with web hosting
 using BacklashOverseer;
+using BacklashCommon.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,19 +56,13 @@ class Program
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
                 var currentDir = Directory.GetCurrentDirectory();
-                Console.WriteLine($"Current working directory: {currentDir}");
+                var configurationBuilder = ConfigurationHelper.CreateConfigurationBuilder(currentDir, args);
 
-                // Check if appsettings files exist
-                var appsettingsPath = Path.Combine(currentDir, "appsettings.json");
-                var localAppsettingsPath = Path.Combine(currentDir, "appsettings.local.json");
-                Console.WriteLine($"appsettings.json exists: {File.Exists(appsettingsPath)}");
-                Console.WriteLine($"appsettings.local.json exists: {File.Exists(localAppsettingsPath)}");
-
-                config.SetBasePath(currentDir)
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables()
-                    .AddCommandLine(args);
+                // Copy the sources to the host configuration
+                foreach (var source in configurationBuilder.Sources)
+                {
+                    config.Sources.Add(source);
+                }
             })
             .ConfigureWebHostDefaults(webBuilder =>
             {
