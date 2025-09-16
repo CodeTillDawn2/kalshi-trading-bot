@@ -159,7 +159,7 @@ namespace BacklashOverseer
             services.Configure<BacklashCommon.Configuration.SecretsConfig>(Configuration.GetSection("Secrets"));
 
             // Resolve KeyFile path - combine secrets path with filename from secrets
-            services.PostConfigure<KalshiConfig>((config, secretsConfig) =>
+            services.PostConfigure<KalshiConfig>(config =>
             {
                 if (!string.IsNullOrEmpty(config.KeyFile) && config.KeyFile.Contains("{Kalshi:KeyFile}"))
                 {
@@ -167,8 +167,10 @@ namespace BacklashOverseer
                     var keyFileName = Configuration.GetValue<string>("Kalshi:KeyFile");
                     if (!string.IsNullOrEmpty(keyFileName))
                     {
+                        // Get secrets path from configuration
+                        var secretsPath = Configuration.GetValue<string>("Secrets:SecretsPath") ?? "Secrets";
                         // Combine secrets directory path with filename
-                        var secretsDir = Path.Combine(Directory.GetCurrentDirectory(), secretsConfig.SecretsPath);
+                        var secretsDir = Path.Combine(Directory.GetCurrentDirectory(), secretsPath);
                         config.KeyFile = Path.Combine(secretsDir, keyFileName);
                     }
                 }

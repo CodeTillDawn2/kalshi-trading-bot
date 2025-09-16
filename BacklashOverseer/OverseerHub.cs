@@ -229,9 +229,9 @@ namespace BacklashOverseer
                 ["MessagesPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.MessagesProcessed / minutesSinceReset : 0,
                 ["HandshakeRequestsPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.HandshakeRequests / minutesSinceReset : 0,
                 ["CheckInRequestsPerMinute"] = minutesSinceReset > 0 ? signalRMetrics.CheckInRequests / minutesSinceReset : 0,
-                ["AverageHandshakeLatencyMs"] = _config.EnablePerformanceMetrics ? signalRMetrics.AvgHandshakeLatencyMs : 0,
-                ["AverageCheckInLatencyMs"] = _config.EnablePerformanceMetrics ? signalRMetrics.AvgCheckInLatencyMs : 0,
-                ["AverageMessageLatencyMs"] = _config.EnablePerformanceMetrics ? signalRMetrics.AvgMessageLatencyMs : 0,
+                ["AverageHandshakeLatencyMs"] = _config.EnableOverseerHubPerformanceMetrics ? signalRMetrics.AvgHandshakeLatencyMs : 0,
+                ["AverageCheckInLatencyMs"] = _config.EnableOverseerHubPerformanceMetrics ? signalRMetrics.AvgCheckInLatencyMs : 0,
+                ["AverageMessageLatencyMs"] = _config.EnableOverseerHubPerformanceMetrics ? signalRMetrics.AvgMessageLatencyMs : 0,
                 ["CurrentConnectionCount"] = _connectedClients.Count,
                 ["LastMetricsReset"] = signalRMetrics.LastReset
             };
@@ -285,7 +285,7 @@ namespace BacklashOverseer
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task Handshake(string clientId, string clientName, string clientType)
         {
-            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+            var stopwatch = _config.EnableOverseerHubPerformanceMetrics ? Stopwatch.StartNew() : null;
 
             var httpContext = Context.GetHttpContext();
             var ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -302,7 +302,7 @@ namespace BacklashOverseer
                 return;
             }
 
-            if (_config.EnablePerformanceMetrics)
+            if (_config.EnableOverseerHubPerformanceMetrics)
             {
                 _performanceMetrics.RecordSignalRHandshake();
                 _performanceMetrics.RecordSignalRMessage();
@@ -328,7 +328,7 @@ namespace BacklashOverseer
                 _clientInfo[Context.ConnectionId] = clientInfo;
 
                 // Log to database if available and performance metrics are enabled
-                if (_config.EnablePerformanceMetrics)
+                if (_config.EnableOverseerHubPerformanceMetrics)
                 {
                     try
                     {
@@ -393,7 +393,7 @@ namespace BacklashOverseer
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ProcessCheckIn(CheckInData checkInData)
         {
-            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+            var stopwatch = _config.EnableOverseerHubPerformanceMetrics ? Stopwatch.StartNew() : null;
 
             // Rate limiting check
             var clientId = Context.ConnectionId;
@@ -408,7 +408,7 @@ namespace BacklashOverseer
                 return;
             }
 
-            if (_config.EnablePerformanceMetrics)
+            if (_config.EnableOverseerHubPerformanceMetrics)
             {
                 _performanceMetrics.RecordSignalRCheckIn();
                 _performanceMetrics.RecordSignalRMessage();
@@ -471,7 +471,7 @@ namespace BacklashOverseer
                     clientInfo.ClientName, dbBrainExists);
 
                 // Update current market tickers in persistence service
-                if (_config.EnablePerformanceMetrics && !string.IsNullOrEmpty(clientInfo.ClientName))
+                if (_config.EnableOverseerHubPerformanceMetrics && !string.IsNullOrEmpty(clientInfo.ClientName))
                 {
                     try
                     {
@@ -511,7 +511,7 @@ namespace BacklashOverseer
                 }
 
                 // Update client last seen in database
-                if (_config.EnablePerformanceMetrics)
+                if (_config.EnableOverseerHubPerformanceMetrics)
                 {
                     try
                     {
@@ -634,7 +634,7 @@ namespace BacklashOverseer
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ProcessPerformanceMetrics(PerformanceMetricsData performanceMetrics)
         {
-            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+            var stopwatch = _config.EnableOverseerHubPerformanceMetrics ? Stopwatch.StartNew() : null;
 
             _logger.LogInformation("PerformanceMetrics received from connection: {ConnectionId}", Context.ConnectionId);
 
@@ -693,7 +693,7 @@ namespace BacklashOverseer
                 clientInfo.LastSeen = DateTime.UtcNow;
 
                 // Update client last seen in database
-                if (_config.EnablePerformanceMetrics)
+                if (_config.EnableOverseerHubPerformanceMetrics)
                 {
                     try
                     {
@@ -764,7 +764,7 @@ namespace BacklashOverseer
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task HandlePerformanceMetrics(object performanceMetrics)
         {
-            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+            var stopwatch = _config.EnableOverseerHubPerformanceMetrics ? Stopwatch.StartNew() : null;
 
             try
             {
@@ -841,7 +841,7 @@ namespace BacklashOverseer
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task HandleOverseerMessage(string messageType, string message)
         {
-            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+            var stopwatch = _config.EnableOverseerHubPerformanceMetrics ? Stopwatch.StartNew() : null;
 
             _logger.LogInformation("Received SendOverseerMessage: {MessageType} - {Message}", messageType, message);
 
