@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BacklashCommon\BacklashCommon.csproj" />
     <ProjectReference Include="..\BacklashDTOs\BacklashDTOs.csproj" />
     <ProjectReference Include="..\BacklashInterfaces\BacklashInterfaces.csproj" />
     <ProjectReference Include="..\BacklashPatterns\BacklashPatterns.csproj" />

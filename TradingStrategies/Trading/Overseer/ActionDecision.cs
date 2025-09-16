@@ -1,7 +1,7 @@
 using static BacklashInterfaces.Enums.StrategyEnums;
 using System;
 
-namespace TradingStrategies
+namespace TradingStrategies.Trading.Overseer
 {
     /// <summary>
     /// Represents the output of a trading strategy's decision-making process in the Kalshi trading bot system.

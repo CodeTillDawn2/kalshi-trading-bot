@@ -699,13 +699,18 @@ namespace BacklashPatterns
                 if (performanceMonitor != null)
                 {
                     var summary = metrics.GetSummary();
-                    performanceMonitor.RecordPerformanceMetrics(
-                        "PatternSearch.DetectPatternsAsync",
-                        summary.TotalDetectionTimeMs,
-                        summary.TotalCandlesProcessed,
-                        summary.TotalPatternsFound,
-                        summary.PatternCheckTimes
-                    );
+                    var metricsDict = new Dictionary<string, object>
+                    {
+                        ["MethodName"] = "PatternSearch.DetectPatternsAsync",
+                        ["TotalDetectionTimeMs"] = summary.TotalDetectionTimeMs,
+                        ["TotalCandlesProcessed"] = summary.TotalCandlesProcessed,
+                        ["TotalPatternsFound"] = summary.TotalPatternsFound,
+                        ["PatternCheckTimes"] = summary.PatternCheckTimes,
+                        ["Timestamp"] = DateTime.UtcNow
+                    };
+
+                    // Call the overloaded method with enablement status
+                    performanceMonitor.RecordSimulationMetrics("PatternSearch", metricsDict, _enablePerformanceMetrics);
                 }
             }
 

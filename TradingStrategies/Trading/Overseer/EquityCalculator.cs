@@ -211,13 +211,17 @@ namespace TradingStrategies.Trading.Overseer
             long totalExecutionTimeMs = _calculationTimes.Sum();
             int totalCalculations = _calculationTimes.Count;
 
-            performanceMonitor.RecordPerformanceMetrics(
-                methodName: "EquityCalculator.GetEquity",
-                totalExecutionTimeMs: totalExecutionTimeMs,
-                totalItemsProcessed: totalCalculations,
-                totalItemsFound: 0,
-                itemCheckTimes: null
-            );
+            var metricsDict = new Dictionary<string, object>
+            {
+                ["MethodName"] = "EquityCalculator.GetEquity",
+                ["TotalExecutionTimeMs"] = totalExecutionTimeMs,
+                ["TotalItemsProcessed"] = totalCalculations,
+                ["TotalItemsFound"] = 0,
+                ["ItemCheckTimes"] = (Dictionary<string, long>?)null,
+                ["Timestamp"] = DateTime.UtcNow
+            };
+
+            performanceMonitor.RecordSimulationMetrics("EquityCalculator", metricsDict, _config.EquityCalculator_EnablePerformanceMetrics);
         }
     }
 }

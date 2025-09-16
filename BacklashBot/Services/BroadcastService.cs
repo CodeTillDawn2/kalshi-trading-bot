@@ -385,7 +385,28 @@ namespace BacklashBot.Services
                         _totalDataSize,
                         _broadcastsPerMinute,
                         _totalMemoryUsed,
-                        avgDeviation
+                        avgDeviation,
+                        _enablePerformanceMetrics
+                    );
+                }
+                else
+                {
+                    // Use interface method with enablement status
+                    double avgTime = _successfulBroadcasts + _failedBroadcasts > 0 ? _totalBroadcastTime / (_successfulBroadcasts + _failedBroadcasts) : 0;
+                    double successRate = _successfulBroadcasts + _failedBroadcasts > 0 ? (_successfulBroadcasts * 100.0) / (_successfulBroadcasts + _failedBroadcasts) : 0;
+                    double avgDeviation = _intervalCount > 0 ? (_totalIntervalDeviation / _intervalCount) * 1000 : 0;
+
+                    _centralPerformanceMonitor.RecordBroadcastMetrics(
+                        _successfulBroadcasts,
+                        _failedBroadcasts,
+                        _totalBroadcastTime,
+                        avgTime,
+                        successRate,
+                        _totalDataSize,
+                        _broadcastsPerMinute,
+                        _totalMemoryUsed,
+                        avgDeviation,
+                        _enablePerformanceMetrics
                     );
                 }
             }

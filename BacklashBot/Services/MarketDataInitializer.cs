@@ -1,4 +1,5 @@
 using BacklashBot.Management.Interfaces;
+using BacklashBot.Management;
 using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -242,8 +243,22 @@ namespace BacklashBot.Services
                 _logger.LogInformation("Market data initialization completed in {Duration} for {Count} markets", LastInitializationDuration, LastInitializationMarketCount);
 
                 // Post metrics to central performance monitor
-                if (_enablePerformanceMetrics)
+                if (_centralPerformanceMonitor is CentralPerformanceMonitor monitor)
                 {
+                    monitor.RecordMarketDataInitializerMetrics(
+                        LastInitializationDuration,
+                        LastInitializationMarketCount,
+                        AverageMarketInitializationTime,
+                        MemoryUsageDelta,
+                        CpuTimeDelta,
+                        SuccessfulMarketInitializations,
+                        FailedMarketInitializations,
+                        TotalWaitTime,
+                        _enablePerformanceMetrics);
+                }
+                else
+                {
+                    // Use interface method with enablement status
                     _centralPerformanceMonitor.RecordMarketDataInitializerMetrics(
                         LastInitializationDuration,
                         LastInitializationMarketCount,
@@ -252,7 +267,8 @@ namespace BacklashBot.Services
                         CpuTimeDelta,
                         SuccessfulMarketInitializations,
                         FailedMarketInitializations,
-                        TotalWaitTime);
+                        TotalWaitTime,
+                        _enablePerformanceMetrics);
                 }
             }
             catch (OperationCanceledException)

@@ -116,7 +116,7 @@ namespace BacklashBot.Services
             {
                 stopwatch?.Stop();
                 _logger.LogInformation($"InitializeScope execution time: {stopwatch?.ElapsedMilliseconds} ms");
-                _monitor.RecordExecutionTime("InitializeScope", stopwatch?.ElapsedMilliseconds ?? 0);
+                _monitor.RecordExecutionTime("InitializeScope", stopwatch?.ElapsedMilliseconds ?? 0, _enableMetrics);
                 _initializeScopeCallCount++;
                 _scopeCreationTime = DateTime.UtcNow;
             }
@@ -158,7 +158,7 @@ namespace BacklashBot.Services
             {
                 var lifetime = DateTime.UtcNow - _scopeCreationTime.Value;
                 _logger.LogInformation($"Managed scope lifetime: {lifetime.TotalMilliseconds} ms");
-                _monitor.RecordExecutionTime("ScopeLifetime", (long)lifetime.TotalMilliseconds);
+                _monitor.RecordExecutionTime("ScopeLifetime", (long)lifetime.TotalMilliseconds, _enableMetrics);
                 _scopeCreationTime = null;
             }
             _scope?.Dispose();

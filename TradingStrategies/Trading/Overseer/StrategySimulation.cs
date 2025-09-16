@@ -838,7 +838,7 @@ namespace TradingStrategies.Trading.Overseer
             };
 
             // Automatically record to performance monitor if provided
-            _performanceMonitor?.RecordSimulationMetrics(Strategy.Name, metrics);
+            _performanceMonitor?.RecordSimulationMetrics(Strategy.Name, metrics, _config.Simulation_EnablePerformanceMetrics);
 
             return metrics;
         }

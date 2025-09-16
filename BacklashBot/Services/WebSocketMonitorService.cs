@@ -289,7 +289,7 @@ namespace BacklashBot.Services
                 }
 
                 // Post to central performance monitor
-                _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.ExchangeStatusCheck", responseTimeMs);
+                _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.ExchangeStatusCheck", responseTimeMs, _enableMetrics);
             }
         }
 
@@ -352,7 +352,7 @@ namespace BacklashBot.Services
             if (_enableMetrics)
             {
                 _websocketLatenciesMs.Add(latencyMs);
-                _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketLatency", latencyMs);
+                _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketLatency", latencyMs, _enableMetrics);
             }
         }
 
@@ -526,7 +526,7 @@ namespace BacklashBot.Services
                                         _connectionSuccessCount++;
                                         RecordConnectionRecovery();
                                         UpdateUptime(true);
-                                        _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketConnection", connectionDuration);
+                                        _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketConnection", connectionDuration, _enableMetrics);
                                     }
                                     _logger.LogDebug("WebSocket connected successfully in {Duration}ms", connectionDuration);
                                 }
@@ -635,7 +635,7 @@ namespace BacklashBot.Services
                                     _connectionSuccessCount++;
                                     RecordConnectionRecovery();
                                     UpdateUptime(true);
-                                    _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketConnection", connectionDuration);
+                                    _centralPerformanceMonitor.RecordExecutionTime("WebSocketMonitor.WebSocketConnection", connectionDuration, _enableMetrics);
                                 }
                                 _logger.LogInformation("WebSocket connected successfully in {Duration}ms", connectionDuration);
                             }

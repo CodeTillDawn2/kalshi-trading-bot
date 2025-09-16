@@ -643,7 +643,7 @@ namespace KalshiBotAPI.Websockets
                                         _bufferUsageBytes.AddOrUpdate("WebSocketMessage", 0, (k, v) => v + fullMessage.Length);
 
                                         // Post to performance service
-                                        _performanceMetrics?.RecordWebSocketMessageProcessing("WebSocketMessage", stopwatch.ElapsedTicks, 1, fullMessage.Length);
+                                        _performanceMetrics?.RecordWebSocketMessageProcessing("WebSocketMessage", stopwatch.ElapsedTicks, 1, fullMessage.Length, EnablePerformanceMetrics);
                                     }
 
                                     messageBuilder.Clear();
@@ -683,11 +683,11 @@ namespace KalshiBotAPI.Websockets
         #region IWebSocketPerformanceMetrics Implementation
 
         /// <summary>
-        /// Records WebSocket message processing performance.
+        /// Records WebSocket message processing performance with enablement status.
         /// </summary>
-        public void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes)
+        public void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes, bool metricsEnabled)
         {
-            if (!EnablePerformanceMetrics) return;
+            if (!EnablePerformanceMetrics || !metricsEnabled) return;
 
             _messageProcessingTimeTicks.AddOrUpdate(messageType, 0, (k, v) => v + processingTimeTicks);
             _messageProcessingCount.AddOrUpdate(messageType, 0, (k, v) => v + messageCount);
