@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using BacklashDTOs.Configuration;
@@ -74,7 +74,7 @@ namespace BacklashBot.Management
             long totalProcessingTime = 0;
 
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             var tickersAnalyzed = await context.GetSnapshotGroupsFiltered();
             var tickerHashSet = tickersAnalyzed

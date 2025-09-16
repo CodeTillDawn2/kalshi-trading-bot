@@ -7,6 +7,9 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <PlatformTarget>x64</PlatformTarget>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ApplicationIcon />
+    <StartupObject>TradingGUI.Program</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -29,14 +32,35 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BacklashBotData\BacklashBotData.csproj" />
     <ProjectReference Include="..\TradingSimulator\TradingSimulator.csproj" />
-    <ProjectReference Include="..\KalshiBotTests\KalshiBotTests.csproj" />
+    <ProjectReference Include="..\BacklashDTOs\BacklashDTOs.csproj" />
+    <ProjectReference Include="..\TradingStrategies\TradingStrategies.csproj" />
+    <ProjectReference Include="..\BacklashInterfaces\BacklashInterfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
     <Compile Update="SnapshotViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Update="SnapshotViewer.Designer.cs">
+      <DependentUpon>SnapshotViewer.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="SnapshotViewer.resx">
+      <DependentUpon>SnapshotViewer.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

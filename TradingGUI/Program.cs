@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TradingStrategies.Trading.Overseer;
 using BacklashInterfaces.PerformanceMetrics;
 
-namespace SimulatorWinForms
+namespace TradingGUI
 {
     internal static class Program
     {

@@ -1,5 +1,5 @@
 using KalshiBotAPI.Configuration;
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -304,7 +304,7 @@ namespace KalshiBotAPI.KalshiAPI
                             });
 
                             using var scope = _scopeFactory.CreateScope();
-                            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                             await context.AddOrUpdateMarkets(marketsToUpdate.ToList());
                             await Task.CompletedTask;
                         }
@@ -344,7 +344,7 @@ namespace KalshiBotAPI.KalshiAPI
                 if (tickers?.Length > 0 && updateNotFoundToClosed && responseWasSuccessful)
                 {
                     using var scope = _scopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                    var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                     foreach (var ticker in tickers.Where(t => !foundTickers.Contains(t)))
                     {
@@ -606,7 +606,7 @@ namespace KalshiBotAPI.KalshiAPI
                 );
 
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                 if (seriesResponse == null) throw new Exception(url + $" returned null response. JSON: {jsonString}");
 
@@ -705,7 +705,7 @@ namespace KalshiBotAPI.KalshiAPI
                 );
 
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                 if (eventResponse == null || eventResponse.Event == null)
                 {
@@ -734,7 +734,7 @@ namespace KalshiBotAPI.KalshiAPI
                     foreach (var apiMarket in eventResponse.Event.Markets)
                     {
                         using var marketScope = _scopeFactory.CreateScope();
-                        var marketContext = marketScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                        var marketContext = marketScope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
 
                         var market = new MarketDTO
@@ -896,7 +896,7 @@ namespace KalshiBotAPI.KalshiAPI
                 }
 
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                 var existingPositions = await context.GetMarketPositions();
                 var apiTickerSet = allMarketPositions.Select(p => p.Ticker).ToHashSet();
@@ -904,7 +904,7 @@ namespace KalshiBotAPI.KalshiAPI
                 foreach (var apiPosition in allMarketPositions)
                 {
                     using var positionScope = _scopeFactory.CreateScope();
-                    var positionContext = positionScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                    var positionContext = positionScope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                     var position = new MarketPositionDTO
                     {
@@ -1095,7 +1095,7 @@ namespace KalshiBotAPI.KalshiAPI
                     try
                     {
                         using var scope = _scopeFactory.CreateScope();
-                        var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                         var endDateTime = DateTimeOffset.FromUnixTimeSeconds(apiCandlestick.EndPeriodTs).UtcDateTime;
                         if (endDateTime > now)
@@ -1152,7 +1152,7 @@ namespace KalshiBotAPI.KalshiAPI
                 if (candlesticks.Count > 0 && interval == "minute" && updateLastCandlestick)
                 {
                     using var scope = _scopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                    var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                     try
                     {
@@ -1387,7 +1387,7 @@ namespace KalshiBotAPI.KalshiAPI
                 foreach (var apiOrder in allOrders)
                 {
                     using var scope = _scopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                    var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                     var order = new OrderDTO
                     {
@@ -1486,7 +1486,7 @@ namespace KalshiBotAPI.KalshiAPI
                 }
 
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                 var announcementsToAdd = new List<AnnouncementDTO>();
                 foreach (var apiAnnouncement in responseData.Announcements)
@@ -1559,7 +1559,7 @@ namespace KalshiBotAPI.KalshiAPI
                 }
 
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                 // Create ExchangeSchedule DTO
                 var exchangeScheduleDTO = new ExchangeScheduleDTO

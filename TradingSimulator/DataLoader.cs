@@ -1,4 +1,3 @@
-using KalshiBotData.Data.Interfaces;
 using BacklashDTOs.Data;
 using TradingStrategies;
 using System.Text.RegularExpressions;
@@ -6,6 +5,7 @@ using BacklashBot.Services.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Configuration;
 using Microsoft.Extensions.Options;
+using BacklashBotData.Data.Interfaces;
 
 namespace TradingSimulator
 {
@@ -21,7 +21,7 @@ namespace TradingSimulator
         }
 
         public async Task<List<SnapshotGroupDTO>> GetFilteredSnapshotGroupsAsync(
-            IKalshiBotContext context, List<string>? marketsToRun)
+            IBacklashBotContext context, List<string>? marketsToRun)
         {
             var groups = await context.GetSnapshotGroups().ConfigureAwait(false);
             var filtered = new List<SnapshotGroupDTO>();
@@ -42,7 +42,7 @@ namespace TradingSimulator
         }
 
         public async Task<List<MarketSnapshot>> LoadSnapshotsForMarketAsync(
-            IKalshiBotContext context, string marketName)
+            IBacklashBotContext context, string marketName)
         {
             var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, marketsToRun: new() { marketName }).ConfigureAwait(false);
             var marketGroups = filteredGroups.Where(g => g.MarketTicker == marketName).ToList();
@@ -69,7 +69,7 @@ namespace TradingSimulator
         }
 
         public async Task<Dictionary<string, List<MarketSnapshot>>> LoadSnapshotsForMarketsAsync(
-            IKalshiBotContext context, List<string> markets)
+            IBacklashBotContext context, List<string> markets)
         {
             var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, markets).ConfigureAwait(false);
             var uniqueMarkets = filteredGroups.Select(g => g.MarketTicker).Distinct().ToList();

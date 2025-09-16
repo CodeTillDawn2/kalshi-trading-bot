@@ -1,4 +1,4 @@
-namespace SimulatorWinForms
+namespace TradingGUI
 {
     partial class MainForm
     {

@@ -1,6 +1,6 @@
 // CentralPerformanceMonitor.cs
 using KalshiBotAPI.WebSockets.Interfaces;
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
 using BacklashBot.Management.Interfaces;
@@ -242,7 +242,7 @@ namespace BacklashBot.Management
         {
             if (_timerRunning) return;
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             BrainInstanceDTO? dto = await context.GetBrainInstanceByName(BrainInstance ?? "");
 
             var marketRefreshService = _serviceFactory.GetMarketRefreshService();

@@ -1,132 +1,163 @@
-# Prerequisites
-*.d
+# =============================================================================
+# .NET Core / .NET 5+ / .NET 8
+# =============================================================================
 
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
+# Build results
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
 
-# Linker output
-*.ilk
-*.map
-*.exp
+# NuGet packages
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
 
-# Precompiled Headers
-*.gch
+# .NET Core Tools
+.dotnet/
+tools/
+.toolTarget
+
+# Visual Studio
+.vs/
+*.user
+*.aps
 *.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.log
+*.svclog
+*.scc
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
+# Visual Studio Code
+.vscode/
+*.code-workspace
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+# JetBrains Rider
+.idea/
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+# ReSharper
+*_ReSharper.*
+*.DotSettings.user
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
+# Rider
+.idea/
+*.sln.iml
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-/KalshiBotContext/bin
-/KalshiBotContext/obj
-PatternsTest/appsettings.local.json
-PatternsTest/bin/Debug/net8.0/appsettings.local.json
-/PatternsTest
-/SimulatorGUI/obj
-/SmokehouseBot/.vs
-/SmokehouseBot/bin
-/SmokehouseBot/obj
-/SmokehouseDTOs/bin
-/SmokehouseDTOs/obj
-/SmokehouseInterfaces/bin
-/SmokehouseInterfaces/obj
-/SmokehousePatterns/bin
-/SmokehousePatterns/obj
-/TradingSimulator/.vs
-/TradingSimulator/bin
-/TradingSimulator/obj
-/TradingSimulatorGUI/bin
-/TradingSimulatorGUI/obj
-/TradingStrategies/bin
-/TradingStrategies/obj
-SmokehouseBot/publish.log
-SmokehouseBot/prod_private_key.txt
-/SmokehouseBot/Logs
-SmokehouseBot/Benchmarks_05-07-25.xlsx
-SmokehouseBot/appsettings.local.json
-SimulatorGUI/SimulatorGUI.csproj.Backup.tmp
-/SimulatorGUI/bin
-KalshiUI/bin/Debug/net8.0-windows/appsettings.local.json
-/TradingGUI/bin
-/TradingGUI/obj
-/KalshiBotAPI/obj
-/KalshiBotOverseer/obj
-/KalshiBotAPI/bin
-KalshiBotOverseer/appsettings.local.json
-/KalshiBotOverseer/bin
-/BacklashBot/.vs
-BacklashBot/appsettings.local.json
-BacklashBot/Benchmarks_05-07-25.xlsx
-/BacklashBot/bin
-/BacklashBot/obj
-BacklashBot/publish.log
-BacklashBot/UiMockup.psd
-/BacklashDTOs/bin
-/BacklashDTOs/obj
-/BacklashInterfaces/bin
-/BacklashInterfaces/obj
-/BacklashPatterns/obj
-/BacklashPatterns/bin
-/KalshiBotOverseer/bin
-BacklashBot/Logs/shutodown.log
-/KalshiBotLogging/obj
-/KalshiBotLogging/obj
-/KalshiBotTasks/bin
-/KalshiBotTasks/obj
-/KalshiBotTests/bin
-/KalshiBotTests/obj
-!docs/**
-docfx_project/api/
-!docs/**
-!docs/**
-!docs/**
-!docs/**
-!docs/**
-!docs/**
-!docs/**
-!docs/**
-!docs/**
-!docs/**
-!docs/**
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Publish
+publish/
+*.publishproj
+
+# Test results
+TestResults/
+*.trx
+*.testsettings
+
+# Coverage
+*.coverage
+*.coveragexml
+
+# =============================================================================
+# Project-specific
+# =============================================================================
+
+# Configuration files
+**/appsettings.local.json
+**/appsettings.*.json
+
+# Logs
+**/Logs/
+*.log
+
+# Private keys and secrets
+**/prod_private_key.txt
+**/prod_private_key_dev.txt
+**/prod_private_key_old.txt
 jwt-secret.txt
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# Excel files (benchmarks, etc.)
+*.xlsx
+*.xls
+
+# PSD files
+*.psd
+
+# Publish logs
+publish.log
+
+# Documentation
+docfx_project/api/
+
+# =============================================================================
+# OS-specific
+# =============================================================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# =============================================================================
+# Custom/legacy entries (cleaned up)
+# =============================================================================
+
+# Keep docs
 !docs/**
-!docs/**
-/KalshiBotLogging/bin
-!docs/**
-/BacklashCommon/bin
-/BacklashCommon/obj
-/KalshiBotLogging/bin
-!docs/**
+
+# Specific project artifacts
+KalshiUI/bin/Debug/net8.0-windows/appsettings.local.json
+SimulatorGUI/SimulatorGUI.csproj.Backup.tmp
+BacklashBot/Logs/shutodown.log
+/TradingGUI/.vs

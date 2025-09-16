@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
 using Parquet;
 using Parquet.Data;
@@ -206,7 +206,7 @@ namespace BacklashBot.Services
                 _logger.LogInformation("Updating candlesticks for {MarketTicker}", marketTicker);
 
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 var marketService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
                 var market = await context.GetMarketByTicker(marketTicker);
                 if (market == null) return;
@@ -331,7 +331,7 @@ namespace BacklashBot.Services
                 }
 
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 var market = await context.GetMarketByTicker(marketTicker);
                 if (market == null)
                 {
@@ -700,7 +700,7 @@ namespace BacklashBot.Services
             };
 
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             var rawCandlesticks = await context.RetrieveCandlesticksAsync(
                 _statusTracker.GetCancellationToken(), intervalType, marketTicker, sqlStartTime);
@@ -927,7 +927,7 @@ namespace BacklashBot.Services
         {
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             if (!_serviceFactory.GetDataCache().Markets.TryGetValue(marketTicker, out var marketData))
                 return;
 

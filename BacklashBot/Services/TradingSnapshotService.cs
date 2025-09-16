@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using NJsonSchema;
@@ -551,7 +551,7 @@ namespace BacklashBot.Services
         public async Task<bool> ValidateSnapshotSchema()
         {
             using var scope = _serviceScopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             var schema = JsonSchema.FromType<CacheSnapshot>();
             var schemaData = schema.ToJson();

@@ -2,8 +2,9 @@ using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
-using KalshiBotData.Data;
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data;
+using BacklashBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
@@ -24,9 +25,9 @@ using TradingStrategies.Configuration;
 using TradingStrategies.Helpers.Interfaces;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using KalshiBotLogging;
 using BacklashCommon.Services;
 using BacklashInterfaces.PerformanceMetrics;
+using KalshiBotLogging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -164,14 +165,14 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
 });
 
 // Database context
-builder.Services.AddDbContext<KalshiBotContext>(options =>
+builder.Services.AddDbContext<BacklashBotContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IKalshiBotContext>(provider => provider.GetRequiredService<KalshiBotContext>());
+builder.Services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
 builder.Services.AddScoped<IKalshiAPIService, KalshiAPIService>();
 
 // Register services as scoped
-builder.Services.AddScoped<ISqlDataService, SqlDataService>();
+builder.Services.AddScoped<ISqlDataService, KalshiBotData.Data.SqlDataService>();
 builder.Services.AddScoped<ITradingSnapshotService, TradingSnapshotService>();
 builder.Services.AddScoped<IMarketDataService, MarketDataService>();
 builder.Services.AddScoped<ITradingCalculator, TradingCalculator>();

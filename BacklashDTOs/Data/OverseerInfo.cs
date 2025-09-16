@@ -76,7 +76,7 @@ namespace BacklashDTOs.Data
             Port = 5000;
             StartTime = DateTime.UtcNow;
             IsActive = true;
-            ServiceName = "KalshiBotOverseer";
+            ServiceName = "BacklashOverseer";
             LastHeartbeat = DateTime.UtcNow;
         }
     }

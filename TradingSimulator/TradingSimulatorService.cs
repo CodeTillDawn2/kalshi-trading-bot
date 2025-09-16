@@ -7,7 +7,7 @@
 // </summary>
 
 using KalshiBotData.Data;
-using KalshiBotData.Data.Interfaces;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +35,8 @@ using TradingStrategies.Trading.Helpers;
 using TradingStrategies.Trading.Overseer;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using TradingSimulator.Simulator;
+using BacklashBotData.Data.Interfaces;
+using BacklashBotData.Data;
 
 namespace TradingSimulator
 {
@@ -86,7 +88,7 @@ namespace TradingSimulator
         private IOptions<SnapshotConfig> _snapshotOptions;
         private IOptions<TradingConfig> _tradingOptions;
         private IServiceScopeFactory _scopeFactory;
-        private IKalshiBotContext _dbContext;
+        private IBacklashBotContext _dbContext;
         private MarketAnalysisHelper _marketAnalysisHelper;
         private IOptions<ExecutionConfig> _executionConfig;
         private IOptions<SimulatorConfig> _simulatorOptions;
@@ -160,8 +162,8 @@ namespace TradingSimulator
 
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
-            services.AddDbContext<KalshiBotContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
-            services.AddScoped<IKalshiBotContext>(sp => sp.GetRequiredService<KalshiBotContext>());
+            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+            services.AddScoped<IBacklashBotContext>(sp => sp.GetRequiredService<BacklashBotContext>());
             var serviceProvider = services.BuildServiceProvider();
 
             _scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
@@ -176,7 +178,7 @@ namespace TradingSimulator
             _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 
-            _dbContext = serviceProvider.GetRequiredService<IKalshiBotContext>();
+            _dbContext = serviceProvider.GetRequiredService<IBacklashBotContext>();
             _sqlLoggerMock = new Mock<ILogger<SqlDataService>>();
             _sqlDataService = new SqlDataService(config, _sqlLoggerMock.Object);
 
@@ -216,7 +218,7 @@ namespace TradingSimulator
         /// <param name="marketsToRun">Optional list of market names to filter by. If null, all markets are included.</param>
         /// <returns>A list of filtered SnapshotGroupDTO objects containing market snapshot metadata.</returns>
         public async Task<List<SnapshotGroupDTO>> GetFilteredSnapshotGroupsAsync(
-            IKalshiBotContext context, List<string>? marketsToRun)
+            IBacklashBotContext context, List<string>? marketsToRun)
         {
             return await _dataLoader.GetFilteredSnapshotGroupsAsync(context, marketsToRun);
         }
@@ -242,7 +244,7 @@ namespace TradingSimulator
             }
 
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             return await _dataLoader.LoadSnapshotsForMarketAsync(context, marketName);
         }
 
@@ -304,7 +306,7 @@ namespace TradingSimulator
 
             // prep context once
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             // create DTO for just this one set
             var (name, parameters) = paramSets[idx];
@@ -387,7 +389,7 @@ namespace TradingSimulator
 
             // save the one set
             using var saveScope = _scopeFactory.CreateScope();
-            var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var saveContext = saveScope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
 
             OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{marketList.Count} markets)");
@@ -441,7 +443,7 @@ namespace TradingSimulator
         public async Task<HashSet<string>> GetSnapshotGroupNames()
         {
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             return await context.GetSnapshotGroupNames();
         }
 
@@ -467,7 +469,7 @@ namespace TradingSimulator
             }
 
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             // Reuse the existing filtering logic, passing basesToInclude as marketsToRun
             var filteredGroups = await GetFilteredSnapshotGroupsAsync(context, basesToInclude).ConfigureAwait(false);
@@ -565,7 +567,7 @@ ResolveFamily(StrategyFamily family)
             var paramSets = MLEntrySeekerShared.MLSharedParameterSets;
 
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             // Initialize DTOs for results
             var weightSetDtos = new List<WeightSetDTO>(paramSets.Count);
@@ -742,7 +744,7 @@ ResolveFamily(StrategyFamily family)
             foreach (var dto in weightSetDtos)
             {
                 using var saveScope = _scopeFactory.CreateScope();
-                var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var saveContext = saveScope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
             }
         }
@@ -775,7 +777,7 @@ ResolveFamily(StrategyFamily family)
             var (strategiesList, paramSets, label) = ResolveFamily(family);
 
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             var weightSetDtos = new List<WeightSetDTO>(paramSets.Count);
             for (int i = 0; i < paramSets.Count; i++)
@@ -853,7 +855,7 @@ ResolveFamily(StrategyFamily family)
             foreach (var dto in weightSetDtos)
             {
                 using var saveScope = _scopeFactory.CreateScope();
-                var saveContext = saveScope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var saveContext = saveScope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 await saveContext.AddOrUpdateWeightSet(dto).ConfigureAwait(false);
                 OnTestProgress?.Invoke($"Saved {label}/{dto.StrategyName} ({dto.WeightSetMarkets.Count}/{marketList.Count} markets)");
             }

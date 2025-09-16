@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="KalshiBotOverseer\" />
+    <Folder Include="BacklashOverseer\" />
     <Folder Include="TradingStrategies\Models\" />
     <Folder Include="TradingStrategies\Trading\Overseer\" />
   </ItemGroup>

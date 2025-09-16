@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using BacklashDTOs.Configuration;
@@ -112,7 +112,7 @@ namespace BacklashBot.Management
             try
             {
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 BrainInstanceDTO? brainInstance = await context.GetBrainInstance(_executionConfig.BrainInstance);
                 if (brainInstance == null)
                 {

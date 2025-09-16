@@ -340,7 +340,7 @@ namespace BacklashBot.Services
             try
             {
                 using var scope = _serviceFactory.GetScopeManager().CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<KalshiBotData.Data.Interfaces.IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<BacklashBotData.Data.Interfaces.IBacklashBotContext>();
 
                 // Get active overseers from database, ordered by most recent heartbeat
                 var activeOverseers = await context.GetActiveOverseerInfos();
@@ -555,7 +555,7 @@ namespace BacklashBot.Services
             try
             {
                 using var scope = _serviceFactory.GetScopeManager().CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<KalshiBotData.Data.Interfaces.IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<BacklashBotData.Data.Interfaces.IBacklashBotContext>();
 
                 // Get the most recent active overseer
                 var activeOverseers = await context.GetActiveOverseerInfos();

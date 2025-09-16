@@ -3,7 +3,7 @@
 // MarketDashboardControl2.Designer.cs
 using ScottPlot;
 
-namespace SimulatorWinForms
+namespace TradingGUI
 {
     partial class SnapshotViewer
     {

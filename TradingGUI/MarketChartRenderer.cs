@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using TradingSimulator;
 
 
-namespace SimulatorWinForms.Charting
+namespace TradingGUI.Charting
 {
     internal static class MarketChartRenderer
     {

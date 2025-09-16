@@ -1,5 +1,5 @@
 using BacklashInterfaces.SmokehouseBot.Services;
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 
 namespace BacklashBot.Services
 {
@@ -9,14 +9,14 @@ namespace BacklashBot.Services
     public class HealthCheckService : IHealthCheckService
     {
         private readonly ILogger<HealthCheckService> _logger;
-        private readonly IKalshiBotContext _context;
+        private readonly IBacklashBotContext _context;
 
         /// <summary>
         /// Initializes a new instance of the HealthCheckService class.
         /// </summary>
         /// <param name="logger">The logger instance.</param>
         /// <param name="context">The database context.</param>
-        public HealthCheckService(ILogger<HealthCheckService> logger, IKalshiBotContext context)
+        public HealthCheckService(ILogger<HealthCheckService> logger, IBacklashBotContext context)
         {
             _logger = logger;
             _context = context;

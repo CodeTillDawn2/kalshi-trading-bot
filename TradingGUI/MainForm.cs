@@ -1,7 +1,6 @@
 // MainForm.cs
 using BacklashDTOs;
-using KalshiBotData.Data;
-using KalshiBotData.Models;
+using BacklashBotData.Data;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -10,38 +9,22 @@ using TradingStrategies.Strategies.Strategies.Strats;
 using TradingStrategies.Strategies.Strats;
 using TradingStrategies.Trading.Helpers;
 
-/// <summary>
-/// Configuration class for persisting user selections in the Trading GUI.
-/// Stores the last selected strategy and weight set to maintain user preferences
-/// across application sessions.
-/// </summary>
-public class TradingGUIConfig
+
+
+namespace TradingGUI
 {
     /// <summary>
-    /// Gets or sets the name of the last selected trading strategy.
-    /// </summary>
-    public string? LastSelectedStrategy { get; set; }
-
-    /// <summary>
-    /// Gets or sets the name of the last selected weight set for the strategy.
-    /// </summary>
-    public string? LastSelectedWeightSet { get; set; }
-}
-
-namespace SimulatorWinForms
-{
-    /// <summary>
-    /// Main form for the Kalshi Trading Bot GUI application.
+    /// Main form for the Backlash Trading Bot GUI application.
     /// Provides a comprehensive interface for running trading strategy simulations,
     /// visualizing market data through interactive charts, and managing market selections.
-    /// Integrates with the TradingSimulatorService for backtesting and the KalshiBotContext
+    /// Integrates with the TradingSimulatorService for backtesting and the BacklashBotContext
     /// for database operations. Supports real-time chart interaction including panning,
     /// zooming, and tooltips, as well as switching to detailed snapshot views.
     /// </summary>
     public partial class MainForm : Form
     {
         private readonly TradingSimulatorService _simulator;
-        private readonly KalshiBotContext _context;
+        private readonly BacklashBotContext _context;
         private readonly string _cacheDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "TestingOutput");
         private readonly string _configFilePath = Path.Combine(AppContext.BaseDirectory, "trading_gui_config.json");
         private List<(double x, double y, string memo)> _tooltipPoints = new();
@@ -93,7 +76,7 @@ namespace SimulatorWinForms
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
                 .Build();
-            _context = new KalshiBotContext(config);
+            _context = new BacklashBotContext(config);
 
             _simulator = new TradingSimulatorService();
             _simulator.EnsureInitialized();
@@ -547,7 +530,7 @@ namespace SimulatorWinForms
         {
             _lastTooltipMemo = null;
 
-            _tooltipPoints = await SimulatorWinForms.Charting.MarketChartRenderer.Render(
+            _tooltipPoints = await TradingGUI.Charting.MarketChartRenderer.Render(
                 formsPlot1,
                 _cacheDir,
                 market,

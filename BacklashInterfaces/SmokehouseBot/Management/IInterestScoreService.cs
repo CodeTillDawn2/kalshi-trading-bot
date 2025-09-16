@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BacklashBot.Management.Interfaces
@@ -18,7 +18,7 @@ namespace BacklashBot.Management.Interfaces
         Task<(double score,
             (double spreadTightness, double spreadWidth, double volume, double volumePercentile, double liquidityPercentile, double openInterestPercentile, double continuity) scoreParts)>
         CalculateMarketInterestScoreAsync(
-            IKalshiBotContext dbContext,
+            IBacklashBotContext dbContext,
             string marketTicker,
             double spreadTightnessWeight = 0.2,
             double spreadWidthWeight = 0.15,
