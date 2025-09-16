@@ -10,6 +10,7 @@ using TradingStrategies.Extensions;
 using TradingStrategies.Strategies;
 using TradingStrategies.Trading.Helpers;
 using TradingStrategies.Trading.Overseer;
+using TradingStrategies.Configuration;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Trading.Overseer.ReportGenerator;
 using System.Diagnostics;
@@ -46,7 +47,9 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         public SimulationEngine(IConfiguration configuration, PerformanceMonitor? performanceMonitor = null)
         {
-            _marketTypeService = new MarketTypeService();
+            var tradingConfig = new TradingConfig();
+            configuration.GetSection("TradingConfig").Bind(tradingConfig);
+            _marketTypeService = new MarketTypeService(tradingConfig);
             _patternDetectionService = new PatternDetectionService(configuration, performanceMonitor);
             _performanceMonitor = performanceMonitor;
             _enablePerformanceMetrics = configuration.GetValue<bool>("SimulationEngine:EnablePerformanceMetrics", true);
@@ -196,6 +199,10 @@ namespace TradingStrategies.Trading.Overseer
                     _performanceMonitor.RecordSimulationMetrics("SimulationEngine", metrics);
                 }
             }
+
+            // Post MarketTypeService metrics automatically
+            _marketTypeService.PostMetrics(_performanceMonitor);
+
             return activePaths;
         }
 
