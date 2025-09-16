@@ -31,27 +31,6 @@ namespace BacklashBot.Management.Interfaces
         void UpdateWebSocketMetricsRecordingStatus(bool isRecording);
 
         /// <summary>
-        /// Records MarketDataInitializer performance metrics.
-        /// </summary>
-        /// <param name="totalDuration">Total initialization duration.</param>
-        /// <param name="marketCount">Number of markets processed.</param>
-        /// <param name="averageMarketTime">Average time per market.</param>
-        /// <param name="memoryDelta">Memory usage change in bytes.</param>
-        /// <param name="cpuTime">CPU time used.</param>
-        /// <param name="successfulMarkets">Number of successfully initialized markets.</param>
-        /// <param name="failedMarkets">Number of failed market initializations.</param>
-        /// <param name="totalWaitTime">Total time spent waiting.</param>
-        void RecordMarketDataInitializerMetrics(
-            TimeSpan totalDuration,
-            int marketCount,
-            TimeSpan averageMarketTime,
-            long memoryDelta,
-            TimeSpan cpuTime,
-            int successfulMarkets,
-            int failedMarkets,
-            TimeSpan totalWaitTime);
-
-        /// <summary>
         /// Records MarketDataInitializer performance metrics with enablement status.
         /// </summary>
         /// <param name="totalDuration">Total initialization duration.</param>
@@ -84,15 +63,6 @@ namespace BacklashBot.Management.Interfaces
         void RecordMarketAnalysisHelperMetrics(int totalMarkets, long totalTimeMs, double averageTimeMs, int errorCount);
 
         /// <summary>
-        /// Records WebSocket message processing performance.
-        /// </summary>
-        /// <param name="messageType">The type of WebSocket message being processed.</param>
-        /// <param name="processingTimeTicks">The processing time in ticks.</param>
-        /// <param name="messageCount">The number of messages processed.</param>
-        /// <param name="bufferSizeBytes">The buffer size used in bytes.</param>
-        void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes);
-
-        /// <summary>
         /// Records WebSocket message processing performance with enablement status.
         /// </summary>
         /// <param name="messageType">The type of WebSocket message being processed.</param>
@@ -101,29 +71,6 @@ namespace BacklashBot.Management.Interfaces
         /// <param name="bufferSizeBytes">The buffer size used in bytes.</param>
         /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
         void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes, bool metricsEnabled);
-
-        /// <summary>
-        /// Records broadcast service performance metrics.
-        /// </summary>
-        /// <param name="successfulBroadcasts">Number of successful broadcasts.</param>
-        /// <param name="failedBroadcasts">Number of failed broadcasts.</param>
-        /// <param name="totalBroadcastTimeMs">Total time spent on broadcasts in milliseconds.</param>
-        /// <param name="averageBroadcastTimeMs">Average broadcast time in milliseconds.</param>
-        /// <param name="broadcastSuccessRate">Success rate percentage.</param>
-        /// <param name="totalDataSize">Total size of broadcast data in bytes.</param>
-        /// <param name="broadcastsPerMinute">Average broadcasts per minute.</param>
-        /// <param name="totalMemoryUsed">Total memory used during broadcasts in bytes.</param>
-        /// <param name="averageIntervalDeviationMs">Average interval deviation in milliseconds.</param>
-        void RecordBroadcastMetrics(
-            long successfulBroadcasts,
-            long failedBroadcasts,
-            double totalBroadcastTimeMs,
-            double averageBroadcastTimeMs,
-            double broadcastSuccessRate,
-            long totalDataSize,
-            double broadcastsPerMinute,
-            long totalMemoryUsed,
-            double averageIntervalDeviationMs);
 
         /// <summary>
         /// Records broadcast service performance metrics with enablement status.
@@ -151,23 +98,11 @@ namespace BacklashBot.Management.Interfaces
             bool metricsEnabled);
 
         /// <summary>
-        /// Records database performance metrics from the KalshiBotContext.
-        /// </summary>
-        /// <param name="metrics">Dictionary containing database operation metrics.</param>
-        void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics);
-
-        /// <summary>
         /// Records database performance metrics from the KalshiBotContext with enablement status.
         /// </summary>
         /// <param name="metrics">Dictionary containing database operation metrics.</param>
         /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class.</param>
         void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics, bool metricsEnabled);
-
-        /// <summary>
-        /// Records OverseerClientService performance metrics.
-        /// </summary>
-        /// <param name="metrics">Dictionary containing OverseerClientService performance metrics.</param>
-        void RecordOverseerClientServiceMetrics(Dictionary<string, object> metrics);
 
         /// <summary>
         /// Records OverseerClientService performance metrics with enablement status.

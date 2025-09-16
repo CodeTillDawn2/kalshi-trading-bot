@@ -222,22 +222,6 @@ namespace BacklashBot.Management
         }
 
         /// <summary>
-        /// Records the execution time for a specific API method or operation.
-        /// </summary>
-        /// <param name="methodName">The name of the method or operation being timed.</param>
-        /// <param name="milliseconds">The execution time in milliseconds.</param>
-        /// <remarks>
-        /// Execution times are stored in a thread-safe concurrent dictionary with timestamps.
-        /// This data can be used for performance analysis, bottleneck identification,
-        /// and optimization efforts. Multiple executions of the same method are accumulated
-        /// in a list for statistical analysis.
-        /// </remarks>
-        public void RecordExecutionTime(string methodName, long milliseconds)
-        {
-            RecordExecutionTime(methodName, milliseconds, true);
-        }
-
-        /// <summary>
         /// Records the execution time for a specific API method or operation with enablement status.
         /// </summary>
         /// <param name="methodName">The name of the method or operation being timed.</param>
@@ -265,22 +249,7 @@ namespace BacklashBot.Management
         }
 
         /// <summary>
-        /// Records simulation performance metrics from StrategySimulation.
-        /// This is the basic method without enablement status for backward compatibility.
-        /// </summary>
-        /// <param name="simulationName">The name of the simulation.</param>
-        /// <param name="metrics">The detailed metrics dictionary from StrategySimulation.GetDetailedPerformanceMetrics().</param>
-        /// <remarks>
-        /// This method delegates to the overloaded version with enablement status set to true.
-        /// </remarks>
-        public void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics)
-        {
-            RecordSimulationMetrics(simulationName, metrics, true);
-        }
-
-        /// <summary>
         /// Records simulation performance metrics from StrategySimulation with enablement status.
-        /// This is the preferred method for new implementations.
         /// </summary>
         /// <param name="simulationName">The name of the simulation.</param>
         /// <param name="metrics">The detailed metrics dictionary from StrategySimulation.GetDetailedPerformanceMetrics().</param>
@@ -582,19 +551,6 @@ namespace BacklashBot.Management
         }
 
         /// <summary>
-        /// Records database performance metrics from the KalshiBotContext.
-        /// </summary>
-        /// <param name="metrics">Dictionary containing database operation metrics.</param>
-        /// <remarks>
-        /// This method is called by the KalshiBotContext to post database performance metrics
-        /// to the central performance monitor for tracking and analysis.
-        /// </remarks>
-        public void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics)
-        {
-            RecordDatabaseMetrics(metrics, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
-        }
-
-        /// <summary>
         /// Records database performance metrics from the KalshiBotContext with enablement status.
         /// </summary>
         /// <param name="metrics">Dictionary containing database operation metrics.</param>
@@ -621,19 +577,6 @@ namespace BacklashBot.Management
         public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> GetPerformanceMetrics()
         {
             return _databaseMetrics ?? new Dictionary<string, (int, int, TimeSpan, double)>();
-        }
-
-        /// <summary>
-        /// Records OverseerClientService performance metrics.
-        /// </summary>
-        /// <param name="metrics">Dictionary containing OverseerClientService performance metrics.</param>
-        /// <remarks>
-        /// This method is called by OverseerClientService to post its performance metrics
-        /// to the central performance monitor for tracking and analysis.
-        /// </remarks>
-        public void RecordOverseerClientServiceMetrics(Dictionary<string, object> metrics)
-        {
-            RecordOverseerClientServiceMetrics(metrics, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
         }
 
         /// <summary>
@@ -664,37 +607,6 @@ namespace BacklashBot.Management
             _databaseMetrics = null;
             _overseerClientServiceMetrics = null;
             _logger.LogInformation("All performance metrics reset");
-        }
-
-        /// <summary>
-        /// Records broadcast service performance metrics.
-        /// </summary>
-        /// <param name="successfulBroadcasts">Number of successful broadcasts.</param>
-        /// <param name="failedBroadcasts">Number of failed broadcasts.</param>
-        /// <param name="totalBroadcastTimeMs">Total time spent on broadcasts in milliseconds.</param>
-        /// <param name="averageBroadcastTimeMs">Average broadcast time in milliseconds.</param>
-        /// <param name="broadcastSuccessRate">Success rate percentage.</param>
-        /// <param name="totalDataSize">Total size of broadcast data in bytes.</param>
-        /// <param name="broadcastsPerMinute">Average broadcasts per minute.</param>
-        /// <param name="totalMemoryUsed">Total memory used during broadcasts in bytes.</param>
-        /// <param name="averageIntervalDeviationMs">Average interval deviation in milliseconds.</param>
-        /// <remarks>
-        /// This method receives broadcast performance metrics from BroadcastService
-        /// and integrates them with the central performance monitoring system.
-        /// </remarks>
-        public void RecordBroadcastMetrics(
-            long successfulBroadcasts,
-            long failedBroadcasts,
-            double totalBroadcastTimeMs,
-            double averageBroadcastTimeMs,
-            double broadcastSuccessRate,
-            long totalDataSize,
-            double broadcastsPerMinute,
-            long totalMemoryUsed,
-            double averageIntervalDeviationMs)
-        {
-            RecordBroadcastMetrics(successfulBroadcasts, failedBroadcasts, totalBroadcastTimeMs, averageBroadcastTimeMs,
-                broadcastSuccessRate, totalDataSize, broadcastsPerMinute, totalMemoryUsed, averageIntervalDeviationMs, true);
         }
 
         /// <summary>
@@ -751,35 +663,6 @@ namespace BacklashBot.Management
             {
                 _logger.LogWarning("PERFORMANCE ALERT: Average interval deviation {Deviation:F2}ms exceeds 5 seconds", averageIntervalDeviationMs);
             }
-        }
-
-        /// <summary>
-        /// Records MarketDataInitializer performance metrics.
-        /// </summary>
-        /// <param name="totalDuration">Total initialization duration.</param>
-        /// <param name="marketCount">Number of markets processed.</param>
-        /// <param name="averageMarketTime">Average time per market.</param>
-        /// <param name="memoryDelta">Memory usage change in bytes.</param>
-        /// <param name="cpuTime">CPU time used.</param>
-        /// <param name="successfulMarkets">Number of successfully initialized markets.</param>
-        /// <param name="failedMarkets">Number of failed market initializations.</param>
-        /// <param name="totalWaitTime">Total time spent waiting.</param>
-        /// <remarks>
-        /// This method receives performance data from MarketDataInitializer
-        /// and integrates it with the central performance monitoring system.
-        /// </remarks>
-        public void RecordMarketDataInitializerMetrics(
-            TimeSpan totalDuration,
-            int marketCount,
-            TimeSpan averageMarketTime,
-            long memoryDelta,
-            TimeSpan cpuTime,
-            int successfulMarkets,
-            int failedMarkets,
-            TimeSpan totalWaitTime)
-        {
-            RecordMarketDataInitializerMetrics(totalDuration, marketCount, averageMarketTime, memoryDelta, cpuTime,
-                successfulMarkets, failedMarkets, totalWaitTime, true);
         }
 
         /// <summary>
@@ -1127,14 +1010,6 @@ namespace BacklashBot.Management
         #endregion
 
         #region IWebSocketPerformanceMetrics Implementation
-
-        /// <summary>
-        /// Records WebSocket message processing performance.
-        /// </summary>
-        public void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes)
-        {
-            RecordWebSocketMessageProcessing(messageType, processingTimeTicks, messageCount, bufferSizeBytes, true);
-        }
 
         /// <summary>
         /// Records WebSocket message processing performance with enablement status.
