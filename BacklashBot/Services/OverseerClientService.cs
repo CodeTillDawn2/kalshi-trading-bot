@@ -1005,7 +1005,7 @@ namespace BacklashBot.Services
             {
                 // Post metrics to central performance monitor
                 var metrics = GetMetrics();
-                _centralPerformanceMonitor.RecordOverseerClientServiceMetrics(metrics);
+                _centralPerformanceMonitor.RecordOverseerClientServiceMetrics(metrics, _enablePerformanceMetrics);
 
                 // Log metrics every 10 check-ins
                 if (_connectionSuccessCount > 0 && _connectionSuccessCount % 10 == 0)

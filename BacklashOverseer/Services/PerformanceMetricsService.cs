@@ -747,15 +747,17 @@ namespace BacklashOverseer.Services
         #region IWebSocketPerformanceMetrics Implementation
 
         /// <summary>
-        /// Records WebSocket message processing performance.
+        /// Records WebSocket message processing performance with enablement status.
         /// </summary>
-        public void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes)
+        public void RecordWebSocketMessageProcessing(string messageType, long processingTimeTicks, int messageCount, long bufferSizeBytes, bool metricsEnabled)
         {
+            if (!metricsEnabled) return;
+
             _webSocketProcessingTimeTicks.AddOrUpdate(messageType, 0, (k, v) => v + processingTimeTicks);
             _webSocketProcessingCount.AddOrUpdate(messageType, 0, (k, v) => v + messageCount);
             _webSocketBufferUsageBytes.AddOrUpdate(messageType, 0, (k, v) => v + bufferSizeBytes);
-            _logger.LogDebug("WebSocket message processing recorded: Type={Type}, TimeTicks={TimeTicks}, Count={Count}, BufferBytes={BufferBytes}",
-                messageType, processingTimeTicks, messageCount, bufferSizeBytes);
+            _logger.LogDebug("WebSocket message processing recorded: Type={Type}, TimeTicks={TimeTicks}, Count={Count}, BufferBytes={BufferBytes}, MetricsEnabled={MetricsEnabled}",
+                messageType, processingTimeTicks, messageCount, bufferSizeBytes, metricsEnabled);
         }
 
         /// <summary>
