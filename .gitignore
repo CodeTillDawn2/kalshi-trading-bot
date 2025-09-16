@@ -161,3 +161,4 @@ KalshiUI/bin/Debug/net8.0-windows/appsettings.local.json
 SimulatorGUI/SimulatorGUI.csproj.Backup.tmp
 BacklashBot/Logs/shutodown.log
 /TradingGUI/.vs
+/PatternsTest
