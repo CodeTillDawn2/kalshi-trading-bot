@@ -33,13 +33,24 @@ namespace BacklashCommon.Performance
         /// </summary>
         public double? CriticalThreshold { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the GeneralPerformanceMetric class.
+        /// </summary>
         public GeneralPerformanceMetric()
         {
             Category = "General";
         }
 
+        /// <summary>
+        /// Gets the primary value of the performance metric.
+        /// </summary>
+        /// <returns>The primary value as an object.</returns>
         public override object GetPrimaryValue() => Value;
 
+        /// <summary>
+        /// Gets all values of the performance metric as a dictionary.
+        /// </summary>
+        /// <returns>A dictionary containing all metric values.</returns>
         public override Dictionary<string, object> GetAllValues()
         {
             var values = new Dictionary<string, object>
@@ -55,6 +66,10 @@ namespace BacklashCommon.Performance
             return values;
         }
 
+        /// <summary>
+        /// Gets the thresholds for the performance metric.
+        /// </summary>
+        /// <returns>A tuple containing minimum, warning, and critical thresholds.</returns>
         public override (double? Min, double? Warning, double? Critical) GetThresholds()
         {
             return (MinThreshold, WarningThreshold, CriticalThreshold);

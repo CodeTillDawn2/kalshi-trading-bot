@@ -45,14 +45,30 @@ namespace BacklashBot.Management
     {
         private readonly ILogger<ICentralPerformanceMonitor> _logger;
         private readonly IServiceFactory _serviceFactory;
+        /// <summary>
+        /// Gets the concurrent dictionary storing API execution times for performance monitoring.
+        /// Key is the method name, value is a list of timestamp and milliseconds.
+        /// </summary>
         public readonly ConcurrentDictionary<string, List<(DateTime Timestamp, long Milliseconds)>> ApiExecutionTimes;
         private readonly TradingConfig _tradingConfig;
         private readonly ExecutionConfig _executionConfig;
         private readonly IServiceScopeFactory _scopeFactory;
         private IOrderBookService _orderbookService => _serviceFactory.GetOrderBookService();
+        /// <summary>
+        /// Gets the brain instance identifier used for configuration and logging.
+        /// </summary>
         public string? BrainInstance { get; private set; }
+        /// <summary>
+        /// Gets the refresh interval for market data updates.
+        /// </summary>
         public TimeSpan RefreshInterval { get; private set; }
+        /// <summary>
+        /// Gets the current database performance metrics.
+        /// </summary>
         public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? DatabaseMetrics => _databaseMetrics;
+        /// <summary>
+        /// Gets the current OverseerClientService performance metrics.
+        /// </summary>
         public IReadOnlyDictionary<string, object>? OverseerClientServiceMetrics => _overseerClientServiceMetrics;
 
         // Configurable metrics data structure for GUI consumption
@@ -62,16 +78,49 @@ namespace BacklashBot.Management
         private readonly ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>> _queueCountSamples;
         private readonly ConcurrentDictionary<string, List<(DateTime Timestamp, double AvgTime, int TotalOps)>> _orderBookServiceMetrics;
 
+        /// <summary>
+        /// Gets or sets the duration of the last market refresh cycle in seconds.
+        /// </summary>
         public double LastRefreshCycleSeconds { get; set; }
+        /// <summary>
+        /// Gets or sets the interval for the last market refresh cycle in seconds.
+        /// </summary>
         public double LastRefreshCycleInterval { get; set; }
+        /// <summary>
+        /// Gets or sets the number of markets processed in the last refresh cycle.
+        /// </summary>
         public int LastRefreshMarketCount { get; set; }
+        /// <summary>
+        /// Gets or sets the usage percentage of the last refresh cycle.
+        /// </summary>
         public double LastRefreshUsagePercentage { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether the last refresh time was acceptable.
+        /// </summary>
         public bool LastRefreshTimeAcceptable { get; set; }
+        /// <summary>
+        /// Gets or sets the date and time of the last performance sample.
+        /// </summary>
         public DateTime? LastPerformanceSampleDate { get; set; }
+        /// <summary>
+        /// Gets or sets the CPU time used in the last refresh cycle.
+        /// </summary>
         public TimeSpan LastRefreshCpuTime { get; set; }
+        /// <summary>
+        /// Gets or sets the memory usage in the last refresh cycle.
+        /// </summary>
         public long LastRefreshMemoryUsage { get; set; }
+        /// <summary>
+        /// Gets or sets the throughput of the last refresh cycle.
+        /// </summary>
         public double LastRefreshThroughput { get; set; }
+        /// <summary>
+        /// Gets or sets the average time per market in the last refresh cycle.
+        /// </summary>
         public TimeSpan LastRefreshAverageTimePerMarket { get; set; }
+        /// <summary>
+        /// Gets or sets the count of refreshes in the last cycle.
+        /// </summary>
         public int LastRefreshCount { get; set; }
         private readonly IScopeManagerService _scopeManagerService;
         private IStatusTrackerService _statusTrackerService;
@@ -100,7 +149,13 @@ namespace BacklashBot.Management
         private DateTime _messageProcessorLastDuplicateWarningTime;
         private IReadOnlyDictionary<string, long>? _messageProcessorMessageTypeCounts;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the system is currently starting up.
+        /// </summary>
         public bool IsStartingUp { get; set; } = false;
+        /// <summary>
+        /// Gets or sets a value indicating whether the system is currently shutting down.
+        /// </summary>
         public bool IsShuttingDown { get; set; } = false;
 
         /// <summary>
