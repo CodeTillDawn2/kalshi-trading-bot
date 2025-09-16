@@ -246,6 +246,14 @@ public class TradingConfig
     public bool StrategySelectionHelper_EnablePerformanceMetrics { get; set; } = false;
 
     /// <summary>
+    /// Enables or disables performance metrics collection in EquityCalculator.
+    /// When enabled, measures execution time for each equity calculation and collects timing statistics.
+    /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
+    /// Default: true
+    /// </summary>
+    public bool EquityCalculator_EnablePerformanceMetrics { get; set; } = true;
+
+    /// <summary>
     /// Validates the configuration parameters to ensure they are within acceptable ranges and prevent invalid combinations.
     /// This method should be called during application startup to catch misconfigurations early.
     /// Throws ArgumentException if any parameter is invalid.
