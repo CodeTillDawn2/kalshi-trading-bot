@@ -20,6 +20,7 @@ echo.
 REM Set variables
 set PROJECT_NAME=BacklashOverseer
 set PROJECT_PATH=BacklashOverseer\BacklashOverseer.csproj
+set PROJECT_DIR=BacklashOverseer
 set DEPLOY_FOLDER=C:\Deploy\Overseer
 set "OUTPUT_PATH=%DEPLOY_FOLDER%"
 set PUBLISH_PROFILE=Release
@@ -153,7 +154,7 @@ echo Creating zip file...
 REM Create a temporary PowerShell script for better reliability
 set "TEMP_PS_SCRIPT=%TEMP%\deploy_zip_%TIMESTAMP%.ps1"
 echo $ErrorActionPreference = 'Stop' > "%TEMP_PS_SCRIPT%"
-echo $outputPath = '%OUTPUT_PATH%' >> "%TEMP_PS_SCRIPT%"
+echo $outputPath = '%PROJECT_DIR%' >> "%TEMP_PS_SCRIPT%"
 echo $zipDestPath = '%FALLBACK_FOLDER%' >> "%TEMP_PS_SCRIPT%"
 echo $finalPath = '%ZIP_DEST_PATH%' >> "%TEMP_PS_SCRIPT%"
 echo $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss' >> "%TEMP_PS_SCRIPT%"
@@ -161,7 +162,7 @@ echo $zipBaseName = '%ZIP_BASENAME%' >> "%TEMP_PS_SCRIPT%"
 echo $thisScriptName = '%THIS_SCRIPT_NAME%' >> "%TEMP_PS_SCRIPT%"
 echo $zipName = $zipBaseName + '_' + $timestamp + '.zip' >> "%TEMP_PS_SCRIPT%"
 echo $destPath = Join-Path -Path $zipDestPath -ChildPath $zipName >> "%TEMP_PS_SCRIPT%"
-echo $itemsToZip = Get-ChildItem -Path $outputPath -Exclude 'appsettings.json','appsettings.local.json','appsettings.local.backup','web.config','*.zip','Logs','publish.log',$thisScriptName >> "%TEMP_PS_SCRIPT%"
+echo $itemsToZip = Get-ChildItem -Path $outputPath -Exclude 'bin','obj','.vs','*.user','*.suo','*.tmp','*.log','publish.log','appsettings.local.json','appsettings.local.backup','Logs',$thisScriptName >> "%TEMP_PS_SCRIPT%"
 echo if ($itemsToZip) { >> "%TEMP_PS_SCRIPT%"
 echo     try { >> "%TEMP_PS_SCRIPT%"
 echo         Compress-Archive -Path $itemsToZip.FullName -DestinationPath $destPath -Force >> "%TEMP_PS_SCRIPT%"

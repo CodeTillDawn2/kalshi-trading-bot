@@ -1,8 +1,8 @@
 @echo off
 echo ===========================================
-echo BacklashBot Deployment Script
+echo TradingGUI Deployment Script
 echo ===========================================
-echo Publishing BacklashBot project (appsettings.local.json will NOT be copied)...
+echo Publishing TradingGUI project (appsettings.local.json will NOT be copied)...
 echo.
 echo Starting deployment process...
 setlocal enabledelayedexpansion
@@ -18,12 +18,12 @@ echo INFO: Using PowerShell: %POWERSHELL_EXE%
 echo.
 
 :: Configuration
-set "PROJECT_NAME=BacklashBot"
-set "PROJECT_PATH=BacklashBot\BacklashBot.csproj"
-set "PROJECT_DIR=BacklashBot"
-set "OUTPUT_PATH=C:\Deploy\BacklashBot"
+set "PROJECT_NAME=TradingGUI"
+set "PROJECT_PATH=TradingGUI\TradingGUI.csproj"
+set "PROJECT_DIR=TradingGUI"
+set "OUTPUT_PATH=C:\Deploy\TradingGUI"
 set "TARGET_FRAMEWORK=net8.0"
-set "ZIP_BASENAME=BacklashBot"
+set "ZIP_BASENAME=TradingGUI"
 set "THIS_SCRIPT_NAME=%~nx0"
 set "NETWORK_ZIP_PATH=\\DESKTOP-ITC50UT\SmokehouseCandlestickImport"
 set "FALLBACK_FOLDER=%OUTPUT_PATH%"
@@ -49,8 +49,8 @@ echo.
 
 :: Clean build artifacts only
 echo Cleaning build artifacts...
-rmdir /s /q "BacklashBot\bin" 2>nul
-rmdir /s /q "BacklashBot\obj" 2>nul
+rmdir /s /q "TradingGUI\bin" 2>nul
+rmdir /s /q "TradingGUI\obj" 2>nul
 echo Build artifacts cleaned.
 echo.
 
@@ -161,7 +161,6 @@ echo $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss' >> "%TEMP_PS_SCRIPT%"
 echo $zipBaseName = '%ZIP_BASENAME%' >> "%TEMP_PS_SCRIPT%"
 echo $thisScriptName = '%THIS_SCRIPT_NAME%' >> "%TEMP_PS_SCRIPT%"
 echo $zipName = $zipBaseName + '_' + $timestamp + '.zip' >> "%TEMP_PS_SCRIPT%"
-echo $destPath = Join-Path -Path $zipDestPath -ChildPath $zipName >> "%TEMP_PS_SCRIPT%"
 echo $itemsToZip = Get-ChildItem -Path $outputPath -Exclude 'bin','obj','.vs','*.user','*.suo','*.tmp','*.log','publish.log','appsettings.local.json','appsettings.local.backup','Logs',$thisScriptName >> "%TEMP_PS_SCRIPT%"
 echo if ($itemsToZip) { >> "%TEMP_PS_SCRIPT%"
 echo     try { >> "%TEMP_PS_SCRIPT%"
