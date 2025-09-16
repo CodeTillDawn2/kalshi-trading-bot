@@ -298,6 +298,39 @@ namespace BacklashOverseer.Services
         }
 
         /// <summary>
+        /// Updates comprehensive performance metrics for a brain instance asynchronously.
+        /// This method stores the performance metrics object as-is for monitoring purposes.
+        /// </summary>
+        /// <param name="brainInstanceName">The name of the brain instance.</param>
+        /// <param name="performanceMetrics">The comprehensive performance metrics data.</param>
+        /// <exception cref="ArgumentException">Thrown when parameters are invalid.</exception>
+        /// <returns>A task representing the asynchronous performance metrics update operation.</returns>
+        public async Task UpdatePerformanceMetricsAsync(string brainInstanceName, object performanceMetrics)
+        {
+            if (string.IsNullOrWhiteSpace(brainInstanceName))
+                throw new ArgumentException("Brain instance name cannot be null or empty.", nameof(brainInstanceName));
+
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                var brain = GetBrain(brainInstanceName);
+
+                // Simply store the performance metrics object as-is
+                brain.LatestPerformanceMetrics = performanceMetrics;
+
+                await SaveBrainAsync(brain);
+                RecordOperationMetrics("UpdatePerformanceMetrics", stopwatch.ElapsedMilliseconds);
+
+                _logger?.LogInformation("Updated comprehensive performance metrics for brain {BrainName}", brainInstanceName);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error updating performance metrics for brain {BrainInstanceName}", brainInstanceName);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Records performance metrics for service operations.
         /// </summary>
         /// <param name="operationName">The name of the operation being measured.</param>

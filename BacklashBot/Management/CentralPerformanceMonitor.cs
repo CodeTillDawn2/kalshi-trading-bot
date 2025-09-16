@@ -5,11 +5,14 @@ using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
 using BacklashBot.Management.Interfaces;
 using BacklashBot.Services.Interfaces;
+using BacklashBot.Services;
+using BacklashBot.Hubs;
 using BacklashInterfaces.PerformanceMetrics;
 using BacklashDTOs.Data;
 using BacklashBot.State.Interfaces;
 using System.Collections.Concurrent;
 using TradingStrategies.Configuration;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BacklashBot.Management
 {
@@ -452,6 +455,17 @@ namespace BacklashBot.Management
                                 // Check for performance alerts
                                 CheckPerformanceAlerts();
                             }
+
+                            // Send comprehensive performance metrics to Overseer every minute
+                            try
+                            {
+                                await SendPerformanceMetricsToOverseerAsync();
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Error sending performance metrics to Overseer");
+                            }
+
                             marketCheckCounter = 0;
                         }
 
@@ -1420,6 +1434,78 @@ namespace BacklashBot.Management
         {
             // Update the configurable metrics with current enablement status
             _configurableMetrics["EnablePerformanceMetrics"] = true; // CentralPerformanceMonitor is always enabled
+        }
+
+        /// <summary>
+        /// Collects and sends comprehensive performance metrics to the Overseer via SignalR.
+        /// This method gathers all available performance data and transmits it for monitoring and analysis.
+        /// </summary>
+        /// <remarks>
+        /// This method should be called periodically to send performance metrics to the Overseer.
+        /// It collects data from all performance monitoring components including database operations,
+        /// WebSocket metrics, message processing, and API execution times.
+        /// </remarks>
+        public async Task SendPerformanceMetricsToOverseerAsync()
+        {
+            try
+            {
+                // Create the performance metrics data structure
+                var performanceMetrics = new PerformanceMetricsData
+                {
+                    BrainInstanceName = BrainInstance,
+                    Timestamp = DateTime.UtcNow,
+
+                    // Database metrics
+                    DatabaseMetrics = GetPerformanceMetrics(),
+
+                    // OverseerClientService metrics
+                    OverseerClientServiceMetrics = OverseerClientServiceMetrics,
+
+                    // WebSocket metrics
+                    WebSocketProcessingTimeTicks = _webSocketProcessingTimeTicks,
+                    WebSocketProcessingCount = _webSocketProcessingCount,
+                    WebSocketBufferUsageBytes = _webSocketBufferUsageBytes,
+                    WebSocketOperationTimes = _webSocketOperationTimes,
+                    WebSocketSemaphoreWaitCount = _webSocketSemaphoreWaitCount,
+
+                    // SubscriptionManager metrics
+                    SubscriptionManagerOperationMetrics = GetOperationMetrics(),
+                    SubscriptionManagerLockMetrics = GetLockContentionMetrics(),
+
+                    // MessageProcessor metrics
+                    MessageProcessorTotalMessagesProcessed = _messageProcessorTotalMessagesProcessed,
+                    MessageProcessorTotalProcessingTimeMs = _messageProcessorTotalProcessingTimeMs,
+                    MessageProcessorAverageProcessingTimeMs = _messageProcessorAverageProcessingTimeMs,
+                    MessageProcessorMessagesPerSecond = _messageProcessorMessagesPerSecond,
+                    MessageProcessorOrderBookQueueDepth = _messageProcessorOrderBookQueueDepth,
+                    MessageProcessorDuplicateMessageCount = _messageProcessorDuplicateMessageCount,
+                    MessageProcessorDuplicatesInWindow = _messageProcessorDuplicatesInWindow,
+                    MessageProcessorLastDuplicateWarningTime = _messageProcessorLastDuplicateWarningTime,
+                    MessageProcessorMessageTypeCounts = _messageProcessorMessageTypeCounts,
+
+                    // API execution times
+                    ApiExecutionTimes = ApiExecutionTimes,
+
+                    // Configurable metrics
+                    ConfigurableMetrics = GetConfigurableMetrics()
+                };
+
+                // Get the broadcast service and send the metrics
+                var broadcastService = _serviceFactory.GetBroadcastService() as BroadcastService;
+                if (broadcastService != null)
+                {
+                    await broadcastService.BroadcastPerformanceMetricsAsync(performanceMetrics);
+                    _logger.LogInformation("Sent comprehensive performance metrics to Overseer for brain {BrainInstance}", BrainInstance);
+                }
+                else
+                {
+                    _logger.LogWarning("Unable to get BroadcastService for sending performance metrics");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending performance metrics to Overseer");
+            }
         }
 
         #endregion

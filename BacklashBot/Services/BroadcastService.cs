@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
 using System.Text.Json;
+using BacklashBot.Hubs;
 
 namespace BacklashBot.Services
 {
@@ -614,6 +615,103 @@ namespace BacklashBot.Services
                 lock (_metricsLock)
                 {
                     return _intervalCount > 0 ? (_totalIntervalDeviation / _intervalCount) * 1000 : 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sends comprehensive performance metrics from the CentralPerformanceMonitor to all connected clients.
+        /// This method collects all available performance data and broadcasts it for monitoring and analysis.
+        /// </summary>
+        /// <param name="performanceMetrics">The comprehensive performance metrics data to broadcast.</param>
+        /// <returns>A task representing the asynchronous broadcast operation.</returns>
+        public async Task BroadcastPerformanceMetricsAsync(object performanceMetrics)
+        {
+            if (!BacklashBotHub.HasConnectedClients())
+            {
+                _logger.LogDebug("No clients connected, skipping performance metrics broadcast.");
+                return;
+            }
+
+            var stopwatch = Stopwatch.StartNew();
+            bool broadcastSuccessful = false;
+
+            try
+            {
+                _logger.LogInformation("Broadcasting performance metrics");
+
+                // Track data payload size
+                if (_enablePerformanceMetrics)
+                {
+                    string json = JsonSerializer.Serialize(performanceMetrics);
+                    long dataSize = System.Text.Encoding.UTF8.GetByteCount(json);
+                    lock (_metricsLock)
+                    {
+                        _totalDataSize += dataSize;
+                    }
+                }
+
+                // Track memory usage before broadcast
+                long memoryBefore = 0;
+                if (_enablePerformanceMetrics)
+                {
+                    memoryBefore = GC.GetTotalMemory(false);
+                }
+
+                var cancellationToken = _statusTracker.GetCancellationToken();
+
+                for (int attempt = 1; attempt <= _maxRetryAttempts; attempt++)
+                {
+                    try
+                    {
+                        await _hubContext.Clients.All.SendAsync("PerformanceMetrics", performanceMetrics, cancellationToken);
+                        broadcastSuccessful = true;
+                        _logger.LogInformation("Performance metrics broadcast completed");
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Performance metrics broadcast attempt {Attempt} failed", attempt);
+                        if (attempt < _maxRetryAttempts)
+                        {
+                            await Task.Delay(_retryDelay, cancellationToken);
+                        }
+                        else
+                        {
+                            _logger.LogError(ex, "Performance metrics broadcast failed after {MaxAttempts} attempts", _maxRetryAttempts);
+                        }
+                    }
+                }
+
+                // Track memory usage after broadcast
+                if (_enablePerformanceMetrics)
+                {
+                    long memoryAfter = GC.GetTotalMemory(false);
+                    long memoryUsed = memoryAfter - memoryBefore;
+                    lock (_metricsLock)
+                    {
+                        _totalMemoryUsed += memoryUsed;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error broadcasting performance metrics");
+            }
+            finally
+            {
+                stopwatch.Stop();
+                lock (_metricsLock)
+                {
+                    _totalBroadcastTime += stopwatch.Elapsed.TotalMilliseconds;
+                    if (broadcastSuccessful)
+                    {
+                        _successfulBroadcasts++;
+                    }
+                    else
+                    {
+                        _failedBroadcasts++;
+                    }
                 }
             }
         }

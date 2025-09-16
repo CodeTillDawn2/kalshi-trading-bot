@@ -670,6 +670,210 @@ namespace BacklashOverseer
             }
         }
 
+        /// <summary>
+        /// Processes performance metrics from a connected brain instance.
+        /// </summary>
+        /// <param name="performanceMetrics">The performance metrics data containing detailed system performance information.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ProcessPerformanceMetrics(PerformanceMetricsData performanceMetrics)
+        {
+            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
+            _logger.LogInformation("PerformanceMetrics received from connection: {ConnectionId}", Context.ConnectionId);
+
+            try
+            {
+                if (!_clientInfo.TryGetValue(Context.ConnectionId, out var clientInfo))
+                {
+                    _logger.LogWarning("PerformanceMetrics received from unregistered client: {ConnectionId}", Context.ConnectionId);
+                    await Clients.Caller.SendAsync("PerformanceMetricsResponse", new
+                    {
+                        Success = false,
+                        Message = "Client not registered. Please perform handshake first."
+                    });
+                    return;
+                }
+
+                // Validate PerformanceMetricsData
+                if (performanceMetrics == null)
+                {
+                    _logger.LogWarning("PerformanceMetrics received with null data from client: {ConnectionId}", Context.ConnectionId);
+                    await Clients.Caller.SendAsync("PerformanceMetricsResponse", new
+                    {
+                        Success = false,
+                        Message = "PerformanceMetrics data is null."
+                    });
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(performanceMetrics.BrainInstanceName))
+                {
+                    _logger.LogWarning("PerformanceMetrics received with missing BrainInstanceName from client: {ConnectionId}", Context.ConnectionId);
+                    await Clients.Caller.SendAsync("PerformanceMetricsResponse", new
+                    {
+                        Success = false,
+                        Message = "BrainInstanceName is required."
+                    });
+                    return;
+                }
+
+                _logger.LogInformation("PerformanceMetrics received from {ClientId} ({ClientName}): Timestamp={Timestamp}",
+                    clientInfo.ClientId, clientInfo.ClientName, performanceMetrics.Timestamp);
+
+                try
+                {
+                    // Store performance metrics in brain persistence
+                    await _brainService.UpdatePerformanceMetricsAsync(clientInfo.ClientName, performanceMetrics);
+                    _logger.LogInformation("Performance metrics stored for brain: {BrainName}", clientInfo.ClientName);
+                }
+                catch (Exception brainEx)
+                {
+                    _logger.LogWarning(brainEx, "Failed to update performance metrics for {ClientName}", clientInfo.ClientName);
+                }
+                
+
+                // Update client last seen
+                clientInfo.LastSeen = DateTime.UtcNow;
+
+                // Update client last seen in database
+                if (_config.EnablePerformanceMetrics)
+                {
+                    try
+                    {
+                        using var scope = _scopeFactory.CreateScope();
+                        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
+
+                        // Update client last seen
+                        var signalRClient = await context.GetSignalRClient(clientInfo.ClientId);
+                        if (signalRClient != null)
+                        {
+                            signalRClient.LastSeen = DateTime.UtcNow;
+                            await context.AddOrUpdateSignalRClient(signalRClient);
+                        }
+                    }
+                    catch (Exception dbEx)
+                    {
+                        _logger.LogWarning(dbEx, "Failed to log PerformanceMetrics to database for client: {ClientId}", clientInfo.ClientId);
+                    }
+                }
+
+                // Broadcast performance metrics update to all connected clients (including web UI)
+                var connections = _connectedClients.Count;
+                _logger.LogInformation("Broadcasting PerformanceMetricsUpdate for {Brain} to {Count} connections",
+                    performanceMetrics.BrainInstanceName, connections);
+
+                await Clients.All.SendAsync("PerformanceMetricsUpdate", performanceMetrics);
+
+                await Clients.All.SendAsync("BroadcastTrace", new
+                {
+                    kind = "PerformanceMetricsUpdate",
+                    brain = performanceMetrics.BrainInstanceName,
+                    timestamp = performanceMetrics.Timestamp,
+                    serverUtc = DateTime.UtcNow
+                });
+
+                await Clients.Caller.SendAsync("PerformanceMetricsResponse", new
+                {
+                    Success = true,
+                    Message = "Performance metrics processed successfully",
+                    Timestamp = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing PerformanceMetrics from client: {ConnectionId}", Context.ConnectionId);
+                await Clients.Caller.SendAsync("PerformanceMetricsResponse", new
+                {
+                    Success = false,
+                    Message = $"PerformanceMetrics processing failed: {ex.Message}"
+                });
+            }
+            finally
+            {
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    _performanceMetrics.RecordSignalRCheckInLatency(stopwatch.Elapsed);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Handles incoming performance metrics from brain instances.
+        /// Stores the metrics in the brain persistence service for monitoring and analysis.
+        /// </summary>
+        /// <param name="performanceMetrics">The comprehensive performance metrics data from a brain instance.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task HandlePerformanceMetrics(object performanceMetrics)
+        {
+            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+
+            try
+            {
+                // Store the performance metrics in the brain persistence service
+                // The brain instance name and other details are embedded in the metrics object
+                await _brainService.UpdatePerformanceMetricsAsync("DefaultBrain", performanceMetrics);
+
+                // Broadcast the performance metrics to all connected clients (including web UI)
+                var connections = _connectedClients.Count;
+                _logger.LogInformation("Broadcasting performance metrics update to {Count} connections", connections);
+
+                await Clients.All.SendAsync("PerformanceMetricsUpdate", performanceMetrics);
+
+                await Clients.All.SendAsync("BroadcastTrace", new
+                {
+                    kind = "PerformanceMetricsUpdate",
+                    timestamp = DateTime.UtcNow,
+                    serverUtc = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing performance metrics");
+            }
+            finally
+            {
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+                    _performanceMetrics.RecordSignalRMessageLatency(stopwatch.Elapsed);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles performance metrics updates from brain instances.
+        /// Stores the comprehensive performance data for monitoring and display purposes.
+        /// </summary>
+        /// <param name="brainInstanceName">The name of the brain instance sending the metrics.</param>
+        /// <param name="performanceMetrics">The comprehensive performance metrics data.</param>
+        /// <param name="timestamp">The timestamp when the metrics were sent.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task HandlePerformanceMetricsUpdate(string brainInstanceName, object performanceMetrics, DateTime timestamp)
+        {
+            _logger.LogInformation("Received performance metrics update from brain {BrainInstanceName}", brainInstanceName);
+
+            try
+            {
+                // Store the performance metrics in brain persistence
+                await _brainService.UpdatePerformanceMetricsAsync(brainInstanceName, performanceMetrics);
+
+                // Broadcast the performance metrics update to all connected clients (including web UI)
+                await Clients.All.SendAsync("PerformanceMetricsUpdate", new
+                {
+                    BrainInstanceName = brainInstanceName,
+                    PerformanceMetrics = performanceMetrics,
+                    Timestamp = timestamp
+                });
+
+                _logger.LogInformation("Performance metrics update processed and broadcasted for brain {BrainInstanceName}", brainInstanceName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing performance metrics update from brain {BrainInstanceName}", brainInstanceName);
+            }
+        }
 
         /// <summary>
         /// Processes messages from overseer clients, handling different message types
@@ -940,5 +1144,123 @@ namespace BacklashOverseer
         /// Gets or sets the list of markets currently being watched with detailed information.
         /// </summary>
         public List<MarketWatchData>? WatchedMarkets { get; set; }
+    }
+
+    /// <summary>
+    /// Data structure containing comprehensive performance metrics from the CentralPerformanceMonitor.
+    /// Used for detailed performance monitoring and analytics, including database operations,
+    /// WebSocket metrics, queue depths, and system resource utilization.
+    /// </summary>
+    public class PerformanceMetricsData
+    {
+        /// <summary>
+        /// Gets or sets the name of the brain instance providing the performance metrics.
+        /// </summary>
+        public string? BrainInstanceName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp when these performance metrics were collected.
+        /// </summary>
+        public DateTime Timestamp { get; set; }
+
+        /// <summary>
+        /// Gets or sets the database performance metrics.
+        /// </summary>
+        public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? DatabaseMetrics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the OverseerClientService performance metrics.
+        /// </summary>
+        public IReadOnlyDictionary<string, object>? OverseerClientServiceMetrics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebSocket processing time metrics in ticks.
+        /// </summary>
+        public ConcurrentDictionary<string, long>? WebSocketProcessingTimeTicks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebSocket processing count metrics.
+        /// </summary>
+        public ConcurrentDictionary<string, int>? WebSocketProcessingCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebSocket buffer usage metrics in bytes.
+        /// </summary>
+        public ConcurrentDictionary<string, long>? WebSocketBufferUsageBytes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebSocket operation times.
+        /// </summary>
+        public ConcurrentDictionary<string, TimeSpan>? WebSocketOperationTimes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebSocket semaphore wait counts.
+        /// </summary>
+        public ConcurrentDictionary<string, int>? WebSocketSemaphoreWaitCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SubscriptionManager operation metrics.
+        /// </summary>
+        public IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)>? SubscriptionManagerOperationMetrics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SubscriptionManager lock contention metrics.
+        /// </summary>
+        public IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)>? SubscriptionManagerLockMetrics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor total messages processed.
+        /// </summary>
+        public long MessageProcessorTotalMessagesProcessed { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor total processing time in milliseconds.
+        /// </summary>
+        public long MessageProcessorTotalProcessingTimeMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor average processing time in milliseconds.
+        /// </summary>
+        public double MessageProcessorAverageProcessingTimeMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor messages per second rate.
+        /// </summary>
+        public double MessageProcessorMessagesPerSecond { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor order book queue depth.
+        /// </summary>
+        public int MessageProcessorOrderBookQueueDepth { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor duplicate message count.
+        /// </summary>
+        public int MessageProcessorDuplicateMessageCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor duplicates in window.
+        /// </summary>
+        public int MessageProcessorDuplicatesInWindow { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor last duplicate warning time.
+        /// </summary>
+        public DateTime MessageProcessorLastDuplicateWarningTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor message type counts.
+        /// </summary>
+        public IReadOnlyDictionary<string, long>? MessageProcessorMessageTypeCounts { get; set; }
+
+        /// <summary>
+        /// Gets or sets the API execution times.
+        /// </summary>
+        public ConcurrentDictionary<string, List<(DateTime Timestamp, long Milliseconds)>>? ApiExecutionTimes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the configurable metrics for GUI consumption.
+        /// </summary>
+        public IReadOnlyDictionary<string, object>? ConfigurableMetrics { get; set; }
     }
 }

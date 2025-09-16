@@ -6,6 +6,7 @@ using BacklashDTOs;
 using System.Security.Cryptography;
 using System.Text;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace BacklashBot.Hubs
 {
@@ -159,7 +160,7 @@ namespace BacklashBot.Hubs
         /// Broadcasts check-in data from a brain instance to all connected clients, typically the Overseer.
         /// Used for periodic status updates and health monitoring of trading brain instances.
         /// </summary>
-        /// <param name="checkInData">Comprehensive data about the brain's current state including markets, performance metrics, and configuration</param>
+        /// <param name="checkInData">Comprehensive data about the brain's current state including markets and configuration</param>
         public async Task CheckIn(CheckInData checkInData)
         {
             _logger.LogInformation("Sending CheckIn to Overseer");
@@ -173,6 +174,54 @@ namespace BacklashBot.Hubs
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending CheckIn to Overseer");
+            }
+        }
+
+        /// <summary>
+        /// Sends comprehensive performance metrics from a brain instance to the Overseer for monitoring and display.
+        /// This is separate from the check-in process to allow independent timing and frequency of performance data transmission.
+        /// </summary>
+        /// <param name="brainInstanceName">The name of the brain instance sending the metrics.</param>
+        /// <param name="performanceMetrics">The comprehensive performance metrics data to send.</param>
+        public async Task SendPerformanceMetrics(string brainInstanceName, object performanceMetrics)
+        {
+            _logger.LogInformation("Sending performance metrics for brain {BrainInstanceName}", brainInstanceName);
+
+            try
+            {
+                // Send performance metrics to overseer
+                await Clients.All.SendAsync("PerformanceMetricsUpdate", new
+                {
+                    BrainInstanceName = brainInstanceName,
+                    PerformanceMetrics = performanceMetrics,
+                    Timestamp = DateTime.UtcNow
+                });
+                _logger.LogInformation("Performance metrics sent to Overseer successfully for brain {BrainInstanceName}", brainInstanceName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending performance metrics to Overseer for brain {BrainInstanceName}", brainInstanceName);
+            }
+        }
+
+        /// <summary>
+        /// Sends detailed performance metrics from the CentralPerformanceMonitor to all connected clients, typically the Overseer.
+        /// Used for comprehensive performance monitoring and analytics beyond the basic check-in data.
+        /// </summary>
+        /// <param name="performanceMetrics">Detailed performance metrics including database operations, WebSocket metrics, and system performance data</param>
+        public async Task SendPerformanceMetrics(PerformanceMetricsData performanceMetrics)
+        {
+            _logger.LogInformation("Sending PerformanceMetrics to Overseer");
+
+            try
+            {
+                // Send performance metrics data to overseer
+                await Clients.All.SendAsync("PerformanceMetrics", performanceMetrics);
+                _logger.LogInformation("PerformanceMetrics sent to Overseer successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending PerformanceMetrics to Overseer");
             }
         }
 
@@ -369,5 +418,123 @@ namespace BacklashBot.Hubs
         public string BrainInstanceName { get; set; } = "";
         public string Message { get; set; } = "";
         public DateTime Timestamp { get; set; }
+    }
+
+    /// <summary>
+    /// Data structure containing comprehensive performance metrics from the CentralPerformanceMonitor.
+    /// Used for detailed performance monitoring and analytics, including database operations,
+    /// WebSocket metrics, queue depths, and system resource utilization.
+    /// </summary>
+    public class PerformanceMetricsData
+    {
+        /// <summary>
+        /// Gets or sets the name of the brain instance providing the performance metrics.
+        /// </summary>
+        public string? BrainInstanceName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp when these performance metrics were collected.
+        /// </summary>
+        public DateTime Timestamp { get; set; }
+
+        /// <summary>
+        /// Gets or sets the database performance metrics.
+        /// </summary>
+        public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? DatabaseMetrics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the OverseerClientService performance metrics.
+        /// </summary>
+        public IReadOnlyDictionary<string, object>? OverseerClientServiceMetrics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebSocket processing time metrics in ticks.
+        /// </summary>
+        public ConcurrentDictionary<string, long>? WebSocketProcessingTimeTicks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebSocket processing count metrics.
+        /// </summary>
+        public ConcurrentDictionary<string, int>? WebSocketProcessingCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebSocket buffer usage metrics in bytes.
+        /// </summary>
+        public ConcurrentDictionary<string, long>? WebSocketBufferUsageBytes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebSocket operation times.
+        /// </summary>
+        public ConcurrentDictionary<string, TimeSpan>? WebSocketOperationTimes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebSocket semaphore wait counts.
+        /// </summary>
+        public ConcurrentDictionary<string, int>? WebSocketSemaphoreWaitCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SubscriptionManager operation metrics.
+        /// </summary>
+        public IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)>? SubscriptionManagerOperationMetrics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SubscriptionManager lock contention metrics.
+        /// </summary>
+        public IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)>? SubscriptionManagerLockMetrics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor total messages processed.
+        /// </summary>
+        public long MessageProcessorTotalMessagesProcessed { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor total processing time in milliseconds.
+        /// </summary>
+        public long MessageProcessorTotalProcessingTimeMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor average processing time in milliseconds.
+        /// </summary>
+        public double MessageProcessorAverageProcessingTimeMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor messages per second rate.
+        /// </summary>
+        public double MessageProcessorMessagesPerSecond { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor order book queue depth.
+        /// </summary>
+        public int MessageProcessorOrderBookQueueDepth { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor duplicate message count.
+        /// </summary>
+        public int MessageProcessorDuplicateMessageCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor duplicates in window.
+        /// </summary>
+        public int MessageProcessorDuplicatesInWindow { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor last duplicate warning time.
+        /// </summary>
+        public DateTime MessageProcessorLastDuplicateWarningTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the MessageProcessor message type counts.
+        /// </summary>
+        public IReadOnlyDictionary<string, long>? MessageProcessorMessageTypeCounts { get; set; }
+
+        /// <summary>
+        /// Gets or sets the API execution times.
+        /// </summary>
+        public ConcurrentDictionary<string, List<(DateTime Timestamp, long Milliseconds)>>? ApiExecutionTimes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the configurable metrics for GUI consumption.
+        /// </summary>
+        public IReadOnlyDictionary<string, object>? ConfigurableMetrics { get; set; }
     }
 }

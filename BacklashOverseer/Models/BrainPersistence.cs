@@ -306,6 +306,12 @@ namespace BacklashOverseer.Models
         public bool LastRefreshTimeAcceptable { get; set; }
 
         /// <summary>
+        /// Gets or sets the latest comprehensive performance metrics received from the brain.
+        /// This object contains detailed performance data that is stored as-is for monitoring purposes.
+        /// </summary>
+        public object? LatestPerformanceMetrics { get; set; }
+
+        /// <summary>
         /// Creates a deep clone of this BrainPersistence instance.
         /// Uses JSON serialization for safe copying of complex nested objects.
         /// </summary>
@@ -527,6 +533,12 @@ namespace BacklashOverseer.Models
         /// </summary>
         [JsonPropertyName("watchedMarkets")]
         public List<MarketWatchData>? WatchedMarkets { get; set; }
+
+        /// <summary>
+        /// Gets or sets the latest comprehensive performance metrics received from the brain.
+        /// This object contains detailed performance data that is stored as-is for monitoring purposes.
+        /// </summary>
+        public object? LatestPerformanceMetrics { get; set; }
     }
 
     /// <summary>
