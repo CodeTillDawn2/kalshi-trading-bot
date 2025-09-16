@@ -1,7 +1,7 @@
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
-using KalshiBotData.Data;
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -17,6 +17,7 @@ using BacklashDTOs.Helpers;
 using BacklashDTOs.KalshiAPI;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
+using BacklashBotData.Data.Interfaces;
 
 namespace KalshiBotTests
 {
@@ -69,13 +70,13 @@ namespace KalshiBotTests
         /// <summary>
         /// Mock database context for isolating database operations during testing.
         /// </summary>
-        private Mock<IKalshiBotContext> _contextMock;
+        private Mock<IBacklashBotContext> _contextMock;
 
         /// <summary>
         /// Real database context for querying dynamic test data from the actual database.
         /// Used to obtain real market, series, and event tickers for testing.
         /// </summary>
-        private KalshiBotContext _realContext;
+        private BacklashBotContext _realContext;
 
         /// <summary>
         /// Market ticker obtained from the database for use in tests requiring a specific market.
@@ -167,7 +168,7 @@ namespace KalshiBotTests
                 .Build();
 
             // Initialize real context to query for dynamic test data
-            _realContext = new KalshiBotContext(_configuration);
+            _realContext = new BacklashBotContext(_configuration);
 
             // Query for an active market
             var activeMarket = await _realContext.GetMarketsFiltered(
@@ -226,7 +227,7 @@ namespace KalshiBotTests
             _performanceMonitorMock = new Mock<IPerformanceMonitor>();
 
             // Mock the DB context to avoid actual database interactions (focus on API calls)
-            _contextMock = new Mock<IKalshiBotContext>();
+            _contextMock = new Mock<IBacklashBotContext>();
 
             // Setup common DB methods used across API functions
             _contextMock.Setup(c => c.AddOrUpdateMarkets(It.IsAny<List<MarketDTO>>())).Returns(Task.CompletedTask);
@@ -244,7 +245,7 @@ namespace KalshiBotTests
             // Setup scope factory to return mocked context
             var scopeMock = new Mock<IServiceScope>();
             var serviceProviderMock = new Mock<IServiceProvider>();
-            serviceProviderMock.Setup(sp => sp.GetService(typeof(IKalshiBotContext))).Returns(_contextMock.Object);
+            serviceProviderMock.Setup(sp => sp.GetService(typeof(IBacklashBotContext))).Returns(_contextMock.Object);
             scopeMock.Setup(s => s.ServiceProvider).Returns(serviceProviderMock.Object);
             _scopeFactoryMock.Setup(f => f.CreateScope()).Returns(scopeMock.Object);
 

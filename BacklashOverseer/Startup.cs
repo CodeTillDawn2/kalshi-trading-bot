@@ -7,7 +7,7 @@ using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.WebSockets;
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
-using KalshiBotData.Data.Interfaces;
+
 using BacklashOverseer;
 using KalshiBotLogging;
 using BacklashOverseer.Services;
@@ -32,6 +32,8 @@ using Microsoft.Extensions.Options;
 using System.Text.Json;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Websockets;
+using BacklashBotData.Data.Interfaces;
+using BacklashBotData.Data;
 
 namespace BacklashOverseer
 {
@@ -120,8 +122,8 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IConfiguration>().GetSection("Kalshi:KalshiWebSocketClient:EnablePerformanceMetrics").Get<bool?>() ?? true
             ));
             services.AddScoped<ISqlDataService, SqlDataService>();
-            services.AddScoped<KalshiBotContext>(provider => new KalshiBotContext(Configuration));
-            services.AddScoped<IKalshiBotContext>(provider => provider.GetRequiredService<KalshiBotContext>());
+            services.AddScoped<BacklashBotContext>(provider => new BacklashBotContext(Configuration));
+            services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
             services.AddSingleton<IStatusTrackerService, OverseerStatusTracker>();
             services.AddSingleton<IBotReadyStatus, OverseerReadyStatus>();
             services.AddScoped<IDataCache, BacklashBot.State.DataCache>();
@@ -175,7 +177,7 @@ namespace BacklashOverseer
             // Register SnapshotService with dependencies
             services.AddScoped<SnapshotAggregationService>(sp =>
                 new SnapshotAggregationService(
-                    sp.GetRequiredService<IKalshiBotContext>(),
+                    sp.GetRequiredService<IBacklashBotContext>(),
                     sp.GetRequiredService<IConfiguration>(),
                     sp.GetRequiredService<PerformanceMetricsService>(),
                     sp.GetRequiredService<ILogger<SnapshotAggregationService>>()

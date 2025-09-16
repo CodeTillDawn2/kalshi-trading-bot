@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using BacklashBot.KalshiAPI.Interfaces;
 using BacklashBot.Management.Interfaces;
 using BacklashInterfaces.Constants;
@@ -213,7 +213,7 @@ namespace BacklashBot.Services
             {
                 using var scope = scopeFactory.CreateScope();
                 var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
-                var dbContext = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(300));
                 var token = cts.Token;
                 _logger.LogDebug("API: Need to calculate market {0} interest scores... refetching from API", uniqueTickers);
@@ -285,7 +285,7 @@ namespace BacklashBot.Services
         public async Task<(double score,
     (double spreadTightness, double spreadWidth, double volume, double volumePercentile, double liquidityPercentile, double openInterestPercentile, double continuity) scoreParts)>
 CalculateMarketInterestScoreAsync(
-    IKalshiBotContext dbContext,
+    IBacklashBotContext dbContext,
     string marketTicker,
     double spreadTightnessWeight = 0.2,
     double spreadWidthWeight = 0.15,

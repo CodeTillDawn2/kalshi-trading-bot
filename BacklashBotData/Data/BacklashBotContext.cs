@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using KalshiBotData.Extensions;
 using KalshiBotData.Models;
 using BacklashInterfaces.PerformanceMetrics;
@@ -14,7 +14,7 @@ using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using System.Data;
 
-namespace KalshiBotData.Data
+namespace BacklashBotData.Data
 {
     /// <summary>
     /// Entity Framework DbContext implementation for the Kalshi trading bot system.
@@ -32,7 +32,7 @@ namespace KalshiBotData.Data
     /// - Logging and audit trails
     /// - Weight set and strategy management
     /// </remarks>
-    public class KalshiBotContext : DbContext, IKalshiBotContext, IKalshiBotContextPerformanceMetrics
+    public class BacklashBotContext : DbContext, IBacklashBotContext, IKalshiBotContextPerformanceMetrics
     {
         private DbSet<Event> Events { get; set; }
         private DbSet<Series> Series { get; set; }
@@ -68,7 +68,7 @@ namespace KalshiBotData.Data
 
         private readonly string _connectionString;
         private readonly IConfiguration _config;
-        private readonly ILogger<KalshiBotContext>? _logger;
+        private readonly ILogger<BacklashBotContext>? _logger;
 
         // Configuration options
         private readonly int _maxRetryCount;
@@ -82,7 +82,7 @@ namespace KalshiBotData.Data
         /// <param name="config">Application configuration containing database connection strings.</param>
         /// <param name="logger">Optional logger for context operations. If null, logging is disabled.</param>
         /// <exception cref="InvalidOperationException">Thrown when DefaultConnection is not configured.</exception>
-        public KalshiBotContext(IConfiguration config, ILogger<KalshiBotContext>? logger = null)
+        public BacklashBotContext(IConfiguration config, ILogger<BacklashBotContext>? logger = null)
         {
             _config = config;
             _logger = logger;

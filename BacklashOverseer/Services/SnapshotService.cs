@@ -1,9 +1,10 @@
-using KalshiBotData.Data.Interfaces;
+
 using BacklashDTOs.Data;
 using System;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using BacklashBotData.Data.Interfaces;
 
 namespace BacklashOverseer.Services
 {
@@ -14,7 +15,7 @@ namespace BacklashOverseer.Services
     /// </summary>
     public class SnapshotAggregationService
     {
-        private readonly IKalshiBotContext _context;
+        private readonly IBacklashBotContext _context;
         private readonly PerformanceMetricsService _performanceMetrics;
         private readonly ILogger<SnapshotAggregationService> _logger;
 
@@ -32,7 +33,7 @@ namespace BacklashOverseer.Services
         /// <param name="performanceMetrics">The performance metrics service for recording metrics.</param>
         /// <param name="logger">The logger instance for recording operations.</param>
         public SnapshotAggregationService(
-            IKalshiBotContext context,
+            IBacklashBotContext context,
             IConfiguration configuration,
             PerformanceMetricsService performanceMetrics,
             ILogger<SnapshotAggregationService> logger)

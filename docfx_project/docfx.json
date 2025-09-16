@@ -7,7 +7,7 @@
           "files": [
             "BacklashBot/BacklashBot.csproj",
             "KalshiBotAPI/KalshiBotAPI.csproj",
-            "KalshiBotOverseer/KalshiBotOverseer.csproj",
+            "BacklashOverseer/BacklashOverseer.csproj",
             "BacklashDTOs/BacklashDTOs.csproj",
             "BacklashInterfaces/BacklashInterfaces.csproj",
             "KalshiBotLogging/KalshiBotLogging.csproj",

@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
 using BacklashDTOs.Data;
 using System.Collections.Concurrent;
@@ -135,7 +135,7 @@ namespace KalshiBotLogging
 
                     using (var scope = _serviceProvider.CreateScope())
                     {
-                        var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                         try
                         {

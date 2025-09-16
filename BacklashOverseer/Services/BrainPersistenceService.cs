@@ -4,10 +4,11 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using KalshiBotData.Data;
-using KalshiBotData.Data.Interfaces;
+
 using System.Timers;
 using System.Text.Json;
 using System.Linq;
+using BacklashBotData.Data.Interfaces;
 
 namespace BacklashOverseer.Services
 {
@@ -70,7 +71,7 @@ namespace BacklashOverseer.Services
         private readonly ConcurrentDictionary<string, BrainPersistence> _brains = new();
         private readonly BrainPersistenceServiceConfig _config;
         private readonly ILogger<BrainPersistenceService>? _logger;
-        private readonly IKalshiBotContext? _context;
+        private readonly IBacklashBotContext? _context;
         private readonly PerformanceMetricsService? _performanceMetricsService;
         private readonly Stopwatch _serviceStopwatch = new();
         private long _totalOperations;
@@ -92,7 +93,7 @@ namespace BacklashOverseer.Services
         /// <param name="performanceMetricsService">Optional performance metrics service for transmitting metrics.</param>
         public BrainPersistenceService(
             IOptions<BrainPersistenceServiceConfig> config,
-            IKalshiBotContext? context = null,
+            IBacklashBotContext? context = null,
             ILogger<BrainPersistenceService>? logger = null,
             PerformanceMetricsService? performanceMetricsService = null)
         {

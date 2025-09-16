@@ -1,5 +1,5 @@
 // CentralBrain.cs
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
@@ -277,7 +277,7 @@ namespace BacklashBot.Management
                 snapshotService.ResetSnapshotTracking();
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                 _thisBrain = await context.GetBrainInstanceByName(instanceName: _brainInstance);
                 if (_thisBrain == null)
@@ -673,7 +673,7 @@ namespace BacklashBot.Management
         {
             _logger.LogDebug("BRAIN: Checking in...");
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             _thisBrain = await context.GetBrainInstance(instanceName: _brainInstance);
             UpdateBrainInstanceStatus(_thisBrain);
@@ -687,7 +687,7 @@ namespace BacklashBot.Management
         private async void UpdateBrainInstanceStatus(BrainInstanceDTO? brainInstance)
         {
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             if (brainInstance == null)
             {
@@ -711,7 +711,7 @@ namespace BacklashBot.Management
         private async void CleanupStaleBrainLocks(BrainInstanceDTO? brainInstance)
         {
             using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             List<BrainInstanceDTO> staleBrains = await context.GetStaleBrains(_brainStatus.BrainLock);
 

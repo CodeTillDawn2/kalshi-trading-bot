@@ -64,14 +64,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BacklashBotData\BacklashBotData.csproj" />
+    <ProjectReference Include="..\BacklashBotLogging\BacklashBotLogging.csproj" />
     <ProjectReference Include="..\KalshiBotAPI\KalshiBotAPI.csproj" />
-    <ProjectReference Include="..\KalshiBotContext\KalshiBotData.csproj" />
     <ProjectReference Include="..\BacklashDTOs\BacklashDTOs.csproj" />
     <ProjectReference Include="..\BacklashInterfaces\BacklashInterfaces.csproj" />
     <ProjectReference Include="..\BacklashBot\BacklashBot.csproj">
       <ExcludeAssets>Content</ExcludeAssets>
     </ProjectReference>
-    <ProjectReference Include="..\KalshiBotLogging\KalshiBotLogging.csproj" />
   </ItemGroup>
 
 </Project>

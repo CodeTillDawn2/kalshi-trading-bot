@@ -14,7 +14,7 @@ namespace KalshiBotLogging
         private readonly LogLevel _minLevel;
         private readonly LoggingConfig? _loggingConfig;
         private readonly ExecutionConfig? _executionConfig;
-        private readonly IBrainStatusService? _brainStatus;
+        private readonly object? _brainStatus; // Simplified to avoid circular dependency
         private readonly string _defaultEnvironment;
         private readonly string _defaultInstance;
 
@@ -25,7 +25,7 @@ namespace KalshiBotLogging
         /// <param name="minLevel">The minimum log level.</param>
         /// <param name="loggingConfig">The logging configuration.</param>
         /// <param name="executionConfig">The execution configuration.</param>
-        /// <param name="brainStatus">The brain status service.</param>
+        /// <param name="brainStatus">The brain status service (not used in simplified version).</param>
         /// <param name="defaultEnvironment">The default environment name.</param>
         /// <param name="defaultInstance">The default instance name.</param>
         public DatabaseLoggerProvider(
@@ -33,7 +33,7 @@ namespace KalshiBotLogging
             LogLevel minLevel = LogLevel.Warning,
             LoggingConfig? loggingConfig = null,
             ExecutionConfig? executionConfig = null,
-            IBrainStatusService? brainStatus = null,
+            object? brainStatus = null,
             string defaultEnvironment = "KalshiBot",
             string defaultInstance = "DefaultInstance"
             )

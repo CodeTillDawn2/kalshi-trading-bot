@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BacklashOverseer.Services;
+using BacklashBotData.Data.Interfaces;
 
 namespace BacklashOverseer.Controllers
 {
@@ -27,7 +28,7 @@ namespace BacklashOverseer.Controllers
     [Route("v1/[controller]")]
     public class MarketWatchController : ControllerBase
     {
-        private readonly IKalshiBotContext _context;
+        private readonly IBacklashBotContext _context;
         private readonly IMemoryCache _cache;
         private readonly IKalshiAPIService _apiService;
         private readonly SnapshotAggregationService _snapshotService;
@@ -65,7 +66,7 @@ namespace BacklashOverseer.Controllers
         /// <param name="logger">Logger for recording operational information and errors.</param>
         /// <param name="configuration">Configuration for cache durations and performance metrics settings.</param>
         /// <param name="performanceMetricsService">Service for tracking performance metrics and cache statistics.</param>
-        public MarketWatchController(IKalshiBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotAggregationService snapshotService, ILogger<MarketWatchController> logger, IConfiguration configuration, PerformanceMetricsService performanceMetricsService)
+        public MarketWatchController(IBacklashBotContext context, IMemoryCache cache, IKalshiAPIService apiService, SnapshotAggregationService snapshotService, ILogger<MarketWatchController> logger, IConfiguration configuration, PerformanceMetricsService performanceMetricsService)
         {
             _context = context;
             _cache = cache;

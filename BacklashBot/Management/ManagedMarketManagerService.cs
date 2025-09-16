@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
 using BacklashBot.KalshiAPI.Interfaces;
@@ -92,7 +92,7 @@ namespace BacklashBot.Management
             {
                 _statusTrackerService.GetCancellationToken().ThrowIfCancellationRequested();
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 int removedCount = await RemoveEndedMarkets(context);
                 if (removedCount > 0)
                     _logger.LogInformation("BRAIN: Removed {Count} markets due to them being ended.", removedCount);

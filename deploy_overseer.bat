@@ -18,13 +18,13 @@ echo INFO: Using PowerShell: %POWERSHELL_EXE%
 echo.
 
 REM Set variables
-set PROJECT_NAME=KalshiBotOverseer
-set PROJECT_PATH=KalshiBotOverseer\KalshiBotOverseer.csproj
+set PROJECT_NAME=BacklashOverseer
+set PROJECT_PATH=BacklashOverseer\BacklashOverseer.csproj
 set DEPLOY_FOLDER=C:\Deploy\Overseer
 set "OUTPUT_PATH=%DEPLOY_FOLDER%"
 set PUBLISH_PROFILE=Release
 set TARGET_FRAMEWORK=net8.0
-set ZIP_BASENAME=KalshiBotOverseer
+set ZIP_BASENAME=BacklashOverseer
 set THIS_SCRIPT_NAME=%~nx0
 set NETWORK_ZIP_PATH=\\DESKTOP-ITC50UT\SmokehouseCandlestickImport
 set "FALLBACK_FOLDER=%DEPLOY_FOLDER%"

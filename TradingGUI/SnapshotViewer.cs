@@ -1,8 +1,7 @@
 // Updated SnapshotViewer.cs with intelligent isotropic font scaling
 
 // SnapshotViewer.cs (replace the entire class with this updated version)
-using KalshiBotData.Data;
-using KalshiBotData.Models;
+using BacklashBotData.Data;
 using Microsoft.Extensions.Configuration;
 using BacklashDTOs;
 using TradingSimulator;
@@ -16,7 +15,7 @@ namespace TradingGUI
     /// </summary>
     /// <remarks>
     /// This control serves as the primary interface for backtesting and analyzing trading strategies against historical market data.
-    /// It integrates with the KalshiBotContext for data access and provides rich visualization of market dynamics including:
+    /// It integrates with the BacklashBotContext for data access and provides rich visualization of market dynamics including:
     /// - Price charts with technical indicators (RSI, MACD, EMA, Bollinger Bands, etc.)
     /// - Order book visualization with bid/ask spreads
     /// - Market metrics and trading signals
@@ -42,7 +41,7 @@ namespace TradingGUI
         private List<PricePoint> _historicalAverageCostDataPoints = new List<PricePoint>();
         private List<PricePoint> _historicalRestingOrdersDataPoints = new List<PricePoint>();
         private List<PricePoint> _historicalPatternDataPoints = new List<PricePoint>();
-        private readonly KalshiBotContext _context;
+        private readonly BacklashBotContext _context;
 
         public Action? BackAction { get; set; }
 
@@ -117,7 +116,7 @@ namespace TradingGUI
                 })
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .Build();
-            _context = new KalshiBotContext(config);
+            _context = new BacklashBotContext(config);
 
             // Load SnapshotViewer interaction configuration
             _interactionConfig = config.GetSection("SnapshotViewer:InteractionConfig").Get<InteractionConfig>() ?? new InteractionConfig

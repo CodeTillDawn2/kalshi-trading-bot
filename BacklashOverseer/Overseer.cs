@@ -18,6 +18,7 @@ using System.Text.Json;
 using System.Linq;
 using BacklashOverseer.Services;
 using Microsoft.Extensions.Options;
+using BacklashBotData.Data.Interfaces;
 
 namespace BacklashOverseer
 {
@@ -389,7 +390,7 @@ namespace BacklashOverseer
             try
             {
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<KalshiBotData.Data.Interfaces.IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                 // Get local IP address
                 var hostName = System.Net.Dns.GetHostName();

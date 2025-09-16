@@ -1,8 +1,7 @@
 // ChartHub.cs
 using Microsoft.AspNetCore.SignalR;
 using BacklashBot.Services.Interfaces;
-using KalshiBotData.Models;
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using BacklashDTOs;
 using System.Security.Cryptography;
 using System.Text;
@@ -90,7 +89,7 @@ namespace BacklashBot.Hubs
             try
             {
                 using var scope = _serviceFactory.GetScopeManager().CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                 // Get client IP address
                 var httpContext = Context.GetHttpContext();

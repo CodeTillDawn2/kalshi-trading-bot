@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using BacklashBot.Services.Interfaces;
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -170,7 +170,7 @@ namespace BacklashBot.Middleware
             try
             {
                 using var scope = _serviceFactory.GetScopeManager().CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                 var client = await context.GetSignalRClient(clientId);
                 if (client == null || !client.IsActive)
@@ -202,7 +202,7 @@ namespace BacklashBot.Middleware
             try
             {
                 using var scope = _serviceFactory.GetScopeManager().CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 await context.UpdateSignalRClientConnection(clientId, connectionId);
             }
             catch (Exception ex)

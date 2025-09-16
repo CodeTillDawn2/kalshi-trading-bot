@@ -1,4 +1,3 @@
-using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,6 +6,7 @@ using BacklashDTOs;
 using TradingSimulator.Simulator;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;
+using BacklashBotData.Data.Interfaces;
 
 namespace TradingSimulator.Strategies
 {
@@ -57,7 +57,7 @@ namespace TradingSimulator.Strategies
         /// <summary>
         /// Database context for accessing market data and snapshots.
         /// </summary>
-        private readonly IKalshiBotContext _dbContext;
+        private readonly IBacklashBotContext _dbContext;
 
         /// <summary>
         /// Collection of trading strategies to execute, each with a name and function delegate.
@@ -147,7 +147,7 @@ namespace TradingSimulator.Strategies
             IOptions<SnapshotConfig> snapshotOptions,
             IOptions<TradingConfig> tradingOptions,
             IServiceScopeFactory scopeFactory,
-            IKalshiBotContext dbContext,
+            IBacklashBotContext dbContext,
             List<(string Name, TradingStrategyFunc<T> Func)> strategies)
         {
             _snapshotService = snapshotService;

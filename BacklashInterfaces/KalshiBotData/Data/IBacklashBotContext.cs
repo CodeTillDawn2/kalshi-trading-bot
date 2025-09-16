@@ -1,10 +1,10 @@
 using BacklashDTOs;
 using BacklashDTOs.Data;
-using KalshiBotData.Data;
+using BacklashBotData.Data;
 
-namespace KalshiBotData.Data.Interfaces
+namespace BacklashBotData.Data.Interfaces
 {
-    public interface IKalshiBotContext : IDisposable
+    public interface IBacklashBotContext : IDisposable
     {
         #region Series
         Task<SeriesDTO?> GetSeriesByTicker(string seriesTicker);

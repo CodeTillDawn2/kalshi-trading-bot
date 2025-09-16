@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
 using BacklashBot.KalshiAPI.Interfaces;
@@ -207,7 +207,7 @@ namespace BacklashBot.Management
                 }
 
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
                 await apiService.FetchMarketsAsync(tickers: new string[] { market });
 
@@ -266,7 +266,7 @@ namespace BacklashBot.Management
         /// <param name="marketsToRemoveCount">Number of markets to remove</param>
         /// <param name="token">Cancellation token for the operation</param>
         /// <returns>The number of markets successfully removed</returns>
-        protected async Task<int> RemoveLowestInterestMarkets(IKalshiBotContext context, IKalshiAPIService apiService, BrainInstanceDTO brain,
+        protected async Task<int> RemoveLowestInterestMarkets(IBacklashBotContext context, IKalshiAPIService apiService, BrainInstanceDTO brain,
             int marketsToRemoveCount, CancellationToken token)
         {
             int removed = 0;
@@ -337,7 +337,7 @@ namespace BacklashBot.Management
         /// </summary>
         /// <param name="context">Database context for accessing market watch data</param>
         /// <returns>The number of markets successfully removed</returns>
-        protected async Task<int> RemoveEndedMarkets(IKalshiBotContext context)
+        protected async Task<int> RemoveEndedMarkets(IBacklashBotContext context)
         {
             int marketsRemoved = 0;
 
@@ -378,7 +378,7 @@ namespace BacklashBot.Management
         /// <param name="marketsToAddCount">Number of markets to add to the watch list</param>
         /// <param name="minimumInterest">Minimum interest score required for a market to be added</param>
         /// <returns>List of market tickers that were successfully added to the watch list</returns>
-        protected async Task<List<string>> AddHighInterestMarkets(IKalshiBotContext context, IKalshiAPIService apiService, int marketsToAddCount, double minimumInterest)
+        protected async Task<List<string>> AddHighInterestMarkets(IBacklashBotContext context, IKalshiAPIService apiService, int marketsToAddCount, double minimumInterest)
         {
             if (marketsToAddCount == 0) return new List<string>();
             int marketsAdded = 0;
@@ -529,7 +529,7 @@ namespace BacklashBot.Management
         /// <param name="brain">Brain instance configuration containing watch settings</param>
         /// <param name="minimumInterest">Minimum interest score threshold for market retention</param>
         /// <returns>The number of markets successfully removed</returns>
-        protected async Task<int> RemoveUninterestingMarkets(IKalshiBotContext context, IKalshiAPIService apiService, BrainInstanceDTO brain, double minimumInterest)
+        protected async Task<int> RemoveUninterestingMarkets(IBacklashBotContext context, IKalshiAPIService apiService, BrainInstanceDTO brain, double minimumInterest)
         {
             int removed = 0;
             try

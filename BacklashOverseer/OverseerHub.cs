@@ -5,7 +5,7 @@ using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
-using KalshiBotData.Data.Interfaces;
+
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +13,7 @@ using System.Collections.Concurrent;
 using BacklashOverseer.Models;
 using System.Threading;
 using System.Diagnostics;
+using BacklashBotData.Data.Interfaces;
 
 namespace BacklashOverseer
 {
@@ -375,7 +376,7 @@ namespace BacklashOverseer
                     try
                     {
                         using var scope = _scopeFactory.CreateScope();
-                        var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                         var signalRClient = new BacklashDTOs.SignalRClient
                         {
@@ -558,7 +559,7 @@ namespace BacklashOverseer
                     try
                     {
                         using var scope = _scopeFactory.CreateScope();
-                        var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                        var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
                         // Update client last seen
                         var signalRClient = await context.GetSignalRClient(clientInfo.ClientId);

@@ -1,4 +1,4 @@
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using BacklashDTOs.Configuration;
@@ -333,7 +333,7 @@ namespace BacklashBot.Services
             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
             using var scope = _scopeFactory.CreateScope();
             var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             await apiService.FetchPositionsAsync();
             await apiService.FetchOrdersAsync();
             foreach (MarketData marketData in _serviceFactory.GetDataCache().Markets.Values)
@@ -368,7 +368,7 @@ namespace BacklashBot.Services
                     return;
                 }
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 var marketWatch = new MarketWatchDTO
                 {
                     market_ticker = marketTicker,
@@ -567,7 +567,7 @@ namespace BacklashBot.Services
                     return;
                 }
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 MarketWatchDTO? marketWatch = await context.GetMarketWatchByTicker(marketTicker);
                 Guid brainLock = _brainStatus.BrainLock;
                 if (marketWatch != null
@@ -865,7 +865,7 @@ namespace BacklashBot.Services
                 bool marketLoadedFromAPI = false;
 
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 var marketService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
 
                 var marketStatus = await context.GetMarketStatus(marketTicker);
@@ -970,7 +970,7 @@ namespace BacklashBot.Services
                 _logger.LogDebug("Acquired watched markets semaphore");
 
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 var markets = (await context
                     .GetMarketWatchesFiltered(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock })
                     ).Select(m => m.market_ticker);
@@ -1050,7 +1050,7 @@ namespace BacklashBot.Services
 
                 _logger.LogDebug("Cache.WatchedMarkets is empty, re-fetching from database");
                 using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 var markets = ((await context
                     .GetMarketWatchesFiltered(brainLocksIncluded: new HashSet<Guid>() { _brainStatus.BrainLock }))
                     );
@@ -1180,7 +1180,7 @@ namespace BacklashBot.Services
                 if (tickers.Count > 0)
                 {
                     using var scope = _scopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                    var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                     foreach (var batch in tickers.Chunk(_marketDataConfig.TickerBatchSize))
                     {
                         await context.AddOrUpdateTickers(batch.ToList());

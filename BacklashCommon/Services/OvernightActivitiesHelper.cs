@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using KalshiBotData.Data.Interfaces;
+using BacklashBotData.Data.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -145,7 +145,7 @@ namespace BacklashCommon.Services
             try
             {
                 using var scope = scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+                var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
                 var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
 
                 // Track individual task performance
@@ -207,7 +207,7 @@ namespace BacklashCommon.Services
         public async Task DeleteUnrecordedMarkets(IServiceScopeFactory scopeFactory, CancellationToken cancellationToken)
         {
             using var scope = scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             HashSet<string> inactiveMarkets = await context.GetInactiveMarketsWithNoSnapshots();
 
             foreach (string marketTicker in inactiveMarkets)
@@ -228,7 +228,7 @@ namespace BacklashCommon.Services
         public async Task DeleteProcessedSnapshots(IServiceScopeFactory scopeFactory, CancellationToken cancellationToken)
         {
             using var scope = scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             HashSet<string> inactiveMarkets = await context.GetProcessedMarkets();
 
             string hardDataStorageLocation = _executionConfig.HardDataStorageLocation;
@@ -245,14 +245,14 @@ namespace BacklashCommon.Services
         private async Task RemoveOldWatches(IServiceScopeFactory scopeFactory)
         {
             using var scope = scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             await context.RemoveClosedWatches();
         }
 
         private async Task RefreshLikelyClosedMarkets(IServiceScopeFactory scopeFactory, DateTime cutoff, bool isRetry, CancellationToken cancellationToken)
         {
             using var scope = scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             var apiService = scope.ServiceProvider.GetRequiredService<IKalshiAPIService>();
 
             List<MarketDTO> MarketsWhichAreLikelyClosed = await context.GetMarkets(
@@ -376,7 +376,7 @@ namespace BacklashCommon.Services
         private async Task CalculateOvernightMarketInterestScores(IServiceScopeFactory scopeFactory, CancellationToken cancellationToken)
         {
             using var scope = scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
             var interestScoreHelper = scope.ServiceProvider.GetRequiredService<IInterestScoreService>();
 
             // Track database query performance

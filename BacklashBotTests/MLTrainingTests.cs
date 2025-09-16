@@ -1,3 +1,10 @@
+using BacklashBot.Management;
+using BacklashBot.Services;
+using BacklashBot.Services.Interfaces;
+using BacklashBotData.Data;
+using BacklashBotData.Data.Interfaces;
+using BacklashDTOs;
+using BacklashDTOs.Data;
 /// <summary>
 /// Comprehensive NUnit test fixture for validating machine learning training and evaluation workflows
 /// in the Kalshi trading bot system. This class tests the complete pipeline from real market data
@@ -11,20 +18,14 @@
 /// feature engineering, model training, and prediction accuracy before they affect production.
 /// </remarks>
 using KalshiBotData.Data;
-using KalshiBotData.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using BacklashBot.Services;
-using BacklashBot.Services.Interfaces;
-using BacklashBot.Management;
-using BacklashDTOs;
-using BacklashDTOs.Data;
 using System.Text;
-using TradingStrategies.Configuration;
 using TradingSimulator.ML;
+using TradingStrategies.Configuration;
 
 namespace KalshiBotTests
 {
@@ -103,8 +104,8 @@ namespace KalshiBotTests
             // DI: EF context for real snapshot fetching
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
-            services.AddDbContext<KalshiBotContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
-            services.AddScoped<IKalshiBotContext>(sp => sp.GetRequiredService<KalshiBotContext>());
+            services.AddDbContext<BacklashBotContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+            services.AddScoped<IBacklashBotContext>(sp => sp.GetRequiredService<BacklashBotContext>());
             _sp = services.BuildServiceProvider();
             _scopeFactory = _sp.GetRequiredService<IServiceScopeFactory>();
             var centralPerformanceMonitor = _sp.GetRequiredService<CentralPerformanceMonitor>();
@@ -149,7 +150,7 @@ namespace KalshiBotTests
         {
             var results = new List<IReadOnlyList<MarketSnapshot>>(maxMarkets);
             using var scope = _scopeFactory.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<IKalshiBotContext>();
+            var db = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
 
             // Get all snapshot groups and filter to sufficiently long recordings
             var groups = await db.GetSnapshotGroups().ConfigureAwait(false);

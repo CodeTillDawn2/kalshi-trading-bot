@@ -4,21 +4,21 @@ VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashBot", "BacklashBot\BacklashBot.csproj", "{F94FB297-82C7-430F-8200-DE0E6D1FD149}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashOverseer", "KalshiBotOverseer\KalshiBotOverseer.csproj", "{7E248D2E-49F8-4C16-A0C3-F148C23E06E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashOverseer", "BacklashOverseer\BacklashOverseer.csproj", "{7E248D2E-49F8-4C16-A0C3-F148C23E06E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradingGUI", "TradingGUI\TradingGUI.csproj", "{C50F1943-7B9C-480E-A91B-994F65B96A17}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KalshiBotTests", "KalshiBotTests\KalshiBotTests.csproj", "{F1A2B3C4-D5E6-7890-ABCD-EF123456789A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashBotTests", "BacklashBotTests\BacklashBotTests.csproj", "{F1A2B3C4-D5E6-7890-ABCD-EF123456789A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KalshiBotAPI", "KalshiBotAPI\KalshiBotAPI.csproj", "{00193D5F-9F22-4693-9C30-9A4B766129F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KalshiBotData", "KalshiBotContext\KalshiBotData.csproj", "{FF123049-8B01-4626-B76C-E14FD2598C5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BacklashBotData", "BacklashBotData\BacklashBotData.csproj", "{FF123049-8B01-4626-B76C-E14FD2598C5A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashDTOs", "BacklashDTOs\BacklashDTOs.csproj", "{8A84CDB4-160B-4FE4-88C2-68223D68C245}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashInterfaces", "BacklashInterfaces\BacklashInterfaces.csproj", "{8DB07D0B-A55A-4594-A83B-B8728F43B4D3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KalshiBotLogging", "KalshiBotLogging\KalshiBotLogging.csproj", "{002F3807-EFDF-46EB-A43D-9457E2FE2431}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashBotLogging", "BacklashBotLogging\BacklashBotLogging.csproj", "{002F3807-EFDF-46EB-A43D-9457E2FE2431}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashCommon", "BacklashCommon\BacklashCommon.csproj", "{9A84CDB4-160B-4FE4-88C2-68223D68C246}"
 EndProject
