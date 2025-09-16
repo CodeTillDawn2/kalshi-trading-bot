@@ -238,6 +238,14 @@ public class TradingConfig
     public bool MarketTypeService_EnablePerformanceMetrics { get; set; } = true;
 
     /// <summary>
+    /// Enables or disables performance metrics collection in StrategySelectionHelper.
+    /// When enabled, collects strategy instantiation timing and memory allocation metrics for each strategy instance.
+    /// Disable for performance optimization in high-throughput scenarios where metrics are not needed.
+    /// Default: false (due to performance impact of individual instance tracking)
+    /// </summary>
+    public bool StrategySelectionHelper_EnablePerformanceMetrics { get; set; } = false;
+
+    /// <summary>
     /// Validates the configuration parameters to ensure they are within acceptable ranges and prevent invalid combinations.
     /// This method should be called during application startup to catch misconfigurations early.
     /// Throws ArgumentException if any parameter is invalid.

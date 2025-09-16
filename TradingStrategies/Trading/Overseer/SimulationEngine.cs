@@ -50,6 +50,7 @@ namespace TradingStrategies.Trading.Overseer
             var tradingConfig = new TradingConfig();
             configuration.GetSection("TradingConfig").Bind(tradingConfig);
             _marketTypeService = new MarketTypeService(tradingConfig);
+            StrategySelectionHelper.SetConfiguration(tradingConfig);
             _patternDetectionService = new PatternDetectionService(configuration, performanceMonitor);
             _performanceMonitor = performanceMonitor;
             _enablePerformanceMetrics = configuration.GetValue<bool>("SimulationEngine:EnablePerformanceMetrics", true);
@@ -202,6 +203,9 @@ namespace TradingStrategies.Trading.Overseer
 
             // Post MarketTypeService metrics automatically
             _marketTypeService.PostMetrics(_performanceMonitor);
+
+            // Post StrategySelectionHelper metrics automatically
+            StrategySelectionHelper.PostMetrics(_performanceMonitor);
 
             return activePaths;
         }

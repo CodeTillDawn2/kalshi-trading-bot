@@ -5,6 +5,7 @@ using static BacklashInterfaces.Enums.StrategyEnums;
 using static TradingStrategies.Strategies.Strats.BollingerBreakout;
 using System.Diagnostics;
 using System.Collections.Concurrent;
+using TradingStrategies.Configuration;
 
 namespace TradingStrategies.Trading.Helpers
 {
@@ -31,13 +32,33 @@ namespace TradingStrategies.Trading.Helpers
             public TimeSpan TotalInstantiationTime { get; set; }
             public TimeSpan AverageInstantiationTime { get; set; }
             public DateTime Timestamp { get; set; }
+            public List<TimeSpan> IndividualInstantiationTimes { get; set; } = new();
+            public List<long> IndividualMemoryAllocations { get; set; } = new();
+            public long TotalMemoryAllocated { get; set; }
+        }
+
+        /// <summary>
+        /// Static configuration instance for StrategySelectionHelper settings.
+        /// This should be set during application startup with the TradingConfig instance.
+        /// </summary>
+        private static TradingConfig? _config;
+
+        /// <summary>
+        /// Sets the configuration for StrategySelectionHelper.
+        /// This method should be called during application startup to configure performance metrics.
+        /// </summary>
+        /// <param name="config">The trading configuration containing StrategySelectionHelper settings.</param>
+        public static void SetConfiguration(TradingConfig config)
+        {
+            _config = config;
         }
 
         /// <summary>
         /// Flag to enable/disable performance metrics collection.
-        /// Set to true to collect timing data during strategy instantiation.
+        /// Uses configuration from TradingConfig:StrategySelectionHelper_EnablePerformanceMetrics.
+        /// Defaults to false for performance reasons (individual instance tracking has overhead).
         /// </summary>
-        public static bool EnablePerformanceMetrics { get; set; } = false;
+        public static bool EnablePerformanceMetrics => _config?.StrategySelectionHelper_EnablePerformanceMetrics ?? false;
 
         /// <summary>
         /// Thread-safe collection to store performance metrics.
@@ -50,7 +71,10 @@ namespace TradingStrategies.Trading.Helpers
         /// <param name="strategyType">The type of strategy being instantiated.</param>
         /// <param name="instanceCount">Number of instances created.</param>
         /// <param name="totalTime">Total time spent instantiating strategies.</param>
-        private static void RecordPerformanceMetrics(string strategyType, int instanceCount, TimeSpan totalTime)
+        /// <param name="individualTimes">List of individual instantiation times.</param>
+        /// <param name="individualMemoryAllocations">List of individual memory allocations.</param>
+        private static void RecordPerformanceMetrics(string strategyType, int instanceCount, TimeSpan totalTime,
+            List<TimeSpan> individualTimes = null, List<long> individualMemoryAllocations = null)
         {
             if (!EnablePerformanceMetrics) return;
 
@@ -60,7 +84,10 @@ namespace TradingStrategies.Trading.Helpers
                 InstanceCount = instanceCount,
                 TotalInstantiationTime = totalTime,
                 AverageInstantiationTime = instanceCount > 0 ? TimeSpan.FromTicks(totalTime.Ticks / instanceCount) : TimeSpan.Zero,
-                Timestamp = DateTime.UtcNow
+                Timestamp = DateTime.UtcNow,
+                IndividualInstantiationTimes = individualTimes ?? new List<TimeSpan>(),
+                IndividualMemoryAllocations = individualMemoryAllocations ?? new List<long>(),
+                TotalMemoryAllocated = individualMemoryAllocations?.Sum() ?? 0
             };
 
             _performanceMetrics.Add(metrics);
@@ -81,6 +108,48 @@ namespace TradingStrategies.Trading.Helpers
         public static void ClearPerformanceMetrics()
         {
             while (_performanceMetrics.TryTake(out _)) { }
+        }
+
+        /// <summary>
+        /// Posts the current performance metrics to the specified performance monitor.
+        /// </summary>
+        /// <param name="performanceMonitor">The performance monitor to post metrics to. If null, no action is taken.</param>
+        public static void PostMetrics(BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor performanceMonitor)
+        {
+            if (performanceMonitor == null || !EnablePerformanceMetrics) return;
+
+            var allMetrics = GetPerformanceMetrics();
+            if (!allMetrics.Any()) return;
+
+            // Group metrics by strategy type for better organization
+            var metricsByType = allMetrics.GroupBy(m => m.StrategyType);
+
+            foreach (var strategyGroup in metricsByType)
+            {
+                var strategyType = strategyGroup.Key;
+                var metrics = strategyGroup.ToList();
+
+                // Calculate aggregate statistics
+                var totalTime = metrics.Sum(m => m.TotalInstantiationTime.TotalMilliseconds);
+                var avgTime = metrics.Average(m => m.AverageInstantiationTime.TotalMilliseconds);
+                var totalInstances = metrics.Sum(m => m.InstanceCount);
+                var totalMemory = metrics.Sum(m => m.TotalMemoryAllocated);
+
+                var metricsDict = new Dictionary<string, object>
+                {
+                    ["StrategyType"] = strategyType,
+                    ["TotalInstantiationTimeMs"] = totalTime,
+                    ["AverageInstantiationTimeMs"] = avgTime,
+                    ["TotalInstances"] = totalInstances,
+                    ["TotalMemoryAllocated"] = totalMemory,
+                    ["MetricsCount"] = metrics.Count,
+                    ["IndividualInstantiationTimes"] = metrics.SelectMany(m => m.IndividualInstantiationTimes).ToList(),
+                    ["IndividualMemoryAllocations"] = metrics.SelectMany(m => m.IndividualMemoryAllocations).ToList(),
+                    ["Timestamp"] = DateTime.UtcNow
+                };
+
+                performanceMonitor.RecordSimulationMetrics($"StrategySelectionHelper.{strategyType}", metricsDict);
+            }
         }
         /// <summary>
         /// Initializes a new instance of the StrategySelectionHelper class.
@@ -2433,10 +2502,13 @@ namespace TradingStrategies.Trading.Helpers
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
             var stopwatch = Stopwatch.StartNew();
             int instanceCount = 0;
+            var individualTimes = new List<TimeSpan>();
+            var individualMemoryAllocations = new List<long>();
 
             foreach (var (name, parameters) in MLEntrySeekerShared.MLSharedParameterSets)
             {
                 var instantiationStopwatch = Stopwatch.StartNew();
+                var memoryBefore = GC.GetAllocatedBytesForCurrentThread();
 
                 var mlStrat = new MLEntrySeekerShared(
                     name: $"MLShared_{name}",
@@ -2449,9 +2521,13 @@ namespace TradingStrategies.Trading.Helpers
                 var strategiesDict = CreateMarketStrategyMapping(mlStrategy);
 
                 instantiationStopwatch.Stop();
+                var memoryAfter = GC.GetAllocatedBytesForCurrentThread();
+                var memoryAllocated = memoryAfter - memoryBefore;
+
                 if (EnablePerformanceMetrics)
                 {
-                    // Record individual instantiation time if needed
+                    individualTimes.Add(instantiationStopwatch.Elapsed);
+                    individualMemoryAllocations.Add(memoryAllocated);
                 }
 
                 returnList.Add(strategiesDict);
@@ -2459,7 +2535,7 @@ namespace TradingStrategies.Trading.Helpers
             }
 
             stopwatch.Stop();
-            RecordPerformanceMetrics("MLEntrySeekerShared", instanceCount, stopwatch.Elapsed);
+            RecordPerformanceMetrics("MLEntrySeekerShared", instanceCount, stopwatch.Elapsed, individualTimes, individualMemoryAllocations);
 
             return returnList;
         }
@@ -2612,11 +2688,14 @@ namespace TradingStrategies.Trading.Helpers
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
             var stopwatch = Stopwatch.StartNew();
             int instanceCount = 0;
+            var individualTimes = new List<TimeSpan>();
+            var individualMemoryAllocations = new List<long>();
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in MomentumTradingParameterSets)
             {
                 var instantiationStopwatch = Stopwatch.StartNew();
+                var memoryBefore = GC.GetAllocatedBytesForCurrentThread();
 
                 // Create a new MomentumTrading strategy with the current parameter set
                 var momentumStrat = new MomentumTrading(name: name, mlParams: parameters);
@@ -2626,9 +2705,13 @@ namespace TradingStrategies.Trading.Helpers
                 var strategiesDict = CreateMarketStrategyMapping(momentumStrategy);
 
                 instantiationStopwatch.Stop();
+                var memoryAfter = GC.GetAllocatedBytesForCurrentThread();
+                var memoryAllocated = memoryAfter - memoryBefore;
+
                 if (EnablePerformanceMetrics)
                 {
-                    // Record individual instantiation time if needed
+                    individualTimes.Add(instantiationStopwatch.Elapsed);
+                    individualMemoryAllocations.Add(memoryAllocated);
                 }
 
                 returnList.Add(strategiesDict);
@@ -2636,7 +2719,7 @@ namespace TradingStrategies.Trading.Helpers
             }
 
             stopwatch.Stop();
-            RecordPerformanceMetrics("MomentumTrading", instanceCount, stopwatch.Elapsed);
+            RecordPerformanceMetrics("MomentumTrading", instanceCount, stopwatch.Elapsed, individualTimes, individualMemoryAllocations);
 
             return returnList;
         }
@@ -2645,11 +2728,14 @@ namespace TradingStrategies.Trading.Helpers
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
             var stopwatch = Stopwatch.StartNew();
             int instanceCount = 0;
+            var individualTimes = new List<TimeSpan>();
+            var individualMemoryAllocations = new List<long>();
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in FlowMomentumParameterSets)
             {
                 var instantiationStopwatch = Stopwatch.StartNew();
+                var memoryBefore = GC.GetAllocatedBytesForCurrentThread();
 
                 // Create a new FlowMomentumStrat with the current parameter set
                 var flowStrat = new FlowMomentumStrat(name: name, mlParams: parameters);
@@ -2659,9 +2745,13 @@ namespace TradingStrategies.Trading.Helpers
                 var strategiesDict = CreateMarketStrategyMapping(flowStrategy);
 
                 instantiationStopwatch.Stop();
+                var memoryAfter = GC.GetAllocatedBytesForCurrentThread();
+                var memoryAllocated = memoryAfter - memoryBefore;
+
                 if (EnablePerformanceMetrics)
                 {
-                    // Record individual instantiation time if needed
+                    individualTimes.Add(instantiationStopwatch.Elapsed);
+                    individualMemoryAllocations.Add(memoryAllocated);
                 }
 
                 returnList.Add(strategiesDict);
@@ -2669,7 +2759,7 @@ namespace TradingStrategies.Trading.Helpers
             }
 
             stopwatch.Stop();
-            RecordPerformanceMetrics("FlowMomentumStrat", instanceCount, stopwatch.Elapsed);
+            RecordPerformanceMetrics("FlowMomentumStrat", instanceCount, stopwatch.Elapsed, individualTimes, individualMemoryAllocations);
 
             return returnList;
         }
@@ -2678,11 +2768,14 @@ namespace TradingStrategies.Trading.Helpers
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
             var stopwatch = Stopwatch.StartNew();
             int instanceCount = 0;
+            var individualTimes = new List<TimeSpan>();
+            var individualMemoryAllocations = new List<long>();
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in SlopeMomentumStrat.SlopeMomentumParameterSets)
             {
                 var instantiationStopwatch = Stopwatch.StartNew();
+                var memoryBefore = GC.GetAllocatedBytesForCurrentThread();
 
                 // Create a new SlopeMomentumStrat with the current parameter set
                 var slopeStrat = new SlopeMomentumStrat(name: name, mlParams: parameters);
@@ -2692,9 +2785,13 @@ namespace TradingStrategies.Trading.Helpers
                 var strategiesDict = CreateMarketStrategyMapping(slopeStrategy);
 
                 instantiationStopwatch.Stop();
+                var memoryAfter = GC.GetAllocatedBytesForCurrentThread();
+                var memoryAllocated = memoryAfter - memoryBefore;
+
                 if (EnablePerformanceMetrics)
                 {
-                    // Record individual instantiation time if needed
+                    individualTimes.Add(instantiationStopwatch.Elapsed);
+                    individualMemoryAllocations.Add(memoryAllocated);
                 }
 
                 returnList.Add(strategiesDict);
@@ -2702,7 +2799,7 @@ namespace TradingStrategies.Trading.Helpers
             }
 
             stopwatch.Stop();
-            RecordPerformanceMetrics("SlopeMomentumStrat", instanceCount, stopwatch.Elapsed);
+            RecordPerformanceMetrics("SlopeMomentumStrat", instanceCount, stopwatch.Elapsed, individualTimes, individualMemoryAllocations);
 
             return returnList;
         }
@@ -2711,11 +2808,14 @@ namespace TradingStrategies.Trading.Helpers
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
             var stopwatch = Stopwatch.StartNew();
             int instanceCount = 0;
+            var individualTimes = new List<TimeSpan>();
+            var individualMemoryAllocations = new List<long>();
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in TryAgainStrat.TryAgainStratParameterSets)
             {
                 var instantiationStopwatch = Stopwatch.StartNew();
+                var memoryBefore = GC.GetAllocatedBytesForCurrentThread();
 
                 // Create a new TryAgainStrat with the current parameter set
                 var tryAgainStrat = new TryAgainStrat(name: name, mlParams: parameters);
@@ -2725,9 +2825,13 @@ namespace TradingStrategies.Trading.Helpers
                 var strategiesDict = CreateMarketStrategyMapping(tryAgainStrategy);
 
                 instantiationStopwatch.Stop();
+                var memoryAfter = GC.GetAllocatedBytesForCurrentThread();
+                var memoryAllocated = memoryAfter - memoryBefore;
+
                 if (EnablePerformanceMetrics)
                 {
-                    // Record individual instantiation time if needed
+                    individualTimes.Add(instantiationStopwatch.Elapsed);
+                    individualMemoryAllocations.Add(memoryAllocated);
                 }
 
                 returnList.Add(strategiesDict);
@@ -2735,7 +2839,7 @@ namespace TradingStrategies.Trading.Helpers
             }
 
             stopwatch.Stop();
-            RecordPerformanceMetrics("TryAgainStrat", instanceCount, stopwatch.Elapsed);
+            RecordPerformanceMetrics("TryAgainStrat", instanceCount, stopwatch.Elapsed, individualTimes, individualMemoryAllocations);
 
             return returnList;
         }
@@ -2745,11 +2849,14 @@ namespace TradingStrategies.Trading.Helpers
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
             var stopwatch = Stopwatch.StartNew();
             int instanceCount = 0;
+            var individualTimes = new List<TimeSpan>();
+            var individualMemoryAllocations = new List<long>();
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in BollingerParameterSets)
             {
                 var instantiationStopwatch = Stopwatch.StartNew();
+                var memoryBefore = GC.GetAllocatedBytesForCurrentThread();
 
                 // Create a new Bollinger Breakout strategy with the current parameter set
                 var bollingerStrat = new BollingerBreakout(mlParams: parameters);
@@ -2759,9 +2866,13 @@ namespace TradingStrategies.Trading.Helpers
                 var strategiesDict = CreateMarketStrategyMapping(bollingerStrategy);
 
                 instantiationStopwatch.Stop();
+                var memoryAfter = GC.GetAllocatedBytesForCurrentThread();
+                var memoryAllocated = memoryAfter - memoryBefore;
+
                 if (EnablePerformanceMetrics)
                 {
-                    // Record individual instantiation time if needed
+                    individualTimes.Add(instantiationStopwatch.Elapsed);
+                    individualMemoryAllocations.Add(memoryAllocated);
                 }
 
                 returnList.Add(strategiesDict);
@@ -2769,7 +2880,7 @@ namespace TradingStrategies.Trading.Helpers
             }
 
             stopwatch.Stop();
-            RecordPerformanceMetrics("BollingerBreakout", instanceCount, stopwatch.Elapsed);
+            RecordPerformanceMetrics("BollingerBreakout", instanceCount, stopwatch.Elapsed, individualTimes, individualMemoryAllocations);
 
             return returnList;
         }
@@ -2794,11 +2905,14 @@ namespace TradingStrategies.Trading.Helpers
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
             var stopwatch = Stopwatch.StartNew();
             int instanceCount = 0;
+            var individualTimes = new List<TimeSpan>();
+            var individualMemoryAllocations = new List<long>();
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in BreakoutParameterSets)
             {
                 var instantiationStopwatch = Stopwatch.StartNew();
+                var memoryBefore = GC.GetAllocatedBytesForCurrentThread();
 
                 // Create a new Breakout strategy with the current parameter set
                 var breakoutStrat = new Breakout2(mlParams: parameters);
@@ -2808,9 +2922,13 @@ namespace TradingStrategies.Trading.Helpers
                 var strategiesDict = CreateMarketStrategyMapping(breakoutStrategy);
 
                 instantiationStopwatch.Stop();
+                var memoryAfter = GC.GetAllocatedBytesForCurrentThread();
+                var memoryAllocated = memoryAfter - memoryBefore;
+
                 if (EnablePerformanceMetrics)
                 {
-                    // Record individual instantiation time if needed
+                    individualTimes.Add(instantiationStopwatch.Elapsed);
+                    individualMemoryAllocations.Add(memoryAllocated);
                 }
 
                 returnList.Add(strategiesDict);
@@ -2818,7 +2936,7 @@ namespace TradingStrategies.Trading.Helpers
             }
 
             stopwatch.Stop();
-            RecordPerformanceMetrics("Breakout2", instanceCount, stopwatch.Elapsed);
+            RecordPerformanceMetrics("Breakout2", instanceCount, stopwatch.Elapsed, individualTimes, individualMemoryAllocations);
 
             return returnList;
         }
@@ -2851,11 +2969,14 @@ namespace TradingStrategies.Trading.Helpers
             var returnList = new List<Dictionary<MarketType, List<Strategy>>>();
             var stopwatch = Stopwatch.StartNew();
             int instanceCount = 0;
+            var individualTimes = new List<TimeSpan>();
+            var individualMemoryAllocations = new List<long>();
 
             // Create a strategy set for each parameter configuration
             foreach (var (name, parameters) in NothingEverHappensParameterSets)
             {
                 var instantiationStopwatch = Stopwatch.StartNew();
+                var memoryBefore = GC.GetAllocatedBytesForCurrentThread();
 
                 // Create a new NothingEverHappensStrat with the current parameter set
                 var nothingStrat = new NothingEverHappensStrat(name: name, mlParams: parameters);
@@ -2865,9 +2986,13 @@ namespace TradingStrategies.Trading.Helpers
                 var strategiesDict = CreateMarketStrategyMapping(nothingStrategy);
 
                 instantiationStopwatch.Stop();
+                var memoryAfter = GC.GetAllocatedBytesForCurrentThread();
+                var memoryAllocated = memoryAfter - memoryBefore;
+
                 if (EnablePerformanceMetrics)
                 {
-                    // Record individual instantiation time if needed
+                    individualTimes.Add(instantiationStopwatch.Elapsed);
+                    individualMemoryAllocations.Add(memoryAllocated);
                 }
 
                 returnList.Add(strategiesDict);
@@ -2875,7 +3000,7 @@ namespace TradingStrategies.Trading.Helpers
             }
 
             stopwatch.Stop();
-            RecordPerformanceMetrics("NothingEverHappensStrat", instanceCount, stopwatch.Elapsed);
+            RecordPerformanceMetrics("NothingEverHappensStrat", instanceCount, stopwatch.Elapsed, individualTimes, individualMemoryAllocations);
 
             return returnList;
         }
