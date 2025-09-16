@@ -1,7 +1,6 @@
 using BacklashDTOs;
 using TradingStrategies.Trading.Helpers;
 using TradingStrategies.Configuration;
-using BacklashInterfaces.PerformanceMetrics;
 using static BacklashInterfaces.Enums.StrategyEnums;
 using System.Diagnostics;
 using System.Collections.Concurrent;
@@ -260,7 +259,7 @@ namespace TradingStrategies.Trading.Overseer
         /// Posts the current performance metrics to the specified performance monitor.
         /// </summary>
         /// <param name="performanceMonitor">The performance monitor to post metrics to. If null, no action is taken.</param>
-        public void PostMetrics(IPerformanceMonitor performanceMonitor)
+        public void PostMetrics(PerformanceMonitor performanceMonitor)
         {
             if (performanceMonitor != null)
             {
