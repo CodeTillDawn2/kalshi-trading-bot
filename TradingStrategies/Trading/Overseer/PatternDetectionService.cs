@@ -137,6 +137,12 @@ namespace TradingStrategies.Trading.Overseer
         }
 
         /// <summary>
+        /// Gets or sets whether pattern image generation is enabled.
+        /// This setting controls whether visualization images are generated for detected patterns.
+        /// </summary>
+        public bool EnablePatternImageGeneration { get; set; } = true;
+
+        /// <summary>
         /// Detects candlestick patterns from the provided market snapshot.
         /// Analyzes recent candlestick data to identify various technical analysis patterns
         /// that can inform trading strategy decisions.
@@ -193,8 +199,21 @@ namespace TradingStrategies.Trading.Overseer
                 // Create metrics collector for detailed performance tracking (conditionally)
                 var metrics = _config.EnablePatternDetectionMetrics ? new BacklashPatterns.PatternDetectionMetrics() : null;
 
-                // Execute pattern detection asynchronously with custom config and metrics
-                var patterns = PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics, _performanceMonitor).GetAwaiter().GetResult();
+                // Execute pattern detection with or without visualization based on setting
+                Dictionary<int, List<BacklashPatterns.PatternDefinitions.PatternDefinition>> patterns;
+                if (EnablePatternImageGeneration)
+                {
+                    var visualizationPatterns = PatternSearch.DetectPatternsWithVisualizationAsync(mids, _config.LookbackWindow, patternConfig, metrics, _performanceMonitor, true, 10).GetAwaiter().GetResult();
+                    // Convert back to PatternDefinition for compatibility
+                    patterns = visualizationPatterns.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Select(v => v.Pattern).ToList()
+                    );
+                }
+                else
+                {
+                    patterns = PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics, _performanceMonitor).GetAwaiter().GetResult();
+                }
 
                 // Filter patterns based on configured pattern types if specified
                 var filteredPatterns = FilterPatternsByTypes(patterns, _config.PatternTypes);
@@ -331,7 +350,20 @@ namespace TradingStrategies.Trading.Overseer
                 var metrics = _config.EnablePatternDetectionMetrics ? new BacklashPatterns.PatternDetectionMetrics() : null;
 
                 // Execute pattern detection asynchronously with custom config and metrics
-                var patterns = await PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics, _performanceMonitor);
+                Dictionary<int, List<BacklashPatterns.PatternDefinitions.PatternDefinition>> patterns;
+                if (EnablePatternImageGeneration)
+                {
+                    var visualizationPatterns = await PatternSearch.DetectPatternsWithVisualizationAsync(mids, _config.LookbackWindow, patternConfig, metrics, _performanceMonitor, true, 10);
+                    // Convert back to PatternDefinition for compatibility
+                    patterns = visualizationPatterns.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Select(v => v.Pattern).ToList()
+                    );
+                }
+                else
+                {
+                    patterns = await PatternSearch.DetectPatternsAsync(mids, _config.LookbackWindow, patternConfig, metrics, _performanceMonitor);
+                }
 
                 // Filter patterns based on configured pattern types if specified
                 var filteredPatterns = FilterPatternsByTypes(patterns, _config.PatternTypes);

@@ -41,17 +41,19 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
         /// <param name="performanceMonitor">Optional performance monitor for recording execution times.</param>
+        /// <param name="enablePatternImageGeneration">Whether to enable pattern image generation.</param>
         /// <remarks>
         /// Creates instances of MarketTypeService and PatternDetectionService for
         /// market classification and pattern recognition during simulation.
         /// </remarks>
-        public SimulationEngine(IConfiguration configuration, PerformanceMonitor? performanceMonitor = null)
+        public SimulationEngine(IConfiguration configuration, PerformanceMonitor? performanceMonitor = null, bool enablePatternImageGeneration = true)
         {
             var tradingConfig = new TradingConfig();
             configuration.GetSection("TradingConfig").Bind(tradingConfig);
             _marketTypeService = new MarketTypeService(tradingConfig);
             StrategySelectionHelper.SetConfiguration(tradingConfig);
             _patternDetectionService = new PatternDetectionService(configuration, performanceMonitor);
+            _patternDetectionService.EnablePatternImageGeneration = enablePatternImageGeneration;
             _performanceMonitor = performanceMonitor;
             _enablePerformanceMetrics = configuration.GetValue<bool>("SimulationEngine:EnablePerformanceMetrics", true);
         }

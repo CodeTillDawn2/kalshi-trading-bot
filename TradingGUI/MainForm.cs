@@ -41,10 +41,18 @@ namespace TradingGUI
 
         List<MarketSnapshot> _snapshots = new();
 
+        /// <summary>
+        /// Gets whether pattern image generation is currently enabled.
+        /// </summary>
+        public bool EnablePatternImageGeneration => _enablePatternImagesCheckBox?.Checked ?? true;
+
         // Strategy selection controls
         private ComboBox? _strategyTypeComboBox;
         private ComboBox? _weightSetComboBox;
         private Button? _refreshWeightSetsButton;
+
+        // Pattern image generation control
+        private CheckBox? _enablePatternImagesCheckBox;
 
         private (double xMin, double xMax, double yMin, double yMax) _savedChartLimits;
 
@@ -1000,17 +1008,29 @@ namespace TradingGUI
             };
             _refreshWeightSetsButton.Click += RefreshWeightSetsButton_Click;
 
+            // Create pattern image generation checkbox
+            _enablePatternImagesCheckBox = new CheckBox
+            {
+                Text = "Generate Pattern Images",
+                Checked = true,
+                AutoSize = true,
+                Margin = new Padding(3)
+            };
+            _enablePatternImagesCheckBox.CheckedChanged += EnablePatternImagesCheckBox_CheckedChanged;
+
             // Add controls to buttonPanel
             // buttonPanel is declared in the designer file and should be accessible
             buttonPanel.Controls.Add(_progressBar);
             buttonPanel.Controls.Add(_strategyTypeComboBox);
             buttonPanel.Controls.Add(_weightSetComboBox);
             buttonPanel.Controls.Add(_refreshWeightSetsButton);
+            buttonPanel.Controls.Add(_enablePatternImagesCheckBox);
 
             // Move them to the front of the flow (before the buttons)
             buttonPanel.Controls.SetChildIndex(_strategyTypeComboBox, 0);
             buttonPanel.Controls.SetChildIndex(_weightSetComboBox, 1);
             buttonPanel.Controls.SetChildIndex(_refreshWeightSetsButton, 2);
+            buttonPanel.Controls.SetChildIndex(_enablePatternImagesCheckBox, 3);
 
             // Load previous selections from config
             LoadConfig();
@@ -1040,10 +1060,20 @@ namespace TradingGUI
                         {
                             _strategyTypeComboBox.SelectedIndex = 0; // Default to first strategy
                         }
+
+                        // Set pattern image generation setting
+                        if (_enablePatternImagesCheckBox != null)
+                        {
+                            _enablePatternImagesCheckBox.Checked = config.EnablePatternImageGeneration;
+                        }
                     }
                     else
                     {
                         _strategyTypeComboBox.SelectedIndex = 0; // Default to first strategy
+                        if (_enablePatternImagesCheckBox != null)
+                        {
+                            _enablePatternImagesCheckBox.Checked = true; // Default to enabled
+                        }
                     }
                 }
                 else
@@ -1065,7 +1095,8 @@ namespace TradingGUI
                 var config = new TradingGUIConfig
                 {
                     LastSelectedStrategy = _strategyTypeComboBox.SelectedItem?.ToString(),
-                    LastSelectedWeightSet = _weightSetComboBox.SelectedItem?.ToString()
+                    LastSelectedWeightSet = _weightSetComboBox.SelectedItem?.ToString(),
+                    EnablePatternImageGeneration = _enablePatternImagesCheckBox?.Checked ?? true
                 };
 
                 var json = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
@@ -1106,6 +1137,12 @@ namespace TradingGUI
         private async void RefreshWeightSetsButton_Click(object? sender, EventArgs e)
         {
             await PopulateWeightSetsAsync();
+        }
+
+        private void EnablePatternImagesCheckBox_CheckedChanged(object? sender, EventArgs e)
+        {
+            // Save config when pattern image generation setting changes
+            SaveConfig();
         }
 
         private IEnumerable<string> GetWeightNamesForStrategy(string strategyName)

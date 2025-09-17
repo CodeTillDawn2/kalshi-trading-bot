@@ -6,6 +6,7 @@ using static BacklashPatterns.PatternUtils;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using BacklashInterfaces.PerformanceMetrics;
+using ScottPlot;
 
 namespace BacklashPatterns
 {
@@ -1149,6 +1150,62 @@ namespace BacklashPatterns
             }
 
             return filteredPatterns;
+        }
+
+        /// <summary>
+        /// Detects candlestick patterns and generates visualization images (synchronous version).
+        /// </summary>
+        /// <param name="prices">Array of candle data containing price and volume information.</param>
+        /// <param name="trendLookback">Number of candles to look back for trend analysis and pattern context.</param>
+        /// <param name="performanceMonitor">Optional performance monitor to record metrics centrally.</param>
+        /// <param name="generateImages">Whether to generate and save pattern visualization images.</param>
+        /// <param name="imageLookback">Number of candles to include in pattern images for context.</param>
+        /// <returns>Dictionary mapping candle indices to lists of pattern visualizations with image paths.</returns>
+        public static Dictionary<int, List<PatternVisualization>> DetectPatternsWithVisualization(CandleMids[] prices, int trendLookback, BacklashInterfaces.PerformanceMetrics.IPerformanceMonitor? performanceMonitor = null, bool generateImages = true, int imageLookback = 10)
+        {
+            var config = new PatternDetectionConfig();
+            var metrics = new PatternDetectionMetrics();
+            return DetectPatternsWithVisualizationAsync(prices, trendLookback, config, metrics, performanceMonitor, generateImages, imageLookback).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Detects candlestick patterns and generates visualization images asynchronously.
+        /// </summary>
+        /// <param name="prices">Array of candle data containing price and volume information.</param>
+        /// <param name="trendLookback">Number of candles to look back for trend analysis and pattern context.</param>
+        /// <param name="config">Configuration for pattern detection thresholds and settings.</param>
+        /// <param name="metrics">Metrics collector for performance tracking.</param>
+        /// <param name="performanceMonitor">Optional performance monitor to record metrics centrally.</param>
+        /// <param name="generateImages">Whether to generate and save pattern visualization images.</param>
+        /// <param name="imageLookback">Number of candles to include in pattern images for context.</param>
+        /// <returns>Task containing dictionary mapping candle indices to lists of pattern visualizations with image paths.</returns>
+        public static async Task<Dictionary<int, List<PatternVisualization>>> DetectPatternsWithVisualizationAsync(CandleMids[] prices,
+                int trendLookback, PatternDetectionConfig config, PatternDetectionMetrics metrics,
+                IPerformanceMonitor? performanceMonitor = null, bool generateImages = true, int imageLookback = 10)
+        {
+            // First detect patterns normally
+            var patterns = await DetectPatternsAsync(prices, trendLookback, config, metrics, performanceMonitor);
+
+            if (!generateImages)
+            {
+                // Convert to PatternVisualization without images
+                var result = new Dictionary<int, List<PatternVisualization>>();
+                foreach (var kvp in patterns)
+                {
+                    result[kvp.Key] = kvp.Value.Select(p => new PatternVisualization(p)).ToList();
+                }
+                return result;
+            }
+
+            // Generate images for each pattern
+            var resultWithImages = new Dictionary<int, List<PatternVisualization>>();
+            foreach (var kvp in patterns)
+            {
+                var visualizations = PatternVisualizer.GeneratePatternImages(kvp.Value, prices, imageLookback);
+                resultWithImages[kvp.Key] = visualizations;
+            }
+
+            return resultWithImages;
         }
     }
 

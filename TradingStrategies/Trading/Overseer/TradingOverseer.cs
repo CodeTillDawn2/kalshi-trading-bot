@@ -44,7 +44,8 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="configuration">The configuration instance for reading settings from appsettings.json.</param>
         /// <param name="logger">Logger for recording warnings and errors.</param>
         /// <param name="performanceMonitor">Monitor for recording performance metrics.</param>
-        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, IConfiguration configuration, ILogger<TradingOverseer> logger, PerformanceMonitor performanceMonitor)
+        /// <param name="enablePatternImageGeneration">Whether to enable pattern image generation.</param>
+        public TradingOverseer(IServiceScopeFactory scopeFactory, ITradingSnapshotService snapshotService, IConfiguration configuration, ILogger<TradingOverseer> logger, PerformanceMonitor performanceMonitor, bool enablePatternImageGeneration = true)
         {
             _scopeFactory = scopeFactory;
             _snapshotService = snapshotService;
@@ -52,7 +53,7 @@ namespace TradingStrategies.Trading.Overseer
             _performanceMonitor = performanceMonitor;
             _enablePerformanceMetrics = configuration.GetValue<bool>("TradingOverseer:EnablePerformanceMetrics", false);
             _performanceMonitor.EnablePerformanceMetrics = _enablePerformanceMetrics;
-            _simulationEngine = new SimulationEngine(configuration);
+            _simulationEngine = new SimulationEngine(configuration, performanceMonitor, enablePatternImageGeneration);
             var tradingConfig = new TradingConfig();
             configuration.GetSection("TradingConfig").Bind(tradingConfig);
             _equityCalculator = new EquityCalculator(tradingConfig);
