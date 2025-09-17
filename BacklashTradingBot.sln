@@ -28,6 +28,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradingSimulator", "Trading
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BacklashPatterns", "BacklashPatterns\BacklashPatterns.csproj", "{465584FB-CAA7-0BF2-BC77-79B8672D54C9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OverseerTests", "OverseerTests\OverseerTests.csproj", "{8E248D2E-49F8-4C16-A0C3-F148C23E06E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,10 @@ Global
 		{465584FB-CAA7-0BF2-BC77-79B8672D54C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{465584FB-CAA7-0BF2-BC77-79B8672D54C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{465584FB-CAA7-0BF2-BC77-79B8672D54C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E248D2E-49F8-4C16-A0C3-F148C23E06E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E248D2E-49F8-4C16-A0C3-F148C23E06E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E248D2E-49F8-4C16-A0C3-F148C23E06E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E248D2E-49F8-4C16-A0C3-F148C23E06E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
