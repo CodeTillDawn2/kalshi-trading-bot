@@ -68,22 +68,30 @@ builder.Services.Configure<SnapshotConfig>(builder.Configuration.GetSection("Wat
 builder.Services.AddOptions<SnapshotConfig>().ValidateDataAnnotations();
 builder.Services.Configure<SimulationConfig>(builder.Configuration.GetSection("Simulation"));
 builder.Services.AddOptions<SimulationConfig>().ValidateDataAnnotations();
+builder.Services.Configure<TradingTimingConfig>(builder.Configuration.GetSection("TradingDecisionService"));
 builder.Services.Configure<TradingConfig>(builder.Configuration.GetSection("TradingDecisionService"));
-builder.Services.Configure<GeneralExecutionConfig>(builder.Configuration.GetSection("GeneralExecution"));
+builder.Services.Configure<OrderbookChangeTrackerConfig>(builder.Configuration.GetSection("OrderbookChangeTracker"));
+builder.Services.Configure<MarketRefreshServiceConfig>(builder.Configuration.GetSection("MarketRefreshServiceConfig"));
+builder.Services.Configure<MarketTypeServiceConfig>(builder.Configuration.GetSection("MarketTypeServiceConfig"));
+builder.Services.Configure<StrategySelectionHelperConfig>(builder.Configuration.GetSection("StrategySelectionHelperConfig"));
+builder.Services.Configure<EquityCalculatorConfig>(builder.Configuration.GetSection("EquityCalculatorConfig"));
+builder.Services.Configure<RiskManagementConfig>(builder.Configuration.GetSection("RiskManagementConfig"));
+builder.Services.Configure<CandlestickConfig>(builder.Configuration.GetSection("CandlestickConfig"));
+builder.Services.Configure<GeneralExecutionConfig>(builder.Configuration.GetSection("Central:GeneralExecution"));
 builder.Services.Configure<OverseerClientServiceConfig>(builder.Configuration.GetSection("OverseerClientService"));
 builder.Services.Configure<CandlestickServiceConfig>(builder.Configuration.GetSection("CandlestickService"));
 builder.Services.Configure<BroadcastServiceConfig>(builder.Configuration.GetSection("BroadcastService"));
 builder.Services.Configure<MarketDataInitializerConfig>(builder.Configuration.GetSection("WatchedMarkets:MarketDataInitializer"));
-builder.Services.Configure<CentralPerformanceMonitorConfig>(builder.Configuration.GetSection("CentralPerformanceMonitor"));
-builder.Services.Configure<KalshiBotScopeManagerServiceConfig>(builder.Configuration.GetSection("KalshiBotScopeManagerService"));
+builder.Services.Configure<CentralPerformanceMonitorConfig>(builder.Configuration.GetSection("Central:CentralPerformanceMonitor"));
+builder.Services.Configure<KalshiBotScopeManagerServiceConfig>(builder.Configuration.GetSection("Central:KalshiBotScopeManagerService"));
 builder.Services.Configure<MarketDataConfig>(builder.Configuration.GetSection("WatchedMarkets:MarketData"));
-builder.Services.Configure<CentralBrainConfig>(builder.Configuration.GetSection("CentralBrain"));
+builder.Services.Configure<CentralBrainConfig>(builder.Configuration.GetSection("Central:CentralBrain"));
 builder.Services.Configure<TargetCalculationServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:TargetCalculationService"));
-builder.Services.Configure<BrainStatusServiceConfig>(builder.Configuration.GetSection("BrainStatusService"));
+builder.Services.Configure<BrainStatusServiceConfig>(builder.Configuration.GetSection("Central:BrainStatusService"));
 builder.Services.Configure<MarketAnalysisHelperConfig>(builder.Configuration.GetSection("MarketAnalysisHelper"));
 builder.Services.Configure<QueueMonitoringConfig>(builder.Configuration.GetSection("CentralPerformanceMonitor"));
 builder.Services.Configure<InterestScoreConfig>(builder.Configuration.GetSection("WatchedMarkets:InterestScore"));
-builder.Services.Configure<ErrorHandlerConfig>(builder.Configuration.GetSection("ErrorHandler"));
+builder.Services.Configure<ErrorHandlerConfig>(builder.Configuration.GetSection("Central:ErrorHandler"));
 builder.Services.Configure<OrderBookServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:OrderBookService"));
 builder.Services.Configure<BacklashBot.State.CalculationConfig>(builder.Configuration.GetSection("CalculationConfig"));
 
@@ -104,7 +112,6 @@ builder.Services.AddSingleton<ICentralBrain>(sp => new CentralBrain(
     sp.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
     sp.GetRequiredService<ICentralErrorHandler>(),
     sp.GetRequiredService<ICentralPerformanceMonitor>(),
-    // CalculationConfig eliminated - properties moved to JSON configuration
     sp.GetRequiredService<IMarketManagerService>(),
     sp.GetRequiredService<IHostApplicationLifetime>(),
     sp.GetRequiredService<IScopeManagerService>(),
@@ -185,6 +192,7 @@ builder.Services.AddTransient(provider =>
         provider.GetRequiredService<ILogger<OrderbookChangeTracker>>(),
         dataCache,
         provider.GetRequiredService<IOptions<TradingConfig>>(),
+        provider.GetRequiredService<IOptions<OrderbookChangeTrackerConfig>>(),
         provider.GetRequiredService<IScopeManagerService>(),
         provider.GetRequiredService<IStatusTrackerService>(),
         provider.GetRequiredService<ICentralPerformanceMonitor>()
@@ -211,6 +219,7 @@ builder.Services.AddTransient<Func<MarketDTO, MarketData>>(provider =>
                 sp.GetRequiredService<ILogger<OrderbookChangeTracker>>(),
                 dataCache,
                 sp.GetRequiredService<IOptions<TradingConfig>>(),
+                sp.GetRequiredService<IOptions<OrderbookChangeTrackerConfig>>(),
                 sp.GetRequiredService<IScopeManagerService>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
                 sp.GetRequiredService<ICentralPerformanceMonitor>()

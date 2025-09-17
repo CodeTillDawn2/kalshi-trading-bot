@@ -45,7 +45,7 @@ namespace BacklashBot.Management
         private readonly IBrainStatusService _brainStatus;
         private readonly SnapshotConfig _snapshotConfig;
         private readonly GeneralExecutionConfig _generalConfig;
-        private readonly TradingConfig _tradingConfig;
+        private readonly TradingConfig _tradingTimingConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
         private readonly IScopeManagerService _scopeManagerService;
         private readonly IHealthCheckService _healthCheckService;
@@ -82,7 +82,7 @@ namespace BacklashBot.Management
             IServiceFactory serviceFactory,
             IServiceScopeFactory scopeFactory,
             IOptions<SnapshotConfig> snapshotConfig,
-            IOptions<TradingConfig> tradingConfig,
+            IOptions<TradingConfig> tradingTimingConfig,
             IOptions<GeneralExecutionConfig> generalConfig,
             ICentralErrorHandler backlashErrorHandler,
             ICentralPerformanceMonitor backlashPerformanceTracker,
@@ -105,14 +105,14 @@ namespace BacklashBot.Management
             _brainStatus = brainStatusService;
             _errorHandler = backlashErrorHandler;
             _performanceTracker = backlashPerformanceTracker;
-            _tradingConfig = tradingConfig.Value;
+            _tradingTimingConfig = tradingTimingConfig.Value;
             _generalConfig = generalConfig.Value;
             _centralBrainConfig = centralBrainConfig.Value;
             _healthCheckService = healthCheckService;
             _statusTrackerService = statusTrackerService;
             _readyStatus = readyStatus;
             _brainInstance = _generalConfig.BrainInstance;
-            _decisionInterval = TimeSpan.FromSeconds(_tradingConfig.DecisionFrequencySeconds);
+            _decisionInterval = TimeSpan.FromSeconds(_tradingTimingConfig.DecisionFrequencySeconds);
             _timerFactory = timerFactory;
 
         }

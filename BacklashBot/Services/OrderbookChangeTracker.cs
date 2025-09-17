@@ -32,6 +32,7 @@ namespace BacklashBot.Services
         private readonly string _marketTicker;
         private readonly IDataCache _cache;
         private readonly IOptions<TradingConfig> _config;
+        private readonly IOptions<OrderbookChangeTrackerConfig> _trackerConfig;
         private CancellationToken _cancellationToken => _statusTrackerService.GetCancellationToken();
 
 
@@ -159,6 +160,7 @@ namespace BacklashBot.Services
             ILogger<IOrderbookChangeTracker> logger,
             IDataCache cache,
             IOptions<TradingConfig> config,
+            IOptions<OrderbookChangeTrackerConfig> trackerConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             ICentralPerformanceMonitor centralPerformanceMonitor)
@@ -168,10 +170,11 @@ namespace BacklashBot.Services
             _cache = cache;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config ?? throw new ArgumentNullException(nameof(config));
+            _trackerConfig = trackerConfig ?? throw new ArgumentNullException(nameof(trackerConfig));
             _statusTrackerService = statusTrackerService;
             _centralPerformanceMonitor = centralPerformanceMonitor ?? throw new ArgumentNullException(nameof(centralPerformanceMonitor));
 
-            _enablePerformanceMetrics = _config.Value.OrderbookChangeTracker_EnablePerformanceMetrics;
+            _enablePerformanceMetrics = _trackerConfig.Value.OrderbookChangeTracker_EnablePerformanceMetrics;
 
             _recalculationTimer = new System.Timers.Timer(10000); // 10 seconds
             _recalculationTimer.Elapsed += (sender, e) => OnRecalculationTimerElapsed(sender, e);
@@ -1219,12 +1222,12 @@ namespace BacklashBot.Services
                 return;
             }
 
-            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_config.Value.OrderbookChangeCleanupThresholdMinutes);
+            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.OrderbookChangeCleanupThresholdMinutes);
             int removedCount = 0;
             int queueSizeBefore = _orderbookChanges.Count;
 
             // First, enforce queue size limits by removing oldest events if queue is too large
-            while (_orderbookChanges.Count > _config.Value.MaxOrderbookChangeQueueSize && _orderbookChanges.TryDequeue(out var oldChange))
+            while (_orderbookChanges.Count > _trackerConfig.Value.MaxOrderbookChangeQueueSize && _orderbookChanges.TryDequeue(out var oldChange))
             {
                 removedCount++;
                 _logger.LogDebug(
@@ -1333,14 +1336,14 @@ namespace BacklashBot.Services
                 return;
             }
 
-            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_config.Value.TradeEventCleanupThresholdMinutes);
+            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.TradeEventCleanupThresholdMinutes);
             var gracePeriodEnd = LastMarketOpenTime.Add(_config.Value.ChangeWindowDuration);
             int removedCount = 0;
             int warningCount = 0;
             int queueSizeBefore = _tradeEvents.Count;
 
             // First, enforce queue size limits by removing oldest trades if queue is too large
-            while (_tradeEvents.Count > _config.Value.MaxTradeEventQueueSize && _tradeEvents.TryDequeue(out var oldTrade))
+            while (_tradeEvents.Count > _trackerConfig.Value.MaxTradeEventQueueSize && _tradeEvents.TryDequeue(out var oldTrade))
             {
                 removedCount++;
                 _logger.LogDebug(

@@ -154,7 +154,7 @@ namespace KalshiBotTasks
             var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>()!;
             var kalshiConfig = config.GetSection("Kalshi").Get<KalshiConfig>()!; // Add this for KalshiConfig
             _snapshotOptions = Options.Create(snapshotConfig);
-            _executionConfig = Options.Create(config.GetSection("GeneralExecution").Get<GeneralExecutionConfig>()!);
+            _executionConfig = Options.Create(config.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>()!);
             var kalshiOptions = Options.Create(kalshiConfig); // Create options for KalshiConfig
 
             var snapshotLoggerMock = new Mock<ILogger<TradingSnapshotService>>();
