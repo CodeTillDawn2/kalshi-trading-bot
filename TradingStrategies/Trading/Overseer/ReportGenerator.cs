@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace TradingStrategies.Trading.Overseer
@@ -11,424 +15,87 @@ namespace TradingStrategies.Trading.Overseer
     /// </summary>
     public class ReportGenerator
     {
-        /// <summary>
-        /// Represents a single event log entry from a trading simulation, capturing the complete state
-        /// of the trading environment at a specific point in time. This data structure is used to record
-        /// and analyze the progression of trading activities, market conditions, and strategy decisions
-        /// throughout a simulation run.
-        /// </summary>
-        public class SimulationEventLog
-        {
-            /// <summary>
-            /// The timestamp when this event occurred during the simulation.
-            /// </summary>
-            public DateTime Timestamp { get; set; }
-
-            /// <summary>
-            /// The type of market condition or category this event represents (e.g., "Trending", "Ranging").
-            /// </summary>
-            public string MarketType { get; set; } = null!;
-
-            /// <summary>
-            /// The trading action taken at this event (e.g., "Buy", "Sell", "Hold").
-            /// </summary>
-            public string Action { get; set; } = null!;
-
-            /// <summary>
-            /// The current position size after this event (positive for long, negative for short).
-            /// </summary>
-            public int Position { get; set; }
-
-            /// <summary>
-            /// The cash balance available at this event.
-            /// </summary>
-            public double Cash { get; set; }
-
-            /// <summary>
-            /// The market liquidity measure at this event.
-            /// </summary>
-            public double Liquidity { get; set; }
-
-            /// <summary>
-            /// The bid-ask spread for the Yes side of the market.
-            /// </summary>
-            public int YesSpread { get; set; }
-
-            /// <summary>
-            /// The overall trade rate at this event.
-            /// </summary>
-            public double TradeRate { get; set; }
-
-            /// <summary>
-            /// The Relative Strength Index (RSI) value at this event.
-            /// </summary>
-            public double RSI { get; set; }
-
-            /// <summary>
-            /// The active trading strategies applied at this event.
-            /// </summary>
-            public string Strategies { get; set; } = null!;
-
-            /// <summary>
-            /// The best bid price for the Yes side of the market.
-            /// </summary>
-            public int BestYesBid { get; set; }
-
-            /// <summary>
-            /// The best ask price for the Yes side of the market.
-            /// </summary>
-            public int BestYesAsk { get; set; }
-
-            /// <summary>
-            /// The best bid price for the No side of the market.
-            /// </summary>
-            public int BestNoBid { get; set; }
-
-            /// <summary>
-            /// The best ask price for the No side of the market.
-            /// </summary>
-            public int BestNoAsk { get; set; }
-
-            /// <summary>
-            /// The bid-ask spread for the No side of the market.
-            /// </summary>
-            public int NoSpread { get; set; }
-
-            /// <summary>
-            /// The depth of orders at the best Yes bid price.
-            /// </summary>
-            public int DepthAtBestYesBid { get; set; }
-
-            /// <summary>
-            /// The depth of orders at the best Yes ask price.
-            /// </summary>
-            public int DepthAtBestYesAsk { get; set; }
-
-            /// <summary>
-            /// The depth of orders at the best No bid price.
-            /// </summary>
-            public int DepthAtBestNoBid { get; set; }
-
-            /// <summary>
-            /// The depth of orders at the best No ask price.
-            /// </summary>
-            public int DepthAtBestNoAsk { get; set; }
-
-            /// <summary>
-            /// The total number of bid contracts on the Yes side.
-            /// </summary>
-            public int TotalYesBidContracts { get; set; }
-
-            /// <summary>
-            /// The total number of bid contracts on the No side.
-            /// </summary>
-            public int TotalNoBidContracts { get; set; }
-
-            /// <summary>
-            /// The imbalance between Yes and No bid volumes.
-            /// </summary>
-            public int BidImbalance { get; set; }
-
-            /// <summary>
-            /// The trade rate per minute for the Yes side.
-            /// </summary>
-            public double TradeRatePerMinute_Yes { get; set; }
-
-            /// <summary>
-            /// The trade rate per minute for the No side.
-            /// </summary>
-            public double TradeRatePerMinute_No { get; set; }
-
-            /// <summary>
-            /// The trade volume per minute for the Yes side.
-            /// </summary>
-            public double TradeVolumePerMinute_Yes { get; set; }
-
-            /// <summary>
-            /// The trade volume per minute for the No side.
-            /// </summary>
-            public double TradeVolumePerMinute_No { get; set; }
-
-            /// <summary>
-            /// The number of trades for the Yes side.
-            /// </summary>
-            public int TradeCount_Yes { get; set; }
-
-            /// <summary>
-            /// The number of trades for the No side.
-            /// </summary>
-            public int TradeCount_No { get; set; }
-
-            /// <summary>
-            /// The average trade size for the Yes side.
-            /// </summary>
-            public double AverageTradeSize_Yes { get; set; }
-
-            /// <summary>
-            /// The average trade size for the No side.
-            /// </summary>
-            public double AverageTradeSize_No { get; set; }
-
-            /// <summary>
-            /// Summary of resting bid orders on the Yes side, formatted as "price:quantity, price:quantity".
-            /// </summary>
-            public string RestingYesBids { get; set; } = "";
-
-            /// <summary>
-            /// Summary of resting bid orders on the No side, formatted as "price:quantity, price:quantity".
-            /// </summary>
-            public string RestingNoBids { get; set; } = "";
-
-            /// <summary>
-            /// Additional memo or notes for this event.
-            /// </summary>
-            public string Memo { get; set; } = "";
-
-            /// <summary>
-            /// The average cost of the current position.
-            /// </summary>
-            public double AverageCost { get; set; } = 0.0;
-
-            /// <summary>
-            /// List of detected technical patterns for this event snapshot.
-            /// </summary>
-            public List<BacklashPatterns.PatternDefinitions.PatternDefinition> Patterns { get; set; } = new List<BacklashPatterns.PatternDefinitions.PatternDefinition>();
-        }
+        // Constants for magic numbers and common values
+        private const int MaxPrice = 100;
+        private const double PriceDivider = 100.0;
+        private const double HighTradeRateThreshold = 1.0;
+        private const int StrongBidImbalanceThreshold = 500;
+        private const double WideSpreadThreshold = 5.0;
+        private const double HighBidPriceThreshold = 0.9;
+        private const double LowBidPriceThreshold = 0.1;
+        private const string DefaultOutputDir = @"C:\Users\Peter\Documents\GitHub\TestingOutput";
+        private const string NaValue = "N/A";
+        private const string YesSide = "Yes";
+        private const string NoSide = "No";
+        private const string NoneSide = "None";
 
         /// <summary>
-        /// Represents a grouped collection of related event logs that share the same market type and action.
-        /// This class aggregates multiple SimulationEventLog entries into summary statistics for analysis and reporting,
-        /// providing averaged metrics and position changes over a time period.
+        /// Corrects the spread and ask/bid data for all events in the collection.
         /// </summary>
-        public class EventGroup
+        /// <param name="events">The list of simulation events to correct.</param>
+        private void CorrectEventData(List<SimulationEventLog> events)
         {
-            /// <summary>
-            /// The market type shared by all events in this group.
-            /// </summary>
-            public string MarketType { get; set; } = null!;
-
-            /// <summary>
-            /// The action shared by all events in this group.
-            /// </summary>
-            public string Action { get; set; } = null!;
-
-            /// <summary>
-            /// The timestamp of the first event in this group.
-            /// </summary>
-            public DateTime StartTime { get; set; }
-
-            /// <summary>
-            /// The timestamp of the last event in this group.
-            /// </summary>
-            public DateTime EndTime { get; set; }
-
-            /// <summary>
-            /// The number of event snapshots included in this group.
-            /// </summary>
-            public int SnapshotCount { get; set; }
-
-            /// <summary>
-            /// The position at the start of this event group.
-            /// </summary>
-            public int StartPosition { get; set; }
-
-            /// <summary>
-            /// The position at the end of this event group.
-            /// </summary>
-            public int EndPosition { get; set; }
-
-            /// <summary>
-            /// The cash balance at the start of this event group.
-            /// </summary>
-            public double StartCash { get; set; }
-
-            /// <summary>
-            /// The cash balance at the end of this event group.
-            /// </summary>
-            public double EndCash { get; set; }
-
-            /// <summary>
-            /// The average liquidity across all events in this group.
-            /// </summary>
-            public double AvgLiquidity { get; set; }
-
-            /// <summary>
-            /// The average RSI across all events in this group.
-            /// </summary>
-            public double AvgRSI { get; set; }
-
-            /// <summary>
-            /// The strategies applied during this event group.
-            /// </summary>
-            public string Strategies { get; set; } = null!;
-
-            /// <summary>
-            /// The average Yes spread across all events in this group.
-            /// </summary>
-            public double AvgYesSpread { get; set; }
-
-            /// <summary>
-            /// The average No spread across all events in this group.
-            /// </summary>
-            public double AvgNoSpread { get; set; }
-
-            /// <summary>
-            /// The average trade rate for the Yes side across all events in this group.
-            /// </summary>
-            public double AvgTradeRateYes { get; set; }
-
-            /// <summary>
-            /// The average trade rate for the No side across all events in this group.
-            /// </summary>
-            public double AvgTradeRateNo { get; set; }
-
-            /// <summary>
-            /// The average depth at No bid across all events in this group.
-            /// </summary>
-            public double AvgDepthNoBid { get; set; }
-
-            /// <summary>
-            /// The average bid imbalance across all events in this group.
-            /// </summary>
-            public double AvgBidImbalance { get; set; }
-
-            /// <summary>
-            /// The average Yes bid price in dollars across all events in this group.
-            /// </summary>
-            public double AvgYesBidPrice { get; set; }
-
-            /// <summary>
-            /// The average No bid price in dollars across all events in this group.
-            /// </summary>
-            public double AvgNoBidPrice { get; set; }
-
-            /// <summary>
-            /// The average quantity of resting Yes bids across all events in this group.
-            /// </summary>
-            public double AvgRestingYesQty { get; set; }
-
-            /// <summary>
-            /// The average quantity of resting No bids across all events in this group.
-            /// </summary>
-            public double AvgRestingNoQty { get; set; }
-        }
-
-        /// <summary>
-        /// Contains information about the strategies used in a specific trading path.
-        /// This class provides a simple container for listing the strategy names that were
-        /// active during a particular market condition or trading scenario.
-        /// </summary>
-        public class PathInfo
-        {
-            /// <summary>
-            /// List of strategy names that were applied in this path.
-            /// </summary>
-            public List<string> Strats { get; set; } = new List<string>();
-        }
-
-        /// <summary>
-        /// Represents the performance metrics for a complete trading path or simulation run.
-        /// This class aggregates key performance indicators including profit/loss, equity changes,
-        /// trade counts, and market state transitions for comprehensive analysis of trading outcomes.
-        /// </summary>
-        public class PathPerformance
-        {
-            /// <summary>
-            /// The unique identifier of the market this performance relates to.
-            /// </summary>
-            public string? MarketId { get; set; }
-
-            /// <summary>
-            /// The sequence of market types or path taken during the simulation.
-            /// </summary>
-            public string? PathTaken { get; set; }
-
-            /// <summary>
-            /// Dictionary mapping market types to the number of snapshots taken for each type.
-            /// </summary>
-            public Dictionary<string, int>? SnapshotsPerType { get; set; }
-
-            /// <summary>
-            /// The profit and loss for this trading path.
-            /// </summary>
-            public double PnL { get; set; }
-
-            /// <summary>
-            /// The final equity value after completing this trading path.
-            /// </summary>
-            public double Equity { get; set; }
-
-            /// <summary>
-            /// The total number of trades executed in this path.
-            /// </summary>
-            public int Trades { get; set; }
-
-            /// <summary>
-            /// The Yes bid price at the start of this path.
-            /// </summary>
-            public int StartYesBid { get; set; }
-
-            /// <summary>
-            /// The No bid price at the start of this path.
-            /// </summary>
-            public int StartNoBid { get; set; }
-
-            /// <summary>
-            /// The Yes bid price at the end of this path.
-            /// </summary>
-            public int EndYesBid { get; set; }
-
-            /// <summary>
-            /// The No bid price at the end of this path.
-            /// </summary>
-            public int EndNoBid { get; set; }
-
-            /// <summary>
-            /// The type or outcome of the market at the end of this path.
-            /// </summary>
-            public string? EndType { get; set; }
-
-            /// <summary>
-            /// The simulated position size at the end of this path.
-            /// </summary>
-            public int SimulatedPosition { get; set; }
-
-            /// <summary>
-            /// The average cost of the position throughout this path.
-            /// </summary>
-            public double AverageCost { get; set; }
-        }
-
-        /// <summary>
-        /// Generates a comprehensive detailed performance report from trading simulation event logs.
-        /// This method processes a collection of SimulationEventLog entries to create a multi-section CSV report
-        /// containing summary statistics, market distribution analysis, order book summaries, full event logs,
-        /// summarized event timelines, and path definitions. The report provides detailed insights into
-        /// trading performance, market conditions, and strategy effectiveness.
-        /// </summary>
-        /// <param name="marketId">The unique identifier of the market being analyzed.</param>
-        /// <param name="events">The collection of event logs from the trading simulation.</param>
-        /// <param name="initialCash">The starting cash balance for the simulation.</param>
-        /// <param name="paths">Dictionary mapping path identifiers to their strategy information.</param>
-        /// <param name="writeToFile">Whether to write the report to a file in addition to returning it as a string.</param>
-        /// <param name="outputDir">The directory path where the report file should be written.</param>
-        /// <returns>A string containing the complete CSV-formatted performance report.</returns>
-        public string GenerateDetailedPerformanceReport(string? marketId, List<SimulationEventLog> events, double initialCash, Dictionary<string, PathInfo> paths, bool writeToFile, string outputDir = @"C:\Users\Peter\Documents\GitHub\TestingOutput")
-        {
-            if (events == null || events.Count == 0) return "No events to report.";
-
-            var sb = new StringBuilder();
-
-            // Correct spreads and asks/bids for all events
             foreach (var ev in events)
             {
-                ev.BestYesAsk = ev.BestNoBid > 0 ? 100 - ev.BestNoBid : 100;
-                ev.BestNoAsk = ev.BestYesBid > 0 ? 100 - ev.BestYesBid : 100;
+                ev.BestYesAsk = ev.BestNoBid > 0 ? MaxPrice - ev.BestNoBid : MaxPrice;
+                ev.BestNoAsk = ev.BestYesBid > 0 ? MaxPrice - ev.BestYesBid : MaxPrice;
                 ev.YesSpread = ev.BestYesAsk - ev.BestYesBid;
                 ev.NoSpread = ev.BestNoAsk - ev.BestNoBid;
             }
+        }
 
-            // Summary Section as CSV
+        /// <summary>
+        /// Calculates the final equity for a given event.
+        /// </summary>
+        /// <param name="finalEvent">The final event in the simulation.</param>
+        /// <returns>The calculated final equity.</returns>
+        private double CalculateFinalEquity(SimulationEventLog finalEvent)
+        {
+            bool natural = finalEvent.BestYesBid == 0 || finalEvent.BestNoBid == 0;
+            if (natural)
+            {
+                bool resolvedYes = finalEvent.BestNoBid == 0;
+                if (finalEvent.Position > 0)
+                {
+                    return finalEvent.Cash + (resolvedYes ? finalEvent.Position * 1.0 : 0.0);
+                }
+                else if (finalEvent.Position < 0)
+                {
+                    return finalEvent.Cash + (resolvedYes ? 0.0 : Math.Abs(finalEvent.Position) * 1.0);
+                }
+                else
+                {
+                    return finalEvent.Cash;
+                }
+            }
+            else
+            {
+                double midYes = (finalEvent.BestYesBid + finalEvent.BestYesAsk) / PriceDivider;
+                double midNo = (finalEvent.BestNoBid + finalEvent.BestNoAsk) / PriceDivider;
+                if (finalEvent.Position > 0)
+                {
+                    return finalEvent.Cash + finalEvent.Position * midYes;
+                }
+                else if (finalEvent.Position < 0)
+                {
+                    return finalEvent.Cash + Math.Abs(finalEvent.Position) * midNo;
+                }
+                else
+                {
+                    return finalEvent.Cash;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Appends the summary section to the report.
+        /// </summary>
+        /// <param name="sb">The StringBuilder to append to.</param>
+        /// <param name="marketId">The market identifier.</param>
+        /// <param name="events">The list of events.</param>
+        /// <param name="initialCash">The initial cash amount.</param>
+        private void AppendSummarySection(StringBuilder sb, string? marketId, List<SimulationEventLog> events, double initialCash)
+        {
             sb.AppendLine("Section,Key,Value");
             sb.AppendLine($"Summary,Market ID,{marketId}");
             var start = events.First().Timestamp;
@@ -438,68 +105,35 @@ namespace TradingStrategies.Trading.Overseer
             sb.AppendLine($"Summary,Initial Cash,{initialCash:F2}");
 
             var finalEvent = events.Last();
-            bool natural = finalEvent.BestYesBid == 0 || finalEvent.BestNoBid == 0;
-            double finalEquity;
-            if (natural)
-            {
-                bool resolvedYes = finalEvent.BestNoBid == 0;
-                if (finalEvent.Position > 0)
-                {
-                    finalEquity = finalEvent.Cash + (resolvedYes ? finalEvent.Position * 1.0 : 0.0);
-                }
-                else if (finalEvent.Position < 0)
-                {
-                    finalEquity = finalEvent.Cash + (resolvedYes ? 0.0 : Math.Abs(finalEvent.Position) * 1.0);
-                }
-                else
-                {
-                    finalEquity = finalEvent.Cash;
-                }
-            }
-            else
-            {
-                double midYes = (finalEvent.BestYesBid + finalEvent.BestYesAsk) / 100.0;
-                double midNo = (finalEvent.BestNoBid + finalEvent.BestNoAsk) / 100.0;
-                if (finalEvent.Position > 0)
-                {
-                    finalEquity = finalEvent.Cash + finalEvent.Position * midYes;
-                }
-                else if (finalEvent.Position < 0)
-                {
-                    finalEquity = finalEvent.Cash + Math.Abs(finalEvent.Position) * midNo;
-                }
-                else
-                {
-                    finalEquity = finalEvent.Cash;
-                }
-            }
+            double finalEquity = CalculateFinalEquity(finalEvent);
             double pnl = finalEquity - initialCash;
             double returnPct = initialCash > 0 ? (pnl / initialCash * 100) : 0;
 
             sb.AppendLine($"Summary,Final Cash,{finalEvent.Cash:F2}");
             sb.AppendLine($"Summary,Final Position,{finalEvent.Position}");
-            sb.AppendLine($"Summary,Final Held,{(finalEvent.Position > 0 ? "Yes" : finalEvent.Position < 0 ? "No" : "None")},{Math.Abs(finalEvent.Position)}");
-            sb.AppendLine($"Summary,Final Yes Bid Price,{finalEvent.BestYesBid / 100.0:F2}");
-            sb.AppendLine($"Summary,Final No Bid Price,{finalEvent.BestNoBid / 100.0:F2}");
+            sb.AppendLine($"Summary,Final Held,{(finalEvent.Position > 0 ? YesSide : finalEvent.Position < 0 ? NoSide : NoneSide)},{Math.Abs(finalEvent.Position)}");
+            sb.AppendLine($"Summary,Final Yes Bid Price,{finalEvent.BestYesBid / PriceDivider:F2}");
+            sb.AppendLine($"Summary,Final No Bid Price,{finalEvent.BestNoBid / PriceDivider:F2}");
             sb.AppendLine($"Summary,Final Equity,{finalEquity:F2}");
             sb.AppendLine($"Summary,P&L,{pnl:F2}");
             sb.AppendLine($"Summary,Return %,{returnPct:F2}");
+        }
 
-            // Statistics
+        /// <summary>
+        /// Appends the statistics section to the report.
+        /// </summary>
+        /// <param name="sb">The StringBuilder to append to.</param>
+        /// <param name="events">The list of events.</param>
+        private void AppendStatisticsSection(StringBuilder sb, List<SimulationEventLog> events)
+        {
             sb.AppendLine($"Statistics,Total Snapshots,{events.Count}");
 
-            int totalTrades = 0;
-            double avgTradeSize = 0;
-            for (int i = 1; i < events.Count; i++)
-            {
-                int delta = Math.Abs(events[i].Position - events[i - 1].Position);
-                if (delta > 0)
-                {
-                    totalTrades++;
-                    avgTradeSize += delta;
-                }
-            }
-            avgTradeSize = totalTrades > 0 ? avgTradeSize / totalTrades : 0;
+            var tradeData = events.Skip(1)
+                .Select((ev, i) => Math.Abs(ev.Position - events[i].Position))
+                .Where(delta => delta > 0);
+
+            var totalTrades = tradeData.Count();
+            var avgTradeSize = totalTrades > 0 ? tradeData.Average() : 0.0;
             sb.AppendLine($"Statistics,Total Trades,{totalTrades}");
             sb.AppendLine($"Statistics,Average Trade Size,{avgTradeSize:F2}");
 
@@ -522,19 +156,34 @@ namespace TradingStrategies.Trading.Overseer
             sb.AppendLine($"Statistics,Average TradeRate No,{avgTradeRateNo:F2}");
             sb.AppendLine($"Statistics,Average TradeVolume Yes,{avgTradeVolumeYes:F2}");
             sb.AppendLine($"Statistics,Average TradeVolume No,{avgTradeVolumeNo:F2}");
+        }
 
-            // Market Type Distribution
+        /// <summary>
+        /// Appends the market distribution section to the report.
+        /// </summary>
+        /// <param name="sb">The StringBuilder to append to.</param>
+        /// <param name="events">The list of events.</param>
+        private void AppendMarketDistributionSection(StringBuilder sb, List<SimulationEventLog> events)
+        {
             sb.AppendLine();
             sb.AppendLine("Market Type Distribution");
             sb.AppendLine("Market Type,Snapshots,Percentage");
-            var marketDist = events.GroupBy(e => e.MarketType).ToDictionary(g => g.Key, g => g.Count());
-            foreach (var kv in marketDist)
-            {
-                var pct = (kv.Value * 100.0 / events.Count);
-                sb.AppendLine($"\"{kv.Key}\",{kv.Value},{pct:F1}");
-            }
+            var marketDist = events.GroupBy(e => e.MarketType)
+                .Select(g => new { MarketType = g.Key, Count = g.Count(), Percentage = (g.Count() * 100.0 / events.Count) });
 
-            // Order Book Summary (Averages)
+            foreach (var item in marketDist)
+            {
+                sb.AppendLine($"\"{item.MarketType}\",{item.Count},{item.Percentage:F1}");
+            }
+        }
+
+        /// <summary>
+        /// Appends the order book summary section to the report.
+        /// </summary>
+        /// <param name="sb">The StringBuilder to append to.</param>
+        /// <param name="events">The list of events.</param>
+        private void AppendOrderBookSummarySection(StringBuilder sb, List<SimulationEventLog> events)
+        {
             sb.AppendLine();
             sb.AppendLine("Order Book Summary (Averages)");
             sb.AppendLine("Metric,Yes Side,No Side");
@@ -546,13 +195,20 @@ namespace TradingStrategies.Trading.Overseer
             sb.AppendLine($"Average Bid Imbalance,{events.Average(e => e.BidImbalance):F0},N/A");
             sb.AppendLine($"Average Trade Count,{events.Average(e => e.TradeCount_Yes):F0},{events.Average(e => e.TradeCount_No):F0}");
             sb.AppendLine($"Average Average Trade Size,{events.Average(e => e.AverageTradeSize_Yes):F2},{events.Average(e => e.AverageTradeSize_No):F2}");
+        }
 
-            // Full Event Log per Snapshot (Added buy/sold columns after resting bids)
+        /// <summary>
+        /// Appends the full event log section to the report.
+        /// </summary>
+        /// <param name="sb">The StringBuilder to append to.</param>
+        /// <param name="events">The list of events.</param>
+        /// <param name="initialCash">The initial cash amount.</param>
+        private void AppendFullEventLogSection(StringBuilder sb, List<SimulationEventLog> events, double initialCash)
+        {
             sb.AppendLine();
             sb.AppendLine("Full Event Log (Per Snapshot)");
             sb.AppendLine("Timestamp,Market Type,Action,Position,Cash,Equity,BestYesAsk,BestYesBid,BestNoAsk,BestNoBid,RestingYesBids,RestingNoBids,YesBought,YesSold,NoBought,NoSold,YesSpread,NoSpread,Liquidity,TradeRateYes,TradeRateNo,TradeVolumeYes,TradeVolumeNo,TradeCountYes,TradeCountNo,AvgTradeSizeYes,AvgTradeSizeNo,DepthBestYesBid,DepthBestNoBid,TotalYesBidContracts,TotalNoBidContracts,BidImbalance,RSI,PnL Since Start,Strategies,Arbitrage Note");
             double cumulativePnL = 0;
-            int prevYesBought = 0, prevYesSold = 0, prevNoBought = 0, prevNoSold = 0; // Track for deltas
             for (int i = 0; i < events.Count; i++)
             {
                 var ev = events[i];
@@ -560,29 +216,31 @@ namespace TradingStrategies.Trading.Overseer
                 if (i > 0)
                 {
                     var prevEv = events[i - 1];
-                    // Calculate deltas (buys positive, sells negative for each side)
-                    int yesDelta = ev.BestYesBid - prevEv.BestYesBid; // Simplified proxy; adjust based on actual fill data if available
+                    int yesDelta = ev.BestYesBid - prevEv.BestYesBid;
                     yesBought = Math.Max(yesDelta, 0);
                     yesSold = Math.Abs(Math.Min(yesDelta, 0));
                     int noDelta = ev.BestNoBid - prevEv.BestNoBid;
                     noBought = Math.Max(noDelta, 0);
                     noSold = Math.Abs(Math.Min(noDelta, 0));
                 }
-                if (string.IsNullOrEmpty(ev.Strategies)) ev.Strategies = "N/A";
-                if (string.IsNullOrEmpty(ev.RestingYesBids)) ev.RestingYesBids = "N/A";
-                if (string.IsNullOrEmpty(ev.RestingNoBids)) ev.RestingNoBids = "N/A";
+                if (string.IsNullOrEmpty(ev.Strategies)) ev.Strategies = NaValue;
+                if (string.IsNullOrEmpty(ev.RestingYesBids)) ev.RestingYesBids = NaValue;
+                if (string.IsNullOrEmpty(ev.RestingNoBids)) ev.RestingNoBids = NaValue;
                 double equity = CalculateEquity(ev);
                 cumulativePnL = equity - initialCash;
-                string arbNote = (ev.YesSpread < 0 || ev.NoSpread < 0) ? "Potential Arbitrage (Negative Spread)" : (ev.BestYesAsk == 100 ? "No Yes Ask Available" : (ev.BestNoAsk == 100 ? "No No Ask Available" : ""));
-                if (string.IsNullOrEmpty(arbNote)) arbNote = "N/A";
+                string arbNote = (ev.YesSpread < 0 || ev.NoSpread < 0) ? "Potential Arbitrage (Negative Spread)" : (ev.BestYesAsk == MaxPrice ? "No Yes Ask Available" : (ev.BestNoAsk == MaxPrice ? "No No Ask Available" : ""));
+                if (string.IsNullOrEmpty(arbNote)) arbNote = NaValue;
                 sb.AppendLine($"{ev.Timestamp},\"{ev.MarketType}\",\"{ev.Action}\",{ev.Position},{ev.Cash:F2},{equity:F2},{ev.BestYesAsk},{ev.BestYesBid},{ev.BestNoAsk},{ev.BestNoBid},\"{ev.RestingYesBids}\",\"{ev.RestingNoBids}\",{yesBought},{yesSold},{noBought},{noSold},{ev.YesSpread},{ev.NoSpread},{ev.Liquidity:F1},{ev.TradeRatePerMinute_Yes:F2},{ev.TradeRatePerMinute_No:F2},{ev.TradeVolumePerMinute_Yes:F2},{ev.TradeVolumePerMinute_No:F2},{ev.TradeCount_Yes},{ev.TradeCount_No},{ev.AverageTradeSize_Yes:F2},{ev.AverageTradeSize_No:F2},{ev.DepthAtBestYesBid},{ev.DepthAtBestNoBid},{ev.TotalYesBidContracts},{ev.TotalNoBidContracts},{ev.BidImbalance},{ev.RSI:F2},{cumulativePnL:F2},\"{ev.Strategies}\",\"{arbNote}\"");
-                prevYesBought = yesBought;
-                prevYesSold = yesSold;
-                prevNoBought = noBought;
-                prevNoSold = noSold;
             }
+        }
 
-            // Summarized Event Timeline
+        /// <summary>
+        /// Appends the summarized timeline section to the report.
+        /// </summary>
+        /// <param name="sb">The StringBuilder to append to.</param>
+        /// <param name="events">The list of events.</param>
+        private void AppendSummarizedTimelineSection(StringBuilder sb, List<SimulationEventLog> events)
+        {
             sb.AppendLine();
             sb.AppendLine("Summarized Event Timeline");
             sb.AppendLine("Market Type,Action,Start Time,End Time,Snapshots,Start Position,End Position,Start Cash,End Cash,Avg YesBidPrice,Avg NoBidPrice,Avg Liquidity,Avg RSI,Avg YesSpread,Avg NoSpread,Avg TradeRateYes,Avg TradeRateNo,Avg DepthYesBid,Avg DepthNoBid,Avg BidImbalance,Strategies,AvgRestingYesQty,AvgRestingNoQty,Nuance");
@@ -592,19 +250,86 @@ namespace TradingStrategies.Trading.Overseer
                 string nuance = GenerateNuance(group);
                 sb.AppendLine($"\"{group.MarketType}\",\"{group.Action}\",{group.StartTime},{group.EndTime},{group.SnapshotCount},{group.StartPosition},{group.EndPosition},{group.StartCash:F2},{group.EndCash:F2},{group.AvgYesBidPrice:F2},{group.AvgNoBidPrice:F2},{group.AvgLiquidity:F1},{group.AvgRSI:F2},{group.AvgYesSpread:F1},{group.AvgNoSpread:F1},{group.AvgTradeRateYes:F2},{group.AvgTradeRateNo:F2},{group.AvgDepthNoBid:F0},{group.AvgBidImbalance:F0},\"{group.Strategies}\",{Math.Round(group.AvgRestingYesQty)},{Math.Round(group.AvgRestingNoQty)},\"{nuance}\"");
             }
+        }
 
-            // Path Definitions
+        /// <summary>
+        /// Appends the path definitions section to the report.
+        /// </summary>
+        /// <param name="sb">The StringBuilder to append to.</param>
+        /// <param name="events">The list of events.</param>
+        /// <param name="paths">The dictionary of paths.</param>
+        private void AppendPathDefinitionsSection(StringBuilder sb, List<SimulationEventLog> events, Dictionary<string, PathInfo> paths)
+        {
             sb.AppendLine();
             sb.AppendLine("Path Definitions");
-            var actualPath = string.Join(" ? ", events.Select(e => e.MarketType).Distinct().ToArray());
+            var actualPath = string.Join(" ? ", events.Select(e => e.MarketType).Distinct());
             sb.AppendLine($"Actual Path Taken: {actualPath}");
             sb.AppendLine("Path,Strategies");
             foreach (var kv in paths)
             {
                 var stratsStr = string.Join(";", kv.Value.Strats);
-                if (string.IsNullOrEmpty(stratsStr)) stratsStr = "N/A";
+                if (string.IsNullOrEmpty(stratsStr)) stratsStr = NaValue;
                 sb.AppendLine($"\"{kv.Key}\",\"{stratsStr}\"");
             }
+        }
+
+        /// <summary>
+        /// Parses the resting quantity from a string format.
+        /// </summary>
+        /// <param name="restingBids">The resting bids string.</param>
+        /// <returns>The total quantity parsed from the string.</returns>
+        private double ParseRestingQuantity(string? restingBids)
+        {
+            if (string.IsNullOrEmpty(restingBids) || restingBids == NaValue)
+                return 0;
+
+            try
+            {
+                return restingBids.Split(',')
+                    .Select(s => s.Trim().Split(':').LastOrDefault() ?? "0")
+                    .Select(qtyStr => qtyStr.Trim())
+                    .Sum(qtyStr => int.TryParse(qtyStr, out int qty) ? qty : 0);
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+
+
+
+        /// <summary>
+        /// Generates a comprehensive detailed performance report from trading simulation event logs.
+        /// This method processes a collection of SimulationEventLog entries to create a multi-section CSV report
+        /// containing summary statistics, market distribution analysis, order book summaries, full event logs,
+        /// summarized event timelines, and path definitions. The report provides detailed insights into
+        /// trading performance, market conditions, and strategy effectiveness.
+        /// </summary>
+        /// <param name="marketId">The unique identifier of the market being analyzed.</param>
+        /// <param name="events">The collection of event logs from the trading simulation.</param>
+        /// <param name="initialCash">The starting cash balance for the simulation.</param>
+        /// <param name="paths">Dictionary mapping path identifiers to their strategy information.</param>
+        /// <param name="writeToFile">Whether to write the report to a file in addition to returning it as a string.</param>
+        /// <param name="outputDir">The directory path where the report file should be written.</param>
+        /// <returns>A string containing the complete CSV-formatted performance report.</returns>
+        public string GenerateDetailedPerformanceReport(string? marketId, List<SimulationEventLog> events, double initialCash, Dictionary<string, PathInfo> paths, bool writeToFile, string outputDir = DefaultOutputDir)
+        {
+            if (events == null || events.Count == 0) return "No events to report.";
+
+            var sb = new StringBuilder();
+
+            // Correct spreads and asks/bids for all events
+            CorrectEventData(events);
+
+            // Build report sections
+            AppendSummarySection(sb, marketId, events, initialCash);
+            AppendStatisticsSection(sb, events);
+            AppendMarketDistributionSection(sb, events);
+            AppendOrderBookSummarySection(sb, events);
+            AppendFullEventLogSection(sb, events, initialCash);
+            AppendSummarizedTimelineSection(sb, events);
+            AppendPathDefinitionsSection(sb, events, paths);
 
             var detailedReport = sb.ToString();
 
@@ -671,18 +396,8 @@ namespace TradingStrategies.Trading.Overseer
                 AvgBidImbalance = current.BidImbalance,
                 AvgYesBidPrice = current.BestYesBid / 100.0,
                 AvgNoBidPrice = current.BestNoBid / 100.0,
-                AvgRestingYesQty = string.IsNullOrEmpty(current.RestingYesBids) || current.RestingYesBids == "N/A" ? 0 : current.RestingYesBids.Split(',').Sum(s =>
-                {
-                    var qtyStr = s.Trim().Split(':').LastOrDefault() ?? "0";
-                    qtyStr = qtyStr.Trim();
-                    return int.TryParse(qtyStr, out int qty) ? qty : 0;
-                }),
-                AvgRestingNoQty = string.IsNullOrEmpty(current.RestingNoBids) || current.RestingNoBids == "N/A" ? 0 : current.RestingNoBids.Split(',').Sum(s =>
-                {
-                    var qtyStr = s.Trim().Split(':').LastOrDefault() ?? "0";
-                    qtyStr = qtyStr.Trim();
-                    return int.TryParse(qtyStr, out int qty) ? qty : 0;
-                })
+                AvgRestingYesQty = ParseRestingQuantity(current.RestingYesBids),
+                AvgRestingNoQty = ParseRestingQuantity(current.RestingNoBids)
             };
             if (string.IsNullOrEmpty(group.Strategies)) group.Strategies = "N/A";
 
@@ -709,18 +424,8 @@ namespace TradingStrategies.Trading.Overseer
                     group.AvgBidImbalance = (group.AvgBidImbalance * (group.SnapshotCount - 1) + next.BidImbalance) / group.SnapshotCount;
                     group.AvgYesBidPrice = (group.AvgYesBidPrice * (group.SnapshotCount - 1) + (next.BestYesBid / 100.0)) / group.SnapshotCount;
                     group.AvgNoBidPrice = (group.AvgNoBidPrice * (group.SnapshotCount - 1) + (next.BestNoBid / 100.0)) / group.SnapshotCount;
-                    group.AvgRestingYesQty = (group.AvgRestingYesQty * (group.SnapshotCount - 1) + (string.IsNullOrEmpty(next.RestingYesBids) || next.RestingYesBids == "N/A" ? 0 : next.RestingYesBids.Split(',').Sum(s =>
-                    {
-                        var qtyStr = s.Trim().Split(':').LastOrDefault() ?? "0";
-                        qtyStr = qtyStr.Trim();
-                        return int.TryParse(qtyStr, out int qty) ? qty : 0;
-                    }))) / group.SnapshotCount;
-                    group.AvgRestingNoQty = (group.AvgRestingNoQty * (group.SnapshotCount - 1) + (string.IsNullOrEmpty(next.RestingNoBids) || next.RestingNoBids == "N/A" ? 0 : next.RestingNoBids.Split(',').Sum(s =>
-                    {
-                        var qtyStr = s.Trim().Split(':').LastOrDefault() ?? "0";
-                        qtyStr = qtyStr.Trim();
-                        return int.TryParse(qtyStr, out int qty) ? qty : 0;
-                    }))) / group.SnapshotCount;
+                    group.AvgRestingYesQty = (group.AvgRestingYesQty * (group.SnapshotCount - 1) + ParseRestingQuantity(next.RestingYesBids)) / group.SnapshotCount;
+                    group.AvgRestingNoQty = (group.AvgRestingNoQty * (group.SnapshotCount - 1) + ParseRestingQuantity(next.RestingNoBids)) / group.SnapshotCount;
                 }
                 else
                 {
@@ -747,18 +452,8 @@ namespace TradingStrategies.Trading.Overseer
                         AvgBidImbalance = next.BidImbalance,
                         AvgYesBidPrice = next.BestYesBid / 100.0,
                         AvgNoBidPrice = next.BestNoBid / 100.0,
-                        AvgRestingYesQty = string.IsNullOrEmpty(next.RestingYesBids) || next.RestingYesBids == "N/A" ? 0 : next.RestingYesBids.Split(',').Sum(s =>
-                        {
-                            var qtyStr = s.Trim().Split(':').LastOrDefault() ?? "0";
-                            qtyStr = qtyStr.Trim();
-                            return int.TryParse(qtyStr, out int qty) ? qty : 0;
-                        }),
-                        AvgRestingNoQty = string.IsNullOrEmpty(next.RestingNoBids) || next.RestingNoBids == "N/A" ? 0 : next.RestingNoBids.Split(',').Sum(s =>
-                        {
-                            var qtyStr = s.Trim().Split(':').LastOrDefault() ?? "0";
-                            qtyStr = qtyStr.Trim();
-                            return int.TryParse(qtyStr, out int qty) ? qty : 0;
-                        })
+                        AvgRestingYesQty = ParseRestingQuantity(next.RestingYesBids),
+                        AvgRestingNoQty = ParseRestingQuantity(next.RestingNoBids)
                     };
                     if (string.IsNullOrEmpty(group.Strategies)) group.Strategies = "N/A";
                 }
@@ -779,12 +474,12 @@ namespace TradingStrategies.Trading.Overseer
         private string GenerateNuance(EventGroup group)
         {
             var nuance = new List<string> { "Gradual position changes; liquidity trends." };
-            if (group.AvgTradeRateNo > 1.0) nuance.Add("High No trade activity.");
-            if (group.AvgBidImbalance > 500) nuance.Add("Strong Yes bid imbalance.");
-            else if (group.AvgBidImbalance < -500) nuance.Add("Strong No bid imbalance.");
-            if (group.AvgNoSpread > 5) nuance.Add("Wide No spread - low liquidity on No side.");
-            if (group.AvgYesBidPrice > 0.9) nuance.Add("High Yes bid price.");
-            if (group.AvgNoBidPrice < 0.1) nuance.Add("Low No bid price.");
+            if (group.AvgTradeRateNo > HighTradeRateThreshold) nuance.Add("High No trade activity.");
+            if (group.AvgBidImbalance > StrongBidImbalanceThreshold) nuance.Add("Strong Yes bid imbalance.");
+            else if (group.AvgBidImbalance < -StrongBidImbalanceThreshold) nuance.Add("Strong No bid imbalance.");
+            if (group.AvgNoSpread > WideSpreadThreshold) nuance.Add("Wide No spread - low liquidity on No side.");
+            if (group.AvgYesBidPrice > HighBidPriceThreshold) nuance.Add("High Yes bid price.");
+            if (group.AvgNoBidPrice < LowBidPriceThreshold) nuance.Add("Low No bid price.");
             return string.Join("; ", nuance);
         }
 
@@ -802,7 +497,7 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="writeToFile">Whether to write the report to a file.</param>
         /// <param name="outputDir">The directory path for file output.</param>
         /// <returns>A string containing the CSV-formatted final performance report.</returns>
-        public string GenerateFinalPerformanceReport(string? marketId, string pathTaken, Dictionary<string, int> snapshotsPerType, double pnl, double finalEquity, string notes, bool writeToFile, string outputDir = @"C:\Users\Peter\Documents\GitHub\TestingOutput")
+        public string GenerateFinalPerformanceReport(string? marketId, string pathTaken, Dictionary<string, int> snapshotsPerType, double pnl, double finalEquity, string notes, bool writeToFile, string outputDir = DefaultOutputDir)
         {
             var sb = new StringBuilder();
             sb.AppendLine("Market,Path Taken,Snapshots per Type,Final P&L,Final Equity,Notes");
@@ -830,7 +525,7 @@ namespace TradingStrategies.Trading.Overseer
         /// <param name="writeToFile">Whether to write the report to a file.</param>
         /// <param name="outputDir">The directory path for file output.</param>
         /// <returns>A string containing the CSV-formatted rollup performance report.</returns>
-        public string GenerateRollupReport(List<PathPerformance> allPerformances, bool writeToFile, string outputDir = @"C:\Users\Peter\Documents\GitHub\TestingOutput")
+        public string GenerateRollupReport(List<PathPerformance> allPerformances, bool writeToFile, string outputDir = DefaultOutputDir)
         {
             var sb = new StringBuilder();
             sb.AppendLine("Market,Path Taken,Snapshots per Type,Final P&L,Final Equity,Trades,Start Yes Bid,Start No Bid,End Yes Bid,End No Bid,End Type");

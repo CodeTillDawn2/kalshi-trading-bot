@@ -205,7 +205,7 @@ namespace TradingStrategies.Trading.Overseer
 
                 var endType = (finalSnapshot.BestYesBid == 0 || finalSnapshot.BestNoBid == 0) ? "Natural" : "Abrupt";
 
-                var performance = new ReportGenerator.PathPerformance
+                var performance = new PathPerformance
                 {
                     MarketId = uniqueId,
                     PathTaken = pathTaken,
@@ -282,14 +282,14 @@ namespace TradingStrategies.Trading.Overseer
         /// </summary>
         /// <param name="strategiesByMarketConditions">Dictionary mapping market types to sets of strategies.</param>
         /// <returns>Dictionary mapping market type strings to path information containing strategy names.</returns>
-        private Dictionary<string, ReportGenerator.PathInfo> GetStrategyPathsByMarketType(Dictionary<MarketType, HashSet<Strategy>> strategiesByMarketConditions)
+        private Dictionary<string, PathInfo> GetStrategyPathsByMarketType(Dictionary<MarketType, HashSet<Strategy>> strategiesByMarketConditions)
         {
-            var result = new Dictionary<string, ReportGenerator.PathInfo>();
+            var result = new Dictionary<string, PathInfo>();
             foreach (var kv in strategiesByMarketConditions)
             {
                 var marketStr = kv.Key.ToString();
                 var strats = kv.Value.SelectMany(s => s.Strats.Select(e => e.GetType().Name)).Distinct().ToList();
-                result[marketStr] = new ReportGenerator.PathInfo { Strats = strats };
+                result[marketStr] = new PathInfo { Strats = strats };
             }
             return result;
         }
