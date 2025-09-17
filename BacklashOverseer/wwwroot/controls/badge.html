@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .badge {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="control-card">
+        <div class="control-title">Error Count</div>
+        <div class="control-description">Number of recent errors</div>
+        <div class="badge" style="position: relative; display: flex; align-items: center; justify-content: center; margin: 0 auto; width: 80px; height: 35px;">
+            <span style="color: white; font-size: 16px; font-weight: bold;">3</span>
+        </div>
+    </div>
+
+    <script>
+        function updateBadge() {
+            const count = Math.floor(Math.random() * 15); // 0-14 errors
+            const badge = document.querySelector('.badge span');
+            const badgeElement = document.querySelector('.badge');
+
+            if (badge) {
+                badge.textContent = count;
+            }
+
+            if (badgeElement) {
+                if (count > 5) {
+                    badgeElement.style.background = 'linear-gradient(45deg, #dc3545, #fd7e14)';
+                } else {
+                    badgeElement.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+                }
+            }
+        }
+
+        // Auto-update every 6 seconds
+        setInterval(updateBadge, 6000);
+        updateBadge(); // Initial update
+    </script>
+</body>
+</html>

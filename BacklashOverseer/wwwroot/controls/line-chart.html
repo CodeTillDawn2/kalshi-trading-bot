@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .trend-chart {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            height: 80px;
+            padding: 10px 15px;
+            background: rgba(28, 51, 39, 0.1);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .trend-bar {
+            width: 8px;
+            background: linear-gradient(to top, #28a745, #20c997);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+        }
+
+        .trend-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 15px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="control-card">
+        <div class="control-title">Performance Trend</div>
+        <div class="control-description">Recent CPU usage history</div>
+        <div class="trend-chart">
+            <div class="trend-bar" style="height: 35%;"></div>
+            <div class="trend-bar" style="height: 42%;"></div>
+            <div class="trend-bar" style="height: 58%;"></div>
+            <div class="trend-bar" style="height: 61%;"></div>
+            <div class="trend-bar" style="height: 75%;"></div>
+            <div class="trend-bar" style="height: 68%;"></div>
+            <div class="trend-bar" style="height: 52%;"></div>
+            <div class="trend-bar" style="height: 38%;"></div>
+        </div>
+        <div class="trend-labels">
+            <span style="color: rgb(225, 221, 206); font-size: 9px; opacity: 0.7;">-10m</span>
+            <span style="color: rgb(225, 221, 206); font-size: 9px; opacity: 0.7;">Now</span>
+        </div>
+    </div>
+
+    <script>
+        function updateLineChart() {
+            const bars = document.querySelectorAll('.trend-bar');
+
+            bars.forEach((bar, index) => {
+                if (index < bars.length - 1) {
+                    const nextBar = bars[index + 1];
+                    const nextHeight = parseFloat(nextBar.style.height) || 50;
+                    bar.style.height = nextHeight + '%';
+
+                    updateBarColor(bar, nextHeight);
+                } else {
+                    const newValue = Math.floor(Math.random() * 80) + 20;
+                    bar.style.height = newValue + '%';
+
+                    updateBarColor(bar, newValue);
+                }
+            });
+        }
+
+        function updateBarColor(bar, value) {
+            if (value < 50) {
+                bar.style.background = 'linear-gradient(to top, #28a745, #20c997)';
+            } else if (value < 75) {
+                bar.style.background = 'linear-gradient(to top, #ffc107, #fd7e14)';
+            } else {
+                bar.style.background = 'linear-gradient(to top, #dc3545, #c82333)';
+            }
+        }
+
+        // Auto-update every 4.5 seconds
+        setInterval(updateLineChart, 4500);
+        updateLineChart(); // Initial update
+    </script>
+</body>
+</html>

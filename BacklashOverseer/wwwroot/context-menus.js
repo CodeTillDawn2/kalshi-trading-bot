@@ -134,6 +134,13 @@ function hideMarketContextMenu() {
     document.getElementById('marketContextMenu').style.display = 'none';
 }
 
+function handleBrainDetails() {
+    logToBackend(`Details clicked for brain: ${currentBrainInstance}`);
+    // Navigate to details page
+    window.location.href = `brain-details.html?brain=${encodeURIComponent(currentBrainInstance)}`;
+    hideBrainContextMenu();
+}
+
 function handleChart() {
     logToBackend(`Chart clicked for market: ${currentMarketTicker}`);
     currentChartMarket = currentMarketTicker;

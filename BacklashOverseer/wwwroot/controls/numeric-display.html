@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .numeric-display {
+            background: rgba(28, 51, 39, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            color: rgb(225, 221, 206);
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            min-width: 140px;
+            border: 2px solid rgba(28, 51, 39, 0.6);
+            box-shadow: 0 0 15px rgba(28, 51, 39, 0.3);
+        }
+
+        .response-bar {
+            position: absolute;
+            bottom: 12px;
+            left: 15px;
+            right: 15px;
+            height: 12px;
+            background: rgba(28, 51, 39, 0.3);
+            border-radius: 6px;
+        }
+
+        .response-fill {
+            height: 100%;
+            width: 60%;
+            background: linear-gradient(90deg, #28a745, #ffc107);
+            border-radius: 6px;
+            transition: all 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="control-card">
+        <div class="control-title">Response Time</div>
+        <div class="control-description">Average response time in milliseconds</div>
+        <div class="numeric-display" style="position: relative;">
+            <div class="response-bar">
+                <div class="response-fill"></div>
+            </div>
+        </div>
+        <div class="control-overlay" style="font-size: 32px; opacity: 0.9;">42.7 ms</div>
+    </div>
+
+    <script>
+        function updateNumericDisplay() {
+            const value = (Math.random() * 100 + 10).toFixed(1);
+            const overlay = document.querySelector('.control-overlay');
+            const responseFill = document.querySelector('.response-fill');
+
+            if (overlay) {
+                overlay.textContent = value + ' ms';
+            }
+
+            if (responseFill) {
+                const percentage = Math.max(0, Math.min(100, (100 - value)));
+                responseFill.style.width = percentage + '%';
+
+                if (value < 30) {
+                    responseFill.style.background = 'linear-gradient(90deg, #28a745, #20c997)';
+                } else if (value < 60) {
+                    responseFill.style.background = 'linear-gradient(90deg, #ffc107, #fd7e14)';
+                } else {
+                    responseFill.style.background = 'linear-gradient(90deg, #dc3545, #c82333)';
+                }
+            }
+        }
+
+        // Auto-update every 2.5 seconds
+        setInterval(updateNumericDisplay, 2500);
+        updateNumericDisplay(); // Initial update
+    </script>
+</body>
+</html>

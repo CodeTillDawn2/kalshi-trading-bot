@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .counter {
+            font-size: 64px;
+            font-weight: bold;
+            color: rgb(225, 221, 206);
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 15px rgba(28, 51, 39, 0.7);
+            letter-spacing: 2px;
+        }
+
+        .counter-info {
+            position: absolute;
+            bottom: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="control-card">
+        <div class="counter"></div>
+        <div class="counter-info">
+            <div style="color: rgb(225, 221, 206); font-size: 12px; font-weight: 600; margin-bottom: 1px;">Active Markets</div>
+            <div style="color: rgb(225, 221, 206); font-size: 9px; opacity: 0.7;">Count of currently watched markets</div>
+        </div>
+    </div>
+
+    <script>
+        function updateCounter() {
+            const count = Math.floor(Math.random() * 2000) + 100;
+            const counterElement = document.querySelector('.counter');
+            if (counterElement) {
+                animateCounter(counterElement, parseInt(counterElement.textContent.replace(',', '')), count);
+            }
+        }
+
+        function animateCounter(element, from, to) {
+            const duration = 1000;
+            const start = Date.now();
+            const step = () => {
+                const now = Date.now();
+                const progress = Math.min((now - start) / duration, 1);
+                const current = Math.floor(from + (to - from) * progress);
+                element.textContent = current.toLocaleString();
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            };
+            requestAnimationFrame(step);
+        }
+
+        // Auto-update every 4 seconds
+        setInterval(updateCounter, 4000);
+        updateCounter(); // Initial update
+    </script>
+</body>
+</html>
