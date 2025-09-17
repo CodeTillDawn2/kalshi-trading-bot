@@ -17,7 +17,9 @@ namespace BacklashBot.Management
     /// </summary>
     public class MarketAnalysisHelper : IMarketAnalysisHelper
     {
-        private readonly ExecutionConfig _executionConfig;
+        private readonly GeneralExecutionConfig _generalExecutionConfig;
+        private readonly CentralBrainConfig _centralBrainConfig;
+        private readonly MarketAnalysisHelperConfig _marketAnalysisHelperConfig;
         private readonly ISnapshotPeriodHelper _snapshotPeriodHelper;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ITradingSnapshotService _snapshotService;
@@ -34,30 +36,36 @@ namespace BacklashBot.Management
         /// <param name="scopeFactory">Factory for creating service scopes to access database context.</param>
         /// <param name="snapshotPeriodHelper">Helper for processing snapshot periods into valid groups.</param>
         /// <param name="snapshotService">Service for managing trading snapshots.</param>
-        /// <param name="executionConfig">Configuration options for execution settings.</param>
+        /// <param name="generalExecutionConfig">Configuration options for general execution settings.</param>
+        /// <param name="centralBrainConfig">Configuration options for central brain settings.</param>
+        /// <param name="marketAnalysisHelperConfig">Configuration options for market analysis helper settings.</param>
         /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics. Can be null for environments without central monitoring.</param>
         /// <param name="logger">Logger for recording analysis operations and errors.</param>
-        public MarketAnalysisHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper, ITradingSnapshotService snapshotService, IOptions<ExecutionConfig> executionConfig, ICentralPerformanceMonitor? centralPerformanceMonitor, ILogger<MarketAnalysisHelper> logger)
+        public MarketAnalysisHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper, ITradingSnapshotService snapshotService, IOptions<GeneralExecutionConfig> generalExecutionConfig, IOptions<CentralBrainConfig> centralBrainConfig, IOptions<MarketAnalysisHelperConfig> marketAnalysisHelperConfig, ICentralPerformanceMonitor? centralPerformanceMonitor, ILogger<MarketAnalysisHelper> logger)
         {
             ArgumentNullException.ThrowIfNull(scopeFactory);
             ArgumentNullException.ThrowIfNull(snapshotPeriodHelper);
             ArgumentNullException.ThrowIfNull(snapshotService);
-            ArgumentNullException.ThrowIfNull(executionConfig);
+            ArgumentNullException.ThrowIfNull(generalExecutionConfig);
+            ArgumentNullException.ThrowIfNull(centralBrainConfig);
+            ArgumentNullException.ThrowIfNull(marketAnalysisHelperConfig);
             ArgumentNullException.ThrowIfNull(logger);
 
             _snapshotService = snapshotService;
             _scopeFactory = scopeFactory;
             _snapshotPeriodHelper = snapshotPeriodHelper;
-            _executionConfig = executionConfig.Value ?? throw new ArgumentNullException(nameof(executionConfig.Value));
+            _generalExecutionConfig = generalExecutionConfig.Value ?? throw new ArgumentNullException(nameof(generalExecutionConfig.Value));
+            _centralBrainConfig = centralBrainConfig.Value ?? throw new ArgumentNullException(nameof(centralBrainConfig.Value));
+            _marketAnalysisHelperConfig = marketAnalysisHelperConfig.Value ?? throw new ArgumentNullException(nameof(marketAnalysisHelperConfig.Value));
             _centralPerformanceMonitor = centralPerformanceMonitor;
 
-            if (string.IsNullOrWhiteSpace(_executionConfig.HardDataStorageLocation))
+            if (string.IsNullOrWhiteSpace(_centralBrainConfig.HardDataStorageLocation))
             {
-                throw new ArgumentException("HardDataStorageLocation must be specified in ExecutionConfig.", nameof(_executionConfig.HardDataStorageLocation));
+                throw new ArgumentException("HardDataStorageLocation must be specified in CentralBrainConfig.", nameof(_centralBrainConfig.HardDataStorageLocation));
             }
 
             _logger = logger;
-            _metricsEnabled = _executionConfig.EnableMarketAnalysisHelperPerformanceMetrics;
+            _metricsEnabled = _marketAnalysisHelperConfig.EnableMarketAnalysisHelperPerformanceMetrics;
         }
 
         /// <summary>
@@ -119,7 +127,7 @@ namespace BacklashBot.Management
                     }
                     try
                     {
-                        await Task.Delay(_executionConfig.RetryDelayMs);
+                        await Task.Delay(_generalExecutionConfig.RetryDelayMs);
                         rawSnapshots = await context.GetSnapshotsFiltered(marketTicker: marketTicker);
                         rawSnapshots = rawSnapshots.OrderBy(x => x.SnapshotDate).ToList();
                     }
@@ -165,7 +173,7 @@ namespace BacklashBot.Management
                     continue;
                 }
 
-                string snapshotDirectory = Path.Combine(_executionConfig.HardDataStorageLocation, "Preprocessed", "SnapshotGroups");
+                string snapshotDirectory = Path.Combine(_centralBrainConfig.HardDataStorageLocation, "Preprocessed", "SnapshotGroups");
 
                 // Process valid snapshots into snapshot groups
                 var validPeriods = await _snapshotPeriodHelper.SplitIntoValidGroups(validSnapshots, snapshotDirectory);

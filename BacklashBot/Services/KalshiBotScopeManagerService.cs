@@ -90,7 +90,6 @@ namespace BacklashBot.Services
 
             // Resolve critical services to validate scope initialization
             var configuration = sp.GetRequiredService<IConfiguration>();
-            var executionConfig = sp.GetRequiredService<IOptions<ExecutionConfig>>();
             var kalshiConfig = sp.GetRequiredService<IOptions<KalshiConfig>>();
             var snapshotConfig = sp.GetRequiredService<IOptions<SnapshotConfig>>();
             var tradingConfig = sp.GetRequiredService<IOptions<TradingConfig>>();

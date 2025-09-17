@@ -113,7 +113,8 @@ namespace BacklashBot.Services
         public OverseerClientService(
             ILogger<OverseerClientService> logger,
             IServiceFactory serviceFactory,
-            IOptions<ExecutionConfig> executionConfig,
+            IOptions<OverseerClientServiceConfig> overseerConfig,
+            IOptions<GeneralExecutionConfig> generalConfig,
             ICentralPerformanceMonitor centralPerformanceMonitor)
         {
             _logger = logger;
@@ -122,17 +123,17 @@ namespace BacklashBot.Services
             _clientId = Guid.NewGuid().ToString();
 
             // Read brain instance name from configuration, fallback to hardcoded if not set
-            _clientName = executionConfig.Value.BrainInstance ?? "BacklashBot";
+            _clientName = generalConfig.Value.BrainInstance ?? "BacklashBot";
             _logger.LogInformation("OVERSEER- Using brain instance name: {BrainInstanceName}", _clientName);
 
             // Initialize configurable timeouts and intervals
-            _connectionTimeout = TimeSpan.FromSeconds(executionConfig.Value.OverseerConnectionTimeoutSeconds);
-            _semaphoreTimeout = TimeSpan.FromSeconds(executionConfig.Value.OverseerSemaphoreTimeoutSeconds);
-            _overseerDiscoveryInterval = TimeSpan.FromMinutes(executionConfig.Value.OverseerDiscoveryIntervalMinutes);
-            _checkInInterval = TimeSpan.FromSeconds(executionConfig.Value.OverseerCheckInIntervalSeconds);
-            _circuitBreakerFailureThreshold = executionConfig.Value.OverseerCircuitBreakerFailureThreshold;
-            _circuitBreakerTimeout = TimeSpan.FromMinutes(executionConfig.Value.OverseerCircuitBreakerTimeoutMinutes);
-            _enablePerformanceMetrics = executionConfig.Value.OverseerClientService_EnablePerformanceMetrics;
+            _connectionTimeout = TimeSpan.FromSeconds(overseerConfig.Value.OverseerConnectionTimeoutSeconds);
+            _semaphoreTimeout = TimeSpan.FromSeconds(overseerConfig.Value.OverseerSemaphoreTimeoutSeconds);
+            _overseerDiscoveryInterval = TimeSpan.FromMinutes(overseerConfig.Value.OverseerDiscoveryIntervalMinutes);
+            _checkInInterval = TimeSpan.FromSeconds(overseerConfig.Value.OverseerCheckInIntervalSeconds);
+            _circuitBreakerFailureThreshold = overseerConfig.Value.OverseerCircuitBreakerFailureThreshold;
+            _circuitBreakerTimeout = TimeSpan.FromMinutes(overseerConfig.Value.OverseerCircuitBreakerTimeoutMinutes);
+            _enablePerformanceMetrics = overseerConfig.Value.OverseerClientService_EnablePerformanceMetrics;
         }
 
         /// <summary>

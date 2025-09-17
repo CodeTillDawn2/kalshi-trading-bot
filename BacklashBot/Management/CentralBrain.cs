@@ -44,9 +44,8 @@ namespace BacklashBot.Management
         private readonly ICentralPerformanceMonitor _performanceTracker;
         private readonly IBrainStatusService _brainStatus;
         private readonly SnapshotConfig _snapshotConfig;
-        private readonly ExecutionConfig _executionConfig;
+        private readonly GeneralExecutionConfig _generalConfig;
         private readonly TradingConfig _tradingConfig;
-        private readonly CalculationConfig _calculationConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
         private readonly IScopeManagerService _scopeManagerService;
         private readonly IHealthCheckService _healthCheckService;
@@ -84,10 +83,9 @@ namespace BacklashBot.Management
             IServiceScopeFactory scopeFactory,
             IOptions<SnapshotConfig> snapshotConfig,
             IOptions<TradingConfig> tradingConfig,
-            IOptions<ExecutionConfig> executionConfig,
+            IOptions<GeneralExecutionConfig> generalConfig,
             ICentralErrorHandler backlashErrorHandler,
             ICentralPerformanceMonitor backlashPerformanceTracker,
-            IOptions<CalculationConfig> calculationConfig,
             IMarketManagerService marketManager,
             IHostApplicationLifetime appLifetime,
             IScopeManagerService scopeManagerService,
@@ -108,13 +106,12 @@ namespace BacklashBot.Management
             _errorHandler = backlashErrorHandler;
             _performanceTracker = backlashPerformanceTracker;
             _tradingConfig = tradingConfig.Value;
-            _executionConfig = executionConfig.Value;
-            _calculationConfig = calculationConfig.Value;
+            _generalConfig = generalConfig.Value;
             _centralBrainConfig = centralBrainConfig.Value;
             _healthCheckService = healthCheckService;
             _statusTrackerService = statusTrackerService;
             _readyStatus = readyStatus;
-            _brainInstance = _executionConfig.BrainInstance;
+            _brainInstance = _generalConfig.BrainInstance;
             _decisionInterval = TimeSpan.FromSeconds(_tradingConfig.DecisionFrequencySeconds);
             _timerFactory = timerFactory;
 
@@ -155,7 +152,7 @@ namespace BacklashBot.Management
                 _logger.LogInformation("BRAIN: Created SmokehouseBrain instance {InstanceName}", _brainInstance);
                 _logger.LogInformation("BRAIN: {InstanceName} Waking up, Session {1}", _brainInstance, _brainStatus.SessionIdentifier);
                 InitializeBrain();
-                if (!_executionConfig.LaunchDataDashboard)
+                if (!_centralBrainConfig.LaunchDataDashboard)
                 {
                     _logger.LogInformation("BRAIN: LaunchDataDashboard is false, skipping dashboard startup and daily timers.");
                     return;
@@ -1310,7 +1307,7 @@ namespace BacklashBot.Management
             _startTimer?.Dispose();
             _overnightTimer?.Dispose();
 
-            if (_executionConfig.RunOvernightActivities)
+            if (_centralBrainConfig.RunOvernightActivities)
             {
                 _overnightTimer = _timerFactory();
                 _overnightTimer.Interval = overnightTaskDelay.TotalMilliseconds;

@@ -1,7 +1,7 @@
 using BacklashBot.Helpers;
 using BacklashDTOs;
 using System.Text;
-using TradingStrategies.Configuration;
+using BacklashBot.State;
 using TradingStrategies.Helpers.Interfaces;
 
 namespace BacklashBot.Services

@@ -39,7 +39,7 @@ namespace KalshiBotTasks
         private OvernightActivitiesHelper _overnightService;
         private IInterestScoreService _interestScoreService;
         private SnapshotPeriodHelper _snapshotPeriodHelper;
-        private IOptions<ExecutionConfig> _executionConfig;
+        private IOptions<GeneralExecutionConfig> _executionConfig;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;
         private MarketAnalysisHelper _marketAnalysisHelper;
         private IKalshiBotContext _dbContext;
@@ -154,7 +154,7 @@ namespace KalshiBotTasks
             var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>()!;
             var kalshiConfig = config.GetSection("Kalshi").Get<KalshiConfig>()!; // Add this for KalshiConfig
             _snapshotOptions = Options.Create(snapshotConfig);
-            _executionConfig = Options.Create(config.GetSection("Execution").Get<ExecutionConfig>()!);
+            _executionConfig = Options.Create(config.GetSection("GeneralExecution").Get<GeneralExecutionConfig>()!);
             var kalshiOptions = Options.Create(kalshiConfig); // Create options for KalshiConfig
 
             var snapshotLoggerMock = new Mock<ILogger<TradingSnapshotService>>();

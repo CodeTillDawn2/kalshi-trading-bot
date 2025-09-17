@@ -25,7 +25,8 @@ namespace BacklashBot.Services
     public class CandlestickService : ICandlestickService
     {
         private readonly ILogger<ICandlestickService> _logger;
-        private readonly ExecutionConfig _executionConfig;
+        private readonly CandlestickServiceConfig _candlestickConfig;
+        private readonly CentralBrainConfig _centralBrainConfig;
         private readonly LoggingConfig _loggingConfig;
         private readonly IStatusTrackerService _statusTracker;
         private readonly IServiceScopeFactory _scopeFactory;
@@ -46,7 +47,8 @@ namespace BacklashBot.Services
             ILogger<ICandlestickService> logger,
             IServiceScopeFactory scopeFactory,
             IStatusTrackerService statusTracker,
-            IOptions<ExecutionConfig> executionConfig,
+            IOptions<CandlestickServiceConfig> candlestickConfig,
+            IOptions<CentralBrainConfig> centralBrainConfig,
             IOptions<LoggingConfig> loggingConfig,
             IServiceFactory serviceFactory,
             IScopeManagerService scopeManagerService)
@@ -55,7 +57,8 @@ namespace BacklashBot.Services
             _scopeManagerService = scopeManagerService;
             _statusTracker = statusTracker;
             _scopeFactory = scopeFactory;
-            _executionConfig = executionConfig.Value;
+            _candlestickConfig = candlestickConfig.Value;
+            _centralBrainConfig = centralBrainConfig.Value;
             _loggingConfig = loggingConfig.Value;
             _serviceFactory = serviceFactory;
         }
@@ -71,11 +74,11 @@ namespace BacklashBot.Services
             {
                 _logger.LogInformation("Starting candlestick data cleanup");
 
-                var retentionCutoff = DateTime.UtcNow.AddDays(-_executionConfig.CandlestickDataRetentionDays);
+                var retentionCutoff = DateTime.UtcNow.AddDays(-_candlestickConfig.CandlestickDataRetentionDays);
                 int totalCleaned = 0;
 
                 // Clean up old Parquet files
-                var hardDataStorageLocation = _executionConfig.HardDataStorageLocation;
+                var hardDataStorageLocation = _centralBrainConfig.HardDataStorageLocation;
                 if (Directory.Exists(hardDataStorageLocation))
                 {
                     var candlestickDir = Path.Combine(hardDataStorageLocation, "Candlesticks");
@@ -171,7 +174,7 @@ namespace BacklashBot.Services
         /// <param name="additionalData">Optional additional data to log</param>
         private void LogPerformanceMetric(string operationName, long elapsedMilliseconds, string? additionalData = null)
         {
-            if (!_executionConfig.EnableCandlestickServicePerformanceMetrics) return;
+            if (!_candlestickConfig.EnableCandlestickServicePerformanceMetrics) return;
 
             var message = $"Performance: {operationName} completed in {elapsedMilliseconds}ms";
             if (!string.IsNullOrEmpty(additionalData))
@@ -185,7 +188,7 @@ namespace BacklashBot.Services
             var performanceMonitor = _serviceFactory.GetPerformanceMonitor();
             if (performanceMonitor != null)
             {
-                performanceMonitor.RecordExecutionTime(operationName, elapsedMilliseconds, _executionConfig.EnableCandlestickServicePerformanceMetrics);
+                performanceMonitor.RecordExecutionTime(operationName, elapsedMilliseconds, _candlestickConfig.EnableCandlestickServicePerformanceMetrics);
             }
         }
 
@@ -341,7 +344,7 @@ namespace BacklashBot.Services
                 marketData.MarketInfo = market;
 
                 // Process all intervals in parallel with concurrency limit
-                using var semaphore = new SemaphoreSlim(_executionConfig.MaxParallelCandlestickTasks);
+                using var semaphore = new SemaphoreSlim(_candlestickConfig.MaxParallelCandlestickTasks);
                 var intervalTasks = new[] { "minute", "hour", "day" }
                     .Select(interval => Task.Run(async () =>
                     {
@@ -351,7 +354,7 @@ namespace BacklashBot.Services
                             _statusTracker.GetCancellationToken().ThrowIfCancellationRequested();
                             _logger.LogDebug("Processing {Interval} candlesticks for market {MarketTicker}", interval, marketTicker);
 
-                            string hardDataStorageLocation = _executionConfig.HardDataStorageLocation;
+                            string hardDataStorageLocation = _centralBrainConfig.HardDataStorageLocation;
                             var existingCandlesticks = marketData.Candlesticks[interval];
                             var latestExistingDate = existingCandlesticks.Any() ? existingCandlesticks.Max(c => c.Date) : (DateTime?)null;
 
@@ -763,12 +766,12 @@ namespace BacklashBot.Services
                 .ToList();
 
             // Apply data retention limit
-            if (finalCandlesticks.Count > _executionConfig.MaxCandlesticksPerMarket)
+            if (finalCandlesticks.Count > _candlestickConfig.MaxCandlesticksPerMarket)
             {
-                var retentionCutoff = DateTime.UtcNow.AddDays(-_executionConfig.CandlestickDataRetentionDays);
+                var retentionCutoff = DateTime.UtcNow.AddDays(-_candlestickConfig.CandlestickDataRetentionDays);
                 finalCandlesticks = finalCandlesticks
                     .Where(c => c.Date >= retentionCutoff)
-                    .Take(_executionConfig.MaxCandlesticksPerMarket)
+                    .Take(_candlestickConfig.MaxCandlesticksPerMarket)
                     .ToList();
 
                 _logger.LogDebug("Applied data retention limit for {MarketTicker} at {Interval}: Kept {Count} candlesticks after filtering",

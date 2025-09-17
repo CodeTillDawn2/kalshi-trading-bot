@@ -235,8 +235,8 @@ namespace BacklashOverseer
             services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
                 (INightActivitiesPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
 
-            // Register ExecutionConfig
-            services.Configure<ExecutionConfig>(Configuration.GetSection("Execution"));
+            // Register GeneralExecutionConfig
+            services.Configure<GeneralExecutionConfig>(Configuration.GetSection("GeneralExecution"));
 
             // Register services needed for OvernightActivitiesHelper
             services.AddScoped<IInterestScoreService, InterestScoreService>();
@@ -248,7 +248,7 @@ namespace BacklashOverseer
                     provider.GetRequiredService<ILogger<IOvernightActivitiesHelper>>(),
                     null, // interestScoreHelper parameter not used in constructor
                     provider.GetRequiredService<IMarketAnalysisHelper>(),
-                    provider.GetRequiredService<IOptions<ExecutionConfig>>(),
+                    provider.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
                     provider.GetRequiredService<ISqlDataService>(),
                     provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
 

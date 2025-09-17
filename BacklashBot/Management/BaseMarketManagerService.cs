@@ -32,8 +32,9 @@ namespace BacklashBot.Management
         protected List<string> MarketsToAddAfterReset = new List<string>();
         protected bool _recentMarketAdjustment = false;
         protected bool _firstWatchUpdate = true;
-        protected readonly ExecutionConfig _executionConfig;
+        protected readonly GeneralExecutionConfig _executionConfig;
         protected readonly TradingConfig _tradingConfig;
+        protected readonly CentralBrainConfig _centralBrainConfig;
         protected IStatusTrackerService _statusTrackerService;
         protected bool MonitoringWatchList = false;
         protected readonly object _resetLock = new();
@@ -57,8 +58,9 @@ namespace BacklashBot.Management
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
             ICentralPerformanceMonitor performanceMonitor,
-            IOptions<ExecutionConfig> executionConfig,
+            IOptions<GeneralExecutionConfig> executionConfig,
             IOptions<TradingConfig> tradingConfig,
+            IOptions<CentralBrainConfig> centralBrainConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBrainStatusService brainStatus,
@@ -71,6 +73,7 @@ namespace BacklashBot.Management
             _scopeFactory = scopeFactory;
             _tradingConfig = tradingConfig.Value;
             _executionConfig = executionConfig.Value;
+            _centralBrainConfig = centralBrainConfig.Value;
             _performanceMonitor = performanceMonitor;
             _brainStatus = brainStatus;
             _targetCalculationService = targetCalculationService;
@@ -430,7 +433,7 @@ namespace BacklashBot.Management
                     }
                 }
 
-                int marketsToAdd = Math.Min(marketsToAddCount - marketsAdded, _executionConfig.MaxMarketsPerSubscriptionAction);
+                int marketsToAdd = Math.Min(marketsToAddCount - marketsAdded, _centralBrainConfig.MaxMarketsPerSubscriptionAction);
                 if (marketsToAdd > 0)
                 {
                     List<MarketDTO> candidates = await context.GetMarkets(includedStatuses: new HashSet<string> { KalshiConstants.Status_Active },

@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Options;
+using BacklashBot.State;
+using BacklashDTOs.Configuration;
 using TradingStrategies.Configuration;
 using System;
 using System.Text.Json;
