@@ -44,6 +44,16 @@ namespace TradingGUI
         private readonly BacklashBotContext _context;
 
         /// <summary>
+        /// PictureBox control for displaying pattern images in tooltips
+        /// </summary>
+        private PictureBox? _patternImageTooltip;
+
+        /// <summary>
+        /// Stores pattern data with image paths for tooltip display
+        /// </summary>
+        private List<(double x, double y, string patternName, string? imagePath)> _patternTooltipData = new();
+
+        /// <summary>
         /// Gets or sets the action to perform when the back button is clicked.
         /// </summary>
         public Action? BackAction { get; set; }
@@ -208,6 +218,139 @@ namespace TradingGUI
             secondaryChart.Visible = false; // Start hidden, will be shown when metrics are checked
             secondaryChart.Plot.XAxis.TickLabelFormat("yyyy-MM-dd HH:mm", dateTimeFormat: true);
             secondaryChart.Plot.AxisAutoY();
+
+            // Initialize pattern image tooltip
+            InitializePatternImageTooltip();
+        }
+
+        /// <summary>
+        /// Initializes the pattern image tooltip control for displaying pattern visualizations.
+        /// </summary>
+        private void InitializePatternImageTooltip()
+        {
+            _patternImageTooltip = new PictureBox
+            {
+                Size = new Size(400, 300),
+                Visible = false,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.White,
+                SizeMode = PictureBoxSizeMode.Zoom
+            };
+
+            // Add the tooltip to the form
+            this.Controls.Add(_patternImageTooltip);
+            _patternImageTooltip.BringToFront();
+
+            // Add mouse leave event to hide tooltip when mouse leaves chart
+            priceChart.MouseLeave += (s, e) => HidePatternImageTooltip();
+            secondaryChart.MouseLeave += (s, e) => HidePatternImageTooltip();
+        }
+
+        /// <summary>
+        /// Shows the pattern image tooltip at the specified location with the given image.
+        /// </summary>
+        /// <param name="imagePath">Path to the pattern image file.</param>
+        /// <param name="screenLocation">Screen coordinates for tooltip position.</param>
+        private void ShowPatternImageTooltip(string imagePath, Point screenLocation)
+        {
+            if (_patternImageTooltip == null || !File.Exists(imagePath)) return;
+
+            try
+            {
+                // Load the image
+                using (var image = Image.FromFile(imagePath))
+                {
+                    _patternImageTooltip.Image = new Bitmap(image);
+                }
+
+                // Position the tooltip near the mouse cursor
+                var tooltipLocation = this.PointToClient(screenLocation);
+                tooltipLocation.X += 15; // Offset from cursor
+                tooltipLocation.Y += 15;
+
+                // Ensure tooltip stays within form bounds
+                if (tooltipLocation.X + _patternImageTooltip.Width > this.ClientSize.Width)
+                    tooltipLocation.X = this.ClientSize.Width - _patternImageTooltip.Width - 10;
+                if (tooltipLocation.Y + _patternImageTooltip.Height > this.ClientSize.Height)
+                    tooltipLocation.Y = this.ClientSize.Height - _patternImageTooltip.Height - 10;
+
+                _patternImageTooltip.Location = tooltipLocation;
+                _patternImageTooltip.Visible = true;
+                _patternImageTooltip.BringToFront();
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't crash
+                Console.WriteLine($"Error loading pattern image {imagePath}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Hides the pattern image tooltip.
+        /// </summary>
+        private void HidePatternImageTooltip()
+        {
+            if (_patternImageTooltip != null)
+            {
+                _patternImageTooltip.Visible = false;
+                _patternImageTooltip.Image?.Dispose();
+                _patternImageTooltip.Image = null;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to find the image path for a pattern based on the pattern data and name.
+        /// </summary>
+        /// <param name="patternPoint">The pattern data point.</param>
+        /// <param name="patternName">The name of the pattern.</param>
+        /// <returns>The image path if found, null otherwise.</returns>
+        private string? FindPatternImagePath(PricePoint patternPoint, string patternName)
+        {
+            try
+            {
+                // Look for pattern images in the PatternImages folder
+                string patternImagesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PatternImages");
+
+                if (!Directory.Exists(patternImagesPath))
+                    return null;
+
+                // Get all PNG files in the pattern images directory
+                var imageFiles = Directory.GetFiles(patternImagesPath, "*.png");
+
+                // Look for files that contain the pattern name and are close to the pattern timestamp
+                foreach (var imageFile in imageFiles)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(imageFile);
+
+                    // Check if the filename contains the pattern name
+                    if (fileName.Contains(patternName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Try to extract timestamp from filename (format: PatternName_YYYYMMDD_HHMMSS_FFF)
+                        var parts = fileName.Split('_');
+                        if (parts.Length >= 3)
+                        {
+                            string timestampPart = $"{parts[1]}_{parts[2]}";
+                            if (DateTime.TryParseExact(timestampPart, "yyyyMMdd_HHmmss",
+                                System.Globalization.CultureInfo.InvariantCulture,
+                                System.Globalization.DateTimeStyles.None, out DateTime imageTime))
+                            {
+                                // Check if the image timestamp is close to the pattern timestamp (within 1 minute)
+                                if (Math.Abs((imageTime - patternPoint.Date).TotalMinutes) < 1)
+                                {
+                                    return imageFile;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't crash
+                Console.WriteLine($"Error finding pattern image: {ex.Message}");
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -474,6 +617,7 @@ namespace TradingGUI
         private void PriceChart_MouseMove_Cursor(object? sender, MouseEventArgs e)
         {
             UpdateCursorLine(priceChart, e);
+            CheckPatternHover(priceChart, e);
         }
 
         private void PriceChart_MouseLeave(object? sender, EventArgs e)
@@ -492,6 +636,7 @@ namespace TradingGUI
         private void SecondaryChart_MouseMove_Cursor(object? sender, MouseEventArgs e)
         {
             UpdateCursorLine(secondaryChart, e);
+            CheckPatternHover(secondaryChart, e);
         }
 
         private void SecondaryChart_MouseLeave(object? sender, EventArgs e)
@@ -529,6 +674,40 @@ namespace TradingGUI
                 _mouseCursorLine = null;
                 chart.Refresh();
             }
+        }
+
+        /// <summary>
+        /// Checks if the mouse is hovering over a pattern marker and shows the pattern image tooltip.
+        /// </summary>
+        /// <param name="chart">The chart control being checked.</param>
+        /// <param name="e">Mouse event arguments.</param>
+        private void CheckPatternHover(ScottPlot.FormsPlot chart, MouseEventArgs e)
+        {
+            if (_patternTooltipData.Count == 0 || _patternImageTooltip == null) return;
+
+            // Get mouse position in data coordinates
+            double mouseX = chart.Plot.GetCoordinateX(e.X);
+            double mouseY = chart.Plot.GetCoordinateY(e.Y);
+
+            // Define hover tolerance (in data units)
+            double hoverTolerance = 0.5; // Adjust based on your data scale
+
+            // Check if mouse is over any pattern point
+            foreach (var patternData in _patternTooltipData)
+            {
+                double distance = Math.Sqrt(Math.Pow(mouseX - patternData.x, 2) + Math.Pow(mouseY - patternData.y, 2));
+
+                if (distance <= hoverTolerance && patternData.imagePath != null)
+                {
+                    // Mouse is over this pattern, show the image tooltip
+                    Point screenLocation = chart.PointToScreen(e.Location);
+                    ShowPatternImageTooltip(patternData.imagePath, screenLocation);
+                    return;
+                }
+            }
+
+            // Mouse is not over any pattern, hide the tooltip
+            HidePatternImageTooltip();
         }
 
         /// <summary>
@@ -2115,20 +2294,33 @@ namespace TradingGUI
                 var patternValuePoints = new List<double>();
                 var patternTooltips = new List<string>();
 
+                // Clear previous pattern tooltip data
+                _patternTooltipData.Clear();
+
                 foreach (var patternPoint in _historicalPatternDataPoints!)
                 {
-                    patternTimePoints.Add(patternPoint.Date.ToOADate());
-                    patternValuePoints.Add(patternPoint.Price);
+                    double timePoint = patternPoint.Date.ToOADate();
+                    double valuePoint = patternPoint.Price;
+
+                    patternTimePoints.Add(timePoint);
+                    patternValuePoints.Add(valuePoint);
 
                     // Create tooltip with pattern details from Memo field
                     string tooltip = patternPoint.Memo ?? "Pattern";
+                    string patternName = tooltip;
                     if (tooltip.Contains("Pattern: "))
                     {
                         // Extract pattern name from the memo
-                        string patternName = tooltip.Replace("Pattern: ", "");
+                        patternName = tooltip.Replace("Pattern: ", "");
                         tooltip = $"Pattern: {patternName}";
                     }
                     patternTooltips.Add(tooltip);
+
+                    // Try to find the image path for this pattern
+                    string? imagePath = FindPatternImagePath(patternPoint, patternName);
+
+                    // Store pattern data for tooltip functionality
+                    _patternTooltipData.Add((timePoint, valuePoint, patternName, imagePath));
                 }
 
                 if (patternTimePoints.Count > 0)
@@ -2820,6 +3012,12 @@ namespace TradingGUI
 
         private void patternsLabel_CheckedChanged(object sender, EventArgs e)
         {
+            // Hide pattern tooltip when patterns are disabled
+            if (!patternsLabel.Checked)
+            {
+                HidePatternImageTooltip();
+                _patternTooltipData.Clear();
+            }
             EvaluateChartFilters();
         }
 
@@ -2891,6 +3089,31 @@ namespace TradingGUI
         private void totalContractsCB_CheckedChanged(object sender, EventArgs e)
         {
             EvaluateChartFilters();
+        }
+
+        /// <summary>
+        /// Clean up resources when the control is disposed.
+        /// </summary>
+        /// <param name="disposing">True if managed resources should be disposed.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Clean up pattern image tooltip
+                HidePatternImageTooltip();
+                if (_patternImageTooltip != null)
+                {
+                    this.Controls.Remove(_patternImageTooltip);
+                    _patternImageTooltip.Image?.Dispose();
+                    _patternImageTooltip.Dispose();
+                    _patternImageTooltip = null;
+                }
+
+                // Clear pattern tooltip data
+                _patternTooltipData.Clear();
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

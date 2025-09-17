@@ -47,12 +47,17 @@ namespace BacklashPatterns
             // Create the plot
             var plot = new Plot();
 
-            // Create simple line plot for demonstration
-            var dates = candles.Select(c => c.Timestamp.ToOADate()).ToArray();
-            var closes = candles.Select(c => c.Close).ToArray();
+            // Convert to OHLC format for ScottPlot
+            var ohlcs = candles.Select((c, idx) => new OHLC(
+                open: c.Open,
+                high: c.High,
+                low: c.Low,
+                close: c.Close
+            )).ToArray();
 
-            // Add line plot
-            plot.Add.Scatter(dates, closes);
+            // Add candlestick plot
+            var candlePlot = plot.Add.Candlestick(ohlcs.ToList());
+            candlePlot.Sequential = true;
 
             // Highlight the pattern candles
             var patternIndices = pattern.Candles.Select(c => c - startIndex).Where(i => i >= 0 && i < candles.Count).ToArray();
@@ -62,6 +67,9 @@ namespace BacklashPatterns
                 plot.Add.Marker(candles[idx].Timestamp.ToOADate(), candles[idx].High + (candles[idx].High - candles[idx].Low) * 0.1,
                     MarkerShape.FilledCircle, 10, Colors.Red);
             }
+
+            // Add pattern information labels
+            AddPatternLabels(plot, pattern, candles);
 
             // Customize the plot
             plot.Title($"{pattern.Name} Pattern");
@@ -78,6 +86,54 @@ namespace BacklashPatterns
             plot.SavePng(filePath, 800, 600);
 
             return filePath;
+        }
+
+        /// <summary>
+        /// Adds pattern information labels to the chart.
+        /// </summary>
+        /// <param name="plot">The ScottPlot chart to add labels to.</param>
+        /// <param name="pattern">The pattern definition containing the information to display.</param>
+        /// <param name="candles">The candle data for positioning the labels.</param>
+        private static void AddPatternLabels(Plot plot, PatternDefinition pattern, List<CandleMids> candles)
+        {
+            if (candles.Count == 0) return;
+
+            // Calculate position for labels (top-left corner of the chart)
+            double minTime = candles.Min(c => c.Timestamp.ToOADate());
+            double maxTime = candles.Max(c => c.Timestamp.ToOADate());
+            double minPrice = candles.Min(c => c.Low);
+            double maxPrice = candles.Max(c => c.High);
+
+            // Position labels in the top-left area with some padding
+            double labelX = minTime + (maxTime - minTime) * 0.02; // 2% from left
+            double labelY = maxPrice - (maxPrice - minPrice) * 0.05; // 5% from top
+
+            // Create label text with pattern information
+            string labelText = $"Pattern: {pattern.Name}\n" +
+                              $"Strength: {pattern.Strength:F3}\n" +
+                              $"Certainty: {pattern.Certainty:F3}\n" +
+                              $"Uncertainty: {pattern.Uncertainty:F3}";
+
+            // Add the label as text on the plot
+            var textLabel = plot.Add.Text(labelText, labelX, labelY);
+            textLabel.LabelFontSize = 10;
+            textLabel.LabelFontColor = Colors.Black;
+            textLabel.LabelBold = true;
+            textLabel.LabelFontName = "Arial";
+
+            // Add a semi-transparent background rectangle for better readability
+            double rectWidth = (maxTime - minTime) * 0.25; // 25% of chart width
+            double rectHeight = (maxPrice - minPrice) * 0.15; // 15% of chart height
+
+            var backgroundRect = plot.Add.Rectangle(
+                labelX - (maxTime - minTime) * 0.01, // slight padding
+                labelY + (maxPrice - minPrice) * 0.02,
+                labelX + rectWidth,
+                labelY - rectHeight
+            );
+            backgroundRect.FillColor = Colors.White.WithAlpha(0.8f);
+            backgroundRect.LineColor = Colors.Black.WithAlpha(0.5f);
+            backgroundRect.LineWidth = 1;
         }
 
         /// <summary>
