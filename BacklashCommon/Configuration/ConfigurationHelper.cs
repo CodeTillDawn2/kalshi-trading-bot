@@ -68,16 +68,13 @@ namespace BacklashCommon.Configuration
         {
             // Check if appsettings files exist
             var appsettingsPath = Path.Combine(currentDir, "appsettings.json");
-            var localAppsettingsPath = Path.Combine(currentDir, "appsettings.local.json");
             Console.WriteLine($"Current working directory: {currentDir}");
             Console.WriteLine($"appsettings.json exists: {File.Exists(appsettingsPath)}");
-            Console.WriteLine($"appsettings.local.json exists: {File.Exists(localAppsettingsPath)}");
 
             // Load main configuration first
             var config = new ConfigurationBuilder()
                 .SetBasePath(currentDir)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
             // Load secrets configuration
             var baseConfig = config.Build();

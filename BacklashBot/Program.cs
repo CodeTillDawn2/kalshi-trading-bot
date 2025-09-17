@@ -2,6 +2,7 @@ using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
 using KalshiBotAPI.Websockets;
 using KalshiBotAPI.WebSockets.Interfaces;
+using Microsoft.Extensions.Logging;
 using BacklashBotData.Data;
 using BacklashBotData.Data.Interfaces;
 using BacklashBotData.Data.Interfaces;
@@ -18,6 +19,7 @@ using BacklashBot.Services.Interfaces;
 using BacklashBot.State;
 using BacklashBot.State.Interfaces;
 using BacklashInterfaces.SmokehouseBot.Services;
+using BacklashBot.KalshiAPI.Interfaces;
 using BacklashDTOs.Data;
 using TradingStrategies.Classification;
 using TradingStrategies.Classification.Interfaces;
@@ -50,12 +52,17 @@ builder.Services.AddHostedService(provider => provider.GetRequiredService<Databa
 // ## Configuration Setup
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
     .AddCommandLine(args);
 
 // Bind configurations to respective models
 builder.Services.Configure<LoggingConfig>(builder.Configuration.GetSection("Logging"));
 builder.Services.Configure<KalshiConfig>(builder.Configuration.GetSection("Kalshi"));
+builder.Services.Configure<KalshiAPIServiceConfig>(builder.Configuration.GetSection("API"));
+builder.Services.Configure<WebSocketConnectionManagerConfig>(builder.Configuration.GetSection("Websockets:WebSocketConnectionManager"));
+builder.Services.Configure<MessageProcessorConfig>(builder.Configuration.GetSection("Websockets:MessageProcessor"));
+builder.Services.Configure<SubscriptionManagerConfig>(builder.Configuration.GetSection("Websockets:SubscriptionManager"));
+builder.Services.Configure<WebSocketMonitorConfig>(builder.Configuration.GetSection("Websockets:WebSocketMonitor"));
+builder.Services.Configure<KalshiWebSocketClientConfig>(builder.Configuration.GetSection("Websockets:KalshiWebSocketClient"));
 builder.Services.Configure<SnapshotConfig>(builder.Configuration.GetSection("Snapshots"));
 builder.Services.AddOptions<SnapshotConfig>().ValidateDataAnnotations();
 builder.Services.Configure<SimulationConfig>(builder.Configuration.GetSection("Simulation"));
@@ -67,6 +74,7 @@ builder.Services.Configure<MarketDataConfig>(builder.Configuration.GetSection("M
 builder.Services.Configure<CentralBrainConfig>(builder.Configuration.GetSection("CentralBrain"));
 builder.Services.Configure<InterestScoreConfig>(builder.Configuration.GetSection("InterestScore"));
 builder.Services.Configure<ErrorHandlerConfig>(builder.Configuration.GetSection("ErrorHandler"));
+builder.Services.Configure<OrderBookServiceConfig>(builder.Configuration.GetSection("OrderBookService"));
 
 // Increase shutdown timeout
 builder.Services.Configure<HostOptions>(options =>
@@ -169,7 +177,15 @@ builder.Services.AddDbContext<BacklashBotContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IBacklashBotContext>(provider => provider.GetRequiredService<BacklashBotContext>());
-builder.Services.AddScoped<IKalshiAPIService, KalshiAPIService>();
+builder.Services.AddScoped<IKalshiAPIService>(sp => new KalshiAPIService(
+    sp.GetRequiredService<ILogger<IKalshiAPIService>>(),
+    sp.GetRequiredService<IConfiguration>(),
+    sp.GetRequiredService<IServiceScopeFactory>(),
+    sp.GetRequiredService<IStatusTrackerService>(),
+    sp.GetRequiredService<IOptions<KalshiConfig>>(),
+    sp.GetRequiredService<IOptions<KalshiAPIServiceConfig>>(),
+    sp.GetRequiredService<IPerformanceMonitor>()
+));
 
 // Register services as scoped
 builder.Services.AddScoped<ISqlDataService, KalshiBotData.Data.SqlDataService>();
@@ -177,14 +193,35 @@ builder.Services.AddScoped<ITradingSnapshotService, TradingSnapshotService>();
 builder.Services.AddScoped<IMarketDataService, MarketDataService>();
 builder.Services.AddScoped<ITradingCalculator, TradingCalculator>();
 builder.Services.AddScoped<IMarketAnalysisHelper, MarketAnalysisHelper>();
-builder.Services.AddScoped<IOrderBookService, OrderBookService>();
+builder.Services.AddScoped<IOrderBookService>(provider =>
+    new OrderBookService(
+        provider.GetRequiredService<ILogger<IOrderBookService>>(),
+        provider.GetRequiredService<IServiceScopeFactory>(),
+        provider.GetRequiredService<IServiceFactory>(),
+        provider.GetRequiredService<IScopeManagerService>(),
+        provider.GetRequiredService<IStatusTrackerService>(),
+        provider.GetRequiredService<IOptions<OrderBookServiceConfig>>().Value
+    ));
 builder.Services.AddScoped<IMarketDataInitializer, MarketDataInitializer>();
 builder.Services.AddScoped<ICandlestickService, CandlestickService>();
 builder.Services.AddScoped<IBroadcastService, BroadcastService>();
 builder.Services.AddScoped<IMarketRefreshService, MarketRefreshService>();
-builder.Services.AddScoped<IWebSocketMonitorService, WebSocketMonitorService>();
+builder.Services.AddScoped<IWebSocketMonitorService>(sp => new WebSocketMonitorService(
+    sp.GetRequiredService<IServiceScopeFactory>(),
+    sp.GetRequiredService<IServiceFactory>(),
+    sp.GetRequiredService<ILogger<IWebSocketMonitorService>>(),
+    sp.GetRequiredService<IOptions<WebSocketMonitorConfig>>(),
+    sp.GetRequiredService<IScopeManagerService>(),
+    sp.GetRequiredService<IBotReadyStatus>(),
+    sp.GetRequiredService<IStatusTrackerService>(),
+    sp.GetRequiredService<ICentralPerformanceMonitor>()));
 builder.Services.AddSingleton<IOverseerClientService, OverseerClientService>();
-builder.Services.AddScoped<IWebSocketConnectionManager, WebSocketConnectionManager>();
+builder.Services.AddScoped<IWebSocketConnectionManager>(sp => new WebSocketConnectionManager(
+    sp.GetRequiredService<IOptions<KalshiConfig>>(),
+    sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>(),
+    sp.GetRequiredService<ILogger<WebSocketConnectionManager>>(),
+    sp.GetRequiredService<ICentralPerformanceMonitor>()
+));
 builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
     sp.GetRequiredService<ILogger<MessageProcessor>>(),
     sp.GetRequiredService<IWebSocketConnectionManager>(),
@@ -192,7 +229,7 @@ builder.Services.AddScoped<IMessageProcessor>(sp => new MessageProcessor(
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<ISqlDataService>(),
     sp.GetRequiredService<IKalshiAPIService>(),
-    sp.GetRequiredService<IOptions<KalshiConfig>>().Value,
+    sp.GetRequiredService<IOptions<MessageProcessorConfig>>().Value,
     sp.GetRequiredService<IMessageProcessorPerformanceMetrics>()
 ));
 builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
@@ -200,10 +237,11 @@ builder.Services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
     sp.GetRequiredService<IWebSocketConnectionManager>(),
     sp.GetRequiredService<IDataCache>(),
     sp.GetRequiredService<IStatusTrackerService>(),
-    sp.GetRequiredService<IConfiguration>()
+    sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>()
 ));
 builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
     sp.GetRequiredService<IOptions<KalshiConfig>>(),
+    sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),
     sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
     sp.GetRequiredService<IStatusTrackerService>(),
     sp.GetRequiredService<IBotReadyStatus>(),
@@ -214,8 +252,8 @@ builder.Services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClie
     sp.GetRequiredService<IDataCache>(),
     sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
     sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents,
-    sp.GetRequiredService<IOptions<KalshiConfig>>().Value.WebSocketBufferSize,
-    sp.GetRequiredService<IConfiguration>().GetSection("Kalshi:KalshiWebSocketClient:EnableKalshiWebSocketClientPerformanceMetrics").Get<bool?>() ?? true
+    sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.BufferSize,
+    sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.EnablePerformanceMetrics ?? true
 ));
 builder.Services.AddScoped<IInterestScoreService, InterestScoreService>();
 builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>

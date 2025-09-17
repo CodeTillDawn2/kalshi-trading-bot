@@ -13,6 +13,7 @@ using BacklashDTOs;
 using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using System.Data;
+using BacklashBotData.Configuration;
 
 namespace BacklashBotData.Data
 {
@@ -89,9 +90,10 @@ namespace BacklashBotData.Data
             _connectionString = _config.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
 
             // Initialize configuration options with defaults
-            _maxRetryCount = _config.GetValue<int>("Database:MaxRetryCount", 3);
-            _retryDelay = TimeSpan.FromSeconds(_config.GetValue<double>("Database:RetryDelaySeconds", 1.0));
-            _batchSize = _config.GetValue<int>("Database:BatchSize", 100);
+            var dataConfig = _config.GetSection("BacklashBotData").Get<BacklashBotDataConfig>();
+            _maxRetryCount = dataConfig.MaxRetryCount;
+            _retryDelay = TimeSpan.FromSeconds(dataConfig.RetryDelaySeconds);
+            _batchSize = dataConfig.BatchSize;
             _performanceMetrics = new Dictionary<string, (int, int, TimeSpan)>();
         }
 

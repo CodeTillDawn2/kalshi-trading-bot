@@ -100,7 +100,7 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IStatusTrackerService>(),
                 sp.GetRequiredService<ISqlDataService>(),
                 sp.GetRequiredService<IKalshiAPIService>(),
-                sp.GetRequiredService<IOptions<KalshiConfig>>().Value,
+                sp.GetRequiredService<IOptions<MessageProcessorConfig>>().Value,
                 sp.GetRequiredService<IMessageProcessorPerformanceMetrics>()
             ));
             services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
@@ -108,10 +108,11 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IWebSocketConnectionManager>(),
                 sp.GetRequiredService<IDataCache>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
-                sp.GetRequiredService<IConfiguration>()
+                sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>()
             ));
             services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
                 sp.GetRequiredService<IOptions<KalshiConfig>>(),
+                sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),
                 sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
                 sp.GetRequiredService<IBotReadyStatus>(),
@@ -122,8 +123,8 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IDataCache>(),
                 sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
                 sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents,
-                sp.GetRequiredService<IOptions<KalshiConfig>>().Value.WebSocketBufferSize,
-                sp.GetRequiredService<IConfiguration>().GetSection("Kalshi:KalshiWebSocketClient:EnablePerformanceMetrics").Get<bool?>() ?? true
+                sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.BufferSize,
+                sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.EnablePerformanceMetrics ?? true
             ));
             services.AddScoped<ISqlDataService, SqlDataService>();
             services.AddScoped<BacklashBotContext>(provider => new BacklashBotContext(Configuration));
@@ -152,7 +153,10 @@ namespace BacklashOverseer
             services.Configure<MarketWatchControllerConfig>(Configuration.GetSection("MarketWatchController"));
 
             // Configure SubscriptionManager settings
-            services.Configure<SubscriptionManagerConfig>(Configuration.GetSection("SubscriptionManager"));
+            services.Configure<SubscriptionManagerConfig>(Configuration.GetSection("Websockets:SubscriptionManager"));
+            services.Configure<MessageProcessorConfig>(Configuration.GetSection("Websockets:MessageProcessor"));
+            services.Configure<WebSocketConnectionManagerConfig>(Configuration.GetSection("Websockets:WebSocketConnectionManager"));
+            services.Configure<KalshiWebSocketClientConfig>(Configuration.GetSection("Websockets:KalshiWebSocketClient"));
 
 
             // Configure Secrets settings
@@ -184,7 +188,7 @@ namespace BacklashOverseer
                     Console.WriteLine("Warning: KalshiConfig not properly bound, attempting manual override...");
 
                     // Try to read from local file directly
-                    var localConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.local.json");
+                    var localConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
                     if (File.Exists(localConfigPath))
                     {
                         try

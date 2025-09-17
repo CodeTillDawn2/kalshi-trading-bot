@@ -1,6 +1,7 @@
 using KalshiBotAPI.WebSockets.Interfaces;
+using KalshiBotAPI.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using BacklashInterfaces.Enums;
 using BacklashInterfaces.Constants;
 using BacklashInterfaces.PerformanceMetrics;
@@ -77,14 +78,14 @@ namespace KalshiBotAPI.Websockets
         /// <param name="connectionManager">Manages WebSocket connection lifecycle and communication.</param>
         /// <param name="dataCache">Provides access to cached market data and watched markets list.</param>
         /// <param name="statusTrackerService">Provides system status and cancellation token management.</param>
-        /// <param name="configuration">Configuration for subscription manager settings.</param>
+        /// <param name="config">Configuration options for subscription manager settings.</param>
         /// <param name="performanceMetrics">Optional service for posting performance metrics.</param>
         public SubscriptionManager(
             ILogger<SubscriptionManager> logger,
             IWebSocketConnectionManager connectionManager,
             IDataCache dataCache,
             IStatusTrackerService statusTrackerService,
-            IConfiguration configuration,
+            IOptions<SubscriptionManagerConfig> config,
             ISubscriptionManagerPerformanceMetrics? performanceMetrics = null)
         {
             _logger = logger;
@@ -94,15 +95,15 @@ namespace KalshiBotAPI.Websockets
             _performanceMetrics = performanceMetrics;
             _processingCancellationToken = statusTrackerService.GetCancellationToken();
 
-            // Load configuration values
-            var subscriptionConfig = configuration.GetSection("SubscriptionManager");
-            _subscriptionTimeoutMs = subscriptionConfig.GetValue("SubscriptionTimeoutMs", 60000);
-            _confirmationTimeoutSeconds = subscriptionConfig.GetValue("ConfirmationTimeoutSeconds", 60);
-            _retryDelayMs = subscriptionConfig.GetValue("RetryDelayMs", 1000);
-            _maxQueueSize = subscriptionConfig.GetValue("MaxQueueSize", 1000);
-            _batchSize = subscriptionConfig.GetValue("BatchSize", 10);
-            _healthCheckIntervalMs = subscriptionConfig.GetValue("HealthCheckIntervalMs", 30000);
-            _enableMetrics = subscriptionConfig.GetValue("EnableMetrics", true);
+            // Load configuration values from injected options
+            var subscriptionConfig = config.Value;
+            _subscriptionTimeoutMs = subscriptionConfig.SubscriptionTimeoutMs;
+            _confirmationTimeoutSeconds = subscriptionConfig.ConfirmationTimeoutSeconds;
+            _retryDelayMs = subscriptionConfig.RetryDelayMs;
+            _maxQueueSize = subscriptionConfig.MaxQueueSize;
+            _batchSize = subscriptionConfig.BatchSize;
+            _healthCheckIntervalMs = subscriptionConfig.HealthCheckIntervalMs;
+            _enableMetrics = subscriptionConfig.EnableSubscriptionManagerMetrics;
 
             // Initialize message type counts
             _messageTypeCounts.TryAdd("OrderBook", 0);

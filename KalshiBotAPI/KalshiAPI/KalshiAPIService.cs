@@ -39,6 +39,7 @@ namespace KalshiBotAPI.KalshiAPI
         private readonly ILogger<IKalshiAPIService> _logger;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly KalshiConfig _kalshiConfig;
+        private readonly KalshiAPIServiceConfig _apiConfig;
         private readonly HttpClient _httpClient;
         private readonly RSA _privateKey;
         private readonly string _keyId;
@@ -62,7 +63,8 @@ namespace KalshiBotAPI.KalshiAPI
         /// <param name="config">Configuration instance for accessing connection strings and settings.</param>
         /// <param name="scopeFactory">Factory for creating service scopes for database operations.</param>
         /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens.</param>
-        /// <param name="kalshiConfig">Configuration options specific to Kalshi API integration.</param>
+        /// <param name="kalshiConfig">Configuration options specific to Kalshi core settings.</param>
+        /// <param name="apiConfig">Configuration options specific to Kalshi API operations.</param>
         /// <param name="performanceMonitor">Central performance monitor for unified metrics collection.</param>
         public KalshiAPIService(
             ILogger<IKalshiAPIService> logger,
@@ -70,13 +72,15 @@ namespace KalshiBotAPI.KalshiAPI
             IServiceScopeFactory scopeFactory,
             IStatusTrackerService statusTrackerService,
             IOptions<KalshiConfig> kalshiConfig,
+            IOptions<KalshiAPIServiceConfig> apiConfig,
             IPerformanceMonitor performanceMonitor)
         {
             _logger = logger;
             _statusTrackerService = statusTrackerService;
             _kalshiConfig = kalshiConfig.Value;
+            _apiConfig = apiConfig.Value;
             _performanceMonitor = performanceMonitor;
-            _enablePerformanceMetrics = _kalshiConfig.KalshiAPIServiceEnablePerformanceMetrics;
+            _enablePerformanceMetrics = _apiConfig.KalshiAPIService.EnablePerformanceMetrics;
 
             // Initialize connection string from configuration
             _connectionString = config.GetConnectionString("DefaultConnection") ?? throw new ArgumentNullException("DefaultConnection connection string not configured");
@@ -93,12 +97,12 @@ namespace KalshiBotAPI.KalshiAPI
             _privateKey.ImportFromPem(File.ReadAllText(keyFile));
             _scopeFactory = scopeFactory;
 
-            // Initialize intervals from configuration
+            // Initialize intervals from configuration (cushion values are constants)
             _intervals = new Dictionary<string, (int Minutes, int DbType, int MaxDays, int CushionSeconds)>
             {
-                ["minute"] = (1, 1, _kalshiConfig.CandlestickLookback.Minute, _kalshiConfig.CandlestickCushion.Minute),
-                ["hour"] = (60, 2, _kalshiConfig.CandlestickLookback.Hour, _kalshiConfig.CandlestickCushion.Hour),
-                ["day"] = (1440, 3, _kalshiConfig.CandlestickLookback.Day, _kalshiConfig.CandlestickCushion.Day)
+                ["minute"] = (1, 1, _apiConfig.KalshiAPIService.CandlestickMandatoryOverlapDaysMinute, 60),
+                ["hour"] = (60, 2, _apiConfig.KalshiAPIService.CandlestickMandatoryOverlapDaysHour, 3600),
+                ["day"] = (1440, 3, _apiConfig.KalshiAPIService.CandlestickMandatoryOverlapDaysDay, 86400)
             };
         }
 

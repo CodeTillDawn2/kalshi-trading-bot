@@ -93,12 +93,12 @@ namespace KalshiBotTests
         [SetUp]
         public void Setup()
         {
-            // Locate BacklashBot/appsettings.local.json exactly like your other tests
+            // Locate BacklashBot/appsettings.json exactly like your other tests
             var basePath = Path.GetFullPath(
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
             var config = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
 
             // DI: EF context for real snapshot fetching

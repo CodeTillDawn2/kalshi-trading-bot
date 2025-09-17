@@ -152,7 +152,7 @@ namespace TradingSimulator
             var marketAnalysisLoggerMock = new Mock<ILogger<MarketAnalysisHelper>>();
             var overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
-            var snapshotConfig = config.GetSection("TradingSnapshotService").Get<SnapshotConfig>();
+            var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>();
             var tradingConfig = config.GetSection("TradingStrategy").Get<TradingConfig>();
             var simulatorConfig = config.GetSection("TradingSimulatorService").Get<SimulatorConfig>();
             _snapshotOptions = Options.Create(snapshotConfig);

@@ -62,7 +62,7 @@ namespace KalshiBotTests
         /// <remarks>
         /// This setup method:
         /// - Creates and configures all necessary mock objects for dependencies
-        /// - Loads configuration from appsettings.local.json for realistic testing
+        /// - Loads configuration from appsettings.json for realistic testing
         /// - Initializes the real SqlDataService for database operations
         /// - Sets up mock behaviors for WebSocket components and message processing
         /// - Creates the KalshiWebSocketClient instance with all dependencies
@@ -83,27 +83,27 @@ namespace KalshiBotTests
             var cts = new CancellationTokenSource();
             _statusTracker.Setup(st => st.GetCancellationToken()).Returns(cts.Token);
 
-            // Load configuration from appsettings.local.json
+            // Load configuration from appsettings.json
             var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
             _configuration = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
 
             var kalshiConfig = new KalshiConfig();
             _configuration.GetSection("Kalshi").Bind(kalshiConfig);
 
             // Validate configuration
-            Assert.That(kalshiConfig.KeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.KeyId is missing in appsettings.local.json");
-            Assert.That(kalshiConfig.KeyFile, Is.Not.Null.And.Not.Empty, "KalshiConfig.KeyFile is missing in appsettings.local.json");
+            Assert.That(kalshiConfig.KeyId, Is.Not.Null.And.Not.Empty, "KalshiConfig.KeyId is missing in appsettings.json");
+            Assert.That(kalshiConfig.KeyFile, Is.Not.Null.And.Not.Empty, "KalshiConfig.KeyFile is missing in appsettings.json");
             Assert.That(System.IO.File.Exists(kalshiConfig.KeyFile), Is.True, $"KeyFile {kalshiConfig.KeyFile} does not exist");
-            Assert.That(kalshiConfig.Environment, Is.Not.Null.And.Not.Empty, "KalshiConfig.Environment is missing in appsettings.local.json");
+            Assert.That(kalshiConfig.Environment, Is.Not.Null.And.Not.Empty, "KalshiConfig.Environment is missing in appsettings.json");
 
             _kalshiConfigOptions = Options.Create(kalshiConfig);
 
             // Initialize real SqlDataService
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.local.json");
+            Assert.That(connectionString, Is.Not.Null.And.Not.Empty, "DefaultConnection string is missing in appsettings.json");
             _sqlService = new SqlDataService(_configuration, _sqlLoggerMock.Object);
 
             // Create mock objects for the new refactored dependencies

@@ -3,6 +3,8 @@ using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs.KalshiAPI;
 using BacklashBot.Management.Interfaces;
+using KalshiBotAPI.Configuration;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,7 +29,7 @@ namespace BacklashBot.Services
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IServiceFactory _serviceFactory;
         private readonly ILogger<IWebSocketMonitorService> _logger;
-        private readonly IConfiguration _configuration;
+        private readonly WebSocketMonitorConfig _config;
         private bool _isWebSocketConnected = false;
         private Task _exchangeStatusMonitorTask;
         private readonly IScopeManagerService _scopeManagerService;
@@ -90,7 +92,7 @@ namespace BacklashBot.Services
             IServiceScopeFactory scopeFactory,
             IServiceFactory serviceFactory,
             ILogger<IWebSocketMonitorService> logger,
-            IConfiguration configuration,
+            IOptions<WebSocketMonitorConfig> config,
             IScopeManagerService scopeManagerService,
             IBotReadyStatus readyStatus,
             IStatusTrackerService statusTrackerService,
@@ -102,15 +104,15 @@ namespace BacklashBot.Services
             _scopeFactory = scopeFactory;
             _readyStatus = readyStatus;
             _logger = logger;
-            _configuration = configuration;
+            _config = config.Value;
             _centralPerformanceMonitor = centralPerformanceMonitor;
 
-            // Load configurable intervals with defaults
-            _monitoringIntervalMinutes = _configuration.GetValue<int>("WebSocketMonitor:MonitoringIntervalMinutes", 1);
-            _retryDelayMinutes = _configuration.GetValue<int>("WebSocketMonitor:RetryDelayMinutes", 5);
-            _enableMetrics = _configuration.GetValue<bool>("WebSocketMonitor:EnableMetrics", true);
+            // Load configuration values from injected options
+            _monitoringIntervalMinutes = _config.MonitoringIntervalMinutes;
+            _retryDelayMinutes = _config.RetryDelayMinutes;
+            _enableMetrics = _config.EnableWebSocketMonitorMetrics;
 
-            _logger.LogDebug("WebSocketMonitorService instance created with MonitoringInterval={MonitoringInterval}min, RetryDelay={RetryDelay}min, EnableMetrics={EnableMetrics}",
+            _logger.LogDebug("WebSocketMonitorService instance created with MonitoringInterval={MonitoringInterval}min, RetryDelay={RetryDelay}min, EnableWebSocketMonitorMetrics={EnableWebSocketMonitorMetrics}",
                 _monitoringIntervalMinutes, _retryDelayMinutes, _enableMetrics);
         }
 
