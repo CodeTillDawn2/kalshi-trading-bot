@@ -48,6 +48,7 @@
         </div>
     </div>
 
+    <script src="color-config.js"></script>
     <script>
         function updateLineChart() {
             const bars = document.querySelectorAll('.trend-bar');
@@ -69,13 +70,8 @@
         }
 
         function updateBarColor(bar, value) {
-            if (value < 50) {
-                bar.style.background = 'linear-gradient(to top, #28a745, #20c997)';
-            } else if (value < 75) {
-                bar.style.background = 'linear-gradient(to top, #ffc107, #fd7e14)';
-            } else {
-                bar.style.background = 'linear-gradient(to top, #dc3545, #c82333)';
-            }
+            // Use centralized color configuration
+            bar.style.background = ColorUtils.getStatusGradient(value, { normal: 50, warning: 75 });
         }
 
         // Auto-update every 4.5 seconds

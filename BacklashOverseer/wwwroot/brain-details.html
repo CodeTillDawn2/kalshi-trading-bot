@@ -76,7 +76,26 @@
             transition: opacity 0.3s ease;
         }
 
-        .control-title.hidden, .control-description.hidden {
+        /* Per-element label visibility control */
+        .control-title.hide-label, .control-description.hide-label {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Data attribute approach for more granular control */
+        [data-show-labels="false"] .control-title,
+        [data-show-labels="false"] .control-description {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Individual control overrides */
+        .speed-dial-control.hide-labels .control-title,
+        .speed-dial-control.hide-labels .control-description,
+        .progress-control.hide-labels .control-title,
+        .progress-control.hide-labels .control-description,
+        .counter-control.hide-labels .control-title,
+        .counter-control.hide-labels .control-description {
             opacity: 0;
             pointer-events: none;
         }
@@ -355,21 +374,15 @@
         <div class="details-container">
             <div class="details-header">
                 <h1 class="details-title">Brain Details: <span id="brainName">Loading...</span></h1>
-                <div style="display: flex; align-items: center;">
-                    <button class="toggle-btn" id="labelToggle" onclick="toggleLabels()">
-                        <i class="fas fa-eye-slash"></i>
-                        Hide Labels
-                    </button>
-                    <button class="back-btn" onclick="goBack()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back to Dashboard
-                    </button>
-                </div>
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </button>
             </div>
 
             <div class="controls-grid">
                 <!-- Speed Dial -->
-                <div class="control-card">
+                <div class="control-card speed-dial-control hide-labels">
                     <div class="control-title">CPU Usage</div>
                     <div class="control-description">Circular gauge for CPU utilization</div>
                     <div class="speed-dial">
@@ -534,28 +547,6 @@
             window.location.href = 'marketwatch.html';
         }
 
-        // Toggle label visibility
-        function toggleLabels() {
-            const toggleBtn = document.getElementById('labelToggle');
-            const titles = document.querySelectorAll('.control-title');
-            const descriptions = document.querySelectorAll('.control-description');
-
-            const isHidden = toggleBtn.classList.contains('active');
-
-            if (isHidden) {
-                // Show labels
-                toggleBtn.classList.remove('active');
-                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Labels';
-                titles.forEach(title => title.classList.remove('hidden'));
-                descriptions.forEach(desc => desc.classList.remove('hidden'));
-            } else {
-                // Hide labels
-                toggleBtn.classList.add('active');
-                toggleBtn.innerHTML = '<i class="fas fa-eye"></i> Show Labels';
-                titles.forEach(title => title.classList.add('hidden'));
-                descriptions.forEach(desc => desc.classList.add('hidden'));
-            }
-        }
 
         // Dynamic update functions
         function updateSpeedDial() {

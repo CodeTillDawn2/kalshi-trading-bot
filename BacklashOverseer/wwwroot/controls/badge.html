@@ -2,13 +2,21 @@
 <html>
 <head>
     <style>
+        :root {
+            --badge-text-color: white;
+            --badge-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --badge-font-size: 18px;
+            --badge-font-weight: bold;
+        }
+
         .badge {
             background: linear-gradient(45deg, #28a745, #20c997);
-            color: white;
+            color: var(--badge-text-color);
             padding: 12px 24px;
             border-radius: 25px;
-            font-size: 18px;
-            font-weight: bold;
+            font-size: var(--badge-font-size);
+            font-weight: var(--badge-font-weight);
+            font-family: var(--badge-font-family);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
             border: 2px solid rgba(255, 255, 255, 0.2);
         }
@@ -23,6 +31,7 @@
         </div>
     </div>
 
+    <script src="color-config.js"></script>
     <script>
         function updateBadge() {
             const count = Math.floor(Math.random() * 15); // 0-14 errors
@@ -34,10 +43,11 @@
             }
 
             if (badgeElement) {
+                // Use centralized color configuration
                 if (count > 5) {
-                    badgeElement.style.background = 'linear-gradient(45deg, #dc3545, #fd7e14)';
+                    badgeElement.style.background = COLOR_CONFIG.gradients.danger;
                 } else {
-                    badgeElement.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+                    badgeElement.style.background = COLOR_CONFIG.gradients.success;
                 }
             }
         }
