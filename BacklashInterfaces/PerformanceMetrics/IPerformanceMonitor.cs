@@ -52,5 +52,6 @@ namespace BacklashInterfaces.PerformanceMetrics
             int totalItemsProcessed,
             int totalItemsFound,
             Dictionary<string, long>? itemCheckTimes = null);
+
     }
 }

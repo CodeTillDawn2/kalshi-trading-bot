@@ -24,7 +24,7 @@ namespace BacklashBot.Services
     /// ensuring proper resource management and access to scoped services throughout the application.
     /// Includes configurable performance metrics for monitoring scope efficiency.
     /// </summary>
-    public class KaslhiBotScopeManagerService : IScopeManagerService
+    public class KalshiBotScopeManagerService : IScopeManagerService
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<IScopeManagerService> _logger;
@@ -46,19 +46,19 @@ namespace BacklashBot.Services
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="KaslhiBotScopeManagerService"/> class.
+        /// Initializes a new instance of the <see cref="KalshiBotScopeManagerService"/> class.
         /// </summary>
         /// <param name="serviceProvider">The root service provider for creating scopes.</param>
         /// <param name="logger">The logger instance for recording service operations.</param>
         /// <param name="monitor">The central performance monitor for posting metrics.</param>
         /// <param name="config">The configuration instance for reading settings.</param>
-        public KaslhiBotScopeManagerService(IServiceProvider serviceProvider, ILogger<IScopeManagerService> logger, CentralPerformanceMonitor monitor, IConfiguration config)
+        public KalshiBotScopeManagerService(IServiceProvider serviceProvider, ILogger<IScopeManagerService> logger, CentralPerformanceMonitor monitor, IConfiguration config)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
             _monitor = monitor;
             _config = config;
-            _enableMetrics = _config.GetValue<bool>("Execution:KaslhiBotScopeManagerService_EnableMetrics", true);
+            _enableMetrics = _config.GetValue<bool>("Execution:KalshiBotScopeManagerService_EnableMetrics", true);
             if (_enableMetrics)
             {
                 _metricsTimer = new System.Timers.Timer(60000); // 1 minute

@@ -47,6 +47,7 @@ namespace KalshiBotTests
         private SqlDataService _sqlService;
         private KalshiWebSocketClient _client;
         private IOptions<KalshiConfig> _kalshiConfigOptions;
+        private IOptions<KalshiBotAPI.Configuration.KalshiWebSocketClientConfig> _websocketConfigOptions;
         private IConfiguration _configuration;
 
         // New mocks for refactored components
@@ -100,6 +101,10 @@ namespace KalshiBotTests
             Assert.That(kalshiConfig.Environment, Is.Not.Null.And.Not.Empty, "KalshiConfig.Environment is missing in appsettings.json");
 
             _kalshiConfigOptions = Options.Create(kalshiConfig);
+
+            var websocketConfig = new KalshiBotAPI.Configuration.KalshiWebSocketClientConfig();
+            _configuration.GetSection("KalshiWebSocketClient").Bind(websocketConfig);
+            _websocketConfigOptions = Options.Create(websocketConfig);
 
             // Initialize real SqlDataService
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
@@ -248,6 +253,7 @@ namespace KalshiBotTests
 
             _client = new KalshiWebSocketClient(
                 _kalshiConfigOptions,
+                _websocketConfigOptions,
                 _loggerMock.Object,
                 _statusTracker.Object,
                 _readyStatus.Object,

@@ -58,11 +58,11 @@ builder.Configuration
 builder.Services.Configure<LoggingConfig>(builder.Configuration.GetSection("Logging"));
 builder.Services.Configure<KalshiConfig>(builder.Configuration.GetSection("Kalshi"));
 builder.Services.Configure<KalshiAPIServiceConfig>(builder.Configuration.GetSection("API"));
-builder.Services.Configure<WebSocketConnectionManagerConfig>(builder.Configuration.GetSection("Websockets:WebSocketConnectionManager"));
-builder.Services.Configure<MessageProcessorConfig>(builder.Configuration.GetSection("Websockets:MessageProcessor"));
-builder.Services.Configure<SubscriptionManagerConfig>(builder.Configuration.GetSection("Websockets:SubscriptionManager"));
-builder.Services.Configure<WebSocketMonitorConfig>(builder.Configuration.GetSection("Websockets:WebSocketMonitor"));
-builder.Services.Configure<KalshiWebSocketClientConfig>(builder.Configuration.GetSection("Websockets:KalshiWebSocketClient"));
+builder.Services.Configure<WebSocketConnectionManagerConfig>(builder.Configuration.GetSection("Websocket:WebSocketConnectionManager"));
+builder.Services.Configure<MessageProcessorConfig>(builder.Configuration.GetSection("Websocket:MessageProcessor"));
+builder.Services.Configure<SubscriptionManagerConfig>(builder.Configuration.GetSection("Websocket:SubscriptionManager"));
+builder.Services.Configure<WebSocketMonitorConfig>(builder.Configuration.GetSection("Websocket:WebSocketMonitor"));
+builder.Services.Configure<KalshiWebSocketClientConfig>(builder.Configuration.GetSection("Websocket:KalshiWebSocketClient"));
 builder.Services.Configure<SnapshotConfig>(builder.Configuration.GetSection("Snapshots"));
 builder.Services.AddOptions<SnapshotConfig>().ValidateDataAnnotations();
 builder.Services.Configure<SimulationConfig>(builder.Configuration.GetSection("Simulation"));
@@ -86,7 +86,7 @@ builder.Services.Configure<HostOptions>(options =>
 builder.Services.AddSingleton<IServiceFactory, ServiceFactory>();
 builder.Services.AddSingleton<ICentralBrain, CentralBrain>();
 builder.Services.AddSingleton<ICentralErrorHandler, CentralErrorHandler>();
-builder.Services.AddSingleton<IScopeManagerService, KaslhiBotScopeManagerService>();
+builder.Services.AddSingleton<IScopeManagerService, KalshiBotScopeManagerService>();
 builder.Services.AddSingleton<ICentralPerformanceMonitor, CentralPerformanceMonitor>();
 builder.Services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
     (INightActivitiesPerformanceMetrics)provider.GetRequiredService<ICentralPerformanceMonitor>());
@@ -210,7 +210,7 @@ builder.Services.AddScoped<IWebSocketMonitorService>(sp => new WebSocketMonitorS
     sp.GetRequiredService<IServiceScopeFactory>(),
     sp.GetRequiredService<IServiceFactory>(),
     sp.GetRequiredService<ILogger<IWebSocketMonitorService>>(),
-    sp.GetRequiredService<IOptions<WebSocketMonitorConfig>>(),
+    sp.GetRequiredService<IConfiguration>(),
     sp.GetRequiredService<IScopeManagerService>(),
     sp.GetRequiredService<IBotReadyStatus>(),
     sp.GetRequiredService<IStatusTrackerService>(),

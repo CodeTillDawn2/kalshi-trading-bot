@@ -152,6 +152,7 @@ namespace BacklashBot.Management
         private DateTime _messageProcessorLastDuplicateWarningTime;
         private IReadOnlyDictionary<string, long>? _messageProcessorMessageTypeCounts;
 
+
         /// <summary>
         /// Gets or sets a value indicating whether the system is currently starting up.
         /// </summary>
@@ -1076,8 +1077,6 @@ namespace BacklashBot.Management
             return summary;
         }
 
-        #endregion
-
         #region IWebSocketPerformanceMetrics Implementation
 
         /// <summary>
@@ -1418,6 +1417,67 @@ namespace BacklashBot.Management
             _logger.LogInformation("MessageProcessor performance metrics reset");
         }
 
+        #endregion
+
+        /// <summary>
+        /// Records candlestick data gaps using the existing performance monitoring system.
+        /// Simply records the gap duration as an execution time for later analysis.
+        /// </summary>
+        /// <param name="intervalType">The candlestick interval type ("Minute", "Hour", or "Day").</param>
+        /// <param name="timestamp">The timestamp of the received candlestick.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class/component.</param>
+        /// <remarks>
+        /// This method uses the existing RecordExecutionTime to track gap durations.
+        /// The gap duration will be recorded as "CandlestickGap.{intervalType}" and can be analyzed later.
+        /// </remarks>
+        public void RecordCandlestickDataPoint(string intervalType, DateTime timestamp, bool metricsEnabled)
+        {
+            if (!metricsEnabled) return;
+
+            // Determine expected interval based on type
+            int expectedIntervalSeconds = intervalType.ToLower() switch
+            {
+                "minute" => 60,      // 1 minute = 60 seconds
+                "hour" => 3600,      // 1 hour = 3600 seconds
+                "day" => 86400,      // 1 day = 86400 seconds
+                _ => 60              // Default to minute interval
+            };
+
+            // Use a simple static variable to track last timestamp per interval
+            var lastTimestampKey = $"Last{intervalType}Timestamp";
+            var lastTimestamp = GetLastTimestamp(lastTimestampKey);
+
+            if (lastTimestamp.HasValue)
+            {
+                var timeSinceLast = timestamp - lastTimestamp.Value;
+                var expectedInterval = TimeSpan.FromSeconds(expectedIntervalSeconds);
+                var gap = timeSinceLast - expectedInterval;
+
+                if (gap > TimeSpan.Zero)
+                {
+                    // Record the gap duration using existing RecordExecutionTime method
+                    RecordExecutionTime($"CandlestickGap.{intervalType}", (long)gap.TotalMilliseconds, metricsEnabled);
+
+                    _logger.LogDebug("Recorded candlestick gap: {IntervalType} = {GapDuration:F2} minutes", intervalType, gap.TotalMinutes);
+                }
+            }
+
+            // Update last timestamp
+            SetLastTimestamp(lastTimestampKey, timestamp);
+        }
+
+        private readonly ConcurrentDictionary<string, DateTime> _lastTimestamps = new();
+
+        private DateTime? GetLastTimestamp(string key)
+        {
+            return _lastTimestamps.TryGetValue(key, out var timestamp) ? timestamp : (DateTime?)null;
+        }
+
+        private void SetLastTimestamp(string key, DateTime timestamp)
+        {
+            _lastTimestamps[key] = timestamp;
+        }
+
         /// <summary>
         /// Gets all configurable performance metrics for GUI consumption.
         /// </summary>
@@ -1482,6 +1542,7 @@ namespace BacklashBot.Management
                     MessageProcessorDuplicatesInWindow = _messageProcessorDuplicatesInWindow,
                     MessageProcessorLastDuplicateWarningTime = _messageProcessorLastDuplicateWarningTime,
                     MessageProcessorMessageTypeCounts = _messageProcessorMessageTypeCounts,
+
 
                     // API execution times
                     ApiExecutionTimes = ApiExecutionTimes,

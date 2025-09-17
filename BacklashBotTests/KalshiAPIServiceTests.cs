@@ -250,12 +250,17 @@ namespace KalshiBotTests
             _scopeFactoryMock.Setup(f => f.CreateScope()).Returns(scopeMock.Object);
 
             // Instantiate the real API service with mocks and real config
+            var apiConfig = new KalshiAPIServiceConfig();
+            _configuration.GetSection("API").Bind(apiConfig);
+            var apiConfigOptions = Options.Create(apiConfig);
+
             _apiService = new KalshiAPIService(
                 _loggerMock.Object,
                 _configuration,
                 _scopeFactoryMock.Object,
                 _statusTrackerMock.Object,
                 _kalshiConfigOptions,
+                apiConfigOptions,
                 _performanceMonitorMock.Object
             );
         }
@@ -1107,6 +1112,7 @@ namespace KalshiBotTests
                 _scopeFactoryMock.Object,
                 _statusTrackerMock.Object,
                 invalidOptions,
+                Options.Create(new KalshiAPIServiceConfig()),
                 _performanceMonitorMock.Object
             );
 
@@ -1199,7 +1205,7 @@ namespace KalshiBotTests
 
             var ex1 = Assert.Throws<ArgumentException>(() =>
                 new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options1, _performanceMonitorMock.Object));
+                    _statusTrackerMock.Object, options1, Options.Create(new KalshiAPIServiceConfig()), _performanceMonitorMock.Object));
             Assert.That(ex1.Message, Does.Contain("KeyId"), "Expected KeyId validation message");
 
             // Test missing KeyFile
@@ -1213,7 +1219,7 @@ namespace KalshiBotTests
 
             var ex2 = Assert.Throws<ArgumentException>(() =>
                 new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options2, _performanceMonitorMock.Object));
+                    _statusTrackerMock.Object, options2, Options.Create(new KalshiAPIServiceConfig()), _performanceMonitorMock.Object));
             Assert.That(ex2.Message, Does.Contain("KeyFile"), "Expected KeyFile validation message");
 
             // Test missing Environment
@@ -1227,7 +1233,7 @@ namespace KalshiBotTests
 
             var ex3 = Assert.Throws<ArgumentException>(() =>
                 new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options3, _performanceMonitorMock.Object));
+                    _statusTrackerMock.Object, options3, Options.Create(new KalshiAPIServiceConfig()), _performanceMonitorMock.Object));
             Assert.That(ex3.Message, Does.Contain("Environment"), "Expected Environment validation message");
 
             Console.WriteLine("✅ PASSED: Configuration validation works correctly");
@@ -1257,7 +1263,7 @@ namespace KalshiBotTests
 
             var ex = Assert.Throws<ArgumentException>(() =>
                 new KalshiAPIService(_loggerMock.Object, _configuration, _scopeFactoryMock.Object,
-                    _statusTrackerMock.Object, options, _performanceMonitorMock.Object));
+                    _statusTrackerMock.Object, options, Options.Create(new KalshiAPIServiceConfig()), _performanceMonitorMock.Object));
             Assert.That(ex.Message, Does.Contain("does not exist"), "Expected file existence validation message");
 
             Console.WriteLine("✅ PASSED: Key file validation works correctly");
@@ -1283,6 +1289,7 @@ namespace KalshiBotTests
                 _scopeFactoryMock.Object,
                 _statusTrackerMock.Object,
                 _kalshiConfigOptions,
+                Options.Create(new KalshiAPIServiceConfig()),
                 _performanceMonitorMock.Object
             );
 
