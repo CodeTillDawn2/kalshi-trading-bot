@@ -16,15 +16,15 @@ namespace BacklashCommon.Helpers
     /// Helper service for performing market analysis operations, specifically generating snapshot groups
     /// from raw market snapshots by filtering markets and processing them into valid time periods.
     /// </summary>
-    public class MarketAnalysisHelper : IMarketAnalysisHelper
+    public class SnapshotGroupHelper : ISnapshotGroupHelper
     {
         private readonly GeneralExecutionConfig _generalExecutionConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
-        private readonly MarketAnalysisHelperConfig _marketAnalysisHelperConfig;
+        private readonly SnapshotGroupHelperConfig _snapshotGroupHelperConfig;
         private readonly ISnapshotPeriodHelper _snapshotPeriodHelper;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ITradingSnapshotService _snapshotService;
-        private readonly ILogger<MarketAnalysisHelper> _logger;
+        private readonly ILogger<SnapshotGroupHelper> _logger;
         private readonly ICentralPerformanceMonitor? _centralPerformanceMonitor;
         private readonly bool _metricsEnabled;
         private int _totalMarketsProcessed = 0;
@@ -32,7 +32,7 @@ namespace BacklashCommon.Helpers
         private int _errorCount = 0;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MarketAnalysisHelper"/> class.
+        /// Initializes a new instance of the <see cref="SnapshotGroupHelper"/> class.
         /// </summary>
         /// <param name="scopeFactory">Factory for creating service scopes to access database context.</param>
         /// <param name="snapshotPeriodHelper">Helper for processing snapshot periods into valid groups.</param>
@@ -42,7 +42,7 @@ namespace BacklashCommon.Helpers
         /// <param name="marketAnalysisHelperConfig">Configuration options for market analysis helper settings.</param>
         /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics. Can be null for environments without central monitoring.</param>
         /// <param name="logger">Logger for recording analysis operations and errors.</param>
-        public MarketAnalysisHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper, ITradingSnapshotService snapshotService, IOptions<GeneralExecutionConfig> generalExecutionConfig, IOptions<CentralBrainConfig> centralBrainConfig, IOptions<MarketAnalysisHelperConfig> marketAnalysisHelperConfig, ICentralPerformanceMonitor? centralPerformanceMonitor, ILogger<MarketAnalysisHelper> logger)
+        public SnapshotGroupHelper(IServiceScopeFactory scopeFactory, ISnapshotPeriodHelper snapshotPeriodHelper, ITradingSnapshotService snapshotService, IOptions<GeneralExecutionConfig> generalExecutionConfig, IOptions<CentralBrainConfig> centralBrainConfig, IOptions<SnapshotGroupHelperConfig> marketAnalysisHelperConfig, ICentralPerformanceMonitor? centralPerformanceMonitor, ILogger<SnapshotGroupHelper> logger)
         {
             ArgumentNullException.ThrowIfNull(scopeFactory);
             ArgumentNullException.ThrowIfNull(snapshotPeriodHelper);
@@ -57,7 +57,7 @@ namespace BacklashCommon.Helpers
             _snapshotPeriodHelper = snapshotPeriodHelper;
             _generalExecutionConfig = generalExecutionConfig.Value ?? throw new ArgumentNullException(nameof(generalExecutionConfig.Value));
             _centralBrainConfig = centralBrainConfig.Value ?? throw new ArgumentNullException(nameof(centralBrainConfig.Value));
-            _marketAnalysisHelperConfig = marketAnalysisHelperConfig.Value ?? throw new ArgumentNullException(nameof(marketAnalysisHelperConfig.Value));
+            _snapshotGroupHelperConfig = marketAnalysisHelperConfig.Value ?? throw new ArgumentNullException(nameof(marketAnalysisHelperConfig.Value));
             _centralPerformanceMonitor = centralPerformanceMonitor;
 
             if (string.IsNullOrWhiteSpace(_centralBrainConfig.HardDataStorageLocation))
@@ -66,7 +66,7 @@ namespace BacklashCommon.Helpers
             }
 
             _logger = logger;
-            _metricsEnabled = _marketAnalysisHelperConfig.EnablePerformanceMetrics;
+            _metricsEnabled = _snapshotGroupHelperConfig.EnablePerformanceMetrics;
         }
 
         /// <summary>

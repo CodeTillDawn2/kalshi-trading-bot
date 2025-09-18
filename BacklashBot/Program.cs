@@ -90,7 +90,7 @@ builder.Services.Configure<MarketDataConfig>(builder.Configuration.GetSection("W
 builder.Services.Configure<CentralBrainConfig>(builder.Configuration.GetSection("Central:CentralBrain"));
 builder.Services.Configure<TargetCalculationServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:TargetCalculationService"));
 builder.Services.Configure<BrainStatusServiceConfig>(builder.Configuration.GetSection("Central:BrainStatusService"));
-builder.Services.Configure<MarketAnalysisHelperConfig>(builder.Configuration.GetSection("MarketAnalysisHelper"));
+builder.Services.Configure<SnapshotGroupHelperConfig>(builder.Configuration.GetSection("MarketAnalysisHelper"));
 builder.Services.Configure<QueueMonitoringConfig>(builder.Configuration.GetSection("CentralPerformanceMonitor"));
 builder.Services.Configure<InterestScoreConfig>(builder.Configuration.GetSection("WatchedMarkets:InterestScore"));
 builder.Services.Configure<ErrorHandlerConfig>(builder.Configuration.GetSection("Central:ErrorHandler"));
@@ -248,7 +248,7 @@ builder.Services.AddScoped<ISqlDataService, KalshiBotData.Data.SqlDataService>()
 builder.Services.AddScoped<ITradingSnapshotService, TradingSnapshotService>();
 builder.Services.AddScoped<IMarketDataService, MarketDataService>();
 builder.Services.AddScoped<ITradingCalculator, TradingCalculator>();
-builder.Services.AddScoped<IMarketAnalysisHelper, MarketAnalysisHelper>();
+builder.Services.AddScoped<ISnapshotGroupHelper, SnapshotGroupHelper>();
 builder.Services.AddScoped<IOrderBookService>(provider =>
     new OrderBookService(
         provider.GetRequiredService<ILogger<IOrderBookService>>(),
@@ -337,7 +337,7 @@ builder.Services.AddScoped<IOvernightActivitiesHelper>(provider =>
     new OvernightActivitiesHelper(
         provider.GetRequiredService<ILogger<BacklashCommon.Services.OvernightActivitiesHelper>>(),
         provider.GetRequiredService<IInterestScoreService>(),
-        provider.GetRequiredService<IMarketAnalysisHelper>(),
+        provider.GetRequiredService<ISnapshotGroupHelper>(),
         provider.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
         provider.GetRequiredService<ISqlDataService>(),
         provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));

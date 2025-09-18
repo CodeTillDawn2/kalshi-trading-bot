@@ -2,7 +2,7 @@
 {
 /// <summary>IMarketAnalysisHelper</summary>
 /// <summary>IMarketAnalysisHelper</summary>
-    public interface IMarketAnalysisHelper
+    public interface ISnapshotGroupHelper
 /// <summary>GenerateSnapshotGroups</summary>
     {
         Task GenerateSnapshotGroups();

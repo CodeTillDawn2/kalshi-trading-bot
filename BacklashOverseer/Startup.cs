@@ -241,14 +241,14 @@ namespace BacklashOverseer
 
             // Register services needed for OvernightActivitiesHelper
             services.AddScoped<IInterestScoreService, InterestScoreService>();
-            services.AddScoped<IMarketAnalysisHelper, MarketAnalysisHelper>();
+            services.AddScoped<ISnapshotGroupHelper, SnapshotGroupHelper>();
 
             // Register OvernightActivitiesHelper
             services.AddScoped<IOvernightActivitiesHelper>(provider =>
                 new BacklashCommon.Services.OvernightActivitiesHelper(
                     provider.GetRequiredService<ILogger<IOvernightActivitiesHelper>>(),
                     null, // interestScoreHelper parameter not used in constructor
-                    provider.GetRequiredService<IMarketAnalysisHelper>(),
+                    provider.GetRequiredService<ISnapshotGroupHelper>(),
                     provider.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
                     provider.GetRequiredService<ISqlDataService>(),
                     provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));

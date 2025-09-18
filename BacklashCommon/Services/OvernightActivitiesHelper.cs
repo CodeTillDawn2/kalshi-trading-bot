@@ -84,7 +84,7 @@ namespace BacklashCommon.Services
     public class OvernightActivitiesHelper : IOvernightActivitiesHelper, INightActivitiesPerformanceMetrics
     {
         private readonly ILogger<IOvernightActivitiesHelper> _logger;
-        private readonly IMarketAnalysisHelper _analysisHelper;
+        private readonly ISnapshotGroupHelper _analysisHelper;
         private readonly GeneralExecutionConfig _executionConfig;
         private readonly ISqlDataService _sqlDataService;
         private readonly PerformanceMetrics _performanceMetrics = new();
@@ -100,7 +100,7 @@ namespace BacklashCommon.Services
         /// <param name="sqlDataService">The SQL data service for snapshot operations.</param>
         /// <param name="performanceMonitor">Optional performance monitor for tracking metrics (uses interface segregation).</param>
         public OvernightActivitiesHelper(ILogger<IOvernightActivitiesHelper> logger, IInterestScoreService interestScoreHelper,
-            IMarketAnalysisHelper analysisHelper, IOptions<GeneralExecutionConfig> executionConfig, ISqlDataService sqlDataService,
+            ISnapshotGroupHelper analysisHelper, IOptions<GeneralExecutionConfig> executionConfig, ISqlDataService sqlDataService,
             INightActivitiesPerformanceMetrics? performanceMonitor = null)
         {
             _logger = logger;

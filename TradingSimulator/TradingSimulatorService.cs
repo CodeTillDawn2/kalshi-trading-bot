@@ -87,7 +87,7 @@ namespace TradingSimulator
         private Mock<ILogger<TradingStrategy<MarketSnapshot>>> _strategyLoggerMock;
         private IServiceScopeFactory _scopeFactory;
         private IBacklashBotContext _dbContext;
-        private MarketAnalysisHelper _marketAnalysisHelper;
+        private SnapshotGroupHelper _marketAnalysisHelper;
         private IOptions<GeneralExecutionConfig> _executionConfig;
         private IOptions<SimulatorConfig> _simulatorOptions;
         private HashSet<string> _processedMarkets;
@@ -148,7 +148,7 @@ namespace TradingSimulator
             _serviceFactory = new Mock<IServiceFactory>().Object;
             _strategyLoggerMock = new Mock<ILogger<TradingStrategy<MarketSnapshot>>>();
             _interestScoreLoggerMock = new Mock<ILogger<IInterestScoreService>>();
-            var marketAnalysisLoggerMock = new Mock<ILogger<MarketAnalysisHelper>>();
+            var marketAnalysisLoggerMock = new Mock<ILogger<SnapshotGroupHelper>>();
             var overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
             var simulatorConfig = config.GetSection("TradingSimulatorService").Get<SimulatorConfig>();
@@ -170,7 +170,7 @@ namespace TradingSimulator
             _performanceMonitor = new PerformanceMonitor();
 
             _overseer = new TradingOverseer(_scopeFactory, _snapshotService, config, overseerLoggerMock.Object, _performanceMonitor);
-            _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, null, null, marketAnalysisLoggerMock.Object);
+            _marketAnalysisHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, null, null, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 
             _dbContext = serviceProvider.GetRequiredService<IBacklashBotContext>();
