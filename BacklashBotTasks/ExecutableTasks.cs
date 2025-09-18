@@ -40,12 +40,12 @@ namespace KalshiBotTasks
         private OvernightActivitiesHelper _overnightService;
         private IInterestScoreService _interestScoreService;
         private SnapshotPeriodHelper _snapshotPeriodHelper;
-        private IOptions<ExecutionConfig> _executionConfig;
+        private IOptions<GeneralExecutionConfig> _executionConfig;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;
         private MarketAnalysisHelper _marketAnalysisHelper;
         private IBacklashBotContext _dbContext;
         private ServiceProvider? _serviceProvider;
-        private IOptions<SnapshotConfig> _snapshotOptions;
+        private IOptions<TradingSnapshotServiceConfig> _tradingSnapshotServiceOptions;
         private int _missingOrderbookCount;
         private int _overlappingPriceCount;
         private int _rateDiscrepancyCount; // New counter
@@ -151,11 +151,11 @@ namespace KalshiBotTasks
 
             this.config = configuration;
 
-            var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>()!;
+            var tradingSnapshotServiceConfig = config.GetSection("WatchedMarkets:TradingSnapshotService").Get<TradingSnapshotServiceConfig>()!;
             var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>()!;
             var kalshiConfig = config.GetSection("Kalshi").Get<KalshiConfig>()!; // Add this for KalshiConfig
-            _snapshotOptions = Options.Create(snapshotConfig);
-            _executionConfig = Options.Create(config.GetSection("Execution").Get<ExecutionConfig>()!);
+            _tradingSnapshotServiceOptions = Options.Create(tradingSnapshotServiceConfig);
+            _executionConfig = Options.Create(config.GetSection("Central:GeneralExecution").Get<GeneralExecutionConfig>()!);
             var kalshiOptions = Options.Create(kalshiConfig); // Create options for KalshiConfig
 
             var snapshotLoggerMock = new Mock<ILogger<TradingSnapshotService>>();
@@ -204,10 +204,10 @@ namespace KalshiBotTasks
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
             var centralPerformanceMonitor = _serviceProvider.GetRequiredService<CentralPerformanceMonitor>();
 
-            _snapshotPeriodHelper = new SnapshotPeriodHelper(_snapshotOptions.Value);
+            _snapshotPeriodHelper = new SnapshotPeriodHelper(Options.Create(new SnapshotPeriodHelperConfig { SmallGapMinutes = 10.0, MaxActiveGapHours = 1.0, PriceChangeThreshold = 3 }).Value);
             _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, marketAnalysisLoggerMock.Object);
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _marketAnalysisHelper, _executionConfig, _sqlDataService);
-            _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _snapshotOptions, Options.Create(tradingConfig), _scopeFactory, this.config, centralPerformanceMonitor);
+            _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _tradingSnapshotServiceOptions, Options.Create(tradingConfig), _scopeFactory, this.config, centralPerformanceMonitor);
 
             _dbContext = new BacklashBotContext(config);
             _missingOrderbookCount = 0;

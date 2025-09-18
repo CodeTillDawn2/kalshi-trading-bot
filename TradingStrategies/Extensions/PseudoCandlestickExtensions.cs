@@ -35,7 +35,7 @@ namespace TradingStrategies.Extensions
         public static CandleMids[] ToCandleMids(
             this IList<PseudoCandlestick> candles,
             string marketTicker,
-            TradingConfig config = null,
+            PseudoCandlestickExtensionsConfig config = null,
             ILogger logger = null)
         {
             if (candles == null || candles.Count < 2)

@@ -52,6 +52,7 @@ namespace KalshiBotAPI.Websockets
     {
         private readonly ILogger<WebSocketConnectionManager> _logger;
         private readonly KalshiConfig _kalshiConfig;
+        private readonly WebSocketConnectionManagerConfig _websocketConfig;
         private readonly RSA _privateKey;
         private readonly ICentralPerformanceMonitor? _performanceMonitor;
         private ClientWebSocket? _webSocket = null!;
@@ -128,7 +129,8 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Initializes a new instance of the WebSocketConnectionManager class.
         /// </summary>
-        /// <param name="kalshiConfig">Configuration options containing API credentials and connection settings.</param>
+        /// <param name="kalshiConfig">Configuration options containing API credentials.</param>
+        /// <param name="websocketConfig">Configuration options for WebSocket operations.</param>
         /// <param name="logger">Logger instance for recording connection operations and errors.</param>
         /// <param name="performanceMonitor">Optional performance monitor for recording WebSocket metrics.</param>
         /// <remarks>
@@ -139,10 +141,12 @@ namespace KalshiBotAPI.Websockets
         /// </remarks>
         public WebSocketConnectionManager(
             IOptions<KalshiConfig> kalshiConfig,
+            IOptions<WebSocketConnectionManagerConfig> websocketConfig,
             ILogger<WebSocketConnectionManager> logger,
             ICentralPerformanceMonitor? performanceMonitor = null)
         {
             _kalshiConfig = kalshiConfig.Value;
+            _websocketConfig = websocketConfig.Value;
             _logger = logger;
             _performanceMonitor = performanceMonitor;
             _privateKey = RSA.Create();
@@ -155,15 +159,15 @@ namespace KalshiBotAPI.Websockets
             }
 
             // Initialize configuration values
-            _maxRetryAttempts = _kalshiConfig.WebSocketMaxRetryAttempts;
-            _retryDelays = _kalshiConfig.WebSocketRetryDelays ?? new int[] { 1000, 2000, 4000, 8000, 16000 };
-            _bufferSize = _kalshiConfig.WebSocketBufferSize;
-            _resetDelayMs = _kalshiConfig.WebSocketResetDelayMs;
-            _semaphoreTimeoutMs = _kalshiConfig.WebSocketSemaphoreTimeoutMs;
-            _signatureCacheDuration = TimeSpan.FromMinutes(_kalshiConfig.WebSocketSignatureCacheDurationMinutes);
+            _maxRetryAttempts = _websocketConfig.MaxRetryAttempts;
+            _retryDelays = _websocketConfig.RetryDelays ?? new int[] { 1000, 2000, 4000, 8000, 16000 };
+            _bufferSize = _websocketConfig.BufferSize;
+            _resetDelayMs = _websocketConfig.ResetDelayMs;
+            _semaphoreTimeoutMs = _websocketConfig.SemaphoreTimeoutMs;
+            _signatureCacheDuration = TimeSpan.FromMinutes(_websocketConfig.SignatureCacheDurationMinutes);
 
             // Initialize metrics configuration (defaults to true if not specified)
-            EnableMetrics = _kalshiConfig.WebSocketEnableMetrics ?? true;
+            EnableMetrics = _websocketConfig.EnablePerformanceMetrics ?? true;
 
             // Notify performance monitor of initial metrics status
             _performanceMonitor?.UpdateWebSocketMetricsRecordingStatus(EnableMetrics);

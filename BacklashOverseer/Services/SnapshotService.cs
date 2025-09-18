@@ -41,7 +41,7 @@ namespace BacklashOverseer.Services
             _context = context;
             _performanceMetrics = performanceMetrics;
             _logger = logger;
-            EnableSnapshotAggregationMetrics = configuration.GetValue<bool>("Performance:SnapshotAggregation:EnableMetrics", true);
+            EnableSnapshotAggregationMetrics = configuration.GetValue<bool>("PerformanceMetricsService:EnablePerformanceMetricsServiceMetrics", true);
         }
 
         /// <summary>

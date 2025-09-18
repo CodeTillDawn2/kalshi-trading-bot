@@ -52,7 +52,7 @@ namespace KalshiBotTasks
         /// - Registers the database context with SQL Server connection
         /// - Adds logging services for test output
         /// - Registers the SchemaDeploymentObj service for testing
-        /// - Configures SnapshotConfig from configuration section
+        /// - Configures GeneralExecutionConfig from configuration section
         /// - Creates the service provider and initializes database context
         /// - Ensures the database schema is created and accessible
         ///
@@ -93,16 +93,16 @@ namespace KalshiBotTasks
                 options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
             serviceCollection.AddLogging(logging => logging.AddConsole());
             serviceCollection.AddScoped<SchemaDeploymentObj>();
-            serviceCollection.Configure<SnapshotConfig>(_configuration.GetSection("Snapshots"));
-            serviceCollection.AddSingleton(resolver => resolver.GetRequiredService<IOptions<SnapshotConfig>>().Value);
+            serviceCollection.Configure<GeneralExecutionConfig>(_configuration.GetSection("Central:GeneralExecution"));
+            serviceCollection.AddSingleton(resolver => resolver.GetRequiredService<IOptions<GeneralExecutionConfig>>().Value);
 
             IServiceProvider _serviceProvider = serviceCollection.BuildServiceProvider();
 
             // Initialize context and schema deployment
             _context = _serviceProvider.GetRequiredService<BacklashBotContext>();
             var logger = _serviceProvider.GetRequiredService<ILogger<SchemaDeployment>>();
-            var snapshotConfig = _serviceProvider.GetRequiredService<SnapshotConfig>();
-            _schemaDeployment = new SchemaDeploymentObj(_context, logger, snapshotConfig, _configuration);
+            var generalExecutionConfig = _serviceProvider.GetRequiredService<GeneralExecutionConfig>();
+            _schemaDeployment = new SchemaDeploymentObj(_context, logger, generalExecutionConfig, _configuration);
 
             // Ensure database is accessible
             _context.Database.EnsureCreated();
@@ -182,7 +182,7 @@ namespace KalshiBotTasks
         {
             private readonly BacklashBotContext _context;
             private readonly ILogger<SchemaDeployment> _logger;
-            private readonly SnapshotConfig _snapshotConfig;
+            private readonly GeneralExecutionConfig _generalExecutionConfig;
             private readonly IConfigurationRoot _configuration;
 
             /// <summary>
@@ -190,18 +190,18 @@ namespace KalshiBotTasks
             /// </summary>
             /// <param name="context">Database context for schema persistence operations.</param>
             /// <param name="logger">Logger for recording deployment operations and errors.</param>
-            /// <param name="snapshotConfig">Configuration settings for snapshot operations.</param>
+            /// <param name="generalExecutionConfig">Configuration settings for general execution operations.</param>
             /// <param name="configuration">Application configuration root for accessing settings.</param>
             /// <exception cref="ArgumentNullException">Thrown when any required parameter is null.</exception>
             /// <remarks>
             /// The constructor validates all dependencies to ensure the service is properly initialized.
             /// This prevents runtime errors during schema deployment operations.
             /// </remarks>
-            public SchemaDeploymentObj(BacklashBotContext context, ILogger<SchemaDeployment> logger, SnapshotConfig snapshotConfig, IConfigurationRoot configuration)
+            public SchemaDeploymentObj(KalshiBotContext context, ILogger<SchemaDeployment> logger, GeneralExecutionConfig generalExecutionConfig, IConfigurationRoot configuration)
             {
                 _context = context ?? throw new ArgumentNullException(nameof(context));
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-                _snapshotConfig = snapshotConfig ?? throw new ArgumentNullException(nameof(snapshotConfig));
+                _generalExecutionConfig = generalExecutionConfig ?? throw new ArgumentNullException(nameof(generalExecutionConfig));
                 _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             }
 
@@ -269,7 +269,7 @@ namespace KalshiBotTasks
 
             /// <summary>
             /// Updates the appsettings.local.json configuration file with the new snapshot schema version.
-            /// Navigates the JSON structure to update the Snapshots:SnapshotSchemaVersion setting.
+            /// Navigates the JSON structure to update the Central:GeneralExecution:SnapshotSchemaVersion setting.
             /// </summary>
             /// <param name="newVersion">The new schema version number to write to the configuration file.</param>
             /// <remarks>
@@ -316,16 +316,23 @@ namespace KalshiBotTasks
                         return;
                     }
 
-                    // Navigate to Snapshots:SnapshotSchemaVersion
-                    var snapshotsNode = jsonNode["Snapshots"] as JsonObject;
-                    if (snapshotsNode == null)
+                    // Navigate to Central:GeneralExecution:SnapshotSchemaVersion
+                    var centralNode = jsonNode["Central"] as JsonObject;
+                    if (centralNode == null)
                     {
-                        snapshotsNode = new JsonObject();
-                        jsonNode["Snapshots"] = snapshotsNode;
+                        centralNode = new JsonObject();
+                        jsonNode["Central"] = centralNode;
+                    }
+
+                    var generalExecutionNode = centralNode["GeneralExecution"] as JsonObject;
+                    if (generalExecutionNode == null)
+                    {
+                        generalExecutionNode = new JsonObject();
+                        centralNode["GeneralExecution"] = generalExecutionNode;
                     }
 
                     // Update SnapshotSchemaVersion
-                    snapshotsNode["SnapshotSchemaVersion"] = newVersion;
+                    generalExecutionNode["SnapshotSchemaVersion"] = newVersion;
 
                     // Read configured JSON serialization options
                     var writeIndented = _configuration.GetValue<bool>("Deployment:JsonWriteIndented", true);

@@ -48,10 +48,14 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         public SimulationEngine(IConfiguration configuration, PerformanceMonitor? performanceMonitor = null, bool enablePatternImageGeneration = true)
         {
-            var tradingConfig = new TradingConfig();
-            configuration.GetSection("TradingConfig").Bind(tradingConfig);
-            _marketTypeService = new MarketTypeService(tradingConfig);
-            StrategySelectionHelper.SetConfiguration(tradingConfig);
+            var marketTypeServiceConfig = new Configuration.MarketTypeServiceConfig();
+            configuration.GetSection("MarketTypeService").Bind(marketTypeServiceConfig);
+            _marketTypeService = new MarketTypeService(marketTypeServiceConfig);
+
+            var strategySelectionHelperConfig = new Configuration.StrategySelectionHelperConfig();
+            configuration.GetSection("StrategySelectionHelper").Bind(strategySelectionHelperConfig);
+            StrategySelectionHelper.SetConfiguration(strategySelectionHelperConfig);
+
             _patternDetectionService = new PatternDetectionService(configuration, performanceMonitor);
             _patternDetectionService.EnablePatternImageGeneration = enablePatternImageGeneration;
             _performanceMonitor = performanceMonitor;
@@ -132,7 +136,6 @@ namespace TradingStrategies.Trading.Overseer
             var activePaths = new List<SimulationPath> { initialPath };
 
             MarketSnapshot prevSnapshot = null;
-            double maxRisk = 10.0;
 
             foreach (var snapshot in snapshots)
             {
@@ -164,7 +167,7 @@ namespace TradingStrategies.Trading.Overseer
                     foreach (var kvp in actionGroups)
                     {
                         var newPath = ProcessStrategyActionGroup(path, kvp.Key, kvp.Value, effectiveSnapshot, prevSnapshot,
-                            currentMarketConditions, book, maxRisk, isSingleStrategy);
+                            currentMarketConditions, book, isSingleStrategy);
                         if (newPath != null)
                         {
                             newPaths.Add(newPath);
@@ -399,7 +402,7 @@ namespace TradingStrategies.Trading.Overseer
                 actionEvents = new List<SimulationEventLog>(path.Events);
             }
 
-            path.CurrentRisk = path.CurrentRisk;
+            // No risk management needed
 
             var (restingYes, restingNo) = SummarizeRestingOrders(actionResting);
 
@@ -452,8 +455,7 @@ namespace TradingStrategies.Trading.Overseer
                 {
                     Events = actionEvents,
                     SimulatedBook = actionBook,
-                    SimulatedRestingOrders = actionResting,
-                    CurrentRisk = path.CurrentRisk
+                    SimulatedRestingOrders = actionResting
                 };
             }
         }
@@ -514,7 +516,7 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         private SimulationPath ProcessStrategyActionGroup(SimulationPath path, ActionType action, List<(Strategy strategy, ActionDecision decision)> strategiesWithDecisions,
        MarketSnapshot effectiveSnapshot, MarketSnapshot? previousEffectiveSnapshot,
-       MarketType currentMarketConditions, SimulatedOrderbook book, double maxRisk, bool isSingleStrategy)
+       MarketType currentMarketConditions, SimulatedOrderbook book, bool isSingleStrategy)
         {
             var decision = strategiesWithDecisions.First().decision;
 
@@ -547,20 +549,19 @@ namespace TradingStrategies.Trading.Overseer
 
             int newPosition = path.Position;
             double newCash = path.Cash;
-            double newRisk = path.CurrentRisk;
 
             bool needsFlip = (action == ActionType.Long && path.Position < 0) || (action == ActionType.Short && path.Position > 0);
             bool skipAdd = false;
             if (needsFlip)
             {
                 skipAdd = ExecuteSpecificTradingAction(ActionType.Exit, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)),
-                    effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk, path.Position);
+                    effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, path, effectiveSnapshot.Timestamp, path.Position);
                 if (skipAdd || newPosition == path.Position) return null;
             }
             else
             {
                 skipAdd = ExecuteSpecificTradingAction(action, new HashSet<Strategy>(strategiesWithDecisions.Select(t => t.strategy)),
-                    effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, effectiveSnapshot.Timestamp, maxRisk, path.Position);
+                    effectiveSnapshot, previousEffectiveSnapshot, actionBook, actionResting, ref newPosition, ref newCash, path, effectiveSnapshot.Timestamp, path.Position);
                 if (skipAdd) return null;
             }
 
@@ -602,7 +603,6 @@ namespace TradingStrategies.Trading.Overseer
             {
                 path.Position = newPosition;
                 path.Cash = newCash;
-                path.CurrentRisk = newRisk;
                 return path;
             }
             else
@@ -613,7 +613,6 @@ namespace TradingStrategies.Trading.Overseer
                     SimulatedBook = actionBook,
                     SimulatedRestingOrders = actionResting
                 };
-                newPath.CurrentRisk = newRisk;
                 return newPath;
             }
         }
@@ -655,10 +654,8 @@ namespace TradingStrategies.Trading.Overseer
      List<(string action, string side, string type, int count, int price, DateTime? expiration)> actionResting,
      ref int newPosition,
      ref double newCash,
-     ref double newRisk,
      SimulationPath path,
      DateTime timestamp,
-     double maxRisk,
      int simulationPosition)
         {
             // Combo actions: execute market take first, then replace resting with 100% of current position
@@ -666,7 +663,7 @@ namespace TradingStrategies.Trading.Overseer
             {
                 var takeAction = (action == ActionType.LongPostAsk) ? ActionType.Long : ActionType.Short;
                 ExecuteSpecificTradingAction(takeAction, strategiesForAction, effectiveSnapshot, previousEffectiveSnapshot,
-                    actionBook, actionResting, ref newPosition, ref newCash, ref newRisk, path, timestamp, maxRisk, simulationPosition);
+                    actionBook, actionResting, ref newPosition, ref newCash, path, timestamp, simulationPosition);
 
                 int desiredQty = Math.Abs(newPosition);
                 if (desiredQty <= 0) return false;
@@ -727,7 +724,6 @@ namespace TradingStrategies.Trading.Overseer
                 bool isPaying = action != ActionType.Exit;
                 double LevelPriceFunc(int price) => isPaying ? (100 - price) / 100.0 : price / 100.0;
 
-                double remainingRisk = maxRisk - newRisk;
                 double remainingCash = newCash;
 
                 for (int p = 99; p >= 1; p--)
@@ -736,9 +732,8 @@ namespace TradingStrategies.Trading.Overseer
                     if (bookToReduce[p] == null || bookToReduce[p].Count == 0) continue;
                     int depth = bookToReduce[p].Sum(o => o.count);
                     double levelPrice = LevelPriceFunc(p);
-                    int maxFillByRisk = isPaying ? (int)Math.Floor(remainingRisk / levelPrice) : depth;
                     int maxFillByCash = isPaying ? (int)Math.Floor(remainingCash / levelPrice) : depth;
-                    int maxFill = Math.Min(depth, Math.Min(maxFillByRisk, maxFillByCash));
+                    int maxFill = Math.Min(depth, maxFillByCash);
                     int fill = Math.Min(remainingQty, maxFill);
 
                     totalCost += fill * levelPrice;
@@ -747,7 +742,6 @@ namespace TradingStrategies.Trading.Overseer
 
                     if (isPaying)
                     {
-                        remainingRisk -= fill * levelPrice;
                         remainingCash -= fill * levelPrice;
                         if (shortSide)
                             path.TotalReceived += fill * levelPrice;
@@ -764,8 +758,6 @@ namespace TradingStrategies.Trading.Overseer
                 }
 
                 int filled = qty - remainingQty;
-
-                if (action != ActionType.Exit) newRisk += totalCost; else newRisk = 0;
 
                 if (isPaying) newCash -= totalCost; else newCash += totalCost;
 

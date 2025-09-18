@@ -1,4 +1,5 @@
 using BacklashOverseer.Models;
+using BacklashOverseer.Config;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -12,51 +13,6 @@ using BacklashBotData.Data.Interfaces;
 
 namespace BacklashOverseer.Services
 {
-    /// <summary>
-    /// Configuration options for the BrainPersistenceService.
-    /// </summary>
-    public class BrainPersistenceServiceConfig
-    {
-        /// <summary>
-        /// Gets or sets the maximum number of entries to keep in metric history lists.
-        /// Default is 50.
-        /// </summary>
-        public int MaxHistoryEntries { get; set; } = 50;
-
-        /// <summary>
-        /// Gets or sets the mapping of metric names to their string identifiers.
-        /// </summary>
-        public Dictionary<string, string> MetricNames { get; set; } = new()
-        {
-            ["CpuUsage"] = "CpuUsage",
-            ["EventQueue"] = "EventQueue",
-            ["TickerQueue"] = "TickerQueue",
-            ["NotificationQueue"] = "NotificationQueue",
-            ["OrderbookQueue"] = "OrderbookQueue",
-            ["MarketCount"] = "MarketCount",
-            ["Error"] = "Error"
-        };
-
-        /// <summary>
-        /// Gets or sets whether to enable performance metrics collection.
-        /// </summary>
-        public bool EnablePerformanceMetrics { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets whether to enable data persistence to database.
-        /// </summary>
-        public bool EnablePersistence { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets whether to enable BrainPersistenceService performance metrics collection.
-        /// </summary>
-        public bool EnableBrainPersistenceServicePerformanceMetrics { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets the interval in minutes for saving data to persistence store.
-        /// </summary>
-        public int PersistenceSaveIntervalMinutes { get; set; } = 5;
-    }
 
     /// <summary>
     /// Service responsible for managing brain instance states with configurable persistence options.
@@ -275,7 +231,7 @@ namespace BacklashOverseer.Services
                 if (history.Count > _config.MaxHistoryEntries)
                 {
                     history.RemoveRange(0, history.Count - _config.MaxHistoryEntries);
-                    if (_config.EnableBrainPersistenceServicePerformanceMetrics)
+                    if (_config.EnablePerformanceMetrics)
                     {
                         lock (_metricsLock)
                         {
@@ -337,7 +293,7 @@ namespace BacklashOverseer.Services
         /// <param name="elapsedMilliseconds">The time taken for the operation in milliseconds.</param>
         private void RecordOperationMetrics(string operationName, long elapsedMilliseconds)
         {
-            if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
+            if (!_config.EnablePerformanceMetrics)
                 return;
 
             var lockStart = Stopwatch.GetTimestamp();
@@ -391,7 +347,7 @@ namespace BacklashOverseer.Services
                     if (history.Count > _config.MaxHistoryEntries)
                     {
                         history.RemoveRange(0, history.Count - _config.MaxHistoryEntries);
-                        if (_config.EnableBrainPersistenceServicePerformanceMetrics)
+                        if (_config.EnablePerformanceMetrics)
                         {
                             lock (_metricsLock)
                             {
@@ -594,7 +550,7 @@ namespace BacklashOverseer.Services
         /// </summary>
         public IReadOnlyDictionary<string, (long AverageMs, long P50Ms, long P95Ms, long P99Ms)> GetOperationStats()
         {
-            if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
+            if (!_config.EnablePerformanceMetrics)
                 return new Dictionary<string, (long, long, long, long)>();
 
             var result = new Dictionary<string, (long, long, long, long)>();
@@ -619,7 +575,7 @@ namespace BacklashOverseer.Services
         /// <summary>
         /// Gets the count of history trimmings per metric type.
         /// </summary>
-        public IReadOnlyDictionary<string, int> TrimmingCounts => _config.EnableBrainPersistenceServicePerformanceMetrics ? _trimmingCounts : new Dictionary<string, int>();
+        public IReadOnlyDictionary<string, int> TrimmingCounts => _config.EnablePerformanceMetrics ? _trimmingCounts : new Dictionary<string, int>();
 
         /// <summary>
         /// Gets lock contention metrics.
@@ -628,7 +584,7 @@ namespace BacklashOverseer.Services
         {
             get
             {
-                if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
+                if (!_config.EnablePerformanceMetrics)
                     return (0, 0);
 
                 lock (_metricsLock)
@@ -643,7 +599,7 @@ namespace BacklashOverseer.Services
         /// </summary>
         public long GetMemoryUsageForBrain(string brainInstanceName)
         {
-            if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
+            if (!_config.EnablePerformanceMetrics)
                 return 0;
 
             if (!_brains.TryGetValue(brainInstanceName, out var brain))
@@ -675,7 +631,7 @@ namespace BacklashOverseer.Services
         /// </summary>
         private void TransmitMetrics()
         {
-            if (_performanceMetricsService == null || !_config.EnableBrainPersistenceServicePerformanceMetrics)
+            if (_performanceMetricsService == null || !_config.EnablePerformanceMetrics)
                 return;
 
             var operationStats = GetOperationStats();
@@ -708,20 +664,14 @@ namespace BacklashOverseer.Services
 
         /// <summary>
         /// Retrieves the appropriate metric history list for a given brain and metric name.
-        /// This method maps configurable metric names to their corresponding history collections.
-        /// Supports custom metric name mappings through configuration for flexibility.
+        /// This method maps metric names directly to their corresponding history collections.
         /// </summary>
         /// <param name="brain">The BrainPersistence object containing the history lists.</param>
-        /// <param name="metricName">The name of the metric to retrieve history for (supports configured aliases).</param>
+        /// <param name="metricName">The name of the metric to retrieve history for.</param>
         /// <returns>The list of MetricHistory entries for the specified metric.</returns>
         /// <exception cref="ArgumentException">Thrown when an unknown metric name is provided.</exception>
         private List<Models.MetricHistory> GetMetricHistoryList(BrainPersistence brain, string metricName)
         {
-            if (_config.MetricNames.TryGetValue(metricName, out var configuredName))
-            {
-                metricName = configuredName;
-            }
-
             return metricName switch
             {
                 "CpuUsage" => brain.CpuUsageHistory,

@@ -47,8 +47,7 @@ namespace BacklashBot.Services
         private readonly IBrainStatusService _brainStatus;
         private readonly ILogger<IMarketDataService> _logger;
         private readonly Func<MarketDTO, MarketData> _marketDataFactory;
-        private readonly ExecutionConfig _executionConfig;
-        private readonly SnapshotConfig _snapshotConfig;
+        private readonly IConfiguration _configuration;
         private readonly CalculationConfig _calculationConfig;
         private readonly LoggingConfig _loggingConfig;
         private readonly MarketDataConfig _marketDataConfig;
@@ -73,11 +72,8 @@ namespace BacklashBot.Services
             ILogger<IMarketDataService> logger,
             IConfiguration config,
             IServiceScopeFactory scopeFactory,
-            IOptions<ExecutionConfig> executionConfig,
-            IOptions<SnapshotConfig> snapshotConfig,
             IOptions<LoggingConfig> loggingConfig,
             Func<MarketDTO, MarketData> marketDataFactory,
-            IOptions<CalculationConfig> calculationConfig,
             IOptions<MarketDataConfig> marketDataConfigOptions,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTracker,
@@ -88,10 +84,8 @@ namespace BacklashBot.Services
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _scopeFactory = scopeFactory;
-            _executionConfig = executionConfig.Value;
-            _snapshotConfig = snapshotConfig.Value;
+            _configuration = config;
             _loggingConfig = loggingConfig.Value;
-            _calculationConfig = calculationConfig.Value;
             _marketDataConfig = marketDataConfigOptions?.Value ?? new MarketDataConfig();
             _marketDataFactory = marketDataFactory;
             _statusTracker = statusTracker;
@@ -810,10 +804,10 @@ namespace BacklashBot.Services
                     marketData.AllSupportResistanceLevels = _serviceFactory.GetTradingCalculator().CalculateHistoricalSupportResistance(
                         marketTicker,
                         marketData.Candlesticks["minute"],
-                        minCandlestickPercentage: _calculationConfig.ResistanceLevels_MinCandlestickPercentage,
-                        maxLevels: _calculationConfig.ResistanceLevels_MaxLevels,
-                        sigma: _calculationConfig.ResistanceLevels_Sigma,
-                        minDistance: _calculationConfig.ResistanceLevels_MinDistance);
+                        minCandlestickPercentage: _configuration.GetValue<double>("CalculationConfig:ResistanceLevels_MinCandlestickPercentage", 0.1),
+                        maxLevels: _configuration.GetValue<int>("CalculationConfig:ResistanceLevels_MaxLevels", 6),
+                        sigma: _configuration.GetValue<double>("CalculationConfig:ResistanceLevels_Sigma", 2.0),
+                        minDistance: _configuration.GetValue<int>("CalculationConfig:ResistanceLevels_MinDistance", 3));
                 }
 
                 NotifyMarketDataUpdated(marketTicker);

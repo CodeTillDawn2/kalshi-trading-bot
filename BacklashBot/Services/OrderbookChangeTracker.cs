@@ -31,7 +31,7 @@ namespace BacklashBot.Services
         private readonly ILogger<IOrderbookChangeTracker> _logger;
         private readonly string _marketTicker;
         private readonly IDataCache _cache;
-        private readonly IOptions<TradingConfig> _config;
+        private readonly IOptions<OrderbookChangeTrackerConfig> _trackerConfig;
         private CancellationToken _cancellationToken => _statusTrackerService.GetCancellationToken();
 
 
@@ -91,7 +91,7 @@ namespace BacklashBot.Services
                     return false;
                 }
                 TimeSpan elapsedSinceOpen = DateTime.UtcNow - LastMarketOpenTime;
-                return elapsedSinceOpen >= _config.Value.ChangeWindowDuration;
+                return elapsedSinceOpen >= TimeSpan.FromMinutes(5);
             }
         }
 
@@ -100,21 +100,21 @@ namespace BacklashBot.Services
         /// This determines how far back in time to consider orderbook changes and trades.
         /// </summary>
         /// <value>The change window duration from configuration</value>
-        public TimeSpan ChangeWindowDuration => _config.Value.ChangeWindowDuration;
+        public TimeSpan ChangeWindowDuration => TimeSpan.FromMinutes(5);
 
         /// <summary>
         /// Gets the time window used for matching trades to orderbook changes.
         /// This determines how far back and forward to look when correlating trades with orderbook activity.
         /// </summary>
         /// <value>The trade matching window duration from configuration</value>
-        public TimeSpan TradeMatchingWindow => _config.Value.TradeMatchingWindow;
+        public TimeSpan TradeMatchingWindow => TimeSpan.FromSeconds(5);
 
         /// <summary>
         /// Gets the time window used for detecting orderbook change cancellations.
         /// This determines how far back to look when checking if opposing orderbook changes cancel each other out.
         /// </summary>
         /// <value>The orderbook cancel window duration from configuration</value>
-        public TimeSpan OrderbookCancelWindow => _config.Value.OrderbookCancelWindow;
+        public TimeSpan OrderbookCancelWindow => TimeSpan.FromSeconds(10);
         #endregion
 
         #region Constructor and Initialization
@@ -149,16 +149,16 @@ namespace BacklashBot.Services
         /// <param name="marketTicker">The ticker symbol of the market to track</param>
         /// <param name="logger">Logger instance for recording operations and errors</param>
         /// <param name="cache">Shared data cache containing market data and system state</param>
-        /// <param name="config">Trading configuration containing time windows and thresholds</param>
+        /// <param name="trackerConfig">Orderbook change tracker configuration containing time windows and thresholds</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking system status and cancellation tokens</param>
         /// <param name="centralPerformanceMonitor">Central performance monitor for recording metrics</param>
-        /// <exception cref="ArgumentNullException">Thrown when marketTicker, logger, config, or statusTrackerService is null</exception>
+        /// <exception cref="ArgumentNullException">Thrown when marketTicker, logger, trackerConfig, or statusTrackerService is null</exception>
         public OrderbookChangeTracker(
             string marketTicker,
             ILogger<IOrderbookChangeTracker> logger,
             IDataCache cache,
-            IOptions<TradingConfig> config,
+            IOptions<OrderbookChangeTrackerConfig> trackerConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             ICentralPerformanceMonitor centralPerformanceMonitor)
@@ -167,11 +167,11 @@ namespace BacklashBot.Services
             _scopeManagerService = scopeManagerService;
             _cache = cache;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _trackerConfig = trackerConfig ?? throw new ArgumentNullException(nameof(trackerConfig));
             _statusTrackerService = statusTrackerService;
             _centralPerformanceMonitor = centralPerformanceMonitor ?? throw new ArgumentNullException(nameof(centralPerformanceMonitor));
 
-            _enablePerformanceMetrics = _config.Value.OrderbookChangeTracker_EnablePerformanceMetrics;
+            _enablePerformanceMetrics = _trackerConfig.Value.EnablePerformanceMetrics;
 
             _recalculationTimer = new System.Timers.Timer(10000); // 10 seconds
             _recalculationTimer.Elapsed += (sender, e) => OnRecalculationTimerElapsed(sender, e);
@@ -533,7 +533,7 @@ namespace BacklashBot.Services
 
                 lock (_orderbookMatchingLock)
                 {
-                    var expectedRollOffTime = change.Timestamp + _config.Value.ChangeWindowDuration;
+                    var expectedRollOffTime = change.Timestamp + TimeSpan.FromMinutes(5);
                     _logger.LogDebug(
                         "Received orderbook change for {MarketTicker}: ChangeID={ChangeID}, Side={Side}, Price={Price}, DeltaContracts={DeltaContracts}, Timestamp={Timestamp:F1}, ExpectedRollOffTime={ExpectedRollOffTime}",
                         _marketTicker, change.Id, change.Side, change.Price, change.DeltaContracts, change.Timestamp, expectedRollOffTime);
@@ -630,7 +630,7 @@ namespace BacklashBot.Services
                 Timestamp = timestamp
             };
 
-            var expectedRollOffTime = trade.Timestamp + _config.Value.ChangeWindowDuration;
+            var expectedRollOffTime = trade.Timestamp + TimeSpan.FromMinutes(5);
 
             _logger.LogDebug(
                 "Received trade for {MarketTicker}: TradeID={TradeID}, TakerSide={TakerSide}, YesPrice={YesPrice}, NoPrice={NoPrice}, Count={Count}, Timestamp={Timestamp}, ExpectedRollOffTime={ExpectedRollOffTime}",
@@ -684,8 +684,8 @@ namespace BacklashBot.Services
                     return trade.HasMatchingOrderbookChange;
                 }
 
-                var cutoff = trade.Timestamp - _config.Value.TradeMatchingWindow;
-                var futureCutoff = trade.Timestamp + _config.Value.TradeMatchingWindow;
+                var cutoff = trade.Timestamp - TimeSpan.FromSeconds(5);
+                var futureCutoff = trade.Timestamp + TimeSpan.FromSeconds(5);
                 string expectedOrderBookSide = trade.TakerSide == "yes" ? "no" : "yes";
                 int tradePriceToMatch = trade.TakerSide == "yes" ? trade.NoPrice : trade.YesPrice;
                 OrderbookChange? bestMatch = null;
@@ -768,7 +768,7 @@ namespace BacklashBot.Services
                 if (_cancellationToken.IsCancellationRequested || change.DeltaContracts >= 0)
                     return false;
 
-                var cutoff = change.Timestamp - _config.Value.TradeMatchingWindow;
+                var cutoff = change.Timestamp - TimeSpan.FromSeconds(5);
                 foreach (var trade in _tradeEvents)
                 {
                     if (trade.HasMatchingOrderbookChange)
@@ -810,7 +810,7 @@ namespace BacklashBot.Services
                 return;
             }
 
-            var cutoff = newChange.Timestamp - _config.Value.OrderbookCancelWindow;
+            var cutoff = newChange.Timestamp - TimeSpan.FromSeconds(10);
             lock (_orderbookMatchingLock)
             {
                 foreach (var existingChange in _orderbookChanges)
@@ -1013,7 +1013,7 @@ namespace BacklashBot.Services
                 return;
             }
             List<OrderbookData> bids = new List<OrderbookData>(Market.GetBids());
-            _logger.LogDebug("RecalculateMetrics for {MarketTicker}: ChangeWindowDuration.TotalMinutes={ChangeWindowDuration.TotalMinutes}", _marketTicker, ChangeWindowDuration.TotalMinutes);
+            _logger.LogDebug("RecalculateMetrics for {MarketTicker}: 5.0={5.0}", _marketTicker, 5.0);
 
             double velocitySumYes = validYesChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
             double orderVolumeYesBid = validYesChanges.Where(c => !c.IsTradeRelated).Sum(c => c.Price / 100.0 * c.DeltaContracts);
@@ -1219,18 +1219,9 @@ namespace BacklashBot.Services
                 return;
             }
 
-            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_config.Value.OrderbookChangeCleanupThresholdMinutes);
+            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.CleanupThresholdMinutes);
             int removedCount = 0;
             int queueSizeBefore = _orderbookChanges.Count;
-
-            // First, enforce queue size limits by removing oldest events if queue is too large
-            while (_orderbookChanges.Count > _config.Value.MaxOrderbookChangeQueueSize && _orderbookChanges.TryDequeue(out var oldChange))
-            {
-                removedCount++;
-                _logger.LogDebug(
-                    "Orderbook change removed due to queue size limit for {MarketTicker}: ChangeID={ChangeID}, Side={Side}, Price={Price}, DeltaContracts={DeltaContracts}, Timestamp={Timestamp}",
-                    _marketTicker, oldChange.Id, oldChange.Side, oldChange.Price, oldChange.DeltaContracts, oldChange.Timestamp);
-            }
 
             // Then, remove events older than the cleanup threshold
             while (_orderbookChanges.TryPeek(out var change) && change.Timestamp < cutoff)
@@ -1333,22 +1324,13 @@ namespace BacklashBot.Services
                 return;
             }
 
-            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_config.Value.TradeEventCleanupThresholdMinutes);
-            var gracePeriodEnd = LastMarketOpenTime.Add(_config.Value.ChangeWindowDuration);
+            var cutoff = DateTime.UtcNow - TimeSpan.FromMinutes(_trackerConfig.Value.CleanupThresholdMinutes);
+            var gracePeriodEnd = LastMarketOpenTime.Add(TimeSpan.FromMinutes(5));
             int removedCount = 0;
             int warningCount = 0;
             int queueSizeBefore = _tradeEvents.Count;
 
-            // First, enforce queue size limits by removing oldest trades if queue is too large
-            while (_tradeEvents.Count > _config.Value.MaxTradeEventQueueSize && _tradeEvents.TryDequeue(out var oldTrade))
-            {
-                removedCount++;
-                _logger.LogDebug(
-                    "Trade event removed due to queue size limit for {MarketTicker}: TradeID={TradeID}, TakerSide={TakerSide}, Count={Count}, Timestamp={Timestamp}",
-                    _marketTicker, oldTrade.Id, oldTrade.TakerSide, oldTrade.Count, oldTrade.Timestamp);
-            }
-
-            // Then, remove trades older than the cleanup threshold
+            // remove trades older than the cleanup threshold
             while (_tradeEvents.TryPeek(out var trade) && trade.Timestamp < cutoff)
             {
                 if (_cancellationToken.IsCancellationRequested)
@@ -1384,7 +1366,7 @@ namespace BacklashBot.Services
                                 "TRADEMON-Trade cleared from queue without matching orderbook change for {marketTicker}", _marketTicker);
                             _logger.LogWarning(
                                 "TRADEMON-Grace period status for {MarketTicker}: IsGracePeriodOver={IsGracePeriodOver}, GracePeriodStart={GracePeriodStart}, GracePeriodEnd={GracePeriodEnd}, GracePeriodDuration={GracePeriodDuration}, CurrentTime={CurrentTime}",
-                                _marketTicker, isGracePeriodOver, LastMarketOpenTime, gracePeriodEnd, _config.Value.ChangeWindowDuration, DateTime.UtcNow);
+                                _marketTicker, isGracePeriodOver, LastMarketOpenTime, gracePeriodEnd, TimeSpan.FromMinutes(5), DateTime.UtcNow);
                         }
                     }
                     MetricsNeedRecalculation = true;
@@ -1403,8 +1385,8 @@ namespace BacklashBot.Services
         {
             lock (_orderbookMatchingLock)
             {
-                var cutoff = trade.Timestamp - _config.Value.TradeMatchingWindow;
-                var futureCutoff = trade.Timestamp + _config.Value.TradeMatchingWindow;
+                var cutoff = trade.Timestamp - TimeSpan.FromSeconds(5);
+                var futureCutoff = trade.Timestamp + TimeSpan.FromSeconds(5);
                 string expectedOrderBookSide = trade.TakerSide == "yes" ? "no" : "yes";
                 int tradePriceToMatch = trade.TakerSide == "yes" ? trade.NoPrice : trade.YesPrice;
 
@@ -1439,7 +1421,7 @@ namespace BacklashBot.Services
         #endregion
 
         #region Velocity and Rate Calculations
-        // Revised GetBottomNoVelocityPerMinute (remove ChangeWindowDuration.TotalMinutes parameter)
+        // Revised GetBottomNoVelocityPerMinute (remove 5.0 parameter)
         public (double Volume, int Levels) GetBottomNoVelocityPerMinute(List<OrderbookData> noBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1468,7 +1450,7 @@ namespace BacklashBot.Services
 
             var bottomChanges = validChanges.Where(c => c.Price < threshold).ToList();
             _logger.LogDebug("Calculating VelocityPerMinute_Bottom_No_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, NoBidsCount={NoBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
-                _marketTicker, threshold, levels, bottomChanges.Count, noBids.Count, ChangeWindowDuration.TotalMinutes);
+                _marketTicker, threshold, levels, bottomChanges.Count, noBids.Count, 5.0);
 
             foreach (var change in bottomChanges)
             {
@@ -1480,9 +1462,9 @@ namespace BacklashBot.Services
             if (bottomChanges.Any())
             {
                 double totalDollarDelta = bottomChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
+                volume = 5.0 > 0 ? totalDollarDelta / 5.0 : 0;
                 _logger.LogDebug("VelocityPerMinute_Bottom_No_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, levels);
+                    _marketTicker, totalDollarDelta, 5.0, volume, levels);
             }
             else
             {
@@ -1512,7 +1494,7 @@ namespace BacklashBot.Services
             return Bids.Where(x => x.Price < upperBound).Count();
         }
 
-        // Revised GetBottomYesVelocityPerMinute (remove ChangeWindowDuration.TotalMinutes parameter)
+        // Revised GetBottomYesVelocityPerMinute (remove 5.0 parameter)
         public (double Volume, int Levels) GetBottomYesVelocityPerMinute(List<OrderbookData> yesBids, List<OrderbookChange> orderbookChanges, int threshold)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -1541,7 +1523,7 @@ namespace BacklashBot.Services
 
             var bottomChanges = validChanges.Where(c => c.Price < threshold).ToList();
             _logger.LogDebug("Calculating VelocityPerMinute_Bottom_Yes_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, YesBidsCount={YesBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
-                _marketTicker, threshold, levels, bottomChanges.Count, yesBids.Count, ChangeWindowDuration.TotalMinutes);
+                _marketTicker, threshold, levels, bottomChanges.Count, yesBids.Count, 5.0);
 
             foreach (var change in bottomChanges)
             {
@@ -1553,9 +1535,9 @@ namespace BacklashBot.Services
             if (bottomChanges.Any())
             {
                 double totalDollarDelta = bottomChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
+                volume = 5.0 > 0 ? totalDollarDelta / 5.0 : 0;
                 _logger.LogDebug("VelocityPerMinute_Bottom_Yes_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, levels);
+                    _marketTicker, totalDollarDelta, 5.0, volume, levels);
             }
             else
             {
@@ -1593,7 +1575,7 @@ namespace BacklashBot.Services
 
             var topChanges = validChanges.Where(c => c.Price >= threshold).ToList();
             _logger.LogDebug("Calculating VelocityPerMinute_Top_No_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, NoBidsCount={NoBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
-                _marketTicker, threshold, levels, topChanges.Count, noBids.Count, ChangeWindowDuration.TotalMinutes);
+                _marketTicker, threshold, levels, topChanges.Count, noBids.Count, 5.0);
 
             foreach (var change in topChanges)
             {
@@ -1605,9 +1587,9 @@ namespace BacklashBot.Services
             if (topChanges.Any())
             {
                 double totalDollarDelta = topChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
+                volume = 5.0 > 0 ? totalDollarDelta / 5.0 : 0;
                 _logger.LogDebug("VelocityPerMinute_Top_No_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, levels);
+                    _marketTicker, totalDollarDelta, 5.0, volume, levels);
             }
             else
             {
@@ -1645,7 +1627,7 @@ namespace BacklashBot.Services
 
             var topChanges = validChanges.Where(c => c.Price >= threshold).ToList();
             _logger.LogDebug("Calculating VelocityPerMinute_Top_Yes_Bid for {MarketTicker}, Threshold={Threshold}, Levels={Levels}, Changes={ChangeCount}, YesBidsCount={YesBidsCount}, EffectiveMinutes={EffectiveMinutes:F2}",
-                _marketTicker, threshold, levels, topChanges.Count, yesBids.Count, ChangeWindowDuration.TotalMinutes);
+                _marketTicker, threshold, levels, topChanges.Count, yesBids.Count, 5.0);
 
             foreach (var change in topChanges)
             {
@@ -1657,9 +1639,9 @@ namespace BacklashBot.Services
             if (topChanges.Any())
             {
                 double totalDollarDelta = topChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
+                volume = 5.0 > 0 ? totalDollarDelta / 5.0 : 0;
                 _logger.LogDebug("VelocityPerMinute_Top_Yes_Bid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, EffectiveMinutes={EffectiveMinutes:F2}, Rate={Rate:F2} dollars/minute, Levels={Levels}",
-                    _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, levels);
+                    _marketTicker, totalDollarDelta, 5.0, volume, levels);
             }
             else
             {
@@ -1689,11 +1671,11 @@ namespace BacklashBot.Services
             }
 
             double totalDollarDelta = validChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-            double volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
+            double volume = 5.0 > 0 ? totalDollarDelta / 5.0 : 0;
             volume = Math.Round(volume, 2);
 
             _logger.LogDebug("OrderRatePerMinute_YesBid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, Minutes={Minutes:F2}, Rate={Rate:F2} dollars/minute, Count={Count}",
-                _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, orderCount);
+                _marketTicker, totalDollarDelta, 5.0, volume, orderCount);
             return (volume, orderCount);
         }
 
@@ -1717,11 +1699,11 @@ namespace BacklashBot.Services
             }
 
             double totalDollarDelta = validChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-            double volume = ChangeWindowDuration.TotalMinutes > 0 ? totalDollarDelta / ChangeWindowDuration.TotalMinutes : 0;
+            double volume = 5.0 > 0 ? totalDollarDelta / 5.0 : 0;
             volume = Math.Round(volume, 2);
 
             _logger.LogDebug("OrderRatePerMinute_NoBid for {MarketTicker}: TotalDollarDelta={TotalDollarDelta:F2}, Minutes={Minutes:F2}, Rate={Rate:F2} dollars/minute, Count={Count}",
-                _marketTicker, totalDollarDelta, ChangeWindowDuration.TotalMinutes, volume, orderCount);
+                _marketTicker, totalDollarDelta, 5.0, volume, orderCount);
             return (volume, orderCount);
         }
 
@@ -1743,7 +1725,7 @@ namespace BacklashBot.Services
                 _marketTicker, yesTradeRelatedChanges.Count);
 
             double volume;
-            double rate = ChangeWindowDuration.TotalMinutes > 0 ? yesTradeRelatedChanges.Count / ChangeWindowDuration.TotalMinutes : 0;
+            double rate = 5.0 > 0 ? yesTradeRelatedChanges.Count / 5.0 : 0;
 
             if (!yesTradeRelatedChanges.Any())
             {
@@ -1753,9 +1735,9 @@ namespace BacklashBot.Services
             else
             {
                 double totalTradeDollar = yesTradeRelatedChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalTradeDollar / ChangeWindowDuration.TotalMinutes : 0;
+                volume = 5.0 > 0 ? totalTradeDollar / 5.0 : 0;
                 _logger.LogDebug("tradeVolumePerMinute_Yes for {MarketTicker}: TotalTradeDollar={TotalTradeDollar:F2}, Minutes={Minutes:F2}, Rate={Rate:F2}, Volume={Volume:F2} dollars/minute",
-                    _marketTicker, totalTradeDollar, ChangeWindowDuration.TotalMinutes, rate, volume);
+                    _marketTicker, totalTradeDollar, 5.0, rate, volume);
             }
 
             return (Math.Round(rate, 2), volume);
@@ -1779,7 +1761,7 @@ namespace BacklashBot.Services
                 _marketTicker, noTradeRelatedChanges.Count);
 
             double volume;
-            double rate = ChangeWindowDuration.TotalMinutes > 0 ? noTradeRelatedChanges.Count / ChangeWindowDuration.TotalMinutes : 0;
+            double rate = 5.0 > 0 ? noTradeRelatedChanges.Count / 5.0 : 0;
 
             if (!noTradeRelatedChanges.Any())
             {
@@ -1789,9 +1771,9 @@ namespace BacklashBot.Services
             else
             {
                 double totalTradeDollar = noTradeRelatedChanges.Sum(c => c.Price / 100.0 * c.DeltaContracts);
-                volume = ChangeWindowDuration.TotalMinutes > 0 ? totalTradeDollar / ChangeWindowDuration.TotalMinutes : 0;
+                volume = 5.0 > 0 ? totalTradeDollar / 5.0 : 0;
                 _logger.LogDebug("tradeVolumePerMinute_No for {MarketTicker}: TotalTradeDollar={TotalTradeDollar:F2}, Minutes={Minutes:F2}, Rate={Rate:F2}, Volume={Volume:F2} dollars/minute",
-                    _marketTicker, totalTradeDollar, ChangeWindowDuration.TotalMinutes, rate, volume);
+                    _marketTicker, totalTradeDollar, 5.0, rate, volume);
             }
 
             return (Math.Round(rate, 2), volume);

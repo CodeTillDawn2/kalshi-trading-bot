@@ -1,8 +1,9 @@
 using BacklashBot.Helpers;
 using BacklashDTOs;
 using System.Text;
-using TradingStrategies.Configuration;
+using BacklashBot.State;
 using TradingStrategies.Helpers.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace BacklashBot.Services
 {
@@ -31,10 +32,10 @@ namespace BacklashBot.Services
         /// <param name="logger">The logger instance for recording calculation events and errors.</param>
         /// <param name="config">The CalculationConfig instance containing parameters for technical indicator calculations.</param>
         /// <exception cref="ArgumentNullException">Thrown when logger or config is null.</exception>
-        public TradingCalculator(ILogger<ITradingCalculator> logger, CalculationConfig config)
+        public TradingCalculator(ILogger<ITradingCalculator> logger, IOptions<BacklashBot.State.CalculationConfig> config)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _config = config?.Value ?? throw new ArgumentNullException(nameof(config));
         }
 
         /// <summary>

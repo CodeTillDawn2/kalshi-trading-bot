@@ -43,10 +43,8 @@ namespace BacklashBot.Management
         private readonly ICentralErrorHandler _errorHandler;
         private readonly ICentralPerformanceMonitor _performanceTracker;
         private readonly IBrainStatusService _brainStatus;
-        private readonly SnapshotConfig _snapshotConfig;
-        private readonly ExecutionConfig _executionConfig;
-        private readonly TradingConfig _tradingConfig;
-        private readonly CalculationConfig _calculationConfig;
+        private readonly TradingSnapshotServiceConfig _tradingSnapshotServiceConfig;
+        private readonly GeneralExecutionConfig _generalConfig;
         private readonly CentralBrainConfig _centralBrainConfig;
         private readonly IScopeManagerService _scopeManagerService;
         private readonly IHealthCheckService _healthCheckService;
@@ -82,12 +80,11 @@ namespace BacklashBot.Management
             ILogger<ICentralBrain> logger,
             IServiceFactory serviceFactory,
             IServiceScopeFactory scopeFactory,
-            IOptions<SnapshotConfig> snapshotConfig,
-            IOptions<TradingConfig> tradingConfig,
-            IOptions<ExecutionConfig> executionConfig,
+            IOptions<TradingSnapshotServiceConfig> tradingSnapshotServiceConfig,
+            IOptions<GeneralExecutionConfig> generalExecutionConfig,
+            IOptions<GeneralExecutionConfig> generalConfig,
             ICentralErrorHandler backlashErrorHandler,
             ICentralPerformanceMonitor backlashPerformanceTracker,
-            IOptions<CalculationConfig> calculationConfig,
             IMarketManagerService marketManager,
             IHostApplicationLifetime appLifetime,
             IScopeManagerService scopeManagerService,
@@ -102,20 +99,18 @@ namespace BacklashBot.Management
             _scopeManagerService = scopeManagerService;
             _serviceFactory = serviceFactory;
             _scopeFactory = scopeFactory;
-            _snapshotConfig = snapshotConfig.Value;
+            _tradingSnapshotServiceConfig = tradingSnapshotServiceConfig.Value;
             _marketManager = marketManager;
             _brainStatus = brainStatusService;
             _errorHandler = backlashErrorHandler;
             _performanceTracker = backlashPerformanceTracker;
-            _tradingConfig = tradingConfig.Value;
-            _executionConfig = executionConfig.Value;
-            _calculationConfig = calculationConfig.Value;
+            _generalConfig = generalExecutionConfig.Value;
             _centralBrainConfig = centralBrainConfig.Value;
             _healthCheckService = healthCheckService;
             _statusTrackerService = statusTrackerService;
             _readyStatus = readyStatus;
-            _brainInstance = _executionConfig.BrainInstance;
-            _decisionInterval = TimeSpan.FromSeconds(_tradingConfig.DecisionFrequencySeconds);
+            _brainInstance = _generalConfig.BrainInstance;
+            _decisionInterval = TimeSpan.FromSeconds(_generalConfig.DecisionFrequencySeconds);
             _timerFactory = timerFactory;
 
         }
@@ -155,7 +150,7 @@ namespace BacklashBot.Management
                 _logger.LogInformation("BRAIN: Created SmokehouseBrain instance {InstanceName}", _brainInstance);
                 _logger.LogInformation("BRAIN: {InstanceName} Waking up, Session {1}", _brainInstance, _brainStatus.SessionIdentifier);
                 InitializeBrain();
-                if (!_executionConfig.LaunchDataDashboard)
+                if (!_centralBrainConfig.LaunchDataDashboard)
                 {
                     _logger.LogInformation("BRAIN: LaunchDataDashboard is false, skipping dashboard startup and daily timers.");
                     return;
@@ -942,7 +937,7 @@ namespace BacklashBot.Management
                 _logger.LogDebug("BRAIN: Completed parallel snapshot creation, processed {Count} markets successfully", marketSnapshots.Count);
 
                 cancellationToken.ThrowIfCancellationRequested();
-                allSnapshots = new CacheSnapshot(snapshotDate, _serviceFactory.GetDataCache().SoftwareVersion, _snapshotConfig.SnapshotSchemaVersion,
+                allSnapshots = new CacheSnapshot(snapshotDate, _serviceFactory.GetDataCache().SoftwareVersion, _generalConfig.SnapshotSchemaVersion,
                     _serviceFactory.GetDataCache().AccountBalance, _serviceFactory.GetDataCache().PortfolioValue, _serviceFactory.GetDataCache().LastWebSocketTimestamp, marketSnapshots);
 
 
@@ -1153,8 +1148,8 @@ namespace BacklashBot.Management
                kvp.Value.YesBidCenterOfMass,
                kvp.Value.NoBidCenterOfMass,
                kvp.Value.TolerancePercentage,
-               _snapshotConfig.SnapshotSchemaVersion,
-               totalYesDepth,
+                _generalConfig.SnapshotSchemaVersion,
+                totalYesDepth,
                totalNoDepth,
                kvp.Value.TotalBidVolume_Yes,
                kvp.Value.TotalBidVolume_No,
@@ -1310,7 +1305,7 @@ namespace BacklashBot.Management
             _startTimer?.Dispose();
             _overnightTimer?.Dispose();
 
-            if (_executionConfig.RunOvernightActivities)
+            if (_centralBrainConfig.RunOvernightActivities)
             {
                 _overnightTimer = _timerFactory();
                 _overnightTimer.Interval = overnightTaskDelay.TotalMilliseconds;

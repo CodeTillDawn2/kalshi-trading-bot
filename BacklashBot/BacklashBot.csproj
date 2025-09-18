@@ -93,6 +93,7 @@
     <ProjectReference Include="..\BacklashInterfaces\BacklashInterfaces.csproj" />
     <ProjectReference Include="..\TradingStrategies\TradingStrategies.csproj" />
     <ProjectReference Include="..\BacklashCommon\BacklashCommon.csproj" />
+    <ProjectReference Include="..\OverseerBotShared\OverseerBotShared.csproj" />
   </ItemGroup>
 
 </Project>

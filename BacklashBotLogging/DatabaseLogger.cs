@@ -24,7 +24,7 @@ namespace KalshiBotLogging
         private readonly LogLevel _minConsoleLogLevel;
         private readonly LogLevel _minSqlLogLevel;
         private readonly LoggingConfig? _loggingConfig;
-        private readonly ExecutionConfig? _executionConfig;
+        private readonly GeneralExecutionConfig? _executionConfig;
         private readonly object? _brainStatus; // Simplified to avoid circular dependency
         private readonly string _defaultEnvironment;
         private readonly string _defaultInstance;
@@ -45,7 +45,7 @@ namespace KalshiBotLogging
             DatabaseLoggingQueue loggingQueue,
             LogLevel minLevel,
             LoggingConfig? loggingConfig = null,
-            ExecutionConfig? executionConfig = null,
+            GeneralExecutionConfig? executionConfig = null,
             object? brainStatus = null,
             string defaultEnvironment = "KalshiBot",
             string defaultInstance = "DefaultInstance")
@@ -59,9 +59,14 @@ namespace KalshiBotLogging
             _defaultEnvironment = defaultEnvironment;
             _defaultInstance = defaultInstance;
 
-            // Parse configurable log levels with defaults
-            _minConsoleLogLevel = _loggingConfig != null ? Enum.Parse<LogLevel>(_loggingConfig.ConsoleLogLevel, true) : LogLevel.Debug;
-            _minSqlLogLevel = _loggingConfig != null ? Enum.Parse<LogLevel>(_loggingConfig.SqlDatabaseLogLevel, true) : LogLevel.Information;
+            // Parse configurable log levels - required
+            if (_loggingConfig?.LogLevel?.ConsoleLogLevel == null)
+                throw new InvalidOperationException("ConsoleLogLevel is required in LoggingConfig.LogLevel");
+            if (_loggingConfig?.LogLevel?.SqlDatabaseLogLevel == null)
+                throw new InvalidOperationException("SqlDatabaseLogLevel is required in LoggingConfig.LogLevel");
+
+            _minConsoleLogLevel = Enum.Parse<LogLevel>(_loggingConfig.LogLevel.ConsoleLogLevel, true);
+            _minSqlLogLevel = Enum.Parse<LogLevel>(_loggingConfig.LogLevel.SqlDatabaseLogLevel, true);
         }
 
         /// <summary>

@@ -10,40 +10,12 @@ using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
 using System.Linq;
 using BacklashOverseer.Services;
+using BacklashOverseer.Config;
 using Microsoft.Extensions.Options;
 using BacklashBotData.Data.Interfaces;
 
 namespace BacklashOverseer
 {
-    /// <summary>
-    /// Configuration options for the Overseer system.
-    /// </summary>
-    public class OverseerConfig
-    {
-        /// <summary>
-        /// Gets or sets the interval in minutes for periodic API data fetching.
-        /// Default is 10 minutes.
-        /// </summary>
-        public int ApiFetchIntervalMinutes { get; set; } = 10;
-
-        /// <summary>
-        /// Gets or sets the interval in minutes for periodic system info logging.
-        /// Default is 1 minute.
-        /// </summary>
-        public int SystemInfoLogIntervalMinutes { get; set; } = 1;
-
-        /// <summary>
-        /// Gets or sets the batch size for SignalR broadcast operations.
-        /// Default is 10 to prevent payload size issues.
-        /// </summary>
-        public int SignalRBatchSize { get; set; } = 10;
-
-        /// <summary>
-        /// Gets or sets the batch size for brain persistence logging operations.
-        /// Default is 50 for better performance with large brain sets.
-        /// </summary>
-        public int BrainBatchSize { get; set; } = 50;
-    }
 
     /// <summary>
     /// Central orchestrator for the KalshiBot Overseer system that manages WebSocket connections,
@@ -80,6 +52,7 @@ namespace BacklashOverseer
         private readonly TimeSpan _systemInfoLogInterval; // Configurable logging interval
         private readonly int _signalRBatchSize; // Configurable SignalR broadcast batch size
         private readonly int _brainBatchSize; // Configurable batch size for brain persistence logging
+        private readonly bool _enableOverseerPerformanceMetrics; // Configurable performance metrics enablement
 
         // Performance metrics are now handled by PerformanceMetricsService
 
@@ -109,6 +82,7 @@ namespace BacklashOverseer
             _systemInfoLogInterval = TimeSpan.FromMinutes(_config.SystemInfoLogIntervalMinutes);
             _signalRBatchSize = _config.SignalRBatchSize;
             _brainBatchSize = _config.BrainBatchSize;
+            _enableOverseerPerformanceMetrics = _config.EnableOverseerPerformanceMetrics;
         }
 
         /// <summary>
@@ -123,6 +97,9 @@ namespace BacklashOverseer
 
             // Log comprehensive brain persistence state for debugging and monitoring
             await LogBrainPersistenceStateAsync();
+
+            // Send initial metrics update regardless of performance metrics flag
+            _performanceMetrics.RecordWebSocketEvent(); // Record one event to indicate initialization
 
             // Subscribe to WebSocket events for real-time market data processing
             _webSocketClient.FillReceived += HandleFillEvent;
@@ -169,7 +146,10 @@ namespace BacklashOverseer
                 return;
             }
 
-            _performanceMetrics.RecordWebSocketEvent();
+            if (_enableOverseerPerformanceMetrics)
+            {
+                _performanceMetrics.RecordWebSocketEvent();
+            }
             _logger?.LogInformation("Received Fill event: {EventData}", e);
         }
 
@@ -187,7 +167,10 @@ namespace BacklashOverseer
                 return;
             }
 
-            _performanceMetrics.RecordWebSocketEvent();
+            if (_enableOverseerPerformanceMetrics)
+            {
+                _performanceMetrics.RecordWebSocketEvent();
+            }
             _logger?.LogInformation("Received MarketLifecycle event: {EventData}", e);
         }
 
@@ -205,7 +188,10 @@ namespace BacklashOverseer
                 return;
             }
 
-            _performanceMetrics.RecordWebSocketEvent();
+            if (_enableOverseerPerformanceMetrics)
+            {
+                _performanceMetrics.RecordWebSocketEvent();
+            }
             _logger?.LogInformation("Received EventLifecycle event: {EventData}", e);
 
             // Process check-in data from brain instances
@@ -363,7 +349,10 @@ namespace BacklashOverseer
                     exchangeScheduleResult.ProcessedCount, exchangeScheduleResult.ErrorCount);
 
                 stopwatch.Stop();
-                _performanceMetrics.RecordApiFetch(stopwatch.Elapsed);
+                if (_enableOverseerPerformanceMetrics)
+                {
+                    _performanceMetrics.RecordApiFetch(stopwatch.Elapsed);
+                }
 
                 _logger?.LogInformation("Periodic API data fetch completed successfully at {Timestamp} in {Duration}ms", DateTime.UtcNow, stopwatch.ElapsedMilliseconds);
             }

@@ -17,6 +17,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TradingStrategies.Configuration;
+using BacklashDTOs.Configuration;
 
 namespace BacklashBot.Services
 {
@@ -34,8 +35,8 @@ namespace BacklashBot.Services
     public class TradingSnapshotService : ITradingSnapshotService
     {
         private readonly ILogger<ITradingSnapshotService> _logger;
-        private readonly IOptions<SnapshotConfig> _snapshotConfig;
-        private readonly IOptions<TradingConfig> _tradingConfig;
+        private readonly IOptions<TradingSnapshotServiceConfig> _tradingSnapshotServiceConfig;
+        private readonly IOptions<GeneralExecutionConfig> _generalExecutionConfig;
         private readonly ICentralPerformanceMonitor? _centralPerformanceMonitor;
         private DateTime? _lastSavedSnapshotTimestamp; // Actual timestamp of the last saved snapshot
 
@@ -66,29 +67,29 @@ namespace BacklashBot.Services
         /// Initializes a new instance of the TradingSnapshotService with required dependencies.
         /// </summary>
         /// <param name="logger">Logger for recording snapshot operations, warnings, and errors.</param>
-        /// <param name="snapshotConfig">Configuration options for snapshot behavior including tolerance settings.</param>
-        /// <param name="tradingConfig">Configuration options for trading parameters including decision frequency.</param>
+        /// <param name="tradingSnapshotServiceConfig">Configuration options for trading snapshot service behavior including tolerance settings.</param>
+        /// <param name="generalExecutionConfig">Configuration options for general execution parameters including decision frequency.</param>
         /// <param name="scopeFactory">Factory for creating service scopes to access database services.</param>
         /// <param name="configuration">Configuration for accessing app settings.</param>
         /// <param name="centralPerformanceMonitor">Central performance monitor for recording execution times.</param>
         public TradingSnapshotService(
             ILogger<ITradingSnapshotService> logger,
-            IOptions<SnapshotConfig> snapshotConfig,
-            IOptions<TradingConfig> tradingConfig,
+            IOptions<TradingSnapshotServiceConfig> tradingSnapshotServiceConfig,
+            IOptions<GeneralExecutionConfig> generalExecutionConfig,
             IServiceScopeFactory scopeFactory,
             IConfiguration configuration,
             ICentralPerformanceMonitor? centralPerformanceMonitor = null)
         {
             _logger = logger;
-            _snapshotConfig = snapshotConfig;
-            _tradingConfig = tradingConfig;
+            _tradingSnapshotServiceConfig = tradingSnapshotServiceConfig;
+            _generalExecutionConfig = generalExecutionConfig;
             _serviceScopeFactory = scopeFactory;
             _centralPerformanceMonitor = centralPerformanceMonitor;
-            _decisionFrequencyInterval = TimeSpan.FromSeconds(tradingConfig.Value.DecisionFrequencySeconds);
-            _snapshotTimingTolerance = TimeSpan.FromSeconds(snapshotConfig.Value.SnapshotToleranceSeconds);
+            _decisionFrequencyInterval = TimeSpan.FromSeconds(generalExecutionConfig.Value.DecisionFrequencySeconds);
+            _snapshotTimingTolerance = TimeSpan.FromSeconds(tradingSnapshotServiceConfig.Value.SnapshotToleranceSeconds);
 
             // Use configurable storage directory or fallback to default
-            _snapshotStorageDirectory = snapshotConfig.Value.StorageDirectory ?? @"\\DESKTOP-ITC50UT\SmokehouseDataStorage\NewSnapshots";
+            _snapshotStorageDirectory = tradingSnapshotServiceConfig.Value.StorageDirectory ?? @"\\DESKTOP-ITC50UT\SmokehouseDataStorage\NewSnapshots";
 
             // Ensure the directory exists
             if (!Directory.Exists(_snapshotStorageDirectory))
@@ -158,7 +159,7 @@ namespace BacklashBot.Services
                 var timestamp = cacheSnapshot.Timestamp;
                 var timestampString = timestamp.ToString("yyyyMMddTHHmmssZ");
 
-                var discardThreshold = _decisionFrequencyInterval + TimeSpan.FromSeconds(_snapshotConfig.Value.SnapshotToleranceSeconds * 2);
+                var discardThreshold = _decisionFrequencyInterval + TimeSpan.FromSeconds(_tradingSnapshotServiceConfig.Value.SnapshotToleranceSeconds * 2);
 
                 if (_isFirstSnapshotTaken)
                 {
@@ -239,7 +240,7 @@ namespace BacklashBot.Services
                         {
                             MarketTicker = marketSnapshot.Value.MarketTicker,
                             SnapshotDate = timestamp,
-                            JSONSchemaVersion = _snapshotConfig.Value.SnapshotSchemaVersion,
+                            JSONSchemaVersion = _generalExecutionConfig.Value.SnapshotSchemaVersion,
                             PositionSize = marketSnapshot.Value.PositionSize,
                             ChangeMetricsMature = marketSnapshot.Value.ChangeMetricsMature,
                             VelocityPerMinute_Top_Yes_Bid = marketSnapshot.Value.VelocityPerMinute_Top_Yes_Bid,
@@ -362,7 +363,7 @@ namespace BacklashBot.Services
                 // Process each market group in parallel with configurable limits
                 var parallelOptions = new ParallelOptions
                 {
-                    MaxDegreeOfParallelism = _snapshotConfig.Value.MaxParallelism > 0 ? _snapshotConfig.Value.MaxParallelism : -1
+                    MaxDegreeOfParallelism = _tradingSnapshotServiceConfig.Value.MaxParallelism > 0 ? _tradingSnapshotServiceConfig.Value.MaxParallelism : -1
                 };
 
                 Parallel.ForEach(groupedSnapshots, parallelOptions, group =>
@@ -398,7 +399,7 @@ namespace BacklashBot.Services
                     // Upgrade in batch
                     foreach (var cacheSnapshot in newCacheSnapshots)
                     {
-                        cacheSnapshot.UpgradeSnapshot(_snapshotConfig.Value.SnapshotSchemaVersion);
+                        cacheSnapshot.UpgradeSnapshot(_generalExecutionConfig.Value.SnapshotSchemaVersion);
                     }
 
                     lock (result)  // Sync access to result dict
@@ -556,7 +557,7 @@ namespace BacklashBot.Services
             var schema = JsonSchema.FromType<CacheSnapshot>();
             var schemaData = schema.ToJson();
 
-            int expectedVersion = _snapshotConfig.Value.SnapshotSchemaVersion;
+            int expectedVersion = _generalExecutionConfig.Value.SnapshotSchemaVersion;
             SnapshotSchemaDTO? schemaDTO = await context.GetSnapshotSchema(expectedVersion);
             if (schemaDTO == null)
             {

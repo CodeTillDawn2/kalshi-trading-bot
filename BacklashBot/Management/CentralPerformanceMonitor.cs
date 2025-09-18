@@ -53,8 +53,9 @@ namespace BacklashBot.Management
         /// Key is the method name, value is a list of timestamp and milliseconds.
         /// </summary>
         public readonly ConcurrentDictionary<string, List<(DateTime Timestamp, long Milliseconds)>> ApiExecutionTimes;
-        private readonly TradingConfig _tradingConfig;
-        private readonly ExecutionConfig _executionConfig;
+        private readonly GeneralExecutionConfig _generalExecutionConfig;
+        private readonly QueueMonitoringConfig _queueMonitoringConfig;
+        private readonly CentralPerformanceMonitorConfig _centralPerformanceMonitorConfig;
         private readonly IServiceScopeFactory _scopeFactory;
         private IOrderBookService _orderbookService => _serviceFactory.GetOrderBookService();
         /// <summary>
@@ -152,6 +153,7 @@ namespace BacklashBot.Management
         private DateTime _messageProcessorLastDuplicateWarningTime;
         private IReadOnlyDictionary<string, long>? _messageProcessorMessageTypeCounts;
 
+
         /// <summary>
         /// Gets or sets a value indicating whether the system is currently starting up.
         /// </summary>
@@ -190,7 +192,9 @@ namespace BacklashBot.Management
         /// </summary>
         /// <param name="logger">Logger instance for recording performance monitoring operations.</param>
         /// <param name="serviceFactory">Factory for accessing system services and data caches.</param>
-        /// <param name="executionConfig">Configuration settings for execution parameters.</param>
+        /// <param name="generalExecutionConfig">Configuration settings for general execution parameters.</param>
+        /// <param name="queueMonitoringConfig">Configuration settings for queue monitoring parameters.</param>
+        /// <param name="centralPerformanceMonitorConfig">Configuration settings for CentralPerformanceMonitor parameters.</param>
         /// <param name="tradingConfig">Configuration settings for trading parameters.</param>
         /// <param name="scopeFactory">Factory for creating service scopes.</param>
         /// <param name="scopeManagerService">Service for managing database operation scopes.</param>
@@ -198,8 +202,10 @@ namespace BacklashBot.Management
         public CentralPerformanceMonitor(
             ILogger<ICentralPerformanceMonitor> logger,
             IServiceFactory serviceFactory,
-            IOptions<ExecutionConfig> executionConfig,
-            IOptions<TradingConfig> tradingConfig,
+            IOptions<GeneralExecutionConfig> generalExecutionConfig,
+            IOptions<QueueMonitoringConfig> queueMonitoringConfig,
+            IOptions<CentralPerformanceMonitorConfig> centralPerformanceMonitorConfig,
+            IOptions<GeneralExecutionConfig> generalExecutionConfig2,
             IServiceScopeFactory scopeFactory,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService)
@@ -210,10 +216,11 @@ namespace BacklashBot.Management
             _statusTrackerService = statusTrackerService;
             _scopeFactory = scopeFactory;
             ApiExecutionTimes = new ConcurrentDictionary<string, List<(DateTime Timestamp, long Milliseconds)>>();
-            _executionConfig = executionConfig.Value;
-            _tradingConfig = tradingConfig.Value;
-            RefreshInterval = TimeSpan.FromMinutes(_tradingConfig.RefreshIntervalMinutes);
-            BrainInstance = _executionConfig.BrainInstance;
+            _generalExecutionConfig = generalExecutionConfig.Value;
+            _queueMonitoringConfig = queueMonitoringConfig.Value;
+            _centralPerformanceMonitorConfig = centralPerformanceMonitorConfig.Value;
+            RefreshInterval = TimeSpan.FromMinutes(_generalExecutionConfig.RefreshIntervalMinutes);
+            BrainInstance = _generalExecutionConfig.BrainInstance;
             _logger.LogInformation("PERFMON: Initialized with BrainInstance='{BrainInstance}' from config", BrainInstance);
             _queueCountSamples = new ConcurrentDictionary<string, List<(DateTime Timestamp, int Count)>>();
             _orderBookServiceMetrics = new ConcurrentDictionary<string, List<(DateTime Timestamp, double AvgTime, int TotalOps)>>();
@@ -294,7 +301,7 @@ namespace BacklashBot.Management
         public void RecordExecutionTime(string methodName, long milliseconds, bool metricsEnabled)
         {
             // Check if performance metrics are enabled
-            if (!(_executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            if (!(_centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
             {
                 return;
             }
@@ -320,7 +327,7 @@ namespace BacklashBot.Management
         public void RecordSimulationMetrics(string simulationName, Dictionary<string, object> metrics, bool metricsEnabled)
         {
             // Check if performance metrics are enabled
-            if (!(_executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            if (!(_centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
             {
                 return;
             }
@@ -353,7 +360,7 @@ namespace BacklashBot.Management
             Dictionary<string, long>? itemCheckTimes = null)
         {
             // Check if performance metrics are enabled
-            if (!(_executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true))
+            if (!(_centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true))
             {
                 return;
             }
@@ -609,7 +616,7 @@ namespace BacklashBot.Management
             if (!eventSamples.Any()) return 0;
 
             // Calculate percentage of samples where EventQueue count >= _executionConfig.QueuesTargetCount
-            var highCountSamples = eventSamples.Count(s => s.Count >= _executionConfig.QueuesTargetCount);
+            var highCountSamples = eventSamples.Count(s => s.Count >= _generalExecutionConfig.QueuesTargetCount);
 
             double percentage = (double)(highCountSamples * 100.0 / eventSamples.Count);
 
@@ -630,7 +637,7 @@ namespace BacklashBot.Management
         /// </remarks>
         public void RecordDatabaseMetrics(Dictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)> metrics, bool metricsEnabled)
         {
-            if (!(_executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            if (!(_centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
             {
                 return;
             }
@@ -659,7 +666,7 @@ namespace BacklashBot.Management
         /// </remarks>
         public void RecordOverseerClientServiceMetrics(Dictionary<string, object> metrics, bool metricsEnabled)
         {
-            if (!(_executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
+            if (!(_centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true) || !metricsEnabled)
             {
                 return;
             }
@@ -710,7 +717,7 @@ namespace BacklashBot.Management
             if (!metricsEnabled) return;
 
             // Record execution time for broadcast operations with proper enablement status
-            RecordExecutionTime("BroadcastService", (long)totalBroadcastTimeMs, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+            RecordExecutionTime("BroadcastService", (long)totalBroadcastTimeMs, _centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
 
             // Log broadcast performance summary
             _logger.LogInformation(
@@ -764,7 +771,7 @@ namespace BacklashBot.Management
             if (!metricsEnabled) return;
 
             // Record execution time with proper enablement status
-            RecordExecutionTime("MarketDataInitializer", (long)totalDuration.TotalMilliseconds, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+            RecordExecutionTime("MarketDataInitializer", (long)totalDuration.TotalMilliseconds, _centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
 
             // Log performance summary
             _logger.LogInformation(
@@ -801,7 +808,7 @@ namespace BacklashBot.Management
             var (totalTime, marketsProcessed, apiCalls, errors, peakMemory, startTime, endTime, taskDurations) = metrics.GetOvernightPerformanceMetrics();
 
             // Record execution time with proper enablement status
-            RecordExecutionTime("OvernightActivities", totalTime, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+            RecordExecutionTime("OvernightActivities", totalTime, _centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
 
             // Log comprehensive overnight performance summary
             _logger.LogInformation("OVERNIGHT PERFORMANCE: Total={TotalTime}ms, Markets={Markets}, API Calls={ApiCalls}, Errors={Errors}, Peak Memory={PeakMemory}MB",
@@ -925,38 +932,38 @@ namespace BacklashBot.Management
         public void CheckPerformanceAlerts()
         {
             var queueHighPercentage = GetQueueHighCountPercentage();
-            if (queueHighPercentage >= _executionConfig.QueueHighCountAlertThreshold)
+            if (queueHighPercentage >= _queueMonitoringConfig.QueueHighCountAlertThreshold)
             {
                 _logger.LogWarning("PERFORMANCE ALERT: EventQueue high count percentage {Percentage:F2}% exceeds threshold {Threshold:F2}%. System may be overloaded.",
-                    queueHighPercentage, _executionConfig.QueueHighCountAlertThreshold);
+                    queueHighPercentage, _queueMonitoringConfig.QueueHighCountAlertThreshold);
             }
 
-            if (LastRefreshUsagePercentage >= _executionConfig.RefreshUsageAlertThreshold)
+            if (LastRefreshUsagePercentage >= _queueMonitoringConfig.RefreshUsageAlertThreshold)
             {
                 _logger.LogWarning("PERFORMANCE ALERT: Refresh usage {Usage:F2}% exceeds threshold {Threshold:F2}%. Market refresh cycle may be too slow.",
-                    LastRefreshUsagePercentage, _executionConfig.RefreshUsageAlertThreshold);
+                    LastRefreshUsagePercentage, _queueMonitoringConfig.RefreshUsageAlertThreshold);
             }
 
             var (eventQueueAvg, tickerQueueAvg, notificationQueueAvg, orderBookQueueAvg) = GetQueueCountRollingAverages();
-            if (eventQueueAvg >= _executionConfig.QueueCountAlertThreshold)
+            if (eventQueueAvg >= _queueMonitoringConfig.QueueCountAlertThreshold)
             {
                 _logger.LogWarning("PERFORMANCE ALERT: Average EventQueue count {Avg:F2} exceeds threshold {Threshold}. Processing may be delayed.",
-                    eventQueueAvg, _executionConfig.QueueCountAlertThreshold);
+                    eventQueueAvg, _queueMonitoringConfig.QueueCountAlertThreshold);
             }
-            if (tickerQueueAvg >= _executionConfig.QueueCountAlertThreshold)
+            if (tickerQueueAvg >= _queueMonitoringConfig.QueueCountAlertThreshold)
             {
                 _logger.LogWarning("PERFORMANCE ALERT: Average TickerQueue count {Avg:F2} exceeds threshold {Threshold}. Processing may be delayed.",
-                    tickerQueueAvg, _executionConfig.QueueCountAlertThreshold);
+                    tickerQueueAvg, _queueMonitoringConfig.QueueCountAlertThreshold);
             }
-            if (notificationQueueAvg >= _executionConfig.QueueCountAlertThreshold)
+            if (notificationQueueAvg >= _queueMonitoringConfig.QueueCountAlertThreshold)
             {
                 _logger.LogWarning("PERFORMANCE ALERT: Average NotificationQueue count {Avg:F2} exceeds threshold {Threshold}. Processing may be delayed.",
-                    notificationQueueAvg, _executionConfig.QueueCountAlertThreshold);
+                    notificationQueueAvg, _queueMonitoringConfig.QueueCountAlertThreshold);
             }
-            if (orderBookQueueAvg >= _executionConfig.QueueCountAlertThreshold)
+            if (orderBookQueueAvg >= _queueMonitoringConfig.QueueCountAlertThreshold)
             {
                 _logger.LogWarning("PERFORMANCE ALERT: Average OrderBookQueue count {Avg:F2} exceeds threshold {Threshold}. Processing may be delayed.",
-                    orderBookQueueAvg, _executionConfig.QueueCountAlertThreshold);
+                    orderBookQueueAvg, _queueMonitoringConfig.QueueCountAlertThreshold);
             }
         }
 
@@ -983,7 +990,7 @@ namespace BacklashBot.Management
         /// <param name="success">Whether the task was successful.</param>
         public void RecordOvernightTask(string taskName, long duration, bool success)
         {
-            RecordExecutionTime(taskName, duration, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+            RecordExecutionTime(taskName, duration, _centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
             if (!success)
             {
                 _logger.LogWarning("Overnight task '{TaskName}' failed after {Duration}ms", taskName, duration);
@@ -1042,7 +1049,7 @@ namespace BacklashBot.Management
         public void RecordMarketAnalysisHelperMetrics(int totalMarkets, long totalTimeMs, double averageTimeMs, int errorCount)
         {
             // Record execution time with proper enablement status
-            RecordExecutionTime("MarketAnalysisHelper.GenerateSnapshotGroups", totalTimeMs, _executionConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
+            RecordExecutionTime("MarketAnalysisHelper.GenerateSnapshotGroups", totalTimeMs, _centralPerformanceMonitorConfig?.CentralPerformanceMonitor_EnableDatabaseMetrics ?? true);
 
             // Log performance summary
             _logger.LogInformation(
@@ -1075,8 +1082,6 @@ namespace BacklashBot.Management
             var summary = "Central Performance Monitor - Overnight Activities Summary";
             return summary;
         }
-
-        #endregion
 
         #region IWebSocketPerformanceMetrics Implementation
 
@@ -1418,6 +1423,67 @@ namespace BacklashBot.Management
             _logger.LogInformation("MessageProcessor performance metrics reset");
         }
 
+        #endregion
+
+        /// <summary>
+        /// Records candlestick data gaps using the existing performance monitoring system.
+        /// Simply records the gap duration as an execution time for later analysis.
+        /// </summary>
+        /// <param name="intervalType">The candlestick interval type ("Minute", "Hour", or "Day").</param>
+        /// <param name="timestamp">The timestamp of the received candlestick.</param>
+        /// <param name="metricsEnabled">Whether performance metrics are enabled for the calling class/component.</param>
+        /// <remarks>
+        /// This method uses the existing RecordExecutionTime to track gap durations.
+        /// The gap duration will be recorded as "CandlestickGap.{intervalType}" and can be analyzed later.
+        /// </remarks>
+        public void RecordCandlestickDataPoint(string intervalType, DateTime timestamp, bool metricsEnabled)
+        {
+            if (!metricsEnabled) return;
+
+            // Determine expected interval based on type
+            int expectedIntervalSeconds = intervalType.ToLower() switch
+            {
+                "minute" => 60,      // 1 minute = 60 seconds
+                "hour" => 3600,      // 1 hour = 3600 seconds
+                "day" => 86400,      // 1 day = 86400 seconds
+                _ => 60              // Default to minute interval
+            };
+
+            // Use a simple static variable to track last timestamp per interval
+            var lastTimestampKey = $"Last{intervalType}Timestamp";
+            var lastTimestamp = GetLastTimestamp(lastTimestampKey);
+
+            if (lastTimestamp.HasValue)
+            {
+                var timeSinceLast = timestamp - lastTimestamp.Value;
+                var expectedInterval = TimeSpan.FromSeconds(expectedIntervalSeconds);
+                var gap = timeSinceLast - expectedInterval;
+
+                if (gap > TimeSpan.Zero)
+                {
+                    // Record the gap duration using existing RecordExecutionTime method
+                    RecordExecutionTime($"CandlestickGap.{intervalType}", (long)gap.TotalMilliseconds, metricsEnabled);
+
+                    _logger.LogDebug("Recorded candlestick gap: {IntervalType} = {GapDuration:F2} minutes", intervalType, gap.TotalMinutes);
+                }
+            }
+
+            // Update last timestamp
+            SetLastTimestamp(lastTimestampKey, timestamp);
+        }
+
+        private readonly ConcurrentDictionary<string, DateTime> _lastTimestamps = new();
+
+        private DateTime? GetLastTimestamp(string key)
+        {
+            return _lastTimestamps.TryGetValue(key, out var timestamp) ? timestamp : (DateTime?)null;
+        }
+
+        private void SetLastTimestamp(string key, DateTime timestamp)
+        {
+            _lastTimestamps[key] = timestamp;
+        }
+
         /// <summary>
         /// Gets all configurable performance metrics for GUI consumption.
         /// </summary>
@@ -1482,6 +1548,7 @@ namespace BacklashBot.Management
                     MessageProcessorDuplicatesInWindow = _messageProcessorDuplicatesInWindow,
                     MessageProcessorLastDuplicateWarningTime = _messageProcessorLastDuplicateWarningTime,
                     MessageProcessorMessageTypeCounts = _messageProcessorMessageTypeCounts,
+
 
                     // API execution times
                     ApiExecutionTimes = ApiExecutionTimes,

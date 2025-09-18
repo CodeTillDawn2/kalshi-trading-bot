@@ -3,6 +3,7 @@ using BacklashBot.Services.Interfaces;
 using BacklashBot.State.Interfaces;
 using BacklashDTOs.KalshiAPI;
 using BacklashBot.Management.Interfaces;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -105,12 +106,12 @@ namespace BacklashBot.Services
             _configuration = configuration;
             _centralPerformanceMonitor = centralPerformanceMonitor;
 
-            // Load configurable intervals with defaults
-            _monitoringIntervalMinutes = _configuration.GetValue<int>("WebSocketMonitor:MonitoringIntervalMinutes", 1);
-            _retryDelayMinutes = _configuration.GetValue<int>("WebSocketMonitor:RetryDelayMinutes", 5);
-            _enableMetrics = _configuration.GetValue<bool>("WebSocketMonitor:EnableMetrics", true);
+            // Load configuration values from injected options
+            _monitoringIntervalMinutes = _configuration.GetValue<int>("Websocket:WebSocketMonitor.MonitoringIntervalMinutes", 1);
+            _retryDelayMinutes = _configuration.GetValue<int>("Websocket:WebSocketMonitor.RetryDelayMinutes", 5);
+            _enableMetrics = _configuration.GetValue<bool>("Websocket:WebSocketMonitor.EnableWebSocketMonitorMetrics", true);
 
-            _logger.LogDebug("WebSocketMonitorService instance created with MonitoringInterval={MonitoringInterval}min, RetryDelay={RetryDelay}min, EnableMetrics={EnableMetrics}",
+            _logger.LogDebug("WebSocketMonitorService instance created with MonitoringInterval={MonitoringInterval}min, RetryDelay={RetryDelay}min, EnableWebSocketMonitorMetrics={EnableWebSocketMonitorMetrics}",
                 _monitoringIntervalMinutes, _retryDelayMinutes, _enableMetrics);
         }
 

@@ -20,7 +20,8 @@ namespace BacklashBot.Management
         private Task? _initTask;
         private readonly object _lock = new();
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly ExecutionConfig _executionConfig;
+        private readonly GeneralExecutionConfig _generalExecutionConfig;
+        private readonly BrainStatusServiceConfig _brainStatusConfig;
         private readonly ILogger<BrainStatusService> _logger;
         private TimeSpan _initializationTime = TimeSpan.Zero;
         private int _initializationAttempts = 0;
@@ -29,20 +30,23 @@ namespace BacklashBot.Management
         /// Initializes a new instance of the <see cref="BrainStatusService"/> class.
         /// </summary>
         /// <param name="scopeFactory">Factory for creating service scopes to access database context.</param>
-        /// <param name="executionConfig">Configuration options for execution settings.</param>
+        /// <param name="generalExecutionConfig">Configuration options for general execution settings.</param>
+        /// <param name="brainStatusConfig">Configuration options for brain status settings.</param>
         /// <param name="logger">Logger for recording service operations and errors.</param>
-        public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions<ExecutionConfig> executionConfig, ILogger<BrainStatusService> logger)
+        public BrainStatusService(IServiceScopeFactory scopeFactory, IOptions<GeneralExecutionConfig> generalExecutionConfig, IOptions<BrainStatusServiceConfig> brainStatusConfig, ILogger<BrainStatusService> logger)
         {
             ArgumentNullException.ThrowIfNull(scopeFactory);
-            ArgumentNullException.ThrowIfNull(executionConfig);
+            ArgumentNullException.ThrowIfNull(generalExecutionConfig);
+            ArgumentNullException.ThrowIfNull(brainStatusConfig);
             ArgumentNullException.ThrowIfNull(logger);
 
             _scopeFactory = scopeFactory;
-            _executionConfig = executionConfig.Value ?? throw new ArgumentNullException(nameof(executionConfig.Value));
+            _generalExecutionConfig = generalExecutionConfig.Value ?? throw new ArgumentNullException(nameof(generalExecutionConfig.Value));
+            _brainStatusConfig = brainStatusConfig.Value ?? throw new ArgumentNullException(nameof(brainStatusConfig.Value));
 
-            if (string.IsNullOrWhiteSpace(_executionConfig.BrainInstance))
+            if (string.IsNullOrWhiteSpace(_generalExecutionConfig.BrainInstance))
             {
-                throw new ArgumentException("BrainInstance must be specified in ExecutionConfig.", nameof(_executionConfig.BrainInstance));
+                throw new ArgumentException("BrainInstance must be specified in GeneralExecutionConfig.", nameof(_generalExecutionConfig.BrainInstance));
             }
 
             _logger = logger;
@@ -113,22 +117,22 @@ namespace BacklashBot.Management
             {
                 using var scope = _scopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<IBacklashBotContext>();
-                BrainInstanceDTO? brainInstance = await context.GetBrainInstance(_executionConfig.BrainInstance);
+                BrainInstanceDTO? brainInstance = await context.GetBrainInstance(_generalExecutionConfig.BrainInstance);
                 if (brainInstance == null)
                 {
-                    _logger.LogError("Brain instance with ID {BrainInstance} not found.", _executionConfig.BrainInstance);
-                    throw new Exception($"Brain instance with ID {_executionConfig.BrainInstance} not found.");
+                    _logger.LogError("Brain instance with ID {BrainInstance} not found.", _generalExecutionConfig.BrainInstance);
+                    throw new Exception($"Brain instance with ID {_generalExecutionConfig.BrainInstance} not found.");
                 }
                 _brainLock = brainInstance.BrainLock ?? Guid.NewGuid();
-                _sessionIdentifier = GenerateRandomString(_executionConfig.SessionIdLength);
+                _sessionIdentifier = GenerateRandomString(_brainStatusConfig.SessionIdLength);
                 _initialized = true;
                 _initializationTime = DateTime.UtcNow - startTime;
-                _logger.LogInformation("Brain status service initialized successfully for brain instance {BrainInstance}.", _executionConfig.BrainInstance);
+                _logger.LogInformation("Brain status service initialized successfully for brain instance {BrainInstance}.", _generalExecutionConfig.BrainInstance);
             }
             catch (Exception ex)
             {
                 _initializationTime = DateTime.UtcNow - startTime;
-                _logger.LogError(ex, "Failed to initialize brain status service for brain instance {BrainInstance}.", _executionConfig.BrainInstance);
+                _logger.LogError(ex, "Failed to initialize brain status service for brain instance {BrainInstance}.", _generalExecutionConfig.BrainInstance);
                 throw; // Rethrow to surface in task; handle as needed in consumers.
             }
         }

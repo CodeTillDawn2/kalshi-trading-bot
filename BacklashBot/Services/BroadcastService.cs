@@ -6,9 +6,10 @@ using BacklashBot.Management.Interfaces;
 using BacklashBot.Management;
 using System.Diagnostics;
 using Microsoft.Extensions.Options;
-using BacklashDTOs.Configuration;
+using BacklashBot.Configuration;
 using System.Text.Json;
 using BacklashBot.Hubs;
+using OverseerBotShared;
 
 namespace BacklashBot.Services
 {
@@ -27,7 +28,7 @@ namespace BacklashBot.Services
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IScopeManagerService _scopeManagerService;
         private readonly IStatusTrackerService _statusTracker;
-        private readonly ExecutionConfig _executionConfig;
+        private readonly IConfiguration _configuration;
         private readonly ICentralPerformanceMonitor _centralPerformanceMonitor;
 
         /// <summary>
@@ -119,7 +120,8 @@ namespace BacklashBot.Services
         /// <param name="scopeFactory">Factory for creating service scopes</param>
         /// <param name="logger">Logger for recording service operations and errors</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
-        /// <param name="executionConfig">Configuration options for execution parameters</param>
+        /// <param name="configuration">Configuration instance for reading settings</param>
+        /// <param name="broadcastServiceConfig">Configuration options for broadcast service settings</param>
         public BroadcastService(
             IHubContext<BacklashBotHub> hubContext,
             IServiceFactory serviceFactory,
@@ -127,8 +129,9 @@ namespace BacklashBot.Services
             IServiceScopeFactory scopeFactory,
             ILogger<IBroadcastService> logger,
             IScopeManagerService scopeManagerService,
-            IOptions<ExecutionConfig> executionConfig,
-            ICentralPerformanceMonitor centralPerformanceMonitor)
+            IConfiguration configuration,
+            ICentralPerformanceMonitor centralPerformanceMonitor,
+            IOptions<BroadcastServiceConfig> broadcastServiceConfig)
         {
             _scopeManagerService = scopeManagerService;
             _hubContext = hubContext;
@@ -136,17 +139,16 @@ namespace BacklashBot.Services
             _serviceFactory = serviceFactory;
             _scopeFactory = scopeFactory;
             _logger = logger;
-            _executionConfig = executionConfig.Value;
+            _configuration = configuration;
             _centralPerformanceMonitor = centralPerformanceMonitor;
             _serviceStartTime = DateTime.Now;
 
-            // Configure broadcast settings from ExecutionConfig
-            _broadcastIntervalSeconds = GetConfigValue(_executionConfig, "BroadcastIntervalSeconds", 30);
-            _maxRetryAttempts = GetConfigValue(_executionConfig, "BroadcastMaxRetryAttempts", 3);
-            _retryDelay = TimeSpan.FromSeconds(GetConfigValue(_executionConfig, "BroadcastRetryDelaySeconds", 1));
-
-            // Configure metric tracking flag
-            _enablePerformanceMetrics = GetConfigBoolValue(_executionConfig, "BroadcastService_EnablePerformanceMetrics", false);
+            // Configure broadcast settings from BroadcastServiceConfig
+            var config = broadcastServiceConfig.Value;
+            _broadcastIntervalSeconds = config.BroadcastIntervalSeconds;
+            _maxRetryAttempts = config.BroadcastMaxRetryAttempts;
+            _retryDelay = TimeSpan.FromSeconds(config.BroadcastRetryDelaySeconds);
+            _enablePerformanceMetrics = config.EnablePerformanceMetrics;
         }
 
         /// <summary>
@@ -457,37 +459,26 @@ namespace BacklashBot.Services
         }
 
         /// <summary>
-        /// Retrieves a configuration value from ExecutionConfig using reflection, with a default fallback.
+        /// Retrieves a configuration value from configuration, with a default fallback.
         /// </summary>
-        /// <param name="config">The ExecutionConfig instance</param>
-        /// <param name="propertyName">The name of the property to retrieve</param>
+        /// <param name="key">The configuration key to retrieve</param>
         /// <param name="defaultValue">The default value if property is not found or invalid</param>
         /// <returns>The configuration value or default</returns>
-        private int GetConfigValue(ExecutionConfig config, string propertyName, int defaultValue)
+        private int GetConfigValue(string key, int defaultValue)
         {
-            var property = config.GetType().GetProperty(propertyName);
-            if (property != null && property.GetValue(config) is int value && value > 0)
-            {
-                return value;
-            }
-            return defaultValue;
+            var value = _configuration.GetValue<int>(key);
+            return value > 0 ? value : defaultValue;
         }
 
         /// <summary>
-        /// Retrieves a boolean configuration value from ExecutionConfig using reflection, with a default fallback.
+        /// Retrieves a boolean configuration value from configuration, with a default fallback.
         /// </summary>
-        /// <param name="config">The ExecutionConfig instance</param>
-        /// <param name="propertyName">The name of the property to retrieve</param>
+        /// <param name="key">The configuration key to retrieve</param>
         /// <param name="defaultValue">The default value if property is not found or invalid</param>
         /// <returns>The configuration value or default</returns>
-        private bool GetConfigBoolValue(ExecutionConfig config, string propertyName, bool defaultValue)
+        private bool GetConfigBoolValue(string key, bool defaultValue)
         {
-            var property = config.GetType().GetProperty(propertyName);
-            if (property != null && property.GetValue(config) is bool value)
-            {
-                return value;
-            }
-            return defaultValue;
+            return _configuration.GetValue<bool>(key, defaultValue);
         }
 
         /// <summary>
@@ -625,7 +616,7 @@ namespace BacklashBot.Services
         /// </summary>
         /// <param name="performanceMetrics">The comprehensive performance metrics data to broadcast.</param>
         /// <returns>A task representing the asynchronous broadcast operation.</returns>
-        public async Task BroadcastPerformanceMetricsAsync(object performanceMetrics)
+        public async Task BroadcastPerformanceMetricsAsync(PerformanceMetricsData performanceMetrics)
         {
             if (!BacklashBotHub.HasConnectedClients())
             {

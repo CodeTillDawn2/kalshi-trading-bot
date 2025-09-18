@@ -37,6 +37,8 @@ using static BacklashInterfaces.Enums.StrategyEnums;
 using TradingSimulator.Simulator;
 using BacklashBotData.Data.Interfaces;
 using BacklashBotData.Data;
+using BacklashCommon.Services;
+using BacklashCommon.Helpers;
 
 namespace TradingSimulator
 {
@@ -46,9 +48,8 @@ namespace TradingSimulator
     /// <typeparam name="T">The type of market data being processed.</typeparam>
     /// <param name="currentData">The current market snapshot data.</param>
     /// <param name="previousData">The previous market snapshot data for comparison.</param>
-    /// <param name="config">The snapshot configuration settings.</param>
     /// <param name="context">The trading context containing shared variables and decisions.</param>
-    public delegate void TradingStrategyFunc<T>(T currentData, T previousData, SnapshotConfig config, TradingContext context);
+    public delegate void TradingStrategyFunc<T>(T currentData, T previousData, TradingContext context);
 
     /// <summary>
     /// Context object containing shared variables and trading decisions for strategy execution.
@@ -84,13 +85,11 @@ namespace TradingSimulator
         private Mock<ILogger<ITradingSnapshotService>> _snapshotLoggerMock;
         private Mock<ILogger<IInterestScoreService>> _interestScoreLoggerMock;
         private Mock<ILogger<TradingStrategy<MarketSnapshot>>> _strategyLoggerMock;
-        private IOptions<SnapshotConfig> _snapshotOptions;
-        private IOptions<TradingConfig> _tradingOptions;
         private IServiceScopeFactory _scopeFactory;
         private IBacklashBotContext _dbContext;
-        private MarketAnalysisHelper _marketAnalysisHelper;
-        private IOptions<ExecutionConfig> _executionConfig;
-        private IOptions<SimulatorConfig> _simulatorOptions;
+        private SnapshotGroupHelper _marketAnalysisHelper;
+        private IOptions<GeneralExecutionConfig> _executionConfig;
+        private IOptions<TradingSimulatorServiceConfig> _simulatorOptions;
         private HashSet<string> _processedMarkets;
         private string _cacheDirectory;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;
@@ -138,26 +137,27 @@ namespace TradingSimulator
         /// </summary>
         public void Setup()
         {
-            var basePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "BacklashBot"));
+            // Use the current directory (TradingGUI's directory) for configuration
+            var basePath = AppDomain.CurrentDomain.BaseDirectory;
             var config = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.local.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
 
             _snapshotLoggerMock = new Mock<ILogger<ITradingSnapshotService>>();
             _serviceFactory = new Mock<IServiceFactory>().Object;
             _strategyLoggerMock = new Mock<ILogger<TradingStrategy<MarketSnapshot>>>();
             _interestScoreLoggerMock = new Mock<ILogger<IInterestScoreService>>();
-            var marketAnalysisLoggerMock = new Mock<ILogger<MarketAnalysisHelper>>();
+            var marketAnalysisLoggerMock = new Mock<ILogger<SnapshotGroupHelper>>();
             var overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
-            var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>();
-            var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>();
-            var simulatorConfig = config.GetSection("Simulator").Get<SimulatorConfig>();
-            _snapshotOptions = Options.Create(snapshotConfig);
-            _tradingOptions = Options.Create(tradingConfig);
-            _executionConfig = Options.Create(config.GetSection("Execution").Get<ExecutionConfig>());
+            var simulatorConfig = config.GetSection("TradingSimulatorService").Get<TradingSimulatorServiceConfig>();
+            _executionConfig = Options.Create(config.GetSection("GeneralExecution").Get<GeneralExecutionConfig>());
             _simulatorOptions = Options.Create(simulatorConfig);
+
+            // Configure DataLoaderConfig
+            var dataLoaderConfig = config.GetSection("SnapshotHandling:DataLoader").Get<DataLoaderConfig>() ?? new DataLoaderConfig();
+            var dataLoaderOptions = Options.Create(dataLoaderConfig);
 
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(config);
@@ -167,14 +167,14 @@ namespace TradingSimulator
 
             _scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
-            _snapshotPeriodHelper = new SnapshotPeriodHelper(_snapshotOptions.Value);
-            _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, _snapshotOptions, _tradingOptions, _scopeFactory, config);
+            _snapshotPeriodHelper = new SnapshotPeriodHelper(Options.Create(new SnapshotPeriodHelperConfig { SmallGapMinutes = 10.0, MaxActiveGapHours = 1.0, PriceChangeThreshold = 3 }).Value);
+            _snapshotService = new TradingSnapshotService(_snapshotLoggerMock.Object, Options.Create(new TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true }), Options.Create(new BacklashDTOs.Configuration.GeneralExecutionConfig { HardDataStorageLocation = @"C:\Temp\Storage" }), _scopeFactory, config, null);
 
             // Initialize performance monitor first
             _performanceMonitor = new PerformanceMonitor();
 
             _overseer = new TradingOverseer(_scopeFactory, _snapshotService, config, overseerLoggerMock.Object, _performanceMonitor, true);
-            _marketAnalysisHelper = new MarketAnalysisHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, marketAnalysisLoggerMock.Object);
+            _marketAnalysisHelper = new SnapshotGroupHelper(_scopeFactory, _snapshotPeriodHelper, _snapshotService, _executionConfig, null, null, null, marketAnalysisLoggerMock.Object);
             _simulatorReporting = new SimulatorReporting();
 
             _dbContext = serviceProvider.GetRequiredService<IBacklashBotContext>();
@@ -186,7 +186,7 @@ namespace TradingSimulator
             Directory.CreateDirectory(_cacheDirectory); // ensure output dir exists
 
             // Initialize helper classes
-            _dataLoader = new DataLoader(_snapshotService, _simulatorOptions);
+            _dataLoader = new DataLoader(_snapshotService, dataLoaderOptions);
             var marketProcessorConfig = new MarketProcessorConfig
             {
                 CacheDirectory = _cacheDirectory,

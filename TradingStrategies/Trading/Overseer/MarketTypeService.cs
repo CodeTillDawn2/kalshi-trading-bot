@@ -83,19 +83,19 @@ namespace TradingStrategies.Trading.Overseer
         /// <summary>
         /// Initializes a new instance of the MarketTypeService class.
         /// </summary>
-        /// <param name="config">The trading configuration containing settings for cache expiration and performance metrics. If null, defaults are used.</param>
+        /// <param name="config">The market type service configuration containing settings for cache expiration and performance metrics. If null, defaults are used.</param>
         /// <remarks>
         /// Creates the MarketTypeHelper instance and initializes the cache with configurable expiration.
-        /// The cache expiration can be configured via TradingConfig:MarketTypeCacheExpirationMinutes in appsettings.json.
-        /// Performance metrics collection can be enabled/disabled via TradingConfig:MarketTypeService_EnablePerformanceMetrics.
+        /// The cache expiration can be configured via MarketTypeServiceConfig:CacheExpirationMinutes in appsettings.json.
+        /// Performance metrics collection can be enabled/disabled via MarketTypeServiceConfig:EnablePerformanceMetrics.
         /// This constructor sets up the service for immediate use in market type classification.
         /// </remarks>
-        public MarketTypeService(TradingConfig? config = null)
+        public MarketTypeService(MarketTypeServiceConfig? config = null)
         {
             _marketTypeHelper = new MarketTypeHelper();
             _marketTypeCache = new ConcurrentDictionary<string, (MarketType Type, DateTime CachedAt)>();
-            _cacheExpiration = config != null && config.MarketTypeCacheExpirationMinutes.HasValue ? TimeSpan.FromMinutes(config.MarketTypeCacheExpirationMinutes.Value) : TimeSpan.FromMinutes(30);
-            _enablePerformanceMetrics = config?.MarketTypeService_EnablePerformanceMetrics ?? true;
+            _cacheExpiration = config != null && config.CacheExpirationMinutes.HasValue ? TimeSpan.FromMinutes(config.CacheExpirationMinutes.Value) : TimeSpan.FromMinutes(30);
+            _enablePerformanceMetrics = config?.EnablePerformanceMetrics ?? true;
         }
 
         /// <summary>

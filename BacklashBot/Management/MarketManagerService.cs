@@ -34,7 +34,7 @@ namespace BacklashBot.Management
         /// <param name="scopeFactory">Factory for creating service scopes</param>
         /// <param name="performanceMonitor">Monitor for tracking system performance metrics</param>
         /// <param name="executionConfig">Configuration options for execution parameters</param>
-        /// <param name="tradingConfig">Configuration options for trading parameters</param>
+        /// <param name="centralBrainConfig">Configuration options for central brain parameters</param>
         /// <param name="scopeManagerService">Service for managing dependency injection scopes</param>
         /// <param name="statusTrackerService">Service for tracking operation status and cancellation</param>
         /// <param name="brainStatus">Service providing brain instance status information</param>
@@ -43,16 +43,16 @@ namespace BacklashBot.Management
             ILogger<IMarketManagerService> logger,
             IServiceScopeFactory scopeFactory,
             ICentralPerformanceMonitor performanceMonitor,
-            IOptions<ExecutionConfig> executionConfig,
-            IOptions<TradingConfig> tradingConfig,
+            IOptions<GeneralExecutionConfig> executionConfig,
+            IOptions<CentralBrainConfig> centralBrainConfig,
             IScopeManagerService scopeManagerService,
             IStatusTrackerService statusTrackerService,
             IBrainStatusService brainStatus,
             ITargetCalculationService targetCalculationService)
-            : base(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, tradingConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
+            : base(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService)
         {
-            _managedService = new ManagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, tradingConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService);
-            _unmanagedService = new UnmanagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, tradingConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService);
+            _managedService = new ManagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService);
+            _unmanagedService = new UnmanagedMarketManagerService(serviceFactory, logger, scopeFactory, performanceMonitor, executionConfig, centralBrainConfig, scopeManagerService, statusTrackerService, brainStatus, targetCalculationService);
         }
 
         public new void ClearMarketsToReset()

@@ -34,7 +34,7 @@ namespace KalshiBotAPI.Websockets
         private readonly IStatusTrackerService _statusTrackerService;
         private readonly ISqlDataService _sqlDataService;
         private readonly IKalshiAPIService _kalshiAPIService;
-        private readonly KalshiConfig _config;
+        private readonly MessageProcessorConfig _config;
         private bool _isDataPersistenceEnabled;
         private readonly bool _enablePerformanceMonitoring;
         private readonly IMessageProcessorPerformanceMetrics _performanceMetrics;
@@ -82,6 +82,7 @@ namespace KalshiBotAPI.Websockets
         /// Cancellation token source for controlling the batch processing task lifecycle.
         /// </summary>
         private readonly CancellationTokenSource _batchCancellationSource = new();
+
 
         // Performance metrics fields
         /// <summary>
@@ -168,7 +169,7 @@ namespace KalshiBotAPI.Websockets
         /// <param name="statusTrackerService">Provides system status and cancellation token management.</param>
         /// <param name="sqlDataService">Handles data persistence to SQL database when enabled.</param>
         /// <param name="kalshiAPIService">Provides access to Kalshi API for market data retrieval and updates.</param>
-        /// <param name="config">Configuration settings for message processing behavior.</param>
+        /// <param name="config">Configuration settings for WebSocket operations.</param>
         /// <param name="performanceMetrics">Service for posting performance metrics to central monitoring.</param>
         public MessageProcessor(
             ILogger<MessageProcessor> logger,
@@ -177,7 +178,7 @@ namespace KalshiBotAPI.Websockets
             IStatusTrackerService statusTrackerService,
             ISqlDataService sqlDataService,
             IKalshiAPIService kalshiAPIService,
-            KalshiConfig config,
+            MessageProcessorConfig config,
             IMessageProcessorPerformanceMetrics performanceMetrics)
         {
             _logger = logger;
@@ -189,11 +190,11 @@ namespace KalshiBotAPI.Websockets
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _performanceMetrics = performanceMetrics ?? throw new ArgumentNullException(nameof(performanceMetrics));
             _isDataPersistenceEnabled = false; // Default to false, will be set by SetDataPersistenceEnabled method
-            _enablePerformanceMonitoring = _config.MessageProcessor.EnablePerformanceMetrics;
+            _enablePerformanceMonitoring = _config.EnablePerformanceMetrics;
             _processingCancellationToken = statusTrackerService.GetCancellationToken();
 
             // Initialize locking mechanism based on configuration
-            _orderBookQueueLock = _config.MessageProcessor.UseAdvancedLocking
+            _orderBookQueueLock = _config.UseAdvancedLocking
                 ? new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion)
                 : null;
 
@@ -217,13 +218,13 @@ namespace KalshiBotAPI.Websockets
             _messageTypeCounts.TryAdd("Unknown", 0);
 
             // Start batch processing task if enabled
-            if (_config.MessageProcessor.EnableMessageBatching)
+            if (_config.EnableMessageBatching)
             {
                 _batchProcessingTask = Task.Run(() => ProcessMessageBatchAsync(), _batchCancellationSource.Token);
             }
 
             _logger.LogInformation("MessageProcessor initialized with configuration: Batching={BatchingEnabled}, AdvancedLocking={AdvancedLockingEnabled}, Metrics={MetricsEnabled}",
-                _config.MessageProcessor.EnableMessageBatching, _config.MessageProcessor.UseAdvancedLocking, _enablePerformanceMonitoring);
+                _config.EnableMessageBatching, _config.UseAdvancedLocking, _enablePerformanceMonitoring);
         }
 
         /// <summary>
@@ -257,6 +258,7 @@ namespace KalshiBotAPI.Websockets
                 }
             }
 
+
             if (_messageReceivingTask != null && !_messageReceivingTask.IsCompleted)
             {
                 await _messageReceivingTask.ConfigureAwait(false);
@@ -272,7 +274,7 @@ namespace KalshiBotAPI.Websockets
         {
             get
             {
-                if (_config.MessageProcessor.UseAdvancedLocking && _orderBookQueueLock != null)
+                if (_config.UseAdvancedLocking && _orderBookQueueLock != null)
                 {
                     _orderBookQueueLock.EnterReadLock();
                     try
@@ -369,7 +371,7 @@ namespace KalshiBotAPI.Websockets
         private async Task ReceiveAsync()
         {
             _logger.LogInformation("WebSocket message receiving task started");
-            var buffer = new byte[_config.WebSocketBufferSize]; // Use configurable buffer size
+            var buffer = new byte[16384]; // Use configurable buffer size
             var messageBuilder = new StringBuilder();
             try
             {
@@ -398,7 +400,7 @@ namespace KalshiBotAPI.Websockets
                             _logger.LogDebug("Received complete WebSocket message: Length={Length}", fullMessage.Length);
 
                             // Use batching or direct processing based on configuration
-                            if (_config.MessageProcessor.EnableMessageBatching)
+                            if (_config.EnableMessageBatching)
                             {
                                 _messageBatchQueue.Enqueue(fullMessage);
                             }
@@ -478,9 +480,9 @@ namespace KalshiBotAPI.Websockets
                         }
 
                         // Periodic cleanup of old sequence numbers to prevent memory leaks
-                        if (_processedSequenceNumbers.Count > _config.MessageProcessor.MaxSequenceNumbersToKeep)
+                        if (_processedSequenceNumbers.Count > _config.MaxSequenceNumbersToKeep)
                         {
-                            var oldestToKeep = _latestProcessedSequenceNumber - (_config.MessageProcessor.MaxSequenceNumbersToKeep / 2);
+                            var oldestToKeep = _latestProcessedSequenceNumber - (_config.MaxSequenceNumbersToKeep / 2);
                             _processedSequenceNumbers.RemoveWhere(seq => seq < oldestToKeep);
                         }
                     }
@@ -586,7 +588,7 @@ namespace KalshiBotAPI.Websockets
         {
             _logger.LogInformation("Clearing order book update queue for market: {MarketTicker}", marketTicker);
 
-            if (_config.MessageProcessor.UseAdvancedLocking && _orderBookQueueLock != null)
+            if (_config.UseAdvancedLocking && _orderBookQueueLock != null)
             {
                 _orderBookQueueLock.EnterWriteLock();
                 try
@@ -638,16 +640,13 @@ namespace KalshiBotAPI.Websockets
         {
             var startTime = DateTime.UtcNow;
             bool waited = false;
-            var configuredTimeout = TimeSpan.FromMilliseconds(_config.MessageProcessor.OrderBookQueueTimeoutMs);
-
-            // Use the shorter of the provided timeout or configured timeout
-            var effectiveTimeout = timeout < configuredTimeout ? timeout : configuredTimeout;
+            var effectiveTimeout = timeout;
 
             while (!_processingCancellationToken.IsCancellationRequested)
             {
                 bool hasPendingUpdates;
 
-                if (_config.MessageProcessor.UseAdvancedLocking && _orderBookQueueLock != null)
+                if (_config.UseAdvancedLocking && _orderBookQueueLock != null)
                 {
                     _orderBookQueueLock.EnterReadLock();
                     try
@@ -1209,7 +1208,7 @@ namespace KalshiBotAPI.Websockets
             {
                 while (!_batchCancellationSource.Token.IsCancellationRequested)
                 {
-                    await Task.Delay(_config.MessageProcessor.BatchProcessingIntervalMs, _batchCancellationSource.Token);
+                    await Task.Delay(_config.BatchProcessingIntervalMs, _batchCancellationSource.Token);
 
                     if (_messageBatchQueue.IsEmpty)
                         continue;
@@ -1217,7 +1216,7 @@ namespace KalshiBotAPI.Websockets
                     var messagesToProcess = new List<string>();
 
                     // Collect batch of messages
-                    while (messagesToProcess.Count < _config.MessageProcessor.MaxBatchSize &&
+                    while (messagesToProcess.Count < _config.MaxBatchSize &&
                            _messageBatchQueue.TryDequeue(out var message))
                     {
                         messagesToProcess.Add(message);
@@ -1270,7 +1269,7 @@ namespace KalshiBotAPI.Websockets
                 var now = DateTime.UtcNow;
                 var timeSinceLastLog = now - _lastMetricsLogTime;
 
-                if (timeSinceLastLog.TotalMilliseconds >= _config.MessageProcessor.PerformanceMetricsLogIntervalMs)
+                if (timeSinceLastLog.TotalMilliseconds >= _config.PerformanceMetricsLogIntervalMs)
                 {
                     var messagesPerSecond = _totalMessagesProcessed / timeSinceLastLog.TotalSeconds;
                     var avgProcessingTime = _totalMessagesProcessed > 0 ? _totalProcessingTimeMs / _totalMessagesProcessed : 0;
@@ -1309,12 +1308,12 @@ namespace KalshiBotAPI.Websockets
             var now = DateTime.UtcNow;
             var timeSinceLastWarning = now - _lastDuplicateWarningTime;
 
-            if (timeSinceLastWarning.TotalMilliseconds >= _config.MessageProcessor.DuplicateMessageTimeWindowMs)
+            if (timeSinceLastWarning.TotalMilliseconds >= _config.DuplicateMessageTimeWindowMs)
             {
-                if (_duplicateMessagesInWindow >= _config.MessageProcessor.DuplicateMessageWarningThreshold)
+                if (_duplicateMessagesInWindow >= _config.DuplicateMessageWarningThreshold)
                 {
                     _logger.LogWarning("High duplicate message rate detected: {DuplicateCount} duplicates in {TimeWindow}ms window. This may indicate message processing issues.",
-                        _duplicateMessagesInWindow, _config.MessageProcessor.DuplicateMessageTimeWindowMs);
+                        _duplicateMessagesInWindow, _config.DuplicateMessageTimeWindowMs);
 
                     // Post duplicate metrics to central monitoring
                     _performanceMetrics.PostDuplicateMessageMetrics(
@@ -1328,5 +1327,6 @@ namespace KalshiBotAPI.Websockets
                 _lastDuplicateWarningTime = now;
             }
         }
+
     }
 }

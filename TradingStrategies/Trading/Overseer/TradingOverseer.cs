@@ -53,10 +53,10 @@ namespace TradingStrategies.Trading.Overseer
             _performanceMonitor = performanceMonitor;
             _enablePerformanceMetrics = configuration.GetValue<bool>("TradingOverseer:EnablePerformanceMetrics", false);
             _performanceMonitor.EnablePerformanceMetrics = _enablePerformanceMetrics;
-            _simulationEngine = new SimulationEngine(configuration, performanceMonitor, enablePatternImageGeneration);
-            var tradingConfig = new TradingConfig();
-            configuration.GetSection("TradingConfig").Bind(tradingConfig);
-            _equityCalculator = new EquityCalculator(tradingConfig);
+            _simulationEngine = new SimulationEngine(configuration);
+            var equityCalculatorConfig = new EquityCalculatorConfig();
+            configuration.GetSection("EquityCalculator").Bind(equityCalculatorConfig);
+            _equityCalculator = new EquityCalculator(equityCalculatorConfig);
         }
 
         private record SnapshotMetadata(string MarketTicker, DateTime StartTime, DateTime EndTime);

@@ -15,17 +15,17 @@ namespace TradingSimulator
     public class DataLoader
     {
         private readonly ITradingSnapshotService _snapshotService;
-        private readonly IOptions<SimulatorConfig> _simulatorOptions;
+        private readonly IOptions<DataLoaderConfig> _dataLoaderConfig;
 
         /// <summary>
         /// Initializes a new instance of the DataLoader class.
         /// </summary>
         /// <param name="snapshotService">The trading snapshot service.</param>
-        /// <param name="simulatorOptions">The simulator configuration options.</param>
-        public DataLoader(ITradingSnapshotService snapshotService, IOptions<SimulatorConfig> simulatorOptions)
+        /// <param name="dataLoaderOptions">The simulator configuration options.</param>
+        public DataLoader(ITradingSnapshotService snapshotService, IOptions<DataLoaderConfig> dataLoaderOptions)
         {
             _snapshotService = snapshotService;
-            _simulatorOptions = simulatorOptions;
+            _dataLoaderConfig = dataLoaderOptions;
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace TradingSimulator
                     .ToList();
 
                 // Validate snapshots if enabled
-                if (_simulatorOptions.Value.EnableSnapshotValidation && marketSnapshots.Any())
+                if (_dataLoaderConfig.Value.EnableSnapshotValidation && marketSnapshots.Any())
                 {
                     marketSnapshots = ValidateSnapshots(marketSnapshots, market);
                 }
@@ -140,7 +140,7 @@ namespace TradingSimulator
         private List<MarketSnapshot> ValidateSnapshots(List<MarketSnapshot> snapshots, string marketName)
         {
             var validSnapshots = new List<MarketSnapshot>();
-            int minCount = _simulatorOptions.Value.MinSnapshotCountForValidation;
+            int minCount = _dataLoaderConfig.Value.MinSnapshotCountForValidation;
 
             if (snapshots.Count < minCount)
             {

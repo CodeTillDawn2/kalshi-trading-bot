@@ -1,5 +1,8 @@
 using Microsoft.Extensions.Options;
+using BacklashBot.State;
+using BacklashDTOs.Configuration;
 using TradingStrategies.Configuration;
+using BacklashBotTests.Configuration;
 using System;
 using System.Text.Json;
 using System.IO;
@@ -43,16 +46,31 @@ namespace KalshiBotTests
         /// The returned options object can be injected into services that depend on TradingConfig for isolated testing.
         /// </summary>
         /// <returns>An IOptions&lt;TradingConfig&gt; instance configured with standard test values.</returns>
-        public static IOptions<TradingConfig> GetTradingConfig()
+        public static IOptions<BacklashDTOs.Configuration.GeneralExecutionConfig> GetGeneralExecutionConfig()
         {
-            var tradingConfig = new TradingConfig
+            var generalExecutionConfig = new BacklashDTOs.Configuration.GeneralExecutionConfig
             {
                 DecisionFrequencySeconds = 60,
+                HardDataStorageLocation = @"C:\Temp\Storage",
+            };
+            return Options.Create(generalExecutionConfig);
+        }
+
+        /// <summary>
+        /// Creates and returns an IOptions&lt;TestHelperConfig&gt; instance with predefined test values for test-specific settings.
+        /// These values represent configuration parameters used only in test scenarios.
+        /// The returned options object can be injected into services that depend on TestHelperConfig for isolated testing.
+        /// </summary>
+        /// <returns>An IOptions&lt;TestHelperConfig&gt; instance configured with standard test values.</returns>
+        public static IOptions<TestHelperConfig> GetTestHelperConfig()
+        {
+            var testHelperConfig = new TestHelperConfig
+            {
                 ChangeWindowDurationMinutes = 5,
                 TradeMatchingWindowSeconds = 5,
+                OrderbookCancelWindowSeconds = 10,
             };
-            ValidateTradingConfig(tradingConfig);
-            return Options.Create(tradingConfig);
+            return Options.Create(testHelperConfig);
         }
 
         /// <summary>
@@ -95,28 +113,6 @@ namespace KalshiBotTests
             return Options.Create(calculationConfig);
         }
 
-        /// <summary>
-        /// Validates all properties of a TradingConfig instance to ensure they contain valid values.
-        /// Throws ArgumentException if any property has an invalid value.
-        /// </summary>
-        /// <param name="config">The TradingConfig instance to validate.</param>
-        /// <exception cref="ArgumentException">Thrown when any configuration property has an invalid value.</exception>
-        private static void ValidateTradingConfig(TradingConfig config)
-        {
-            if (config.DecisionFrequencySeconds <= 0) throw new ArgumentException("DecisionFrequencySeconds must be positive");
-            if (config.ChangeWindowDurationMinutes <= 0) throw new ArgumentException("ChangeWindowDurationMinutes must be positive");
-            if (config.TradeMatchingWindowSeconds < 0) throw new ArgumentException("TradeMatchingWindowSeconds must be non-negative");
-            if (config.OrderbookCancelWindowSeconds < 0) throw new ArgumentException("OrderbookCancelWindowSeconds must be non-negative");
-            if (config.RefreshIntervalMinutes <= 0) throw new ArgumentException("RefreshIntervalMinutes must be positive");
-            if (config.RefreshThresholdRatio < 0 || config.RefreshThresholdRatio > 1) throw new ArgumentException("RefreshThresholdRatio must be between 0 and 1");
-            if (config.TimeBudgetRatio < 0 || config.TimeBudgetRatio > 1) throw new ArgumentException("TimeBudgetRatio must be between 0 and 1");
-            if (config.MaxPositionSizePercent < 0 || config.MaxPositionSizePercent > 1) throw new ArgumentException("MaxPositionSizePercent must be between 0 and 1");
-            if (config.MaxTotalExposurePercent < 0) throw new ArgumentException("MaxTotalExposurePercent must be non-negative");
-            if (config.StopLossPercent < 0 || config.StopLossPercent > 1) throw new ArgumentException("StopLossPercent must be between 0 and 1");
-            if (config.TakeProfitPercent < 0) throw new ArgumentException("TakeProfitPercent must be non-negative");
-            if (config.MaxConcurrentPositions <= 0) throw new ArgumentException("MaxConcurrentPositions must be positive");
-            if (config.MaxDrawdownPercent < 0 || config.MaxDrawdownPercent > 1) throw new ArgumentException("MaxDrawdownPercent must be between 0 and 1");
-        }
 
         /// <summary>
         /// Validates all properties of a CalculationConfig instance to ensure they contain valid values.
@@ -169,34 +165,52 @@ namespace KalshiBotTests
         /// </summary>
         /// <param name="scenario">The test scenario to use for configuration values.</param>
         /// <returns>An IOptions&lt;TradingConfig&gt; instance configured for the specified scenario.</returns>
-        public static TradingConfig GetTradingConfig(TestScenario scenario)
+        public static BacklashDTOs.Configuration.GeneralExecutionConfig GetGeneralExecutionConfig(TestScenario scenario)
         {
-            var config = new TradingConfig();
+            var config = new BacklashDTOs.Configuration.GeneralExecutionConfig
+            {
+                HardDataStorageLocation = @"C:\Temp\Storage"
+            };
             switch (scenario)
             {
                 case TestScenario.Fast:
                     config.DecisionFrequencySeconds = 30;
-                    config.ChangeWindowDurationMinutes = 2;
-                    config.TradeMatchingWindowSeconds = 2;
-                    config.OrderbookCancelWindowSeconds = 5;
-                    config.RefreshIntervalMinutes = 1;
                     break;
                 case TestScenario.Slow:
                     config.DecisionFrequencySeconds = 300;
-                    config.ChangeWindowDurationMinutes = 10;
-                    config.TradeMatchingWindowSeconds = 10;
-                    config.OrderbookCancelWindowSeconds = 30;
-                    config.RefreshIntervalMinutes = 15;
                     break;
                 default:
                     config.DecisionFrequencySeconds = 60;
+                    break;
+            }
+            return config;
+        }
+        /// <summary>
+        /// Creates and returns an TestHelperConfig instance with scenario-based test values.
+        /// </summary>
+        /// <param name="scenario">The test scenario to use for configuration values.</param>
+        /// <returns>An IOptions&lt;TestHelperConfig&gt; instance configured for the specified scenario.</returns>
+        public static TestHelperConfig GetTestHelperConfig(TestScenario scenario)
+        {
+            var config = new TestHelperConfig();
+            switch (scenario)
+            {
+                case TestScenario.Fast:
+                    config.ChangeWindowDurationMinutes = 2;
+                    config.TradeMatchingWindowSeconds = 2;
+                    config.OrderbookCancelWindowSeconds = 5;
+                    break;
+                case TestScenario.Slow:
+                    config.ChangeWindowDurationMinutes = 10;
+                    config.TradeMatchingWindowSeconds = 10;
+                    config.OrderbookCancelWindowSeconds = 30;
+                    break;
+                default:
                     config.ChangeWindowDurationMinutes = 5;
                     config.TradeMatchingWindowSeconds = 5;
                     config.OrderbookCancelWindowSeconds = 10;
-                    config.RefreshIntervalMinutes = 5;
                     break;
             }
-            ValidateTradingConfig(config);
             return Options.Create(config).Value;
         }
 
@@ -274,12 +288,11 @@ namespace KalshiBotTests
         /// </summary>
         /// <param name="filePath">Path to the JSON configuration file.</param>
         /// <returns>An IOptions&lt;TradingConfig&gt; instance loaded from the file.</returns>
-        public static IOptions<TradingConfig> LoadTradingConfigFromFile(string filePath)
+        public static IOptions<BacklashDTOs.Configuration.GeneralExecutionConfig> LoadGeneralExecutionConfigFromFile(string filePath)
         {
             if (!File.Exists(filePath)) throw new FileNotFoundException("Configuration file not found", filePath);
             var json = File.ReadAllText(filePath);
-            var config = JsonSerializer.Deserialize<TradingConfig>(json);
-            ValidateTradingConfig(config);
+            var config = JsonSerializer.Deserialize<BacklashDTOs.Configuration.GeneralExecutionConfig>(json);
             return Options.Create(config);
         }
 

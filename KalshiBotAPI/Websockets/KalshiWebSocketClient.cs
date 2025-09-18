@@ -38,6 +38,7 @@ namespace KalshiBotAPI.Websockets
         private readonly IBotReadyStatus _readyStatus;
         private readonly ILogger<IKalshiWebSocketClient> _logger;
         private readonly KalshiConfig _kalshiConfig;
+        private readonly KalshiWebSocketClientConfig _websocketConfig;
         private readonly IWebSocketConnectionManager _connectionManager;
         private readonly ISubscriptionManager _subscriptionManager;
         private readonly IMessageProcessor _messageProcessor;
@@ -188,7 +189,8 @@ namespace KalshiBotAPI.Websockets
         /// <summary>
         /// Initializes a new instance of the KalshiWebSocketClient class.
         /// </summary>
-        /// <param name="kalshiConfig">Configuration options for Kalshi API connection.</param>
+        /// <param name="kalshiConfig">Configuration options for Kalshi core settings.</param>
+        /// <param name="websocketConfig">Configuration options for WebSocket operations.</param>
         /// <param name="logger">Logger instance for recording operations and errors.</param>
         /// <param name="statusTrackerService">Service for tracking bot status and cancellation tokens.</param>
         /// <param name="readyStatus">Service for tracking bot readiness state.</param>
@@ -203,6 +205,7 @@ namespace KalshiBotAPI.Websockets
         /// <param name="enablePerformanceMetrics">Whether to enable performance metrics collection. Default is true.</param>
         public KalshiWebSocketClient(
             IOptions<KalshiConfig> kalshiConfig,
+            IOptions<KalshiWebSocketClientConfig> websocketConfig,
             ILogger<IKalshiWebSocketClient> logger,
             IStatusTrackerService statusTrackerService,
             IBotReadyStatus readyStatus,
@@ -217,6 +220,7 @@ namespace KalshiBotAPI.Websockets
             bool? enablePerformanceMetrics = null)
         {
             _kalshiConfig = kalshiConfig.Value;
+            _websocketConfig = websocketConfig.Value;
             _logger = logger;
             _statusTrackerService = statusTrackerService;
             _readyStatus = readyStatus;
@@ -228,7 +232,7 @@ namespace KalshiBotAPI.Websockets
             _performanceMetrics = performanceMetrics;
             WriteToSQL = writeToSql;
             _webSocketBufferSize = webSocketBufferSize;
-            EnablePerformanceMetrics = enablePerformanceMetrics ?? true;
+            EnablePerformanceMetrics = enablePerformanceMetrics ?? _websocketConfig.EnablePerformanceMetrics;
 
             // Wire up events from MessageProcessor to expose them publicly
             _messageProcessor.OrderBookReceived += (sender, args) => OrderBookReceived?.Invoke(sender, args);

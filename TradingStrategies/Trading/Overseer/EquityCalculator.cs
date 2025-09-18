@@ -32,14 +32,14 @@ namespace TradingStrategies.Trading.Overseer
     /// </remarks>
     public class EquityCalculator
     {
-        private readonly TradingConfig _config;
+        private readonly EquityCalculatorConfig _config;
         private readonly List<long> _calculationTimes = new List<long>();
 
         /// <summary>
         /// Initializes a new instance of the EquityCalculator class.
         /// </summary>
-        /// <param name="config">The trading configuration containing performance metrics settings.</param>
-        public EquityCalculator(TradingConfig config)
+        /// <param name="config">The equity calculator configuration containing performance metrics settings.</param>
+        public EquityCalculator(EquityCalculatorConfig config)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
@@ -88,7 +88,7 @@ namespace TradingStrategies.Trading.Overseer
             if (path == null)
                 throw new ArgumentNullException(nameof(path), "Simulation path cannot be null");
 
-            var stopwatch = _config.EquityCalculator_EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
+            var stopwatch = _config.EnablePerformanceMetrics ? Stopwatch.StartNew() : null;
 
             double equity = path.Cash;
             if (path.SimulatedBook == null)
@@ -160,7 +160,7 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         public long[] GetCalculationTimes()
         {
-            return _config.EquityCalculator_EnablePerformanceMetrics ? _calculationTimes.ToArray() : Array.Empty<long>();
+            return _config.EnablePerformanceMetrics ? _calculationTimes.ToArray() : Array.Empty<long>();
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         public (int Count, double AverageMs, long MinMs, long MaxMs) GetCalculationStatistics()
         {
-            if (!_config.EquityCalculator_EnablePerformanceMetrics || _calculationTimes.Count == 0)
+            if (!_config.EnablePerformanceMetrics || _calculationTimes.Count == 0)
                 return (0, 0, 0, 0);
 
             return (
@@ -206,7 +206,7 @@ namespace TradingStrategies.Trading.Overseer
         /// </remarks>
         public void PostMetrics(PerformanceMonitor performanceMonitor)
         {
-            if (!performanceMonitor.EnablePerformanceMetrics || !_config.EquityCalculator_EnablePerformanceMetrics) return;
+            if (!performanceMonitor.EnablePerformanceMetrics || !_config.EnablePerformanceMetrics) return;
 
             long totalExecutionTimeMs = _calculationTimes.Sum();
             int totalCalculations = _calculationTimes.Count;
@@ -221,7 +221,7 @@ namespace TradingStrategies.Trading.Overseer
                 ["Timestamp"] = DateTime.UtcNow
             };
 
-            performanceMonitor.RecordSimulationMetrics("EquityCalculator", metricsDict, _config.EquityCalculator_EnablePerformanceMetrics);
+            performanceMonitor.RecordSimulationMetrics("EquityCalculator", metricsDict, _config.EnablePerformanceMetrics);
         }
     }
 }

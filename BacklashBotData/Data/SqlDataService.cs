@@ -15,6 +15,7 @@ using Polly;
 using Polly.Retry;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using BacklashInterfaces.PerformanceMetrics;
+using BacklashBotData.Configuration;
 namespace KalshiBotData.Data
 {
     /// <summary>
@@ -155,13 +156,13 @@ namespace KalshiBotData.Data
             _performanceMetricsReceivers = performanceMetricsReceivers ?? Array.Empty<ISqlDataServicePerformanceMetrics>();
 
             // Load configuration options with defaults
-            var sqlDataConfig = configuration.GetSection("SqlDataService");
-            _retryCount = sqlDataConfig.GetValue<int>("RetryCount", 3);
-            _retryDelay = TimeSpan.FromSeconds(sqlDataConfig.GetValue<double>("RetryDelaySeconds", 1.0));
-            _maxQueueSize = sqlDataConfig.GetValue<int>("MaxQueueSize", 10000);
-            _workersPerQueue = sqlDataConfig.GetValue<int>("WorkersPerQueue", 1);
-            _batchSize = sqlDataConfig.GetValue<int>("BatchSize", 1);
-            _enablePerformanceMetrics = sqlDataConfig.GetValue<bool>("EnablePerformanceMetrics", false);
+            var dataConfig = configuration.GetSection("BacklashBotData").Get<BacklashBotDataConfig>();
+            _retryCount = dataConfig.MaxRetryCount;
+            _retryDelay = TimeSpan.FromSeconds(dataConfig.RetryDelaySeconds);
+            _maxQueueSize = dataConfig.MaxQueueSize;
+            _workersPerQueue = dataConfig.WorkersPerQueue;
+            _batchSize = dataConfig.BatchSize;
+            _enablePerformanceMetrics = dataConfig.EnablePerformanceMetrics;
 
             _orderBookQueue = new ConcurrentQueue<DatabaseOperation>();
             _tradeQueue = new ConcurrentQueue<DatabaseOperation>();

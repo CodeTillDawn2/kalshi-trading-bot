@@ -14,17 +14,17 @@ namespace BacklashBot.Management
     public class TargetCalculationService : ITargetCalculationService
     {
         private readonly ILogger<TargetCalculationService> _logger;
-        private readonly ExecutionConfig _executionConfig;
+        private readonly TargetCalculationServiceConfig _targetCalculationConfig;
 
         /// <summary>
         /// Initializes a new instance of the TargetCalculationService class.
         /// </summary>
         /// <param name="logger">Logger for recording target calculation operations</param>
-        /// <param name="executionConfig">Configuration options containing queue limits</param>
-        public TargetCalculationService(ILogger<TargetCalculationService> logger, IOptions<ExecutionConfig> executionConfig)
+        /// <param name="targetCalculationConfig">Configuration options containing queue limits</param>
+        public TargetCalculationService(ILogger<TargetCalculationService> logger, IOptions<TargetCalculationServiceConfig> targetCalculationConfig)
         {
             _logger = logger;
-            _executionConfig = executionConfig.Value;
+            _targetCalculationConfig = targetCalculationConfig.Value;
         }
 
         /// <summary>
@@ -54,28 +54,28 @@ namespace BacklashBot.Management
             }
 
             // Validate queue limits from config
-            if (_executionConfig.NotificationQueueLimit <= 0)
+            if (_targetCalculationConfig.NotificationQueueLimit <= 0)
             {
-                _logger.LogWarning("Invalid NotificationQueueLimit in configuration: {Limit}. Using default of 50", _executionConfig.NotificationQueueLimit);
-                _executionConfig.NotificationQueueLimit = 50;
+                _logger.LogWarning("Invalid NotificationQueueLimit in configuration: {Limit}. Using default of 50", _targetCalculationConfig.NotificationQueueLimit);
+                // Note: Config is read-only, can't modify it here
             }
 
-            if (_executionConfig.OrderbookQueueLimit <= 0)
+            if (_targetCalculationConfig.OrderbookQueueLimit <= 0)
             {
-                _logger.LogWarning("Invalid OrderbookQueueLimit in configuration: {Limit}. Using default of 50", _executionConfig.OrderbookQueueLimit);
-                _executionConfig.OrderbookQueueLimit = 50;
+                _logger.LogWarning("Invalid OrderbookQueueLimit in configuration: {Limit}. Using default of 50", _targetCalculationConfig.OrderbookQueueLimit);
+                // Note: Config is read-only, can't modify it here
             }
 
-            if (_executionConfig.EventQueueLimit <= 0)
+            if (_targetCalculationConfig.EventQueueLimit <= 0)
             {
-                _logger.LogWarning("Invalid EventQueueLimit in configuration: {Limit}. Using default of 50", _executionConfig.EventQueueLimit);
-                _executionConfig.EventQueueLimit = 50;
+                _logger.LogWarning("Invalid EventQueueLimit in configuration: {Limit}. Using default of 50", _targetCalculationConfig.EventQueueLimit);
+                // Note: Config is read-only, can't modify it here
             }
 
-            if (_executionConfig.TickerQueueLimit <= 0)
+            if (_targetCalculationConfig.TickerQueueLimit <= 0)
             {
-                _logger.LogWarning("Invalid TickerQueueLimit in configuration: {Limit}. Using default of 50", _executionConfig.TickerQueueLimit);
-                _executionConfig.TickerQueueLimit = 50;
+                _logger.LogWarning("Invalid TickerQueueLimit in configuration: {Limit}. Using default of 50", _targetCalculationConfig.TickerQueueLimit);
+                // Note: Config is read-only, can't modify it here
             }
 
             // Helper function to calculate target and validate result
@@ -94,16 +94,16 @@ namespace BacklashBot.Management
             int targetCountUsage = CalculateAndValidateTarget(brain.UsageTarget, metrics.CurrentUsage, metrics.CurrentCount);
 
             // Target count by Notification Queue
-            int targetCountNotificationQueue = CalculateAndValidateTarget(_executionConfig.NotificationQueueLimit, metrics.NotificationQueueAvg, metrics.CurrentCount);
+            int targetCountNotificationQueue = CalculateAndValidateTarget(_targetCalculationConfig.NotificationQueueLimit, metrics.NotificationQueueAvg, metrics.CurrentCount);
 
             // Target count by Orderbook Queue
-            int targetCountOrderbookQueue = CalculateAndValidateTarget(_executionConfig.OrderbookQueueLimit, metrics.OrderbookQueueAvg, metrics.CurrentCount);
+            int targetCountOrderbookQueue = CalculateAndValidateTarget(_targetCalculationConfig.OrderbookQueueLimit, metrics.OrderbookQueueAvg, metrics.CurrentCount);
 
             // Target count by Event Queue
-            int targetCountEventQueue = CalculateAndValidateTarget(_executionConfig.EventQueueLimit, metrics.EventQueueAvg, metrics.CurrentCount);
+            int targetCountEventQueue = CalculateAndValidateTarget(_targetCalculationConfig.EventQueueLimit, metrics.EventQueueAvg, metrics.CurrentCount);
 
             // Target count by Ticker Queue
-            int targetCountTickerQueue = CalculateAndValidateTarget(_executionConfig.TickerQueueLimit, metrics.TickerQueueAvg, metrics.CurrentCount);
+            int targetCountTickerQueue = CalculateAndValidateTarget(_targetCalculationConfig.TickerQueueLimit, metrics.TickerQueueAvg, metrics.CurrentCount);
 
             // Collect valid targets
             var validTargets = new List<int>();

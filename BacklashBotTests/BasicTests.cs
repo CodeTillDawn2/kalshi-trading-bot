@@ -5,10 +5,12 @@ using Microsoft.Extensions.Options;
 using Moq;
 using BacklashBot.Helpers;
 using BacklashBot.Services;
-using TradingStrategies.Configuration;
+using BacklashBot.State;
 using KalshiBotData.Extensions;
 using KalshiBotData.Models;
 using BacklashDTOs.Data;
+using BacklashDTOs.Configuration;
+using TradingStrategies.Configuration;
 using System.Collections.Generic;
 
 namespace KalshiBotTests
@@ -54,9 +56,6 @@ namespace KalshiBotTests
         private Mock<ILogger<TradingCalculator>> _tradingCalculatorLoggerMock;
 
         /// <summary>
-        /// Configuration options for snapshot service behavior.
-        /// </summary>
-        private IOptions<SnapshotConfig> _snapshotOptions;
 
         /// <summary>
         /// Configuration options for calculation parameters (periods, multipliers, etc.).
@@ -64,9 +63,9 @@ namespace KalshiBotTests
         private IOptions<CalculationConfig> _calculationOptions;
 
         /// <summary>
-        /// Configuration options for trading parameters and thresholds.
+        /// Configuration options for general execution parameters.
         /// </summary>
-        private IOptions<TradingConfig> _tradingOptions;
+        private IOptions<BacklashDTOs.Configuration.GeneralExecutionConfig> _generalExecutionOptions;
 
         /// <summary>
         /// Margin factor used for floating-point comparison tolerance in assertions.
@@ -93,13 +92,14 @@ namespace KalshiBotTests
             _scopeFactory = new Mock<IServiceScopeFactory>().Object;
             _tradingSnapshotServiceLoggerMock = new Mock<ILogger<TradingSnapshotService>>();
             _tradingCalculatorLoggerMock = new Mock<ILogger<TradingCalculator>>();
-            _tradingCalculator = new TradingCalculator(_tradingCalculatorLoggerMock.Object, _calculationOptions.Value);
-            _tradingOptions = TestHelper.GetTradingConfig();
+            _tradingCalculator = new TradingCalculator(_tradingCalculatorLoggerMock.Object, _calculationOptions);
+            _generalExecutionOptions = TestHelper.GetGeneralExecutionConfig();
             _calculationOptions = TestHelper.GetCalculationConfig();
             _marginFactor = 0.001; // 0.1% margin factor
 
             var config = new ConfigurationBuilder().Build();
-            _snapshotService = new TradingSnapshotService(_tradingSnapshotServiceLoggerMock.Object, _snapshotOptions, _tradingOptions, _scopeFactory, config);
+            var snapshotServiceConfig = Options.Create(new BacklashDTOs.Configuration.TradingSnapshotServiceConfig { SnapshotToleranceSeconds = 5, StorageDirectory = @"C:\Temp\Storage", MaxParallelism = 8, EnablePerformanceMetrics = true });
+            _snapshotService = new TradingSnapshotService(_tradingSnapshotServiceLoggerMock.Object, snapshotServiceConfig, _generalExecutionOptions, _scopeFactory, config);
         }
 
         /// <summary>

@@ -9,7 +9,10 @@ using KalshiBotAPI.WebSockets.Interfaces;
 using KalshiBotData.Data;
 
 using BacklashOverseer;
+using BacklashOverseer.Config;
+using BacklashCommon.Configuration;
 using KalshiBotLogging;
+using Microsoft.Extensions.Options;
 using BacklashOverseer.Services;
 using BacklashDTOs.Configuration;
 using BacklashCommon.Services;
@@ -30,10 +33,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using System.IO;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Websockets;
 using BacklashBotData.Data.Interfaces;
 using BacklashBotData.Data;
+using BacklashCommon.Helpers;
 
 namespace BacklashOverseer
 {
@@ -96,7 +101,7 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IStatusTrackerService>(),
                 sp.GetRequiredService<ISqlDataService>(),
                 sp.GetRequiredService<IKalshiAPIService>(),
-                sp.GetRequiredService<IOptions<KalshiConfig>>().Value,
+                sp.GetRequiredService<IOptions<MessageProcessorConfig>>().Value,
                 sp.GetRequiredService<IMessageProcessorPerformanceMetrics>()
             ));
             services.AddScoped<ISubscriptionManager>(sp => new SubscriptionManager(
@@ -104,10 +109,11 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IWebSocketConnectionManager>(),
                 sp.GetRequiredService<IDataCache>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
-                sp.GetRequiredService<IConfiguration>()
+                sp.GetRequiredService<IOptions<SubscriptionManagerConfig>>()
             ));
             services.AddScoped<IKalshiWebSocketClient>(sp => new KalshiWebSocketClient(
                 sp.GetRequiredService<IOptions<KalshiConfig>>(),
+                sp.GetRequiredService<IOptions<KalshiWebSocketClientConfig>>(),
                 sp.GetRequiredService<ILogger<IKalshiWebSocketClient>>(),
                 sp.GetRequiredService<IStatusTrackerService>(),
                 sp.GetRequiredService<IBotReadyStatus>(),
@@ -118,8 +124,8 @@ namespace BacklashOverseer
                 sp.GetRequiredService<IDataCache>(),
                 sp.GetRequiredService<IWebSocketPerformanceMetrics>(),
                 sp.GetRequiredService<IOptions<LoggingConfig>>().Value.StoreWebSocketEvents,
-                sp.GetRequiredService<IOptions<KalshiConfig>>().Value.WebSocketBufferSize,
-                sp.GetRequiredService<IConfiguration>().GetSection("Kalshi:KalshiWebSocketClient:EnablePerformanceMetrics").Get<bool?>() ?? true
+                sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.BufferSize,
+                sp.GetRequiredService<IOptions<WebSocketConnectionManagerConfig>>().Value.EnablePerformanceMetrics ?? true
             ));
             services.AddScoped<ISqlDataService, SqlDataService>();
             services.AddScoped<BacklashBotContext>(provider => new BacklashBotContext(Configuration));
@@ -135,7 +141,41 @@ namespace BacklashOverseer
             services.Configure<KalshiConfig>(Configuration.GetSection("Kalshi"));
 
             // Configure OverseerHub settings
-            services.Configure<OverseerHubConfig>(Configuration.GetSection("OverseerHub"));
+            services.Configure<OverseerHubConfig>(Configuration.GetSection("Endpoints:OverseerHub"));
+
+            // Configure Overseer settings
+            services.Configure<OverseerConfig>(Configuration.GetSection("Endpoints:Overseer"));
+
+            // Configure MarketWatchController settings
+            services.Configure<MarketWatchControllerConfig>(Configuration.GetSection("Endpoints:MarketWatchController"));
+
+            // Configure SubscriptionManager settings
+            services.Configure<SubscriptionManagerConfig>(Configuration.GetSection("Websockets:SubscriptionManager"));
+            services.Configure<MessageProcessorConfig>(Configuration.GetSection("Websockets:MessageProcessor"));
+            services.Configure<WebSocketConnectionManagerConfig>(Configuration.GetSection("Websockets:WebSocketConnectionManager"));
+            services.Configure<KalshiWebSocketClientConfig>(Configuration.GetSection("Websockets:KalshiWebSocketClient"));
+
+
+            // Configure Secrets settings
+            services.Configure<BacklashCommon.Configuration.SecretsConfig>(Configuration.GetSection("Secrets"));
+
+            // Resolve KeyFile path - combine secrets path with filename from secrets
+            services.PostConfigure<KalshiConfig>(config =>
+            {
+                if (!string.IsNullOrEmpty(config.KeyFile) && config.KeyFile.Contains("{Kalshi:KeyFile}"))
+                {
+                    // Get the key file name from secrets
+                    var keyFileName = Configuration.GetValue<string>("Kalshi:KeyFile");
+                    if (!string.IsNullOrEmpty(keyFileName))
+                    {
+                        // Get secrets path from configuration
+                        var secretsPath = Configuration.GetValue<string>("Secrets:SecretsPath") ?? "Secrets";
+                        // Combine secrets directory path with filename
+                        var secretsDir = Path.Combine(Directory.GetCurrentDirectory(), secretsPath);
+                        config.KeyFile = Path.Combine(secretsDir, keyFileName);
+                    }
+                }
+            });
 
             // Optional: Manual override if configuration binding fails
             services.PostConfigure<KalshiConfig>(config =>
@@ -145,7 +185,7 @@ namespace BacklashOverseer
                     Console.WriteLine("Warning: KalshiConfig not properly bound, attempting manual override...");
 
                     // Try to read from local file directly
-                    var localConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.local.json");
+                    var localConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
                     if (File.Exists(localConfigPath))
                     {
                         try
@@ -192,20 +232,20 @@ namespace BacklashOverseer
             services.AddSingleton<INightActivitiesPerformanceMetrics>(provider =>
                 (INightActivitiesPerformanceMetrics)provider.GetRequiredService<PerformanceMetricsService>());
 
-            // Register ExecutionConfig
-            services.Configure<ExecutionConfig>(Configuration.GetSection("Execution"));
+            // Register GeneralExecutionConfig
+            services.Configure<GeneralExecutionConfig>(Configuration.GetSection("GeneralExecution"));
 
             // Register services needed for OvernightActivitiesHelper
             services.AddScoped<IInterestScoreService, InterestScoreService>();
-            services.AddScoped<IMarketAnalysisHelper, MarketAnalysisHelper>();
+            services.AddScoped<ISnapshotGroupHelper, SnapshotGroupHelper>();
 
             // Register OvernightActivitiesHelper
             services.AddScoped<IOvernightActivitiesHelper>(provider =>
                 new BacklashCommon.Services.OvernightActivitiesHelper(
                     provider.GetRequiredService<ILogger<IOvernightActivitiesHelper>>(),
                     null, // interestScoreHelper parameter not used in constructor
-                    provider.GetRequiredService<IMarketAnalysisHelper>(),
-                    provider.GetRequiredService<IOptions<ExecutionConfig>>(),
+                    provider.GetRequiredService<ISnapshotGroupHelper>(),
+                    provider.GetRequiredService<IOptions<GeneralExecutionConfig>>(),
                     provider.GetRequiredService<ISqlDataService>(),
                     provider.GetRequiredService<INightActivitiesPerformanceMetrics>()));
 

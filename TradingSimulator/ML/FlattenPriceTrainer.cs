@@ -1,8 +1,8 @@
 using Microsoft.ML;
 using Microsoft.ML.Data;
-using Microsoft.ML.Trainers.LightGbm;
 using Microsoft.VisualBasic.FileIO;
 using System.Globalization;
+using Microsoft.ML.Trainers.LightGbm;
 
 namespace TradingSimulator.ML
 {

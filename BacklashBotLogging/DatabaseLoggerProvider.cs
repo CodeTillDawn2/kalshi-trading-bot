@@ -13,7 +13,7 @@ namespace KalshiBotLogging
         private readonly DatabaseLoggingQueue _loggingQueue;
         private readonly LogLevel _minLevel;
         private readonly LoggingConfig? _loggingConfig;
-        private readonly ExecutionConfig? _executionConfig;
+        private readonly GeneralExecutionConfig? _executionConfig;
         private readonly object? _brainStatus; // Simplified to avoid circular dependency
         private readonly string _defaultEnvironment;
         private readonly string _defaultInstance;
@@ -32,7 +32,7 @@ namespace KalshiBotLogging
             DatabaseLoggingQueue loggingQueue,
             LogLevel minLevel = LogLevel.Warning,
             LoggingConfig? loggingConfig = null,
-            ExecutionConfig? executionConfig = null,
+            GeneralExecutionConfig? executionConfig = null,
             object? brainStatus = null,
             string defaultEnvironment = "KalshiBot",
             string defaultInstance = "DefaultInstance"
