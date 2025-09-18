@@ -64,10 +64,6 @@ namespace KalshiBotTests
         private ITradingSnapshotService _snapshotService;
 
         /// <summary>
-        /// Configuration options for snapshot processing, including tolerance settings
-        /// and schema versions used during data loading.
-        /// </summary>
-        private IOptions<SnapshotConfig> _snapOpts;
 
         /// <summary>
         /// Configuration options for general execution parameters, including decision frequencies

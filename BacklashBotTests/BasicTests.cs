@@ -56,9 +56,6 @@ namespace KalshiBotTests
         private Mock<ILogger<TradingCalculator>> _tradingCalculatorLoggerMock;
 
         /// <summary>
-        /// Configuration options for snapshot service behavior.
-        /// </summary>
-        private IOptions<SnapshotConfig> _snapshotOptions;
 
         /// <summary>
         /// Configuration options for calculation parameters (periods, multipliers, etc.).

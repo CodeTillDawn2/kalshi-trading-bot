@@ -47,9 +47,8 @@ namespace TradingSimulator
     /// <typeparam name="T">The type of market data being processed.</typeparam>
     /// <param name="currentData">The current market snapshot data.</param>
     /// <param name="previousData">The previous market snapshot data for comparison.</param>
-    /// <param name="config">The snapshot configuration settings.</param>
     /// <param name="context">The trading context containing shared variables and decisions.</param>
-    public delegate void TradingStrategyFunc<T>(T currentData, T previousData, SnapshotConfig config, TradingContext context);
+    public delegate void TradingStrategyFunc<T>(T currentData, T previousData, TradingContext context);
 
     /// <summary>
     /// Context object containing shared variables and trading decisions for strategy execution.
@@ -85,7 +84,6 @@ namespace TradingSimulator
         private Mock<ILogger<ITradingSnapshotService>> _snapshotLoggerMock;
         private Mock<ILogger<IInterestScoreService>> _interestScoreLoggerMock;
         private Mock<ILogger<TradingStrategy<MarketSnapshot>>> _strategyLoggerMock;
-        private IOptions<SnapshotConfig> _snapshotOptions;
         private IServiceScopeFactory _scopeFactory;
         private IBacklashBotContext _dbContext;
         private MarketAnalysisHelper _marketAnalysisHelper;
@@ -152,9 +150,7 @@ namespace TradingSimulator
             var marketAnalysisLoggerMock = new Mock<ILogger<MarketAnalysisHelper>>();
             var overseerLoggerMock = new Mock<ILogger<TradingOverseer>>();
 
-            var snapshotConfig = config.GetSection("Snapshots").Get<SnapshotConfig>();
             var simulatorConfig = config.GetSection("TradingSimulatorService").Get<SimulatorConfig>();
-            _snapshotOptions = Options.Create(snapshotConfig);
             _executionConfig = Options.Create(config.GetSection("GeneralExecution").Get<GeneralExecutionConfig>());
             _simulatorOptions = Options.Create(simulatorConfig);
 

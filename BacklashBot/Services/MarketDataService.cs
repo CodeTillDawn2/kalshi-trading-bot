@@ -48,7 +48,6 @@ namespace BacklashBot.Services
         private readonly ILogger<IMarketDataService> _logger;
         private readonly Func<MarketDTO, MarketData> _marketDataFactory;
         private readonly IConfiguration _configuration;
-        private readonly SnapshotConfig _snapshotConfig;
         private readonly CalculationConfig _calculationConfig;
         private readonly LoggingConfig _loggingConfig;
         private readonly MarketDataConfig _marketDataConfig;
@@ -73,7 +72,6 @@ namespace BacklashBot.Services
             ILogger<IMarketDataService> logger,
             IConfiguration config,
             IServiceScopeFactory scopeFactory,
-            IOptions<SnapshotConfig> snapshotConfig,
             IOptions<LoggingConfig> loggingConfig,
             Func<MarketDTO, MarketData> marketDataFactory,
             IOptions<MarketDataConfig> marketDataConfigOptions,
@@ -87,7 +85,6 @@ namespace BacklashBot.Services
             _serviceFactory = serviceFactory;
             _scopeFactory = scopeFactory;
             _configuration = config;
-            _snapshotConfig = snapshotConfig.Value;
             _loggingConfig = loggingConfig.Value;
             _marketDataConfig = marketDataConfigOptions?.Value ?? new MarketDataConfig();
             _marketDataFactory = marketDataFactory;

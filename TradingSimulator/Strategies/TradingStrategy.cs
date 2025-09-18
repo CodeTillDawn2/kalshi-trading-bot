@@ -7,6 +7,7 @@ using TradingSimulator.Simulator;
 using TradingStrategies.Classification.Interfaces;
 using TradingStrategies.Configuration;
 using BacklashBotData.Data.Interfaces;
+using BacklashDTOs.Configuration;
 
 namespace TradingSimulator.Strategies
 {
@@ -42,7 +43,7 @@ namespace TradingSimulator.Strategies
         /// <summary>
         /// Configuration options for snapshot processing and validation.
         /// </summary>
-        private readonly IOptions<SnapshotConfig> _snapshotOptions;
+        private readonly IOptions<TradingSnapshotServiceConfig> _tradingSnapshotServiceOptions;
 
 
         /// <summary>
@@ -131,7 +132,7 @@ namespace TradingSimulator.Strategies
         /// <param name="snapshotService">Service for managing trading snapshot data.</param>
         /// <param name="snapshotPeriodHelper">Helper for processing snapshot periods.</param>
         /// <param name="logger">Logger for recording simulation events.</param>
-        /// <param name="snapshotOptions">Configuration for snapshot processing.</param>
+        /// <param name="tradingSnapshotServiceOptions">Configuration for trading snapshot service.</param>
         /// <param name="scopeFactory">Factory for creating service scopes.</param>
         /// <param name="dbContext">Database context for data access.</param>
         /// <param name="strategies">List of strategies to execute, each with name and function.</param>
@@ -139,7 +140,7 @@ namespace TradingSimulator.Strategies
             ITradingSnapshotService snapshotService,
             ISnapshotPeriodHelper snapshotPeriodHelper,
             ILogger<TradingStrategy<T>> logger,
-            IOptions<SnapshotConfig> snapshotOptions,
+            IOptions<TradingSnapshotServiceConfig> tradingSnapshotServiceOptions,
             IServiceScopeFactory scopeFactory,
             IBacklashBotContext dbContext,
             List<(string Name, TradingStrategyFunc<T> Func)> strategies)
@@ -147,7 +148,7 @@ namespace TradingSimulator.Strategies
             _snapshotService = snapshotService;
             _logger = logger;
             _snapshotPeriodHelper = snapshotPeriodHelper;
-            _snapshotOptions = snapshotOptions;
+            _tradingSnapshotServiceOptions = tradingSnapshotServiceOptions;
             _scopeFactory = scopeFactory;
             _dbContext = dbContext;
             _strategies = strategies;
@@ -292,7 +293,7 @@ namespace TradingSimulator.Strategies
                         {
                             try
                             {
-                                await Task.Run(() => strategy.Func(currentData, previousData, _snapshotOptions.Value, context)).ConfigureAwait(false);
+                                await Task.Run(() => strategy.Func(currentData, previousData, context)).ConfigureAwait(false);
                                 OnSimulationProgress?.Invoke($"[{strategy.Name}] Processed for {market} at {snapshot.Timestamp}");
                             }
                             catch (Exception ex)
