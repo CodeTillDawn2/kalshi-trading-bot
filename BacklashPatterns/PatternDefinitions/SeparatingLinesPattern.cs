@@ -33,11 +33,11 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the name of the pattern.
         /// </summary>
-        public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish reversal pattern with two candles where the second bullish candle opens at the same level as the first bearish candle's close, signaling a reversal from downtrend to uptrend."
             : "A bearish reversal pattern with two candles where the second bearish candle opens at the same level as the first bullish candle's close, signaling a reversal from uptrend to downtrend.";
         /// <summary>
@@ -52,16 +52,19 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the uncertainty of the pattern.
         /// </summary>
         public override double Uncertainty { get; protected set; }
-        private readonly bool IsBullish;
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction { get; }
 
         /// <summary>
         /// Initializes a new instance of the SeparatingLinesPattern class.
         /// </summary>
         /// <param name="candles">The list of candle indices.</param>
-        /// <param name="isBullish">Whether the pattern is bullish.</param>
-        public SeparatingLinesPattern(List<int> candles, bool isBullish) : base(candles)
+        /// <param name="direction">The direction of the pattern.</param>
+        public SeparatingLinesPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
-            IsBullish = isBullish;
+            Direction = direction;
         }
 
         /// <summary>
@@ -75,7 +78,7 @@ namespace BacklashPatterns.PatternDefinitions
             Dictionary<int, CandleMetrics> metricsCache,
             int index,
             int trendLookback,
-            bool isBullish,
+            PatternDirection direction,
             CandleMids[] prices)
         {
             // Early exit if index is invalid
@@ -103,23 +106,23 @@ namespace BacklashPatterns.PatternDefinitions
             if (!sameOpen) return null;
 
             // Determine if the candle directions align with the pattern type
-            bool direction = isBullish
+            bool directionMatch = direction == PatternDirection.Bullish
                 ? (currMetrics.IsBullish && prevMetrics.IsBearish)
                 : (currMetrics.IsBearish && prevMetrics.IsBullish);
 
             // Validate the trend direction using CandleMetrics method
-            bool trendValid = isBullish
+            bool trendValid = direction == PatternDirection.Bullish
                 ? currMetrics.GetLookbackMeanTrend(2) <= -trendThreshold // Downtrend before bullish continuation
                 : currMetrics.GetLookbackMeanTrend(2) >= trendThreshold;  // Uptrend before bearish continuation
 
             // Combine conditions to confirm the pattern
-            if (!direction || !trendValid) return null;
+            if (!directionMatch || !trendValid) return null;
 
             // Define the candle indices for the pattern (two candles)
             var candles = new List<int> { index - 1, index };
 
             // Return the pattern instance with the specified direction
-            return new SeparatingLinesPattern(candles, isBullish);
+            return new SeparatingLinesPattern(candles, direction);
         }
 
         /// <summary>

@@ -1,6 +1,25 @@
 namespace BacklashPatterns.PatternDefinitions
 {
     /// <summary>
+    /// Enum representing the direction of a candlestick pattern.
+    /// </summary>
+    public enum PatternDirection
+    {
+        /// <summary>
+        /// Indicates a bullish pattern, suggesting upward price movement.
+        /// </summary>
+        Bullish,
+        /// <summary>
+        /// Indicates a bearish pattern, suggesting downward price movement.
+        /// </summary>
+        Bearish,
+        /// <summary>
+        /// Indicates a neutral pattern, suggesting indecision or no clear direction.
+        /// </summary>
+        Neutral
+    }
+
+    /// <summary>
     /// Represents the base class for all pattern definitions.
     /// </summary>
     public abstract class PatternDefinition
@@ -14,6 +33,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the description of the pattern.
         /// </summary>
         public abstract string Description { get; }
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public abstract PatternDirection Direction { get; }
         /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>

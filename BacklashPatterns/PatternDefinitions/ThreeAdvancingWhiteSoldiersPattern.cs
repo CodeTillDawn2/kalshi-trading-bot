@@ -32,7 +32,11 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the name of the pattern.
         /// </summary>
-        public override string Name => BaseName;
+        public override string Name => BaseName + "_" + Direction.ToString();
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Bullish;
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>

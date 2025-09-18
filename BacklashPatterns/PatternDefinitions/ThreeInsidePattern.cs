@@ -53,13 +53,17 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the name of the pattern.
         /// </summary>
-        public override string Name => BaseName;
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish reversal pattern with a large bearish candle followed by a smaller bullish candle contained within it, and a third bullish candle closing above the first. Signals potential reversal from downtrend to uptrend."
             : "A bearish reversal pattern with a large bullish candle followed by a smaller bearish candle contained within it, and a third bearish candle closing below the first. Signals potential reversal from uptrend to downtrend.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction { get; }
         /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
@@ -76,8 +80,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// Initializes a new instance of the ThreeInsidePattern class.
         /// </summary>
         /// <param name="candles">The list of candle indices.</param>
-        public ThreeInsidePattern(List<int> candles) : base(candles)
+        /// <param name="direction">The direction of the pattern.</param>
+        public ThreeInsidePattern(List<int> candles, PatternDirection direction) : base(candles)
         {
+            Direction = direction;
         }
 
         /// <summary>
@@ -85,16 +91,16 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         /// <param name="index">The index of the third candle.</param>
         /// <param name="trendLookback">The trend lookback period.</param>
-        /// <param name="isBullish">Whether to check for bullish pattern.</param>
+        /// <param name="direction">The direction of the pattern to check for.</param>
         /// <param name="prices">The array of candle prices.</param>
         /// <param name="metricsCache">The metrics cache.</param>
         /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<ThreeInsidePattern?> IsPatternAsync(
-            int index,
-            int trendLookback,
-            bool isBullish,
-            CandleMids[] prices,
-            Dictionary<int, CandleMetrics> metricsCache)
+        int index,
+        int trendLookback,
+        PatternDirection direction,
+        CandleMids[] prices,
+        Dictionary<int, CandleMetrics> metricsCache)
         {
             if (index < 2) return null; // Need 3 candles
 
@@ -106,7 +112,7 @@ namespace BacklashPatterns.PatternDefinitions
             var metrics2 = await GetCandleMetricsAsync(metricsCache, c2, prices, trendLookback, false);
             var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
-            if (isBullish) // Three Inside Up
+            if (direction == PatternDirection.Bullish) // Three Inside Up
             {
                 double body1 = metrics1.BodySize;
                 double body2 = metrics2.BodySize;
@@ -162,7 +168,7 @@ namespace BacklashPatterns.PatternDefinitions
             }
 
             var candles = new List<int> { c1, c2, c3 };
-            return new ThreeInsidePattern(candles);
+            return new ThreeInsidePattern(candles, direction);
         }
 
         /// <summary>

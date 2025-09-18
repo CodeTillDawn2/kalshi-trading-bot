@@ -47,11 +47,15 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the name of the pattern.
         /// </summary>
-        public override string Name => BaseName;
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
         public override string Description => "A bearish reversal pattern in an uptrend with three candles where the first two are bullish with ascending closes, but the third opens higher and closes lower, signaling weakening momentum.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Bearish;
         /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>

@@ -4,34 +4,6 @@ using static BacklashPatterns.PatternUtils;
 namespace BacklashPatterns.PatternDefinitions
 {
 /// <summary>ThrustingPattern</summary>
-/// <summary>ThrustingPattern</summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
 /// </summary>
     public class ThrustingPattern : PatternDefinition
     {
@@ -40,64 +12,25 @@ namespace BacklashPatterns.PatternDefinitions
         /// Strictest: 1.0 (original logic), Loosest: 0.3 (minimal but still notable size).
         /// </summary>
         public static double MinBodySize { get; set; } = 0.5;
-/// <summary>Gets or sets the Uncertainty.</summary>
-/// <summary>Gets or sets the Certainty.</summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
 
-/// <summary>IsPatternAsync</summary>
-/// <summary>
-/// </summary>
         /// <summary>
         /// Maximum body size for the second candle to maintain pattern integrity.
         /// Strictest: 2.0 (original logic), Loosest: 4.0 (allows larger but still controlled thrust).
         /// </summary>
         public static double MaxBodySize { get; set; } = 3.0;
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
 
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
         /// <summary>
         /// Threshold for confirming a downtrend in a bullish thrusting pattern (negative value).
         /// Strictest: -0.5 (strong downtrend), Loosest: 0.0 (neutral or very weak downtrend).
         /// </summary>
         public static double BullishTrendThreshold { get; set; } = -0.2;
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
 
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
         /// <summary>
         /// Threshold for confirming an uptrend in a bearish thrusting pattern (positive value).
         /// Strictest: 0.5 (strong uptrend), Loosest: 0.0 (neutral or very weak uptrend).
         /// </summary>
         public static double BearishTrendThreshold { get; set; } = 0.2;
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
 
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
         /// <summary>
         /// Represents a Thrusting pattern (Bullish or Bearish).
         /// - Bullish Thrusting: A potential continuation or weak reversal in a downtrend. First candle is bearish, second is bullish but doesn t close above the first s open, indicating hesitation.
@@ -108,34 +41,31 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish continuation pattern in a downtrend with a bearish candle followed by a bullish candle that opens below the previous close but closes above it, showing hesitation before continuing the downtrend."
             : "A bearish continuation pattern in an uptrend with a bullish candle followed by a bearish candle that opens above the previous close but closes below it, showing hesitation before continuing the uptrend.";
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-        public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
-        private readonly bool IsBullish;
-/// <summary>
-/// </summary>
+
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction { get; }
+
+        public override string Name => BaseName + "_" + Direction.ToString();
+
         public override double Strength { get; protected set; }
         public override double Certainty { get; protected set; }
         public override double Uncertainty { get; protected set; }
-/// <summary>
-/// </summary>
 
-        public ThrustingPattern(List<int> candles, bool isBullish) : base(candles)
+
+        public ThrustingPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
-            IsBullish = isBullish;
+            Direction = direction;
         }
 
         public static async Task<ThrustingPattern?> IsPatternAsync(
             int index,
             int trendLookback,
-            bool isBullish,
+            PatternDirection direction,
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache)
         {
@@ -149,7 +79,7 @@ namespace BacklashPatterns.PatternDefinitions
             CandleMids prevPrices = prices[prevIndex];
             CandleMids currPrices = prices[currIndex];
 
-            if (isBullish)
+            if (direction == PatternDirection.Bullish)
             {
                 if (currMetrics.GetLookbackMeanTrend(2) > BullishTrendThreshold) return null;
 
@@ -177,7 +107,7 @@ namespace BacklashPatterns.PatternDefinitions
             }
 
             var candles = new List<int> { prevIndex, currIndex };
-            return new ThrustingPattern(candles, isBullish);
+            return new ThrustingPattern(candles, direction);
         }
 
         /// <summary>
@@ -213,7 +143,7 @@ namespace BacklashPatterns.PatternDefinitions
             secondBodyScore = Math.Clamp(secondBodyScore, 0, 1);
 
             double thrustExtent = 0;
-            if (IsBullish)
+            if (Direction == PatternDirection.Bullish)
             {
                 thrustExtent = (prevPrices.Open - currPrices.Close) / prevMetrics.BodySize;
                 thrustExtent = Math.Min(thrustExtent, 1);
@@ -224,7 +154,7 @@ namespace BacklashPatterns.PatternDefinitions
                 thrustExtent = Math.Min(thrustExtent, 1);
             }
 
-            double trendThreshold = IsBullish ? BullishTrendThreshold : BearishTrendThreshold;
+            double trendThreshold = Direction == PatternDirection.Bullish ? BullishTrendThreshold : BearishTrendThreshold;
             double trendStrength = Math.Abs(currMetrics.GetLookbackMeanTrend(2) - trendThreshold) / Math.Abs(trendThreshold);
             trendStrength = 1 - trendStrength; // Closer to threshold is better
 

@@ -29,11 +29,15 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public static double TrendThreshold { get; } = -0.3;
         public const string BaseName = "Unique3River";
-        public override string Name => BaseName;
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
         public override string Description => "A bullish reversal pattern in a downtrend with a strong bearish candle followed by a smaller bearish candle and a bullish candle that opens below the second close and closes above it, signaling slowing bearish momentum.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Bullish;
         public override double Strength { get; protected set; }
         public override double Certainty { get; protected set; }
         public override double Uncertainty { get; protected set; }

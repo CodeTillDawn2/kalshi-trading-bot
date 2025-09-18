@@ -32,13 +32,17 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the name of the pattern.
         /// </summary>
-        public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish reversal pattern in a downtrend with three candles where two bearish candles sandwich a bullish candle, and the first and third candles close at nearly the same level."
             : "A bearish reversal pattern in an uptrend with three candles where two bullish candles sandwich a bearish candle, and the first and third candles close at nearly the same level.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction { get; }
         /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
@@ -51,16 +55,15 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the uncertainty of the pattern.
         /// </summary>
         public override double Uncertainty { get; protected set; }
-        private readonly bool IsBullish;
 
         /// <summary>
         /// Initializes a new instance of the StickSandwichPattern class.
         /// </summary>
         /// <param name="candles">The list of candle indices.</param>
-        /// <param name="isBullish">Whether the pattern is bullish.</param>
-        public StickSandwichPattern(List<int> candles, bool isBullish) : base(candles)
+        /// <param name="direction">The direction of the pattern.</param>
+        public StickSandwichPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
-            IsBullish = isBullish;
+            Direction = direction;
         }
 
         /// <summary>
@@ -74,17 +77,17 @@ namespace BacklashPatterns.PatternDefinitions
         /// Determines if a Stick Sandwich pattern exists at the specified index.
         /// </summary>
         /// <param name="index">The index of the third candle.</param>
-        /// <param name="isBullish">Whether to check for bullish pattern.</param>
+        /// <param name="direction">The direction of the pattern to check for.</param>
         /// <param name="prices">The array of candle prices.</param>
         /// <param name="metricsCache">The metrics cache.</param>
         /// <param name="trendLookback">The trend lookback period.</param>
         /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<StickSandwichPattern?> IsPatternAsync(
-            int index,
-            bool isBullish,
-            CandleMids[] prices,
-            Dictionary<int, CandleMetrics> metricsCache,
-            int trendLookback)
+        int index,
+        PatternDirection direction,
+        CandleMids[] prices,
+        Dictionary<int, CandleMetrics> metricsCache,
+        int trendLookback)
         {
             if (index < 2) return null; // Need 3 candles
 
@@ -100,7 +103,7 @@ namespace BacklashPatterns.PatternDefinitions
             double body2 = metrics2.BodySize;
             double body3 = metrics3.BodySize;
 
-            if (isBullish)
+            if (direction == PatternDirection.Bullish)
             {
                 // Directions
                 if (!metrics1.IsBearish || !metrics2.IsBullish || !metrics3.IsBearish) return null;
@@ -138,7 +141,7 @@ namespace BacklashPatterns.PatternDefinitions
             }
 
             var candles = new List<int> { c1, c2, c3 };
-            return new StickSandwichPattern(candles, isBullish);
+            return new StickSandwichPattern(candles, direction);
         }
 
         /// <summary>

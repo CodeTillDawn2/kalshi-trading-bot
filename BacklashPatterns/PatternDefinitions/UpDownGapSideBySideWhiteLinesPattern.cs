@@ -50,13 +50,17 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the name of the pattern.
         /// </summary>
-        public override string Name => BaseName;
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish continuation pattern in an uptrend with three bullish candles where the second gaps up from the first and the third opens near the second with similar size, signaling sustained upward momentum."
             : "A bearish continuation pattern in a downtrend with three bearish candles where the second gaps down from the first and the third opens near the second with similar size, signaling sustained downward momentum.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction { get; }
         /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
@@ -73,8 +77,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// Initializes a new instance of the UpDownGapSideBySideWhiteLinesPattern class.
         /// </summary>
         /// <param name="candles">The list of candle indices.</param>
-        public UpDownGapSideBySideWhiteLinesPattern(List<int> candles) : base(candles)
+        /// <param name="direction">The direction of the pattern.</param>
+        public UpDownGapSideBySideWhiteLinesPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
+            Direction = direction;
         }
 
         /*
@@ -120,7 +126,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static async Task<UpDownGapSideBySideWhiteLinesPattern?> IsPatternAsync(
                     int index,
                     int trendLookback,
-                    bool isBullish,
+                    PatternDirection direction,
                     CandleMids[] prices,
                     Dictionary<int, CandleMetrics> metricsCache)
         {
@@ -138,7 +144,7 @@ namespace BacklashPatterns.PatternDefinitions
             var ask2 = prices[c2];
             var ask3 = prices[c3];
 
-            if (isBullish)
+            if (direction == PatternDirection.Bullish)
             {
                 // All candles bullish, minimal body size
                 if (!metrics1.IsBullish || metrics1.BodySize < MinBodySize ||
@@ -176,7 +182,7 @@ namespace BacklashPatterns.PatternDefinitions
             }
 
             var candles = new List<int> { c1, c2, c3 };
-            return new UpDownGapSideBySideWhiteLinesPattern(candles);
+            return new UpDownGapSideBySideWhiteLinesPattern(candles, direction);
         }
 
         /// <summary>

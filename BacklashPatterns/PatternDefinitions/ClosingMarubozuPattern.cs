@@ -75,15 +75,15 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish pattern with a single candle that opens at its low and closes at its high, showing strong buying momentum. Can indicate continuation or reversal depending on trend context."
             : "A bearish pattern with a single candle that opens at its high and closes at its low, showing strong selling momentum. Can indicate continuation or reversal depending on trend context.";
 /// <summary>
 /// </summary>
-        public override string Name => $"{BaseName}_{(IsBullish ? "Bullish" : "Bearish")}{(IsContinuation.HasValue ? (IsContinuation.Value ? "_Continuation" : "_Reversal") : "")}";
+        public override string Name => $"{BaseName}_{Direction.ToString()}{(IsContinuation.HasValue ? (IsContinuation.Value ? "_Continuation" : "_Reversal") : "")}";
 /// <summary>
 /// </summary>
-        private readonly bool IsBullish;
+        public override PatternDirection Direction { get; }
         private readonly bool? IsContinuation; // Nullable to allow unclassified cases
         public override double Strength { get; protected set; }
         public override double Certainty { get; protected set; }
@@ -93,11 +93,11 @@ namespace BacklashPatterns.PatternDefinitions
         /// Initializes a new instance of the ClosingMarubozuPattern class.
         /// </summary>
         /// <param name="candles">List of candle indices forming the pattern.</param>
-        /// <param name="isBullish">True for bullish pattern, false for bearish.</param>
+        /// <param name="direction">The direction of the pattern.</param>
         /// <param name="isContinuation">True for continuation, false for reversal, null if trend unavailable.</param>
-        public ClosingMarubozuPattern(List<int> candles, bool isBullish, bool? isContinuation = null) : base(candles)
+        public ClosingMarubozuPattern(List<int> candles, PatternDirection direction, bool? isContinuation = null) : base(candles)
         {
-            IsBullish = isBullish;
+            Direction = direction;
             IsContinuation = isContinuation;
         }
 
@@ -108,14 +108,14 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="metricsCache">Cache of candle metrics.</param>
         /// <param name="prices">Array of candle price data.</param>
         /// <param name="trendLookback">Number of candles to look back for trend and average range.</param>
-        /// <param name="isBullish">True for bullish pattern, false for bearish.</param>
+        /// <param name="direction">The direction of the pattern to check for.</param>
         /// <returns>A ClosingMarubozuPattern instance if detected, otherwise null.</returns>
         public static async Task<ClosingMarubozuPattern?> IsPatternAsync(
             int index,
             Dictionary<int, CandleMetrics> metricsCache,
             CandleMids[] prices,
             int trendLookback,
-            bool isBullish)
+            PatternDirection direction)
         {
             var candles = new List<int> { index };
             CandleMetrics candleMetrics = await GetCandleMetricsAsync(metricsCache, index, prices, trendLookback, true);
@@ -124,11 +124,11 @@ namespace BacklashPatterns.PatternDefinitions
             double minBodySize = MinBodyToAvgRangeRatio * avgRange;
             if (candleMetrics.BodySize < minBodySize) return null;
 
-            if (isBullish && !candleMetrics.IsBullish) return null;
-            if (!isBullish && !candleMetrics.IsBearish) return null;
+            if (direction == PatternDirection.Bullish && !candleMetrics.IsBullish) return null;
+            if (direction == PatternDirection.Bearish && !candleMetrics.IsBearish) return null;
 
             var currentPrices = prices[index];
-            bool meetsCriteria = isBullish
+            bool meetsCriteria = direction == PatternDirection.Bullish
                 ? (currentPrices.Open == currentPrices.Low && currentPrices.Close == currentPrices.High)
                 : (currentPrices.Open == currentPrices.High && currentPrices.Close == currentPrices.Low);
             if (!meetsCriteria) return null;
@@ -139,7 +139,7 @@ namespace BacklashPatterns.PatternDefinitions
                 bool priorTrendIsBullish = candleMetrics.BullishRatio[PatternSize - 1] >= OptionalTrendDirectionRatioMin;
                 bool priorTrendIsBearish = candleMetrics.BearishRatio[PatternSize - 1] >= OptionalTrendDirectionRatioMin;
 
-                if (isBullish)
+                if (direction == PatternDirection.Bullish)
                 {
                     if (priorTrendIsBullish) isContinuation = true;
                     else if (priorTrendIsBearish) isContinuation = false;
@@ -152,7 +152,7 @@ namespace BacklashPatterns.PatternDefinitions
                 if (!priorTrendIsBullish && !priorTrendIsBearish) isContinuation = null; // Explicit ambiguity
             }
 
-            return new ClosingMarubozuPattern(candles, isBullish, isContinuation);
+            return new ClosingMarubozuPattern(candles, direction, isContinuation);
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace BacklashPatterns.PatternDefinitions
             double bodyScore = candleMetrics.BodySize / (MinBodyToAvgRangeRatio * avgRange);
             bodyScore = Math.Min(bodyScore, 1);
 
-            double trendDirectionRatio = IsBullish ? candleMetrics.BullishRatio[PatternSize - 1] : candleMetrics.BearishRatio[PatternSize - 1];
+            double trendDirectionRatio = Direction == PatternDirection.Bullish ? candleMetrics.BullishRatio[PatternSize - 1] : candleMetrics.BearishRatio[PatternSize - 1];
 
             double continuationScore = 0.5; // Neutral if no trend
             if (IsContinuation.HasValue)
@@ -190,7 +190,7 @@ namespace BacklashPatterns.PatternDefinitions
             }
 
             // Check if it's a perfect Marubozu (no shadows)
-            bool isPerfectMarubozu = IsBullish
+            bool isPerfectMarubozu = Direction == PatternDirection.Bullish
                 ? (currentPrices.Open == currentPrices.Low && currentPrices.Close == currentPrices.High)
                 : (currentPrices.Open == currentPrices.High && currentPrices.Close == currentPrices.Low);
             double marubozuScore = isPerfectMarubozu ? 1.0 : 0.5;

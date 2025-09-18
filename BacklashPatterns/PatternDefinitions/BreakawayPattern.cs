@@ -64,21 +64,24 @@ namespace BacklashPatterns.PatternDefinitions
         public static double TrendDirectionRatioMin { get; set; } = 0.3;
 
         public const string BaseName = "Breakaway";
-        public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish reversal pattern with a strong bearish candle, three consolidation candles, and a bullish breakout candle. Signals potential reversal from downtrend to uptrend."
             : "A bearish reversal pattern with a strong bullish candle, three consolidation candles, and a bearish breakout candle. Signals potential reversal from uptrend to downtrend.";
-        private readonly bool IsBullish;
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction { get; }
         public override double Strength { get; protected set; }
         public override double Certainty { get; protected set; }
         public override double Uncertainty { get; protected set; }
 
-        public BreakawayPattern(List<int> candles, bool isBullish) : base(candles)
+        public BreakawayPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
-            IsBullish = isBullish;
+            Direction = direction;
         }
 
         /// <summary>
@@ -87,15 +90,15 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="index">The index of the fifth candle in the pattern.</param>
         /// <param name="prices">Array of candle price data.</param>
         /// <param name="metricsCache">Cache of candle metrics.</param>
-        /// <param name="isBullish">True for bullish pattern, false for bearish.</param>
+        /// <param name="direction">The direction of the pattern to check for.</param>
         /// <param name="trendLookback">Number of candles to look back for trend and average range.</param>
         /// <returns>A BreakawayPattern instance if detected, otherwise null.</returns>
         public static async Task<BreakawayPattern?> IsPatternAsync(
-             int index,
-             CandleMids[] prices,
-             Dictionary<int, CandleMetrics> metricsCache,
-             bool isBullish,
-             int trendLookback)
+              int index,
+              CandleMids[] prices,
+              Dictionary<int, CandleMetrics> metricsCache,
+              PatternDirection direction,
+              int trendLookback)
         {
             if (index < PatternSize + trendLookback - 1) return null;
             int startIndex = index - (PatternSize - 1);
@@ -114,11 +117,11 @@ namespace BacklashPatterns.PatternDefinitions
             double avgRange = metrics5.LookbackAvgRange[PatternSize - 1];
 
             // Check prior trend using TrendDirectionRatio (unchanged from original)
-            double trendDirectionRatio = isBullish ? metrics5.BearishRatio[PatternSize - 1] : metrics5.BullishRatio[PatternSize - 1];
+            double trendDirectionRatio = direction == PatternDirection.Bullish ? metrics5.BearishRatio[PatternSize - 1] : metrics5.BullishRatio[PatternSize - 1];
             if (trendDirectionRatio < TrendDirectionRatioMin) return null;
 
             // Check first candle: direction and size (unchanged from original)
-            bool firstCandleDirection = isBullish ? metrics1.IsBearish : metrics1.IsBullish;
+            bool firstCandleDirection = direction == PatternDirection.Bullish ? metrics1.IsBearish : metrics1.IsBullish;
             if (!firstCandleDirection || metrics1.BodySize < MinBodyToAvgRangeRatio * avgRange) return null;
 
             // Check middle three candles: consolidation (unchanged from original)
@@ -143,19 +146,19 @@ namespace BacklashPatterns.PatternDefinitions
             if (consolidationRange > ConsolidationTightRangeMax * avgRange) return null;
 
             // Step 4: Check fifth candle with relaxed requirements
-            bool fifthCandleDirection = isBullish ? metrics5.IsBullish : metrics5.IsBearish;
+            bool fifthCandleDirection = direction == PatternDirection.Bullish ? metrics5.IsBullish : metrics5.IsBearish;
             double minBreakoutBodySize = 0.5 * avgRange; // Relaxed from 1.0 to 0.5
             if (!fifthCandleDirection || metrics5.BodySize < minBreakoutBodySize) return null;
 
             // Step 4: Relaxed breakout condition (within 10% of consolidation boundary)
-            bool breaksConsolidation = isBullish
+            bool breaksConsolidation = direction == PatternDirection.Bullish
                 ? prices[index].Close > consolidationMaxHigh * 0.9  // 10% below max high
                 : prices[index].Close < consolidationMinLow * 1.1;  // 10% above min low
             if (!breaksConsolidation) return null;
 
             // Step 5: Gap check removed entirely (no hasGap variable or condition)
 
-            return new BreakawayPattern(candles, isBullish);
+            return new BreakawayPattern(candles, direction);
         }
 
         /// <summary>
@@ -201,7 +204,7 @@ namespace BacklashPatterns.PatternDefinitions
             double fifthBodyScore = metrics5.BodySize / avgRange;
             fifthBodyScore = Math.Min(fifthBodyScore, 1);
 
-            double trendDirectionRatio = IsBullish ? metrics5.BearishRatio[PatternSize - 1] : metrics5.BullishRatio[PatternSize - 1];
+            double trendDirectionRatio = Direction == PatternDirection.Bullish ? metrics5.BearishRatio[PatternSize - 1] : metrics5.BullishRatio[PatternSize - 1];
 
             double volumeScore = 0.5; // Placeholder for volume if needed
 

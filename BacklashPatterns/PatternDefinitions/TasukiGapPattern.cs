@@ -26,13 +26,17 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the name of the pattern.
         /// </summary>
-        public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish continuation pattern in an uptrend with three candles where the second gaps up from the first and the third fills part of that gap, signaling continued upward momentum."
             : "A bearish continuation pattern in a downtrend with three candles where the second gaps down from the first and the third fills part of that gap, signaling continued downward momentum.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction { get; }
         /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
@@ -45,16 +49,15 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the uncertainty of the pattern.
         /// </summary>
         public override double Uncertainty { get; protected set; }
-        private readonly bool IsBullish;
 
         /// <summary>
         /// Initializes a new instance of the TasukiGapPattern class.
         /// </summary>
         /// <param name="candles">The list of candle indices.</param>
-        /// <param name="isBullish">Whether the pattern is bullish.</param>
-        public TasukiGapPattern(List<int> candles, bool isBullish) : base(candles)
+        /// <param name="direction">The direction of the pattern.</param>
+        public TasukiGapPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
-            IsBullish = isBullish;
+            Direction = direction;
         }
 
         /// <summary>
@@ -69,16 +72,16 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         /// <param name="index">The index of the third candle.</param>
         /// <param name="trendLookback">The trend lookback period.</param>
-        /// <param name="isBullish">Whether to check for bullish pattern.</param>
+        /// <param name="direction">The direction of the pattern to check for.</param>
         /// <param name="prices">The array of candle prices.</param>
         /// <param name="metricsCache">The metrics cache.</param>
         /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<TasukiGapPattern?> IsPatternAsync(
-            int index,
-            int trendLookback,
-            bool isBullish,
-            CandleMids[] prices,
-            Dictionary<int, CandleMetrics> metricsCache)
+        int index,
+        int trendLookback,
+        PatternDirection direction,
+        CandleMids[] prices,
+        Dictionary<int, CandleMetrics> metricsCache)
         {
             if (index < 2) return null; // Need 3 candles
 
@@ -91,15 +94,15 @@ namespace BacklashPatterns.PatternDefinitions
             var metrics3 = await GetCandleMetricsAsync(metricsCache, c3, prices, trendLookback, true);
 
             // Trend check using LookbackMeanTrend (3 candles)
-            bool hasTrend = isBullish ? metrics3.GetLookbackMeanTrend(3) > TrendThreshold
-                                     : metrics3.GetLookbackMeanTrend(3) < -TrendThreshold;
+            bool hasTrend = direction == PatternDirection.Bullish ? metrics3.GetLookbackMeanTrend(3) > TrendThreshold
+                                      : metrics3.GetLookbackMeanTrend(3) < -TrendThreshold;
             if (!hasTrend) return null;
 
             var ask1 = prices[c1];
             var ask2 = prices[c2];
             var ask3 = prices[c3];
 
-            if (isBullish)
+            if (direction == PatternDirection.Bullish)
             {
                 // First candle: Bullish or small/neutral if second is strongly bullish
                 bool c1Direction = metrics1.IsBullish || (metrics1.BodySize < 1.0 && metrics2.IsBullish);
@@ -139,7 +142,7 @@ namespace BacklashPatterns.PatternDefinitions
             }
 
             var candles = new List<int> { c1, c2, c3 };
-            return new TasukiGapPattern(candles, isBullish);
+            return new TasukiGapPattern(candles, direction);
         }
 
         /// <summary>

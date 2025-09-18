@@ -46,13 +46,17 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the name of the pattern.
         /// </summary>
-        public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A rare bullish reversal pattern with a bearish candle, Doji, and bullish candle, each gapped from the previous. Signals potential reversal from downtrend to uptrend."
             : "A rare bearish reversal pattern with a bullish candle, Doji, and bearish candle, each gapped from the previous. Signals potential reversal from uptrend to downtrend.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction { get; }
         /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
@@ -65,7 +69,6 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the uncertainty of the pattern.
         /// </summary>
         public override double Uncertainty { get; protected set; }
-        private readonly bool IsBullish;
 
         /// <summary>
         /// Initializes a new instance of the AbandonedBabyPattern class.
@@ -73,11 +76,11 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="candles">The list of candle indices.</param>
         /// <param name="prices">The array of candle prices.</param>
         /// <param name="avgVolume">The average volume.</param>
-        /// <param name="isBullish">Whether the pattern is bullish.</param>
+        /// <param name="direction">The direction of the pattern.</param>
         public AbandonedBabyPattern(List<int> candles, CandleMids[] prices,
-            double avgVolume, bool isBullish) : base(candles)
+            double avgVolume, PatternDirection direction) : base(candles)
         {
-            IsBullish = isBullish;
+            Direction = direction;
         }
 
         /// <summary>
@@ -87,14 +90,14 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="trendLookback">The trend lookback period.</param>
         /// <param name="metricsCache">The metrics cache.</param>
         /// <param name="prices">The array of candle prices.</param>
-        /// <param name="isBullish">Whether to check for bullish pattern.</param>
+        /// <param name="direction">The direction of the pattern to check for.</param>
         /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<AbandonedBabyPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             Dictionary<int, CandleMetrics> metricsCache,
             CandleMids[] prices,
-            bool isBullish)
+            PatternDirection direction)
         {
             if (index < 2) return null; // Need 3 candles
             var candles = new List<int> { index }; // Third candle
@@ -119,7 +122,7 @@ namespace BacklashPatterns.PatternDefinitions
 
             double trendThreshold = 0.5; // Adjustable threshold for trend flexibility
 
-            if (isBullish)
+            if (direction == PatternDirection.Bullish)
             {
                 bool isFirstBearish = firstMetrics.IsBearish;
                 bool hasInitialGap = middlePrices.High < firstPrices.Low;
@@ -129,7 +132,7 @@ namespace BacklashPatterns.PatternDefinitions
 
                 if (isFirstBearish && hasInitialGap && hasSecondGap && isFinalReversal && isPrecedingDowntrend)
                     return new AbandonedBabyPattern(candles, prices,
-                        thirdMetrics.GetAvgVolumeVsLookback(candles.Count), true);
+                        thirdMetrics.GetAvgVolumeVsLookback(candles.Count), direction);
             }
             else
             {
@@ -141,7 +144,7 @@ namespace BacklashPatterns.PatternDefinitions
 
                 if (isFirstBullish && hasInitialGap && hasSecondGap && isFinalReversal && isPrecedingUptrend)
                     return new AbandonedBabyPattern(candles, prices,
-                        thirdMetrics.GetAvgVolumeVsLookback(candles.Count), false);
+                        thirdMetrics.GetAvgVolumeVsLookback(candles.Count), direction);
             }
 
             return null;
@@ -180,8 +183,8 @@ namespace BacklashPatterns.PatternDefinitions
             double dojiRatio = middleMetrics.BodySize / middleMetrics.TotalRange;
             double dojiStrength = Math.Max(1 - (dojiRatio / DojiBodyRangeRatio), 0);
 
-            double gap1Size = IsBullish ? (firstPrices.Low - middlePrices.High) : (middlePrices.Low - firstPrices.High);
-            double gap2Size = IsBullish ? (thirdPrices.Low - middlePrices.High) : (middlePrices.Low - thirdPrices.High);
+            double gap1Size = Direction == PatternDirection.Bullish ? (firstPrices.Low - middlePrices.High) : (middlePrices.Low - firstPrices.High);
+            double gap2Size = Direction == PatternDirection.Bullish ? (thirdPrices.Low - middlePrices.High) : (middlePrices.Low - thirdPrices.High);
             double normFactor = 0.01 * firstPrices.Close;
             double gapStrength = (gap1Size + gap2Size) / (2 * normFactor);
             gapStrength = Math.Min(gapStrength, 1);

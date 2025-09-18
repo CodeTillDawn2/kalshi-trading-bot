@@ -47,21 +47,24 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public static double CloseToleranceRangeFactor { get; } = 0.2;
         public const string BaseName = "Tristar";
-        public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A rare bullish reversal pattern with three Doji candles where the second gaps below the first and the third closes near the first, signaling potential reversal from downtrend to uptrend."
             : "A rare bearish reversal pattern with three Doji candles where the second gaps above the first and the third closes near the first, signaling potential reversal from uptrend to downtrend.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction { get; }
         public override double Strength { get; protected set; }
         public override double Certainty { get; protected set; }
         public override double Uncertainty { get; protected set; }
-        private readonly bool IsBullish;
 
-        public TristarPattern(List<int> candles, bool isBullish) : base(candles)
+        public TristarPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
-            IsBullish = isBullish;
+            Direction = direction;
         }
 
         /// <summary>
@@ -81,7 +84,7 @@ namespace BacklashPatterns.PatternDefinitions
         public static async Task<TristarPattern?> IsPatternAsync(
             int index,
             int trendLookback,
-            bool isBullish,
+            PatternDirection direction,
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache)
         {
@@ -111,7 +114,7 @@ namespace BacklashPatterns.PatternDefinitions
 
 
             // Loosened gap condition (restored from original: min 0.3-point gap or body outside range)
-            bool gapValid = isBullish
+            bool gapValid = direction == PatternDirection.Bullish
                 ? (ask2.Open < ask1.Close - MinGapSize || ask2.Close < ask1.Close - MinGapSize) // Below first close
                 : (ask2.Open > ask1.Close + MinGapSize || ask2.Close > ask1.Close + MinGapSize); // Above first close
             if (!gapValid) return null;
@@ -122,7 +125,7 @@ namespace BacklashPatterns.PatternDefinitions
             if (!closesMatch) return null;
 
             // Loosened trend check using CandleMetrics method (restored from original:  0.3)
-            bool trendValid = isBullish
+            bool trendValid = direction == PatternDirection.Bullish
                 ? (metrics3.GetLookbackMeanTrend(3) <= -TrendThreshold) // Downtrend for bullish
                 : (metrics3.GetLookbackMeanTrend(3) >= TrendThreshold);  // Uptrend for bearish
             if (!trendValid) return null;
@@ -131,7 +134,7 @@ namespace BacklashPatterns.PatternDefinitions
             var candles = new List<int> { c1, c2, c3 };
 
             // Return the pattern instance with the specified direction
-            return new TristarPattern(candles, isBullish);
+            return new TristarPattern(candles, direction);
         }
 
         /// <summary>
@@ -167,7 +170,7 @@ namespace BacklashPatterns.PatternDefinitions
             double rangeScore = (metrics1.TotalRange / DojiRangeMin + metrics2.TotalRange / DojiRangeMin + metrics3.TotalRange / DojiRangeMin) / 3;
             rangeScore = Math.Min(rangeScore, 1);
 
-            double gapSize = IsBullish ? (prices1.Close - prices2.Close) : (prices2.Close - prices1.Close);
+            double gapSize = Direction == PatternDirection.Bullish ? (prices1.Close - prices2.Close) : (prices2.Close - prices1.Close);
             double gapScore = gapSize / MinGapSize;
             gapScore = Math.Min(gapScore, 1);
 

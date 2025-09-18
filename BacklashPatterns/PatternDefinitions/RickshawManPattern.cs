@@ -70,11 +70,15 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the name of the pattern.
         /// </summary>
-        public override string Name => BaseName;
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
         public override string Description => "A Doji candle where the open and close are at the exact midpoint of the high-low range, indicating perfect market indecision and potential for a significant directional move.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Neutral;
         /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>

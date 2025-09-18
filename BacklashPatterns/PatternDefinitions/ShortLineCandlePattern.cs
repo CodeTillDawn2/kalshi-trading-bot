@@ -45,13 +45,17 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the name of the pattern.
         /// </summary>
-        public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish candle with a small body and minimal wicks, indicating weak buying momentum and potential continuation or reversal depending on context."
             : "A bearish candle with a small body and minimal wicks, indicating weak selling momentum and potential continuation or reversal depending on context.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction { get; }
         /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
@@ -64,16 +68,15 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the uncertainty of the pattern.
         /// </summary>
         public override double Uncertainty { get; protected set; }
-        private readonly bool IsBullish;
 
         /// <summary>
         /// Initializes a new instance of the ShortLineCandlePattern class.
         /// </summary>
         /// <param name="candles">The list of candle indices.</param>
-        /// <param name="isBullish">Whether the pattern is bullish.</param>
-        public ShortLineCandlePattern(List<int> candles, bool isBullish) : base(candles)
+        /// <param name="direction">The direction of the pattern.</param>
+        public ShortLineCandlePattern(List<int> candles, PatternDirection direction) : base(candles)
         {
-            IsBullish = isBullish;
+            Direction = direction;
         }
 
         /// <summary>
@@ -81,14 +84,14 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         /// <param name="index">The index of the candle.</param>
         /// <param name="trendLookback">The trend lookback period.</param>
-        /// <param name="isBullish">Whether to check for bullish pattern.</param>
+        /// <param name="direction">The direction of the pattern to check for.</param>
         /// <param name="metricsCache">The metrics cache.</param>
         /// <param name="prices">The array of candle prices.</param>
         /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
         public static async Task<ShortLineCandlePattern?> IsPatternAsync(
             int index,
             int trendLookback,
-            bool isBullish,
+            PatternDirection direction,
             Dictionary<int, CandleMetrics> metricsCache,
             CandleMids[] prices)
         {
@@ -105,13 +108,13 @@ namespace BacklashPatterns.PatternDefinitions
             bool smallRange = metrics.TotalRange <= MaxRange;
 
             // Confirm the candle direction matches the specified trend (original logic)
-            bool direction = isBullish ? metrics.IsBullish : metrics.IsBearish;
+            bool directionMatch = direction == PatternDirection.Bullish ? metrics.IsBullish : metrics.IsBearish;
 
             // If any condition fails, it s not the pattern
-            if (!isShort || !smallRange || !direction) return null;
+            if (!isShort || !smallRange || !directionMatch) return null;
 
             // Adjusted trend conditions from original: Use CandleMetrics methods
-            bool priorTrend = isBullish
+            bool priorTrend = direction == PatternDirection.Bullish
                 ? (metrics.GetLookbackMeanTrend(1) <= -TrendThreshold && metrics.GetLookbackTrendConsistency(1) <= -TrendConsistencyThreshold) // Consistent downtrend
                 : (metrics.GetLookbackMeanTrend(1) >= TrendThreshold && metrics.GetLookbackTrendConsistency(1) >= TrendConsistencyThreshold);   // Consistent uptrend
 
@@ -122,7 +125,7 @@ namespace BacklashPatterns.PatternDefinitions
             var candles = new List<int> { index };
 
             // Return the pattern instance with the specified direction
-            return new ShortLineCandlePattern(candles, isBullish);
+            return new ShortLineCandlePattern(candles, direction);
         }
 
         /// <summary>

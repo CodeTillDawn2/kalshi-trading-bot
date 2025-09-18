@@ -134,15 +134,17 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the name of the pattern, appending "_Bullish" or "_Bearish" based on direction.
         /// </summary>
-        public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        public override string Name => BaseName + "_" + Direction.ToString();
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish reversal pattern with a single candle that opens near its low and closes near its high, with minimal upper wick. Signals potential reversal from downtrend to uptrend."
             : "A bearish reversal pattern with a single candle that opens near its high and closes near its low, with minimal lower wick. Signals potential reversal from uptrend to downtrend.";
-
-        private readonly bool IsBullish;
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction { get; }
 
         /// <summary>
         /// Gets the calculated strength of the pattern.
@@ -166,10 +168,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// Initializes a new instance of the BeltHoldPattern class.
         /// </summary>
         /// <param name="candles">List of candle indices forming the pattern (single candle).</param>
-        /// <param name="isBullish">True for bullish Belt Hold, false for bearish.</param>
-        public BeltHoldPattern(List<int> candles, bool isBullish) : base(candles)
+        /// <param name="direction">The direction of the pattern.</param>
+        public BeltHoldPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
-            IsBullish = isBullish;
+            Direction = direction;
             Strength = 0.0;
             Certainty = 0.0;
             Uncertainty = 1.0;
@@ -185,14 +187,14 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="trendLookback">Number of candles to look back for trend analysis (e.g., 15 for minutes, 5 for hours/days).</param>
         /// <param name="prices">Array of candle data.</param>
         /// <param name="metricsCache">Cache of precomputed candle metrics.</param>
-        /// <param name="isBullish">True to check for bullish pattern, false for bearish.</param>
+        /// <param name="direction">The direction of the pattern to check for.</param>
         /// <returns>A BeltHoldPattern instance if the pattern is detected, otherwise null.</returns>
         public static async Task<BeltHoldPattern?> IsPatternAsync(
             int index,
             int trendLookback,
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache,
-            bool isBullish)
+            PatternDirection direction)
         {
             if (index < (PatternSize - 1) + trendLookback) return null;
             CandleMids currentPrices = prices[index];
@@ -204,8 +206,8 @@ namespace BacklashPatterns.PatternDefinitions
             if (currentMetrics.TotalRange <= 0) return null;
             double bodySize = currentMetrics.BodySize;
             if (bodySize / currentMetrics.TotalRange < BodyRangeRatio) return null;
-            if (isBullish && !currentMetrics.IsBullish || !isBullish && !currentMetrics.IsBearish) return null;
-            double criticalWick = isBullish ? (currentPrices.Open - currentPrices.Low) : (currentPrices.High - currentPrices.Open);
+            if (direction == PatternDirection.Bullish && !currentMetrics.IsBullish || direction == PatternDirection.Bearish && !currentMetrics.IsBearish) return null;
+            double criticalWick = direction == PatternDirection.Bullish ? (currentPrices.Open - currentPrices.Low) : (currentPrices.High - currentPrices.Open);
             if (criticalWick / bodySize > CriticalWickToBodyMax) return null;
 
             // Step 2: Trend Validation
@@ -222,7 +224,7 @@ namespace BacklashPatterns.PatternDefinitions
                 int k = i - lookbackStart;
                 changes[k] = prices[i].Close - prices[i].Open;
                 midpoints[k] = (prices[i].Open + prices[i].Close) / 2;
-                bool isTrendDirection = isBullish ? changes[k] < 0 : changes[k] > 0;
+                bool isTrendDirection = direction == PatternDirection.Bullish ? changes[k] < 0 : changes[k] > 0;
                 if (isTrendDirection)
                 {
                     directionalChangeSum += Math.Abs(changes[k]);
@@ -302,7 +304,7 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Power Score: Based on body dominance, wick minimization, trend, reversal, position, ATR
             double bodyDominance = currentMetrics.BodySize / currentMetrics.TotalRange;
-            double criticalWick = IsBullish ? (currentPrices.Open - currentPrices.Low) : (currentPrices.High - currentPrices.Open);
+            double criticalWick = Direction == PatternDirection.Bullish ? (currentPrices.Open - currentPrices.Low) : (currentPrices.High - currentPrices.Open);
             double wickScore = Math.Max(1 - (criticalWick / currentMetrics.BodySize), 0);
 
             // Trend score (simplified, as full calculation is complex)
