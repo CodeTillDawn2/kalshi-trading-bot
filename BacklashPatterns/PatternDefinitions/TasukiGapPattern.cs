@@ -28,6 +28,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish continuation pattern in an uptrend with three candles where the second gaps up from the first and the third fills part of that gap, signaling continued upward momentum."
+            : "A bearish continuation pattern in a downtrend with three candles where the second gaps down from the first and the third fills part of that gap, signaling continued downward momentum.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -134,6 +140,95 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { c1, c2, c3 };
             return new TasukiGapPattern(candles, isBullish);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 3)
+                throw new InvalidOperationException("TasukiGapPattern must have exactly 3 candles.");
+
+            int c1 = Candles[0], c2 = Candles[1], c3 = Candles[2];
+
+            var metrics1 = metricsCache[c1];
+            var metrics2 = metricsCache[c2];
+            var metrics3 = metricsCache[c3];
+
+            var prices1 = prices[c1];
+            var prices2 = prices[c2];
+            var prices3 = prices[c3];
+
+            // Power Score: Based on gap size, third candle closing within gap, trend
+            double gapScore = 0;
+            if (IsBullish)
+            {
+                gapScore = (prices2.Open - prices1.Close) / MinGapSize;
+                gapScore = Math.Min(gapScore, 1);
+            }
+            else
+            {
+                gapScore = (prices1.Close - prices2.Open) / MinGapSize;
+                gapScore = Math.Min(gapScore, 1);
+            }
+
+            double inGapScore = 0;
+            if (IsBullish)
+            {
+                if (prices1.Close <= prices3.Close && prices3.Close <= prices2.Open)
+                    inGapScore = 1.0;
+                else
+                {
+                    // Partial score based on how close it is
+                    double distance = 0;
+                    if (prices3.Close < prices1.Close)
+                        distance = prices1.Close - prices3.Close;
+                    else if (prices3.Close > prices2.Open)
+                        distance = prices3.Close - prices2.Open;
+                    inGapScore = Math.Max(0, 1 - (distance / (prices2.Open - prices1.Close)));
+                }
+            }
+            else
+            {
+                if (prices2.Open <= prices3.Close && prices3.Close <= prices1.Close)
+                    inGapScore = 1.0;
+                else
+                {
+                    // Partial score based on how close it is
+                    double distance = 0;
+                    if (prices3.Close < prices2.Open)
+                        distance = prices2.Open - prices3.Close;
+                    else if (prices3.Close > prices1.Close)
+                        distance = prices3.Close - prices1.Close;
+                    inGapScore = Math.Max(0, 1 - (distance / (prices1.Close - prices2.Open)));
+                }
+            }
+
+            double trendStrength = Math.Abs(metrics3.GetLookbackMeanTrend(3) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wGap = 0.4, wInGap = 0.4, wTrend = 0.1, wVolume = 0.1;
+            double powerScore = (wGap * gapScore + wInGap * inGapScore + wTrend * trendStrength + wVolume * volumeScore) /
+                                (wGap + wInGap + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double trendDeviation = Math.Abs(metrics3.GetLookbackMeanTrend(3) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double matchScore = 1 - trendDeviation;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

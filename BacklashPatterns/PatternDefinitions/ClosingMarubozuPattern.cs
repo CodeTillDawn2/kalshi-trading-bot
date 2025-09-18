@@ -72,6 +72,12 @@ namespace BacklashPatterns.PatternDefinitions
 /// <summary>
 /// </summary>
         public const string BaseName = "ClosingMarubozu";
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish pattern with a single candle that opens at its low and closes at its high, showing strong buying momentum. Can indicate continuation or reversal depending on trend context."
+            : "A bearish pattern with a single candle that opens at its high and closes at its low, showing strong selling momentum. Can indicate continuation or reversal depending on trend context.";
 /// <summary>
 /// </summary>
         public override string Name => $"{BaseName}_{(IsBullish ? "Bullish" : "Bearish")}{(IsContinuation.HasValue ? (IsContinuation.Value ? "_Continuation" : "_Reversal") : "")}";
@@ -147,6 +153,63 @@ namespace BacklashPatterns.PatternDefinitions
             }
 
             return new ClosingMarubozuPattern(candles, isBullish, isContinuation);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 1)
+                throw new InvalidOperationException("ClosingMarubozuPattern must have exactly 1 candle.");
+
+            int index = Candles[0];
+            var candleMetrics = metricsCache[index];
+            var currentPrices = prices[index];
+
+            double avgRange = candleMetrics.LookbackAvgRange[PatternSize - 1];
+
+            // Power Score: Based on body size, trend strength, continuation/reversal clarity
+            double bodyScore = candleMetrics.BodySize / (MinBodyToAvgRangeRatio * avgRange);
+            bodyScore = Math.Min(bodyScore, 1);
+
+            double trendDirectionRatio = IsBullish ? candleMetrics.BullishRatio[PatternSize - 1] : candleMetrics.BearishRatio[PatternSize - 1];
+
+            double continuationScore = 0.5; // Neutral if no trend
+            if (IsContinuation.HasValue)
+            {
+                continuationScore = IsContinuation.Value ? 1.0 : 0.0; // 1 for continuation, 0 for reversal
+            }
+
+            // Check if it's a perfect Marubozu (no shadows)
+            bool isPerfectMarubozu = IsBullish
+                ? (currentPrices.Open == currentPrices.Low && currentPrices.Close == currentPrices.High)
+                : (currentPrices.Open == currentPrices.High && currentPrices.Close == currentPrices.Low);
+            double marubozuScore = isPerfectMarubozu ? 1.0 : 0.5;
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wBody = 0.3, wTrend = 0.3, wContinuation = 0.2, wMarubozu = 0.1, wVolume = 0.1;
+            double powerScore = (wBody * bodyScore + wTrend * trendDirectionRatio +
+                                 wContinuation * continuationScore + wMarubozu * marubozuScore + wVolume * volumeScore) /
+                                (wBody + wTrend + wContinuation + wMarubozu + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = Math.Abs(candleMetrics.BodySize - MinBodyToAvgRangeRatio * avgRange) / (MinBodyToAvgRangeRatio * avgRange);
+            double trendDeviation = Math.Abs(trendDirectionRatio - OptionalTrendDirectionRatioMin) / OptionalTrendDirectionRatioMin;
+            double matchScore = 1 - (bodyDeviation + trendDeviation) / 2;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

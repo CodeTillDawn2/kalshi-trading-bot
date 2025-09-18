@@ -125,6 +125,10 @@ namespace BacklashPatterns.PatternDefinitions
 /// <summary>
 /// </summary>
         public override string Name => BaseName;
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A bullish reversal pattern in a downtrend with three candles: a large bearish candle, a Doji star, and a large bullish candle.";
         public override double Strength { get; protected set; }
 /// <summary>
 /// </summary>

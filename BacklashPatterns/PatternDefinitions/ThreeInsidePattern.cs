@@ -55,6 +55,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish reversal pattern with a large bearish candle followed by a smaller bullish candle contained within it, and a third bullish candle closing above the first. Signals potential reversal from downtrend to uptrend."
+            : "A bearish reversal pattern with a large bullish candle followed by a smaller bearish candle contained within it, and a third bearish candle closing below the first. Signals potential reversal from uptrend to downtrend.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -157,6 +163,85 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { c1, c2, c3 };
             return new ThreeInsidePattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 3)
+                throw new InvalidOperationException("ThreeInsidePattern must have exactly 3 candles.");
+
+            int c1 = Candles[0], c2 = Candles[1], c3 = Candles[2];
+
+            var metrics1 = metricsCache[c1];
+            var metrics2 = metricsCache[c2];
+            var metrics3 = metricsCache[c3];
+
+            var prices1 = prices[c1];
+            var prices2 = prices[c2];
+            var prices3 = prices[c3];
+
+            // Power Score: Based on body sizes, containment, breakout, trend
+            double firstBodyScore = metrics1.BodySize / MinBodySizeFirst;
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double secondBodyScore = 1 - (metrics2.BodySize / MaxBodySizeSecond);
+            secondBodyScore = Math.Clamp(secondBodyScore, 0, 1);
+
+            double thirdBodyScore = metrics3.BodySize / MinBodySizeThird;
+            thirdBodyScore = Math.Min(thirdBodyScore, 1);
+
+            // Containment score
+            double prevMin = Math.Min(prices1.Open, prices1.Close);
+            double prevMax = Math.Max(prices1.Open, prices1.Close);
+            bool inside = prices2.Open >= prevMin - ContainmentBuffer && prices2.Open <= prevMax + ContainmentBuffer &&
+                          prices2.Close >= prevMin - ContainmentBuffer && prices2.Close <= prevMax + ContainmentBuffer;
+            double containmentScore = inside ? 1.0 : 0.5;
+
+            // Breakout score
+            double breakoutScore = 0;
+            if (metrics1.IsBearish && metrics2.IsBullish && metrics3.IsBullish)
+            {
+                breakoutScore = (prices3.Close - prices2.High) / metrics1.BodySize;
+                breakoutScore = Math.Min(breakoutScore, 1);
+            }
+            else if (metrics1.IsBullish && metrics2.IsBearish && metrics3.IsBearish)
+            {
+                breakoutScore = (prices2.Low - prices3.Close) / metrics1.BodySize;
+                breakoutScore = Math.Min(breakoutScore, 1);
+            }
+
+            double trendStrength = Math.Abs(metrics3.GetLookbackMeanTrend(1));
+            double trendConsistency = metrics3.GetLookbackTrendConsistency(1);
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirst = 0.15, wSecond = 0.15, wThird = 0.15, wContainment = 0.2, wBreakout = 0.2, wTrend = 0.1, wVolume = 0.05;
+            double powerScore = (wFirst * firstBodyScore + wSecond * secondBodyScore + wThird * thirdBodyScore +
+                                 wContainment * containmentScore + wBreakout * breakoutScore + wTrend * trendStrength + wVolume * volumeScore) /
+                                (wFirst + wSecond + wThird + wContainment + wBreakout + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double firstDeviation = Math.Abs(metrics1.BodySize - MinBodySizeFirst) / MinBodySizeFirst;
+            double secondDeviation = Math.Abs(metrics2.BodySize - MaxBodySizeSecond) / MaxBodySizeSecond;
+            double thirdDeviation = Math.Abs(metrics3.BodySize - MinBodySizeThird) / MinBodySizeThird;
+            double trendDeviation = Math.Abs(trendStrength - TrendThreshold) / TrendThreshold;
+            double consistencyDeviation = Math.Abs(trendConsistency - 0.4) / 0.4;
+            double matchScore = 1 - (firstDeviation + secondDeviation + thirdDeviation + trendDeviation + consistencyDeviation) / 5;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

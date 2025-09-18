@@ -10,6 +10,7 @@ using BacklashDTOs.Data;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TradingStrategies.Configuration;
+using BacklashBotData.Data;
 
 namespace KalshiBotTasks
 {
@@ -33,7 +34,7 @@ namespace KalshiBotTasks
     [TestFixture]
     public class SchemaDeployment
     {
-        private KalshiBotContext _context;
+        private BacklashBotContext _context;
         private SchemaDeploymentObj _schemaDeployment;
         private IConfigurationRoot _configuration;
         private string basePath;
@@ -88,7 +89,7 @@ namespace KalshiBotTasks
             // Setup dependency injection
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<IConfiguration>(_configuration);
-            serviceCollection.AddDbContext<KalshiBotContext>(options =>
+            serviceCollection.AddDbContext<BacklashBotContext>(options =>
                 options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
             serviceCollection.AddLogging(logging => logging.AddConsole());
             serviceCollection.AddScoped<SchemaDeploymentObj>();
@@ -98,7 +99,7 @@ namespace KalshiBotTasks
             IServiceProvider _serviceProvider = serviceCollection.BuildServiceProvider();
 
             // Initialize context and schema deployment
-            _context = _serviceProvider.GetRequiredService<KalshiBotContext>();
+            _context = _serviceProvider.GetRequiredService<BacklashBotContext>();
             var logger = _serviceProvider.GetRequiredService<ILogger<SchemaDeployment>>();
             var snapshotConfig = _serviceProvider.GetRequiredService<SnapshotConfig>();
             _schemaDeployment = new SchemaDeploymentObj(_context, logger, snapshotConfig, _configuration);
@@ -179,7 +180,7 @@ namespace KalshiBotTasks
         /// </remarks>
         public class SchemaDeploymentObj
         {
-            private readonly KalshiBotContext _context;
+            private readonly BacklashBotContext _context;
             private readonly ILogger<SchemaDeployment> _logger;
             private readonly SnapshotConfig _snapshotConfig;
             private readonly IConfigurationRoot _configuration;
@@ -196,7 +197,7 @@ namespace KalshiBotTasks
             /// The constructor validates all dependencies to ensure the service is properly initialized.
             /// This prevents runtime errors during schema deployment operations.
             /// </remarks>
-            public SchemaDeploymentObj(KalshiBotContext context, ILogger<SchemaDeployment> logger, SnapshotConfig snapshotConfig, IConfigurationRoot configuration)
+            public SchemaDeploymentObj(BacklashBotContext context, ILogger<SchemaDeployment> logger, SnapshotConfig snapshotConfig, IConfigurationRoot configuration)
             {
                 _context = context ?? throw new ArgumentNullException(nameof(context));
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));

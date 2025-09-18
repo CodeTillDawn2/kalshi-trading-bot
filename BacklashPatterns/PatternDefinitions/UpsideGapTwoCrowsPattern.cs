@@ -53,6 +53,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A bearish reversal pattern in an uptrend with a strong bullish candle followed by two bearish candles where the second gaps up from the first and the third closes below the second but near the first, signaling potential reversal from uptrend to downtrend.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -118,6 +122,67 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { c1, c2, c3 };
             return new UpsideGapTwoCrowsPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 3)
+                throw new InvalidOperationException("UpsideGapTwoCrowsPattern must have exactly 3 candles.");
+
+            int c1 = Candles[0], c2 = Candles[1], c3 = Candles[2];
+
+            var metrics1 = metricsCache[c1];
+            var metrics2 = metricsCache[c2];
+            var metrics3 = metricsCache[c3];
+
+            var prices1 = prices[c1];
+            var prices2 = prices[c2];
+            var prices3 = prices[c3];
+
+            // Power Score: Based on body size, gap, positioning, close proximity, trend
+            double firstBodyScore = metrics1.BodySize / FirstCandleMinBodySize;
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double gapScore = (prices2.Open - prices1.Close) / GapOverlapTolerance;
+            gapScore = Math.Min(gapScore, 1);
+
+            double secondPositionScore = (prices2.Close - prices1.Open) / metrics1.BodySize;
+            secondPositionScore = Math.Min(secondPositionScore, 1);
+
+            double thirdPositionScore = 1 - ((prices3.Close - prices1.Close) / ThirdCandleCloseTolerance);
+            thirdPositionScore = Math.Clamp(thirdPositionScore, 0, 1);
+
+            double engulfScore = (prices2.Close - prices3.Close) / metrics2.BodySize;
+            engulfScore = Math.Min(engulfScore, 1);
+
+            double trendStrength = metrics3.GetLookbackMeanTrend(3);
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirst = 0.15, wGap = 0.15, wSecond = 0.15, wThird = 0.15, wEngulf = 0.2, wTrend = 0.1, wVolume = 0.05;
+            double powerScore = (wFirst * firstBodyScore + wGap * gapScore + wSecond * secondPositionScore +
+                                 wThird * thirdPositionScore + wEngulf * engulfScore + wTrend * trendStrength + wVolume * volumeScore) /
+                                (wFirst + wGap + wSecond + wThird + wEngulf + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = Math.Abs(metrics1.BodySize - FirstCandleMinBodySize) / FirstCandleMinBodySize;
+            double trendDeviation = Math.Abs(trendStrength - TrendThreshold) / TrendThreshold;
+            double matchScore = 1 - (bodyDeviation + trendDeviation) / 2;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

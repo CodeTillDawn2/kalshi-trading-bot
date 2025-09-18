@@ -58,6 +58,12 @@ namespace BacklashPatterns.PatternDefinitions
         public const string BaseName = "Marubozu";
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish candle with no wicks (open equals low, close equals high), showing strong buying momentum with no rejection of higher prices."
+            : "A bearish candle with no wicks (open equals high, close equals low), showing strong selling momentum with no rejection of lower prices.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -126,6 +132,64 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Return the pattern instance with the specified direction
             return new MarubozuPattern(candles, isBullish);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 1)
+                throw new InvalidOperationException("MarubozuPattern must have exactly 1 candle.");
+
+            int index = Candles[0];
+            var metrics = metricsCache[index];
+            var ask = prices[index];
+
+            // Power Score: Based on range, body size, wick absence, trend
+            double rangeScore = metrics.TotalRange / MinRange;
+            rangeScore = Math.Min(rangeScore, 1);
+
+            double bodyScore = metrics.BodySize / MinRange; // Body should be close to total range
+            bodyScore = Math.Min(bodyScore, 1);
+
+            // Wick absence score (perfect Marubozu has no wicks)
+            double wickScore = 1.0;
+            if (IsBullish)
+            {
+                if (ask.Open != ask.Low || ask.Close != ask.High) wickScore = 0.5;
+            }
+            else
+            {
+                if (ask.Open != ask.High || ask.Close != ask.Low) wickScore = 0.5;
+            }
+
+            double trendStrength = Math.Abs(metrics.GetLookbackMeanTrend(1) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wRange = 0.25, wBody = 0.25, wWick = 0.25, wTrend = 0.15, wVolume = 0.1;
+            double powerScore = (wRange * rangeScore + wBody * bodyScore + wWick * wickScore +
+                                 wTrend * trendStrength + wVolume * volumeScore) /
+                                (wRange + wBody + wWick + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double rangeDeviation = Math.Abs(metrics.TotalRange - MinRange) / MinRange;
+            double trendDeviation = Math.Abs(metrics.GetLookbackMeanTrend(1) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double matchScore = 1 - (rangeDeviation + trendDeviation) / 2;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

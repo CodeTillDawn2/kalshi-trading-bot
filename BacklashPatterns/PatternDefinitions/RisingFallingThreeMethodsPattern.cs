@@ -52,6 +52,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish continuation pattern in an uptrend with a long bullish candle followed by three smaller candles that stay within its range, and a fifth bullish candle that breaks higher."
+            : "A bearish continuation pattern in a downtrend with a long bearish candle followed by three smaller candles that stay within its range, and a fifth bearish candle that breaks lower.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -174,6 +180,90 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Return the pattern instance if all conditions are met
             return new RisingFallingThreeMethodsPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 5)
+                throw new InvalidOperationException("RisingFallingThreeMethodsPattern must have exactly 5 candles.");
+
+            int startIndex = Candles[0];
+            var metrics = new CandleMetrics[5];
+            var asks = new CandleMids[5];
+
+            for (int i = 0; i < 5; i++)
+            {
+                metrics[i] = metricsCache[Candles[i]];
+                asks[i] = prices[Candles[i]];
+            }
+
+            // Power Score: Based on body sizes, containment, wick control, continuation, trend
+            double firstBodyScore = metrics[0].BodySize / MinBodySizeMajor;
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double middleBodyScore = 1 - ((metrics[1].BodySize + metrics[2].BodySize + metrics[3].BodySize) / (3 * MaxBodySizeMinor));
+            middleBodyScore = Math.Clamp(middleBodyScore, 0, 1);
+
+            double fifthBodyScore = metrics[4].BodySize / MinBodySizeMajor;
+            fifthBodyScore = Math.Min(fifthBodyScore, 1);
+
+            double wickScore = 1 - ((metrics[4].UpperWick + metrics[4].LowerWick) / (2 * WickRangeRatio * metrics[4].TotalRange));
+            wickScore = Math.Clamp(wickScore, 0, 1);
+
+            double rangeBuffer = Math.Max(MinRangeBuffer, RangeBufferFactor * metrics[0].TotalRange);
+            int inRangeCount = 0;
+            for (int i = 1; i <= 3; i++)
+            {
+                if (asks[i].High <= asks[0].High + rangeBuffer && asks[i].Low >= asks[0].Low - rangeBuffer)
+                    inRangeCount++;
+            }
+            double containmentScore = inRangeCount / 3.0;
+
+            double continuationScore = 0;
+            if (metrics[0].IsBullish && metrics[4].IsBullish)
+            {
+                continuationScore = (asks[4].Close - asks[0].Close) / MinBodySizeMajor;
+                continuationScore = Math.Min(continuationScore, 1);
+            }
+            else if (metrics[0].IsBearish && metrics[4].IsBearish)
+            {
+                continuationScore = (asks[0].Close - asks[4].Close) / MinBodySizeMajor;
+                continuationScore = Math.Min(continuationScore, 1);
+            }
+
+            double trendStrength = Math.Abs(metrics[4].GetLookbackMeanTrend(5) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirst = 0.15, wMiddle = 0.15, wFifth = 0.15, wWick = 0.15, wContainment = 0.15, wContinuation = 0.15, wTrend = 0.05, wVolume = 0.05;
+            double powerScore = (wFirst * firstBodyScore + wMiddle * middleBodyScore + wFifth * fifthBodyScore +
+                                 wWick * wickScore + wContainment * containmentScore + wContinuation * continuationScore +
+                                 wTrend * trendStrength + wVolume * volumeScore) /
+                                (wFirst + wMiddle + wFifth + wWick + wContainment + wContinuation + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double firstDeviation = Math.Abs(metrics[0].BodySize - MinBodySizeMajor) / MinBodySizeMajor;
+            double middleDeviation = Math.Abs((metrics[1].BodySize + metrics[2].BodySize + metrics[3].BodySize) / 3 - MaxBodySizeMinor) / MaxBodySizeMinor;
+            double fifthDeviation = Math.Abs(metrics[4].BodySize - MinBodySizeMajor) / MinBodySizeMajor;
+            double wickDeviation = (metrics[4].UpperWick + metrics[4].LowerWick) / (2 * WickRangeRatio * metrics[4].TotalRange);
+            double trendDeviation = Math.Abs(metrics[4].GetLookbackMeanTrend(5) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double matchScore = 1 - (firstDeviation + middleDeviation + fifthDeviation + wickDeviation + trendDeviation) / 5;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

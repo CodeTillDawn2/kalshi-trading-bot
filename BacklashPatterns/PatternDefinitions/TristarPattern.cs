@@ -48,6 +48,12 @@ namespace BacklashPatterns.PatternDefinitions
         public static double CloseToleranceRangeFactor { get; } = 0.2;
         public const string BaseName = "Tristar";
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A rare bullish reversal pattern with three Doji candles where the second gaps below the first and the third closes near the first, signaling potential reversal from downtrend to uptrend."
+            : "A rare bearish reversal pattern with three Doji candles where the second gaps above the first and the third closes near the first, signaling potential reversal from uptrend to downtrend.";
         public override double Strength { get; protected set; }
         public override double Certainty { get; protected set; }
         public override double Uncertainty { get; protected set; }
@@ -126,6 +132,67 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Return the pattern instance with the specified direction
             return new TristarPattern(candles, isBullish);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 3)
+                throw new InvalidOperationException("TristarPattern must have exactly 3 candles.");
+
+            int c1 = Candles[0], c2 = Candles[1], c3 = Candles[2];
+
+            var metrics1 = metricsCache[c1];
+            var metrics2 = metricsCache[c2];
+            var metrics3 = metricsCache[c3];
+
+            var prices1 = prices[c1];
+            var prices2 = prices[c2];
+            var prices3 = prices[c3];
+
+            // Power Score: Based on Doji smallness, gap, close match, trend
+            double dojiScore = (1 - (metrics1.BodySize / DojiBodyMax) + 1 - (metrics2.BodySize / DojiBodyMax) + 1 - (metrics3.BodySize / DojiBodyMax)) / 3;
+            dojiScore = Math.Clamp(dojiScore, 0, 1);
+
+            double rangeScore = (metrics1.TotalRange / DojiRangeMin + metrics2.TotalRange / DojiRangeMin + metrics3.TotalRange / DojiRangeMin) / 3;
+            rangeScore = Math.Min(rangeScore, 1);
+
+            double gapSize = IsBullish ? (prices1.Close - prices2.Close) : (prices2.Close - prices1.Close);
+            double gapScore = gapSize / MinGapSize;
+            gapScore = Math.Min(gapScore, 1);
+
+            double closeMatch = 1 - (Math.Abs(prices3.Close - prices1.Close) / (CloseToleranceBase + CloseToleranceRangeFactor * metrics1.TotalRange));
+            closeMatch = Math.Clamp(closeMatch, 0, 1);
+
+            double trendStrength = Math.Abs(metrics3.GetLookbackMeanTrend(3));
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wDoji = 0.2, wRange = 0.2, wGap = 0.2, wClose = 0.2, wTrend = 0.1, wVolume = 0.1;
+            double powerScore = (wDoji * dojiScore + wRange * rangeScore + wGap * gapScore +
+                                 wClose * closeMatch + wTrend * trendStrength + wVolume * volumeScore) /
+                                (wDoji + wRange + wGap + wClose + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = (metrics1.BodySize + metrics2.BodySize + metrics3.BodySize) / (3 * DojiBodyMax);
+            double rangeDeviation = (DojiRangeMin - (metrics1.TotalRange + metrics2.TotalRange + metrics3.TotalRange) / 3) / DojiRangeMin;
+            rangeDeviation = Math.Max(rangeDeviation, 0);
+            double trendDeviation = Math.Abs(trendStrength - TrendThreshold) / TrendThreshold;
+            double matchScore = 1 - (bodyDeviation + rangeDeviation + trendDeviation) / 3;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
 
         // Helper method restored from original IsLoosenedDoji, adapted to current structure

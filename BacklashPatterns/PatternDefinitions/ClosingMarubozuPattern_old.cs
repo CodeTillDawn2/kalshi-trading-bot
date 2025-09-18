@@ -27,6 +27,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the name of the pattern.
         /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish momentum pattern with a single candle that opens at its low and closes at its high, showing strong buying pressure."
+            : "A bearish momentum pattern with a single candle that opens at its high and closes at its low, showing strong selling pressure.";
         private readonly bool IsBullish;
         /// <summary>
         /// Gets the strength of the pattern.

@@ -56,6 +56,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A bearish reversal pattern in an uptrend with a small body, long lower wick, and minimal upper wick. The long lower wick shows rejection of lower prices, signaling potential reversal from uptrend to downtrend.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -105,6 +109,63 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { index };
             return new HangingManPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 1)
+                throw new InvalidOperationException("HangingManPattern must have exactly 1 candle.");
+
+            int index = Candles[0];
+            var currentMetrics = metricsCache[index];
+
+            // Power Score: Based on range, body smallness, wick strength, trend
+            double rangeScore = currentMetrics.TotalRange / MinRange;
+            rangeScore = Math.Min(rangeScore, 1);
+
+            double bodyScore = 1 - (currentMetrics.BodySize / BodyMax);
+            bodyScore = Math.Clamp(bodyScore, 0, 1);
+
+            double wickBodyScore = currentMetrics.LowerWick / (WickBodyRatio * currentMetrics.BodySize);
+            wickBodyScore = Math.Min(wickBodyScore, 1);
+
+            double upperWickScore = 1 - (currentMetrics.UpperWick / (UpperWickMaxRatio * currentMetrics.TotalRange));
+            upperWickScore = Math.Clamp(upperWickScore, 0, 1);
+
+            double trendScore = currentMetrics.GetLookbackMeanTrend(1) / TrendThreshold;
+            trendScore = Math.Min(trendScore, 1);
+
+            double consistencyScore = currentMetrics.GetLookbackTrendConsistency(1) / ConsistencyThreshold;
+            consistencyScore = Math.Min(consistencyScore, 1);
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wRange = 0.15, wBody = 0.15, wWickBody = 0.25, wUpperWick = 0.15, wTrend = 0.15, wConsistency = 0.1, wVolume = 0.05;
+            double powerScore = (wRange * rangeScore + wBody * bodyScore + wWickBody * wickBodyScore +
+                                 wUpperWick * upperWickScore + wTrend * trendScore + wConsistency * consistencyScore + wVolume * volumeScore) /
+                                (wRange + wBody + wWickBody + wUpperWick + wTrend + wConsistency + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double rangeDeviation = Math.Abs(currentMetrics.TotalRange - MinRange) / MinRange;
+            double bodyDeviation = Math.Abs(currentMetrics.BodySize - BodyMax) / BodyMax;
+            double wickDeviation = Math.Abs(currentMetrics.LowerWick - WickBodyRatio * currentMetrics.BodySize) / (WickBodyRatio * currentMetrics.BodySize);
+            double trendDeviation = Math.Abs(currentMetrics.GetLookbackMeanTrend(1) - TrendThreshold) / TrendThreshold;
+            double matchScore = 1 - (rangeDeviation + bodyDeviation + wickDeviation + trendDeviation) / 4;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

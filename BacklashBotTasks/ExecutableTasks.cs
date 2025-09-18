@@ -1,7 +1,6 @@
 using KalshiBotAPI.Configuration;
 using KalshiBotAPI.KalshiAPI;
 using KalshiBotData.Data;
-using KalshiBotData.Data.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -22,6 +21,8 @@ using TradingSimulator.Strategies;
 using TradingStrategies.Classification;
 using TradingStrategies.Configuration;
 using BacklashBot.Management;
+using BacklashBotData.Data.Interfaces;
+using BacklashBotData.Data;
 
 
 namespace KalshiBotTasks
@@ -42,7 +43,7 @@ namespace KalshiBotTasks
         private IOptions<ExecutionConfig> _executionConfig;
         private Mock<ILogger<SqlDataService>> _sqlLoggerMock;
         private MarketAnalysisHelper _marketAnalysisHelper;
-        private IKalshiBotContext _dbContext;
+        private IBacklashBotContext _dbContext;
         private ServiceProvider? _serviceProvider;
         private IOptions<SnapshotConfig> _snapshotOptions;
         private int _missingOrderbookCount;
@@ -169,7 +170,7 @@ namespace KalshiBotTasks
             var statusTrackerMock = new Mock<IStatusTrackerService>();
 
             var services = new ServiceCollection();
-            services.AddScoped<IKalshiBotContext>(provider => new KalshiBotContext(config));
+            services.AddScoped<IBacklashBotContext>(provider => new BacklashBotContext(config));
             services.AddScoped<IKalshiAPIService, KalshiAPIService>(); // Register with interface
             services.AddScoped<IServiceFactory, ServiceFactory>();
             services.AddScoped<CentralPerformanceMonitor>();
@@ -208,7 +209,7 @@ namespace KalshiBotTasks
             _overnightService = new OvernightActivitiesHelper(overnightLoggerMock.Object, _interestScoreService, _marketAnalysisHelper, _executionConfig, _sqlDataService);
             _snapshotService = new TradingSnapshotService(snapshotLoggerMock.Object, _snapshotOptions, Options.Create(tradingConfig), _scopeFactory, this.config, centralPerformanceMonitor);
 
-            _dbContext = new KalshiBotContext(config);
+            _dbContext = new BacklashBotContext(config);
             _missingOrderbookCount = 0;
             _overlappingPriceCount = 0;
             _rateDiscrepancyCount = 0; // Initialize new counter
@@ -308,7 +309,7 @@ namespace KalshiBotTasks
 
                     try
                     {
-                        using var dbContext = new KalshiBotContext(config);
+                        using var dbContext = new BacklashBotContext(config);
 
                         // Get market info for category
                         string? marketCategory = null;

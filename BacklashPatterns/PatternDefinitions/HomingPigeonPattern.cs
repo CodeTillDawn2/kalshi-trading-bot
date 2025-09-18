@@ -49,6 +49,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A bullish reversal pattern in a downtrend with two bearish candles where the second is completely contained within the first, signaling slowing bearish momentum and potential reversal.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -111,6 +115,63 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { index - 1, index };
             return new HomingPigeonPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 2)
+                throw new InvalidOperationException("HomingPigeonPattern must have exactly 2 candles.");
+
+            int prevIndex = Candles[0];
+            int currIndex = Candles[1];
+
+            var previousMetrics = metricsCache[prevIndex];
+            var currentMetrics = metricsCache[currIndex];
+
+            var previousPrice = prices[prevIndex];
+            var currentPrice = prices[currIndex];
+
+            // Power Score: Based on containment, body size reduction, low proximity, trend
+            double containmentScore = 1 - ((currentPrice.Open - previousPrice.Open) / MaxOpenBuffer +
+                                           (previousPrice.Close - currentPrice.Close) / MaxCloseBuffer) / 2;
+            containmentScore = Math.Clamp(containmentScore, 0, 1);
+
+            double bodyReductionScore = 1 - (currentMetrics.BodySize / previousMetrics.BodySize);
+            bodyReductionScore = Math.Clamp(bodyReductionScore, 0, 1);
+
+            double lowProximityScore = 1 - (Math.Abs(currentPrice.Low - previousPrice.Low) /
+                                           Math.Max(BaseMaxLowDifference, LowRangeRatio * previousMetrics.TotalRange));
+            lowProximityScore = Math.Clamp(lowProximityScore, 0, 1);
+
+            double trendStrength = Math.Abs(currentMetrics.GetLookbackMeanTrend(2) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wContainment = 0.25, wBodyReduction = 0.25, wLowProximity = 0.25, wTrend = 0.15, wVolume = 0.1;
+            double powerScore = (wContainment * containmentScore + wBodyReduction * bodyReductionScore +
+                                 wLowProximity * lowProximityScore + wTrend * trendStrength + wVolume * volumeScore) /
+                                (wContainment + wBodyReduction + wLowProximity + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = Math.Abs(currentMetrics.BodySize - previousMetrics.BodySize) / previousMetrics.BodySize;
+            double trendDeviation = Math.Abs(currentMetrics.GetLookbackMeanTrend(2) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double matchScore = 1 - (bodyDeviation + trendDeviation) / 2;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

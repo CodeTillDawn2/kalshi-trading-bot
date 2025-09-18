@@ -46,6 +46,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish candle with a large body and small wicks, indicating strong buying momentum and conviction in an uptrend."
+            : "A bearish candle with a large body and small wicks, indicating strong selling momentum and conviction in a downtrend.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -116,6 +122,61 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Return the pattern instance with the specified direction
             return new LongLineCandlePattern(candles, isBullish);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 1)
+                throw new InvalidOperationException("LongLineCandlePattern must have exactly 1 candle.");
+
+            int index = Candles[0];
+            var metrics = metricsCache[index];
+
+            // Power Score: Based on range, body dominance, wick minimization, contextual size, trend
+            double rangeScore = metrics.TotalRange / MinRange;
+            rangeScore = Math.Min(rangeScore, 1);
+
+            double bodyDominanceScore = metrics.BodySize / (BodyRangeRatio * metrics.TotalRange);
+            bodyDominanceScore = Math.Min(bodyDominanceScore, 1);
+
+            double wickScore = 1 - ((metrics.UpperWick + metrics.LowerWick) / (2 * WickRangeRatio * metrics.TotalRange));
+            wickScore = Math.Clamp(wickScore, 0, 1);
+
+            double contextualScore = metrics.BodySize / (AvgRangeMultiplier * metrics.GetLookbackAvgRange(1));
+            contextualScore = Math.Min(contextualScore, 1);
+
+            double trendStrength = Math.Abs(metrics.GetLookbackMeanTrend(1) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wRange = 0.15, wBodyDominance = 0.2, wWick = 0.2, wContextual = 0.2, wTrend = 0.15, wVolume = 0.1;
+            double powerScore = (wRange * rangeScore + wBodyDominance * bodyDominanceScore + wWick * wickScore +
+                                 wContextual * contextualScore + wTrend * trendStrength + wVolume * volumeScore) /
+                                (wRange + wBodyDominance + wWick + wContextual + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double rangeDeviation = Math.Abs(metrics.TotalRange - MinRange) / MinRange;
+            double bodyDeviation = Math.Abs(metrics.BodySize - BodyRangeRatio * metrics.TotalRange) / (BodyRangeRatio * metrics.TotalRange);
+            double wickDeviation = (metrics.UpperWick + metrics.LowerWick) / (2 * WickRangeRatio * metrics.TotalRange);
+            double contextualDeviation = Math.Abs(metrics.BodySize - AvgRangeMultiplier * metrics.GetLookbackAvgRange(1)) / (AvgRangeMultiplier * metrics.GetLookbackAvgRange(1));
+            double trendDeviation = Math.Abs(metrics.GetLookbackMeanTrend(1) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double matchScore = 1 - (rangeDeviation + bodyDeviation + wickDeviation + contextualDeviation + trendDeviation) / 5;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

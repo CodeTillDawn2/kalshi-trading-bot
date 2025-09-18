@@ -49,6 +49,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A bearish reversal pattern in an uptrend with three candles where the first two are bullish with ascending closes, but the third opens higher and closes lower, signaling weakening momentum.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -117,6 +121,71 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Return the pattern instance if all conditions are satisfied
             return new StalledPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 3)
+                throw new InvalidOperationException("StalledPattern must have exactly 3 candles.");
+
+            int c1 = Candles[0], c2 = Candles[1], c3 = Candles[2];
+
+            var metrics1 = metricsCache[c1];
+            var metrics2 = metricsCache[c2];
+            var metrics3 = metricsCache[c3];
+
+            var prices1 = prices[c1];
+            var prices2 = prices[c2];
+            var prices3 = prices[c3];
+
+            // Power Score: Based on body sizes, stalling progression, trend
+            double firstBodyScore = metrics1.BodySize / MinBodySize;
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double secondBodyScore = 1 - (metrics2.BodySize / SmallBodyMax);
+            secondBodyScore = Math.Clamp(secondBodyScore, 0, 1);
+
+            double thirdBodyScore = 1 - (metrics3.BodySize / SmallBodyMax);
+            thirdBodyScore = Math.Clamp(thirdBodyScore, 0, 1);
+
+            double progressionScore = (prices2.Close - prices1.Close) / MinBodySize;
+            progressionScore = Math.Min(progressionScore, 1);
+
+            double stallingScore = 1 - ((prices2.Close - prices3.Close) / MinBodySize);
+            stallingScore = Math.Clamp(stallingScore, 0, 1);
+
+            double trendStrength = metrics3.GetLookbackMeanTrend(3);
+            double trendConsistency = metrics3.GetLookbackTrendConsistency(3);
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirst = 0.15, wSecond = 0.15, wThird = 0.15, wProgression = 0.15, wStalling = 0.15, wTrend = 0.15, wVolume = 0.1;
+            double powerScore = (wFirst * firstBodyScore + wSecond * secondBodyScore + wThird * thirdBodyScore +
+                                 wProgression * progressionScore + wStalling * stallingScore + wTrend * trendStrength + wVolume * volumeScore) /
+                                (wFirst + wSecond + wThird + wProgression + wStalling + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double firstDeviation = Math.Abs(metrics1.BodySize - MinBodySize) / MinBodySize;
+            double secondDeviation = metrics2.BodySize / SmallBodyMax;
+            double thirdDeviation = metrics3.BodySize / SmallBodyMax;
+            double trendDeviation = Math.Abs(trendStrength - TrendThreshold) / TrendThreshold;
+            double consistencyDeviation = Math.Abs(trendConsistency - ConsistencyThreshold) / ConsistencyThreshold;
+            double matchScore = 1 - (firstDeviation + secondDeviation + thirdDeviation + trendDeviation + consistencyDeviation) / 5;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

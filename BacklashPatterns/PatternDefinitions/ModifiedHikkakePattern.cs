@@ -23,6 +23,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish reversal pattern that initially appears as a bearish inside day but then breaks higher, trapping bearish traders with a stronger breakout."
+            : "A bearish reversal pattern that initially appears as a bullish inside day but then breaks lower, trapping bullish traders with a stronger breakout.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -100,6 +106,77 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Return the pattern instance with the specified direction
             return new ModifiedHikkakePattern(candles, isBullish);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 3)
+                throw new InvalidOperationException("ModifiedHikkakePattern must have exactly 3 candles.");
+
+            int firstIdx = Candles[0], secondIdx = Candles[1], thirdIdx = Candles[2];
+
+            var firstMid = prices[firstIdx];
+            var secondMid = prices[secondIdx];
+            var thirdMid = prices[thirdIdx];
+
+            var secondMetrics = metricsCache[secondIdx];
+            var thirdMetrics = metricsCache[thirdIdx];
+
+            // Power Score: Based on breakout strength, reversal strength, trend
+            double breakoutScore = 0;
+            if (IsBullish)
+            {
+                breakoutScore = (secondMid.Close - firstMid.Close) / BreakoutThreshold;
+                if (BreakoutThreshold == 0) breakoutScore = 1; // Any move is full score if threshold is 0
+                else breakoutScore = Math.Min(breakoutScore, 1);
+            }
+            else
+            {
+                breakoutScore = (firstMid.Close - secondMid.Close) / BreakoutThreshold;
+                if (BreakoutThreshold == 0) breakoutScore = 1; // Any move is full score if threshold is 0
+                else breakoutScore = Math.Min(breakoutScore, 1);
+            }
+
+            double reversalScore = 0;
+            if (IsBullish)
+            {
+                reversalScore = (thirdMid.Close - secondMid.Close) / secondMetrics.BodySize;
+                reversalScore = Math.Min(reversalScore, 1);
+            }
+            else
+            {
+                reversalScore = (secondMid.Close - thirdMid.Close) / secondMetrics.BodySize;
+                reversalScore = Math.Min(reversalScore, 1);
+            }
+
+            double trendStrength = Math.Abs(thirdMetrics.GetLookbackMeanTrend(3));
+            trendStrength = Math.Min(trendStrength, 1); // Closer to 0 is better for this loose pattern
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wBreakout = 0.3, wReversal = 0.4, wTrend = 0.2, wVolume = 0.1;
+            double powerScore = (wBreakout * breakoutScore + wReversal * reversalScore +
+                                 wTrend * trendStrength + wVolume * volumeScore) /
+                                (wBreakout + wReversal + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds (very loose for this pattern)
+            double trendDeviation = Math.Abs(thirdMetrics.GetLookbackMeanTrend(3));
+            double matchScore = 1 - trendDeviation; // Closer to 0 is better
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

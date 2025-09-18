@@ -27,7 +27,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum body size for the first and fifth candles relative to the lookback average range.
         /// Purpose: Ensures the first and fifth candles are significant compared to prior volatility.
         /// Default: 1.0 (equal to average range)
-        /// Range: 0.5–2.0 (0.5 for less strict significance, 2.0 for very strong signals).
+        /// Range: 0.5ï¿½2.0 (0.5 for less strict significance, 2.0 for very strong signals).
         /// </summary>
         public static double MinBodyToAvgRangeRatio { get; set; } = 0.5;
 
@@ -35,7 +35,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Maximum body size for the middle three consolidation candles relative to the lookback average range.
         /// Purpose: Ensures the consolidation candles have small bodies, indicating low volatility.
         /// Default: 0.5 (half the average range)
-        /// Range: 0.3–1.0 (0.3 for very tight consolidation, 1.0 for slightly broader consolidation).
+        /// Range: 0.3ï¿½1.0 (0.3 for very tight consolidation, 1.0 for slightly broader consolidation).
         /// </summary>
         public static double ConsolidationBodyToAvgRangeMax { get; set; } = 1.0;
 
@@ -43,7 +43,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Maximum total range for each of the middle three consolidation candles relative to the lookback average range.
         /// Purpose: Ensures each consolidation candle has a small range, reinforcing a tight consolidation.
         /// Default: 1.0 (equal to average range)
-        /// Range: 0.5–1.5 (0.5 for tighter ranges, 1.5 for broader acceptable ranges).
+        /// Range: 0.5ï¿½1.5 (0.5 for tighter ranges, 1.5 for broader acceptable ranges).
         /// </summary>
         public static double ConsolidationRangeToAvgRangeMax { get; set; } = 2.0;
 
@@ -51,7 +51,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// Maximum consolidation range (max high - min low of middle three candles) relative to the lookback average range.
         /// Purpose: Ensures the consolidation period is tight compared to prior volatility.
         /// Default: 2.0 (twice the average range)
-        /// Range: 1.5–3.0 (1.5 for very tight consolidation, 3.0 for slightly broader consolidation).
+        /// Range: 1.5ï¿½3.0 (1.5 for very tight consolidation, 3.0 for slightly broader consolidation).
         /// </summary>
         public static double ConsolidationTightRangeMax { get; set; } = 4.0;
 
@@ -59,12 +59,18 @@ namespace BacklashPatterns.PatternDefinitions
         /// Minimum trend direction ratio in the lookback period to confirm a prior trend.
         /// Purpose: Ensures a consistent prior trend (downtrend for bullish, uptrend for bearish) before the pattern.
         /// Default: 0.6 (60% of candles in trend direction)
-        /// Range: 0.5–0.8 (0.5 for moderate consistency, 0.8 for strong, steady trends).
+        /// Range: 0.5ï¿½0.8 (0.5 for moderate consistency, 0.8 for strong, steady trends).
         /// </summary>
         public static double TrendDirectionRatioMin { get; set; } = 0.3;
 
         public const string BaseName = "Breakaway";
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish reversal pattern with a strong bearish candle, three consolidation candles, and a bullish breakout candle. Signals potential reversal from downtrend to uptrend."
+            : "A bearish reversal pattern with a strong bullish candle, three consolidation candles, and a bearish breakout candle. Signals potential reversal from uptrend to downtrend.";
         private readonly bool IsBullish;
         public override double Strength { get; protected set; }
         public override double Certainty { get; protected set; }
@@ -150,6 +156,74 @@ namespace BacklashPatterns.PatternDefinitions
             // Step 5: Gap check removed entirely (no hasGap variable or condition)
 
             return new BreakawayPattern(candles, isBullish);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 5)
+                throw new InvalidOperationException("BreakawayPattern must have exactly 5 candles.");
+
+            int startIndex = Candles[0];
+            int index = Candles[4]; // Fifth candle
+
+            var metrics1 = metricsCache[startIndex];
+            var metrics2 = metricsCache[startIndex + 1];
+            var metrics3 = metricsCache[startIndex + 2];
+            var metrics4 = metricsCache[startIndex + 3];
+            var metrics5 = metricsCache[index];
+
+            double avgRange = metrics5.LookbackAvgRange[PatternSize - 1];
+
+            // Power Score: Based on first candle strength, consolidation tightness, fifth candle breakout, trend
+            double firstBodyScore = metrics1.BodySize / (MinBodyToAvgRangeRatio * avgRange);
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double consolidationScore = 0;
+            foreach (var metrics in new[] { metrics2, metrics3, metrics4 })
+            {
+                double bodyScore = 1 - (metrics.BodySize / (ConsolidationBodyToAvgRangeMax * avgRange));
+                double rangeScore = 1 - (metrics.TotalRange / (ConsolidationRangeToAvgRangeMax * avgRange));
+                consolidationScore += (bodyScore + rangeScore) / 2;
+            }
+            consolidationScore /= 3;
+
+            double fifthBodyScore = metrics5.BodySize / avgRange;
+            fifthBodyScore = Math.Min(fifthBodyScore, 1);
+
+            double trendDirectionRatio = IsBullish ? metrics5.BearishRatio[PatternSize - 1] : metrics5.BullishRatio[PatternSize - 1];
+
+            double volumeScore = 0.5; // Placeholder for volume if needed
+
+            double wFirst = 0.25, wConsolidation = 0.25, wFifth = 0.25, wTrend = 0.15, wVolume = 0.1;
+            double powerScore = (wFirst * firstBodyScore + wConsolidation * consolidationScore +
+                                 wFifth * fifthBodyScore + wTrend * trendDirectionRatio + wVolume * volumeScore) /
+                                (wFirst + wConsolidation + wFifth + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double firstDeviation = Math.Abs(metrics1.BodySize - MinBodyToAvgRangeRatio * avgRange) / (MinBodyToAvgRangeRatio * avgRange);
+            double consolidationDeviation = 0;
+            foreach (var metrics in new[] { metrics2, metrics3, metrics4 })
+            {
+                consolidationDeviation += Math.Abs(metrics.BodySize - ConsolidationBodyToAvgRangeMax * avgRange) / (ConsolidationBodyToAvgRangeMax * avgRange);
+            }
+            consolidationDeviation /= 3;
+            double trendDeviation = Math.Abs(trendDirectionRatio - TrendDirectionRatioMin) / TrendDirectionRatioMin;
+            double matchScore = 1 - (firstDeviation + consolidationDeviation + trendDeviation) / 3;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

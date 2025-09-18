@@ -36,6 +36,10 @@ public class DojiStarPattern : PatternDefinition
     public static double FirstCandleMinBodySize { get; set; } = 2.0;
     public const string BaseName = "DojiStar";
     public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+    /// <summary>
+    /// Gets the description of the pattern.
+    /// </summary>
+    public override string Description => "A three-candle pattern with a Doji in the middle, signaling indecision and potential reversal after a strong trend.";
     private readonly bool IsBullish;
     public override double Strength { get; protected set; }
     public override double Certainty { get; protected set; }

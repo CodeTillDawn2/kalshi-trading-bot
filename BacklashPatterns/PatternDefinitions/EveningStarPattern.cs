@@ -46,6 +46,10 @@ using static BacklashPatterns.PatternUtils;
     /// </summary>
     public override string Name => BaseName;
     /// <summary>
+    /// Gets the description of the pattern.
+    /// </summary>
+    public override string Description => "A bearish reversal pattern in an uptrend with three candles: a large bullish candle, a small star candle, and a large bearish candle that closes below the midpoint of the first candle.";
+    /// <summary>
     /// Gets the strength of the pattern.
     /// </summary>
     public override double Strength { get; protected set; }

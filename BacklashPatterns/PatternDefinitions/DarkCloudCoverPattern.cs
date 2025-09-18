@@ -60,6 +60,10 @@ public class DarkCloudCoverPattern2 : PatternDefinition
     /// </summary>
     public override string Name => BaseName;
     /// <summary>
+    /// Gets the description of the pattern.
+    /// </summary>
+    public override string Description => "A bearish reversal pattern in an uptrend with a bullish candle followed by a bearish candle that opens above the previous high but closes below the midpoint of the previous candle. Signals potential reversal from uptrend to downtrend.";
+    /// <summary>
     /// Gets the strength of the pattern.
     /// </summary>
     public override double Strength { get; protected set; }
@@ -127,6 +131,70 @@ public class DarkCloudCoverPattern2 : PatternDefinition
         if (currPrices.Close >= penetrationPoint || currPrices.Close <= prevPrices.Open) return null;
 
         return new DarkCloudCoverPattern(candles);
+    }
+
+    /// <summary>
+    /// Calculates the strength of the pattern using historical cache for comparison.
+    /// </summary>
+    /// <param name="metricsCache">The metrics cache.</param>
+    /// <param name="prices">The array of candle prices.</param>
+    /// <param name="avgVolume">The average volume.</param>
+    /// <param name="historicalCache">The historical pattern cache.</param>
+    public void CalculateStrength(
+        Dictionary<int, CandleMetrics> metricsCache,
+        CandleMids[] prices,
+        double avgVolume,
+        HistoricalPatternCache historicalCache)
+    {
+        if (Candles.Count != 2)
+            throw new InvalidOperationException("DarkCloudCoverPattern must have exactly 2 candles.");
+
+        int prevIndex = Candles[0];
+        int currIndex = Candles[1];
+
+        var prevMetrics = metricsCache[prevIndex];
+        var currMetrics = metricsCache[currIndex];
+
+        var prevPrices = prices[prevIndex];
+        var currPrices = prices[currIndex];
+
+        double avgRange = currMetrics.LookbackAvgRange[PatternSize - 1];
+
+        // Power Score: Based on body sizes, penetration, open proximity, trend
+        double prevBodyScore = prevMetrics.BodySize / (MinBodyToAvgRangeRatio * avgRange);
+        prevBodyScore = Math.Min(prevBodyScore, 1);
+
+        double currBodyScore = currMetrics.BodySize / (MinBodyToAvgRangeRatio * avgRange);
+        currBodyScore = Math.Min(currBodyScore, 1);
+
+        // Penetration: how deep into the first body the second closes
+        double penetrationPoint = prevPrices.Open + BodyPenetration * (prevPrices.Close - prevPrices.Open);
+        double actualPenetration = (penetrationPoint - currPrices.Close) / (prevPrices.Close - prevPrices.Open);
+        double penetrationScore = Math.Min(actualPenetration / BodyPenetration, 1);
+
+        // Open proximity: how close second open is to first close
+        double openDiff = Math.Abs(currPrices.Open - prevPrices.Close);
+        double openScore = 1 - (openDiff / (OpenToleranceToAvgRange * avgRange));
+        openScore = Math.Clamp(openScore, 0, 1);
+
+        double trendDirectionRatio = currMetrics.BullishRatio[PatternSize - 1];
+
+        double volumeScore = 0.5; // Placeholder
+
+        double wPrevBody = 0.2, wCurrBody = 0.2, wPenetration = 0.3, wOpen = 0.2, wTrend = 0.05, wVolume = 0.05;
+        double powerScore = (wPrevBody * prevBodyScore + wCurrBody * currBodyScore + wPenetration * penetrationScore +
+                             wOpen * openScore + wTrend * trendDirectionRatio + wVolume * volumeScore) /
+                            (wPrevBody + wCurrBody + wPenetration + wOpen + wTrend + wVolume);
+
+        // Match Score: Deviation from thresholds
+        double bodyDeviation = Math.Abs(prevMetrics.BodySize - MinBodyToAvgRangeRatio * avgRange) / (MinBodyToAvgRangeRatio * avgRange);
+        double trendDeviation = Math.Abs(trendDirectionRatio - TrendDirectionRatioMin) / TrendDirectionRatioMin;
+        double penetrationDeviation = Math.Abs(actualPenetration - BodyPenetration) / BodyPenetration;
+        double matchScore = 1 - (bodyDeviation + trendDeviation + penetrationDeviation) / 3;
+        matchScore = Math.Clamp(matchScore, 0, 1);
+
+        // Use historical cache for comparative strength
+        Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
     }
 }
 

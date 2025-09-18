@@ -71,6 +71,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A rare bullish reversal pattern in a downtrend with two strong bearish candles followed by a smaller bearish candle that engulfs the third candle. Signals potential reversal from downtrend to uptrend.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -142,6 +146,73 @@ namespace BacklashPatterns.PatternDefinitions
                 return null;
 
             return new ConcealingBabySwallowPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 4)
+                throw new InvalidOperationException("ConcealingBabySwallowPattern must have exactly 4 candles.");
+
+            int startIndex = Candles[0];
+            int index = Candles[3]; // Fourth candle
+
+            var firstMetrics = metricsCache[startIndex];
+            var secondMetrics = metricsCache[startIndex + 1];
+            var thirdMetrics = metricsCache[startIndex + 2];
+            var fourthMetrics = metricsCache[index];
+
+            var firstPrices = prices[startIndex];
+            var secondPrices = prices[startIndex + 1];
+            var thirdPrices = prices[startIndex + 2];
+            var fourthPrices = prices[index];
+
+            double avgRange = Math.Max(fourthMetrics.LookbackAvgRange[PatternSize - 1], 0.001 * fourthPrices.Close);
+
+            // Power Score: Based on body sizes, wick minimization, engulfing, trend
+            double firstBodyScore = firstMetrics.BodySize / (MinBodyToAvgRangeRatio * avgRange);
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double secondBodyScore = secondMetrics.BodySize / (MinBodyToAvgRangeRatio * avgRange);
+            secondBodyScore = Math.Min(secondBodyScore, 1);
+
+            double wickScore = 1 - ((firstMetrics.UpperWick + firstMetrics.LowerWick + secondMetrics.UpperWick + secondMetrics.LowerWick) / (4 * WickToAvgRangeMax * avgRange));
+            wickScore = Math.Clamp(wickScore, 0, 1);
+
+            double thirdBodyScore = 1 - (thirdMetrics.BodySize / (MaxThirdBodyToAvgRange * avgRange));
+            thirdBodyScore = Math.Clamp(thirdBodyScore, 0, 1);
+
+            double engulfingScore = (fourthPrices.Close < thirdPrices.Low && fourthPrices.Close <= secondPrices.Close) ? 1.0 : 0.5;
+
+            double trendDirectionRatio = fourthMetrics.BearishRatio[PatternSize - 1];
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirst = 0.15, wSecond = 0.15, wWick = 0.2, wThird = 0.15, wEngulfing = 0.2, wTrend = 0.1, wVolume = 0.05;
+            double powerScore = (wFirst * firstBodyScore + wSecond * secondBodyScore + wWick * wickScore +
+                                 wThird * thirdBodyScore + wEngulfing * engulfingScore + wTrend * trendDirectionRatio + wVolume * volumeScore) /
+                                (wFirst + wSecond + wWick + wThird + wEngulfing + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = Math.Abs(firstMetrics.BodySize - MinBodyToAvgRangeRatio * avgRange) / (MinBodyToAvgRangeRatio * avgRange);
+            double wickDeviation = ((firstMetrics.UpperWick + firstMetrics.LowerWick) / (2 * WickToAvgRangeMax * avgRange) +
+                                   (secondMetrics.UpperWick + secondMetrics.LowerWick) / (2 * WickToAvgRangeMax * avgRange)) / 2;
+            double trendDeviation = Math.Abs(trendDirectionRatio - BearishTrendDirectionRatioMin) / BearishTrendDirectionRatioMin;
+            double matchScore = 1 - (bodyDeviation + wickDeviation + trendDeviation) / 3;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

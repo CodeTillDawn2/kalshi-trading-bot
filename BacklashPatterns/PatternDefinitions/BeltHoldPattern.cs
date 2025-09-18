@@ -135,6 +135,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the name of the pattern, appending "_Bullish" or "_Bearish" based on direction.
         /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish reversal pattern with a single candle that opens near its low and closes near its high, with minimal upper wick. Signals potential reversal from downtrend to uptrend."
+            : "A bearish reversal pattern with a single candle that opens near its high and closes near its low, with minimal lower wick. Signals potential reversal from uptrend to downtrend.";
 
         private readonly bool IsBullish;
 
@@ -272,6 +278,58 @@ namespace BacklashPatterns.PatternDefinitions
             if (bodySize < MinBodyToATRRRatio * atr) return null;
 
             return new BeltHoldPattern(candles, isBullish);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume (not used in BeltHold).</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 1)
+                throw new InvalidOperationException("BeltHoldPattern must have exactly 1 candle.");
+
+            int index = Candles[0];
+            var currentMetrics = metricsCache[index];
+            var currentPrices = prices[index];
+
+            // Power Score: Based on body dominance, wick minimization, trend, reversal, position, ATR
+            double bodyDominance = currentMetrics.BodySize / currentMetrics.TotalRange;
+            double criticalWick = IsBullish ? (currentPrices.Open - currentPrices.Low) : (currentPrices.High - currentPrices.Open);
+            double wickScore = Math.Max(1 - (criticalWick / currentMetrics.BodySize), 0);
+
+            // Trend score (simplified, as full calculation is complex)
+            double trendScore = 0.5; // Placeholder, could compute from metrics if available
+
+            // Reversal ratio (simplified)
+            double reversalRatio = 0.5; // Placeholder
+
+            // Position suitability
+            double positionSuitability = 0.5; // Placeholder
+
+            // ATR ratio
+            double atrRatio = 0.5; // Placeholder
+
+            double wBody = 0.3, wWick = 0.2, wTrend = 0.2, wReversal = 0.1, wPosition = 0.1, wATR = 0.1;
+            double powerScore = (wBody * bodyDominance + wWick * wickScore + wTrend * trendScore +
+                                 wReversal * reversalRatio + wPosition * positionSuitability + wATR * atrRatio) /
+                                (wBody + wWick + wTrend + wReversal + wPosition + wATR);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = Math.Abs(bodyDominance - BodyRangeRatio) / BodyRangeRatio;
+            double wickDeviation = Math.Abs((criticalWick / currentMetrics.BodySize) - CriticalWickToBodyMax) / CriticalWickToBodyMax;
+            double matchScore = 1 - (bodyDeviation + wickDeviation) / 2;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

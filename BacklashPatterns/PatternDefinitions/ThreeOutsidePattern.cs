@@ -47,6 +47,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish reversal pattern with a bearish candle followed by a larger bullish candle that engulfs it, and a third bullish candle closing higher. Signals potential reversal from downtrend to uptrend."
+            : "A bearish reversal pattern with a bullish candle followed by a larger bearish candle that engulfs it, and a third bearish candle closing lower. Signals potential reversal from uptrend to downtrend.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -134,6 +140,72 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { firstIndex, secondIndex, thirdIndex };
             return new ThreeOutsidePattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 3)
+                throw new InvalidOperationException("ThreeOutsidePattern must have exactly 3 candles.");
+
+            int firstIndex = Candles[0], secondIndex = Candles[1], thirdIndex = Candles[2];
+
+            var metrics1 = metricsCache[firstIndex];
+            var metrics2 = metricsCache[secondIndex];
+            var metrics3 = metricsCache[thirdIndex];
+
+            var prices1 = prices[firstIndex];
+            var prices2 = prices[secondIndex];
+            var prices3 = prices[thirdIndex];
+
+            // Power Score: Based on body sizes, engulfing, confirmation, trend
+            double firstBodyScore = metrics1.BodySize / MinBodySize;
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double engulfFactor = metrics1.IsBearish ? BullishEngulfFactor : BearishEngulfFactor;
+            double engulfingScore = metrics2.BodySize / (metrics1.BodySize * engulfFactor);
+            engulfingScore = Math.Min(engulfingScore, 1);
+
+            double confirmationScore = 0;
+            if (metrics1.IsBearish && metrics2.IsBullish && metrics3.IsBullish)
+            {
+                confirmationScore = (prices3.Close - prices2.Close) / metrics1.BodySize;
+                confirmationScore = Math.Min(confirmationScore, 1);
+            }
+            else if (metrics1.IsBullish && metrics2.IsBearish && metrics3.IsBearish)
+            {
+                confirmationScore = (prices2.Close - prices3.Close) / metrics1.BodySize;
+                confirmationScore = Math.Min(confirmationScore, 1);
+            }
+
+            double trendStrength = Math.Abs(metrics3.GetLookbackMeanTrend(3));
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirst = 0.2, wEngulfing = 0.3, wConfirmation = 0.3, wTrend = 0.1, wVolume = 0.1;
+            double powerScore = (wFirst * firstBodyScore + wEngulfing * engulfingScore + wConfirmation * confirmationScore +
+                                 wTrend * trendStrength + wVolume * volumeScore) /
+                                (wFirst + wEngulfing + wConfirmation + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = Math.Abs(metrics1.BodySize - MinBodySize) / MinBodySize;
+            double engulfDeviation = Math.Abs(metrics2.BodySize - metrics1.BodySize * engulfFactor) / (metrics1.BodySize * engulfFactor);
+            double trendDeviation = Math.Abs(trendStrength - TrendThreshold) / TrendThreshold;
+            double matchScore = 1 - (bodyDeviation + engulfDeviation + trendDeviation) / 3;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

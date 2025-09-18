@@ -58,6 +58,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A bullish reversal pattern in a downtrend with a large bearish candle, a small indecision candle (Doji or small body), and a large bullish candle that closes above the midpoint of the first candle. Signals potential reversal from downtrend to uptrend.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -121,6 +125,73 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Return the pattern instance if all conditions are met
             return new MorningStarPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 3)
+                throw new InvalidOperationException("MorningStarPattern must have exactly 3 candles.");
+
+            int c1 = Candles[0], c2 = Candles[1], c3 = Candles[2];
+
+            var metrics1 = metricsCache[c1];
+            var metrics2 = metricsCache[c2];
+            var metrics3 = metricsCache[c3];
+
+            var prices1 = prices[c1];
+            var prices2 = prices[c2];
+            var prices3 = prices[c3];
+
+            // Power Score: Based on body sizes, gap, recovery, trend
+            double firstBodyScore = metrics1.BodySize / MinBodySize;
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double secondBodyScore = 1 - (metrics2.BodySize / SmallBodyMax);
+            secondBodyScore = Math.Clamp(secondBodyScore, 0, 1);
+
+            double thirdBodyScore = metrics3.BodySize / (ThirdBodyFactor * metrics1.BodySize);
+            thirdBodyScore = Math.Min(thirdBodyScore, 1);
+
+            double recoveryScore = (prices3.Close - prices1.Close) / metrics1.BodySize;
+            recoveryScore = Math.Min(recoveryScore, 1);
+
+            double gapScore = 1 - ((prices2.Open - prices1.Close) / MaxOpenGap);
+            gapScore = Math.Clamp(gapScore, 0, 1);
+
+            double trendStrength = Math.Abs(metrics3.GetLookbackMeanTrend(3) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double trendConsistency = metrics3.GetLookbackTrendConsistency(3);
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirst = 0.15, wSecond = 0.15, wThird = 0.15, wRecovery = 0.2, wGap = 0.1, wTrend = 0.1, wVolume = 0.05;
+            double powerScore = (wFirst * firstBodyScore + wSecond * secondBodyScore + wThird * thirdBodyScore +
+                                 wRecovery * recoveryScore + wGap * gapScore + wTrend * trendStrength + wVolume * volumeScore) /
+                                (wFirst + wSecond + wThird + wRecovery + wGap + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double firstDeviation = Math.Abs(metrics1.BodySize - MinBodySize) / MinBodySize;
+            double secondDeviation = Math.Abs(metrics2.BodySize - SmallBodyMax) / SmallBodyMax;
+            double thirdDeviation = Math.Abs(metrics3.BodySize - ThirdBodyFactor * metrics1.BodySize) / (ThirdBodyFactor * metrics1.BodySize);
+            double trendDeviation = Math.Abs(metrics3.GetLookbackMeanTrend(3) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double consistencyDeviation = Math.Abs(trendConsistency - MinTrendConsistency) / MinTrendConsistency;
+            double matchScore = 1 - (firstDeviation + secondDeviation + thirdDeviation + trendDeviation + consistencyDeviation) / 5;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

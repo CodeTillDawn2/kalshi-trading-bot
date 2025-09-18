@@ -46,6 +46,10 @@ public class HammerPattern : PatternDefinition
     /// </summary>
     public override string Name => BaseName;
     /// <summary>
+    /// Gets the description of the pattern.
+    /// </summary>
+    public override string Description => "A bullish reversal pattern in a downtrend with a small body, long lower wick, and minimal upper wick. The long lower wick shows rejection of lower prices, signaling potential reversal from downtrend to uptrend.";
+    /// <summary>
     /// Gets the strength of the pattern.
     /// </summary>
     public override double Strength { get; protected set; }
@@ -97,6 +101,60 @@ public class HammerPattern : PatternDefinition
 
         var candles = new List<int> { index };
         return new HammerPattern(candles);
+    }
+
+    /// <summary>
+    /// Calculates the strength of the pattern using historical cache for comparison.
+    /// </summary>
+    /// <param name="metricsCache">The metrics cache.</param>
+    /// <param name="prices">The array of candle prices.</param>
+    /// <param name="avgVolume">The average volume.</param>
+    /// <param name="historicalCache">The historical pattern cache.</param>
+    public void CalculateStrength(
+        Dictionary<int, CandleMetrics> metricsCache,
+        CandleMids[] prices,
+        double avgVolume,
+        HistoricalPatternCache historicalCache)
+    {
+        if (Candles.Count != 1)
+            throw new InvalidOperationException("HammerPattern must have exactly 1 candle.");
+
+        int index = Candles[0];
+        var candleMetrics = metricsCache[index];
+
+        // Power Score: Based on range, body smallness, wick strength, trend
+        double rangeScore = candleMetrics.TotalRange / MinRange;
+        rangeScore = Math.Min(rangeScore, 1);
+
+        double bodyScore = 1 - (candleMetrics.BodySize / (BodyRangeRatio * candleMetrics.TotalRange));
+        bodyScore = Math.Clamp(bodyScore, 0, 1);
+
+        double wickRangeScore = candleMetrics.LowerWick / (WickRangeRatio * candleMetrics.TotalRange);
+        wickRangeScore = Math.Min(wickRangeScore, 1);
+
+        double wickBodyScore = candleMetrics.LowerWick / (WickBodyRatio * candleMetrics.BodySize);
+        wickBodyScore = Math.Min(wickBodyScore, 1);
+
+        double trendScore = Math.Abs(candleMetrics.GetLookbackMeanTrend(1) - TrendThreshold) / Math.Abs(TrendThreshold);
+        trendScore = 1 - trendScore; // Closer to threshold is better
+
+        double volumeScore = 0.5; // Placeholder
+
+        double wRange = 0.2, wBody = 0.2, wWickRange = 0.2, wWickBody = 0.2, wTrend = 0.1, wVolume = 0.1;
+        double powerScore = (wRange * rangeScore + wBody * bodyScore + wWickRange * wickRangeScore +
+                             wWickBody * wickBodyScore + wTrend * trendScore + wVolume * volumeScore) /
+                            (wRange + wBody + wWickRange + wWickBody + wTrend + wVolume);
+
+        // Match Score: Deviation from thresholds
+        double rangeDeviation = Math.Abs(candleMetrics.TotalRange - MinRange) / MinRange;
+        double bodyDeviation = Math.Abs(candleMetrics.BodySize - BodyRangeRatio * candleMetrics.TotalRange) / (BodyRangeRatio * candleMetrics.TotalRange);
+        double wickDeviation = Math.Abs(candleMetrics.LowerWick - WickRangeRatio * candleMetrics.TotalRange) / (WickRangeRatio * candleMetrics.TotalRange);
+        double trendDeviation = Math.Abs(candleMetrics.GetLookbackMeanTrend(1) - TrendThreshold) / Math.Abs(TrendThreshold);
+        double matchScore = 1 - (rangeDeviation + bodyDeviation + wickDeviation + trendDeviation) / 4;
+        matchScore = Math.Clamp(matchScore, 0, 1);
+
+        // Use historical cache for comparative strength
+        Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
     }
 }
 

@@ -73,6 +73,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A single candle with a very small body relative to its total range, indicating market indecision. Can signal potential reversal or continuation depending on context and surrounding candles.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -140,6 +144,62 @@ namespace BacklashPatterns.PatternDefinitions
             if (wickRatio > MaxWickRatio) return null;
 
             return new DojiPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 1)
+                throw new InvalidOperationException("DojiPattern must have exactly 1 candle.");
+
+            int index = Candles[0];
+            var indexMetrics = metricsCache[index];
+
+            double avgRange = indexMetrics.LookbackAvgRange[PatternSize - 1];
+
+            // Power Score: Based on body smallness, range significance, wick balance, trend
+            double bodySmallness = 1 - (indexMetrics.BodySize / (BodyToRangeMax * indexMetrics.TotalRange));
+            bodySmallness = Math.Clamp(bodySmallness, 0, 1);
+
+            double rangeSignificance = indexMetrics.TotalRange / (MinRangeToAvgRangeRatio * avgRange);
+            rangeSignificance = Math.Min(rangeSignificance, 1);
+
+            double wickBalance = 1;
+            if (indexMetrics.UpperWick > 0 && indexMetrics.LowerWick > 0)
+            {
+                double wickRatio = Math.Max(indexMetrics.UpperWick, indexMetrics.LowerWick) / Math.Min(indexMetrics.UpperWick, indexMetrics.LowerWick);
+                wickBalance = 1 - (wickRatio - 1) / (MaxWickRatio - 1);
+                wickBalance = Math.Clamp(wickBalance, 0, 1);
+            }
+
+            double trendDirectionRatio = Math.Max(indexMetrics.BullishRatio[PatternSize - 1], indexMetrics.BearishRatio[PatternSize - 1]);
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wBody = 0.3, wRange = 0.3, wWick = 0.2, wTrend = 0.1, wVolume = 0.1;
+            double powerScore = (wBody * bodySmallness + wRange * rangeSignificance + wWick * wickBalance +
+                                 wTrend * trendDirectionRatio + wVolume * volumeScore) /
+                                (wBody + wRange + wWick + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = Math.Abs(indexMetrics.BodySize - BodyToAvgRangeMax * avgRange) / (BodyToAvgRangeMax * avgRange);
+            double rangeDeviation = Math.Abs(indexMetrics.TotalRange - MinRangeToAvgRangeRatio * avgRange) / (MinRangeToAvgRangeRatio * avgRange);
+            double trendDeviation = Math.Abs(trendDirectionRatio - TrendDirectionRatioMin) / TrendDirectionRatioMin;
+            double matchScore = 1 - (bodyDeviation + rangeDeviation + trendDeviation) / 3;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

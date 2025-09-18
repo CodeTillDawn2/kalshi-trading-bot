@@ -48,6 +48,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A rare bullish reversal pattern with a bearish candle, Doji, and bullish candle, each gapped from the previous. Signals potential reversal from downtrend to uptrend."
+            : "A rare bearish reversal pattern with a bullish candle, Doji, and bearish candle, each gapped from the previous. Signals potential reversal from uptrend to downtrend.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -143,15 +149,17 @@ namespace BacklashPatterns.PatternDefinitions
 
         // Keeping CalculateStrength as its an addition, not in original
         /// <summary>
-        /// Calculates the strength of the pattern.
+        /// Calculates the strength of the pattern using historical cache for comparison.
         /// </summary>
         /// <param name="metricsCache">The metrics cache.</param>
         /// <param name="prices">The array of candle prices.</param>
         /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
         public void CalculateStrength(
             Dictionary<int, CandleMetrics> metricsCache,
             CandleMids[] prices,
-            double avgVolume)
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
         {
             if (Candles.Count != 3)
                 throw new InvalidOperationException("AbandonedBabyPattern must have exactly 3 candles.");
@@ -168,6 +176,7 @@ namespace BacklashPatterns.PatternDefinitions
             var middlePrices = prices[middleIndex];
             var thirdPrices = prices[thirdIndex];
 
+            // Power Score: Based on doji, gap, candle, volume strengths
             double dojiRatio = middleMetrics.BodySize / middleMetrics.TotalRange;
             double dojiStrength = Math.Max(1 - (dojiRatio / DojiBodyRangeRatio), 0);
 
@@ -192,11 +201,17 @@ namespace BacklashPatterns.PatternDefinitions
             }
 
             double wDoji = 0.3, wGap = 0.3, wCandle = 0.3, wVolume = 0.1;
-            double totalWeight = wDoji + wGap + wCandle + wVolume;
-            double strength = (wDoji * dojiStrength + wGap * gapStrength +
-                              wCandle * candleStrength + wVolume * volumeStrength) / totalWeight;
+            double powerScore = (wDoji * dojiStrength + wGap * gapStrength +
+                                 wCandle * candleStrength + wVolume * volumeStrength) / (wDoji + wGap + wCandle + wVolume);
 
-            Strength = Math.Clamp(strength, 0, 1);
+            // Match Score: Deviation from thresholds
+            double dojiDeviation = Math.Abs(middleMetrics.BodySize - DojiBodyMax) / DojiBodyMax;
+            double rangeDeviation = Math.Abs(middleMetrics.TotalRange - MinRange) / MinRange;
+            double matchScore = 1 - (dojiDeviation + rangeDeviation) / 2;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

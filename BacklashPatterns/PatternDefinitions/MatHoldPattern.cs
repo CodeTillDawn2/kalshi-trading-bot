@@ -51,6 +51,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish continuation pattern in an uptrend with a long bullish candle followed by three smaller candles that stay above the first candle's low, and a fifth bullish candle that closes above the first candle's high."
+            : "A bearish continuation pattern in a downtrend with a long bearish candle followed by three smaller candles that stay below the first candle's high, and a fifth bearish candle that closes below the first candle's low.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -172,6 +178,107 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Return the pattern instance with the specified direction
             return new MatHoldPattern(candles, isBullish);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 5)
+                throw new InvalidOperationException("MatHoldPattern must have exactly 5 candles.");
+
+            int c1 = Candles[0], c2 = Candles[1], c3 = Candles[2], c4 = Candles[3], c5 = Candles[4];
+
+            var metrics1 = metricsCache[c1];
+            var metrics2 = metricsCache[c2];
+            var metrics3 = metricsCache[c3];
+            var metrics4 = metricsCache[c4];
+            var metrics5 = metricsCache[c5];
+
+            var ask1 = prices[c1];
+            var ask2 = prices[c2];
+            var ask3 = prices[c3];
+            var ask4 = prices[c4];
+            var ask5 = prices[c5];
+
+            // Power Score: Based on body sizes, containment, opposition, continuation, trend
+            double firstBodyScore = metrics1.BodySize / MinBodySize;
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double middleBodyScore = 1 - ((metrics2.BodySize + metrics3.BodySize + metrics4.BodySize) / (3 * MaxBodySize));
+            middleBodyScore = Math.Clamp(middleBodyScore, 0, 1);
+
+            double fifthBodyScore = metrics5.BodySize / MinBodySize;
+            fifthBodyScore = Math.Min(fifthBodyScore, 1);
+
+            // Containment score
+            double containmentScore = 1.0;
+            if (ask2.High > ask1.High + ContainmentBuffer || ask2.Low < ask1.Low - ContainmentBuffer ||
+                ask3.High > ask1.High + ContainmentBuffer || ask3.Low < ask1.Low - ContainmentBuffer ||
+                ask4.High > ask1.High + ContainmentBuffer || ask4.Low < ask1.Low - ContainmentBuffer)
+            {
+                containmentScore = 0.5;
+            }
+
+            // Opposition score (at least one middle candle opposes trend)
+            int oppositionCount = 0;
+            if (IsBullish)
+            {
+                if (metrics2.IsBearish) oppositionCount++;
+                if (metrics3.IsBearish) oppositionCount++;
+                if (metrics4.IsBearish) oppositionCount++;
+            }
+            else
+            {
+                if (metrics2.IsBullish) oppositionCount++;
+                if (metrics3.IsBullish) oppositionCount++;
+                if (metrics4.IsBullish) oppositionCount++;
+            }
+            double oppositionScore = oppositionCount > 0 ? 1.0 : 0.5;
+
+            // Continuation score
+            double continuationScore = 0;
+            if (IsBullish)
+            {
+                continuationScore = (ask5.Close - ask1.Close) / CloseDifference;
+                continuationScore = Math.Min(continuationScore, 1);
+            }
+            else
+            {
+                continuationScore = (ask1.Close - ask5.Close) / CloseDifference;
+                continuationScore = Math.Min(continuationScore, 1);
+            }
+
+            double trendStrength = Math.Abs(metrics5.GetLookbackMeanTrend(5) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirst = 0.15, wMiddle = 0.15, wFifth = 0.15, wContainment = 0.15, wOpposition = 0.15, wContinuation = 0.15, wTrend = 0.05, wVolume = 0.05;
+            double powerScore = (wFirst * firstBodyScore + wMiddle * middleBodyScore + wFifth * fifthBodyScore +
+                                 wContainment * containmentScore + wOpposition * oppositionScore + wContinuation * continuationScore +
+                                 wTrend * trendStrength + wVolume * volumeScore) /
+                                (wFirst + wMiddle + wFifth + wContainment + wOpposition + wContinuation + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double firstDeviation = Math.Abs(metrics1.BodySize - MinBodySize) / MinBodySize;
+            double middleDeviation = Math.Abs((metrics2.BodySize + metrics3.BodySize + metrics4.BodySize) / 3 - MaxBodySize) / MaxBodySize;
+            double fifthDeviation = Math.Abs(metrics5.BodySize - MinBodySize) / MinBodySize;
+            double trendDeviation = Math.Abs(metrics5.GetLookbackMeanTrend(5) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double matchScore = 1 - (firstDeviation + middleDeviation + fifthDeviation + trendDeviation) / 4;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

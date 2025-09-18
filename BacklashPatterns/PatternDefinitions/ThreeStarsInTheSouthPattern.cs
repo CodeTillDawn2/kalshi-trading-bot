@@ -76,6 +76,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A rare bullish reversal pattern in a downtrend with three bearish candles of decreasing size, each with specific wick and low relationships. Signals slowing bearish momentum and potential trend reversal.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -135,6 +139,67 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { c1, c2, c3 };
             return new ThreeStarsInTheSouthPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 3)
+                throw new InvalidOperationException("ThreeStarsInTheSouthPattern must have exactly 3 candles.");
+
+            int c1 = Candles[0], c2 = Candles[1], c3 = Candles[2];
+
+            var metrics1 = metricsCache[c1];
+            var metrics2 = metricsCache[c2];
+            var metrics3 = metricsCache[c3];
+
+            var prices1 = prices[c1];
+            var prices2 = prices[c2];
+            var prices3 = prices[c3];
+
+            // Power Score: Based on body sizes, wick factors, tolerances, trend
+            double firstBodyScore = metrics1.BodySize / MinBodySize;
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double wickScore = metrics1.LowerWick / (LowerWickFactor * metrics1.BodySize);
+            wickScore = Math.Min(wickScore, 1);
+
+            double decreasingScore = 1 - (metrics2.BodySize / metrics1.BodySize + metrics3.BodySize / metrics2.BodySize) / 2;
+            decreasingScore = Math.Max(decreasingScore, 0);
+
+            double toleranceScore = 1 - ((prices3.Low - (prices2.Low - LowTolerance)) / LowTolerance +
+                                         (prices3.High - prices2.High) / HighTolerance) / 2;
+            toleranceScore = Math.Clamp(toleranceScore, 0, 1);
+
+            double trendScore = Math.Abs(metrics3.GetLookbackMeanTrend(3) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendScore = 1 - trendScore; // Closer to threshold is better
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirst = 0.2, wWick = 0.2, wDecreasing = 0.2, wTolerance = 0.2, wTrend = 0.1, wVolume = 0.1;
+            double powerScore = (wFirst * firstBodyScore + wWick * wickScore + wDecreasing * decreasingScore +
+                                 wTolerance * toleranceScore + wTrend * trendScore + wVolume * volumeScore) /
+                                (wFirst + wWick + wDecreasing + wTolerance + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = Math.Abs(metrics1.BodySize - MinBodySize) / MinBodySize;
+            double wickDeviation = Math.Abs(metrics1.LowerWick - LowerWickFactor * metrics1.BodySize) / (LowerWickFactor * metrics1.BodySize);
+            double trendDeviation = Math.Abs(metrics3.GetLookbackMeanTrend(3) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double matchScore = 1 - (bodyDeviation + wickDeviation + trendDeviation) / 3;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

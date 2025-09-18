@@ -27,6 +27,12 @@ public class EngulfingPattern : PatternDefinition
     /// Gets the name of the pattern.
     /// </summary>
     public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+    /// <summary>
+    /// Gets the description of the pattern.
+    /// </summary>
+    public override string Description => IsBullish
+        ? "A bullish reversal pattern where a small bearish candle is followed by a larger bullish candle that completely engulfs it. Signals potential reversal from downtrend to uptrend."
+        : "A bearish reversal pattern where a small bullish candle is followed by a larger bearish candle that completely engulfs it. Signals potential reversal from uptrend to downtrend.";
     private readonly bool IsBullish;
     /// <summary>
     /// Gets the strength of the pattern.
@@ -94,6 +100,72 @@ public class EngulfingPattern : PatternDefinition
 
         var candles = new List<int> { index - 1, index };
         return new EngulfingPattern(candles, isBullish);
+    }
+
+    /// <summary>
+    /// Calculates the strength of the pattern using historical cache for comparison.
+    /// </summary>
+    /// <param name="metricsCache">The metrics cache.</param>
+    /// <param name="prices">The array of candle prices.</param>
+    /// <param name="avgVolume">The average volume.</param>
+    /// <param name="historicalCache">The historical pattern cache.</param>
+    public void CalculateStrength(
+        Dictionary<int, CandleMetrics> metricsCache,
+        CandleMids[] prices,
+        double avgVolume,
+        HistoricalPatternCache historicalCache)
+    {
+        if (Candles.Count != 2)
+            throw new InvalidOperationException("EngulfingPattern must have exactly 2 candles.");
+
+        int prevIndex = Candles[0];
+        int currIndex = Candles[1];
+
+        var prevMetrics = metricsCache[prevIndex];
+        var currMetrics = metricsCache[currIndex];
+
+        var previousPrice = prices[prevIndex];
+        var currentPrice = prices[currIndex];
+
+        // Power Score: Based on engulfing extent, trend strength, consistency
+        double bodyRatio = currMetrics.BodySize / prevMetrics.BodySize;
+        double engulfingExtent = Math.Min(bodyRatio, 2); // Cap at 2x for scoring
+
+        double trendStrength = Math.Abs(currMetrics.GetLookbackMeanTrend(2));
+        double trendConsistency = currMetrics.GetLookbackTrendConsistency(2);
+
+        // Engulfing completeness
+        double engulfingScore = 0;
+        if (IsBullish)
+        {
+            if (currentPrice.Open < previousPrice.Close && currentPrice.Close > previousPrice.Open)
+            {
+                engulfingScore = 1.0;
+            }
+        }
+        else
+        {
+            if (currentPrice.Open > previousPrice.Close && currentPrice.Close < previousPrice.Open)
+            {
+                engulfingScore = 1.0;
+            }
+        }
+
+        double volumeScore = 0.5; // Placeholder
+
+        double wEngulfing = 0.4, wTrendStrength = 0.3, wTrendConsistency = 0.2, wVolume = 0.1;
+        double powerScore = (wEngulfing * engulfingExtent + wTrendStrength * trendStrength +
+                             wTrendConsistency * Math.Abs(trendConsistency) + wVolume * volumeScore) /
+                            (wEngulfing + wTrendStrength + wTrendConsistency + wVolume);
+
+        // Match Score: Deviation from thresholds
+        double trendDeviation = Math.Abs(trendStrength - TrendThreshold) / TrendThreshold;
+        double consistencyDeviation = Math.Abs(Math.Abs(trendConsistency) - TrendConsistencyThreshold) / TrendConsistencyThreshold;
+        double matchScore = 1 - (trendDeviation + consistencyDeviation) / 2;
+        matchScore = Math.Clamp(matchScore, 0, 1);
+
+        // Use historical cache for comparative strength
+        Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
     }
 }
 

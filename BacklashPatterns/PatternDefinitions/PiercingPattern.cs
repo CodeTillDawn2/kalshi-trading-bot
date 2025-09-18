@@ -58,6 +58,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A bullish reversal pattern in a downtrend with a bearish candle followed by a bullish candle that opens below the previous low but closes above the midpoint of the previous candle. Signals potential reversal from downtrend to uptrend.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -126,6 +130,70 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Return the pattern instance if all conditions are met
             return new PiercingPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 2)
+                throw new InvalidOperationException("PiercingPattern must have exactly 2 candles.");
+
+            int prevIndex = Candles[0];
+            int currIndex = Candles[1];
+
+            var prevMetrics = metricsCache[prevIndex];
+            var currMetrics = metricsCache[currIndex];
+
+            var previousPrice = prices[prevIndex];
+            var currentPrice = prices[currIndex];
+
+            // Power Score: Based on body sizes, gap, midpoint penetration, trend
+            double firstBodyScore = prevMetrics.BodySize / MinBodySizeFirst;
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double secondBodyScore = currMetrics.BodySize / MinBodySizeSecond;
+            secondBodyScore = Math.Min(secondBodyScore, 1);
+
+            double bodyRatioScore = currMetrics.BodySize / (BodyToRangeRatio * currMetrics.TotalRange);
+            bodyRatioScore = Math.Min(bodyRatioScore, 1);
+
+            double gapScore = 1 - ((previousPrice.Close - currentPrice.Open) / OpenTolerance);
+            gapScore = Math.Clamp(gapScore, 0, 1);
+
+            double midPoint = prevMetrics.BodyMidPoint;
+            double penetrationScore = (currentPrice.Close - midPoint) / MidPointTolerance;
+            penetrationScore = Math.Min(penetrationScore, 1);
+
+            double trendStrength = Math.Abs(currMetrics.GetLookbackMeanTrend(2) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirst = 0.15, wSecond = 0.15, wRatio = 0.15, wGap = 0.2, wPenetration = 0.2, wTrend = 0.1, wVolume = 0.05;
+            double powerScore = (wFirst * firstBodyScore + wSecond * secondBodyScore + wRatio * bodyRatioScore +
+                                 wGap * gapScore + wPenetration * penetrationScore + wTrend * trendStrength + wVolume * volumeScore) /
+                                (wFirst + wSecond + wRatio + wGap + wPenetration + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double firstDeviation = Math.Abs(prevMetrics.BodySize - MinBodySizeFirst) / MinBodySizeFirst;
+            double secondDeviation = Math.Abs(currMetrics.BodySize - MinBodySizeSecond) / MinBodySizeSecond;
+            double ratioDeviation = Math.Abs(currMetrics.BodySize - BodyToRangeRatio * currMetrics.TotalRange) / (BodyToRangeRatio * currMetrics.TotalRange);
+            double trendDeviation = Math.Abs(currMetrics.GetLookbackMeanTrend(2) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double matchScore = 1 - (firstDeviation + secondDeviation + ratioDeviation + trendDeviation) / 4;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

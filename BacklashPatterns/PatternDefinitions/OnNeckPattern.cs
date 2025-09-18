@@ -44,6 +44,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A bearish continuation pattern in a downtrend where a bullish candle opens below the previous bearish candle's close but closes near it, showing continued downward pressure.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -104,6 +108,67 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Return the pattern instance if all conditions are met
             return new OnNeckPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 2)
+                throw new InvalidOperationException("OnNeckPattern must have exactly 2 candles.");
+
+            int prevIndex = Candles[0];
+            int currIndex = Candles[1];
+
+            var previousMetrics = metricsCache[prevIndex];
+            var currentMetrics = metricsCache[currIndex];
+
+            var previousPrices = prices[prevIndex];
+            var currentPrices = prices[currIndex];
+
+            // Power Score: Based on body sizes, proximity, wick control, trend
+            double firstBodyScore = previousMetrics.BodySize / MinBodySize;
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double openProximityScore = 1 - (Math.Abs(currentPrices.Open - previousPrices.Close) / MaxOpenCloseDifference);
+            openProximityScore = Math.Clamp(openProximityScore, 0, 1);
+
+            double closeProximityScore = 1 - (Math.Abs(currentPrices.Close - previousPrices.Close) / MaxOpenCloseDifference);
+            closeProximityScore = Math.Clamp(closeProximityScore, 0, 1);
+
+            double wickScore = 1 - (currentMetrics.UpperWick / MaxUpperWick);
+            wickScore = Math.Clamp(wickScore, 0, 1);
+
+            double trendStrength = Math.Abs(currentMetrics.GetLookbackMeanTrend(2) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirstBody = 0.2, wOpenProximity = 0.2, wCloseProximity = 0.2, wWick = 0.2, wTrend = 0.1, wVolume = 0.1;
+            double powerScore = (wFirstBody * firstBodyScore + wOpenProximity * openProximityScore +
+                                 wCloseProximity * closeProximityScore + wWick * wickScore + wTrend * trendStrength + wVolume * volumeScore) /
+                                (wFirstBody + wOpenProximity + wCloseProximity + wWick + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = Math.Abs(previousMetrics.BodySize - MinBodySize) / MinBodySize;
+            double openDeviation = Math.Abs(currentPrices.Open - previousPrices.Close) / MaxOpenCloseDifference;
+            double closeDeviation = Math.Abs(currentPrices.Close - previousPrices.Close) / MaxOpenCloseDifference;
+            double wickDeviation = currentMetrics.UpperWick / MaxUpperWick;
+            double trendDeviation = Math.Abs(currentMetrics.GetLookbackMeanTrend(2) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double matchScore = 1 - (bodyDeviation + openDeviation + closeDeviation + wickDeviation + trendDeviation) / 5;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

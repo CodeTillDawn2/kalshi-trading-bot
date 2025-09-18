@@ -51,6 +51,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the name of the pattern.
         /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish reversal pattern with five candles: a strong bearish first candle, three consolidation candles, and a strong bullish breakout candle with a gap."
+            : "A bearish reversal pattern with five candles: a strong bullish first candle, three consolidation candles, and a strong bearish breakout candle with a gap.";
         private readonly bool IsBullish;
         /// <summary>
         /// Gets the strength of the pattern.

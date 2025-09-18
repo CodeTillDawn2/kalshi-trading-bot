@@ -78,6 +78,10 @@ namespace BacklashPatterns.PatternDefinitions
 /// <summary>
 /// </summary>
         public const string BaseName = "HighWaveCandle";
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A candle with a very small body relative to its total range and long wicks, indicating high market volatility and indecision. Can signal potential reversal or continuation depending on context.";
 /// <summary>
 /// </summary>
         public override string Name => BaseName;
@@ -114,6 +118,66 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { index };
             return new HighWaveCandlePattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 1)
+                throw new InvalidOperationException("HighWaveCandlePattern must have exactly 1 candle.");
+
+            int index = Candles[0];
+            var metrics = metricsCache[index];
+
+            // Power Score: Based on range, body smallness, wick length, trend indecision
+            double rangeScore = metrics.TotalRange / MinRange;
+            rangeScore = Math.Min(rangeScore, 1);
+
+            double rangeVsLookbackScore = metrics.TotalRange / (MinRangeVsLookback * metrics.GetLookbackAvgRange(1));
+            rangeVsLookbackScore = Math.Min(rangeVsLookbackScore, 1);
+
+            double bodyScore = 1 - (metrics.BodySize / (BodyRangeRatio * metrics.TotalRange));
+            bodyScore = Math.Clamp(bodyScore, 0, 1);
+
+            double bodyAbsScore = 1 - (metrics.BodySize / BodyMax);
+            bodyAbsScore = Math.Clamp(bodyAbsScore, 0, 1);
+
+            double upperWickScore = metrics.UpperWick / (WickRangeRatio * metrics.TotalRange);
+            upperWickScore = Math.Min(upperWickScore, 1);
+
+            double lowerWickScore = metrics.LowerWick / (WickRangeRatio * metrics.TotalRange);
+            lowerWickScore = Math.Min(lowerWickScore, 1);
+
+            double trendIndecisionScore = 1 - Math.Abs(metrics.GetLookbackTrendConsistency(1)) / MaxTrendConsistency;
+            trendIndecisionScore = Math.Clamp(trendIndecisionScore, 0, 1);
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wRange = 0.15, wRangeVsLookback = 0.15, wBody = 0.15, wBodyAbs = 0.15, wUpperWick = 0.15, wLowerWick = 0.15, wTrend = 0.05, wVolume = 0.05;
+            double powerScore = (wRange * rangeScore + wRangeVsLookback * rangeVsLookbackScore + wBody * bodyScore +
+                                 wBodyAbs * bodyAbsScore + wUpperWick * upperWickScore + wLowerWick * lowerWickScore +
+                                 wTrend * trendIndecisionScore + wVolume * volumeScore) /
+                                (wRange + wRangeVsLookback + wBody + wBodyAbs + wUpperWick + wLowerWick + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double rangeDeviation = Math.Abs(metrics.TotalRange - MinRange) / MinRange;
+            double bodyDeviation = Math.Abs(metrics.BodySize - BodyRangeRatio * metrics.TotalRange) / (BodyRangeRatio * metrics.TotalRange);
+            double wickDeviation = Math.Abs(metrics.UpperWick - WickRangeRatio * metrics.TotalRange) / (WickRangeRatio * metrics.TotalRange);
+            double matchScore = 1 - (rangeDeviation + bodyDeviation + wickDeviation) / 3;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

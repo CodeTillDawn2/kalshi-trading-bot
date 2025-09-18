@@ -52,6 +52,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A bullish reversal pattern in a downtrend with a long bullish candle that opens below the previous bearish candle's low and closes above its high, signaling strong reversal.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -110,6 +114,69 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { index };
             return new TakuriPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 1)
+                throw new InvalidOperationException("TakuriPattern must have exactly 1 candle.");
+
+            int index = Candles[0];
+            var metrics = metricsCache[index];
+
+            // Power Score: Based on range, small body, long wick, wick dominance, trend
+            double rangeScore = metrics.TotalRange / MinRange;
+            rangeScore = Math.Min(rangeScore, 1);
+
+            double bodyScore = 1 - (metrics.BodySize / (BodyRangeRatio * metrics.TotalRange));
+            bodyScore = Math.Clamp(bodyScore, 0, 1);
+
+            double wickScore = metrics.LowerWick / (WickRangeRatio * metrics.TotalRange);
+            wickScore = Math.Min(wickScore, 1);
+
+            double wickDominanceScore = metrics.LowerWick / (WickBodyRatio * metrics.BodySize);
+            wickDominanceScore = Math.Min(wickDominanceScore, 1);
+
+            double upperWickScore = 1 - (metrics.UpperWick / metrics.BodySize);
+            upperWickScore = Math.Clamp(upperWickScore, 0, 1);
+
+            double trendStrength = Math.Abs(metrics.GetLookbackMeanTrend(1) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double trendConsistency = metrics.GetLookbackTrendConsistency(1) / MinTrendConsistency;
+            trendConsistency = Math.Min(trendConsistency, 1);
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wRange = 0.1, wBody = 0.15, wWick = 0.2, wDominance = 0.2, wUpper = 0.1, wTrend = 0.15, wConsistency = 0.05, wVolume = 0.05;
+            double powerScore = (wRange * rangeScore + wBody * bodyScore + wWick * wickScore + wDominance * wickDominanceScore +
+                                 wUpper * upperWickScore + wTrend * trendStrength + wConsistency * trendConsistency + wVolume * volumeScore) /
+                                (wRange + wBody + wWick + wDominance + wUpper + wTrend + wConsistency + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double rangeDeviation = Math.Abs(metrics.TotalRange - MinRange) / MinRange;
+            double bodyDeviation = metrics.BodySize / (BodyRangeRatio * metrics.TotalRange);
+            double wickDeviation = Math.Abs(metrics.LowerWick - WickRangeRatio * metrics.TotalRange) / (WickRangeRatio * metrics.TotalRange);
+            double dominanceDeviation = Math.Abs(metrics.LowerWick - WickBodyRatio * metrics.BodySize) / (WickBodyRatio * metrics.BodySize);
+            double upperDeviation = metrics.UpperWick / metrics.BodySize;
+            double trendDeviation = Math.Abs(metrics.GetLookbackMeanTrend(1) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double consistencyDeviation = Math.Abs(metrics.GetLookbackTrendConsistency(1) - MinTrendConsistency) / MinTrendConsistency;
+            double matchScore = 1 - (rangeDeviation + bodyDeviation + wickDeviation + dominanceDeviation + upperDeviation + trendDeviation + consistencyDeviation) / 7;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

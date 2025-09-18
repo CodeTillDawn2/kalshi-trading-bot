@@ -58,6 +58,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A candle with a small body and long upper and lower wicks of roughly equal length, indicating market indecision and potential for a reversal or continuation depending on context.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -112,6 +116,71 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Return the pattern instance if all conditions are satisfied
             return new SpinningTopPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 1)
+                throw new InvalidOperationException("SpinningTopPattern must have exactly 1 candle.");
+
+            int index = Candles[0];
+            var metrics = metricsCache[index];
+
+            // Power Score: Based on range, body smallness, wick length, symmetry
+            double rangeScore = metrics.TotalRange / MinRange;
+            rangeScore = Math.Min(rangeScore, 1);
+
+            double bodyScore = 1 - (metrics.BodySize / (BodyRangeRatio * metrics.TotalRange));
+            bodyScore = Math.Clamp(bodyScore, 0, 1);
+
+            double bodyAbsScore = 1 - (metrics.BodySize / BodyMax);
+            bodyAbsScore = Math.Clamp(bodyAbsScore, 0, 1);
+
+            double upperWickScore = metrics.UpperWick / (WickRangeRatio * metrics.TotalRange);
+            upperWickScore = Math.Min(upperWickScore, 1);
+
+            double lowerWickScore = metrics.LowerWick / (WickRangeRatio * metrics.TotalRange);
+            lowerWickScore = Math.Min(lowerWickScore, 1);
+
+            double symmetryScore = 0;
+            if (metrics.UpperWick > 0 && metrics.LowerWick > 0)
+            {
+                double wickRatio = metrics.UpperWick / (metrics.LowerWick + 0.001);
+                if (wickRatio >= WickSymmetryMin && wickRatio <= WickSymmetryMax)
+                {
+                    // Closer to 1.0 is better symmetry
+                    symmetryScore = 1 - Math.Abs(wickRatio - 1.0) / Math.Max(1.0, wickRatio);
+                    symmetryScore = Math.Clamp(symmetryScore, 0, 1);
+                }
+            }
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wRange = 0.15, wBody = 0.15, wBodyAbs = 0.15, wUpperWick = 0.15, wLowerWick = 0.15, wSymmetry = 0.15, wVolume = 0.1;
+            double powerScore = (wRange * rangeScore + wBody * bodyScore + wBodyAbs * bodyAbsScore +
+                                 wUpperWick * upperWickScore + wLowerWick * lowerWickScore + wSymmetry * symmetryScore + wVolume * volumeScore) /
+                                (wRange + wBody + wBodyAbs + wUpperWick + wLowerWick + wSymmetry + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double rangeDeviation = Math.Abs(metrics.TotalRange - MinRange) / MinRange;
+            double bodyDeviation = Math.Abs(metrics.BodySize - BodyRangeRatio * metrics.TotalRange) / (BodyRangeRatio * metrics.TotalRange);
+            double wickDeviation = Math.Abs(metrics.UpperWick - WickRangeRatio * metrics.TotalRange) / (WickRangeRatio * metrics.TotalRange);
+            double matchScore = 1 - (rangeDeviation + bodyDeviation + wickDeviation) / 3;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

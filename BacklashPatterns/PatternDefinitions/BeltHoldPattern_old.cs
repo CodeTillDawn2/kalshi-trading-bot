@@ -106,6 +106,12 @@ namespace BacklashPatterns.PatternDefinitions
 /// <summary>
 /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish reversal pattern with a single long candle that opens at its low and closes near its high, showing strong buying momentum."
+            : "A bearish reversal pattern with a single long candle that opens at its high and closes near its low, showing strong selling momentum.";
         private readonly bool IsBullish;
 /// <summary>
 /// </summary>

@@ -86,6 +86,10 @@ public class DownsideGapThreeMethodsPattern : PatternDefinition
 /// <summary>
 /// </summary>
     public override string Name => BaseName;
+    /// <summary>
+    /// Gets the description of the pattern.
+    /// </summary>
+    public override string Description => "A bearish continuation pattern in a downtrend with three candles where the second gaps down from the first and the third fills part of that gap, signaling continued downward momentum.";
     public override double Strength { get; protected set; }
 /// <summary>
 /// </summary>

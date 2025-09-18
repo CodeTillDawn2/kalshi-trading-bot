@@ -125,6 +125,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the name of the pattern.
         /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish reversal pattern with a bearish candle followed by a bullish candle that opens below the previous close but closes above it. Signals potential reversal from downtrend to uptrend."
+            : "A bearish reversal pattern with a bullish candle followed by a bearish candle that opens above the previous close but closes below it. Signals potential reversal from uptrend to downtrend.";
         private readonly bool IsBullish;
         /// <summary>
         /// Gets the strength of the pattern.
@@ -233,6 +239,77 @@ namespace BacklashPatterns.PatternDefinitions
             }
 
             return new CounterattackPattern(candles, isBullish);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 2)
+                throw new InvalidOperationException("CounterattackPattern must have exactly 2 candles.");
+
+            int startIndex = Candles[0];
+            int index = Candles[1];
+
+            var prevMetrics = metricsCache[startIndex];
+            var currMetrics = metricsCache[index];
+
+            var previousPrices = prices[startIndex];
+            var currentPrices = prices[index];
+
+            double avgRange = currMetrics.LookbackAvgRange[PatternSize - 1];
+            double minBodyToAvgRangeRatio = GetMinBodyToAvgRangeRatio(currMetrics.IntervalType);
+
+            // Power Score: Based on body sizes, balance, drop/rise, proximity, trend
+            double prevBodyScore = prevMetrics.BodySize / (minBodyToAvgRangeRatio * avgRange);
+            prevBodyScore = Math.Min(prevBodyScore, 1);
+
+            double currBodyScore = currMetrics.BodySize / (minBodyToAvgRangeRatio * avgRange);
+            currBodyScore = Math.Min(currBodyScore, 1);
+
+            double bodyBalanceScore = currMetrics.BodySize / (MinBodyBalanceRatio * prevMetrics.BodySize);
+            bodyBalanceScore = Math.Min(bodyBalanceScore, 1);
+
+            double moveSize = IsBullish ? (currentPrices.Close - previousPrices.Close) : (previousPrices.Close - currentPrices.Close);
+            double moveScore = moveSize / (MinDropToAvgRangeRatio * avgRange);
+            moveScore = Math.Min(moveScore, 1);
+
+            double proximityScore = 1 - (Math.Abs(currentPrices.Close - previousPrices.Open) / (NearOpenCloseToAvgRange * avgRange));
+            proximityScore = Math.Clamp(proximityScore, 0, 1);
+
+            double meanTrend = currMetrics.GetLookbackMeanTrend(PatternSize);
+            double trendStrength = Math.Abs(meanTrend) / (TrendThresholdToAvgRange * avgRange);
+            trendStrength = Math.Min(trendStrength, 1);
+
+            double trendConsistency = currMetrics.GetLookbackTrendConsistency(PatternSize);
+            double trendDirectionRatio = IsBullish ? currMetrics.BearishRatio[PatternSize - 1] : currMetrics.BullishRatio[PatternSize - 1];
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wPrevBody = 0.15, wCurrBody = 0.15, wBalance = 0.15, wMove = 0.2, wProximity = 0.15, wTrend = 0.1, wVolume = 0.1;
+            double powerScore = (wPrevBody * prevBodyScore + wCurrBody * currBodyScore + wBalance * bodyBalanceScore +
+                                 wMove * moveScore + wProximity * proximityScore + wTrend * trendStrength + wVolume * volumeScore) /
+                                (wPrevBody + wCurrBody + wBalance + wMove + wProximity + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = Math.Abs(prevMetrics.BodySize - minBodyToAvgRangeRatio * avgRange) / (minBodyToAvgRangeRatio * avgRange);
+            double balanceDeviation = Math.Abs(currMetrics.BodySize - MinBodyBalanceRatio * prevMetrics.BodySize) / (MinBodyBalanceRatio * prevMetrics.BodySize);
+            double moveDeviation = Math.Abs(moveSize - MinDropToAvgRangeRatio * avgRange) / (MinDropToAvgRangeRatio * avgRange);
+            double trendDeviation = Math.Abs(trendDirectionRatio - TrendDirectionRatioMin) / TrendDirectionRatioMin;
+            double matchScore = 1 - (bodyDeviation + balanceDeviation + moveDeviation + trendDeviation) / 4;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

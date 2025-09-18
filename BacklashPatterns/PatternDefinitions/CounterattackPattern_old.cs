@@ -52,6 +52,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the name of the pattern.
         /// </summary>
         public override string Name => BaseName + (IsBullish ? "_Bullish" : "_Bearish");
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish reversal pattern with two candles of equal size where a bearish candle is followed by a bullish candle that closes at the same level."
+            : "A bearish reversal pattern with two candles of equal size where a bullish candle is followed by a bearish candle that closes at the same level.";
         private readonly bool IsBullish;
         /// <summary>
         /// Gets the strength of the pattern.

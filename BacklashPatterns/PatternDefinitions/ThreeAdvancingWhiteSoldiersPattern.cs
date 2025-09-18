@@ -34,6 +34,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Name => BaseName;
         /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => "A bullish reversal pattern in a downtrend with three consecutive bullish candles of increasing size and higher closes, signaling strong upward momentum.";
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }
@@ -98,6 +102,64 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { c1, c2, c3 };
             return new ThreeAdvancingWhiteSoldiersPattern(candles);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 3)
+                throw new InvalidOperationException("ThreeAdvancingWhiteSoldiersPattern must have exactly 3 candles.");
+
+            int c1 = Candles[0], c2 = Candles[1], c3 = Candles[2];
+
+            var metrics1 = metricsCache[c1];
+            var metrics2 = metricsCache[c2];
+            var metrics3 = metricsCache[c3];
+
+            var prices1 = prices[c1];
+            var prices2 = prices[c2];
+            var prices3 = prices[c3];
+
+            // Power Score: Based on body sizes, wick minimization, ascending progression, trend
+            double bodyScore = (metrics1.BodySize + metrics2.BodySize + metrics3.BodySize) / (3 * MinBodySize);
+            bodyScore = Math.Min(bodyScore, 1);
+
+            double wickScore = 1 - ((metrics1.UpperWick + metrics1.LowerWick + metrics2.UpperWick + metrics2.LowerWick + metrics3.UpperWick + metrics3.LowerWick) /
+                                    (6 * WickRangeRatio * (metrics1.TotalRange + metrics2.TotalRange + metrics3.TotalRange) / 3));
+            wickScore = Math.Clamp(wickScore, 0, 1);
+
+            double progressionScore = (prices2.Close - prices1.Close + prices3.Close - prices2.Close) / (2 * MinBodySize);
+            progressionScore = Math.Min(progressionScore, 1);
+
+            double trendStrength = Math.Abs(metrics3.GetLookbackMeanTrend(3) - TrendThreshold) / Math.Abs(TrendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wBody = 0.25, wWick = 0.25, wProgression = 0.25, wTrend = 0.15, wVolume = 0.1;
+            double powerScore = (wBody * bodyScore + wWick * wickScore + wProgression * progressionScore +
+                                 wTrend * trendStrength + wVolume * volumeScore) /
+                                (wBody + wWick + wProgression + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double bodyDeviation = Math.Abs(metrics1.BodySize - MinBodySize) / MinBodySize;
+            double wickDeviation = (metrics1.UpperWick + metrics1.LowerWick) / (2 * WickRangeRatio * metrics1.TotalRange);
+            double trendDeviation = Math.Abs(metrics3.GetLookbackMeanTrend(3) - TrendThreshold) / Math.Abs(TrendThreshold);
+            double matchScore = 1 - (bodyDeviation + wickDeviation + trendDeviation) / 3;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

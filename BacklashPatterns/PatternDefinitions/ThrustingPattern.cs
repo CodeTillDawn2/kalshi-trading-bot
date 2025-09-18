@@ -105,6 +105,12 @@ namespace BacklashPatterns.PatternDefinitions
         /// Requirements sourced from: https://www.babypips.com/learn/forex/thrusting-pattern
         /// </summary>
         public const string BaseName = "Thrusting";
+        /// <summary>
+        /// Gets the description of the pattern.
+        /// </summary>
+        public override string Description => IsBullish
+            ? "A bullish continuation pattern in a downtrend with a bearish candle followed by a bullish candle that opens below the previous close but closes above it, showing hesitation before continuing the downtrend."
+            : "A bearish continuation pattern in an uptrend with a bullish candle followed by a bearish candle that opens above the previous close but closes below it, showing hesitation before continuing the uptrend.";
 /// <summary>
 /// </summary>
 /// <summary>
@@ -172,6 +178,72 @@ namespace BacklashPatterns.PatternDefinitions
 
             var candles = new List<int> { prevIndex, currIndex };
             return new ThrustingPattern(candles, isBullish);
+        }
+
+        /// <summary>
+        /// Calculates the strength of the pattern using historical cache for comparison.
+        /// </summary>
+        /// <param name="metricsCache">The metrics cache.</param>
+        /// <param name="prices">The array of candle prices.</param>
+        /// <param name="avgVolume">The average volume.</param>
+        /// <param name="historicalCache">The historical pattern cache.</param>
+        public void CalculateStrength(
+            Dictionary<int, CandleMetrics> metricsCache,
+            CandleMids[] prices,
+            double avgVolume,
+            HistoricalPatternCache historicalCache)
+        {
+            if (Candles.Count != 2)
+                throw new InvalidOperationException("ThrustingPattern must have exactly 2 candles.");
+
+            int prevIndex = Candles[0];
+            int currIndex = Candles[1];
+
+            var prevMetrics = metricsCache[prevIndex];
+            var currMetrics = metricsCache[currIndex];
+
+            var prevPrices = prices[prevIndex];
+            var currPrices = prices[currIndex];
+
+            // Power Score: Based on body sizes, thrust extent, trend
+            double firstBodyScore = prevMetrics.BodySize / MinBodySize;
+            firstBodyScore = Math.Min(firstBodyScore, 1);
+
+            double secondBodyScore = 1 - (currMetrics.BodySize / MaxBodySize);
+            secondBodyScore = Math.Clamp(secondBodyScore, 0, 1);
+
+            double thrustExtent = 0;
+            if (IsBullish)
+            {
+                thrustExtent = (prevPrices.Open - currPrices.Close) / prevMetrics.BodySize;
+                thrustExtent = Math.Min(thrustExtent, 1);
+            }
+            else
+            {
+                thrustExtent = (currPrices.Close - prevPrices.Open) / prevMetrics.BodySize;
+                thrustExtent = Math.Min(thrustExtent, 1);
+            }
+
+            double trendThreshold = IsBullish ? BullishTrendThreshold : BearishTrendThreshold;
+            double trendStrength = Math.Abs(currMetrics.GetLookbackMeanTrend(2) - trendThreshold) / Math.Abs(trendThreshold);
+            trendStrength = 1 - trendStrength; // Closer to threshold is better
+
+            double volumeScore = 0.5; // Placeholder
+
+            double wFirst = 0.2, wSecond = 0.2, wThrust = 0.3, wTrend = 0.2, wVolume = 0.1;
+            double powerScore = (wFirst * firstBodyScore + wSecond * secondBodyScore + wThrust * thrustExtent +
+                                 wTrend * trendStrength + wVolume * volumeScore) /
+                                (wFirst + wSecond + wThrust + wTrend + wVolume);
+
+            // Match Score: Deviation from thresholds
+            double firstDeviation = Math.Abs(prevMetrics.BodySize - MinBodySize) / MinBodySize;
+            double secondDeviation = Math.Abs(currMetrics.BodySize - MaxBodySize) / MaxBodySize;
+            double trendDeviation = Math.Abs(currMetrics.GetLookbackMeanTrend(2) - trendThreshold) / Math.Abs(trendThreshold);
+            double matchScore = 1 - (firstDeviation + secondDeviation + trendDeviation) / 3;
+            matchScore = Math.Clamp(matchScore, 0, 1);
+
+            // Use historical cache for comparative strength
+            Strength = CalculateComparativeStrength(historicalCache, Name, powerScore, matchScore);
         }
     }
 }

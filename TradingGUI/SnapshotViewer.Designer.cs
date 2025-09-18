@@ -1,8 +1,3 @@
-// Full updated SnapshotViewer.Designer.cs
-
-// MarketDashboardControl2.Designer.cs
-using ScottPlot;
-
 namespace TradingGUI
 {
     partial class SnapshotViewer

@@ -1,10 +1,8 @@
-// Updated SnapshotViewer.cs with intelligent isotropic font scaling
-
-// SnapshotViewer.cs (replace the entire class with this updated version)
 using BacklashBotData.Data;
 using Microsoft.Extensions.Configuration;
 using BacklashDTOs;
 using TradingSimulator;
+
 
 namespace TradingGUI
 {
