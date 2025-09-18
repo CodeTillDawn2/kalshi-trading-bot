@@ -48,6 +48,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Description => "A bearish continuation pattern in a downtrend where a bullish candle opens below the previous bearish candle's close but closes near it, showing continued downward pressure.";
         /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Bearish;
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }

@@ -173,7 +173,7 @@ namespace BacklashPatterns.PatternDefinitions
 
             // Power Score: Based on gap size, third candle closing within gap, trend
             double gapScore = 0;
-            if (IsBullish)
+            if (Direction == PatternDirection.Bullish)
             {
                 gapScore = (prices2.Open - prices1.Close) / MinGapSize;
                 gapScore = Math.Min(gapScore, 1);
@@ -185,7 +185,7 @@ namespace BacklashPatterns.PatternDefinitions
             }
 
             double inGapScore = 0;
-            if (IsBullish)
+            if (Direction == PatternDirection.Bullish)
             {
                 if (prices1.Close <= prices3.Close && prices3.Close <= prices2.Open)
                     inGapScore = 1.0;

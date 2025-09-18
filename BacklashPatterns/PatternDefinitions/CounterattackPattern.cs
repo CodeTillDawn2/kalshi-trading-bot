@@ -131,6 +131,10 @@ namespace BacklashPatterns.PatternDefinitions
         public override string Description => IsBullish
             ? "A bullish reversal pattern with a bearish candle followed by a bullish candle that opens below the previous close but closes above it. Signals potential reversal from downtrend to uptrend."
             : "A bearish reversal pattern with a bullish candle followed by a bearish candle that opens above the previous close but closes below it. Signals potential reversal from uptrend to downtrend.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
         private readonly bool IsBullish;
         /// <summary>
         /// Gets the strength of the pattern.

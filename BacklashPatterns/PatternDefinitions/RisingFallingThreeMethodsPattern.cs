@@ -58,7 +58,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <summary>
         /// Gets the description of the pattern.
         /// </summary>
-        public override string Description => IsBullish
+        public override string Description => Direction == PatternDirection.Bullish
             ? "A bullish continuation pattern in an uptrend with a long bullish candle followed by three smaller candles that stay within its range, and a fifth bullish candle that breaks higher."
             : "A bearish continuation pattern in a downtrend with a long bearish candle followed by three smaller candles that stay within its range, and a fifth bearish candle that breaks lower.";
         /// <summary>
@@ -78,8 +78,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// Initializes a new instance of the RisingFallingThreeMethodsPattern class.
         /// </summary>
         /// <param name="candles">The list of candle indices.</param>
-        public RisingFallingThreeMethodsPattern(List<int> candles) : base(candles)
+        /// <param name="direction">The direction of the pattern.</param>
+        public RisingFallingThreeMethodsPattern(List<int> candles, PatternDirection direction) : base(candles)
         {
+            Direction = direction;
         }
 
         /// <summary>
@@ -103,6 +105,7 @@ namespace BacklashPatterns.PatternDefinitions
             if (index < 4) return null;
 
             int startIndex = index - 4;
+            var candles = new List<int> { startIndex, startIndex + 1, startIndex + 2, startIndex + 3, startIndex + 4 };
             var asks = prices.Skip(startIndex).Take(5).ToArray();
 
             // Lazy load metrics for all 5 candles
@@ -145,6 +148,9 @@ namespace BacklashPatterns.PatternDefinitions
                                    (asks[3].High <= asks[0].High + rangeBuffer && asks[3].Low >= asks[0].Low - rangeBuffer ? 1 : 0);
 
                 if (bearishCount < 2 || inRangeCount < 2) return null;
+
+                // Return the pattern instance if all conditions are met
+                return new RisingFallingThreeMethodsPattern(candles, PatternDirection.Bullish);
             }
             else if (metrics1.IsBearish) // Falling
             {
@@ -173,17 +179,14 @@ namespace BacklashPatterns.PatternDefinitions
                                    (asks[3].High <= asks[0].High + rangeBuffer && asks[3].Low >= asks[0].Low - rangeBuffer ? 1 : 0);
 
                 if (bullishCount < 2 || inRangeCount < 2) return null;
+
+                // Return the pattern instance if all conditions are met
+                return new RisingFallingThreeMethodsPattern(candles, PatternDirection.Bearish);
             }
             else
             {
                 return null; // Neither rising nor falling
             }
-
-            // Define the candle indices for the pattern (five candles)
-            var candles = new List<int> { startIndex, startIndex + 1, startIndex + 2, startIndex + 3, startIndex + 4 };
-
-            // Return the pattern instance if all conditions are met
-            return new RisingFallingThreeMethodsPattern(candles);
         }
 
         /// <summary>

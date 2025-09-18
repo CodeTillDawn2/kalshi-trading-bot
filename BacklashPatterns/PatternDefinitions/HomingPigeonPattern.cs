@@ -53,6 +53,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Description => "A bullish reversal pattern in a downtrend with two bearish candles where the second is completely contained within the first, signaling slowing bearish momentum and potential reversal.";
         /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Bullish;
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }

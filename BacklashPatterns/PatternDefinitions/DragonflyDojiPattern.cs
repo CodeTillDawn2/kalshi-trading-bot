@@ -57,6 +57,10 @@ public class DragonflyDojiPattern : PatternDefinition
     /// </summary>
     public override string Description => "A bullish reversal pattern in a downtrend with a Doji candle that has a long lower wick and no upper wick, signaling rejection of lower prices.";
     /// <summary>
+    /// Gets the direction of the pattern.
+    /// </summary>
+    public override PatternDirection Direction => PatternDirection.Bullish;
+    /// <summary>
     /// Gets the strength of the pattern.
     /// </summary>
     /// <summary>

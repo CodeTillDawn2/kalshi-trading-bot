@@ -53,6 +53,10 @@ namespace BacklashPatterns.PatternDefinitions
         public override string Description => IsBullish
             ? "A bullish reversal pattern with two Marubozu candles where a bearish Marubozu is followed by a bullish Marubozu that gaps up, signaling strong reversal from downtrend to uptrend."
             : "A bearish reversal pattern with two Marubozu candles where a bullish Marubozu is followed by a bearish Marubozu that gaps down, signaling strong reversal from uptrend to downtrend.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
         private readonly bool IsBullish;
         /// <summary>
         /// Gets the strength of the pattern.

@@ -1,3 +1,5 @@
+using ScottPlot.WinForms;
+
 namespace TradingGUI
 {
     partial class SnapshotViewer
@@ -6,27 +8,6 @@ namespace TradingGUI
         private System.Windows.Forms.ToolTip toolTip1;
         private FormsPlot secondaryChart;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-
-            // Clean up chart update timer
-            if (_chartUpdateTimer != null)
-            {
-                _chartUpdateTimer.Stop();
-                _chartUpdateTimer.Dispose();
-                _chartUpdateTimer = null;
-            }
-
-            base.Dispose(disposing);
-        }
 
         private void InitializeComponent()
         {

@@ -1,3 +1,5 @@
+using ScottPlot.WinForms;
+
 namespace TradingGUI
 {
     partial class MainForm
@@ -8,7 +10,7 @@ namespace TradingGUI
         private System.Windows.Forms.Button btnRun;
         private System.Windows.Forms.Button btnReload;
         private System.Windows.Forms.Button btnRunSet;
-        private ScottPlot.FormsPlot formsPlot1;
+        private FormsPlot formsPlot1;
         // Panel container for the right side of the layout. This enables swapping the
         // chart view with other controls (e.g., a dashboard) at runtime without
         // disrupting the table layout structure.
@@ -38,7 +40,7 @@ namespace TradingGUI
             btnRun = new Button();
             btnReload = new Button();
             btnRunSet = new Button();
-            formsPlot1 = new ScottPlot.FormsPlot();
+            formsPlot1 = new FormsPlot();
             rightPane = new Panel();
             layout = new TableLayoutPanel();
             buttonPanel = new FlowLayoutPanel();

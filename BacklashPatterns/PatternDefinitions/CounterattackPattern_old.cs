@@ -58,6 +58,10 @@ namespace BacklashPatterns.PatternDefinitions
         public override string Description => IsBullish
             ? "A bullish reversal pattern with two candles of equal size where a bearish candle is followed by a bullish candle that closes at the same level."
             : "A bearish reversal pattern with two candles of equal size where a bullish candle is followed by a bearish candle that closes at the same level.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
         private readonly bool IsBullish;
         /// <summary>
         /// Gets the strength of the pattern.

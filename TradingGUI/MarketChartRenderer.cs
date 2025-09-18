@@ -6,6 +6,7 @@
 /// data aggregation, sorting, and visualization to support trading analysis
 /// and simulation in the GUI application.
 /// </summary>
+using ScottPlot.WinForms;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace TradingGUI.Charting
         /// <param name="collectTooltips">Whether to collect tooltip data for interactive chart points.</param>
         /// <returns>Task containing list of tooltip points with coordinates and labels, or empty list if tooltips disabled.</returns>
         public static async Task<List<(double x, double y, string memo)>> Render(
-            ScottPlot.FormsPlot plot,
+            FormsPlot plot,
             string cacheDir,
             string market,
             Action<string>? log,
@@ -171,7 +172,7 @@ namespace TradingGUI.Charting
         /// <param name="connectLine">Whether to connect points with a line (true) or show only markers (false).</param>
         /// <param name="tooltipPoints">List to append tooltip data to, if collecting tooltips. Can be null if tooltips are disabled.</param>
         private static void Add(
-            ScottPlot.FormsPlot plot,
+            FormsPlot plot,
             List<PricePoint> pts,
             string fallbackLabel,
             Color color,

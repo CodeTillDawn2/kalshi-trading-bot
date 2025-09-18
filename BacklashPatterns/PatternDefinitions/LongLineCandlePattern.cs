@@ -52,6 +52,10 @@ namespace BacklashPatterns.PatternDefinitions
             ? "A bullish candle with a large body and small wicks, indicating strong buying momentum and conviction in an uptrend."
             : "A bearish candle with a large body and small wicks, indicating strong selling momentum and conviction in a downtrend.";
         /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }

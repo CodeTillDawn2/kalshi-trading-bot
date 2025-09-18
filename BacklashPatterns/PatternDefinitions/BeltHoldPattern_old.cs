@@ -112,6 +112,10 @@ namespace BacklashPatterns.PatternDefinitions
         public override string Description => IsBullish
             ? "A bullish reversal pattern with a single long candle that opens at its low and closes near its high, showing strong buying momentum."
             : "A bearish reversal pattern with a single long candle that opens at its high and closes near its low, showing strong selling momentum.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
         private readonly bool IsBullish;
 /// <summary>
 /// </summary>
@@ -126,7 +130,7 @@ namespace BacklashPatterns.PatternDefinitions
             IsBullish = isBullish;
         }
 
-        public static async Task<BeltHoldPattern?> IsPatternAsync(
+        public static async Task<BeltHoldPattern_old?> IsPatternAsync(
         int index,
         int trendLookback,
         CandleMids[] prices,
@@ -155,7 +159,7 @@ namespace BacklashPatterns.PatternDefinitions
                                      : (meanTrend > TrendThreshold && trendConsistency >= TrendConsistencyMin);
             if (!hasTrend) return null;
 
-            return new BeltHoldPattern(candles, isBullish);
+            return new BeltHoldPattern_old(candles, isBullish);
         }
     }
 }

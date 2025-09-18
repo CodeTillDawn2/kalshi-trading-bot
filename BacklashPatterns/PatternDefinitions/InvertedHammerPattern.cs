@@ -71,6 +71,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Description => "A bullish reversal pattern in a downtrend with a small body, long upper wick, and minimal lower wick. The long upper wick shows rejection of higher prices, signaling potential reversal from downtrend to uptrend.";
         /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Bullish;
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }

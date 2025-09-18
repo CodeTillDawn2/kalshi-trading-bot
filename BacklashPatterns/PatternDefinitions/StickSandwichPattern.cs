@@ -187,7 +187,8 @@ namespace BacklashPatterns.PatternDefinitions
                 // Partial exceeding
                 double highExceed = Math.Max(0, prices2.High - prices1.High);
                 double lowExceed = Math.Max(0, prices1.Low - prices2.Low);
-                rangeExceedScore = (highExceed + lowExceed) / (prices1.TotalRange() * 2);
+                double totalRange = prices1.High - prices1.Low;
+                rangeExceedScore = (highExceed + lowExceed) / (totalRange * 2);
                 rangeExceedScore = Math.Min(rangeExceedScore, 1);
             }
 

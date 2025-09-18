@@ -254,9 +254,9 @@ namespace BacklashPatterns.PatternDefinitions
             double trendScore = (
                 trendStrength * TrendStrengthWeight +
                 trendConsistency * TrendConsistencyWeight +
-                (isBullish ? -momentum : momentum) * TrendMomentumWeight
+                (direction == PatternDirection.Bullish ? -momentum : momentum) * TrendMomentumWeight
             );
-            bool hasValidTrend = isBullish ? totalTrendChange < 0 : totalTrendChange > 0;
+            bool hasValidTrend = direction == PatternDirection.Bullish ? totalTrendChange < 0 : totalTrendChange > 0;
             if (!hasValidTrend || trendScore < MinTrendScore) return null;
 
             // Step 3: Reversal Significance
@@ -264,7 +264,7 @@ namespace BacklashPatterns.PatternDefinitions
             if (reversalRatio < MinReversalRatio) return null;
 
             double relativePosition = (currentPrices.Close - lowestLow) / (highestHigh - lowestLow);
-            double positionSuitability = isBullish ? relativePosition : (1 - relativePosition);
+            double positionSuitability = direction == PatternDirection.Bullish ? relativePosition : (1 - relativePosition);
             if (positionSuitability < MinPositionSuitability) return null;
 
             // Step 4: Volatility Check (ATR)
@@ -279,7 +279,7 @@ namespace BacklashPatterns.PatternDefinitions
             atr /= lookbackCount;
             if (bodySize < MinBodyToATRRRatio * atr) return null;
 
-            return new BeltHoldPattern(candles, isBullish);
+            return new BeltHoldPattern(candles, direction);
         }
 
         /// <summary>

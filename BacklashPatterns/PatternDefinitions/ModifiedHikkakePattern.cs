@@ -29,6 +29,10 @@ namespace BacklashPatterns.PatternDefinitions
             ? "A bullish reversal pattern that initially appears as a bearish inside day but then breaks higher, trapping bearish traders with a stronger breakout."
             : "A bearish reversal pattern that initially appears as a bullish inside day but then breaks lower, trapping bullish traders with a stronger breakout.";
         /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }

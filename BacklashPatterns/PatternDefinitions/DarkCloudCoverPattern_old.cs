@@ -46,6 +46,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Description => "A bearish reversal pattern in an uptrend with two candles where a bullish candle is followed by a bearish candle that penetrates deeply into its body.";
         /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Bearish;
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }

@@ -64,6 +64,10 @@ public class DarkCloudCoverPattern2 : PatternDefinition
     /// </summary>
     public override string Description => "A bearish reversal pattern in an uptrend with a bullish candle followed by a bearish candle that opens above the previous high but closes below the midpoint of the previous candle. Signals potential reversal from uptrend to downtrend.";
     /// <summary>
+    /// Gets the direction of the pattern.
+    /// </summary>
+    public override PatternDirection Direction => PatternDirection.Bearish;
+    /// <summary>
     /// Gets the strength of the pattern.
     /// </summary>
     public override double Strength { get; protected set; }

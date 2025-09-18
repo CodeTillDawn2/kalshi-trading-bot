@@ -57,6 +57,10 @@ namespace BacklashPatterns.PatternDefinitions
             ? "A bullish continuation pattern in an uptrend with a long bullish candle followed by three smaller candles that stay above the first candle's low, and a fifth bullish candle that closes above the first candle's high."
             : "A bearish continuation pattern in a downtrend with a long bearish candle followed by three smaller candles that stay below the first candle's high, and a fifth bearish candle that closes below the first candle's low.";
         /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }

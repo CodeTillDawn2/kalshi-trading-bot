@@ -2,6 +2,7 @@ using BacklashBotData.Data;
 using Microsoft.Extensions.Configuration;
 using BacklashDTOs;
 using TradingSimulator;
+using ScottPlot.WinForms;
 
 
 namespace TradingGUI
@@ -469,7 +470,7 @@ namespace TradingGUI
         /// Interactive cursor line that follows mouse movement on charts.
         /// Provides visual feedback for precise time position identification.
         /// </summary>
-        private ScottPlot.Plottable.IPlottable? _mouseCursorLine;
+        private ScottPlot.IPlottable? _mouseCursorLine;
 
 
         /// <summary>
@@ -650,7 +651,7 @@ namespace TradingGUI
             }
         }
 
-        private void UpdateCursorLine(ScottPlot.FormsPlot chart, MouseEventArgs e)
+        private void UpdateCursorLine(FormsPlot chart, MouseEventArgs e)
         {
             // Remove existing cursor line
             RemoveCursorLine(chart);
@@ -663,7 +664,7 @@ namespace TradingGUI
             chart.Refresh();
         }
 
-        private void RemoveCursorLine(ScottPlot.FormsPlot chart)
+        private void RemoveCursorLine(FormsPlot chart)
         {
             if (_mouseCursorLine != null)
             {
@@ -679,7 +680,7 @@ namespace TradingGUI
         /// </summary>
         /// <param name="chart">The chart control being checked.</param>
         /// <param name="e">Mouse event arguments.</param>
-        private void CheckPatternHover(ScottPlot.FormsPlot chart, MouseEventArgs e)
+        private void CheckPatternHover(FormsPlot chart, MouseEventArgs e)
         {
             if (_patternTooltipData.Count == 0 || _patternImageTooltip == null) return;
 
@@ -723,7 +724,7 @@ namespace TradingGUI
         /// - Triggers immediate UI updates for responsive interaction
         /// - Resets navigation speed counters for fresh interaction
         /// </remarks>
-        private async void JumpToClickedPosition(ScottPlot.FormsPlot chart, MouseEventArgs e)
+        private async void JumpToClickedPosition(FormsPlot chart, MouseEventArgs e)
         {
             await Task.Yield();
             if (historySnapshots == null || historySnapshots.Count == 0) return;
@@ -2056,7 +2057,7 @@ namespace TradingGUI
         /// Includes vertical line marker at current snapshot time and initial zoom setup.
         /// Handles both cached and dynamic rendering with proper error recovery.
         /// </remarks>
-        private void RenderBasePriceData(ScottPlot.FormsPlot chart)
+        private void RenderBasePriceData(FormsPlot chart)
         {
             if (historySnapshots == null || historySnapshots.Count == 0 || currentSnapshot == null) return;
 
@@ -2109,7 +2110,7 @@ namespace TradingGUI
             }
         }
 
-        private void RenderFromSnapshotData(ScottPlot.FormsPlot chart)
+        private void RenderFromSnapshotData(FormsPlot chart)
         {
             if (historySnapshots == null || historySnapshots.Count == 0) return;
 
@@ -2163,7 +2164,7 @@ namespace TradingGUI
         /// - Technical pattern detection with interactive tooltips
         /// - Dynamic legend generation based on active indicators
         /// </remarks>
-        private void RenderY1Metrics(ScottPlot.FormsPlot chart)
+        private void RenderY1Metrics(FormsPlot chart)
         {
             var legendItems = new List<string>();
 
@@ -2362,7 +2363,7 @@ namespace TradingGUI
         /// - Position and performance metrics for strategy evaluation
         /// - Automatic legend generation and full time range display
         /// </remarks>
-        private void RenderSecondaryMetrics(ScottPlot.FormsPlot chart)
+        private void RenderSecondaryMetrics(FormsPlot chart)
         {
             var legendItems = new List<string>();
 

@@ -44,6 +44,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Description => "A bullish reversal pattern in a downtrend with five candles where the first four have higher highs and higher lows, and the fifth is a long bullish candle that breaks the pattern, signaling potential reversal.";
         /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Bullish;
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }

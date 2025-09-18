@@ -69,6 +69,10 @@ public class GravestoneDojiPattern : PatternDefinition
     /// </summary>
     public override string Description => "A bearish reversal pattern in an uptrend with a Doji candle that opens and closes near its low with a long upper wick, showing rejection of higher prices and potential reversal from uptrend to downtrend.";
     /// <summary>
+    /// Gets the direction of the pattern.
+    /// </summary>
+    public override PatternDirection Direction => PatternDirection.Bearish;
+    /// <summary>
     /// Gets the strength of the pattern.
     /// </summary>
     public override double Strength { get; protected set; }

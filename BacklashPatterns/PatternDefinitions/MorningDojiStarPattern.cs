@@ -14,36 +14,7 @@ namespace BacklashPatterns.PatternDefinitions
      *   - Third candle: Bullish, closes above the first candle s midpoint or close, confirming reversal.
      *   - Indicates: Stronger bullish reversal potential due to the Doji s indecision.
      */
-/// <summary>MorningDojiStarPattern</summary>
-/// <summary>MorningDojiStarPattern</summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
-/// <summary>
-/// </summary>
+
     public class MorningDojiStarPattern : PatternDefinition
     {
         /// <summary>
@@ -129,6 +100,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the description of the pattern.
         /// </summary>
         public override string Description => "A bullish reversal pattern in a downtrend with three candles: a large bearish candle, a Doji star, and a large bullish candle.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Bullish;
         public override double Strength { get; protected set; }
 /// <summary>
 /// </summary>

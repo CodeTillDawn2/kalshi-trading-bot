@@ -57,6 +57,10 @@ namespace BacklashPatterns.PatternDefinitions
         public override string Description => IsBullish
             ? "A bullish reversal pattern with five candles: a strong bearish first candle, three consolidation candles, and a strong bullish breakout candle with a gap."
             : "A bearish reversal pattern with five candles: a strong bullish first candle, three consolidation candles, and a strong bearish breakout candle with a gap.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
         private readonly bool IsBullish;
         /// <summary>
         /// Gets the strength of the pattern.
@@ -90,7 +94,7 @@ namespace BacklashPatterns.PatternDefinitions
         /// <param name="isBullish">Whether to check for bullish pattern.</param>
         /// <param name="trendLookback">The trend lookback period.</param>
         /// <returns>A task that represents the asynchronous operation, containing the pattern if found, otherwise null.</returns>
-        public static async Task<BreakawayPattern?> IsPatternAsync(
+        public static async Task<BreakawayPattern_old?> IsPatternAsync(
             int index,
             CandleMids[] prices,
             Dictionary<int, CandleMetrics> metricsCache,
@@ -145,7 +149,7 @@ namespace BacklashPatterns.PatternDefinitions
                 : (prices[index].Open < prices[startIndex + 3].Close - GapSize);
             if (!hasGap) return null;
 
-            return new BreakawayPattern(candles, isBullish);
+            return new BreakawayPattern_old(candles, isBullish);
         }
     }
 }

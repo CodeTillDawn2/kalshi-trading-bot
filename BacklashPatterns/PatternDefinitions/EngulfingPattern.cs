@@ -33,6 +33,10 @@ public class EngulfingPattern : PatternDefinition
     public override string Description => IsBullish
         ? "A bullish reversal pattern where a small bearish candle is followed by a larger bullish candle that completely engulfs it. Signals potential reversal from downtrend to uptrend."
         : "A bearish reversal pattern where a small bullish candle is followed by a larger bearish candle that completely engulfs it. Signals potential reversal from uptrend to downtrend.";
+    /// <summary>
+    /// Gets the direction of the pattern.
+    /// </summary>
+    public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
     private readonly bool IsBullish;
     /// <summary>
     /// Gets the strength of the pattern.

@@ -77,6 +77,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Description => "A single candle with a very small body relative to its total range, indicating market indecision. Can signal potential reversal or continuation depending on context and surrounding candles.";
         /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Neutral;
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }

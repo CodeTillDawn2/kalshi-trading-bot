@@ -32,7 +32,7 @@ namespace TradingGUI
         private HashSet<string> _checkedMarketNames = new();
         private bool _simSetup;
         private Label _tooltipOverlay;
-        private ScottPlot.Plottable.VLine _hoverLine;
+        private ScottPlot.Plottables.VerticalLine _hoverLine;
         private bool _isRightPanning;
         private Point _panStartPx;
         private (double xMin, double xMax, double yMin, double yMax) _panStartLimits;

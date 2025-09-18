@@ -50,6 +50,10 @@ public class HammerPattern : PatternDefinition
     /// </summary>
     public override string Description => "A bullish reversal pattern in a downtrend with a small body, long lower wick, and minimal upper wick. The long lower wick shows rejection of lower prices, signaling potential reversal from downtrend to uptrend.";
     /// <summary>
+    /// Gets the direction of the pattern.
+    /// </summary>
+    public override PatternDirection Direction => PatternDirection.Bullish;
+    /// <summary>
     /// Gets the strength of the pattern.
     /// </summary>
     public override double Strength { get; protected set; }

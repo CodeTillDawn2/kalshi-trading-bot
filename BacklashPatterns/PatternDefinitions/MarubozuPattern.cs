@@ -64,6 +64,10 @@ namespace BacklashPatterns.PatternDefinitions
             ? "A bullish candle with no wicks (open equals low, close equals high), showing strong buying momentum with no rejection of higher prices."
             : "A bearish candle with no wicks (open equals high, close equals low), showing strong selling momentum with no rejection of lower prices.";
         /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }

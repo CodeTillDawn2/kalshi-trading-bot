@@ -33,6 +33,10 @@ namespace BacklashPatterns.PatternDefinitions
         public override string Description => IsBullish
             ? "A bullish momentum pattern with a single candle that opens at its low and closes at its high, showing strong buying pressure."
             : "A bearish momentum pattern with a single candle that opens at its high and closes at its low, showing strong selling pressure.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => IsBullish ? PatternDirection.Bullish : PatternDirection.Bearish;
         private readonly bool IsBullish;
         /// <summary>
         /// Gets the strength of the pattern.

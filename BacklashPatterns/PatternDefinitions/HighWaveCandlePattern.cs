@@ -82,6 +82,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// Gets the description of the pattern.
         /// </summary>
         public override string Description => "A candle with a very small body relative to its total range and long wicks, indicating high market volatility and indecision. Can signal potential reversal or continuation depending on context.";
+        /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Neutral;
 /// <summary>
 /// </summary>
         public override string Name => BaseName;

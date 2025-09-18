@@ -61,6 +61,10 @@ namespace BacklashPatterns.PatternDefinitions
         /// </summary>
         public override string Description => "A Doji candle with both long upper and lower wicks and a very small body, indicating high market indecision and potential for a significant price move in either direction.";
         /// <summary>
+        /// Gets the direction of the pattern.
+        /// </summary>
+        public override PatternDirection Direction => PatternDirection.Neutral;
+        /// <summary>
         /// Gets the strength of the pattern.
         /// </summary>
         public override double Strength { get; protected set; }

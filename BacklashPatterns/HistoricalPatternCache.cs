@@ -104,14 +104,14 @@ namespace BacklashPatterns
                 High = s.BestYesBidD + 0.01, // Mock high/low
                 Low = s.BestYesBidD - 0.01,
                 Close = s.BestYesBidD,
-                Volume = s.TradeVolumePerMinute_Yes ?? 0,
+                Volume = s.TradeVolumePerMinute_Yes,
                 Timestamp = s.Timestamp
             }).ToArray();
 
             // Detect patterns (example for AbandonedBabyPattern - extend for others)
             for (int i = 2; i < candles.Length; i++)
             {
-                var pattern = await AbandonedBabyPattern.IsPatternAsync(i, 10, metricsCache, candles, true);
+                var pattern = await AbandonedBabyPattern.IsPatternAsync(i, 10, metricsCache, candles, PatternDirection.Bullish);
                 if (pattern != null)
                 {
                     // Calculate metrics (simplified - use actual calculation)
