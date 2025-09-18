@@ -133,7 +133,7 @@ namespace BacklashBot.Services
             _checkInInterval = TimeSpan.FromSeconds(overseerConfig.Value.OverseerCheckInIntervalSeconds);
             _circuitBreakerFailureThreshold = overseerConfig.Value.OverseerCircuitBreakerFailureThreshold;
             _circuitBreakerTimeout = TimeSpan.FromMinutes(overseerConfig.Value.OverseerCircuitBreakerTimeoutMinutes);
-            _enablePerformanceMetrics = overseerConfig.Value.OverseerClientService_EnablePerformanceMetrics;
+            _enablePerformanceMetrics = overseerConfig.Value.EnablePerformanceMetrics;
         }
 
         /// <summary>

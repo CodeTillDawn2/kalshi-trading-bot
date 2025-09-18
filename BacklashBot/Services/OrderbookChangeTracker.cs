@@ -171,7 +171,7 @@ namespace BacklashBot.Services
             _statusTrackerService = statusTrackerService;
             _centralPerformanceMonitor = centralPerformanceMonitor ?? throw new ArgumentNullException(nameof(centralPerformanceMonitor));
 
-            _enablePerformanceMetrics = _trackerConfig.Value.OrderbookChangeTracker_EnablePerformanceMetrics;
+            _enablePerformanceMetrics = _trackerConfig.Value.EnablePerformanceMetrics;
 
             _recalculationTimer = new System.Timers.Timer(10000); // 10 seconds
             _recalculationTimer.Elapsed += (sender, e) => OnRecalculationTimerElapsed(sender, e);

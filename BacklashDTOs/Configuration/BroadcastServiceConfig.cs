@@ -27,6 +27,6 @@ namespace BacklashDTOs.Configuration
         /// Gets or sets whether to enable performance metrics collection for BroadcastService operations.
         /// </summary>
         /// <value>Default is false.</value>
-        public bool BroadcastService_EnablePerformanceMetrics { get; set; } = false;
+        public bool EnablePerformanceMetrics { get; set; } = false;
     }
 }

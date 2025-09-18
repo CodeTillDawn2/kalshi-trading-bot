@@ -55,5 +55,5 @@ public class OrderbookChangeTrackerConfig
     /// Disable for performance optimization in high-throughput scenarios.
     /// Default: true
     /// </summary>
-    public bool OrderbookChangeTracker_EnablePerformanceMetrics { get; set; } = true;
+    public bool EnablePerformanceMetrics { get; set; } = true;
 }

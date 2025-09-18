@@ -65,7 +65,7 @@ namespace BacklashBot.Management
             }
 
             _logger = logger;
-            _metricsEnabled = _marketAnalysisHelperConfig.EnableMarketAnalysisHelperPerformanceMetrics;
+            _metricsEnabled = _marketAnalysisHelperConfig.EnablePerformanceMetrics;
         }
 
         /// <summary>

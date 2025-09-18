@@ -28,6 +28,6 @@ namespace BacklashDTOs.Configuration
         /// Gets or sets whether to enable performance metrics collection for CandlestickService operations.
         /// </summary>
         /// <value>Default is true.</value>
-        public bool EnableCandlestickServicePerformanceMetrics { get; set; } = true;
+        public bool EnablePerformanceMetrics { get; set; } = true;
     }
 }

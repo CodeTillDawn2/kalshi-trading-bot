@@ -46,6 +46,6 @@ namespace BacklashDTOs.Configuration
         /// When disabled, metrics collection is skipped to improve performance.
         /// </summary>
         /// <value>Default is true.</value>
-        public bool OverseerClientService_EnablePerformanceMetrics { get; set; } = true;
+        public bool EnablePerformanceMetrics { get; set; } = true;
     }
 }

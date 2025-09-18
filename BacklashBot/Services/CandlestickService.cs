@@ -174,7 +174,7 @@ namespace BacklashBot.Services
         /// <param name="additionalData">Optional additional data to log</param>
         private void LogPerformanceMetric(string operationName, long elapsedMilliseconds, string? additionalData = null)
         {
-            if (!_candlestickConfig.EnableCandlestickServicePerformanceMetrics) return;
+            if (!_candlestickConfig.EnablePerformanceMetrics) return;
 
             var message = $"Performance: {operationName} completed in {elapsedMilliseconds}ms";
             if (!string.IsNullOrEmpty(additionalData))
@@ -188,7 +188,7 @@ namespace BacklashBot.Services
             var performanceMonitor = _serviceFactory.GetPerformanceMonitor();
             if (performanceMonitor != null)
             {
-                performanceMonitor.RecordExecutionTime(operationName, elapsedMilliseconds, _candlestickConfig.EnableCandlestickServicePerformanceMetrics);
+                performanceMonitor.RecordExecutionTime(operationName, elapsedMilliseconds, _candlestickConfig.EnablePerformanceMetrics);
             }
         }
 
