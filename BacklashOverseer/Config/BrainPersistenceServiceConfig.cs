@@ -16,7 +16,7 @@ namespace BacklashOverseer.Config
         /// When enabled, detailed performance metrics including operation statistics,
         /// lock metrics, memory usage data, and metrics transmission are collected.
         /// </summary>
-        public bool EnableBrainPersistenceServicePerformanceMetrics { get; set; } = true;
+        public bool EnablePerformanceMetrics { get; set; } = true;
 
         /// <summary>
         /// Gets or sets whether to enable data persistence to database.

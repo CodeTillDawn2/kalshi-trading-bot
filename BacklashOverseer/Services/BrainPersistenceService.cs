@@ -231,7 +231,7 @@ namespace BacklashOverseer.Services
                 if (history.Count > _config.MaxHistoryEntries)
                 {
                     history.RemoveRange(0, history.Count - _config.MaxHistoryEntries);
-                    if (_config.EnableBrainPersistenceServicePerformanceMetrics)
+                    if (_config.EnablePerformanceMetrics)
                     {
                         lock (_metricsLock)
                         {
@@ -293,7 +293,7 @@ namespace BacklashOverseer.Services
         /// <param name="elapsedMilliseconds">The time taken for the operation in milliseconds.</param>
         private void RecordOperationMetrics(string operationName, long elapsedMilliseconds)
         {
-            if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
+            if (!_config.EnablePerformanceMetrics)
                 return;
 
             var lockStart = Stopwatch.GetTimestamp();
@@ -347,7 +347,7 @@ namespace BacklashOverseer.Services
                     if (history.Count > _config.MaxHistoryEntries)
                     {
                         history.RemoveRange(0, history.Count - _config.MaxHistoryEntries);
-                        if (_config.EnableBrainPersistenceServicePerformanceMetrics)
+                        if (_config.EnablePerformanceMetrics)
                         {
                             lock (_metricsLock)
                             {
@@ -550,7 +550,7 @@ namespace BacklashOverseer.Services
         /// </summary>
         public IReadOnlyDictionary<string, (long AverageMs, long P50Ms, long P95Ms, long P99Ms)> GetOperationStats()
         {
-            if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
+            if (!_config.EnablePerformanceMetrics)
                 return new Dictionary<string, (long, long, long, long)>();
 
             var result = new Dictionary<string, (long, long, long, long)>();
@@ -575,7 +575,7 @@ namespace BacklashOverseer.Services
         /// <summary>
         /// Gets the count of history trimmings per metric type.
         /// </summary>
-        public IReadOnlyDictionary<string, int> TrimmingCounts => _config.EnableBrainPersistenceServicePerformanceMetrics ? _trimmingCounts : new Dictionary<string, int>();
+        public IReadOnlyDictionary<string, int> TrimmingCounts => _config.EnablePerformanceMetrics ? _trimmingCounts : new Dictionary<string, int>();
 
         /// <summary>
         /// Gets lock contention metrics.
@@ -584,7 +584,7 @@ namespace BacklashOverseer.Services
         {
             get
             {
-                if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
+                if (!_config.EnablePerformanceMetrics)
                     return (0, 0);
 
                 lock (_metricsLock)
@@ -599,7 +599,7 @@ namespace BacklashOverseer.Services
         /// </summary>
         public long GetMemoryUsageForBrain(string brainInstanceName)
         {
-            if (!_config.EnableBrainPersistenceServicePerformanceMetrics)
+            if (!_config.EnablePerformanceMetrics)
                 return 0;
 
             if (!_brains.TryGetValue(brainInstanceName, out var brain))
@@ -631,7 +631,7 @@ namespace BacklashOverseer.Services
         /// </summary>
         private void TransmitMetrics()
         {
-            if (_performanceMetricsService == null || !_config.EnableBrainPersistenceServicePerformanceMetrics)
+            if (_performanceMetricsService == null || !_config.EnablePerformanceMetrics)
                 return;
 
             var operationStats = GetOperationStats();

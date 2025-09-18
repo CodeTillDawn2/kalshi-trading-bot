@@ -141,17 +141,13 @@ namespace BacklashOverseer
             services.Configure<KalshiConfig>(Configuration.GetSection("Kalshi"));
 
             // Configure OverseerHub settings
-            services.Configure<OverseerHubConfig>(Configuration.GetSection("OverseerHub"));
+            services.Configure<OverseerHubConfig>(Configuration.GetSection("Endpoints:OverseerHub"));
 
             // Configure Overseer settings
-            services.Configure<OverseerConfig>(Configuration.GetSection("Overseer"));
-
-            // Configure Performance settings
-            services.Configure<PerformanceConfig>(Configuration.GetSection("PerformanceMetricsService"));
-
+            services.Configure<OverseerConfig>(Configuration.GetSection("Endpoints:Overseer"));
 
             // Configure MarketWatchController settings
-            services.Configure<MarketWatchControllerConfig>(Configuration.GetSection("MarketWatchController"));
+            services.Configure<MarketWatchControllerConfig>(Configuration.GetSection("Endpoints:MarketWatchController"));
 
             // Configure SubscriptionManager settings
             services.Configure<SubscriptionManagerConfig>(Configuration.GetSection("Websockets:SubscriptionManager"));
