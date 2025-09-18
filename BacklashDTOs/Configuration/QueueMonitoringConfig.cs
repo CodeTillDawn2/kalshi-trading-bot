@@ -22,5 +22,10 @@ namespace BacklashDTOs.Configuration
         /// When any queue's average count exceeds this value, a performance alert is logged.
         /// </summary>
         public int QueueCountAlertThreshold { get; set; } = 100;
+
+        /// <summary>
+        /// Gets or sets whether to enable database metrics collection in CentralPerformanceMonitor.
+        /// </summary>
+        public bool CentralPerformanceMonitor_EnableDatabaseMetrics { get; set; } = true;
     }
 }

@@ -24,7 +24,7 @@ public class KalshiConfig
     /// Gets or sets whether KalshiAPIService performance metrics collection is enabled.
     /// When disabled, method execution times, API response times, and error counts are not tracked to reduce overhead. Defaults to true.
     /// </summary>
-    public bool KalshiAPIServiceEnablePerformanceMetrics { get; set; } = true;
+    public bool EnablePerformanceMetrics { get; set; } = true;
 }
 
 

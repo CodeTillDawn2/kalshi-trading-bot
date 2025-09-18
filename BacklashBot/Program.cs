@@ -67,22 +67,14 @@ builder.Services.Configure<SubscriptionManagerConfig>(builder.Configuration.GetS
 builder.Services.Configure<WebSocketMonitorConfig>(builder.Configuration.GetSection("Websockets:WebSocketMonitor"));
 builder.Services.Configure<KalshiWebSocketClientConfig>(builder.Configuration.GetSection("Websockets:KalshiWebSocketClient"));
 builder.Services.Configure<TradingSnapshotServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:TradingSnapshotService"));
-builder.Services.AddOptions<TradingSnapshotServiceConfig>().ValidateDataAnnotations();
 builder.Services.Configure<SnapshotPeriodHelperConfig>(builder.Configuration.GetSection("WatchedMarkets:SnapshotPeriodHelper"));
-builder.Services.AddOptions<SnapshotPeriodHelperConfig>().ValidateDataAnnotations();
-builder.Services.Configure<SimulationConfig>(builder.Configuration.GetSection("Simulation"));
-builder.Services.AddOptions<SimulationConfig>().ValidateDataAnnotations();
-builder.Services.AddOptions<GeneralExecutionConfig>().ValidateDataAnnotations();
 builder.Services.Configure<OrderbookChangeTrackerConfig>(builder.Configuration.GetSection("WatchedMarkets:OrderbookChangeTracker"));
 builder.Services.Configure<MarketRefreshServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:MarketRefreshService"));
-builder.Services.Configure<MarketTypeServiceConfig>(builder.Configuration.GetSection("MarketTypeService"));
-builder.Services.Configure<StrategySelectionHelperConfig>(builder.Configuration.GetSection("StrategySelectionHelper"));
-builder.Services.Configure<EquityCalculatorConfig>(builder.Configuration.GetSection("EquityCalculator"));
 builder.Services.Configure<PseudoCandlestickExtensionsConfig>(builder.Configuration.GetSection("WatchedMarkets:PseudoCandlestickExtensions"));
 builder.Services.Configure<GeneralExecutionConfig>(builder.Configuration.GetSection("Central:GeneralExecution"));
 builder.Services.Configure<OverseerClientServiceConfig>(builder.Configuration.GetSection("Communications:OverseerClientService"));
 builder.Services.Configure<CandlestickServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:CandlestickService"));
-builder.Services.Configure<BroadcastServiceConfig>(builder.Configuration.GetSection("BroadcastService"));
+builder.Services.Configure<BroadcastServiceConfig>(builder.Configuration.GetSection("Communications:BroadcastService"));
 builder.Services.Configure<MarketDataInitializerConfig>(builder.Configuration.GetSection("WatchedMarkets:MarketDataInitializer"));
 builder.Services.Configure<CentralPerformanceMonitorConfig>(builder.Configuration.GetSection("Central:CentralPerformanceMonitor"));
 builder.Services.Configure<KalshiBotScopeManagerServiceConfig>(builder.Configuration.GetSection("Central:KalshiBotScopeManagerService"));
@@ -90,12 +82,12 @@ builder.Services.Configure<MarketDataConfig>(builder.Configuration.GetSection("W
 builder.Services.Configure<CentralBrainConfig>(builder.Configuration.GetSection("Central:CentralBrain"));
 builder.Services.Configure<TargetCalculationServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:TargetCalculationService"));
 builder.Services.Configure<BrainStatusServiceConfig>(builder.Configuration.GetSection("Central:BrainStatusService"));
-builder.Services.Configure<SnapshotGroupHelperConfig>(builder.Configuration.GetSection("MarketAnalysisHelper"));
-builder.Services.Configure<QueueMonitoringConfig>(builder.Configuration.GetSection("CentralPerformanceMonitor"));
+builder.Services.Configure<SnapshotGroupHelperConfig>(builder.Configuration.GetSection("SnapshotGroupHelper"));
+builder.Services.Configure<QueueMonitoringConfig>(builder.Configuration.GetSection("Central:CentralPerformanceMonitor"));
 builder.Services.Configure<InterestScoreConfig>(builder.Configuration.GetSection("WatchedMarkets:InterestScore"));
 builder.Services.Configure<ErrorHandlerConfig>(builder.Configuration.GetSection("Central:ErrorHandler"));
 builder.Services.Configure<OrderBookServiceConfig>(builder.Configuration.GetSection("WatchedMarkets:OrderBookService"));
-builder.Services.Configure<BacklashBot.State.CalculationConfig>(builder.Configuration.GetSection("CalculationConfig"));
+builder.Services.Configure<BacklashBot.State.CalculationConfig>(builder.Configuration.GetSection("WatchedMarkets:CalculationConfig"));
 
 // Increase shutdown timeout
 builder.Services.Configure<HostOptions>(options =>
