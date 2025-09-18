@@ -48,11 +48,11 @@ namespace TradingStrategies.Trading.Overseer
         public SimulationEngine(IConfiguration configuration, PerformanceMonitor? performanceMonitor = null)
         {
             var marketTypeServiceConfig = new Configuration.MarketTypeServiceConfig();
-            configuration.GetSection("MarketTypeServiceConfig").Bind(marketTypeServiceConfig);
+            configuration.GetSection("MarketTypeService").Bind(marketTypeServiceConfig);
             _marketTypeService = new MarketTypeService(marketTypeServiceConfig);
 
             var strategySelectionHelperConfig = new Configuration.StrategySelectionHelperConfig();
-            configuration.GetSection("StrategySelectionHelperConfig").Bind(strategySelectionHelperConfig);
+            configuration.GetSection("StrategySelectionHelper").Bind(strategySelectionHelperConfig);
             StrategySelectionHelper.SetConfiguration(strategySelectionHelperConfig);
 
             _patternDetectionService = new PatternDetectionService(configuration, performanceMonitor);

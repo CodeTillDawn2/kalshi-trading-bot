@@ -54,7 +54,7 @@ namespace TradingStrategies.Trading.Overseer
             _performanceMonitor.EnablePerformanceMetrics = _enablePerformanceMetrics;
             _simulationEngine = new SimulationEngine(configuration);
             var equityCalculatorConfig = new EquityCalculatorConfig();
-            configuration.GetSection("EquityCalculatorConfig").Bind(equityCalculatorConfig);
+            configuration.GetSection("EquityCalculator").Bind(equityCalculatorConfig);
             _equityCalculator = new EquityCalculator(equityCalculatorConfig);
         }
 

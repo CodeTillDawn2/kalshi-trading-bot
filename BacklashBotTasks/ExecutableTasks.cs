@@ -150,7 +150,7 @@ namespace KalshiBotTasks
 
             this.config = configuration;
 
-            var tradingSnapshotServiceConfig = config.GetSection("WatchedMarkets:TradingSnapshotServiceConfig").Get<TradingSnapshotServiceConfig>()!;
+            var tradingSnapshotServiceConfig = config.GetSection("WatchedMarkets:TradingSnapshotService").Get<TradingSnapshotServiceConfig>()!;
             var tradingConfig = config.GetSection("TradingConfig").Get<TradingConfig>()!;
             var kalshiConfig = config.GetSection("Kalshi").Get<KalshiConfig>()!; // Add this for KalshiConfig
             _tradingSnapshotServiceOptions = Options.Create(tradingSnapshotServiceConfig);
