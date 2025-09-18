@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 using BacklashOverseer.Models;
+using OverseerBotShared;
 using System.Threading;
 using System.Diagnostics;
 using BacklashBotData.Data.Interfaces;
@@ -391,7 +392,7 @@ namespace BacklashOverseer
         /// </summary>
         /// <param name="checkInData">The check-in data containing brain status information.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ProcessCheckIn(CheckInData checkInData)
+        public async Task CheckIn(CheckInData checkInData)
         {
             var stopwatch = _config.EnableOverseerHubPerformanceMetrics ? Stopwatch.StartNew() : null;
 
@@ -632,7 +633,7 @@ namespace BacklashOverseer
         /// </summary>
         /// <param name="performanceMetrics">The performance metrics data containing detailed system performance information.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ProcessPerformanceMetrics(PerformanceMetricsData performanceMetrics)
+        public async Task SendPerformanceMetrics(PerformanceMetricsData performanceMetrics)
         {
             var stopwatch = _config.EnableOverseerHubPerformanceMetrics ? Stopwatch.StartNew() : null;
 
@@ -839,7 +840,7 @@ namespace BacklashOverseer
         /// <param name="messageType">The type of message being sent (e.g., "refresh_data").</param>
         /// <param name="message">The message content or payload.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task HandleOverseerMessage(string messageType, string message)
+        public async Task SendOverseerMessage(string messageType, string message)
         {
             var stopwatch = _config.EnableOverseerHubPerformanceMetrics ? Stopwatch.StartNew() : null;
 
@@ -961,263 +962,4 @@ namespace BacklashOverseer
             }
         }
 
-    /// <summary>
-    /// Data structure containing comprehensive information about a brain instance's current state,
-    /// used during periodic check-in operations to report status to the overseer system.
-    /// </summary>
-    public class CheckInData
-    {
-        /// <summary>
-        /// Gets or sets the name of the brain instance performing the check-in.
-        /// </summary>
-        public string? BrainInstanceName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of market tickers currently being monitored by the brain.
-        /// </summary>
-        public List<string>? Markets { get; set; }
-
-        /// <summary>
-        /// Gets or sets the total count of errors encountered by the brain since startup.
-        /// </summary>
-        public long ErrorCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timestamp of the last snapshot taken by the brain.
-        /// </summary>
-        public DateTime? LastSnapshot { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the brain is currently starting up.
-        /// </summary>
-        public bool IsStartingUp { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the brain is currently shutting down.
-        /// </summary>
-        public bool IsShuttingDown { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the brain is monitoring positions.
-        /// </summary>
-        public bool WatchPositions { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the brain is monitoring orders.
-        /// </summary>
-        public bool WatchOrders { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the brain uses a managed watch list.
-        /// </summary>
-        public bool ManagedWatchList { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the brain captures snapshots.
-        /// </summary>
-        public bool CaptureSnapshots { get; set; }
-
-        /// <summary>
-        /// Gets or sets the target number of markets to watch.
-        /// </summary>
-        public int TargetWatches { get; set; }
-
-        /// <summary>
-        /// Gets or sets the minimum interest threshold for market selection.
-        /// </summary>
-        public double MinimumInterest { get; set; }
-
-        /// <summary>
-        /// Gets or sets the minimum usage threshold for the brain.
-        /// </summary>
-        public double UsageMin { get; set; }
-
-        /// <summary>
-        /// Gets or sets the maximum usage threshold for the brain.
-        /// </summary>
-        public double UsageMax { get; set; }
-
-        /// <summary>
-        /// Gets or sets the current CPU usage percentage of the brain process.
-        /// </summary>
-        public double CurrentCpuUsage { get; set; }
-
-        /// <summary>
-        /// Gets or sets the average size of the event processing queue.
-        /// </summary>
-        public double EventQueueAvg { get; set; }
-
-        /// <summary>
-        /// Gets or sets the average size of the ticker processing queue.
-        /// </summary>
-        public double TickerQueueAvg { get; set; }
-
-        /// <summary>
-        /// Gets or sets the average size of the notification processing queue.
-        /// </summary>
-        public double NotificationQueueAvg { get; set; }
-
-        /// <summary>
-        /// Gets or sets the average size of the orderbook processing queue.
-        /// </summary>
-        public double OrderbookQueueAvg { get; set; }
-
-        /// <summary>
-        /// Gets or sets the duration in seconds of the last refresh cycle.
-        /// </summary>
-        public double LastRefreshCycleSeconds { get; set; }
-
-        /// <summary>
-        /// Gets or sets the interval between refresh cycles.
-        /// </summary>
-        public double LastRefreshCycleInterval { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of markets processed in the last refresh cycle.
-        /// </summary>
-        public double LastRefreshMarketCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the CPU usage percentage during the last refresh cycle.
-        /// </summary>
-        public double LastRefreshUsagePercentage { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the last refresh cycle completed within acceptable time limits.
-        /// </summary>
-        public bool LastRefreshTimeAcceptable { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timestamp of the last performance sample.
-        /// </summary>
-        public DateTime? LastPerformanceSampleDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the brain is connected to the WebSocket feed.
-        /// </summary>
-        public bool IsWebSocketConnected { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of markets currently being watched with detailed information.
-        /// </summary>
-        public List<MarketWatchData>? WatchedMarkets { get; set; }
-    }
-
-    /// <summary>
-    /// Data structure containing comprehensive performance metrics from the CentralPerformanceMonitor.
-    /// Used for detailed performance monitoring and analytics, including database operations,
-    /// WebSocket metrics, queue depths, and system resource utilization.
-    /// </summary>
-    public class PerformanceMetricsData
-    {
-        /// <summary>
-        /// Gets or sets the name of the brain instance providing the performance metrics.
-        /// </summary>
-        public string? BrainInstanceName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timestamp when these performance metrics were collected.
-        /// </summary>
-        public DateTime Timestamp { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database performance metrics.
-        /// </summary>
-        public IReadOnlyDictionary<string, (int SuccessCount, int FailureCount, TimeSpan TotalTime, double AverageTimeMs)>? DatabaseMetrics { get; set; }
-
-        /// <summary>
-        /// Gets or sets the OverseerClientService performance metrics.
-        /// </summary>
-        public IReadOnlyDictionary<string, object>? OverseerClientServiceMetrics { get; set; }
-
-        /// <summary>
-        /// Gets or sets the WebSocket processing time metrics in ticks.
-        /// </summary>
-        public ConcurrentDictionary<string, long>? WebSocketProcessingTimeTicks { get; set; }
-
-        /// <summary>
-        /// Gets or sets the WebSocket processing count metrics.
-        /// </summary>
-        public ConcurrentDictionary<string, int>? WebSocketProcessingCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the WebSocket buffer usage metrics in bytes.
-        /// </summary>
-        public ConcurrentDictionary<string, long>? WebSocketBufferUsageBytes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the WebSocket operation times.
-        /// </summary>
-        public ConcurrentDictionary<string, TimeSpan>? WebSocketOperationTimes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the WebSocket semaphore wait counts.
-        /// </summary>
-        public ConcurrentDictionary<string, int>? WebSocketSemaphoreWaitCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the SubscriptionManager operation metrics.
-        /// </summary>
-        public IReadOnlyDictionary<string, (long AverageTicks, long TotalOperations, long SuccessfulOperations)>? SubscriptionManagerOperationMetrics { get; set; }
-
-        /// <summary>
-        /// Gets or sets the SubscriptionManager lock contention metrics.
-        /// </summary>
-        public IReadOnlyDictionary<string, (long AcquisitionCount, long AverageWaitTicks, long ContentionCount)>? SubscriptionManagerLockMetrics { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor total messages processed.
-        /// </summary>
-        public long MessageProcessorTotalMessagesProcessed { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor total processing time in milliseconds.
-        /// </summary>
-        public long MessageProcessorTotalProcessingTimeMs { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor average processing time in milliseconds.
-        /// </summary>
-        public double MessageProcessorAverageProcessingTimeMs { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor messages per second rate.
-        /// </summary>
-        public double MessageProcessorMessagesPerSecond { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor order book queue depth.
-        /// </summary>
-        public int MessageProcessorOrderBookQueueDepth { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor duplicate message count.
-        /// </summary>
-        public int MessageProcessorDuplicateMessageCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor duplicates in window.
-        /// </summary>
-        public int MessageProcessorDuplicatesInWindow { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor last duplicate warning time.
-        /// </summary>
-        public DateTime MessageProcessorLastDuplicateWarningTime { get; set; }
-
-        /// <summary>
-        /// Gets or sets the MessageProcessor message type counts.
-        /// </summary>
-        public IReadOnlyDictionary<string, long>? MessageProcessorMessageTypeCounts { get; set; }
-
-        /// <summary>
-        /// Gets or sets the API execution times.
-        /// </summary>
-        public ConcurrentDictionary<string, List<(DateTime Timestamp, long Milliseconds)>>? ApiExecutionTimes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the configurable metrics for GUI consumption.
-        /// </summary>
-        public IReadOnlyDictionary<string, object>? ConfigurableMetrics { get; set; }
-    }
 }

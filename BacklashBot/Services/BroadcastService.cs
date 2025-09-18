@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using BacklashBot.Configuration;
 using System.Text.Json;
 using BacklashBot.Hubs;
+using OverseerBotShared;
 
 namespace BacklashBot.Services
 {
@@ -615,7 +616,7 @@ namespace BacklashBot.Services
         /// </summary>
         /// <param name="performanceMetrics">The comprehensive performance metrics data to broadcast.</param>
         /// <returns>A task representing the asynchronous broadcast operation.</returns>
-        public async Task BroadcastPerformanceMetricsAsync(object performanceMetrics)
+        public async Task BroadcastPerformanceMetricsAsync(PerformanceMetricsData performanceMetrics)
         {
             if (!BacklashBotHub.HasConnectedClients())
             {

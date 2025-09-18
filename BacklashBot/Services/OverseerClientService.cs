@@ -9,6 +9,7 @@ using BacklashDTOs.Configuration;
 using BacklashDTOs;
 using BacklashInterfaces.SmokehouseBot.Services;
 using BacklashBot.Management;
+using OverseerBotShared;
 
 namespace BacklashBot.Services
 {
@@ -26,29 +27,6 @@ namespace BacklashBot.Services
     /// </remarks>
     public class OverseerClientService : IOverseerClientService
     {
-        // Response classes for SignalR events
-        private class HandshakeResponse
-        {
-            public bool Success { get; set; }
-            public string AuthToken { get; set; } = "";
-            public string Message { get; set; } = "";
-        }
-
-        private class CheckInResponse
-        {
-            public bool Success { get; set; }
-            public string Message { get; set; } = "";
-            public string[] TargetTickers { get; set; } = Array.Empty<string>();
-            public DateTime Timestamp { get; set; }
-        }
-
-        private class MessageResponse
-        {
-            public bool Success { get; set; }
-            public string MessageType { get; set; } = "";
-            public DateTime Timestamp { get; set; }
-            public string Message { get; set; } = "";
-        }
 
         private readonly ILogger<OverseerClientService> _logger;
         private readonly IServiceFactory _serviceFactory;
