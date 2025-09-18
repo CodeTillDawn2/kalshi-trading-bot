@@ -59,9 +59,14 @@ namespace KalshiBotLogging
             _defaultEnvironment = defaultEnvironment;
             _defaultInstance = defaultInstance;
 
-            // Parse configurable log levels with defaults
-            _minConsoleLogLevel = _loggingConfig != null ? Enum.Parse<LogLevel>(_loggingConfig.ConsoleLogLevel, true) : LogLevel.Debug;
-            _minSqlLogLevel = _loggingConfig != null ? Enum.Parse<LogLevel>(_loggingConfig.SqlDatabaseLogLevel, true) : LogLevel.Information;
+            // Parse configurable log levels - required
+            if (_loggingConfig?.LogLevel?.ConsoleLogLevel == null)
+                throw new InvalidOperationException("ConsoleLogLevel is required in LoggingConfig.LogLevel");
+            if (_loggingConfig?.LogLevel?.SqlDatabaseLogLevel == null)
+                throw new InvalidOperationException("SqlDatabaseLogLevel is required in LoggingConfig.LogLevel");
+
+            _minConsoleLogLevel = Enum.Parse<LogLevel>(_loggingConfig.LogLevel.ConsoleLogLevel, true);
+            _minSqlLogLevel = Enum.Parse<LogLevel>(_loggingConfig.LogLevel.SqlDatabaseLogLevel, true);
         }
 
         /// <summary>
