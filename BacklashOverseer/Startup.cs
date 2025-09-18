@@ -38,6 +38,7 @@ using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotAPI.Websockets;
 using BacklashBotData.Data.Interfaces;
 using BacklashBotData.Data;
+using BacklashCommon.Helpers;
 
 namespace BacklashOverseer
 {

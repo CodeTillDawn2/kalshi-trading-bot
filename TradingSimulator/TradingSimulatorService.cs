@@ -38,6 +38,7 @@ using TradingSimulator.Simulator;
 using BacklashBotData.Data.Interfaces;
 using BacklashBotData.Data;
 using BacklashCommon.Services;
+using BacklashCommon.Helpers;
 
 namespace TradingSimulator
 {

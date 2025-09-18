@@ -31,6 +31,7 @@ using Microsoft.AspNetCore.SignalR;
 using BacklashCommon.Services;
 using BacklashInterfaces.PerformanceMetrics;
 using KalshiBotLogging;
+using BacklashCommon.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 

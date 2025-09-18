@@ -8,8 +8,9 @@ using BacklashDTOs.Data;
 using BacklashInterfaces.Constants;
 using TradingStrategies.Classification.Interfaces;
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace BacklashBot.Management
+namespace BacklashCommon.Helpers
 {
     /// <summary>
     /// Helper service for performing market analysis operations, specifically generating snapshot groups
